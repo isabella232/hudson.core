@@ -1,0 +1,44 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2010 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi
+#        
+#
+#************************************************************************** --> 
+
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+    <j:choose>
+        <j:when test="${empty(items)}">
+            <j:if test="${!empty(app.items)}">
+                <j:set var="views" value="${it.owner.views}"/>
+                <j:set var="currentView" value="${it}"/>
+                <st:include page="viewTabs.jelly" it="${it.owner.viewsTabBar}"/>
+            </j:if>
+            <st:include page="noJob.jelly" />
+        </j:when>
+        <j:otherwise>
+            <!-- set @jobBaseUrl="" so that links to jobs will be under this view. -->
+            <t:projectView jobs="${items}" jobBaseUrl="" showViewTabs="true" columnExtensions="${it.columns}">
+                <j:set var="views" value="${it.owner.views}"/>
+                <j:set var="currentView" value="${it}"/>
+                <j:choose>
+                    <j:when test="${it.owner.class.name=='hudson.model.MyViewsProperty'}">
+                        <st:include page="myViewTabs.jelly" it="${it.owner.myViewsTabBar}"/>
+                    </j:when>
+                    <j:otherwise>
+                        <st:include page="viewTabs.jelly" it="${it.owner.viewsTabBar}"/>
+                    </j:otherwise>
+                </j:choose>
+            </t:projectView>
+        </j:otherwise>
+    </j:choose>
+</j:jelly>

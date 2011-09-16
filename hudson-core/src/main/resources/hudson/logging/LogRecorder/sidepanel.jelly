@@ -1,0 +1,31 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2009 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi
+#        
+#
+#************************************************************************** --> 
+
+
+<!--
+  Side panel for the log recorder
+-->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+  <l:header />
+  <l:side-panel>
+    <l:tasks>
+      <l:task icon="images/24x24/up.gif" href=".." title="${%Back to Loggers}" />
+      <l:task icon="images/24x24/notepad.gif" href="." title="${%Log records}" />
+      <l:task icon="images/24x24/setting.gif" href="configure" title="${%Configure}" />
+      <l:taskWithDialog icon="images/24x24/edit-delete.gif" dialogPanel="deleteConfirmationPanel.jelly" href="delete" title="${%Delete}" />
+    </l:tasks>
+  </l:side-panel>
+</j:jelly>

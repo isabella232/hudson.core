@@ -1,0 +1,25 @@
+<!-- **************************************************************************
+#
+# Copyright (C) 2004-2009 Oracle Corporation
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+#         Kohsuke Kawaguchi
+#
+#************************************************************************** -->
+
+<div>
+    利用可能なテンポラリディレクトリのディスク容量を監視し、ある閾値を下回るようであれば、ノードはオフラインになります。
+
+    <p>
+    Javaのツール、テストおよびビルドは、よくテンポラリディレクトリにファイルを作成しますが、
+    利用可能な容量がなければ正しく動作しない可能性があります。
+
+    <p>
+    もっと具体的に言うと、システムプロパティ<tt>java.io.tmpdir</tt>で指定されたディレクトリを含むパーティションの利用可能なディスク容量をチェックします。
+    スレーブでのこのディレクトリが何であるかチェックするには、<tt>${rootURL}/computer/SLAVENAME/systemInfo</tt>を参照してください。
+</div>

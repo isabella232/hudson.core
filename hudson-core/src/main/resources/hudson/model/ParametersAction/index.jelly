@@ -1,0 +1,38 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2010 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi,
+#        
+#
+#************************************************************************** --> 
+
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+    xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+    xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+  <l:layout title="${it.displayName}">
+    <j:invokeStatic var="currentThread" className="java.lang.Thread" method="currentThread" />
+    <j:invoke var="buildClass" on="${currentThread.contextClassLoader}" method="loadClass">
+      <j:arg value="hudson.model.AbstractBuild" />
+    </j:invoke>
+    <j:set var="build" value="${request.findAncestorObject(buildClass)}" />
+		<st:include page="sidepanel.jelly" it="${build}" />
+		<l:main-panel>
+			<h1>${%Build} ${build.displayName}</h1>
+			<l:pane title="${%Parameters}" width="3">
+			<j:forEach var="parameterValue" items="${it.parameters}">
+				<st:include it="${parameterValue}"
+					page="value.jelly" />
+			</j:forEach>
+			</l:pane>
+		</l:main-panel>
+  </l:layout>
+</j:jelly>

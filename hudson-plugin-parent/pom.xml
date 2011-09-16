@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- **************************************************************************
+#
+# Copyright (C) 2004-2011 Oracle Corporation
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+#         
+#
+#************************************************************************** --> 
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.eclipse.hudson</groupId>
+    <artifactId>hudson-parent</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
+    <relativePath>../hudson-parent/pom.xml</relativePath>
+  </parent>
+
+  <groupId>org.eclipse.hudson.plugins</groupId>
+  <artifactId>hudson-plugin-parent</artifactId>
+  <name>Hudson :: Plugin Parent POM</name>
+  <version>2.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <!-- if your java.net user name is different from local user name, specify it here -->
+    <java.net.id>${user.name}</java.net.id>
+
+    <rest-plugin.version>2.1.0-SNAPSHOT</rest-plugin.version>
+    <maven-plugin.version>2.1.0-SNAPSHOT</maven-plugin.version>
+    <hudson-war.version>2.1.0-SNAPSHOT</hudson-war.version>
+    <hudson-core.version>2.1.0-SNAPSHOT</hudson-core.version>
+    <hudson-test-framework.version>2.1.0-SNAPSHOT</hudson-test-framework.version>
+    <junit.version>4.8.1</junit.version>
+    <servlet-api.version>2.4</servlet-api.version>
+  </properties>
+
+  <scm>
+    <connection>scm:git:git://github.com/hudson/hudson.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/hudson/hudson.git</developerConnection>
+    <url>https://github.com/hudson/hudson</url>
+  </scm>
+
+  <issueManagement>
+    <system>JIRA</system>
+    <url>http://issues.hudson-ci.org/</url>
+  </issueManagement>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.eclipse.hudson.main</groupId>
+        <artifactId>rest-plugin</artifactId>
+        <version>${rest-plugin.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.hudson.main</groupId>
+        <artifactId>maven-plugin</artifactId>
+        <version>${maven-plugin.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.hudson.main</groupId>
+      <artifactId>hudson-war</artifactId>
+      <type>war</type>
+      <version>${hudson-war.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.hudson.main</groupId>
+      <artifactId>hudson-core</artifactId>
+      <version>${hudson-core.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.hudson.main</groupId>
+      <artifactId>hudson-test-framework</artifactId>
+      <version>${hudson-test-framework.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>${servlet-api.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <finalName>${project.artifactId}</finalName>
+    <defaultGoal>package</defaultGoal>
+    <plugins>
+      <plugin>
+        <groupId>org.kohsuke.stapler</groupId>
+        <artifactId>maven-stapler-plugin</artifactId>
+        <extensions>true</extensions>
+      </plugin>
+      <plugin>
+        <groupId>org.jvnet.localizer</groupId>
+        <artifactId>maven-localizer-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <fileMask>Messages.properties</fileMask>
+              <outputDirectory>target/generated-sources/localizer</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <property>
+              <name>hudson.udp</name>
+              <value>33849</value>
+            </property>
+          </systemProperties>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <profiles>
+    <profile>
+      <id>activate-hpi-extension</id>
+      <!--
+       |
+       | We do not want this extension loaded while we are building in the Hudson reactor itself, but it must
+       | be loaded while someone is building an HPI. So we will only activate the loading of the extension if we
+       | are outside the Hudson build structure.
+       |
+       -->
+      <activation>
+        <file>
+          <missing>../.hudson</missing>      
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jvnet.hudson.tools</groupId>
+            <artifactId>maven-hpi-plugin</artifactId>
+            <extensions>true</extensions>
+            <configuration>
+              <showDeprecation>true</showDeprecation>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>  
+</project>

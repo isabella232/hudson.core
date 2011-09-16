@@ -1,0 +1,71 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2010 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi,
+#        
+#
+#************************************************************************** --> 
+
+
+<!--
+  This page shows the status of the plugin installation
+-->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<l:layout title="${%Update Center}" permission="${app.ADMINISTER}">
+  <st:include page="sidepanel.jelly" />
+  <l:main-panel>
+    <h1>${%Installing Plugins/Upgrades}</h1>
+
+    <form method="post" action="${rootURL}/safeRestart">
+      <p class="warning">
+        ${%warning}
+        <j:if test="${app.lifecycle.canRestart()}">
+          <f:submit value="${%Restart When No Jobs Are Running}" />
+        </j:if>
+      </p>
+    </form>
+
+    <st:include page="body.jelly" />
+
+    <script><![CDATA[
+      function refresh() {
+          window.setTimeout(function() {
+              new Ajax.Request("./body", {
+                  onSuccess: function(rsp) {
+                      var div = document.createElement('div');
+                      div.innerHTML = rsp.responseText;
+
+                      var rows = div.firstChild.rows;
+                      for(var i=0; i<rows.length; i++ ) {
+                        var row = rows[i];
+                        var target = document.getElementById(row.id);
+                        if(target==null) {
+                          document.getElementById("log").appendChild(row);
+                        } else {
+                          var tcell = target.cells[1];
+                          var scell = row.cells[1];
+                          if(scell.id!=tcell.id) {
+                            tcell.innerHTML = scell.innerHTML;
+                            tcell.id = scell.id;
+                          }
+                        }
+                      }
+                      refresh();
+                  }
+              });
+          }, 5000);
+      }
+      window.scrollTo(0,10000);
+      refresh();
+    ]]></script>
+  </l:main-panel>
+</l:layout>
+</j:jelly>

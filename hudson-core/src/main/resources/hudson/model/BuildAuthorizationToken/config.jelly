@@ -1,0 +1,39 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2010 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi,
+#        
+#
+#************************************************************************** --> 
+
+
+<!--
+  Pseudo trigger configuration.
+  Note that it is the object that owns BuildAuthorizationToken
+-->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <j:if test="${app.useSecurity}">
+    <f:optionalBlock name="pseudoRemoteTrigger"
+        help="/help/project-config/triggerRemotely.html"
+        title="${%Trigger builds remotely} (${%e.g., from scripts})"
+        checked="${it.authToken!=null}">
+      <f:entry title="${%Authentication Token}">
+        <f:textbox name="authToken" value="${it.authToken.token}" />
+        ${%Use the following URL to trigger build remotely:}
+        <tt>HUDSON_URL</tt>/${it.url}build?token=<tt>TOKEN_NAME</tt>
+        ${%or}
+        /buildWithParameters?token=<tt>TOKEN_NAME</tt>
+        <br/>
+        ${%Optionally append &lt;tt>&amp;cause=Cause+Text&lt;/tt> to provide text that will be included in the recorded build cause.}
+      </f:entry>
+  </f:optionalBlock>
+  </j:if>
+</j:jelly>

@@ -1,0 +1,45 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2010 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi, Tom Huybrechts, Yahoo!, Inc.
+#        
+#
+#************************************************************************** --> 
+
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:test="/lib/test">
+  <l:layout title="${it.owner} ${it.displayName}">
+    <st:include page="sidepanel.jelly" />
+    <l:main-panel>
+      <h1><st:out value="${it.title}" /></h1>
+
+      <j:set var="prev" value="${it.previousResult}" />
+
+      <test:bar />
+
+      <div style="text-align:right;">
+        <a href="history">
+          ${%took(it.durationString)}
+        </a>
+      </div>
+
+      <t:editableDescription permission="${it.owner.UPDATE}"/>
+
+      <table style="margin-top: 1em; margin-left:0em;">
+	  <j:forEach var="action" items="${it.testActions}">
+          <st:include page="summary.jelly" from="${action}" optional="true" it="${action}" />
+	  </j:forEach>
+      </table>
+
+      <st:include page="body.jelly" />
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

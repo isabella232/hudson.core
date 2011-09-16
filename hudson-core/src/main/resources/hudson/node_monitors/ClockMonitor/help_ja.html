@@ -1,0 +1,23 @@
+<!-- **************************************************************************
+#
+# Copyright (C) 2004-2009 Oracle Corporation
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+#         Kohsuke Kawaguchi
+#
+#************************************************************************** -->
+
+<div>
+    マスタとノード間のクロック誤差を監視します。
+    Hudson自身は通常システム間のクロック誤差を許容しますが、
+    バージョンコントロールや分散ファイルシステムでのアクセス(NFSやWindowsでのファイル共有など）では、
+    関係するシステムにクロック誤差があると変な問題が発生する傾向があります。
+
+    <p>
+    クロックの同期をとるには、NTPの利用を検討してください。
+</div>

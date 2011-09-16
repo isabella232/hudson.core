@@ -1,0 +1,29 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2009 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Michael B. Donohue, Alan Harder
+#        
+#
+#************************************************************************** --> 
+
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <t:summary icon="orange-square.gif">
+    <j:forEach var="entry" items="${it.causeCounts.entrySet()}">
+      <p>
+        <st:include page="description.jelly" it="${entry.key}"/>
+        <j:if test="${entry.value > 1}">
+          <st:nbsp/>${%Ntimes(entry.value)}
+        </j:if>
+      </p>
+    </j:forEach>
+  </t:summary>
+</j:jelly>

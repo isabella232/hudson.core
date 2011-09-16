@@ -1,0 +1,78 @@
+<!-- **************************************************************************
+#
+# Copyright (c) 2010-2011 Sonatype, Inc.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#   
+#        
+#
+#************************************************************************** --> 
+
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.eclipse.hudson.main</groupId>
+    <artifactId>hudson-rest</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>hudson-rest-client</artifactId>
+  <name>Hudson :: REST :: Client</name>
+
+  <properties>
+    <async-http-client.version>1.6.3</async-http-client.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.hudson.main</groupId>
+      <artifactId>hudson-rest-common</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.hudson.main</groupId>
+      <artifactId>maven3-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>jersey-ahc-client</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.ning</groupId>
+      <artifactId>async-http-client</artifactId>
+      <version>${async-http-client.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>cometd-java-asynchttpclient</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

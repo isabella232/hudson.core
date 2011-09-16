@@ -1,0 +1,34 @@
+<!-- **************************************************************************
+#
+# Copyright (C) 2004-2009 Oracle Corporation
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+#         Kohsuke Kawaguchi
+#
+#************************************************************************** -->
+
+<div>
+    <p>
+        Ist diese Option gewählt, verwirft Hudson die meisten Artefakte aus
+        älteren Builds. Artefakte des letzten stabilen Builds (soweit vorhanden)
+        werden behalten, ebenso wie die des letzten instabilen und fehlgeschlagenen
+        Builds, sofern diese neuer sind.
+    </p>
+    <p>
+        Diese Option spart Festplattenplatz, ermöglicht aber trotzdem zuverlässige
+        Permalinks, z.B. auf
+        <code>.../lastStableBuild/artifact/...</code> oder
+        <code>.../lastSuccessfulBuild/artifact/...</code> oder
+        <code>.../lastCompletedBuild/artifact/...</code>.
+    </p>
+    <p>
+        (Da der neueste Build noch läuft, geht Hudson konservativerweise davon aus,
+        daß dieser fehlschlagen könnte. Daher behält Hudson mindestens einen älteren Build
+        zurück.)
+    </p>
+</div>
