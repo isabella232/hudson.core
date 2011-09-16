@@ -1,0 +1,40 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2009 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi
+#        
+#
+#************************************************************************** --> 
+
+
+<!--
+  Displays the polling log output
+-->
+<st:compress xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+  <l:layout title="${it.build.parent.displayName} #${it.build.number} ${%Polling Log}" norefresh="true">
+    <st:include it="${it.build}" page="sidepanel.jelly" />
+    <l:main-panel>
+      <h1>${%Polling Log}</h1>
+      <l:rightspace>
+        <a href="pollingLog">
+          <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as plain text}
+        </a>
+      </l:rightspace>
+
+      <p>${%blurb}</p>
+      
+      <pre>
+        <st:getOutput var="output" />
+        <j:whitespace>${it.writePollingLogTo(0,output)}</j:whitespace>
+      </pre>
+    </l:main-panel>
+  </l:layout>
+</st:compress>

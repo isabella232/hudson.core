@@ -1,0 +1,47 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2010 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi
+#        
+#
+#************************************************************************** --> 
+
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	<f:entry title="${%Server}" help="/help/security/ldap/server.html">
+	  <f:textbox name="ldap.server" value="${instance.server}"
+            checkUrl="'${rootURL}/securityRealms/LDAPSecurityRealm/serverCheck?field=server&amp;server='+encodeURIComponent(this.value)+'&amp;managerDN='+encodeURIComponent(this.form.elements['ldap.managerDN'].value)+'&amp;managerPassword='+encodeURIComponent(this.form.elements['ldap.managerPassword'].value)"/>
+	</f:entry>
+  <f:advanced>
+    <f:entry title="${%root DN}" help="/help/security/ldap/rootDN.html">
+      <f:textbox name="ldap.rootDN" value="${instance.rootDN}" />
+    </f:entry>
+    <f:entry title="${%User search base}" help="/help/security/ldap/userSearchBase.html">
+      <f:textbox name="ldap.userSearchBase" value="${instance.userSearchBase}" />
+    </f:entry>
+    <f:entry title="${%User search filter}" help="/help/security/ldap/userSearchFilter.html">
+      <f:textbox name="ldap.userSearch" value="${instance.userSearch}" />
+    </f:entry>
+    <f:entry title="${%Group search base}" help="/help/security/ldap/groupSearchBase.html">
+      <f:textbox name="ldap.groupSearchBase" value="${instance.groupSearchBase}" />
+    </f:entry>
+    <f:entry title="${%Manager DN}" help="/help/security/ldap/managerDN.html">
+      <f:textbox name="ldap.managerDN" value="${instance.managerDN}" autocomplete="off"
+      checkUrl="'${rootURL}/securityRealms/LDAPSecurityRealm/serverCheck?field=managerDN&amp;server='+encodeURIComponent(this.form.elements['ldap.server'].value)+'&amp;managerDN='+encodeURIComponent(this.value)+'&amp;managerPassword='+encodeURIComponent(this.form.elements['ldap.managerPassword'].value)"
+      />
+    </f:entry>
+    <f:entry title="${%Manager Password}" help="/help/security/ldap/managerPassword.html">
+      <f:password name="ldap.managerPassword" value="${instance.managerPassword}" autocomplete="off"
+      checkUrl="'${rootURL}/securityRealms/LDAPSecurityRealm/serverCheck?field=password&amp;server='+encodeURIComponent(this.form.elements['ldap.server'].value)+'&amp;managerDN='+encodeURIComponent(this.form.elements['ldap.managerDN'].value)+'&amp;managerPassword='+encodeURIComponent(this.value)" 
+      />
+    </f:entry>
+  </f:advanced>
+</j:jelly>

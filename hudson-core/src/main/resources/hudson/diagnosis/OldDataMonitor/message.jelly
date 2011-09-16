@@ -1,0 +1,28 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2010 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Alan Harder
+#        
+#
+#************************************************************************** --> 
+
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <div class="warning">
+    <form method="post" action="${rootURL}/${it.url}/act" name="${it.id}">
+      ${%You have data stored in an older format and/or unreadable data.}
+      <st:nbsp/>
+      <st:nbsp/>
+      <f:submit name="yes" value="${%Manage}"/>
+      <f:submit name="no" value="${%Dismiss}"/>
+    </form>
+  </div>
+</j:jelly>

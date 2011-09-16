@@ -1,0 +1,42 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2009 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi
+#        
+#
+#************************************************************************** --> 
+
+
+<!--
+  Include this in the main page to display the log
+-->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <j:choose>
+    <!-- Do progressive console output -->
+    <j:when test="${it.workerThread.running}">
+      <pre id="out" />
+      <div id="spinner">
+        <img src="${imagesURL}/spinner.gif" alt=""/>
+      </div>
+      <t:progressiveText href="progressiveHtml" idref="out" spinner="spinner" />
+    </j:when>
+    <!-- output is completed now. -->
+    <j:otherwise>
+      <pre>
+        <st:getOutput var="output" />
+        <j:whitespace>${it.obtainLog().writeLogTo(0,output)}</j:whitespace>
+      </pre>
+      <form method="get" action="clearError">
+        <f:submit value="${%Clear error to retry}" />
+      </form>
+    </j:otherwise>
+  </j:choose>
+</j:jelly>

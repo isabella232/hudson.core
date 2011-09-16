@@ -1,0 +1,40 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2009 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi
+#        
+#
+#************************************************************************** --> 
+
+
+<!--
+  Manage monitoring
+-->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+  <l:layout title="${%Node Monitoring Configuration}" norefresh="true">
+    <st:include page="sidepanel.jelly" />
+    <l:main-panel>
+      <!-- to make the form field binding work -->
+      <j:set var="instance" value="${it}" />
+      <j:set var="descriptor" value="${it.descriptor}" />
+
+      <f:form method="post" action="configSubmit" name="config">
+        <f:descriptorList title="${%Preventive Node Monitoring}"
+                          descriptors="${it.nodeMonitorDescriptors}"
+                          instances="${it.nonIgnoredMonitors}" />
+
+        <f:block>
+          <f:submit value="OK" />
+        </f:block>
+      </f:form>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

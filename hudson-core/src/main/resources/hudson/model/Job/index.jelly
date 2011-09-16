@@ -1,0 +1,56 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2009 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi, Erik Ramfelt, Tom Huybrechts, id:cactusman
+#        
+#
+#************************************************************************** --> 
+
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+  <l:layout title="${it.displayName}">
+    <st:include page="sidepanel.jelly" />
+    <l:main-panel>
+      <h1>${it.pronoun} ${it.displayName}</h1>
+      <t:editableDescription permission="${it.CONFIGURE}"/>
+
+      <j:if test="${it.parent == app}">
+          <j:choose>
+              <j:when test="${it.disabled}">
+                <div class="warning">
+                  <form method="post" action="enable">
+                    ${%This project is currently disabled}
+                    <l:hasPermission permission="${it.CONFIGURE}">
+                      <f:submit value="${%Enable}" />
+                    </l:hasPermission>
+                  </form>
+                </div>
+                </j:when>
+                <j:otherwise>
+                 <div align="right">
+                  <form method="post" action="disable">
+                    <l:hasPermission permission="${it.CONFIGURE}">
+                      <f:submit value="${%Disable Project}" />
+                    </l:hasPermission>
+                  </form>
+                  </div>
+               </j:otherwise>
+          </j:choose>
+      </j:if>
+
+      <st:include page="jobpropertysummaries.jelly" />
+      <!-- inject main part here -->
+      <st:include page="main.jelly" />
+
+      <st:include page="permalinks.jelly" />
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

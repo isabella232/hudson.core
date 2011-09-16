@@ -1,0 +1,29 @@
+<!-- **************************************************************************
+#
+# Copyright (C) 2004-2009 Oracle Corporation
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+#         Kohsuke Kawaguchi
+#
+#************************************************************************** -->
+
+<div>
+  Delegates the authentication to the underlying Unix operating system user database.
+  With this setting, users will be logged into Hudson by entering their Unix username
+  and password.
+
+  <p>
+  This mode will also allow you to use Unix groups for authorization. For example,
+  you can say "everyone in the 'developers' group will have the administrator access". 
+
+  <p>
+  This is done through a library called <a href="http://en.wikipedia.org/wiki/Pluggable_Authentication_Modules">PAM</a>,
+  which defines its own configuration mechanism. 
+  It also works correctly with user database extensions like
+  <a href="http://en.wikipedia.org/wiki/Network_Information_Service">NIS</a>.
+</div>

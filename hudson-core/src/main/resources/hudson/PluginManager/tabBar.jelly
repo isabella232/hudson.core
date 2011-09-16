@@ -1,0 +1,29 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2010 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi
+#        
+#
+#************************************************************************** --> 
+
+
+<!--
+  List of available new plugins
+-->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <l:tabBar>
+    <l:tab name="${%Updates}" active="${page=='updates'}" href="." />
+    <l:tab name="${%Available}" active="${page=='available'}" href="./available" />
+    <l:tab name="${%Installed}" active="${page=='installed'}" href="./installed" />
+    <!--<l:tab name="${%Sites}" active="${page=='sites'}" href="./sites" />-->
+    <l:tab name="${%Advanced}" active="${page=='advanced'}" href="./advanced" />
+  </l:tabBar>
+</j:jelly>

@@ -1,0 +1,87 @@
+/*******************************************************************************
+ *
+ * Copyright (c) 2004-2009 Oracle Corporation.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors: 
+*
+*    Kohsuke Kawaguchi, Tom Huybrechts
+ *     
+ *
+ *******************************************************************************/ 
+
+package hudson.model;
+
+import net.sf.json.JSONObject;
+
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.export.Exported;
+import hudson.Extension;
+import hudson.cli.CLICommand;
+
+import java.io.IOException;
+
+public class RunParameterDefinition extends SimpleParameterDefinition {
+
+    private final String projectName;
+
+    @DataBoundConstructor
+    public RunParameterDefinition(String name, String projectName, String description) {
+        super(name, description);
+        this.projectName = projectName;
+    }
+
+    @Exported
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public Job getProject() {
+        return (Job) Hudson.getInstance().getItem(projectName);
+    }
+
+    @Extension
+    public static class DescriptorImpl extends ParameterDescriptor {
+        @Override
+        public String getDisplayName() {
+            return Messages.RunParameterDefinition_DisplayName();
+        }
+
+        @Override
+        public String getHelpFile() {
+            return "/help/parameter/run.html";
+        }
+
+        @Override
+        public ParameterDefinition newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+            return req.bindJSON(RunParameterDefinition.class, formData);
+        }
+    }
+
+    @Override
+    public ParameterValue getDefaultParameterValue() {
+        Run<?,?> lastBuild = getProject().getLastBuild();
+        if (lastBuild != null) {
+        	return createValue(lastBuild.getExternalizableId());
+        } else {
+        	return null;
+        }
+    }
+
+    @Override
+    public ParameterValue createValue(StaplerRequest req, JSONObject jo) {
+        RunParameterValue value = req.bindJSON(RunParameterValue.class, jo);
+        value.setDescription(getDescription());
+        return value;
+    }
+
+    public RunParameterValue createValue(String value) {
+        return new RunParameterValue(getName(), value, getDescription());
+    }
+
+}

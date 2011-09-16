@@ -1,0 +1,26 @@
+<!-- **************************************************************************
+#
+# Copyright (C) 2004-2009 Oracle Corporation
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+#         Kohsuke Kawaguchi
+#
+#************************************************************************** -->
+
+﻿<div>
+  Demande à Hudson de scruter les changements dans l'outil de gestion de
+  version.
+
+  <p>
+  Notez que cette opération est consommatrice de ressources pour CVS,
+  car chaque scrutation signifie que Hudson va scanner l'ensemble du
+  workspace et le comparer avec le serveur.
+  Envisagez d'utiliser un trigger de type 'push' pour éviter cette 
+  surcharge, comme décrit dans
+  <a href="https://hudson.java.net/build.html">ce document</a>.
+</div>

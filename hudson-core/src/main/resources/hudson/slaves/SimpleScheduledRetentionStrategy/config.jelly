@@ -1,0 +1,33 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2009 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi, Stephen Connolly
+#        
+#
+#************************************************************************** --> 
+
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:entry title="${%Startup Schedule}"  help="/descriptor/hudson.triggers.TimerTrigger/help/spec">
+        <f:textarea name="retentionStrategy.startTimeSpec" checkUrl="'${rootURL}/retentionStrategy/SimpleScheduledRetentionStrategy/check?value='+encodeURIComponent(this.value)"
+                    value="${instance.startTimeSpec}"/>
+    </f:entry>
+    <f:entry title="${%Scheduled Uptime}"
+             description="${%uptime.description}">
+        <f:textbox clazz="required number"
+               name="retentionStrategy.upTimeMins" value="${instance.upTimeMins}"
+               checkMessage="${%Scheduled Uptime is mandatory and must be a number.}"/>
+    </f:entry>
+    <f:entry title="${%Keep on-line while jobs are running}">
+      <f:checkbox name="retentionStrategy.keepUpWhenActive" checked="${h.defaultToTrue(instance.keepUpWhenActive)}"/>
+    </f:entry>
+</j:jelly>

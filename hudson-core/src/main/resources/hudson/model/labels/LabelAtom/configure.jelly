@@ -1,0 +1,40 @@
+<!-- **************************************************************************
+#
+# Copyright (c) 2010, InfraDNA, Inc.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#   
+#        
+#
+#************************************************************************** --> 
+
+
+<!--
+  Config page
+-->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <l:layout norefresh="true" permission="${app.ADMINISTER}" title="${%title(it.displayName)}">
+    <st:include page="sidepanel.jelly"/>
+    <l:main-panel>
+      <f:form method="post" action="configSubmit" name="config">
+
+        <f:entry title="${%Name}">
+          <f:textbox value="${it.name}" readonly="true" />
+        </f:entry>
+
+        <f:descriptorList descriptors="${it.getApplicablePropertyDescriptors()}" instances="${it.properties}" />
+
+        <f:block>
+          <f:submit value="${%Save}"/>
+        </f:block>
+      </f:form>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

@@ -1,0 +1,55 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2010 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi, Tom Huybrechts
+#        
+#
+#************************************************************************** --> 
+
+
+<!--
+  This view is rendered as /hudson/job/XYZ/build
+-->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+	xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+  <!--
+    send back 4xx code so that machine agents don't confuse this form with successful build triggering
+    405 is "Method Not Allowed" and this fits here because we need POST.
+  -->
+  <st:statusCode value="405" />
+  <l:layout title="${it.displayName}">
+    <st:include page="sidepanel.jelly" it="${it.project}" />
+    <l:main-panel>
+      <h1>${it.owner.pronoun} ${it.owner.displayName}</h1>
+      <p>
+        <j:invokeStatic var="escapedValue" className="hudson.Util" method="escape">
+          <j:arg value="${it.owner.description}"/>
+        </j:invokeStatic>
+        ${escapedValue}
+      </p>
+      <p>${%description}</p>
+      <j:set var="delay" value="${request.getParameter('delay')}" />
+      <f:form method="post" action="build${empty(delay)?'':'?delay='+delay}" name="parameters"
+              tableClass="parameters">
+        <j:forEach var="parameterDefinition" items="${it.parameterDefinitions}">
+          <tbody>
+            <st:include it="${parameterDefinition}"
+                        page="${parameterDefinition.descriptor.valuePage}" />
+          </tbody>
+        </j:forEach>
+        <f:block>
+          <f:submit value="${%Build}" />
+        </f:block>
+      </f:form>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

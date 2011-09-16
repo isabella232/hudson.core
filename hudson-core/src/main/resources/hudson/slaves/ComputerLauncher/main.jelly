@@ -1,0 +1,42 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2009 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi
+#        
+#
+#************************************************************************** --> 
+
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+  <j:if test="${it.launchSupported and it.offline and !it.temporarilyOffline}">
+    <j:choose>
+      <j:when test="${it.isConnecting()}">
+        <p>
+          ${%launchingDescription}
+          <a href="log">${%See log for more details}</a>
+        </p>
+        <l:isAdmin>
+          <form method="get" action="launchSlaveAgent">
+            <f:submit value="${%Relaunch slave agent}" />
+          </form>
+        </l:isAdmin>
+      </j:when>
+
+      <j:otherwise>
+        <l:isAdmin>
+          <form method="get" action="launchSlaveAgent">
+            <f:submit value="${%Launch slave agent}" />
+          </form>
+        </l:isAdmin>
+      </j:otherwise>
+    </j:choose>
+  </j:if>
+</j:jelly>

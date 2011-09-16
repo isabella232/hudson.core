@@ -1,0 +1,30 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2009 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi, Martin Eigenbrodt
+#        
+#
+#************************************************************************** --> 
+
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+    <td data="${lfBuild.timestampString2 ?: '-'}">
+          <j:choose>
+              <j:when test="${lfBuild!=null}">
+                  ${lfBuild.timestampString}
+                  (<a href="${jobBaseUrl}${job.shortUrl}lastFailedBuild/">${lfBuild.displayName}</a>)
+              </j:when>
+              <j:otherwise>
+                  ${%N/A}
+              </j:otherwise>
+          </j:choose>
+      </td>
+  </j:jelly>

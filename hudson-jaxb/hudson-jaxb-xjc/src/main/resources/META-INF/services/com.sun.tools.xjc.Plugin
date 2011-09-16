@@ -1,0 +1,9 @@
+org.eclipse.hudson.jaxb.BooleanGetterPlugin
+org.eclipse.hudson.jaxb.XStreamAliasPlugin
+org.eclipse.hudson.jaxb.XStreamAsAttributePlugin
+org.eclipse.hudson.jaxb.GeneratedPlugin
+org.eclipse.hudson.jaxb.CodeInsertPlugin
+org.eclipse.hudson.jaxb.JsonPropertyPlugin
+org.eclipse.hudson.jaxb.EqualsBuilderPlugin
+org.eclipse.hudson.jaxb.HashCodeBuilderPlugin
+org.eclipse.hudson.jaxb.CloneablePlugin

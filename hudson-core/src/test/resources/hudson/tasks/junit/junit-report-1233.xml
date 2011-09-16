@@ -1,0 +1,28 @@
+<!-- **************************************************************************
+#
+# Copyright (c) 2004-2009 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi, Erik Ramfelt
+#        
+#
+#************************************************************************** --> 
+
+
+<testsuites>
+  <testsuite errors="0" failures="0" hostname="archbuild" id="0"
+      name="StudioAllTests" package="test.infor.clearux.studio.integration"
+      tests="456" time="107.824" timestamp="2008-01-23T10:49:26">
+    <testcase classname="test.foo.bar.DefaultIntegrationTest" name="experimentsWithJavaElements" time="0.0" />
+    <testcase classname="test.foo.bar.BundleResolverIntegrationTest" name="testGetBundle" time="0.0" />
+    <testcase classname="test.foo.bar.BundleResolverIntegrationTest" name="testGetBundleLocation" time="0.656" />
+    <testcase classname="test.foo.bar.ProjectSettingsTest" name="testNatureAddition" time="0.125" />
+    <testcase classname="test.foo.bar.ProjectSettingsTest" name="testNatureRemoval" time="0.11" />
+  </testsuite>
+</testsuites>

@@ -1,0 +1,27 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2009 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi, id:cactusman
+#        
+#
+#************************************************************************** --> 
+
+
+<!-- custom quiet period -->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <f:optionalBlock name="hasCustomQuietPeriod" title="${%Quiet period}" checked="${it.hasCustomQuietPeriod}"
+      help="/help/project-config/quietPeriod.html">
+    <f:entry title="${%Quiet period}"
+      description="${%Number of seconds}">
+      <f:textbox clazz="number" name="quiet_period" value="${it.quietPeriod}"/>
+    </f:entry>
+  </f:optionalBlock>
+</j:jelly>

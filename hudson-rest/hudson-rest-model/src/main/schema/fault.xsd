@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *******************************************************************************
+ *
+ * Copyright (c) 2004-2009 Oracle Corporation.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors: 
+ *
+ *    Kohsuke Kawaguchi, Eric Lefevre-Ardant, id:cactusman
+ *     
+ *******************************************************************************
+-->
+<xs:schema
+        version="1.0"
+        targetNamespace="http://hudson-ci.org/xsd/hudson/2.1.0/rest/fault"
+        xmlns="http://hudson-ci.org/xsd/hudson/2.1.0/rest/fault"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+        xsi:schemaLocation="
+            http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd
+            http://www.w3.org/2001/XMLSchema http://www.w3.org/2001/XMLSchema.xsd"
+        jaxb:version="2.1">
+
+    <xs:annotation>
+        <xs:appinfo>
+            <jaxb:schemaBindings>
+                <jaxb:package name="org.eclipse.hudson.rest.model.fault"/>
+                <jaxb:nameXmlTransform>
+                    <jaxb:elementName suffix="DTO"/>
+                    <jaxb:typeName suffix="DTO"/>
+                </jaxb:nameXmlTransform>
+            </jaxb:schemaBindings>
+        </xs:appinfo>
+    </xs:annotation>
+
+    <xs:element name="fault" type="fault"/>
+
+    <xs:complexType name="fault">
+        <xs:sequence>
+            <xs:element name="id" type="xs:string"/>
+            <xs:element name="detail" type="faultDetail" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="faultDetail">
+        <xs:sequence>
+            <xs:element name="type" type="xs:string"/>
+            <xs:element name="message" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,59 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2009 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi, Erik Ramfelt, Seiji Sogabe
+#        
+#
+#************************************************************************** --> 
+
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <f:section title="${%E-mail Notification}">
+    <f:entry title="${%SMTP server}" field="smtpServer">
+      <f:textbox />
+    </f:entry>
+    <f:entry title="${%Default User E-mail Suffix}" field="defaultSuffix">
+      <f:textbox />
+    </f:entry>
+    <f:entry title="${%System Admin E-mail Address}" field="adminAddress">
+      <f:textbox />
+    </f:entry>
+    <f:entry title="${%Hudson URL}" field="url">
+      
+      <!--
+        Do not try to infer the URL, most of the time you get "localhost:<port>".
+        This is confusing. http://issues.hudson-ci.org/browse/HUDSON-8796
+      <f:textbox default="${h.inferHudsonURL(request)}" />--> 
+      <f:textbox />
+    </f:entry>
+    <f:advanced>
+      <f:optionalBlock name="useSMTPAuth" title="${%Use SMTP Authentication}" checked="${descriptor.smtpAuthUserName!=null}"
+          help="/help/tasks/mailer/smtpAuth.html">
+        <f:entry title="${%User Name}" field="smtpAuthUserName">
+          <f:textbox />
+        </f:entry>
+        <f:entry title="${%Password}" field="smtpAuthPassword">
+          <f:password />
+        </f:entry>
+      </f:optionalBlock>
+      <f:entry title="${%Use SSL}" field="useSsl">
+        <f:checkbox />
+      </f:entry>
+      <f:entry title="${%SMTP Port}" field="smtpPort">
+        <f:textbox />
+      </f:entry>
+      <f:entry title="${%Charset}" field="charset">
+        <f:textbox />
+      </f:entry>
+    </f:advanced>
+    <f:validateButton method="sendTestMail" title="${%Test configuration by sending e-mail to System Admin Address}" with="smtpServer,adminAddress,useSMTPAuth,smtpAuthUserName,smtpAuthPassword,useSsl,smtpPort,charset" />
+  </f:section>
+</j:jelly>

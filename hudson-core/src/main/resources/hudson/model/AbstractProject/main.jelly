@@ -1,0 +1,68 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2009 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi, Erik Ramfelt,
+#        
+#
+#************************************************************************** --> 
+
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+  <p:projectActionFloatingBox />
+
+  <table style="margin-top: 1em; margin-left:1em;">
+
+    <j:forEach var="act" items="${it.prominentActions}">
+      <t:summary icon="${act.iconFileName}" href="${act.urlName}">
+        ${act.displayName}
+      </t:summary>
+    </j:forEach>
+    <t:summary icon="folder.gif" href="ws/" permission="${it.WORKSPACE}">
+      ${%Workspace}
+    </t:summary>
+
+    <t:artifactList caption="${%Last Successful Artifacts}"
+        build="${it.lastSuccessfulBuild}" baseURL="lastSuccessfulBuild/"
+        permission="${it.lastSuccessfulBuild.ARTIFACTS}"/>
+
+    <t:summary icon="notepad.gif" href="changes">
+      ${%Recent Changes}
+    </t:summary>
+
+    <j:set var="tr" value="${it.lastCompletedBuild.testResultAction}"/>
+    <j:if test="${tr!=null}">
+      <t:summary icon="clipboard.gif">
+        <a href="lastCompletedBuild/testReport/">${%Latest Test Result}</a>
+        <st:nbsp/>
+        <t:test-result it="${tr}" />
+      </t:summary>
+    </j:if>
+    <j:if test="${it.lastBuild!=null}">
+      <t:summary icon="terminal.gif" href="lastBuild/console">
+        ${%Latest Console output}
+      </t:summary>
+    </j:if>
+  </table>
+
+  <!-- merge fragments from the actions -->
+  <j:forEach var="a" items="${it.actions}">
+    <!-- Force StaplerProxy to resolve, st:include doesn't respect it. -->
+    <j:set var="b" value="${h.resolveStaplerObject(a)}"/>
+    <st:include page="jobMain.jelly" it="${b}" optional="true">
+      <j:if test="${a != b}">
+        <!-- No luck with proxy's target, fall back to original object -->
+        <st:include page="jobMain.jelly" it="${a}" optional="true" />
+      </j:if>
+    </st:include>
+  </j:forEach>
+
+  <p:upstream-downstream />
+</j:jelly>
