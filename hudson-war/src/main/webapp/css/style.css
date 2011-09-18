@@ -1041,3 +1041,10 @@ table.configure {
 table.configure > td {
     padding: 0px;
 }
+/* --- Slaves Nodes/labels ---*/
+.axis-label {
+    padding-left: 5px;
+}
+.axis-child {
+    padding-left: 15px;
+}

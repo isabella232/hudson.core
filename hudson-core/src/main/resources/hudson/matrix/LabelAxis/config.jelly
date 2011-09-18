@@ -20,30 +20,24 @@
     <f:textbox default="label" />
   </f:entry>
   <f:entry title="${%Node/Label}" field="labels">
-    <div class="yahooTree labelAxis-tree" style="border: 1px solid gray; height: 10em; overflow:auto;" values="${instance.valueString}" />
-    <script>
-      hudsonRules["DIV.labelAxis-tree"] = function(e) {
-        var tree = new YAHOO.widget.TreeView(e);
-
-        var labels = new YAHOO.widget.TextNode("${%Labels}", tree.getRoot(), false);
-        var machines = new YAHOO.widget.TextNode("${%Individual nodes}", tree.getRoot(), false);
-
-        var values = (e.getAttribute("values") || "").split(/[ \n]/);
-        function has(v) {
-          return values.include(v) ? 'checked="checked" ' : "";
-        }
-        <j:forEach var="l" items="${app.labelAtoms}">
-          new YAHOO.widget.TextNode('&lt;input type="checkbox" name="values" json="${l.name}" '+has("${l.name}")+'/&gt;&lt;label class="attach-previous"&gt;${h.jsStringEscape(l.name)} (${h.jsStringEscape(l.description)})&lt;/label&gt;', ${l.isSelfLabel()?'machines':'labels'}, false);
-        </j:forEach>
-
-        tree.draw();
-        <!--
-          force the rendering of HTML, so that input fields are there
-          even when the form is submitted without this tree expanded.
-         -->
-        tree.expandAll();
-        tree.collapseAll();
-      };
-    </script>
+    <j:set var="valueString" value="${instance.valueString}"/>
+    <div class="labelAxis-tree" style="border: 1px solid gray; height: 10em; overflow:auto;" values="${valueString}">
+      <div class="axis-label">${%Labels}</div>
+      <j:forEach var="l" items="${app.labelAtoms}">
+        <j:if test="${!l.isSelfLabel()}">
+          <div class="axis-child">
+            <f:checkbox name="values" json="${l.name}" checked="${valueString.contains(l.name)}" title="${h.jsStringEscape(l.name)} (${h.jsStringEscape(l.description)})"/>
+          </div>
+        </j:if>
+      </j:forEach>
+      <div class="axis-label">${%Individual nodes}</div>
+      <j:forEach var="l" items="${app.labelAtoms}">
+        <j:if test="${l.isSelfLabel()}">
+          <div class="axis-child">
+            <f:checkbox name="values" json="${l.name}" checked="${valueString.contains(l.name)}" title="${h.jsStringEscape(l.name)} (${h.jsStringEscape(l.description)})"/>
+          </div>
+        </j:if>
+      </j:forEach>
+    </div>
   </f:entry>
 </j:jelly>
