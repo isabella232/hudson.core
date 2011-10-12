@@ -207,7 +207,7 @@
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
                                     <destFileName>maven-plugin.hpi</destFileName>
                                 </artifactItem>
-                                
+                                                             
                                 <!-- bundled plugins (external)) -->
                                 
                                 <artifactItem>
@@ -249,6 +249,32 @@
                                 
                             </artifactItems>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <!--
+                          Some plugins uses old gif images. Copy them from the compatibility folder
+                        -->
+                        <id>copyCompatibilityResources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/generated-resources/</outputDirectory>
+                            <resources>          
+                                <resource>
+                                    <directory>${basedir}/compat/</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>              
+                        </configuration>            
                     </execution>
                 </executions>
             </plugin>
