@@ -14,8 +14,8 @@
 
 package hudson.security;
 
-import org.acegisecurity.AccessDeniedException;
-import org.acegisecurity.Authentication;
+import org.springframework.security.AccessDeniedException;
+import org.springframework.security.Authentication;
 
 /**
  * {@link AccessDeniedException} with more information.

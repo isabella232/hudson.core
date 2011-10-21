@@ -18,8 +18,8 @@ package hudson.model;
 
 import hudson.security.ACL;
 import hudson.security.NotSerilizableSecurityContext;
-import org.acegisecurity.context.SecurityContext;
-import org.acegisecurity.context.SecurityContextHolder;
+import org.springframework.security.context.SecurityContext;
+import org.springframework.security.context.SecurityContextHolder;
 
 import java.util.ArrayList;
 import java.util.Collection;

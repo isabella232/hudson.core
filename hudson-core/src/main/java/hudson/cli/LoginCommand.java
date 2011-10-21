@@ -16,7 +16,7 @@ package hudson.cli;
 
 import hudson.Extension;
 import hudson.model.Hudson;
-import org.acegisecurity.Authentication;
+import org.springframework.security.Authentication;
 import org.kohsuke.args4j.CmdLineException;
 
 /**

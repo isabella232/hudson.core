@@ -17,8 +17,8 @@
 package hudson.security;
 
 import org.apache.commons.jelly.JellyTagException;
-import org.acegisecurity.AcegiSecurityException;
-import org.acegisecurity.ui.ExceptionTranslationFilter;
+import org.springframework.security.SpringSecurityException;
+import org.springframework.security.ui.ExceptionTranslationFilter;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
@@ -29,7 +29,7 @@ import javax.servlet.FilterChain;
 import java.io.IOException;
 
 /**
- * If {@link AcegiSecurityException} caused {@link JellyTagException},
+ * If {@link SpringSecurityException} caused {@link JellyTagException},
  * rethrow it accordingly so that {@link ExceptionTranslationFilter}
  * can pick it up and initiate the redirection.
  * 
@@ -47,8 +47,8 @@ public class UnwrapSecurityExceptionFilter implements Filter {
             if (t instanceof JellyTagException) {
                 JellyTagException jte = (JellyTagException) t;
                 Throwable cause = jte.getCause();
-                if (cause instanceof AcegiSecurityException) {
-                    AcegiSecurityException se = (AcegiSecurityException) cause;
+                if (cause instanceof SpringSecurityException) {
+                    SpringSecurityException se = (SpringSecurityException) cause;
                     throw new ServletException(se);
                 }
             }

@@ -38,7 +38,7 @@
                     </td>
                 </tr>
                 <j:if test="${app.security.name()=='SECURED'}">
-                    <!-- remember me service only available for Acegi -->
+                    <!-- remember me service only available for Spring Security -->
                     <tr>
                         <td align="right">
                             <input style="width:10px" id="remember_me" type="checkbox" name="remember_me" />

@@ -27,18 +27,18 @@ import hudson.util.FormValidation;
 import hudson.util.jna.NativeAccessException;
 import hudson.util.jna.NativeUtils;
 import hudson.util.spring.BeanBuilder;
-import org.acegisecurity.Authentication;
-import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.AuthenticationManager;
-import org.acegisecurity.BadCredentialsException;
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.GrantedAuthorityImpl;
-import org.acegisecurity.providers.AuthenticationProvider;
-import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import org.acegisecurity.userdetails.UsernameNotFoundException;
-import org.acegisecurity.userdetails.UserDetailsService;
-import org.acegisecurity.userdetails.UserDetails;
-import org.acegisecurity.userdetails.User;
+import org.springframework.security.Authentication;
+import org.springframework.security.AuthenticationException;
+import org.springframework.security.AuthenticationManager;
+import org.springframework.security.BadCredentialsException;
+import org.springframework.security.GrantedAuthority;
+import org.springframework.security.GrantedAuthorityImpl;
+import org.springframework.security.providers.AuthenticationProvider;
+import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
+import org.springframework.security.userdetails.UsernameNotFoundException;
+import org.springframework.security.userdetails.UserDetailsService;
+import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.userdetails.User;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.context.WebApplicationContext;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -85,7 +85,7 @@ public class PAMSecurityRealm extends SecurityRealm {
                     groups[i++] = new GrantedAuthorityImpl(g);
                 }
                 EnvVars.setHudsonUserEnvVar(username);
-                // I never understood why Acegi insists on keeping the password...
+                // I never understood why Spring Security insists on keeping the password...
                 return new UsernamePasswordAuthenticationToken(username, password, groups);
             } catch (NativeAccessException exc) {
                 throw new BadCredentialsException(exc.getMessage(), exc);

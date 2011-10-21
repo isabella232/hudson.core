@@ -16,7 +16,7 @@
 
 package org.eclipse.hudson.rest.api.internal;
 
-import org.acegisecurity.AcegiSecurityException;
+import org.springframework.security.SpringSecurityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,12 +35,12 @@ import static javax.ws.rs.core.Response.Status.*;
  * @since 2.1.0
  */
 @Provider
-public class AcegiSecurityExceptionMapper
-    implements ExceptionMapper<AcegiSecurityException>
+public class SpringSecurityExceptionMapper
+    implements ExceptionMapper<SpringSecurityException>
 {
-    private static final Logger log = LoggerFactory.getLogger(AcegiSecurityExceptionMapper.class);
+    private static final Logger log = LoggerFactory.getLogger(SpringSecurityExceptionMapper.class);
 
-    public Response toResponse(final AcegiSecurityException cause) {
+    public Response toResponse(final SpringSecurityException cause) {
         checkNotNull(cause);
 
         log.debug("Generating UNAUTHORIZED response for: {}", cause, cause);

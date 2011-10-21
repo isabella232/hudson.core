@@ -26,15 +26,15 @@ import hudson.tasks.MailAddressResolver;
 import hudson.util.spring.BeanBuilder;
 import java.io.Console;
 import java.io.IOException;
-import org.acegisecurity.Authentication;
-import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.AuthenticationManager;
-import org.acegisecurity.BadCredentialsException;
-import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import org.acegisecurity.providers.dao.AbstractUserDetailsAuthenticationProvider;
-import org.acegisecurity.userdetails.UserDetails;
-import org.acegisecurity.userdetails.UserDetailsService;
-import org.acegisecurity.userdetails.UsernameNotFoundException;
+import org.springframework.security.Authentication;
+import org.springframework.security.AuthenticationException;
+import org.springframework.security.AuthenticationManager;
+import org.springframework.security.BadCredentialsException;
+import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
+import org.springframework.security.providers.dao.AbstractUserDetailsAuthenticationProvider;
+import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.userdetails.UserDetailsService;
+import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.jvnet.animal_sniffer.IgnoreJRERequirement;
 import org.kohsuke.args4j.Option;
 import org.springframework.dao.DataAccessException;
@@ -44,7 +44,7 @@ import org.springframework.web.context.WebApplicationContext;
  * Partial implementation of {@link SecurityRealm} for username/password based authentication.
  * This is a convenience base class if all you are trying to do is to check the given username
  * and password with the information stored in somewhere else, and you don't want to do anything
- * with Acegi.
+ * with Spring Security.
  * <p/>
  * <p/>
  * This {@link SecurityRealm} uses the standard login form (and a few other optional mechanisms like BASIC auth)
@@ -114,7 +114,7 @@ public abstract class AbstractPasswordBasedSecurityRealm extends SecurityRealm i
      * <p/>
      * <p/>
      * If the user name and the password pair matches, retrieve the information about this user and
-     * return it as a {@link UserDetails} object. {@link org.acegisecurity.userdetails.User} is a convenient
+     * return it as a {@link UserDetails} object. {@link org.springframework.security.userdetails.User} is a convenient
      * implementation to use, but if your backend offers additional data, you may want to use your own subtype
      * so that the rest of Hudson can use those additional information (such as e-mail address --- see
      * {@link MailAddressResolver}.)

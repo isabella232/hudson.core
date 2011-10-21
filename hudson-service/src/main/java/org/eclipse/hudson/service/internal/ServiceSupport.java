@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <ul>
  * <li>throw a {@link NullPointerException} if a null object
  * reference is passed in any parameter.
- * <li>throw an {@link org.acegisecurity.AccessDeniedException} if the current thread context does not hold a required authority
+ * <li>throw an {@link org.springframework.security.AccessDeniedException} if the current thread context does not hold a required authority
  * to perform an operation
  * </ul>
  *

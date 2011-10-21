@@ -16,9 +16,9 @@
 
 package hudson.security;
 
-import org.acegisecurity.Authentication;
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.GrantedAuthorityImpl;
+import org.springframework.security.Authentication;
+import org.springframework.security.GrantedAuthority;
+import org.springframework.security.GrantedAuthorityImpl;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +33,7 @@ import hudson.model.Hudson;
  * given through {@link HttpServletRequest}.
  *
  * <p>
- * This is used to plug the container authentication to Acegi,
+ * This is used to plug the container authentication to Spring Security,
  * for backward compatibility with Hudson &lt; 1.160.
  *
  * @author Kohsuke Kawaguchi

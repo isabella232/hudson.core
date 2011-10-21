@@ -16,13 +16,12 @@
 
 package hudson.security;
 
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.ldap.InitialDirContextFactory;
-import org.acegisecurity.ldap.LdapDataAccessException;
-import org.acegisecurity.providers.ldap.LdapAuthoritiesPopulator;
-import org.acegisecurity.providers.ldap.populator.DefaultLdapAuthoritiesPopulator;
-import org.acegisecurity.userdetails.ldap.LdapUserDetails;
+import org.springframework.security.GrantedAuthority;
+import org.springframework.ldap.core.ContextSource; 
+import org.springframework.security.ldap.LdapAuthoritiesPopulator;
+import org.springframework.security.ldap.populator.DefaultLdapAuthoritiesPopulator;
 import hudson.security.SecurityRealm.SecurityComponents;
+import org.springframework.ldap.core.DirContextOperations;
 
 /**
  * Implementation of {@link LdapAuthoritiesPopulator} that defers creation of a
@@ -42,10 +41,11 @@ public class DeferredCreationLdapAuthoritiesPopulator implements LdapAuthorities
     private String defaultRole = null;
 
     /**
-     * An initial context factory is only required if searching for groups is
+     * An initial context source is only required if searching for groups is
      * required.
      */
-    private InitialDirContextFactory initialDirContextFactory = null;
+
+    private ContextSource contextSource;
 
     /**
      * Controls used to determine whether group searches should be performed
@@ -83,14 +83,13 @@ public class DeferredCreationLdapAuthoritiesPopulator implements LdapAuthorities
      *            the root DN of the context factory.
      */
     public DeferredCreationLdapAuthoritiesPopulator(
-            InitialDirContextFactory initialDirContextFactory, String groupSearchBase) {
-        this.setInitialDirContextFactory(initialDirContextFactory);
+            ContextSource contextSource, String groupSearchBase) {
+        this.contextSource = contextSource;
         this.setGroupSearchBase(groupSearchBase);
     }
-
-    public GrantedAuthority[] getGrantedAuthorities(LdapUserDetails userDetails)
-            throws LdapDataAccessException {
-        return create().getGrantedAuthorities(userDetails);
+    
+     public GrantedAuthority[] getGrantedAuthorities(DirContextOperations user, String username) {
+        return create().getGrantedAuthorities(user, username);
     }
 
     public void setConvertToUpperCase(boolean convertToUpperCase) {
@@ -113,10 +112,6 @@ public class DeferredCreationLdapAuthoritiesPopulator implements LdapAuthorities
         this.groupSearchFilter = groupSearchFilter;
     }
 
-    public void setInitialDirContextFactory(InitialDirContextFactory initialDirContextFactory) {
-        this.initialDirContextFactory = initialDirContextFactory;
-    }
-
     public void setRolePrefix(String rolePrefix) {
         this.rolePrefix = rolePrefix;
     }
@@ -132,7 +127,7 @@ public class DeferredCreationLdapAuthoritiesPopulator implements LdapAuthorities
      */
     private DefaultLdapAuthoritiesPopulator create() {
         DefaultLdapAuthoritiesPopulator populator = new DefaultLdapAuthoritiesPopulator(
-                initialDirContextFactory, groupSearchBase);
+                contextSource, groupSearchBase);
         populator.setConvertToUpperCase(convertToUpperCase);
         if (defaultRole != null) {
             populator.setDefaultRole(defaultRole);
@@ -143,5 +138,4 @@ public class DeferredCreationLdapAuthoritiesPopulator implements LdapAuthorities
         populator.setSearchSubtree(searchSubtree);
         return populator;
     }
-
 }

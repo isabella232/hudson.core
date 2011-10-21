@@ -24,8 +24,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.ui.webapp.AuthenticationProcessingFilter;
+import org.springframework.security.AuthenticationException;
+import org.springframework.security.ui.webapp.AuthenticationProcessingFilter;
 
 /**
  * {@link AuthenticationProcessingFilter} with a change for Hudson so that
@@ -54,7 +54,7 @@ public class AuthenticationProcessingFilter2 extends AuthenticationProcessingFil
     }
 
     /**
-     * @see org.acegisecurity.ui.AbstractProcessingFilter#determineFailureUrl(javax.servlet.http.HttpServletRequest, org.acegisecurity.AuthenticationException)
+     * @see org.springframework.security.ui.AbstractProcessingFilter#determineFailureUrl(javax.servlet.http.HttpServletRequest, org.springframework.security.AuthenticationException)
      */
     @Override
     protected String determineFailureUrl(HttpServletRequest request, AuthenticationException failed) {
@@ -69,7 +69,7 @@ public class AuthenticationProcessingFilter2 extends AuthenticationProcessingFil
      * Leave the information about login failure.
      *
      * <p>
-     * Otherwise it seems like Acegi doesn't really leave the detail of the failure anywhere.
+     * Otherwise it seems like Spring Security doesn't really leave the detail of the failure anywhere.
      */
     @Override
     protected void onUnsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {

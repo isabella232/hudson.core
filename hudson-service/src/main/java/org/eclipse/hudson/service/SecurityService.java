@@ -22,8 +22,8 @@ import hudson.security.Permission;
 
 import java.util.concurrent.Callable;
 
-import org.acegisecurity.AccessDeniedException;
-import org.acegisecurity.Authentication;
+import org.springframework.security.AccessDeniedException;
+import org.springframework.security.Authentication;
 import org.eclipse.hudson.service.internal.SecurityServiceImpl;
 
 import com.google.inject.ImplementedBy;
