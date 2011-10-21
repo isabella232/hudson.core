@@ -29,16 +29,16 @@ import hudson.util.Protector;
 import hudson.util.Scrambler;
 import hudson.util.XStream2;
 import net.sf.json.JSONObject;
-import org.acegisecurity.Authentication;
-import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.BadCredentialsException;
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.context.SecurityContextHolder;
-import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import org.acegisecurity.providers.encoding.PasswordEncoder;
-import org.acegisecurity.providers.encoding.ShaPasswordEncoder;
-import org.acegisecurity.userdetails.UserDetails;
-import org.acegisecurity.userdetails.UsernameNotFoundException;
+import org.springframework.security.Authentication;
+import org.springframework.security.AuthenticationException;
+import org.springframework.security.BadCredentialsException;
+import org.springframework.security.GrantedAuthority;
+import org.springframework.security.context.SecurityContextHolder;
+import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
+import org.springframework.security.providers.encoding.PasswordEncoder;
+import org.springframework.security.providers.encoding.ShaPasswordEncoder;
+import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.kohsuke.stapler.*;
 import org.springframework.dao.DataAccessException;
 
@@ -578,7 +578,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
      *
      * <p>
      * This abbreviates the need to store the salt separately, which in turn allows us to hide the salt handling
-     * in this little class. The rest of the Acegi thinks that we are not using salt.
+     * in this little class. The rest of the Spring Security thinks that we are not using salt.
      */
     public static final PasswordEncoder PASSWORD_ENCODER = new PasswordEncoder() {
         private final PasswordEncoder passwordEncoder = new ShaPasswordEncoder(256);

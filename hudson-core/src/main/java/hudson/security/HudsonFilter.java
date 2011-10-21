@@ -30,9 +30,9 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.acegisecurity.AuthenticationManager;
-import org.acegisecurity.ui.rememberme.RememberMeServices;
-import org.acegisecurity.userdetails.UserDetailsService;
+import org.springframework.security.AuthenticationManager;
+import org.springframework.security.ui.rememberme.RememberMeServices;
+import org.springframework.security.userdetails.UserDetailsService;
 
 /**
  * {@link Filter} that Hudson uses to implement security support.
@@ -59,7 +59,7 @@ public class HudsonFilter implements Filter {
     private FilterConfig filterConfig;
 
     /**
-     * {@link AuthenticationManager} proxy so that the acegi filter chain can stay the same
+     * {@link AuthenticationManager} proxy so that the Spring Security filter chain can stay the same
      * even when security setting is reconfigured.
      *
      * @deprecated in 1.271.
@@ -69,7 +69,7 @@ public class HudsonFilter implements Filter {
     public static final AuthenticationManagerProxy AUTHENTICATION_MANAGER = new AuthenticationManagerProxy();
 
     /**
-     * {@link UserDetailsService} proxy so that the acegi filter chain can stay the same
+     * {@link UserDetailsService} proxy so that the Spring Security filter chain can stay the same
      * even when security setting is reconfigured.
      *
      * @deprecated in 1.271.
@@ -79,7 +79,7 @@ public class HudsonFilter implements Filter {
     public static final UserDetailsServiceProxy USER_DETAILS_SERVICE_PROXY = new UserDetailsServiceProxy();
     
     /**
-     * {@link RememberMeServices} proxy so that the acegi filter chain can stay the same
+     * {@link RememberMeServices} proxy so that the Spring Security filter chain can stay the same
      * even when security setting is reconfigured.
      *
      * @deprecated in 1.271.

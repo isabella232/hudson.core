@@ -23,7 +23,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import java.io.IOException;
-import org.acegisecurity.AccessDeniedException;
+import org.springframework.security.AccessDeniedException;
 
 /**
  * Authorization token to allow projects to trigger themselves under the secured environment.

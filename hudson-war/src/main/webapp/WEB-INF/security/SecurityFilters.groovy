@@ -22,11 +22,11 @@ import hudson.security.BasicAuthenticationFilter
 import hudson.security.ChainedServletFilter
 import hudson.security.UnwrapSecurityExceptionFilter
 import hudson.security.HudsonAuthenticationEntryPoint
-import org.acegisecurity.providers.anonymous.AnonymousProcessingFilter
-import org.acegisecurity.ui.ExceptionTranslationFilter
-import org.acegisecurity.ui.basicauth.BasicProcessingFilter
-import org.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint
-import org.acegisecurity.ui.rememberme.RememberMeProcessingFilter
+import org.springframework.security.providers.anonymous.AnonymousProcessingFilter
+import org.springframework.security.ui.ExceptionTranslationFilter
+import org.springframework.security.ui.basicauth.BasicProcessingFilter
+import org.springframework.security.ui.basicauth.BasicProcessingFilterEntryPoint
+import org.springframework.security.ui.rememberme.RememberMeProcessingFilter
 import hudson.security.HttpSessionContextIntegrationFilter2
 import hudson.security.SecurityRealm
 
@@ -68,7 +68,7 @@ filter(ChainedServletFilter) {
             rememberMeServices = securityComponents.rememberMe
             authenticationFailureUrl = "/loginError"
             defaultTargetUrl = "/"
-            filterProcessesUrl = "/j_acegi_security_check"
+            filterProcessesUrl = "/j_spring_security_check"
         },
         bean(RememberMeProcessingFilter) {
             rememberMeServices = securityComponents.rememberMe

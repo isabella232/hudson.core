@@ -38,7 +38,7 @@ public enum SecurityMode {
      */
     LEGACY,
     /**
-     * Security-enabled mode implemented through Acegi.
+     * Security-enabled mode implemented through Spring Security.
      */
     SECURED
 }

@@ -16,7 +16,7 @@
 
 package org.eclipse.hudson.rest.plugin.components;
 
-import org.eclipse.hudson.rest.api.internal.AcegiSecurityExceptionMapper;
+import org.eclipse.hudson.rest.api.internal.SpringSecurityExceptionMapper;
 import org.eclipse.hudson.rest.api.internal.FaultExceptionMapper;
 import org.eclipse.hudson.rest.api.internal.GenericExceptionMapper;
 import org.eclipse.hudson.rest.api.internal.HandshakeResource;
@@ -47,7 +47,7 @@ public class CoreComponents
             JacksonProvider.class,
             FaultExceptionMapper.class,
             NotFoundExceptionMapper.class,
-            AcegiSecurityExceptionMapper.class,
+            SpringSecurityExceptionMapper.class,
             WebApplicationExceptionMapper.class,
             GenericExceptionMapper.class,
 

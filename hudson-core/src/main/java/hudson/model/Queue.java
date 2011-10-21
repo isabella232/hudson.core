@@ -83,7 +83,7 @@ import java.util.logging.Logger;
 import javax.management.timer.Timer;
 import javax.servlet.ServletException;
 
-import org.acegisecurity.AccessDeniedException;
+import org.springframework.security.AccessDeniedException;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.HttpResponses;
 import org.kohsuke.stapler.export.Exported;

@@ -16,9 +16,9 @@
 
 package hudson.security;
 
-import org.acegisecurity.Authentication;
-import org.acegisecurity.context.SecurityContext;
-import org.acegisecurity.userdetails.UserDetails;
+import org.springframework.security.Authentication;
+import org.springframework.security.context.SecurityContext;
+import org.springframework.security.userdetails.UserDetails;
 
 import javax.servlet.http.HttpSession;
 
@@ -27,16 +27,16 @@ import javax.servlet.http.HttpSession;
  *
  * <p>
  * Tomcat persists sessions by using Java serialization (and
- * that includes the security token created by Acegi, which includes this object)
+ * that includes the security token created by Spring Security, which includes this object)
  * and when that happens, the next time the server comes back
- * it will try to deserialize {@link SecurityContext} that Acegi
+ * it will try to deserialize {@link SecurityContext} that Spring Security
  * puts into {@link HttpSession} (which transitively includes {@link UserDetails}
  * that can be implemented by Hudson.
  *
  * <p>
  * Such {@link UserDetails} implementation can override the {@link #isInvalid()}
  * method and return false, so that such {@link SecurityContext} will be
- * dropped before the rest of Acegi sees it.
+ * dropped before the rest of Spring Security sees it.
  *
  * <p>
  * See http://issues.hudson-ci.org/browse/HUDSON-1482

@@ -19,7 +19,7 @@ package org.eclipse.hudson.service;
 import com.google.inject.ImplementedBy;
 import hudson.model.Hudson;
 import hudson.model.Queue;
-import org.acegisecurity.AccessDeniedException;
+import org.springframework.security.AccessDeniedException;
 import org.eclipse.hudson.service.internal.QueueServiceImpl;
 
 /**

@@ -20,7 +20,7 @@ import hudson.model.Node;
 
 import java.util.List;
 
-import org.acegisecurity.AccessDeniedException;
+import org.springframework.security.AccessDeniedException;
 import org.eclipse.hudson.service.internal.NodeServiceImpl;
 
 import com.google.inject.ImplementedBy;

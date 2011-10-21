@@ -16,9 +16,9 @@
 
 package hudson.security;
 
-import org.acegisecurity.context.HttpSessionContextIntegrationFilter;
-import org.acegisecurity.context.SecurityContext;
-import org.acegisecurity.Authentication;
+import org.springframework.security.context.HttpSessionContextIntegrationFilter;
+import org.springframework.security.context.SecurityContext;
+import org.springframework.security.Authentication;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -36,21 +36,21 @@ import java.io.IOException;
  */
 public class HttpSessionContextIntegrationFilter2 extends HttpSessionContextIntegrationFilter {
     public HttpSessionContextIntegrationFilter2() throws ServletException {
-        setContext(NotSerilizableSecurityContext.class);
+        setContextClass(NotSerilizableSecurityContext.class);
     }
 
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+    public void doFilterHttp(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpSession session = ((HttpServletRequest) req).getSession(false);
         if(session!=null) {
-            SecurityContext o = (SecurityContext)session.getAttribute(ACEGI_SECURITY_CONTEXT_KEY);
+            SecurityContext o = (SecurityContext)session.getAttribute(SPRING_SECURITY_CONTEXT_KEY);
             if(o!=null) {
                 Authentication a = o.getAuthentication();
                 if(a!=null) {
                     if (a.getPrincipal() instanceof InvalidatableUserDetails) {
                         InvalidatableUserDetails ud = (InvalidatableUserDetails) a.getPrincipal();
                         if(ud.isInvalid())
-                            // don't let Acegi see invalid security context
-                            session.setAttribute(ACEGI_SECURITY_CONTEXT_KEY,null);
+                            // don't let Spring Security see invalid security context
+                            session.setAttribute(SPRING_SECURITY_CONTEXT_KEY,null);
                     }
                 }
             }

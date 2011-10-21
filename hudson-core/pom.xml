@@ -14,7 +14,6 @@
 #
 #************************************************************************** --> 
 
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -31,6 +30,7 @@
 
     <properties>
         <staplerFork>true</staplerFork>
+        
         <!--Libraries-->
         <crypto-util.version>1.0</crypto-util.version>
         <jtidy.version>r938</jtidy.version>
@@ -53,7 +53,8 @@
         <javax-mail.version>1.4</javax-mail.version>
         <activation.version>1.1.1-hudson-1</activation.version>
         <jaxen.version>1.1-beta-11</jaxen.version>
-        <acegi-security.version>1.0.5</acegi-security.version>
+        <spring-security.version>2.0.7.RELEASE</spring-security.version>
+        <spring-ldap.version>1.2.1</spring-ldap.version>
         <spring.version>2.5.6</spring.version>
         <spring-dao.version>2.0.8</spring-dao.version>
         <xpp3.version>1.1.4c</xpp3.version>
@@ -110,7 +111,8 @@
                 <groupId>org.kohsuke.stapler</groupId>
                 <artifactId>maven-stapler-plugin</artifactId>
                 <configuration>
-                    <fork>${staplerFork}</fork><!-- the source code is big enough now that otherwise it fails with OutOfMemoryError -->
+                    <fork>${staplerFork}</fork>
+                    <!-- the source code is big enough now that otherwise it fails with OutOfMemoryError -->
                     <maxmem>128m</maxmem>
                 </configuration>
             </plugin>
@@ -183,7 +185,8 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin><!-- set main class -->
+            <plugin>
+                <!-- set main class -->
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
@@ -196,15 +199,16 @@
                 </configuration>
             </plugin>
             <plugin>
-        <!--
-          Configuration for generating Wiki page.
-          This kicks in with the release profile, or by manually running "mvn apt:process"
-        -->
+                <!--
+                  Configuration for generating Wiki page.
+                  This kicks in with the release profile, or by manually running "mvn apt:process"
+                -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>apt-maven-plugin</artifactId>
                 <version>${apt-maven-plugin.version}</version>
                 <configuration>
-                    <force>true</force><!-- disable staleness check -->
+                    <force>true</force>
+                    <!-- disable staleness check -->
                     <factory>org.jvnet.hudson.tools.ExtensionPointListerFactory</factory>
                     <options>
                         <option>page=Extension points</option>
@@ -242,7 +246,7 @@
         <profile>
             <id>release</id>
             <properties>
-        <!-- for releases, just use the POM version. See above ant-run plugin for how this gets used. -->
+                <!-- for releases, just use the POM version. See above ant-run plugin for how this gets used. -->
                 <build.version>${project.version}</build.version>
             </properties>
             <build>
@@ -260,11 +264,11 @@
                         </executions>
                     </plugin>
                     <plugin>
-            <!--
-              generate jelly taglib docs from src/main/resoruces.
-              this is necessary in addition to the <reporting> configuration
-              to get the results deployed.
-            -->
+                        <!--
+                          generate jelly taglib docs from src/main/resoruces.
+                          this is necessary in addition to the <reporting> configuration
+                          to get the results deployed.
+                        -->
                         <groupId>org.kohsuke.stapler</groupId>
                         <artifactId>maven-stapler-plugin</artifactId>
                         <executions>
@@ -284,7 +288,7 @@
             </build>
         </profile>
         <profile>
-      <!-- run FindBugs for better error detection -->
+            <!-- run FindBugs for better error detection -->
             <id>findbugs</id>
             <reporting>
                 <plugins>
@@ -308,7 +312,7 @@
             <groupId>org.eclipse.hudson.main</groupId>
             <artifactId>hudson-remoting</artifactId>
         </dependency>
-    <!-- Why does the core depend on the CLI? -->
+        <!-- Why does the core depend on the CLI? -->
         <dependency>
             <groupId>org.eclipse.hudson.main</groupId>
             <artifactId>hudson-cli</artifactId>
@@ -355,7 +359,8 @@
             <version>${bridge-method-annotation.version}</version>
         </dependency>
 
-        <dependency><!-- until we get this version through Stapler -->
+        <dependency>
+            <!-- until we get this version through Stapler -->
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
             <version>${json-lib.version}</version>
@@ -401,7 +406,8 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-        <dependency><!-- hudson doesn't use this directly, but some plugins wanted to use the latest -->
+        <dependency>
+            <!-- hudson doesn't use this directly, but some plugins wanted to use the latest -->
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
@@ -417,10 +423,10 @@
             </exclusions>
         </dependency>
         <dependency>
-      <!--
-        The version included in the transitive dependency doesn't have the source zip,
-        so explicitly using the newer version.
-      -->
+             <!--
+                The version included in the transitive dependency doesn't have the source zip,
+                so explicitly using the newer version.
+             -->
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>${commons-beanutils.version}</version>
@@ -440,33 +446,6 @@
             <groupId>org.jvnet.hudson</groupId>
             <artifactId>activation</artifactId>
             <version>${activation.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-            <version>${jaxen.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>dom4j</groupId>
-                    <artifactId>dom4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xom</groupId>
-                    <artifactId>xom</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jdom</groupId>
-                    <artifactId>jdom</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-jelly</groupId>
@@ -533,38 +512,15 @@
             <version>${commons-jexl.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.acegisecurity</groupId>
-            <artifactId>acegi-security</artifactId>
-            <version>${acegi-security.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-remoting</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-support</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-dao</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-jdbc</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>${groovy.version}</version>
         </dependency>
         <dependency>
-      <!--
-        for Grails spring bean builder.
-        Ideally we should be able to modify BeanBuilder so as not to depend on this.
-      -->
+            <!--
+                for Grails spring bean builder.
+                Ideally we should be able to modify BeanBuilder so as not to depend on this.
+            -->
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
@@ -590,6 +546,22 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>${spring-security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-acl</artifactId>
+            <version>${spring-security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ldap</groupId>
+            <artifactId>spring-ldap</artifactId>
+            <version>${spring-ldap.version}</version>
         </dependency>
 
         <dependency>
@@ -645,7 +617,8 @@
             <version>${winsw.version}</version>
             <classifier>bin</classifier>
             <type>exe</type>
-            <scope>provided</scope><!-- this isn't really a dependency that Maven should care about, so putting 'provided' -->
+            <scope>provided</scope>
+            <!-- this isn't really a dependency that Maven should care about, so putting 'provided' -->
         </dependency>
         <dependency>
             <groupId>com.sun.solaris</groupId>
@@ -694,13 +667,17 @@
             <artifactId>test-annotations</artifactId>
         </dependency>
 
-        <dependency><!-- Hudson core doesn't depend on it but some plugin wants the latest version. Bundling 1.4 until we figure out a mechanism to let plugins load its own -->
+        <dependency>
+            <!-- 
+              Hudson core doesn't depend on it but some plugin wants 
+              the latest version. Bundling 1.4 until we figure out a mechanism to let plugins load its own 
+            -->
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
 
         <dependency>
-      <!-- with this, stapler can load parameter names from the debug info -->
+            <!-- with this, stapler can load parameter names from the debug info -->
             <groupId>asm</groupId>
             <artifactId>asm-commons</artifactId>
             <version>${asm-commons.version}</version>
@@ -726,7 +703,8 @@
 
     <reporting>
         <plugins>
-            <plugin><!-- generate Jelly tag lib documentation -->
+            <plugin>
+                <!-- generate Jelly tag lib documentation -->
                 <groupId>org.kohsuke.stapler</groupId>
                 <artifactId>maven-stapler-plugin</artifactId>
                 <version>${maven-stapler-plugin.version}</version>
@@ -736,7 +714,8 @@
                     </patterns>
                 </configuration>
             </plugin>
-            <plugin><!-- skip slow dependency analysis -->
+            <plugin>
+                <!-- skip slow dependency analysis -->
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>${maven-project-info-reports-plugin.version}</version>
                 <configuration>

@@ -39,16 +39,16 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
-import org.acegisecurity.Authentication;
-import org.acegisecurity.AuthenticationManager;
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.GrantedAuthorityImpl;
-import org.acegisecurity.context.SecurityContext;
-import org.acegisecurity.context.SecurityContextHolder;
-import org.acegisecurity.ui.rememberme.RememberMeServices;
-import org.acegisecurity.userdetails.UserDetails;
-import org.acegisecurity.userdetails.UserDetailsService;
-import org.acegisecurity.userdetails.UsernameNotFoundException;
+import org.springframework.security.Authentication;
+import org.springframework.security.AuthenticationManager;
+import org.springframework.security.GrantedAuthority;
+import org.springframework.security.GrantedAuthorityImpl;
+import org.springframework.security.context.SecurityContext;
+import org.springframework.security.context.SecurityContextHolder;
+import org.springframework.security.ui.rememberme.RememberMeServices;
+import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.userdetails.UserDetailsService;
+import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
@@ -57,7 +57,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.acegisecurity.ui.rememberme.TokenBasedRememberMeServices.ACEGI_SECURITY_HASHED_REMEMBER_ME_COOKIE_KEY;
+import static org.springframework.security.ui.rememberme.TokenBasedRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY;
 
 /**
  * Pluggable security realm that connects external user database to Hudson.
@@ -73,7 +73,7 @@ import static org.acegisecurity.ui.rememberme.TokenBasedRememberMeServices.ACEGI
  * For compatibility reasons, there are two somewhat different ways to implement a custom SecurityRealm.
  * <p/>
  * <p/>
- * One is to override the {@link #createSecurityComponents()} and create key Acegi components
+ * One is to override the {@link #createSecurityComponents()} and create key Spring Security components
  * that control the authentication process.
  * The default {@link SecurityRealm#createFilter(FilterConfig)} implementation then assembles them
  * into a chain of {@link Filter}s. All the incoming requests to Hudson go through this filter chain,
@@ -92,7 +92,7 @@ import static org.acegisecurity.ui.rememberme.TokenBasedRememberMeServices.ACEGI
  * The other way of doing this is to ignore {@link #createSecurityComponents()} completely (by returning
  * {@link SecurityComponents} created by the default constructor) and just concentrate on {@link #createFilter(FilterConfig)}.
  * As long as the resulting filter chain properly sets up {@link Authentication} object at the end of the processing,
- * Hudson doesn't really need you to fit the standard Acegi models like {@link AuthenticationManager} and
+ * Hudson doesn't really need you to fit the standard Spring Security models like {@link AuthenticationManager} and
  * {@link UserDetailsService}.
  * <p/>
  * <p/>
@@ -176,7 +176,7 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
      * There's no need to override this, except for {@link LegacySecurityRealm}.
      */
     public String getAuthenticationGatewayUrl() {
-        return "j_acegi_security_check";
+        return "j_spring_security_check";
     }
 
     /**
@@ -262,7 +262,7 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
         EnvVars.clearHudsonUserEnvVar();
 
         // reset remember-me cookie
-        Cookie cookie = new Cookie(ACEGI_SECURITY_HASHED_REMEMBER_ME_COOKIE_KEY, "");
+        Cookie cookie = new Cookie(SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY, "");
         cookie.setPath(req.getContextPath().length() > 0 ? req.getContextPath() : "/");
         rsp.addCookie(cookie);
 
@@ -361,7 +361,7 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
      * If there are multiple beans of the same type or if there are none,
      * this method treats that as an {@link IllegalArgumentException}.
      * <p/>
-     * This method is intended to be used to pick up a Acegi object from
+     * This method is intended to be used to pick up a Spring Security object from
      * spring once the bean definition file is parsed.
      */
     protected static <T> T findBean(Class<T> type, ApplicationContext context) {

@@ -124,14 +124,14 @@ import hudson.views.MyViewsTabBar;
 import hudson.views.ViewsTabBar;
 import hudson.widgets.Widget;
 import net.sf.json.JSONObject;
-import org.acegisecurity.AccessDeniedException;
-import org.acegisecurity.AcegiSecurityException;
-import org.acegisecurity.Authentication;
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.GrantedAuthorityImpl;
-import org.acegisecurity.context.SecurityContextHolder;
-import org.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
-import org.acegisecurity.ui.AbstractProcessingFilter;
+import org.springframework.security.AccessDeniedException;
+import org.springframework.security.SpringSecurityException;
+import org.springframework.security.Authentication;
+import org.springframework.security.GrantedAuthority;
+import org.springframework.security.GrantedAuthorityImpl;
+import org.springframework.security.context.SecurityContextHolder;
+import org.springframework.security.providers.anonymous.AnonymousAuthenticationToken;
+import org.springframework.security.ui.AbstractProcessingFilter;
 import org.apache.commons.jelly.JellyException;
 import org.apache.commons.jelly.Script;
 import org.apache.commons.lang3.StringUtils;
@@ -1990,7 +1990,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             }
         } catch (ServletException e) {
             // for binary compatibility, this method cannot throw a checked exception
-            throw new AcegiSecurityException("Failed to configure filter", e) {
+            throw new SpringSecurityException("Failed to configure filter", e) {
             };
         }
     }
@@ -2892,9 +2892,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             return;
         }
 
-        String url = AbstractProcessingFilter.obtainFullRequestUrl(req);
+        String url = AbstractProcessingFilter.obtainFullSavedRequestUrl(req);
         if (url != null) {
-            // if the login redirect is initiated by Acegi
+            // if the login redirect is initiated by Spring Security
             // this should send the user back to where s/he was from.
             rsp.sendRedirect2(url);
             return;
@@ -3889,7 +3889,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public static final Permission READ = new Permission(PERMISSIONS, "Read", Messages._Hudson_ReadPermission_Description(), Permission.READ);
     /**
      * {@link Authentication} object that represents the anonymous user.
-     * Because Acegi creates its own {@link AnonymousAuthenticationToken} instances, the code must not
+     * Because Spring Security creates its own {@link AnonymousAuthenticationToken} instances, the code must not
      * expect the singleton semantics. This is just a convenient instance.
      *
      * @since 1.343
