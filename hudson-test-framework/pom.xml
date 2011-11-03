@@ -64,9 +64,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.eclipse.hudson.main</groupId>
+      <groupId>org.jvnet.hudson.main</groupId>
       <artifactId>rest-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>2.1.2</version>
     </dependency>
 
     <dependency>
@@ -75,9 +75,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.eclipse.hudson.main</groupId>
+      <groupId>org.jvnet.hudson.main</groupId>
       <artifactId>maven-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>2.1.2</version>
     </dependency>
 
     <dependency>
