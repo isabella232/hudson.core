@@ -413,26 +413,6 @@
             <artifactId>hudson-remoting</artifactId>
         </dependency>
 
-        <!-- declare in reactor, so "mvn install -pl war -am" will work -->
-        <dependency>
-            <groupId>org.eclipse.hudson.main</groupId>
-            <artifactId>rest-plugin</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.hudson.main</groupId>
-            <artifactId>maven3-plugin</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.hudson.main</groupId>
-            <artifactId>maven3-snapshots</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
