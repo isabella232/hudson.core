@@ -50,9 +50,9 @@ import java.util.List;
  */
 public class Graph {
 
-    public static final int TYPE_BAR = 1;
+    public static final int TYPE_STACKED_AREA = 1;
     public static final int TYPE_LINE = 2;
-    public static final int TYPE_STACKED_AREA = 3;
+    public static final int TYPE_STACKED_BAR = 3;
     private final long timestamp;
     private int width;
     private int height;
