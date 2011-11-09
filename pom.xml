@@ -62,7 +62,7 @@
       <sisuGuice.version>3.0.3</sisuGuice.version>
       <sisuInject.version>2.2.3</sisuInject.version>
       <jetty.version>6.1.26</jetty.version>
-      <wagon-http.version>1.0-beta-5</wagon-http.version>
+      <wagon-http.version>1.0-beta-7</wagon-http.version>
       <animal-sniffer-annotation.version>1.0</animal-sniffer-annotation.version>
       <test-annotations.version>1.0</test-annotations.version>
       <servlet-api.version>2.4</servlet-api.version>
