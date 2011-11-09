@@ -1103,7 +1103,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             data.add(((double) r.getDuration()) / (1000 * 60), "min",
                     new TimeTrendChartLabel(r));
         }
-        graph.setXAxisLabel(Messages.Job_minutes());
+        graph.setYAxisLabel(Messages.Job_minutes());
         graph.setData(data);
 
         return graph;

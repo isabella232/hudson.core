@@ -12,8 +12,7 @@
  *    Kohsuke Kawaguchi,  Winston.Prakash@Oracle.com
  *        
  *
- *******************************************************************************/ 
-
+ *******************************************************************************/
 package hudson.util.graph;
 
 import hudson.model.Descriptor.FormException;
@@ -34,7 +33,8 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
- * A JFreeChart-generated graph that's bound to UI.
+ * A Graph interface for graphing support. Actual graph generation is delegated to GraphSupport object.
+ * Plugin can provide their own graphing support via GraphSupport Extension Point.
  *
  * <p>
  * This object exposes two URLs:
@@ -46,13 +46,13 @@ import java.util.List;
  * <dd>Clickable map
  * </dl>
  * 
- * @since 1.320
+ * @since 2.3.0
  */
 public class Graph {
-    
-    public static int TYPE_STACKED_AREA = 1;
-    public static int TYPE_LINE = 2;
 
+    public static final int TYPE_BAR = 1;
+    public static final int TYPE_LINE = 2;
+    public static final int TYPE_STACKED_AREA = 3;
     private final long timestamp;
     private int width;
     private int height;
@@ -67,7 +67,11 @@ public class Graph {
         this.timestamp = timestamp;
         this.width = defaultW;
         this.height = defaultH;
-        if (!GraphSupport.all().isEmpty()){
+    }
+
+    public Graph(Calendar timestamp, int defaultW, int defaultH) {
+        this(timestamp.getTimeInMillis(), defaultW, defaultH);
+        if (!GraphSupport.all().isEmpty()) {
             try {
                 graphSupport = GraphSupport.all().get(0).newInstance(null, null);
             } catch (FormException ex) {
@@ -76,16 +80,20 @@ public class Graph {
         }
     }
 
-    public Graph(Calendar timestamp, int defaultW, int defaultH) {
-        this(timestamp.getTimeInMillis(), defaultW, defaultH);
+    public synchronized GraphSupport getGraphSupport() {
+        return graphSupport;
     }
-    
+
+    public void setGraphSupport(GraphSupport graphSupport) {
+        this.graphSupport = graphSupport;
+    }
+
     public void setChartType(int chartType) {
         if (graphSupport != null) {
             graphSupport.setChartType(chartType);
         }
     }
-    
+
     public void setMultiStageTimeSeries(List<MultiStageTimeSeries> multiStageTimeSeries) {
         if (graphSupport != null) {
             graphSupport.setMultiStageTimeSeries(multiStageTimeSeries);
@@ -150,10 +158,10 @@ public class Graph {
             os.close();
         } catch (Error e) {
             /* OpenJDK on ARM produces an error like this in case of headless error
-               Caused by: java.lang.Error: Probable fatal error:No fonts found.
-               at sun.font.FontManager.getDefaultPhysicalFont(FontManager.java:1088)
-               at sun.font.FontManager.initialiseDeferredFont(FontManager.java:967)
-               ..
+            Caused by: java.lang.Error: Probable fatal error:No fonts found.
+            at sun.font.FontManager.getDefaultPhysicalFont(FontManager.java:1088)
+            at sun.font.FontManager.initialiseDeferredFont(FontManager.java:967)
+            ..
              */
             if (e.getMessage().contains("Probable fatal error:No fonts found")) {
                 rsp.sendRedirect2(req.getContextPath() + "/images/headless.png");
