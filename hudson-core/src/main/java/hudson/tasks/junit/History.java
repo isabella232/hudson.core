@@ -76,7 +76,7 @@ public class History {
      */
     public Graph getDurationGraph() {
         Graph graph = new Graph(-1, 600, 300);
-        graph.setXAxisLabel("seconds");
+        graph.setYAxisLabel("seconds");
         graph.setData(getDurationGraphDataSet());
         return graph;
     }

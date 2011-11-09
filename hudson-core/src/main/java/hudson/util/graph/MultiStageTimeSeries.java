@@ -227,7 +227,7 @@ public class MultiStageTimeSeries {
         
         public Graph createGraph(){
             Graph graph = new Graph(-1, 500, 400);
-            graph.setXAxisLabel("");
+            graph.setYAxisLabel("");
             graph.setData(createDataset());
             graph.setChartType(Graph.TYPE_LINE); 
             graph.setMultiStageTimeSeries(series);

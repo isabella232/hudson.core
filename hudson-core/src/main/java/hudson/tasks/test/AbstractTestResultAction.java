@@ -199,7 +199,7 @@ public abstract class AbstractTestResultAction<T extends AbstractTestResultActio
     
         Area defSize = calcDefaultSize();
         Graph graph = new Graph(-1, defSize.width, defSize.height);
-        graph.setXAxisLabel("count");
+        graph.setYAxisLabel("count");
         graph.setData(getGraphDataSet(req));
         graph.doPng(req,rsp);
         
@@ -215,7 +215,7 @@ public abstract class AbstractTestResultAction<T extends AbstractTestResultActio
         
         Area defSize = calcDefaultSize();
         Graph graph = new Graph(-1, defSize.width, defSize.height);
-        graph.setXAxisLabel("count");
+        graph.setYAxisLabel("count");
         graph.setData(getGraphDataSet(req));
         graph.doMap(req,rsp);
     }
