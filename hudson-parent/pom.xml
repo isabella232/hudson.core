@@ -24,7 +24,7 @@
 
   <groupId>org.eclipse.hudson</groupId>
   <artifactId>hudson-parent</artifactId>
-  <version>2.1.0-SNAPSHOT</version>
+  <version>3.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hudson Parent</name>
