@@ -51,21 +51,6 @@
     <url>http://issues.hudson-ci.org/</url>
   </issueManagement>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.eclipse.hudson.main</groupId>
-        <artifactId>rest-plugin</artifactId>
-        <version>${rest-plugin.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.hudson.main</groupId>
-        <artifactId>maven-plugin</artifactId>
-        <version>${maven-plugin.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.eclipse.hudson.main</groupId>
