@@ -267,8 +267,8 @@ public abstract class AbstractTestResultAction<T extends AbstractTestResultActio
                 }
         }
 
-        public int compareTo(ChartLabel t) {
-            throw new UnsupportedOperationException("Not supported yet.");
+        public int compareTo(ChartLabel that) {
+            return this.build.number-((TestResultChartLabel)that).build.number;
         }
     }
 

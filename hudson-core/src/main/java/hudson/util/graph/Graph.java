@@ -67,17 +67,17 @@ public class Graph {
         this.timestamp = timestamp;
         this.width = defaultW;
         this.height = defaultH;
-    }
-
-    public Graph(Calendar timestamp, int defaultW, int defaultH) {
-        this(timestamp.getTimeInMillis(), defaultW, defaultH);
         if (!GraphSupport.all().isEmpty()) {
             try {
                 graphSupport = GraphSupport.all().get(0).newInstance(null, null);
             } catch (FormException ex) {
-                Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
             }
         }
+    }
+
+    public Graph(Calendar timestamp, int defaultW, int defaultH) {
+        this(timestamp.getTimeInMillis(), defaultW, defaultH);
     }
 
     public synchronized GraphSupport getGraphSupport() {
