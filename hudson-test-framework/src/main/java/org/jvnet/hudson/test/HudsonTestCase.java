@@ -143,10 +143,10 @@ import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebRequestSettings;
 import com.gargoylesoftware.htmlunit.xml.XmlPage;
 import com.gargoylesoftware.htmlunit.html.*;
-import hudson.maven.MavenBuild;
-import hudson.maven.MavenModule;
-import hudson.maven.MavenModuleSet;
-import hudson.maven.MavenModuleSetBuild;
+import org.eclipse.hudson.legacy.maven.plugin.MavenBuild;
+import org.eclipse.hudson.legacy.maven.plugin.MavenModule;
+import org.eclipse.hudson.legacy.maven.plugin.MavenModuleSet;
+import org.eclipse.hudson.legacy.maven.plugin.MavenModuleSetBuild;
 import hudson.slaves.ComputerListener;
 import java.util.concurrent.CountDownLatch;
 
