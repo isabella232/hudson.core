@@ -245,7 +245,7 @@ public abstract class AbstractTestResultAction<T extends AbstractTestResultActio
         }
         @Override
         public Color getColor(int row, int column) {
-            return Color.BLUE;
+            return ColorPalette.BLUE;
         }
 
         @Override
