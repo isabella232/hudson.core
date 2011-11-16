@@ -12,8 +12,7 @@
  *    Kohsuke Kawaguchi, Winston Prakash
  *     
  *
- *******************************************************************************/ 
-
+ *******************************************************************************/
 package hudson.util.graph;
 
 import java.util.ArrayList;
@@ -36,6 +35,9 @@ public final class DataSet<Row extends Comparable, Column extends Comparable> {
     private List<Number> values = new ArrayList<Number>();
     private List<Row> rows = new ArrayList<Row>();
     private List<Column> columns = new ArrayList<Column>();
+    //Included to set data as series definition (to be used by graphing support like BIRT Chart)
+    private GraphSeries<String> xSeries;
+    private List<GraphSeries<Number>> ySeries = new ArrayList<GraphSeries<Number>>();
 
     public void add(Number value, Row rowKey, Column columnKey) {
         values.add(value);
@@ -67,4 +69,19 @@ public final class DataSet<Row extends Comparable, Column extends Comparable> {
         this.values = values;
     }
 
+    public GraphSeries getXSeries() {
+        return xSeries;
+    }
+
+    public void setXSeries(GraphSeries<String> series) {
+        xSeries = series;
+    }
+
+    public List<GraphSeries<Number>> getYSeries() {
+        return ySeries;
+    }
+
+    public void addYSeries(GraphSeries<Number> series) {
+        ySeries.add(series);
+    }
 }

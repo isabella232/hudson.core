@@ -219,7 +219,7 @@ public class MultiStageTimeSeries {
                 date = new Date(date.getTime() + timeScale.tick);
                 String timeStr = format.format(date);
                 for (int j = 0; j < dataPoints.length; j++) {
-                   ds.add(dataPoints[j][i], series.get(j).title.toString(), timeStr);
+                   ds.add((double)dataPoints[j][i], series.get(j).title.toString(), timeStr);
                 }
             }
             return ds;
