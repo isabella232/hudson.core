@@ -20,8 +20,6 @@ import hudson.util.ColorPalette;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.HeadlessException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 

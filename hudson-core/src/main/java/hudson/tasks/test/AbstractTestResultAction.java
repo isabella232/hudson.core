@@ -25,6 +25,7 @@ import hudson.util.graph.ChartLabel;
 import hudson.util.graph.ChartUtil;
 import hudson.util.graph.ChartUtil.NumberOnlyBuildLabel;
 import hudson.util.graph.Graph;
+import hudson.util.graph.GraphSeries;
 import java.awt.Color;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.stapler.StaplerRequest;
@@ -224,13 +225,32 @@ public abstract class AbstractTestResultAction<T extends AbstractTestResultActio
         boolean failureOnly = Boolean.valueOf(req.getParameter("failureOnly"));
 
         DataSet<String, ChartLabel> dsb = new DataSet<String, ChartLabel>();
+        
+        
+        GraphSeries<String> xSeries = new GraphSeries<String>("Build No.");
+        dsb.setXSeries(xSeries);
+        
+        GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>("Failed", ColorPalette.RED, true);
+        ySeriesFailed.setBaseURL(getRelPath(req)); 
+        dsb.addYSeries(ySeriesFailed);
+        
+        GraphSeries<Number> ySeriesSkipped = new GraphSeries<Number>("Skipped", ColorPalette.YELLOW, true);
+        ySeriesSkipped.setBaseURL(getRelPath(req));
+        dsb.addYSeries(ySeriesSkipped);
+        
+        GraphSeries<Number> ySeriesTotal = new GraphSeries<Number>("Total", ColorPalette.BLUE, true);
+        ySeriesTotal.setBaseURL(getRelPath(req));
+        dsb.addYSeries(ySeriesTotal);
 
         for( AbstractTestResultAction<?> a=this; a!=null; a=a.getPreviousResult(AbstractTestResultAction.class) ) {
-            dsb.add( a.getFailCount(), "failed", new TestResultChartLabel(req, a.owner));
+            xSeries.add(a.owner.getDisplayName());
+            dsb.add((double)a.getFailCount(), "failed", new TestResultChartLabel(req, a.owner));
+            ySeriesFailed.add((double)a.getFailCount());
             if(!failureOnly) {
-                
-                dsb.add( a.getSkipCount(), "skipped", new TestResultChartLabel(req, a.owner));
-                dsb.add( a.getTotalCount()-a.getFailCount()-a.getSkipCount(),"total", new TestResultChartLabel(req, a.owner));
+                dsb.add((double)a.getSkipCount(), "skipped", new TestResultChartLabel(req, a.owner));
+                ySeriesSkipped.add((double)a.getSkipCount());
+                dsb.add((double)a.getTotalCount()-a.getFailCount()-a.getSkipCount(),"total", new TestResultChartLabel(req, a.owner));
+                ySeriesTotal.add((double)a.getTotalCount());
             }
         }
         return dsb;
