@@ -184,6 +184,39 @@ public abstract class AbstractTestResultAction<T extends AbstractTestResultActio
     public List<CaseResult> getFailedTests() {
         return Collections.emptyList();
     }
+    
+    /**
+     * {@link TestObject}s do not have their own persistence mechanism, so updatable data of {@link TestObject}s
+     * need to be persisted by the owning {@link AbstractTestResultAction}, and this method and
+     * {@link #setDescription(TestObject, String)} provides that logic.
+     *
+     * <p>
+     * The default implementation stores information in the 'this' object.
+     *
+     * @see TestObject#getDescription() 
+     */
+    protected String getDescription(TestObject object) {
+    	return descriptions.get(object.getId());
+    }
+
+    protected void setDescription(TestObject object, String description) {
+    	descriptions.put(object.getId(), description);
+    }
+
+    public Object readResolve() {
+    	if (descriptions == null) {
+    		descriptions = new ConcurrentHashMap<String, String>();
+    	}
+    	
+    	return this;
+    }
+    
+     /**
+     * Returns a full path down to a test result
+     */
+    public String getTestResultPath(TestResult it) {
+        return getUrlName() + "/" + it.getRelativePathFrom(null);
+    }
 
     /**
      * Generates a PNG image for the test result trend.
@@ -230,32 +263,44 @@ public abstract class AbstractTestResultAction<T extends AbstractTestResultActio
         GraphSeries<String> xSeries = new GraphSeries<String>("Build No.");
         dsb.setXSeries(xSeries);
         
-        GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>("Failed", ColorPalette.RED, true);
+        GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Failed", ColorPalette.RED);
         ySeriesFailed.setBaseURL(getRelPath(req)); 
-        dsb.addYSeries(ySeriesFailed);
         
-        GraphSeries<Number> ySeriesSkipped = new GraphSeries<Number>("Skipped", ColorPalette.YELLOW, true);
+        GraphSeries<Number> ySeriesSkipped = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Skipped", ColorPalette.YELLOW);
         ySeriesSkipped.setBaseURL(getRelPath(req));
-        dsb.addYSeries(ySeriesSkipped);
         
-        GraphSeries<Number> ySeriesTotal = new GraphSeries<Number>("Total", ColorPalette.BLUE, true);
-        ySeriesTotal.setBaseURL(getRelPath(req));
-        dsb.addYSeries(ySeriesTotal);
+        GraphSeries<Number> ySeriesPassed = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Passed", ColorPalette.BLUE);
+        ySeriesPassed.setBaseURL(getRelPath(req));
+        
+        if(!failureOnly) {
+            dsb.addYSeries(ySeriesFailed);
+            dsb.addYSeries(ySeriesSkipped);
+            dsb.addYSeries(ySeriesPassed);
+        }else{
+            dsb.addYSeries(ySeriesFailed);
+        }
 
         for( AbstractTestResultAction<?> a=this; a!=null; a=a.getPreviousResult(AbstractTestResultAction.class) ) {
             xSeries.add(a.owner.getDisplayName());
-            dsb.add((double)a.getFailCount(), "failed", new TestResultChartLabel(req, a.owner));
             ySeriesFailed.add((double)a.getFailCount());
+            
+            // For backward compatibility with JFreechart
+            dsb.add((double)a.getFailCount(), "failed", new TestResultChartLabel(req, a.owner)); 
+            
             if(!failureOnly) {
-                dsb.add((double)a.getSkipCount(), "skipped", new TestResultChartLabel(req, a.owner));
                 ySeriesSkipped.add((double)a.getSkipCount());
+                ySeriesPassed.add((double)(a.getTotalCount() - a.getFailCount() - a.getSkipCount()));
+                
+                // For backward compatibility with JFreechart
+                dsb.add((double)a.getSkipCount(), "skipped", new TestResultChartLabel(req, a.owner));
                 dsb.add((double)a.getTotalCount()-a.getFailCount()-a.getSkipCount(),"total", new TestResultChartLabel(req, a.owner));
-                ySeriesTotal.add((double)a.getTotalCount());
-            }
+            } 
         }
+        
         return dsb;
     }
     
+    // For backward compatibility with JFreechart
     private class TestResultChartLabel extends NumberOnlyBuildLabel{
         final String relPath;
         
@@ -293,13 +338,6 @@ public abstract class AbstractTestResultAction<T extends AbstractTestResultActio
     }
 
     /**
-     * Returns a full path down to a test result
-     */
-    public String getTestResultPath(TestResult it) {
-        return getUrlName() + "/" + it.getRelativePathFrom(null);
-    }
-
-    /**
      * Determines the default size of the trend graph.
      *
      * This is default because the query parameter can choose arbitrary size.
@@ -317,31 +355,5 @@ public abstract class AbstractTestResultAction<T extends AbstractTestResultActio
         String relPath = req.getParameter("rel");
         if(relPath==null)   return "";
         return relPath;
-    }
-
-    /**
-     * {@link TestObject}s do not have their own persistence mechanism, so updatable data of {@link TestObject}s
-     * need to be persisted by the owning {@link AbstractTestResultAction}, and this method and
-     * {@link #setDescription(TestObject, String)} provides that logic.
-     *
-     * <p>
-     * The default implementation stores information in the 'this' object.
-     *
-     * @see TestObject#getDescription() 
-     */
-    protected String getDescription(TestObject object) {
-    	return descriptions.get(object.getId());
-    }
-
-    protected void setDescription(TestObject object, String description) {
-    	descriptions.put(object.getId(), description);
-    }
-
-    public Object readResolve() {
-    	if (descriptions == null) {
-    		descriptions = new ConcurrentHashMap<String, String>();
-    	}
-    	
-    	return this;
     }
 }
