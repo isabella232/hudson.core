@@ -136,7 +136,7 @@ public class MultiStageTimeSeries {
      * Choose which datapoint to use.
      */
     public enum TimeScale {
-
+     
         SEC10(TimeUnit2.SECONDS.toMillis(10)),
         MIN(TimeUnit2.MINUTES.toMillis(1)),
         HOUR(TimeUnit2.HOURS.toMillis(1));
@@ -200,21 +200,43 @@ public class MultiStageTimeSeries {
          * Creates a {@link DefaultCategoryDataset} for rendering a graph from a set of {@link MultiStageTimeSeries}.
          */
         private DataSet createDataset() {
+            
+            DataSet<String, String> ds = new DataSet<String, String>();
+            
+            DateFormat format = timeScale.createDateFormat();
+
+            GraphSeries<String> xSeries = new GraphSeries<String>("Time");
+            ds.setXSeries(xSeries);
+            
+            float[] data = series.get(0).pick(timeScale).getHistory();
+            Date date = new Date(System.currentTimeMillis() - timeScale.tick * data.length);
+            for (int j = data.length - 1; j >= 0; j--) {
+                    date = new Date(date.getTime() + timeScale.tick);
+                    String timeStr = format.format(date);
+                    xSeries.add(timeStr); 
+            }
+                
+            for (int i = 0; i < series.size(); i++){
+                MultiStageTimeSeries mstSeries = series.get(i);
+                GraphSeries<Number> ySeries = new GraphSeries<Number>(GraphSeries.TYPE_LINE, mstSeries.title.toString(), mstSeries.color, false, false);
+                ySeries.setStacked(false);
+                ds.addYSeries(ySeries);
+                data = mstSeries.pick(timeScale).getHistory();
+                 
+                for (int j = data.length - 1; j >= 0; j--) {
+                    ySeries.add(data[j]);
+                }
+            }
+            
+            // For backward compatibility with JFreechart
             float[][] dataPoints = new float[series.size()][];
             for (int i = 0; i < series.size(); i++) {
                 dataPoints[i] = series.get(i).pick(timeScale).getHistory();
             }
-
             int dataLength = dataPoints[0].length;
             for (float[] dataPoint : dataPoints) {
                 assert dataLength == dataPoint.length;
             }
-
-            DataSet<String, String> ds = new DataSet<String, String>();
-
-            DateFormat format = timeScale.createDateFormat();
-
-            Date date = new Date(System.currentTimeMillis() - timeScale.tick * dataLength);
             for (int i = dataLength - 1; i >= 0; i--) {
                 date = new Date(date.getTime() + timeScale.tick);
                 String timeStr = format.format(date);
@@ -222,6 +244,7 @@ public class MultiStageTimeSeries {
                    ds.add((double)dataPoints[j][i], series.get(j).title.toString(), timeStr);
                 }
             }
+            
             return ds;
         }
         
