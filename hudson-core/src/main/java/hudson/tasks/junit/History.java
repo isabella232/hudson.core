@@ -80,7 +80,7 @@ public class History {
      */
     public Graph getDurationGraph() {
         Graph graph = new Graph(-1, 600, 300);
-        graph.setYAxisLabel("seconds");
+        graph.setYAxisLabel("Mins");
         graph.setData(getDurationGraphDataSet());
         return graph;
     }
@@ -115,7 +115,7 @@ public class History {
         for (hudson.tasks.test.TestResult o : list) {
             xSeries.add(o.getOwner().getDisplayName());
             
-            double duration = o.getDuration() / 1000.;
+            double duration = o.getDuration() / 60;
             if (o.getFailCount() > 0) {
                 ySeriesFailed.add(duration);
                 ySeriesSkipped.add(0.);
