@@ -16,6 +16,7 @@
 
 package hudson.model;
 
+import hudson.util.graph.GraphSeries;
 import hudson.widgets.Widget;
 import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Sets;
@@ -1091,90 +1092,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     public String getBuildStatusUrl() {
         return getIconColor().getImage();
     }
-
-    public Graph getBuildTimeGraph() {
-        Graph graph = new Graph(getLastBuild().getTimestamp(), 500, 400);
-
-        DataSet<String, ChartLabel> data = new DataSet<String, ChartLabel>();
-        for (Run r : getBuilds()) {
-            if (r.isBuilding()) {
-                continue;
-            }
-            data.add(((double) r.getDuration()) / (1000 * 60), "min",
-                    new TimeTrendChartLabel(r));
-        }
-        graph.setYAxisLabel(Messages.Job_minutes());
-        graph.setData(data);
-
-        return graph;
-    }
-
-    private class TimeTrendChartLabel extends ChartLabel {
-
-        final Run run;
-
-        public TimeTrendChartLabel(Run r) {
-            this.run = r;
-        }
-
-        public int compareTo(ChartLabel that) {
-            return Run.ORDER_BY_DATE.compare(run, ((TimeTrendChartLabel)that).run);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            // HUDSON-2682 workaround for Eclipse compilation bug
-            // on (c instanceof ChartLabel)
-            if (o == null || !ChartLabel.class.isAssignableFrom(o.getClass())) {
-                return false;
-            }
-            TimeTrendChartLabel that = (TimeTrendChartLabel) o;
-            return run == that.run;
-        }
-
-        public Color getColor(int row, int column) {
-            // TODO: consider gradation. See
-            // http://www.javadrive.jp/java2d/shape/index9.html
-            Result r = run.getResult();
-            if (r == Result.FAILURE) {
-                return ColorPalette.RED;
-            } else if (r == Result.UNSTABLE) {
-                return ColorPalette.YELLOW;
-            } else if (r == Result.ABORTED || r == Result.NOT_BUILT) {
-                return ColorPalette.GREY;
-            } else {
-                return ColorPalette.BLUE;
-            }
-        }
-
-        @Override
-        public int hashCode() {
-            return run.hashCode();
-        }
-
-        @Override
-        public String toString() {
-            String l = run.getDisplayName();
-            if (run instanceof Build) {
-                String s = ((Build) run).getBuiltOnStr();
-                if (s != null) {
-                    l += ' ' + s;
-                }
-            }
-            return l;
-        }
-
-        @Override
-        public String getLink(int row, int column) {
-            return String.valueOf(run.number);
-        }
-
-        @Override
-        public String getToolTip(int row, int column) {
-            return run.getDisplayName() + " : " + run.getDurationString();
-        }
-    }
-
+    
     /**
      * Renames this job.
      */
@@ -1271,5 +1189,133 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         this.creationTime = creationTime;
     }
 
+    public Graph getBuildTimeGraph() {
+        Graph graph = new Graph(getLastBuild().getTimestamp(), 500, 400);
 
+        DataSet<String, ChartLabel> data = new DataSet<String, ChartLabel>();
+        
+        GraphSeries<String> xSeries = new GraphSeries<String>("Build No.");
+        data.setXSeries(xSeries);
+        
+        GraphSeries<Number> ySeriesAborted = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Aborted", ColorPalette.GREY, true, false);
+        //ySeriesFailed.setBaseURL(getRelPath(req)); 
+        data.addYSeries(ySeriesAborted);
+        
+        GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Failed", ColorPalette.RED, true, false);
+        //ySeriesFailed.setBaseURL(getRelPath(req)); 
+        data.addYSeries(ySeriesFailed);
+        
+        GraphSeries<Number> ySeriesUnstable = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Unstable", ColorPalette.YELLOW, true, false);
+        //ySeriesSkipped.setBaseURL(getRelPath(req));
+        data.addYSeries(ySeriesUnstable);
+        
+        GraphSeries<Number> ySeriesSuccessful = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Successful", ColorPalette.BLUE, true, false);
+        //ySeriesTotal.setBaseURL(getRelPath(req));
+        data.addYSeries(ySeriesSuccessful);
+        
+        for (Run run : getBuilds()) {
+            if (run.isBuilding()) {
+                continue;
+            }
+            double duration = run.getDuration() / (1000 * 60);
+            xSeries.add(run.getDisplayName());
+            Result res = run.getResult();
+            if (res == Result.FAILURE) {
+                ySeriesFailed.add(duration);
+                ySeriesUnstable.add(0.);
+                ySeriesAborted.add(0.);
+                ySeriesSuccessful.add(0.);
+            } else if (res == Result.UNSTABLE) {
+                ySeriesUnstable.add(duration);
+                ySeriesFailed.add(0.);
+                ySeriesAborted.add(0.);
+                ySeriesSuccessful.add(0.);
+            } else if (res == Result.ABORTED || res == Result.NOT_BUILT) {
+                ySeriesAborted.add(duration);
+                ySeriesFailed.add(0.);
+                ySeriesUnstable.add(0.);
+                ySeriesSuccessful.add(0.);
+            } else {
+                ySeriesSuccessful.add(duration);
+                ySeriesAborted.add(0.);
+                ySeriesFailed.add(0.);
+                ySeriesUnstable.add(0.);
+            }
+            
+            // For backward compatibility with JFreechart
+            data.add(duration, "min",
+                    new TimeTrendChartLabel(run));
+        }
+        graph.setYAxisLabel(Messages.Job_minutes());
+        graph.setData(data);
+
+        return graph;
+    }
+
+    // For backward compatibility with JFreechart
+    private class TimeTrendChartLabel extends ChartLabel {
+
+        final Run run;
+
+        public TimeTrendChartLabel(Run r) {
+            this.run = r;
+        }
+
+        public int compareTo(ChartLabel that) {
+            return Run.ORDER_BY_DATE.compare(run, ((TimeTrendChartLabel)that).run);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            // HUDSON-2682 workaround for Eclipse compilation bug
+            // on (c instanceof ChartLabel)
+            if (o == null || !ChartLabel.class.isAssignableFrom(o.getClass())) {
+                return false;
+            }
+            TimeTrendChartLabel that = (TimeTrendChartLabel) o;
+            return run == that.run;
+        }
+
+        public Color getColor(int row, int column) {
+            // TODO: consider gradation. See
+            // http://www.javadrive.jp/java2d/shape/index9.html
+            Result r = run.getResult();
+            if (r == Result.FAILURE) {
+                return ColorPalette.RED;
+            } else if (r == Result.UNSTABLE) {
+                return ColorPalette.YELLOW;
+            } else if (r == Result.ABORTED || r == Result.NOT_BUILT) {
+                return ColorPalette.GREY;
+            } else {
+                return ColorPalette.BLUE;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return run.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            String l = run.getDisplayName();
+            if (run instanceof Build) {
+                String s = ((Build) run).getBuiltOnStr();
+                if (s != null) {
+                    l += ' ' + s;
+                }
+            }
+            return l;
+        }
+
+        @Override
+        public String getLink(int row, int column) {
+            return String.valueOf(run.number);
+        }
+
+        @Override
+        public String getToolTip(int row, int column) {
+            return run.getDisplayName() + " : " + run.getDurationString();
+        }
+    }
 }
