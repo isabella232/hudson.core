@@ -16,6 +16,8 @@
 
 package hudson;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import hudson.console.ConsoleAnnotationDescriptor;
 import hudson.console.ConsoleAnnotatorFactory;
 import hudson.model.AbstractProject;
@@ -64,6 +66,7 @@ import hudson.security.captcha.CaptchaSupport;
 import hudson.util.Secret;
 import hudson.views.MyViewsTabBar;
 import hudson.views.ViewsTabBar;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.providers.anonymous.AnonymousAuthenticationToken;
 import org.apache.commons.jelly.JellyContext;
 import org.apache.commons.jelly.JellyTagException;
@@ -1347,5 +1350,24 @@ public class Functions {
             return ((StaplerProxy)obj).getTarget();
         }
         return obj;
+    }
+
+    /**
+     * Returns item by name from the list.
+     *
+     * @param items for filtering.
+     * @param name the name of the item.
+     * @return template.
+     */
+    public static <T extends Item> T getItemByName(List<T> items, final String name) {
+        if (StringUtils.isBlank(name)) {
+            return null;
+        }
+        Iterable<T> templates = Iterables.filter(items, new Predicate<T>() {
+            public boolean apply(T item) {
+                return name.equalsIgnoreCase(item.getName());
+            }
+        });
+        return templates.iterator().hasNext() ? templates.iterator().next() : null;
     }
 }
