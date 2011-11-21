@@ -16,6 +16,7 @@
 
 package hudson.model;
 
+import hudson.Functions;
 import hudson.util.graph.GraphSeries;
 import hudson.widgets.Widget;
 import org.apache.commons.lang3.StringUtils;
@@ -142,6 +143,16 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     protected CopyOnWriteList<JobProperty<? super JobT>> properties = new CopyOnWriteList<JobProperty<? super JobT>>();
 
+    /**
+     * The name of the template.
+     */
+    private String templateName;
+
+    /**
+     * Selected template for this job.
+     */
+    private transient JobT template;
+
     protected Job(ItemGroup parent, String name) {
         super(parent, name);
     }
@@ -155,9 +166,11 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onLoad(ItemGroup<? extends Item> parent, String name)
             throws IOException {
         super.onLoad(parent, name);
+        template = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()), templateName);
 
         TextFile f = getNextBuildNumberFile();
         if (f.exists()) {
@@ -1191,6 +1204,44 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     protected void setCreationTime(long creationTime) {
         this.creationTime = creationTime;
+    }
+
+    /**
+     * Returns template name.
+     *
+     * @return template name.
+     */
+    public String getTemplateName() {
+        return templateName;
+    }
+
+    /**
+     * Sets template name.
+     *
+     * @param templateName template name.
+     */
+    @SuppressWarnings("unchecked")
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
+        this.template = (JobT)Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()), templateName);
+    }
+
+    /**
+     * Returns selected template.
+     *
+     * @return template.
+     */
+    @SuppressWarnings({"unchecked"})
+    public JobT getTemplate() {
+        return template;
+    }
+
+    /**
+     * Checks whether current job is inherited from other project.
+     * @return boolean.
+     */
+    protected boolean hasParentTemplate() {
+        return null != getTemplate();
     }
 
     public Graph getBuildTimeGraph() {
