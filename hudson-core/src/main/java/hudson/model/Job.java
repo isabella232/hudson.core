@@ -19,6 +19,7 @@ package hudson.model;
 import hudson.Functions;
 import hudson.util.graph.GraphSeries;
 import hudson.widgets.Widget;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Sets;
 import com.infradna.tool.bridge_method_injector.WithBridgeMethods;
@@ -346,11 +347,20 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Returns the log rotator for this job, or null if none.
      */
     public LogRotator getLogRotator() {
-        return logRotator;
+        return logRotator!= null ? logRotator : (hasParentTemplate()? getTemplate().getLogRotator() : null);
     }
 
+    /**
+     * Sets log rotator.
+     *
+     * @param logRotator log rotator.
+     */
     public void setLogRotator(LogRotator logRotator) {
-        this.logRotator = logRotator;
+        if (!(hasParentTemplate() && ObjectUtils.equals(getTemplate().getLogRotator(), logRotator))) {
+            this.logRotator = logRotator;
+        } else {
+            this.logRotator = null;
+        }
     }
 
     /**
@@ -1234,6 +1244,15 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @SuppressWarnings({"unchecked"})
     public JobT getTemplate() {
         return template;
+    }
+
+    /**
+     * For the unit tests only. Sets template for the job.
+     *
+     * @param template parent job
+     */
+    void setTemplate(JobT template) {
+        this.template = template;
     }
 
     /**
