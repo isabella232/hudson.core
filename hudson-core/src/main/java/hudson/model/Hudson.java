@@ -17,6 +17,8 @@
 package hudson.model;
 
 import antlr.ANTLRException;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.thoughtworks.xstream.XStream;
 import hudson.BulkChange;
 import hudson.DNSMultiCast;
@@ -1621,6 +1623,25 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     public List<Node> getNodes() {
         return Collections.unmodifiableList(slaves);
+    }
+
+    /**
+     * Returns template by project type and template name.
+     *
+     * @param type type of the project.
+     * @param templateName name of the template
+     * @return template.
+     */
+    public <T extends AbstractProject> T getTemplate(Class<T> type, final String templateName) {
+        if (StringUtils.isBlank(templateName)) {
+            return null;
+        }
+        Iterable<T> templates = Iterables.filter(getAllItems(type), new Predicate<T>() {
+            public boolean apply(T project) {
+                return templateName.equalsIgnoreCase(project.getName());
+            }
+        });
+        return templates.iterator().hasNext() ? templates.iterator().next() : null;
     }
 
     /**
@@ -3592,7 +3613,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         }
         return this;
     }
-    
+
     /**
      * @since 2.1.0
      */

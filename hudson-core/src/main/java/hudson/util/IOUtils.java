@@ -86,6 +86,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils {
      *
      * @since 1.349
      * @deprecated use {@link org.apache.commons.io.IOUtils#skip(java.io.InputStream, long)} instead
+     * @since 2.1.2
      */
     public static long skip(InputStream in, long size) throws IOException {
         return org.apache.commons.io.IOUtils.skip(in, size);
