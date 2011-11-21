@@ -57,11 +57,15 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
     }
 
 
+    public String getCustomWorkspace(boolean useParentValue) {
+       if (!useParentValue || StringUtils.isNotBlank(customWorkspace)) {
+           return customWorkspace;
+       }
+       return hasParentTemplate()? getTemplate().getCustomWorkspace() : null;
+    }
+
     public String getCustomWorkspace() {
-        if (StringUtils.isNotBlank(customWorkspace)) {
-            return customWorkspace;
-        }
-        return hasParentTemplate()? getTemplate().getCustomWorkspace() : null;
+        return getCustomWorkspace(true);
     }
 
 
