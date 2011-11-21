@@ -21,7 +21,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Test for {@link hudson.matrix.MatrixProject}
+ * Tests for {@link hudson.matrix.MatrixProject}
  */
 public class MatrixProjectTest {
 
@@ -32,7 +32,7 @@ public class MatrixProjectTest {
         parentProject.setRunSequentially(Boolean.TRUE);
 
         MatrixProject childProject1 = new MatrixProject("child1");
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         childProject1.setAllowSave(false);
         assertTrue(childProject1.isRunSequentially());
     }
@@ -44,7 +44,7 @@ public class MatrixProjectTest {
         parentProject.setRunSequentially(Boolean.FALSE);
 
         MatrixProject childProject1 = new MatrixProject("child1");
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         childProject1.setAllowSave(false);
         assertFalse(childProject1.isRunSequentially());
     }
@@ -63,7 +63,7 @@ public class MatrixProjectTest {
         parentProject.setRunSequentially(Boolean.FALSE);
 
         MatrixProject childProject1 = new MatrixProject("child1");
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         childProject1.runSequentially = Boolean.TRUE;
         childProject1.setAllowSave(false);
         assertTrue(childProject1.isRunSequentially());
@@ -76,7 +76,7 @@ public class MatrixProjectTest {
         parentProject.setRunSequentially(Boolean.TRUE);
 
         MatrixProject childProject1 = new MatrixProject("child1");
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         childProject1.runSequentially = Boolean.FALSE;
         childProject1.setAllowSave(false);
         assertFalse(childProject1.isRunSequentially());
@@ -89,11 +89,12 @@ public class MatrixProjectTest {
         parentProject.setRunSequentially(null);
 
         MatrixProject childProject1 = new MatrixProject("child1");
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         childProject1.runSequentially = Boolean.TRUE;
         childProject1.setAllowSave(false);
         assertTrue(childProject1.isRunSequentially());
     }
+
 
     @Test
     public void testGetCombinationFilterChildValue() throws IOException {
@@ -110,7 +111,7 @@ public class MatrixProjectTest {
         };
         childProject1.setAllowSave(false);
         childProject1.setCombinationFilter(childCombinationFilter);
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         assertEquals(childProject1.getCombinationFilter(), childCombinationFilter);
     }
 
@@ -127,7 +128,7 @@ public class MatrixProjectTest {
             }
         };
         childProject1.setAllowSave(false);
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         assertEquals(childProject1.getCombinationFilter(), parentCombinationFilter);
     }
 
@@ -145,7 +146,7 @@ public class MatrixProjectTest {
             }
         };
         childProject1.setAllowSave(false);
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         childProject1.setCombinationFilter(childCombinationFilter);
         assertEquals(childProject1.combinationFilter, childCombinationFilter);
     }
@@ -163,7 +164,7 @@ public class MatrixProjectTest {
             }
         };
         childProject1.setAllowSave(false);
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         childProject1.setCombinationFilter(combinationFilter);
         assertNull(childProject1.combinationFilter);
         assertEquals(childProject1.getCombinationFilter(), combinationFilter);
@@ -199,7 +200,7 @@ public class MatrixProjectTest {
         };
         childProject1.setAllowSave(false);
         childProject1.setTouchStoneCombinationFilter(childCombinationFilter);
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         assertEquals(childProject1.getTouchStoneCombinationFilter(), childCombinationFilter);
     }
 
@@ -216,7 +217,7 @@ public class MatrixProjectTest {
             }
         };
         childProject1.setAllowSave(false);
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         assertEquals(childProject1.getTouchStoneCombinationFilter(), parentCombinationFilter);
     }
 
@@ -234,7 +235,7 @@ public class MatrixProjectTest {
             }
         };
         childProject1.setAllowSave(false);
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         childProject1.setTouchStoneCombinationFilter(childCombinationFilter);
         assertEquals(childProject1.touchStoneCombinationFilter, childCombinationFilter);
     }
@@ -252,7 +253,7 @@ public class MatrixProjectTest {
             }
         };
         childProject1.setAllowSave(false);
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         childProject1.setTouchStoneCombinationFilter(combinationFilter);
         assertNull(childProject1.touchStoneCombinationFilter);
         assertEquals(childProject1.getTouchStoneCombinationFilter(), combinationFilter);
@@ -288,7 +289,7 @@ public class MatrixProjectTest {
         };
         childProject1.setAllowSave(false);
         childProject1.setTouchStoneResultCondition(childResultCondition);
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         assertEquals(childProject1.getTouchStoneResultCondition(), childResultCondition);
     }
 
@@ -305,7 +306,7 @@ public class MatrixProjectTest {
             }
         };
         childProject1.setAllowSave(false);
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         assertEquals(childProject1.getTouchStoneResultCondition(), parentResultCondition);
     }
 
@@ -323,7 +324,7 @@ public class MatrixProjectTest {
             }
         };
         childProject1.setAllowSave(false);
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         childProject1.setTouchStoneResultCondition(childResultCondition);
         assertEquals(childProject1.touchStoneResultCondition, childResultCondition);
     }
@@ -341,7 +342,7 @@ public class MatrixProjectTest {
             }
         };
         childProject1.setAllowSave(false);
-        childProject1.setTemplate(parentProject);
+        childProject1.setCascadingProject(parentProject);
         childProject1.setTouchStoneResultCondition(parentResultCondition);
         assertNull(childProject1.touchStoneResultCondition);
         assertEquals(childProject1.getTouchStoneResultCondition(), parentResultCondition);
@@ -378,4 +379,3 @@ public class MatrixProjectTest {
         }
     }
 }
-
