@@ -89,7 +89,9 @@ import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.stapler.ForwardToView;
@@ -513,7 +515,10 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     }
 
     public int getQuietPeriod() {
-        return quietPeriod!=null ? quietPeriod : Hudson.getInstance().getQuietPeriod();
+        if (null != quietPeriod) {
+            return quietPeriod;
+        }
+        return hasParentTemplate() ? getTemplate().getQuietPeriod() : Hudson.getInstance().getQuietPeriod();
     }
 
     public int getScmCheckoutRetryCount() {
@@ -531,10 +536,31 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
 
     /**
      * Sets the custom quiet period of this project, or revert to the global default if null is given.
+     * @param seconds quit period
+     * @throws IOException if any.
      */
     public void setQuietPeriod(Integer seconds) throws IOException {
-        this.quietPeriod = seconds;
+        if (!(hasParentTemplate() && ObjectUtils.equals(getTemplate().getQuietPeriod(), seconds))) {
+            this.quietPeriod = seconds;
+        } else {
+            this.quietPeriod = null;
+        }
         save();
+    }
+
+    /**
+     * Sets quietPeriod, Uses {@link NumberUtils#isNumber(String)} for checking seconds param. If seconds is not valid
+     * number, null will be set.
+     *
+     * @param seconds quiet period.
+     * @throws IOException if any.
+     */
+    protected void setQuietPeriod(String seconds) throws IOException {
+        Integer period = null;
+        if (NumberUtils.isNumber(seconds)) {
+            period = NumberUtils.createInteger(seconds);
+        }
+        setQuietPeriod(period);
     }
 
     public boolean hasCustomScmCheckoutRetryCount(){
@@ -891,10 +917,20 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     }
 
     /**
-     * Gets the JDK that this project is configured with, or null.
+     * @return name of jdk chosen for current project. Could taken from parent
+     */
+    protected String getJDKName() {
+        if (StringUtils.isNotBlank(jdk)) {
+            return jdk;
+        }
+        return hasParentTemplate()? getTemplate().getJDKName() : null;
+    }
+
+    /**
+     * @return JDK that this project is configured with, or null.
      */
     public JDK getJDK() {
-        return Hudson.getInstance().getJDK(jdk);
+        return Hudson.getInstance().getJDK(getJDKName());
     }
 
     /**
@@ -906,7 +942,12 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     }
 
     public void setJDK(String jdk) {
-       this.jdk = jdk;
+        if (!(hasParentTemplate()
+            && StringUtils.equalsIgnoreCase(getTemplate().getJDKName(), jdk))) {
+            this.jdk = jdk;
+        } else {
+            this.jdk = null;
+        }
     }
 
     public BuildAuthorizationToken getAuthToken() {
@@ -1446,6 +1487,13 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     }
 
     /**
+     * @return list of {@link Trigger} elements.
+     */
+    public List<Trigger<?>> getTriggersList() {
+        return triggers;
+    }
+
+    /**
      * Gets the specific trigger, or null if the propert is not configured for this job.
      */
     public <T extends Trigger> T getTrigger(Class<T> clazz) {
@@ -1675,8 +1723,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         makeDisabled(null != req.getParameter("disable"));
         setTemplateName(StringUtils.trimToNull(req.getParameter("templateName")));
         setJDK(req.getParameter("jdk"));
-        setQuietPeriod(null != req.getParameter("hasCustomQuietPeriod") ?
-            Integer.parseInt(req.getParameter("quiet_period")) : null);
+        setQuietPeriod(null != req.getParameter("hasCustomQuietPeriod") ? req.getParameter("quiet_period") : null);
         setScmCheckoutRetryCount(null != req.getParameter("hasCustomScmCheckoutRetryCount")
             ? Integer.parseInt(req.getParameter("scmCheckoutRetryCount")) : null);
         setBlockBuildWhenDownstreamBuilding(null != req.getParameter("blockBuildWhenDownstreamBuilding"));
