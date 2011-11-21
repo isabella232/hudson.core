@@ -442,6 +442,180 @@ public class FreeStyleProjectTest {
         verifyAll();
     }
 
+    @Test
+    public void testSetScmCheckoutRetryCountEqualsWithParent() throws IOException {
+        String scmCheckoutRetryCount = "10";
+        int globalScmCheckoutRetryCount = 4;
+        FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
+        parentProject.allowSave.set(false);
+        parentProject.setScmCheckoutRetryCount(scmCheckoutRetryCount);
+        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        childProject.allowSave.set(false);
+        Hudson hudson = createMock(Hudson.class);
+        expect(hudson.getScmCheckoutRetryCount()).andReturn(globalScmCheckoutRetryCount);
+        mockStatic(Hudson.class);
+        expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
+        replayAll();
+        assertEquals(childProject.getScmCheckoutRetryCount(), globalScmCheckoutRetryCount);
+        childProject.setTemplate(parentProject);
+        childProject.setScmCheckoutRetryCount(scmCheckoutRetryCount);
+        assertEquals(childProject.getScmCheckoutRetryCount(), Integer.parseInt(scmCheckoutRetryCount));
+        verifyAll();
+    }
+
+    @Test
+    public void testSetScmCheckoutRetryCountNotEqualsWithParent() throws IOException{
+        String parentScmCheckoutRetryCount = "10";
+        String childScmCheckoutRetryCount = "11";
+        FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
+        parentProject.allowSave.set(false);
+        parentProject.setScmCheckoutRetryCount(parentScmCheckoutRetryCount);
+        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        childProject.allowSave.set(false);
+        childProject.setTemplate(parentProject);
+        childProject.setScmCheckoutRetryCount(childScmCheckoutRetryCount);
+
+        Hudson hudson = createMock(Hudson.class);
+        mockStatic(Hudson.class);
+        expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
+        replayAll();
+        assertEquals(childProject.getScmCheckoutRetryCount(), Integer.parseInt(childScmCheckoutRetryCount));
+        verifyAll();
+    }
+
+    @Test
+    public void testSetScmCheckoutRetryCountParentNull() throws IOException{
+        String scmCheckoutRetryCount = "10";
+        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        childProject.allowSave.set(false);
+        childProject.setScmCheckoutRetryCount(scmCheckoutRetryCount);
+        assertEquals(Integer.parseInt(scmCheckoutRetryCount), childProject.getScmCheckoutRetryCount());
+    }
+
+    @Test
+    public void testSetInvalidScmCheckoutRetryCount() throws IOException{
+        String scmCheckoutRetryCount = "asd10asdasd";
+        int globalScmCheckoutRetryCount = 4;
+        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        childProject.allowSave.set(false);
+        childProject.setScmCheckoutRetryCount(scmCheckoutRetryCount);
+        Hudson hudson = createMock(Hudson.class);
+        expect(hudson.getScmCheckoutRetryCount()).andReturn(globalScmCheckoutRetryCount).anyTimes();
+        mockStatic(Hudson.class);
+        expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
+        replayAll();
+        assertEquals(globalScmCheckoutRetryCount, childProject.getScmCheckoutRetryCount());
+        verifyAll();
+    }
+
+    @Test
+    public void testGetScmCheckoutRetryCount() throws IOException{
+        String scmCheckoutRetryCountString = "10";
+        int globalScmCheckoutRetryCount = 4;
+        int scmCheckoutRetryCount = Integer.parseInt(scmCheckoutRetryCountString);
+        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
+        Hudson hudson = createMock(Hudson.class);
+        expect(hudson.getScmCheckoutRetryCount()).andReturn(globalScmCheckoutRetryCount).anyTimes();
+        mockStatic(Hudson.class);
+        expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
+        replayAll();
+
+        childProject.allowSave.set(false);
+        childProject.setScmCheckoutRetryCount(scmCheckoutRetryCountString);
+        assertEquals(scmCheckoutRetryCount, childProject.getScmCheckoutRetryCount());
+
+        parentProject.allowSave.set(false);
+        parentProject.setScmCheckoutRetryCount(scmCheckoutRetryCountString);
+        childProject.setScmCheckoutRetryCount(" ");
+        childProject.setTemplate(parentProject);
+        assertEquals(childProject.getScmCheckoutRetryCount(), scmCheckoutRetryCount);
+
+        parentProject.setScmCheckoutRetryCount("  ");
+        assertEquals(globalScmCheckoutRetryCount, childProject.getScmCheckoutRetryCount());
+        verifyAll();
+    }
+
+    @Test
+    public void testSetBlockBuildWhenDownstreamBuildingEqualsWithParent() throws IOException {
+        boolean blockBuildWhenDownstreamBuilding = true;
+        FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
+        parentProject.allowSave.set(false);
+        parentProject.setBlockBuildWhenDownstreamBuilding(blockBuildWhenDownstreamBuilding);
+        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        childProject.allowSave.set(false);
+        childProject.setTemplate(parentProject);
+        childProject.setBlockBuildWhenDownstreamBuilding(blockBuildWhenDownstreamBuilding);
+        assertEquals(childProject.blockBuildWhenDownstreamBuilding(), (Boolean) blockBuildWhenDownstreamBuilding);
+        childProject.setBlockBuildWhenDownstreamBuilding(null);
+        assertNull(childProject.blockBuildWhenDownstreamBuilding);
+        assertEquals(childProject.blockBuildWhenDownstreamBuilding(), (Boolean) blockBuildWhenDownstreamBuilding);
+    }
+
+    @Test
+    public void testSetBlockBuildWhenDownstreamBuildingNotEqualsWithParent() throws IOException {
+        boolean childBlockBuildWhenDownstreamBuilding = false;
+        boolean parentBlockBuildWhenDownstreamBuilding = true;
+        FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
+        parentProject.allowSave.set(false);
+        parentProject.setBlockBuildWhenDownstreamBuilding(parentBlockBuildWhenDownstreamBuilding);
+        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        childProject.allowSave.set(false);
+        childProject.setTemplate(parentProject);
+        childProject.setBlockBuildWhenDownstreamBuilding(childBlockBuildWhenDownstreamBuilding);
+        assertNotNull(childProject.blockBuildWhenDownstreamBuilding);
+        assertEquals(childProject.blockBuildWhenDownstreamBuilding(), (Boolean) childBlockBuildWhenDownstreamBuilding);
+    }
+
+    @Test
+    public void testSetBlockBuildWhenDownstreamBuildingParentNull() throws IOException {
+        boolean blockBuildWhenDownstreamBuilding = true;
+        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        childProject.allowSave.set(false);
+        childProject.setBlockBuildWhenDownstreamBuilding(blockBuildWhenDownstreamBuilding);
+        assertEquals(childProject.blockBuildWhenDownstreamBuilding(), (Boolean) blockBuildWhenDownstreamBuilding);
+    }
+
+    @Test
+    public void testSetBlockBuildWhenUpstreamBuildingEqualsWithParent() throws IOException {
+        boolean blockBuildWhenUpstreamBuilding = true;
+        FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
+        parentProject.allowSave.set(false);
+        parentProject.setBlockBuildWhenUpstreamBuilding(blockBuildWhenUpstreamBuilding);
+        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        childProject.allowSave.set(false);
+        childProject.setTemplate(parentProject);
+        childProject.setBlockBuildWhenUpstreamBuilding(blockBuildWhenUpstreamBuilding);
+        assertEquals(childProject.blockBuildWhenUpstreamBuilding(), (Boolean) blockBuildWhenUpstreamBuilding);
+        childProject.setBlockBuildWhenUpstreamBuilding(null);
+        assertNull(childProject.blockBuildWhenUpstreamBuilding);
+        assertEquals(childProject.blockBuildWhenUpstreamBuilding(), (Boolean) blockBuildWhenUpstreamBuilding);
+    }
+
+    @Test
+    public void testSetBlockBuildWhenUpstreamBuildingNotEqualsWithParent() throws IOException {
+        boolean childBlockBuildWhenUpstreamBuilding = false;
+        boolean parentBlockBuildWhenUpstreamBuilding = true;
+        FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
+        parentProject.allowSave.set(false);
+        parentProject.setBlockBuildWhenUpstreamBuilding(parentBlockBuildWhenUpstreamBuilding);
+        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        childProject.allowSave.set(false);
+        childProject.setTemplate(parentProject);
+        childProject.setBlockBuildWhenUpstreamBuilding(childBlockBuildWhenUpstreamBuilding);
+        assertNotNull(childProject.blockBuildWhenUpstreamBuilding);
+        assertEquals(childProject.blockBuildWhenUpstreamBuilding(), (Boolean) childBlockBuildWhenUpstreamBuilding);
+    }
+
+    @Test
+    public void testSetBlockBuildWhenUpstreamBuildingParentNull() throws IOException {
+        boolean blockBuildWhenUpstreamBuilding = true;
+        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        childProject.allowSave.set(false);
+        childProject.setBlockBuildWhenUpstreamBuilding(blockBuildWhenUpstreamBuilding);
+        assertEquals(childProject.blockBuildWhenUpstreamBuilding(), (Boolean) blockBuildWhenUpstreamBuilding);
+    }
+
     private class FreeStyleProjectMock extends FreeStyleProject {
 
         private FreeStyleProjectMock(String name) {
