@@ -23,6 +23,7 @@ import hudson.FeedAdapter;
 import hudson.FilePath;
 import hudson.Functions;
 import hudson.Launcher;
+import hudson.RestrictedSince;
 import hudson.Util;
 import hudson.cli.declarative.CLIMethod;
 import hudson.cli.declarative.CLIResolver;
@@ -92,6 +93,8 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.stapler.ForwardToView;
@@ -221,13 +224,20 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     @CopyOnWrite
     protected transient volatile List<Action> transientActions = new Vector<Action>();
 
-
-    private boolean concurrentBuild;
+    /**
+     * Note: this field was made protected for testing purpose. Access it via {@link #isConcurrentBuild()} method
+     */
+    @Restricted(NoExternalUse.class)
+    @RestrictedSince("2.1.2")
+    protected Boolean concurrentBuild = false;
 
     /**
-    * True to clean the workspace prior to each build.
-    */
-    private volatile boolean cleanWorkspaceRequired;
+     * True to clean the workspace prior to each build.
+     * Note: this field was made protected for testing purpose. Access it via {@link #isCleanWorkspaceRequired()} method
+     */
+    @Restricted(NoExternalUse.class)
+    @RestrictedSince("2.1.2")
+    protected volatile Boolean cleanWorkspaceRequired = false;
 
     protected AbstractProject(ItemGroup parent, String name) {
         super(parent, name);
@@ -258,7 +268,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         super.onLoad(parent, name);
 
         this.builds = new RunMap<R>();
-        this.builds.load(this,new Constructor<R>() {
+        this.builds.load(this, new Constructor<R>() {
             public R create(File dir) throws IOException {
                 return loadBuild(dir);
             }
@@ -278,6 +288,21 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
 
         if(transientActions==null)
             transientActions = new Vector<Action>();    // happens when loaded from disk
+
+        //Initialize boolean values since from 2.1.2 primitive wrappers were used.
+        if (null == blockBuildWhenDownstreamBuilding) {
+            blockBuildWhenDownstreamBuilding = false;
+        }
+        if (null == blockBuildWhenUpstreamBuilding) {
+            blockBuildWhenUpstreamBuilding = false;
+        }
+        if (null == cleanWorkspaceRequired) {
+            cleanWorkspaceRequired = false;
+        }
+        if (null == concurrentBuild) {
+            concurrentBuild = false;
+        }
+
         updateTransientActions();
     }
 
@@ -301,20 +326,55 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      */
     @Exported
     public boolean isConcurrentBuild() {
-        return Hudson.CONCURRENT_BUILD && concurrentBuild;
+        if (null != concurrentBuild) {
+            return Hudson.CONCURRENT_BUILD && concurrentBuild;
+        }
+        return null != getTemplate() && getTemplate().isConcurrentBuild();
     }
 
+    /**
+     * @param b boolean value.
+     * @throws IOException if any.
+     * @since 2.1.2
+     * @deprecated
+     */
     public void setConcurrentBuild(boolean b) throws IOException {
-        concurrentBuild = b;
+       setConcurrentBuild(Boolean.valueOf(b));
+    }
+
+    public void setConcurrentBuild(Boolean b) throws IOException {
+        if (!(hasParentTemplate()
+            && ObjectUtils.equals(getTemplate().isConcurrentBuild(), b))) {
+            concurrentBuild = b;
+        } else {
+            this.concurrentBuild = null;
+        }
         save();
     }
 
     public boolean isCleanWorkspaceRequired() {
-        return cleanWorkspaceRequired;
+        if (null != cleanWorkspaceRequired) {
+            return cleanWorkspaceRequired;
+        }
+        return hasParentTemplate() && getTemplate().isCleanWorkspaceRequired();
     }
 
+    /**
+     * @param cleanWorkspaceRequired boolean value.
+     * @since 2.1.2
+     * @deprecated
+     */
     public void setCleanWorkspaceRequired(boolean cleanWorkspaceRequired) {
-        this.cleanWorkspaceRequired = cleanWorkspaceRequired;
+        setCleanWorkspaceRequired(Boolean.valueOf(cleanWorkspaceRequired));
+    }
+
+    public void setCleanWorkspaceRequired(Boolean cleanWorkspaceRequired) {
+        if (!(hasParentTemplate()
+            && ObjectUtils.equals(getTemplate().isCleanWorkspaceRequired(), cleanWorkspaceRequired))) {
+            this.cleanWorkspaceRequired = cleanWorkspaceRequired;
+        } else {
+            this.cleanWorkspaceRequired = null;
+        }
     }
 
     /**
@@ -603,11 +663,21 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         return true;
     }
 
-    public Boolean blockBuildWhenDownstreamBuilding() {
+    public boolean blockBuildWhenDownstreamBuilding() {
         if (null != blockBuildWhenDownstreamBuilding) {
             return blockBuildWhenDownstreamBuilding;
         }
         return hasParentTemplate() && getTemplate().blockBuildWhenDownstreamBuilding();
+    }
+
+    /**
+     * @param b boolean value.
+     * @throws IOException if any.
+     * @since 2.1.2
+     * @deprecated
+     */
+    public void setBlockBuildWhenDownstreamBuilding(boolean b) throws IOException {
+        setBlockBuildWhenDownstreamBuilding(Boolean.valueOf(b));
     }
 
     public void setBlockBuildWhenDownstreamBuilding(Boolean b) throws IOException {
@@ -619,11 +689,21 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         save();
     }
 
-    public Boolean blockBuildWhenUpstreamBuilding() {
+    public boolean blockBuildWhenUpstreamBuilding() {
         if (null != blockBuildWhenUpstreamBuilding) {
             return blockBuildWhenUpstreamBuilding;
         }
         return hasParentTemplate() && getTemplate().blockBuildWhenUpstreamBuilding();
+    }
+
+    /**
+     * @param b boolean value.
+     * @throws IOException if any.
+     * @since 2.1.2
+     * @deprecated
+     */
+    public void setBlockBuildWhenUpstreamBuilding(boolean b) throws IOException {
+        setBlockBuildWhenUpstreamBuilding(Boolean.valueOf(b));
     }
 
     public void setBlockBuildWhenUpstreamBuilding(Boolean b) throws IOException {
@@ -1764,8 +1844,8 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         setQuietPeriod(null != req.getParameter("hasCustomQuietPeriod") ? req.getParameter("quiet_period") : null);
         setScmCheckoutRetryCount(null != req.getParameter("hasCustomScmCheckoutRetryCount")
             ? req.getParameter("scmCheckoutRetryCount") : null);
-        setBlockBuildWhenDownstreamBuilding(null != req.getParameter("blockBuildWhenDownstreamBuilding"));
-        setBlockBuildWhenUpstreamBuilding(null != req.getParameter("blockBuildWhenUpstreamBuilding"));
+        setBlockBuildWhenDownstreamBuilding((Boolean) (null != req.getParameter("blockBuildWhenDownstreamBuilding")));
+        setBlockBuildWhenUpstreamBuilding((Boolean) (null != req.getParameter("blockBuildWhenUpstreamBuilding")));
 
         if (req.getParameter("hasSlaveAffinity") != null) {
             // New logic for handling whether this choice came from the dropdown or textfield.
@@ -1782,11 +1862,11 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         }
 
 
-        setCleanWorkspaceRequired(null != req.getParameter("cleanWorkspaceRequired"));
+        setCleanWorkspaceRequired((Boolean) (null != req.getParameter("cleanWorkspaceRequired")));
 
         canRoam = assignedNode==null;
 
-        setConcurrentBuild(req.getSubmittedForm().has("concurrentBuild"));
+        setConcurrentBuild((Boolean) (req.getSubmittedForm().has("concurrentBuild")));
 
         authToken = BuildAuthorizationToken.create(req);
 

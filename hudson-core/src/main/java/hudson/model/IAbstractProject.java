@@ -68,14 +68,14 @@ public interface IAbstractProject extends IJob {
      *
      * @return true if yes, false - otherwise.
      */
-    Boolean blockBuildWhenDownstreamBuilding();
+    boolean blockBuildWhenDownstreamBuilding();
 
     /**
      * Indicates whether build should be blocked while upstream project is building.
      *
      * @return true if yes, false - otherwise.
      */
-    Boolean blockBuildWhenUpstreamBuilding();
+    boolean blockBuildWhenUpstreamBuilding();
 
     /**
      * Checks whether scmRetryCount is configured
