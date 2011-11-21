@@ -64,6 +64,7 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
         return hasParentTemplate()? getTemplate().getCustomWorkspace() : null;
     }
 
+
     /**
      * User-specified workspace directory, or null if it's up to Hudson.
      *
@@ -80,6 +81,7 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
      * If this path is relative, it's resolved against {@link Node#getRootPath()} on the node where this workspace
      * is prepared.
      *
+     * @param customWorkspace customWorkspace.
      * @since 1.320
      */
     public void setCustomWorkspace(String customWorkspace) throws IOException {

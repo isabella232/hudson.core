@@ -21,6 +21,7 @@ import hudson.AbortException;
 import hudson.CopyOnWrite;
 import hudson.FeedAdapter;
 import hudson.FilePath;
+import hudson.Functions;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.cli.declarative.CLIMethod;
@@ -225,7 +226,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     /**
      * Selected template for this project.
      */
-    private transient AbstractProject template;
+    private transient P template;
 
     private boolean concurrentBuild;
 
@@ -237,7 +238,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     protected AbstractProject(ItemGroup parent, String name) {
         super(parent, name);
 
-        if(!Hudson.getInstance().getNodes().isEmpty()) {
+        if (Hudson.getInstance() != null && !Hudson.getInstance().getNodes().isEmpty()) {
             // if a new job is configured with Hudson that already has slave nodes
             // make it roamable by default
             canRoam = true;
@@ -260,6 +261,9 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     @Override
     public void onLoad(ItemGroup<? extends Item> parent, String name) throws IOException {
         super.onLoad(parent, name);
+
+        //TODO fix it
+        template = (P) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()), templateName);
 
         this.builds = new RunMap<R>();
         this.builds.load(this,new Constructor<R>() {
@@ -1967,9 +1971,11 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      *
      * @param templateName template name.
      */
+    @SuppressWarnings({"unchecked"})
     public void setTemplateName(String templateName) {
         this.templateName = templateName;
-        this.template = Hudson.getInstance().getTemplate(this.getClass(), templateName);
+        //TODO fix it
+        this.template = (P)Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()), templateName);
     }
 
     /**
@@ -1979,10 +1985,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      */
     @SuppressWarnings({"unchecked"})
     public P getTemplate() {
-        if (null == template) {
-            template = Hudson.getInstance().getTemplate(this.getClass(),templateName);
-        }
-        return (P)template;
+        return template;
     }
 
     /**
