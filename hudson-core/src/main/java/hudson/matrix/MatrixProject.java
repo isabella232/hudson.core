@@ -102,10 +102,11 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
     /**
      * The filter that is applied to combinations. It is a Groovy if condition.
      * This can be null, which means "true".
+     * Package visible for the tests only.
      *
      * @see #getCombinationFilter()
      */
-    private volatile String combinationFilter;
+    volatile String combinationFilter;
 
     /**
      * List of active {@link Builder}s configured for this project.
@@ -140,15 +141,17 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
     Boolean runSequentially;
 
     /**
-     * Filter to select a number of combinations to build first
+     * Filter to select a number of combinations to build first.
+     * Package visible for the tests only.
      */
-    private String touchStoneCombinationFilter;
+    String touchStoneCombinationFilter;
 
     /**
      * Required result on the touchstone combinations, in order to
-     * continue with the rest
+     * continue with the rest.
+     * Package visible for the tests only.
      */
-    private Result touchStoneResultCondition;
+    Result touchStoneResultCondition;
 
     /**
      * See {@link #setCustomWorkspace(String)}.
@@ -221,7 +224,6 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
         } else {
             this.combinationFilter = null;
         }
-        // TODO verify me
         rebuildConfigurations();
         save();
     }
@@ -467,7 +469,7 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
     /**
      * Rebuilds the {@link #configurations} list and {@link #activeConfigurations}.
      */
-    private void rebuildConfigurations() throws IOException {
+    void rebuildConfigurations() throws IOException {
         {
             // backward compatibility check to see if there's any data in the old structure
             // if so, bring them to the newer structure.
