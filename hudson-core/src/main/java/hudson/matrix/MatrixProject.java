@@ -82,7 +82,8 @@ import static hudson.Util.*;
  *
  * @author Kohsuke Kawaguchi
  */
-public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> implements TopLevelItem, SCMedItem, ItemGroup<MatrixConfiguration>, Saveable, FlyweightTask, BuildableItemWithBuildWrappers {
+public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> implements IMatrixProject, TopLevelItem,
+    SCMedItem, ItemGroup<MatrixConfiguration>, Saveable, FlyweightTask, BuildableItemWithBuildWrappers {
     /**
      * Configuration axes.
      */
@@ -151,12 +152,15 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
         super(parent, name);
     }
 
+    /**
+     * @inheritDoc
+     */
     public AxisList getAxes() {
         return axes;
     }
 
     /**
-     * Reconfigures axes.
+     * @inheritDoc
      */
     public void setAxes(AxisList axes) throws IOException {
         this.axes = new AxisList(axes);
@@ -165,23 +169,22 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
     }
 
     /**
-     * If true, {@link MatrixRun}s are run sequentially, instead of running in parallel.
-     *
-     * TODO: this should be subsumed by {@link ResourceController}.
+     * @inheritDoc
      */
     public boolean isRunSequentially() {
         return runSequentially;
     }
 
+    /**
+     * @inheritDoc
+     */
     public void setRunSequentially(boolean runSequentially) throws IOException {
         this.runSequentially = runSequentially;
         save();
     }
 
     /**
-     * Sets the combination filter.
-     *
-     * @param combinationFilter the combinationFilter to set
+     * @inheritDoc
      */
     public void setCombinationFilter(String combinationFilter) throws IOException {
         this.combinationFilter = combinationFilter;
@@ -190,73 +193,99 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
     }
 
     /**
-     * Obtains the combination filter, used to trim down the size of the matrix.
-     *
-     * <p>
-     * By default, a {@link MatrixConfiguration} is created for every possible combination of axes exhaustively.
-     * But by specifying a Groovy expression as a combination filter, one can trim down the # of combinations built.
-     *
-     * <p>
-     * Namely, this expression is evaluated for each axis value combination, and only when it evaluates to true,
-     * a corresponding {@link MatrixConfiguration} will be created and built. 
-     *
-     * @return can be null.
-     * @since 1.279
+     * @inheritDoc
      */
     public String getCombinationFilter() {
         return combinationFilter;
     }
 
+    /**
+     * @inheritDoc
+     */
     public String getTouchStoneCombinationFilter() {
         return touchStoneCombinationFilter;
     }
 
+    /**
+     * @inheritDoc
+     */
     public void setTouchStoneCombinationFilter(
             String touchStoneCombinationFilter) {
         this.touchStoneCombinationFilter = touchStoneCombinationFilter;
     }
 
+    /**
+     * @inheritDoc
+     */
     public Result getTouchStoneResultCondition() {
         return touchStoneResultCondition;
     }
 
+    /**
+     * @inheritDoc
+     */
     public void setTouchStoneResultCondition(Result touchStoneResultCondition) {
         this.touchStoneResultCondition = touchStoneResultCondition;
     }
 
+    /**
+     * @inheritDoc
+     */
     public String getCustomWorkspace() {
       return customWorkspace;
     }
-    
+
     /**
-     * User-specified workspace directory, or null if it's up to Hudson.
-     *
-     * <p>
-     * Normally a matrix project uses the workspace location assigned by its parent container,
-     * but sometimes people have builds that have hard-coded paths.
-     *
-     * <p>
-     * This is not {@link File} because it may have to hold a path representation on another OS.
-     *
-     * <p>
-     * If this path is relative, it's resolved against {@link Node#getRootPath()} on the node where this workspace
-     * is prepared.
+     * @inheritDoc
      */
     public void setCustomWorkspace(String customWorkspace) throws IOException {
         this.customWorkspace= customWorkspace;
     }
-    
+
+    /**
+     * @inheritDoc
+     */
+    public List<Builder> getBuilders() {
+        return builders.toList();
+    }
+
+    public DescribableList<Builder,Descriptor<Builder>> getBuildersList() {
+        return builders;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public Map<Descriptor<Publisher>,Publisher> getPublishers() {
+        return publishers.toMap();
+    }
+
+    public DescribableList<Publisher,Descriptor<Publisher>> getPublishersList() {
+        return publishers;
+    }
+
+    public DescribableList<BuildWrapper, Descriptor<BuildWrapper>> getBuildWrappersList() {
+        return buildWrappers;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public Map<Descriptor<BuildWrapper>,BuildWrapper> getBuildWrappers() {
+        return buildWrappers.toMap();
+    }
+
     @Override
     protected List<Action> createTransientActions() {
         List<Action> r = super.createTransientActions();
 
-        for (BuildStep step : builders)
+        for (BuildStep step : getBuildersList())
             r.addAll(step.getProjectActions(this));
-        for (BuildStep step : publishers)
+        for (BuildStep step : getPublishersList())
             r.addAll(step.getProjectActions(this));
-        for (BuildWrapper step : buildWrappers)
+        for (BuildWrapper step : getBuildWrappersList())
             r.addAll(step.getProjectActions(this));
-        for (Trigger trigger : triggers)
+        for (Trigger trigger : getTriggersList())
             r.addAll(trigger.getProjectActions());
 
         return r;
@@ -505,30 +534,6 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
         for (Combination c : axes.subList(LabelAxis.class).list())
             r.add(Hudson.getInstance().getLabel(Util.join(c.values(),"&&")));
         return r;
-    }
-
-    public List<Builder> getBuilders() {
-        return builders.toList();
-    }
-
-    public DescribableList<Builder,Descriptor<Builder>> getBuildersList() {
-        return builders;
-    }
-
-    public Map<Descriptor<Publisher>,Publisher> getPublishers() {
-        return publishers.toMap();
-    }
-
-    public DescribableList<Publisher,Descriptor<Publisher>> getPublishersList() {
-        return publishers;
-    }
-
-    public DescribableList<BuildWrapper, Descriptor<BuildWrapper>> getBuildWrappersList() {
-        return buildWrappers;
-    }
-
-    public Map<Descriptor<BuildWrapper>,BuildWrapper> getBuildWrappers() {
-        return buildWrappers.toMap();
     }
 
     public Publisher getPublisher(Descriptor<Publisher> descriptor) {

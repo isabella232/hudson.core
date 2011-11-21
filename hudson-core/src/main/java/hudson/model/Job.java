@@ -460,7 +460,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     @SuppressWarnings("unchecked")
     public Map<JobPropertyDescriptor, JobProperty<? super JobT>> getProperties() {
-        return Descriptor.toMap((Iterable) properties);
+        return Descriptor.toMap((Iterable) properties); //TODO should we analyze properties from super psroject?
     }
 
     /**
@@ -1245,6 +1245,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     @SuppressWarnings({"unchecked"})
     public JobT getTemplate() {
+        if (template == null) {
+            template = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()), templateName);
+        }
         return template;
     }
 
