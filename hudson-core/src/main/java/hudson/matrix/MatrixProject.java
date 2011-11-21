@@ -52,6 +52,7 @@ import hudson.util.DescribableList;
 import hudson.util.FormValidation;
 import hudson.util.FormValidation.Kind;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang3.ObjectUtils;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -82,13 +83,22 @@ import static hudson.Util.*;
  *
  * @author Kohsuke Kawaguchi
  */
-public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> implements IMatrixProject, TopLevelItem,
+public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> implements IMatrixProject, TopLevelItem,
     SCMedItem, ItemGroup<MatrixConfiguration>, Saveable, FlyweightTask, BuildableItemWithBuildWrappers {
+
+    protected static final String HAS_COMBINATION_FILTER_PARAM = "hasCombinationFilter";
+    protected static final String COMBINATION_FILTER_PARAM = "combinationFilter";
+    protected static final String HAS_TOUCH_STONE_COMBINATION_FILTER_PARAM = "hasTouchStoneCombinationFilter";
+    protected static final String TOUCH_STONE_COMBINATION_FILTER_PARAM = "touchStoneCombinationFilter";
+    protected static final String TOUCH_STONE_RESULT_CONDITION_PARAM = "touchStoneResultCondition";
+    protected static final String CUSTOM_WORKSPACE_PARAM = "customWorkspace";
+    protected static final String CUSTOM_WORKSPACE_DIRECTORY_PARAM = "customWorkspace.directory";
+
     /**
      * Configuration axes.
      */
-    private volatile AxisList axes = new AxisList();
-    
+    private volatile AxisList axes; //TODO verify it = new AxisList();
+
     /**
      * The filter that is applied to combinations. It is a Groovy if condition.
      * This can be null, which means "true".
@@ -126,13 +136,14 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
     @CopyOnWrite
     private transient /*final*/ Set<MatrixConfiguration> activeConfigurations = new LinkedHashSet<MatrixConfiguration>();
 
-    private boolean runSequentially;
-    
+    //package visible for the tests only.
+    Boolean runSequentially;
+
     /**
      * Filter to select a number of combinations to build first
      */
     private String touchStoneCombinationFilter;
-    
+
     /**
      * Required result on the touchstone combinations, in order to
      * continue with the rest
@@ -143,7 +154,7 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
      * See {@link #setCustomWorkspace(String)}.
      */
     private String customWorkspace;
-    
+
     public MatrixProject(String name) {
         this(Hudson.getInstance(), name);
     }
@@ -156,14 +167,19 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
      * @inheritDoc
      */
     public AxisList getAxes() {
-        return axes;
+        return axes!= null ? axes : (hasParentTemplate()? getTemplate().getAxes() : null);
     }
 
     /**
      * @inheritDoc
      */
     public void setAxes(AxisList axes) throws IOException {
-        this.axes = new AxisList(axes);
+        if (!(hasParentTemplate() && ObjectUtils.equals(getTemplate().getAxes(), axes))) {
+            this.axes = new AxisList(axes);
+        } else {
+            this.axes = null;
+        }
+        // TODO verify me
         rebuildConfigurations();
         save();
     }
@@ -172,14 +188,27 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
      * @inheritDoc
      */
     public boolean isRunSequentially() {
-        return runSequentially;
+        return runSequentially!= null ? runSequentially : (hasParentTemplate() && getTemplate().isRunSequentially());
+    }
+
+    /**
+     * @deprecated use #setRunSequentially(Boolean runSequentially) instead
+     */
+    @Deprecated
+    public void setRunSequentially(boolean runSequentially) throws IOException {
+        setRunSequentially(Boolean.valueOf(runSequentially));
     }
 
     /**
      * @inheritDoc
      */
-    public void setRunSequentially(boolean runSequentially) throws IOException {
-        this.runSequentially = runSequentially;
+    public void setRunSequentially(Boolean runSequentially) throws IOException {
+        if (!(hasParentTemplate() && ObjectUtils.equals(getTemplate().isRunSequentially(), runSequentially))) {
+            this.runSequentially = runSequentially;
+        } else {
+            this.runSequentially = null;
+        }
+        // TODO verify me
         save();
     }
 
@@ -187,7 +216,12 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
      * @inheritDoc
      */
     public void setCombinationFilter(String combinationFilter) throws IOException {
-        this.combinationFilter = combinationFilter;
+        if (!(hasParentTemplate() && ObjectUtils.equals(getTemplate().getCombinationFilter(), combinationFilter))) {
+            this.combinationFilter = combinationFilter;
+        } else {
+            this.combinationFilter = null;
+        }
+        // TODO verify me
         rebuildConfigurations();
         save();
     }
@@ -196,83 +230,116 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
      * @inheritDoc
      */
     public String getCombinationFilter() {
-        return combinationFilter;
+        return combinationFilter != null ? combinationFilter
+            : (hasParentTemplate() ? getTemplate().getCombinationFilter() : null);
     }
 
     /**
      * @inheritDoc
      */
     public String getTouchStoneCombinationFilter() {
-        return touchStoneCombinationFilter;
+        return touchStoneCombinationFilter != null ? touchStoneCombinationFilter
+            : (hasParentTemplate() ? getTemplate().getTouchStoneCombinationFilter() : null);
     }
 
     /**
      * @inheritDoc
      */
-    public void setTouchStoneCombinationFilter(
-            String touchStoneCombinationFilter) {
-        this.touchStoneCombinationFilter = touchStoneCombinationFilter;
+    public void setTouchStoneCombinationFilter(String touchStoneCombinationFilter) {
+        if (!(hasParentTemplate() && ObjectUtils.equals(getTemplate().getTouchStoneCombinationFilter(),
+            touchStoneCombinationFilter))) {
+            this.touchStoneCombinationFilter = touchStoneCombinationFilter;
+        } else {
+            this.touchStoneCombinationFilter = null;
+        }
     }
 
     /**
      * @inheritDoc
      */
     public Result getTouchStoneResultCondition() {
-        return touchStoneResultCondition;
+        return touchStoneResultCondition != null ? touchStoneResultCondition
+            : (hasParentTemplate() ? getTemplate().getTouchStoneResultCondition() : null);
     }
 
     /**
      * @inheritDoc
      */
     public void setTouchStoneResultCondition(Result touchStoneResultCondition) {
-        this.touchStoneResultCondition = touchStoneResultCondition;
+        if (!(hasParentTemplate() && ObjectUtils.equals(getTemplate().getTouchStoneResultCondition(),
+            touchStoneResultCondition))) {
+            this.touchStoneResultCondition = touchStoneResultCondition;
+        } else {
+            this.touchStoneResultCondition = null;
+        }
     }
 
     /**
      * @inheritDoc
      */
     public String getCustomWorkspace() {
-      return customWorkspace;
+        return customWorkspace != null ? customWorkspace
+            : (hasParentTemplate() ? getTemplate().getCustomWorkspace() : null);
     }
 
     /**
      * @inheritDoc
      */
     public void setCustomWorkspace(String customWorkspace) throws IOException {
-        this.customWorkspace= customWorkspace;
+        if (!(hasParentTemplate() && ObjectUtils.equals(getTemplate().getTouchStoneResultCondition(),
+            customWorkspace))) {
+            this.customWorkspace = customWorkspace;
+        } else {
+            this.customWorkspace = null;
+        }
     }
 
     /**
      * @inheritDoc
      */
     public List<Builder> getBuilders() {
-        return builders.toList();
+        DescribableList<Builder,Descriptor<Builder>> buildersList = getBuildersList();
+        return (buildersList != null ? buildersList.toList() : null);
     }
 
+    //TODO improve it
     public DescribableList<Builder,Descriptor<Builder>> getBuildersList() {
-        return builders;
+        return !(builders == null || builders.isEmpty()) ? builders
+            : (hasParentTemplate() ? getTemplate().getBuildersList() : null);
     }
 
     /**
      * @inheritDoc
      */
     public Map<Descriptor<Publisher>,Publisher> getPublishers() {
-        return publishers.toMap();
+        DescribableList<Publisher,Descriptor<Publisher>> publishersList = getPublishersList();
+        return (publishersList != null ? publishersList.toMap() : null);
     }
 
+    /**
+     * @inheritDoc
+     */
+    //TODO improve it
     public DescribableList<Publisher,Descriptor<Publisher>> getPublishersList() {
-        return publishers;
+        return !(publishers == null || publishers.isEmpty()) ? publishers
+            : (hasParentTemplate() ? getTemplate().getPublishersList() : null);
     }
 
+    /**
+     * @inheritDoc
+     */
+    //TODO improve it
     public DescribableList<BuildWrapper, Descriptor<BuildWrapper>> getBuildWrappersList() {
-        return buildWrappers;
+        return !(buildWrappers == null || buildWrappers.isEmpty()) ? buildWrappers
+            : (hasParentTemplate() ? getTemplate().getBuildWrappersList() : null);
     }
 
     /**
      * @inheritDoc
      */
     public Map<Descriptor<BuildWrapper>,BuildWrapper> getBuildWrappers() {
-        return buildWrappers.toMap();
+        DescribableList<BuildWrapper, Descriptor<BuildWrapper>> buildWrappersList = getBuildWrappersList();
+        return (buildWrappersList != null ? buildWrappersList.toMap() : null);
     }
 
     @Override
@@ -315,11 +382,11 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
 
     @Override
     public void onLoad(ItemGroup<? extends Item> parent, String name) throws IOException {
-        super.onLoad(parent,name);
+        super.onLoad(parent, name);
         Collections.sort(axes); // perhaps the file was edited on disk and the sort order might have been broken
-        builders.setOwner(this);
-        publishers.setOwner(this);
-        buildWrappers.setOwner(this);
+        getBuildersList().setOwner(this);
+        getPublishersList().setOwner(this);
+        getBuildWrappersList().setOwner(this);
         rebuildConfigurations();
     }
 
@@ -327,7 +394,7 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
     public void logRotate() throws IOException, InterruptedException {
         super.logRotate();
         // perform the log rotation of inactive configurations to make sure
-        // their logs get eventually discarded 
+        // their logs get eventually discarded
         for (MatrixConfiguration config : configurations.values()) {
             if(!config.isActiveConfiguration())
                 config.logRotate();
@@ -553,9 +620,9 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
     }
 
     protected void buildDependencyGraph(DependencyGraph graph) {
-        publishers.buildDependencyGraph(this,graph);
-        builders.buildDependencyGraph(this,graph);
-        buildWrappers.buildDependencyGraph(this,graph);
+        getPublishersList().buildDependencyGraph(this,graph);
+        getBuildersList().buildDependencyGraph(this,graph);
+        getBuildWrappersList().buildDependencyGraph(this,graph);
     }
 
     public MatrixProject asProject() {
@@ -580,26 +647,20 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
 
         JSONObject json = req.getSubmittedForm();
 
-        if(req.getParameter("hasCombinationFilter")!=null) {
-            this.combinationFilter = Util.nullify(req.getParameter("combinationFilter"));
+        setCombinationFilter(
+            req.getParameter(HAS_COMBINATION_FILTER_PARAM) != null ? Util.nullify(req.getParameter(
+                COMBINATION_FILTER_PARAM)) : null);
+
+        if (req.getParameter(HAS_TOUCH_STONE_COMBINATION_FILTER_PARAM)!=null) {
+            setTouchStoneCombinationFilter(Util.nullify(req.getParameter(TOUCH_STONE_COMBINATION_FILTER_PARAM)));
+            setTouchStoneResultCondition(Result.fromString(req.getParameter(TOUCH_STONE_RESULT_CONDITION_PARAM)));
         } else {
-            this.combinationFilter = null;
-        }
-        
-        if (req.getParameter("hasTouchStoneCombinationFilter")!=null) {
-            this.touchStoneCombinationFilter = Util.nullify(req.getParameter("touchStoneCombinationFilter"));
-            String touchStoneResultCondition = req.getParameter("touchStoneResultCondition");
-            this.touchStoneResultCondition = Result.fromString(touchStoneResultCondition);
-        } else {
-            this.touchStoneCombinationFilter = null;
+            setTouchStoneCombinationFilter(null);
         }
 
-        if(req.hasParameter("customWorkspace")) {
-            customWorkspace = req.getParameter("customWorkspace.directory");
-        } else {
-            customWorkspace = null;        
-        }
-        
+        setCustomWorkspace(
+            req.hasParameter(CUSTOM_WORKSPACE_PARAM) ? req.getParameter(CUSTOM_WORKSPACE_DIRECTORY_PARAM) : null);
+
         // parse system axes
         DescribableList<Axis,AxisDescriptor> newAxes = new DescribableList<Axis,AxisDescriptor>(this);
         newAxes.rebuildHetero(req, json, Axis.all(),"axis");
@@ -608,9 +669,9 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
 
         runSequentially = json.has("runSequentially");
 
-        buildWrappers.rebuild(req, json, BuildWrappers.getFor(this));
-        builders.rebuildHetero(req, json, Builder.all(), "builder");
-        publishers.rebuild(req, json, BuildStepDescriptor.filter(Publisher.all(),this.getClass()));
+        getBuildWrappersList().rebuild(req, json, BuildWrappers.getFor(this));
+        getBuildersList().rebuildHetero(req, json, Builder.all(), "builder");
+        getPublishersList().rebuild(req, json, BuildStepDescriptor.filter(Publisher.all(),this.getClass()));
 
         rebuildConfigurations();
     }
@@ -670,6 +731,24 @@ public class MatrixProject extends AbstractProject<MatrixProject,MatrixBuild> im
             }
             return r;
         }
+    }
+
+    /**
+     * For the unit tests only. Sets template for the job.
+     *
+     * @param template parent job
+     */
+    void setTemplate(MatrixProject template) {
+        this.template = template;
+    }
+
+    /**
+     * For the unit tests only.
+     *
+     * @param allowSave allow set.
+     */
+    void setAllowSave(Boolean allowSave) {
+        this.allowSave.set(allowSave);
     }
 
     private static final Logger LOGGER = Logger.getLogger(MatrixProject.class.getName());
