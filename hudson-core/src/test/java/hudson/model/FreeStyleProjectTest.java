@@ -234,6 +234,7 @@ public class FreeStyleProjectTest {
         FreeStyleProject childProject1 = new FreeStyleProjectMock("child1");
         childProject1.setLogRotator(new LogRotator(10, 11, 12, 13));
         assertNotNull(childProject1.getLogRotator());
+        assertEquals(childProject1.getLogRotator().getDaysToKeep(), 10);
     }
 
     @Test
