@@ -385,7 +385,7 @@ public class FreeStyleProjectTest {
         mockStatic(Hudson.class);
         expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
         replayAll();
-        assertEquals( childProject.getQuietPeriod(), Integer.parseInt(childQuietPeriod));
+        assertEquals(childProject.getQuietPeriod(), Integer.parseInt(childQuietPeriod));
         verifyAll();
     }
 

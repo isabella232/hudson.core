@@ -522,11 +522,34 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     }
 
     public int getScmCheckoutRetryCount() {
-        return scmCheckoutRetryCount !=null ? scmCheckoutRetryCount : Hudson.getInstance().getScmCheckoutRetryCount();
+        if (null != scmCheckoutRetryCount) {
+            return scmCheckoutRetryCount;
+        }
+        return hasParentTemplate() ?
+            getTemplate().getScmCheckoutRetryCount() : Hudson.getInstance().getScmCheckoutRetryCount();
     }
 
-    public void setScmCheckoutRetryCount(Integer scmCheckoutRetryCount) {
-        this.scmCheckoutRetryCount = scmCheckoutRetryCount;
+    public void setScmCheckoutRetryCount(Integer retryCount) {
+        if (!(hasParentTemplate() && ObjectUtils.equals(getTemplate().getScmCheckoutRetryCount(), retryCount))) {
+            this.scmCheckoutRetryCount = retryCount;
+        } else {
+            this.scmCheckoutRetryCount = null;
+        }
+    }
+
+    /**
+     * Sets scmCheckoutRetryCount, Uses {@link NumberUtils#isNumber(String)} for checking retryCount param.
+     * If it is not valid number, null will be set.
+     *
+     * @param scmCheckoutRetryCount retry count.
+     * @throws IOException if any.
+     */
+    protected void setScmCheckoutRetryCount(String scmCheckoutRetryCount) throws IOException {
+        Integer retryCount = null;
+        if (NumberUtils.isNumber(scmCheckoutRetryCount)) {
+            retryCount = NumberUtils.createInteger(scmCheckoutRetryCount);
+        }
+        setScmCheckoutRetryCount(retryCount);
     }
 
     // ugly name because of EL
@@ -1725,7 +1748,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         setJDK(req.getParameter("jdk"));
         setQuietPeriod(null != req.getParameter("hasCustomQuietPeriod") ? req.getParameter("quiet_period") : null);
         setScmCheckoutRetryCount(null != req.getParameter("hasCustomScmCheckoutRetryCount")
-            ? Integer.parseInt(req.getParameter("scmCheckoutRetryCount")) : null);
+            ? req.getParameter("scmCheckoutRetryCount") : null);
         setBlockBuildWhenDownstreamBuilding(null != req.getParameter("blockBuildWhenDownstreamBuilding"));
         setBlockBuildWhenUpstreamBuilding(null != req.getParameter("blockBuildWhenUpstreamBuilding"));
 
