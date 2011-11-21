@@ -154,6 +154,13 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     private transient JobT template;
 
+    protected final ThreadLocal<Boolean> allowSave = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return true;
+        }
+    };
+
     protected Job(ItemGroup parent, String name) {
         super(parent, name);
     }
@@ -1392,11 +1399,4 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             return run.getDisplayName() + " : " + run.getDurationString();
         }
     }
-
-    protected static final ThreadLocal<Boolean> allowSave = new ThreadLocal<Boolean>() {
-        @Override
-        protected Boolean initialValue() {
-            return true;
-        }
-    };
 }
