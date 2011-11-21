@@ -154,7 +154,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     protected transient JobT template;
 
-    protected transient volatile ThreadLocal<Boolean> allowSave = new ThreadLocal<Boolean>() {
+    protected transient ThreadLocal<Boolean> allowSave = new ThreadLocal<Boolean>() {
         @Override
         protected Boolean initialValue() {
             return true;
@@ -179,6 +179,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             throws IOException {
         super.onLoad(parent, name);
         template = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()), templateName);
+        //TODO investigate why allowSave is null
         if (null == allowSave) {// Initialize property if null.
             allowSave = new ThreadLocal<Boolean>() {
                 @Override
@@ -1252,10 +1253,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     @SuppressWarnings({"unchecked"})
     public JobT getTemplate() {
-//TODO enable me
-//        if (template == null) {
-//            template = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()), templateName);
-//        }
+        if (StringUtils.isNotBlank(templateName) && template == null) {
+            template = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()), templateName);
+        }
         return template;
     }
 
