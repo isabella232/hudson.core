@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2011 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  *
  * Contributors: 
 *
-*    Kohsuke Kawaguchi, Jorg Heymans, Red Hat, Inc., id:cactusman
+*    Kohsuke Kawaguchi, Jorg Heymans, Red Hat, Inc., id:cactusman, Anton Kozak, Nikita Levyankov
  *     
  *
  *******************************************************************************/ 
@@ -94,7 +94,7 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
     protected static final String COMBINATION_FILTER_PROPERTY_NAME = "combinationFilter";
     protected static final String TOUCH_STONE_COMBINATION_FILTER_PROPERTY_NAME = "touchStoneCombinationFilter";
     protected static final String TOUCH_STONE_RESULT_CONDITION_PROPERTY_NAME = "touchStoneResultCondition";
-    protected static final String CUSTOM_WORKSPACE_PROPERTY_NAME = "customWorkspace";
+
     /**
      * Configuration axes.
      */
