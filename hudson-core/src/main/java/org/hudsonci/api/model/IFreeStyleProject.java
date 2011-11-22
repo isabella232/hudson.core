@@ -12,7 +12,7 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
-package hudson.model;
+package org.hudsonci.api.model;
 
 /**
  * FreeStyle project interface.

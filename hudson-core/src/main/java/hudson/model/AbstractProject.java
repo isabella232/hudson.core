@@ -21,9 +21,7 @@ import hudson.AbortException;
 import hudson.CopyOnWrite;
 import hudson.FeedAdapter;
 import hudson.FilePath;
-import hudson.Functions;
 import hudson.Launcher;
-import hudson.RestrictedSince;
 import hudson.Util;
 import hudson.cli.declarative.CLIMethod;
 import hudson.cli.declarative.CLIResolver;
@@ -93,8 +91,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
+import org.hudsonci.api.model.IAbstractProject;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.stapler.ForwardToView;
@@ -118,7 +115,8 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
  * @author Kohsuke Kawaguchi
  * @see AbstractBuild
  */
-public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends AbstractBuild<P,R>> extends Job<P,R> implements BuildableItem, IAbstractProject {
+public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends AbstractBuild<P,R>> extends Job<P,R> implements BuildableItem,
+    IAbstractProject {
 
     /**
      * {@link SCM} associated with the project.

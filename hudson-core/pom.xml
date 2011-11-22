@@ -76,7 +76,6 @@
         <bridge-method-injector.version>1.4</bridge-method-injector.version>
         <access-modifier-checker.version>1.0</access-modifier-checker.version>
         <antlr-maven-plugin.version>2.1</antlr-maven-plugin.version>
-        <cobertura-maven-plugin.version>2.5.1</cobertura-maven-plugin.version>
         <apt-maven-plugin.version>1.0-alpha-2</apt-maven-plugin.version>
         <maven-project-info-reports-plugin.version>2.1</maven-project-info-reports-plugin.version>
     </properties>

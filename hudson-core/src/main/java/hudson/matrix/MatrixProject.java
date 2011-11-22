@@ -33,9 +33,7 @@ import hudson.model.Items;
 import hudson.model.JDK;
 import hudson.model.Job;
 import hudson.model.Label;
-import hudson.model.Node;
 import hudson.model.Queue.FlyweightTask;
-import hudson.model.ResourceController;
 import hudson.model.Result;
 import hudson.model.SCMedItem;
 import hudson.model.Saveable;
@@ -53,6 +51,7 @@ import hudson.util.FormValidation;
 import hudson.util.FormValidation.Kind;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.ObjectUtils;
+import org.hudsonci.api.matrix.IMatrixProject;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -74,8 +73,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static hudson.Util.*;
 
 /**
  * {@link Job} that allows you to run multiple different configurations
