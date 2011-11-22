@@ -92,6 +92,7 @@ import org.eclipse.hudson.api.model.IProjectProperty;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerOverridable;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -1353,6 +1354,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         return cascadingProjectName;
     }
 
+    public synchronized void doUpdateCascadingProject(@QueryParameter(fixEmpty = true) String projectName) {
+        setCascadingProjectName(projectName);
+    }
+
     /**
      * Sets cascadingProject name.
      *
@@ -1360,12 +1365,15 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     @SuppressWarnings("unchecked")
     public synchronized void setCascadingProjectName(String cascadingProjectName) {
-        this.cascadingProjectName = cascadingProjectName;
         if (StringUtils.isBlank(cascadingProjectName)) {
-            this.cascadingProject = null;
-        } else {
+            clearCascadingProject();
+        } else if (!StringUtils.equalsIgnoreCase(this.cascadingProjectName, cascadingProjectName)) {
+            this.cascadingProjectName = cascadingProjectName;
             this.cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
                 cascadingProjectName);
+            for (IProjectProperty property : jobProperties.values()) {
+                property.setOverridden(property.getValue() != property.getCascadingValue());
+            }
         }
     }
 
@@ -1391,6 +1399,18 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     public boolean hasCascadingProject() {
         return null != getCascadingProject();
     }
+
+    /**
+     * Remove cascading project data and mark all project properties as non-overridden
+     */
+    private void clearCascadingProject() {
+        this.cascadingProject = null;
+        this.cascadingProjectName = null;
+        for (IProjectProperty property : jobProperties.values()) {
+            property.setOverridden(false);
+        }
+    }
+
 
     public Graph getBuildTimeGraph() {
         Graph graph = new Graph(getLastBuild().getTimestamp(), 500, 400);

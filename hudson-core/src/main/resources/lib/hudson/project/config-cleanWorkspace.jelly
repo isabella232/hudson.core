@@ -21,6 +21,6 @@
   <j:set var="cleanWorkspaceRequired" value="${cleanWorkspaceRequiredProperty.getValue()}"/>
   <f:optionalBlock name="cleanWorkspaceRequired" title="${%Clean workspace before build}"
                    checked="${cleanWorkspaceRequired}"
-                   isPropertyOverridden="${cleanWorkspaceRequiredProperty.isPropertyOverridden()}"
+                   isPropertyOverridden="${cleanWorkspaceRequiredProperty.isOverridden()}"
                    help="/help/project-config/cleanWorkspace.html" />
 </j:jelly>

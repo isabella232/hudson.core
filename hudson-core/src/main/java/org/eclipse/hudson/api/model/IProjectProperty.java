@@ -64,7 +64,7 @@ public interface IProjectProperty<T> extends Serializable {
     /**
      * @return true if value inherited from cascading project, false - otherwise,
      */
-    boolean isPropertyOverridden();
+    boolean isOverridden();
 
     /**
      * Returns property value. If originalValue is not null or value was overridden for this
@@ -85,4 +85,11 @@ public interface IProjectProperty<T> extends Serializable {
      * Resets value for given job. Default implementation sets Null value and resets propertyOverridden flag to false.
      */
     void resetValue();
+
+    /**
+     * Sets the overridden flag.
+     *
+     * @param overridden true - mark property as overridden, false - otherwise.
+     */
+    void setOverridden(boolean overridden);
 }

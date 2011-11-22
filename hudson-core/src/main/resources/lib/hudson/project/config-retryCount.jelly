@@ -9,7 +9,7 @@
 #
 # Contributors: 
 #
-#    Shinod 
+#    Shinod, Nikita Levyankov, Anton Kozak
 #        
 #
 #************************************************************************** --> 
@@ -21,7 +21,7 @@
   <j:set var="scmCheckoutRetryCount" value="${scmCheckoutRetryCountProperty.getValue()}"/>
   <f:optionalBlock name="hasCustomScmCheckoutRetryCount" title="${%Retry Count}"
                    checked="${scmCheckoutRetryCount!=null and scmCheckoutRetryCount!=scmCheckoutRetryCountProperty.getDefaultValue()}"
-                   isPropertyOverridden="${scmCheckoutRetryCountProperty.isPropertyOverridden()}"
+                   isPropertyOverridden="${scmCheckoutRetryCountProperty.isOverridden()}"
                    help="/help/project-config/scmCheckoutRetryCount.html">
     <f:entry title="${%SCM checkout retry count}">
       <f:textbox name="scmCheckoutRetryCount" value="${scmCheckoutRetryCount}"/>

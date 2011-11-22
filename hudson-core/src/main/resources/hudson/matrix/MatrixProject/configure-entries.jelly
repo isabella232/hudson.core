@@ -9,7 +9,7 @@
 #
 # Contributors: 
 #
-#    Kohsuke Kawaguchi, Stephen Connolly
+#    Kohsuke Kawaguchi, Stephen Connolly, Nikita Levyankov, Anton Kozak
 #        
 #
 #************************************************************************** --> 
@@ -57,13 +57,13 @@
             checked="${runSequentially}"
             field="runSequentially"
             title="${%Run each configuration sequentially}"
-            isPropertyOverridden="${runSequentiallyProperty.isPropertyOverridden()}"/>
+            isPropertyOverridden="${runSequentiallyProperty.isOverridden()}"/>
 
     <j:set var="combinationFilterProperty" value="${it.getStringProperty(it.COMBINATION_FILTER_PROPERTY_NAME)}"/>
     <j:set var="combinationFilter" value="${combinationFilterProperty.getValue()}"/>
     <f:optionalBlock name="hasCombinationFilter" title="${%Combination Filter}"
                      checked="${!empty(combinationFilter)}"
-                     isPropertyOverridden="${combinationFilterProperty.isPropertyOverridden()}"
+                     isPropertyOverridden="${combinationFilterProperty.isOverridden()}"
                      help="/help/matrix/combinationfilter.html">
 	    <f:entry title="${%Filter}">
 	      <f:textbox name="combinationFilter" value="${combinationFilter}" />
@@ -74,7 +74,7 @@
     <j:set var="touchStoneCombinationFilter" value="${touchStoneCombinationFilterProperty.getValue()}"/>
     <f:optionalBlock name="hasTouchStoneCombinationFilter" title="${%Execute touchstone builds first}"
                      checked="${!empty(touchStoneCombinationFilter)}"
-                     isPropertyOverridden="${touchStoneCombinationFilterProperty.isPropertyOverridden()}"
+                     isPropertyOverridden="${touchStoneCombinationFilterProperty.isOverridden()}"
                      help="/help/matrix/touchstone.html">
         <f:entry title="${%Filter}">
           <f:textbox name="touchStoneCombinationFilter" value="${touchStoneCombinationFilter}" />

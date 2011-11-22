@@ -17,11 +17,6 @@ package org.eclipse.hudson.api.model.project.property;
 
 import hudson.model.FreeStyleProjectMock;
 import hudson.tasks.LogRotator;
-import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
-import org.eclipse.hudson.api.model.project.property.BooleanProjectProperty;
-import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
-import org.eclipse.hudson.api.model.project.property.LogRotatorProjectProperty;
-import org.eclipse.hudson.api.model.project.property.StringProjectProperty;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -270,13 +265,13 @@ public class ProjectPropertyTest {
         property.setKey(propertyKey);
         property.setValue(null);
         //If project doesn't have cascading - default boolean value is used for propertyOverridden flag
-        assertFalse(property.isPropertyOverridden());
+        assertFalse(property.isOverridden());
         assertNull(property.getOriginalValue());
 
         Object value = 12345;
         property.setValue(value);
         //If project doesn't have cascading - default boolean value is used for propertyOverridden flag
-        assertFalse(property.isPropertyOverridden());
+        assertFalse(property.isOverridden());
         assertEquals(value, property.getOriginalValue());
 
         String parentValue = "equalValue";
@@ -286,18 +281,21 @@ public class ProjectPropertyTest {
         parent.putJobProperty(propertyKey, parentProperty);
         project.setCascadingProject(parent);
 
+        //If value set to null, need to check whether default value is equals to cascading
+        property.setValue(null);
+        assertTrue(property.isOverridden());
         String overriddenValue = "newValue";
         property.setValue(overriddenValue);
-        assertTrue(property.isPropertyOverridden());
+        assertTrue(property.isOverridden());
 
         //Check whether current value is not null, after setting equal-to-cascading value current will be null
         assertNotNull(property.getOriginalValue());
-        assertTrue(property.isPropertyOverridden());
+        assertTrue(property.isOverridden());
         property.setValue(parentValue);
         //Reset current property to null
         assertNull(property.getOriginalValue());
         //Cascading value is equal to current - reset flag to false.
-        assertFalse(property.isPropertyOverridden());
+        assertFalse(property.isOverridden());
     }
 
     @Test
@@ -314,10 +312,10 @@ public class ProjectPropertyTest {
         //if current value is set to null and property is not overridden - defaultValue (Zero) will be taken
         Integer value = property.getValue();
         assertNotNull(value);
-        assertFalse(property.isPropertyOverridden());
+        assertFalse(property.isOverridden());
         assertEquals(property.getDefaultValue(), value);
 
-        property.setPropertyOverridden(true);
+        property.setOverridden(true);
         //If property is overridden - return its actual value.
         assertNull(property.getValue());
 
@@ -333,11 +331,12 @@ public class ProjectPropertyTest {
         assertNull(property.getOriginalValue());
         assertEquals(propertyValue, property.getValue());
 
-        property.setPropertyOverridden(true);
+        property.setOverridden(true);
         //Property is overridden - return current value even if it is null.
         assertNull(property.getOriginalValue());
         assertNull(property.getValue());
     }
+
 
     /**
      * Property should have not null property key.
@@ -375,18 +374,17 @@ public class ProjectPropertyTest {
     }
 
     /**
-     * Resets project property value,
+     * Test setOverridden method.
      */
     @Test
-    public void testResetValue() {
+    public void testSetPropertyOverridden() {
         BaseProjectProperty property = new BaseProjectProperty(project);
-        property.setKey(propertyKey);
-        property.setValue(new Object());
-        property.setPropertyOverridden(true);
-        assertNotNull(property.getOriginalValue());
-        assertTrue(property.isPropertyOverridden());
-        property.resetValue();
-        assertNull(property.getOriginalValue());
-        assertFalse(property.isPropertyOverridden());
+        //By default property isOverridden flag is set to false.
+        assertFalse(property.isOverridden());
+        //Test if flag is configured as expected. Set true/false values and check whether they are set correctly.
+        property.setOverridden(true);
+        assertTrue(property.isOverridden());
+        property.setOverridden(false);
+        assertFalse(property.isOverridden());
     }
 }
