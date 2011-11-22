@@ -129,9 +129,16 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
             originalValue = value;
             setPropertyOverridden(true);
         } else {
-            this.originalValue = null;
-            setPropertyOverridden(false);
+            resetValue();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void resetValue() {
+        this.originalValue = null;
+        setPropertyOverridden(false);
     }
 
     /**
