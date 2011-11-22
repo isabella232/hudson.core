@@ -12,8 +12,10 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
-package hudson.model;
+package org.hudsonci.api.model;
 
+import hudson.model.JobProperty;
+import hudson.model.JobPropertyDescriptor;
 import hudson.tasks.LogRotator;
 import java.util.Map;
 

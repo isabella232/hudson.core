@@ -32,6 +32,7 @@ import hudson.tasks.Maven.MavenInstallation;
 import hudson.triggers.Trigger;
 import hudson.util.DescribableList;
 import net.sf.json.JSONObject;
+import org.hudsonci.api.model.IProject;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -48,7 +49,8 @@ import java.util.Set;
  * @author Kohsuke Kawaguchi
  */
 public abstract class Project<P extends Project<P,B>,B extends Build<P,B>>
-    extends AbstractProject<P,B> implements SCMedItem, Saveable, ProjectWithMaven, BuildableItemWithBuildWrappers, IProject {
+    extends AbstractProject<P,B> implements SCMedItem, Saveable, ProjectWithMaven, BuildableItemWithBuildWrappers,
+    IProject {
 
     /**
      * List of active {@link Builder}s configured for this project.

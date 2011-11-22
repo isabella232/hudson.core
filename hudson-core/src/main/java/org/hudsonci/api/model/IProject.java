@@ -12,8 +12,9 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
-package hudson.model;
+package org.hudsonci.api.model;
 
+import hudson.model.Descriptor;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.Builder;
 import hudson.tasks.Publisher;
