@@ -212,7 +212,7 @@
                                 <artifactItem>
                                     <groupId>org.hudsonci.plugins</groupId>
                                     <artifactId>subversion</artifactId>
-                                    <version>2.1.0</version>
+                                    <version>2.1.1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -221,7 +221,7 @@
                                 <artifactItem>
                                     <groupId>org.hudsonci.plugins</groupId>
                                     <artifactId>cvs</artifactId>
-                                    <version>2.1.0</version>
+                                    <version>2.1.0_1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -230,7 +230,7 @@
                                 <artifactItem>
                                     <groupId>org.hudsonci.plugins</groupId>
                                     <artifactId>git</artifactId>
-                                    <version>2.1.0</version>
+                                    <version>2.1.1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -239,7 +239,7 @@
                                 <artifactItem>
                                     <groupId>org.hudsonci.plugins</groupId>
                                     <artifactId>ssh-slaves</artifactId>
-                                    <version>2.1.0</version>
+                                    <version>2.1.1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
