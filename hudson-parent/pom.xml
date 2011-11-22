@@ -57,6 +57,12 @@
     <maven-localizer-plugin.version>1.10</maven-localizer-plugin.version>
     <maven-hpi-plugin.version>2.1.1</maven-hpi-plugin.version>
     <maven-stapler-plugin.version>1.16</maven-stapler-plugin.version>
+
+    <!--Test dependencies-->
+    <junit.version>4.8.1</junit.version>
+    <easymock.version>3.0</easymock.version>
+    <mockito-core.version>1.8.5</mockito-core.version>
+    <powermock.version>1.4.10</powermock.version>
   </properties>
 
   <organization>
@@ -215,6 +221,7 @@
             <systemPropertyVariables>
               <java.io.tmpdir>${project.build.directory}</java.io.tmpdir>
             </systemPropertyVariables>
+            <forkMode>always</forkMode>
           </configuration>
         </plugin>
 
@@ -240,24 +247,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
           <version>${maven-pmd-plugin.version}</version>
-          <!--configuration>
-            <verbose>true</verbose>
-            <targetJdk>1.5</targetJdk>
-            <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
-            <targetDirectory>${project.build.directory}</targetDirectory>
-            <excludeRoots>
-              <excludeRoot>${basedir}/target/generated-sources/</excludeRoot>
-            </excludeRoots>
-          </configuration>
-          <executions>
-            <execution>
-              <phase>validate</phase>
-              <goals>
-                <goal>check</goal>
-                <goal>cpd-check</goal>
-              </goals>
-            </execution>
-          </executions-->
         </plugin>
 
         <plugin>
