@@ -27,6 +27,8 @@ import org.eclipse.hudson.api.model.IProjectProperty;
  * @author Nikita Levyankov
  */
 public class BaseProjectProperty<T> implements IProjectProperty<T> {
+    static final String INVALID_JOB_EXCEPTION = "Project property should have not null job";
+    static final String INVALID_PROPERTY_KEY_EXCEPTION = "Project property should have not null propertyKey";
 
     private transient String propertyKey;
     private transient IJob job;
@@ -53,8 +55,26 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
      * {@inheritDoc}
      */
     public void setJob(IJob job) {
-        assert job != null;
+        if (null == job) {
+            throw new IllegalArgumentException(INVALID_JOB_EXCEPTION);
+        }
         this.job = job;
+    }
+
+    /**
+     * @return job that property belongs to.
+     */
+    final IJob getJob() {
+        return job;
+    }
+
+    /**
+     * Sets the overridden flag.
+     *
+     * @param overridden true - mark property as overridden, false - otherwise.
+     */
+    final void setPropertyOverridden(boolean overridden) {
+        propertyOverridden = overridden;
     }
 
     /**
@@ -62,8 +82,11 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
      */
     @SuppressWarnings("unchecked")
     public T getCascadingValue() {
-        return job.hasCascadingProject() ?
-            (T) job.getCascadingProject().getProperty(propertyKey, this.getClass()).getValue() : getDefaultValue();
+        if (null == propertyKey) {
+            throw new IllegalArgumentException(INVALID_PROPERTY_KEY_EXCEPTION);
+        }
+        return getJob().hasCascadingProject() ?
+            (T) getJob().getCascadingProject().getProperty(propertyKey, this.getClass()).getValue() : getDefaultValue();
     }
 
     /**
@@ -95,16 +118,19 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
      */
     @SuppressWarnings("unchecked")
     public void setValue(T value) {
+        if (null == propertyKey) {
+            throw new IllegalArgumentException(INVALID_PROPERTY_KEY_EXCEPTION);
+        }
         value = prepareValue(value);
-        if (!job.hasCascadingProject()) {
+        if (!getJob().hasCascadingProject()) {
             originalValue = value;
         } else if (allowOverrideValue(
-            (T) job.getCascadingProject().getProperty(propertyKey, this.getClass()).getValue(), value)) {
+            (T) getJob().getCascadingProject().getProperty(propertyKey, this.getClass()).getValue(), value)) {
             originalValue = value;
-            propertyOverridden = true;
+            setPropertyOverridden(true);
         } else {
             this.originalValue = null;
-            propertyOverridden = false;
+            setPropertyOverridden(false);
         }
     }
 
