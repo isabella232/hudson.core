@@ -27,10 +27,19 @@ import org.eclipse.hudson.api.model.IProjectProperty;
  */
 public abstract class BaseProjectProperty<T> implements IProjectProperty<T> {
 
-    private String propertyKey;
+    private transient String propertyKey;
     private transient IJob job;
     private T originalValue;
     private boolean propertyOverridden;
+
+    /**
+     * Instantiate new property.
+     *
+     * @param job owner of current property.
+     */
+    public BaseProjectProperty(IJob job) {
+        setJob(job);
+    }
 
     /**
      * {@inheritDoc}

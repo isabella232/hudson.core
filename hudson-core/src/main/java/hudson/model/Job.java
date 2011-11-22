@@ -20,6 +20,7 @@ package hudson.model;
 import hudson.Functions;
 import hudson.util.graph.GraphSeries;
 import hudson.widgets.Widget;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -113,8 +114,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         extends AbstractItem implements ExtensionPoint, StaplerOverridable, IJob {
     private static transient final String HUDSON_BUILDS_PROPERTY_KEY = "HUDSON_BUILDS";
 
-    private Set<String> overriddenValues = new CopyOnWriteArraySet<String>();
-
     /**
      * Next build number. Kept in a separate file because this is the only
      * information that gets updated often. This allows the rest of the
@@ -166,44 +165,26 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     protected transient JobT cascadingProject;
 
-    protected transient ThreadLocal<Boolean> allowSave = new ThreadLocal<Boolean>() {
+    private transient ThreadLocal<Boolean> allowSave = new ThreadLocal<Boolean>() {
         @Override
         protected Boolean initialValue() {
             return true;
         }
     };
 
+    /**
+     * Set true if save operation for config is permitted, false - otherwise .
+     *
+     * @param allowSave allow save.
+     */
+    protected void setAllowSave(Boolean allowSave) {
+        this.allowSave.set(allowSave);
+    }
+
     protected Job(ItemGroup parent, String name) {
         super(parent, name);
     }
 
-    /**
-     * Checks whether property is overridden by this job and doesn't equal to cascading parent
-     *
-     * @param propertyName property name.
-     * @return true - if overridden, false - otherwise.
-     */
-    public boolean isOverriddenProperty(String propertyName) {
-        return null != propertyName && overriddenValues.contains(propertyName);
-    }
-
-    /**
-     * Marks property name as overridden. Is used to show, that given property will have overridden property value.
-     *
-     * @param propertyName name of property.
-     */
-    protected void registerOverriddenProperty(String propertyName) {
-        overriddenValues.add(propertyName);
-    }
-
-    /**
-     * Un-mark property name as overridden. Property will inherit value from cascading parent.
-     *
-     * @param propertyName name of property.
-     */
-    protected void unRegisterOverriddenProperty(String propertyName) {
-        overriddenValues.remove(propertyName);
-    }
 
     /**
      * Put job property to properties map.
@@ -228,18 +209,22 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     /**
      * {@inheritDoc}
      */
+    //TODO improve error handling for this method
     public IProjectProperty getProperty(String key, Class clazz) {
         IProjectProperty t = jobProperties.get(key);
         if (null == t && null != clazz) {
             try {
-                t = (IProjectProperty) clazz.newInstance();
-                t.setJob(this);
+                t = (IProjectProperty) clazz.getConstructor(IJob.class).newInstance(this);
                 t.setKey(key);
                 putJobProperty(key, t);
             } catch (InstantiationException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
             }
         }
         return t;
@@ -268,17 +253,13 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         super.onLoad(parent, name);
         cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
             cascadingProjectName);
-        //TODO investigate why allowSave is null
-        if (null == allowSave) {// Initialize property if null.
+        if (null == allowSave) {// Initialize property if null for legacy config.
             allowSave = new ThreadLocal<Boolean>() {
                 @Override
                 protected Boolean initialValue() {
                     return true;
                 }
             };
-        }
-        if (null == overriddenValues) {
-            overriddenValues = new CopyOnWriteArraySet<String>();
         }
         TextFile f = getNextBuildNumberFile();
         if (f.exists()) {
@@ -299,22 +280,20 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
 
         if (properties == null) // didn't exist < 1.72
-        {
             properties = new CopyOnWriteList<JobProperty<? super JobT>>();
-        }
 
-        for (JobProperty p : properties) {
+        for (JobProperty p : properties)
             p.setOwner(this);
-        }
 
         if (null == jobProperties) {
             jobProperties = new ConcurrentHashMap<String, IProjectProperty>();
         }
-        for (IProjectProperty property : jobProperties.values()) {
+        for (Map.Entry<String, IProjectProperty> entry : jobProperties.entrySet()) {
+            IProjectProperty property = entry.getValue();
+            property.setKey(entry.getKey());
             property.setJob(this);
         }
     }
-
 
     @Override
     public void onCopiedFrom(Item src) {
@@ -1157,9 +1136,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 }
             }
 
-            allowSave.set(false);
+            setAllowSave(false);
             submit(req, rsp);
-            allowSave.remove();
+            setAllowSave(true);
 
             save();
 

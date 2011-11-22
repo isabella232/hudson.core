@@ -16,8 +16,20 @@
 package hudson.model;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.hudson.api.model.IJob;
 
+/**
+ * String property for project.
+ * <p/>
+ * Date: 9/22/11
+ *
+ * @author Nikita Levyankov
+ */
 public class StringProjectProperty extends BaseProjectProperty<String> {
+
+    public StringProjectProperty(IJob job) {
+        super(job);
+    }
 
     @Override
     protected String prepareValue(String candidateValue) {
