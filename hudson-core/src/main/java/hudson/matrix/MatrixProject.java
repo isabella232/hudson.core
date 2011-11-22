@@ -104,7 +104,7 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
      * The filter that is applied to combinations. It is a Groovy if condition.
      * This can be null, which means "true".
      *
-     * @see #getCombinationFilter()
+     * @deprecated as of 2.2.0, use #getCombinationFilter() and #setCombinationFilter() instead
      */
     private volatile String combinationFilter;
 
@@ -137,10 +137,15 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
     @CopyOnWrite
     private transient /*final*/ Set<MatrixConfiguration> activeConfigurations = new LinkedHashSet<MatrixConfiguration>();
 
+    /**
+     * @deprecated as of 2.2.0, use #isRunSequentially() and #setRunSequentially() instead
+     */
     private boolean runSequentially;
 
     /**
-     * Filter to select a number of combinations to build first.
+     * Filter to select a number of combinations to build first
+     *
+     * @deprecated as of 2.2.0, use #getTouchStoneCombinationFilter() and #setTouchStoneCombinationFilter() instead
      */
     private String touchStoneCombinationFilter;
 
@@ -148,11 +153,13 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
      * Required result on the touchstone combinations, in order to
      * continue with the rest.
      * Package visible for the tests only.
+     *
+     * @deprecated as of 2.2.0, use #getTouchStoneResultCondition() and #setTouchStoneResultCondition() instead
      */
     Result touchStoneResultCondition;
 
     /**
-     * See {@link #setCustomWorkspace(String)}.
+     * @deprecated as of 2.2.0, use #getCustomWorkspace() and #setCustomWorkspace() instead
      */
     private String customWorkspace;
 
@@ -268,7 +275,7 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
 
     //TODO improve it
     public DescribableList<Builder,Descriptor<Builder>> getBuildersList() {
-        return !(builders == null || builders.isEmpty()) ? builders
+        return !(builders == null /*|| builders.isEmpty()*/) ? builders
             : (hasCascadingProject() ? getCascadingProject().getBuildersList() : null);
     }
 
@@ -285,7 +292,7 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
      */
     //TODO improve it
     public DescribableList<Publisher,Descriptor<Publisher>> getPublishersList() {
-        return !(publishers == null || publishers.isEmpty()) ? publishers
+        return !(publishers == null /*|| publishers.isEmpty()*/) ? publishers
             : (hasCascadingProject() ? getCascadingProject().getPublishersList() : null);
     }
 
@@ -294,7 +301,7 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
      */
     //TODO improve it
     public DescribableList<BuildWrapper, Descriptor<BuildWrapper>> getBuildWrappersList() {
-        return !(buildWrappers == null || buildWrappers.isEmpty()) ? buildWrappers
+        return !(buildWrappers == null /*|| buildWrappers.isEmpty()*/) ? buildWrappers
             : (hasCascadingProject() ? getCascadingProject().getBuildWrappersList() : null);
     }
 

@@ -244,6 +244,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         return (BooleanProjectProperty) getProperty(key, BooleanProjectProperty.class);
     }
 
+    public IntegerProjectProperty getIntegerProperty(String key) {
+        return (IntegerProjectProperty) getProperty(key, IntegerProjectProperty.class);
+    }
+
     @Override
     public synchronized void save() throws IOException {
         if (null == allowSave) {
