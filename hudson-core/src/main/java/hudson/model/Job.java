@@ -18,12 +18,14 @@
 package hudson.model;
 
 import hudson.Functions;
+import hudson.model.project.property.BooleanProjectProperty;
+import hudson.model.project.property.IntegerProjectProperty;
+import hudson.model.project.property.StringProjectProperty;
 import hudson.util.graph.GraphSeries;
 import hudson.widgets.Widget;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Sets;
@@ -1368,14 +1370,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         return cascadingProject;
     }
 
-    /**
-     * For the unit tests only. Sets cascadingProject for the job.
-     *
-     * @param cascadingProject parent job
-     */
-    void setCascadingProject(JobT cascadingProject) {
-        this.cascadingProject = cascadingProject;
-    }
 
     /**
      * Checks whether current job is inherited from other project.

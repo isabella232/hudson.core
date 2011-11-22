@@ -198,7 +198,7 @@ public class FreeStyleProjectTest {
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setLogRotator(new LogRotator(10,11,12,13));
 
-        FreeStyleProject childProject1 = new FreeStyleProjectMock("child1");
+        FreeStyleProjectMock childProject1 = new FreeStyleProjectMock("child1");
         childProject1.setCascadingProject(parentProject);
         LogRotator result = childProject1.getLogRotator();
         assertNotNull(result);
@@ -210,7 +210,7 @@ public class FreeStyleProjectTest {
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setLogRotator(new LogRotator(10,10,10,10));
 
-        FreeStyleProject childProject1 = new FreeStyleProjectMock("child1");
+        FreeStyleProjectMock childProject1 = new FreeStyleProjectMock("child1");
         childProject1.setLogRotator(new LogRotator(20, 20, 20, 20));
         childProject1.setCascadingProject(parentProject);
         LogRotator result = childProject1.getLogRotator();
@@ -223,7 +223,7 @@ public class FreeStyleProjectTest {
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setLogRotator(new LogRotator(10,11,12,13));
 
-        FreeStyleProject childProject1 = new FreeStyleProjectMock("child1");
+        FreeStyleProjectMock childProject1 = new FreeStyleProjectMock("child1");
         childProject1.setCascadingProject(parentProject);
         childProject1.setLogRotator(new LogRotator(10, 11, 12, 13));
         childProject1.setCascadingProject(null); // else log rotator will be taken from parent
@@ -243,7 +243,7 @@ public class FreeStyleProjectTest {
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         String customWorkspace = "/tmp";
         parentProject.setCustomWorkspace(customWorkspace);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setCustomWorkspace(customWorkspace);
         childProject.setCascadingProject(null);
@@ -256,7 +256,7 @@ public class FreeStyleProjectTest {
         String parentCustomWorkspace = "/tmp";
         String childCustomWorkspace = "/tmp1";
         parentProject.setCustomWorkspace(parentCustomWorkspace);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setCustomWorkspace(childCustomWorkspace);
         assertEquals(childCustomWorkspace, childProject.getCustomWorkspace());
@@ -273,7 +273,7 @@ public class FreeStyleProjectTest {
     @Test
     public void testGetCustomWorkspace() throws IOException{
         String customWorkspace = "/tmp";
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCustomWorkspace(customWorkspace);
         assertEquals(customWorkspace, childProject.getCustomWorkspace());
 
@@ -291,7 +291,7 @@ public class FreeStyleProjectTest {
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         String jdkName = "sun-java5-jdk32";
         parentProject.setJDK(jdkName);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setJDK(jdkName);
         childProject.setCascadingProject(null);
@@ -304,7 +304,7 @@ public class FreeStyleProjectTest {
         String parentJdkName = "sun-java5-jdk32";
         String childJdkName = "sun-java6-jdk32";
         parentProject.setJDK(parentJdkName);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setJDK(childJdkName);
         assertEquals(childJdkName, childProject.getJDKName());
@@ -321,7 +321,7 @@ public class FreeStyleProjectTest {
     @Test
     public void testGetJdkName() throws IOException{
         String JdkName = "sun-java6-jdk32";
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setJDK(JdkName);
         assertEquals(JdkName, childProject.getJDKName());
 
@@ -339,7 +339,7 @@ public class FreeStyleProjectTest {
         String quietPeriod = "10";
         int globalQuietPeriod = 4;
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         Hudson hudson = createMock(Hudson.class);
         expect(hudson.getQuietPeriod()).andReturn(globalQuietPeriod).anyTimes();
         mockStatic(Hudson.class);
@@ -357,7 +357,7 @@ public class FreeStyleProjectTest {
         String quietPeriod = "4";
         int globalQuietPeriod = 4;
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         Hudson hudson = createMock(Hudson.class);
         expect(hudson.getQuietPeriod()).andReturn(globalQuietPeriod).anyTimes();
         mockStatic(Hudson.class);
@@ -377,7 +377,7 @@ public class FreeStyleProjectTest {
         String childQuietPeriod = "11";
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setQuietPeriod(parentQuietPeriod);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setQuietPeriod(childQuietPeriod);
 
@@ -417,7 +417,7 @@ public class FreeStyleProjectTest {
         String quietPeriodString = "10";
         int globalQuietPeriod = 4;
         int quietPeriod = Integer.parseInt(quietPeriodString);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         Hudson hudson = createMock(Hudson.class);
         expect(hudson.getQuietPeriod()).andReturn(globalQuietPeriod).anyTimes();
@@ -444,7 +444,7 @@ public class FreeStyleProjectTest {
         int globalScmCheckoutRetryCount = 4;
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setScmCheckoutRetryCount(scmCheckoutRetryCount);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         Hudson hudson = createMock(Hudson.class);
         expect(hudson.getScmCheckoutRetryCount()).andReturn(globalScmCheckoutRetryCount);
         mockStatic(Hudson.class);
@@ -463,7 +463,7 @@ public class FreeStyleProjectTest {
         String childScmCheckoutRetryCount = "11";
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setScmCheckoutRetryCount(parentScmCheckoutRetryCount);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setScmCheckoutRetryCount(childScmCheckoutRetryCount);
 
@@ -503,7 +503,7 @@ public class FreeStyleProjectTest {
         String scmCheckoutRetryCountString = "10";
         int globalScmCheckoutRetryCount = 4;
         int scmCheckoutRetryCount = Integer.parseInt(scmCheckoutRetryCountString);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         Hudson hudson = createMock(Hudson.class);
         expect(hudson.getScmCheckoutRetryCount()).andReturn(globalScmCheckoutRetryCount).anyTimes();
@@ -529,7 +529,7 @@ public class FreeStyleProjectTest {
         Boolean blockBuildWhenDownstreamBuilding = true;
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setBlockBuildWhenDownstreamBuilding(blockBuildWhenDownstreamBuilding);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setBlockBuildWhenDownstreamBuilding(blockBuildWhenDownstreamBuilding);
         assertFalse(childProject.blockBuildWhenDownstreamBuilding);
@@ -541,7 +541,7 @@ public class FreeStyleProjectTest {
         Boolean parentBlockBuildWhenDownstreamBuilding = true;
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setBlockBuildWhenDownstreamBuilding(parentBlockBuildWhenDownstreamBuilding);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setBlockBuildWhenDownstreamBuilding(childBlockBuildWhenDownstreamBuilding);
         //if child value is not equals to parent one, field should be populated
@@ -566,7 +566,7 @@ public class FreeStyleProjectTest {
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setBlockBuildWhenDownstreamBuilding(parentBlockBuildWhenDownstreamBuilding);
         assertEquals(parentBlockBuildWhenDownstreamBuilding, parentProject.blockBuildWhenDownstreamBuilding());
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         //Set equal to parent in order to inherit from cascading project
         childProject.setCascadingProject(parentProject);
         childProject.setBlockBuildWhenDownstreamBuilding(parentBlockBuildWhenDownstreamBuilding);
@@ -582,7 +582,7 @@ public class FreeStyleProjectTest {
         boolean blockBuildWhenUpstreamBuilding = true;
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setBlockBuildWhenUpstreamBuilding(blockBuildWhenUpstreamBuilding);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setBlockBuildWhenUpstreamBuilding(blockBuildWhenUpstreamBuilding);
         assertFalse(childProject.getBooleanProperty(AbstractProject.BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME)
@@ -595,7 +595,7 @@ public class FreeStyleProjectTest {
         Boolean parentBlockBuildWhenUpstreamBuilding = true;
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setBlockBuildWhenUpstreamBuilding(parentBlockBuildWhenUpstreamBuilding);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setBlockBuildWhenUpstreamBuilding(childBlockBuildWhenUpstreamBuilding);
         //if child value is not equals to parent one, field should be populated
@@ -619,7 +619,7 @@ public class FreeStyleProjectTest {
         boolean parentBlockBuildWhenUpstreamBuilding = true;
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setBlockBuildWhenUpstreamBuilding(parentBlockBuildWhenUpstreamBuilding);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
                 //Set equal to parent in order to inherit from cascading project
         childProject.setBlockBuildWhenUpstreamBuilding(parentBlockBuildWhenUpstreamBuilding);
         childProject.setCascadingProject(parentProject);
@@ -636,7 +636,7 @@ public class FreeStyleProjectTest {
         boolean cleanWorkspaceRequired = true;
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setCleanWorkspaceRequired(cleanWorkspaceRequired);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setCleanWorkspaceRequired(cleanWorkspaceRequired);
         assertFalse(
@@ -649,7 +649,7 @@ public class FreeStyleProjectTest {
         Boolean parentCleanWorkspaceRequired = true;
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setCleanWorkspaceRequired(parentCleanWorkspaceRequired);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setCleanWorkspaceRequired(childCleanWorkspaceRequired);
         //if child value is not equals to parent one, field should be populated
@@ -673,7 +673,7 @@ public class FreeStyleProjectTest {
         boolean parentCleanWorkspaceRequired = true;
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setCleanWorkspaceRequired(parentCleanWorkspaceRequired);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCleanWorkspaceRequired(parentCleanWorkspaceRequired);
         childProject.setCascadingProject(parentProject);
         //Value should be taken from cascadingProject
@@ -688,7 +688,7 @@ public class FreeStyleProjectTest {
         Boolean concurrentBuild = true;
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setConcurrentBuild(concurrentBuild);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setConcurrentBuild(concurrentBuild);
         assertFalse(childProject.getBooleanProperty(AbstractProject.CONCURRENT_BUILD_PROPERTY_NAME).getOriginalValue());
@@ -700,7 +700,7 @@ public class FreeStyleProjectTest {
         Boolean parentConcurrentBuild = true;
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setConcurrentBuild(parentConcurrentBuild);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setConcurrentBuild(childConcurrentBuild);
         //if child value is not equals to parent one, field should be populated
@@ -724,7 +724,7 @@ public class FreeStyleProjectTest {
         boolean parentConcurrentBuild = true;
         FreeStyleProject parentProject = new FreeStyleProjectMock("parent");
         parentProject.setConcurrentBuild(parentConcurrentBuild);
-        FreeStyleProject childProject = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
         childProject.setConcurrentBuild(true);
         //Value should be taken from cascadingProject
