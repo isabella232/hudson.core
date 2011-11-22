@@ -9,7 +9,7 @@
  *
  * Contributors:
  *
- *    Nikita Levyankov
+ *    Anton Kozak
  *
  *******************************************************************************/
 package hudson.model;
@@ -17,23 +17,16 @@ package hudson.model;
 import org.eclipse.hudson.api.model.IJob;
 
 /**
- * Represents integer property.
+ * Represents {@link Result} property.
  * <p/>
- * Date: 9/22/11
+ * Date: 9/23/11
  *
- * @author Nikita Levyankov
+ * @author Anton Kozak
  */
-public class IntegerProjectProperty extends BaseProjectProperty<Integer> {
+//TODO try to replace it with generics
+public class ResultProjectProperty extends BaseProjectProperty<Result> {
 
-    public IntegerProjectProperty(IJob job) {
+    public ResultProjectProperty(IJob job) {
         super(job);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Integer getDefaultValue() {
-        return 0;
     }
 }

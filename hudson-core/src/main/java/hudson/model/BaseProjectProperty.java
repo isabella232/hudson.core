@@ -15,6 +15,7 @@
 
 package hudson.model;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.eclipse.hudson.api.model.IJob;
 import org.eclipse.hudson.api.model.IProjectProperty;
 
@@ -25,7 +26,7 @@ import org.eclipse.hudson.api.model.IProjectProperty;
  *
  * @author Nikita Levyankov
  */
-public abstract class BaseProjectProperty<T> implements IProjectProperty<T> {
+public class BaseProjectProperty<T> implements IProjectProperty<T> {
 
     private transient String propertyKey;
     private transient IJob job;
@@ -114,7 +115,9 @@ public abstract class BaseProjectProperty<T> implements IProjectProperty<T> {
      * @param candidateValue candidate value.
      * @return true if cascading value should be replaced by candidate value.
      */
-    protected abstract boolean allowOverrideValue(T cascadingValue, T candidateValue);
+    protected boolean allowOverrideValue(T cascadingValue, T candidateValue) {
+        return !ObjectUtils.equals(cascadingValue, candidateValue);
+    }
 
     /**
      * Pre-process candidate value.
