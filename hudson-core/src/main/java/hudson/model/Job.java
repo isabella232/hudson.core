@@ -1275,7 +1275,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Checks whether current job is inherited from other project.
      * @return boolean.
      */
-    protected boolean hasCascadingProject() {
+    public boolean hasCascadingProject() {
         return null != getCascadingProject();
     }
 
