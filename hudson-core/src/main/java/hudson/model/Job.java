@@ -18,15 +18,15 @@
 package hudson.model;
 
 import hudson.Functions;
-import hudson.model.project.property.BooleanProjectProperty;
-import hudson.model.project.property.IntegerProjectProperty;
-import hudson.model.project.property.StringProjectProperty;
+import org.eclipse.hudson.api.model.project.property.BooleanProjectProperty;
+import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
+import org.eclipse.hudson.api.model.project.property.LogRotatorProjectProperty;
+import org.eclipse.hudson.api.model.project.property.StringProjectProperty;
 import hudson.util.graph.GraphSeries;
 import hudson.widgets.Widget;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Sets;
 import com.infradna.tool.bridge_method_injector.WithBridgeMethods;
@@ -116,6 +116,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         extends AbstractItem implements ExtensionPoint, StaplerOverridable, IJob {
     private static transient final String HUDSON_BUILDS_PROPERTY_KEY = "HUDSON_BUILDS";
 
+    public static final String LOG_ROTATOR_PROPERTY_NAME = "logRotator";
+
     /**
      * Next build number. Kept in a separate file because this is the only
      * information that gets updated often. This allows the rest of the
@@ -130,6 +132,12 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * is saved once.
      */
     private transient volatile boolean holdOffBuildUntilSave;
+
+    /**
+     * @deprecated as of 2.2.0
+     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     *             Use getter/setter for accessing to this field.
+     */
     private volatile LogRotator logRotator;
 
     private ConcurrentMap<String, IProjectProperty> jobProperties = new ConcurrentHashMap<String, IProjectProperty>();
@@ -314,6 +322,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             property.setKey(entry.getKey());
             property.setJob(this);
         }
+        if (null == getProperty(LOG_ROTATOR_PROPERTY_NAME)) {
+            setLogRotator(logRotator);
+            logRotator = null;
+        }
     }
 
     /**
@@ -471,7 +483,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Returns the log rotator for this job, or null if none.
      */
     public LogRotator getLogRotator() {
-        return logRotator!= null ? logRotator : (hasCascadingProject()? getCascadingProject().getLogRotator() : null);
+        return (LogRotator) getProperty(LOG_ROTATOR_PROPERTY_NAME, LogRotatorProjectProperty.class).getValue();
     }
 
     /**
@@ -479,12 +491,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      *
      * @param logRotator log rotator.
      */
+    @SuppressWarnings("unchecked")
     public void setLogRotator(LogRotator logRotator) {
-        if (!(hasCascadingProject() && ObjectUtils.equals(getCascadingProject().getLogRotator(), logRotator))) {
-            this.logRotator = logRotator;
-        } else {
-            this.logRotator = null;
-        }
+        getProperty(LOG_ROTATOR_PROPERTY_NAME, LogRotatorProjectProperty.class).setValue(logRotator);
     }
 
     /**
@@ -1350,10 +1359,14 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * @param cascadingProjectName cascadingProject name.
      */
     @SuppressWarnings("unchecked")
-    public void setCascadingProjectName(String cascadingProjectName) {
+    public synchronized void setCascadingProjectName(String cascadingProjectName) {
         this.cascadingProjectName = cascadingProjectName;
-        this.cascadingProject = (JobT)Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
-            cascadingProjectName);
+        if (StringUtils.isBlank(cascadingProjectName)) {
+            this.cascadingProject = null;
+        } else {
+            this.cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
+                cascadingProjectName);
+        }
     }
 
     /**

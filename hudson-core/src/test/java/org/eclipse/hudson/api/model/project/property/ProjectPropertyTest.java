@@ -13,9 +13,15 @@
  *
  *******************************************************************************/
 
-package hudson.model.project.property;
+package org.eclipse.hudson.api.model.project.property;
 
 import hudson.model.FreeStyleProjectMock;
+import hudson.tasks.LogRotator;
+import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
+import org.eclipse.hudson.api.model.project.property.BooleanProjectProperty;
+import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
+import org.eclipse.hudson.api.model.project.property.LogRotatorProjectProperty;
+import org.eclipse.hudson.api.model.project.property.StringProjectProperty;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -74,6 +80,12 @@ public class ProjectPropertyTest {
         } catch (Exception e) {
             assertEquals(BaseProjectProperty.INVALID_JOB_EXCEPTION, e.getMessage());
         }
+        try {
+            new LogRotatorProjectProperty(null);
+            fail("Null should be handled by ProjectProperty constructor.");
+        } catch (Exception e) {
+            assertEquals(BaseProjectProperty.INVALID_JOB_EXCEPTION, e.getMessage());
+        }
         BaseProjectProperty property = new BaseProjectProperty(project);
         assertNotNull(property.getJob());
         assertEquals(project, property.getJob());
@@ -95,6 +107,12 @@ public class ProjectPropertyTest {
         assertNull(property.prepareValue(null));
         assertFalse((Boolean) property.prepareValue(false));
         assertTrue((Boolean) property.prepareValue(true));
+
+        //Boolean property acts as BaseProperty
+        property = new LogRotatorProjectProperty(project);
+        assertNull(property.prepareValue(null));
+        value = new LogRotator(1, 1, 1, 1);
+        assertEquals(value, property.prepareValue(value));
 
         //Integer property acts as BaseProperty
         property = new IntegerProjectProperty(project);
@@ -124,7 +142,8 @@ public class ProjectPropertyTest {
         assertEquals(0, property.getDefaultValue());
         property = new BooleanProjectProperty(project);
         assertFalse((Boolean) property.getDefaultValue());
-
+        property = new LogRotatorProjectProperty(project);
+        assertNull(property.getDefaultValue());
     }
 
     /**
@@ -162,6 +181,12 @@ public class ProjectPropertyTest {
         assertTrue(property.allowOverrideValue(null, "abc"));
         assertTrue(property.allowOverrideValue("abc", null));
         assertTrue(property.allowOverrideValue("abc", "abcd"));
+
+        property = new LogRotatorProjectProperty(project);
+        assertFalse(property.allowOverrideValue(null, null));
+        assertTrue(property.allowOverrideValue(new LogRotator(1, 1, 1, 1), null));
+        assertTrue(property.allowOverrideValue(null, new LogRotator(1, 1, 1, 1)));
+        assertTrue(property.allowOverrideValue(new LogRotator(1, 1, 1, 2), new LogRotator(1, 1, 1, 1)));
     }
 
     /**
@@ -228,6 +253,12 @@ public class ProjectPropertyTest {
         assertEquals(value, property.getOriginalValue());
         property.setValue(null);
         assertFalse((Boolean) property.getOriginalValue());
+
+        value = new LogRotator(1, 1, 1, 1);
+        property = new LogRotatorProjectProperty(project);
+        property.setKey(propertyKey);
+        property.setValue(value);
+        assertEquals(value, property.getOriginalValue());
     }
 
     /**

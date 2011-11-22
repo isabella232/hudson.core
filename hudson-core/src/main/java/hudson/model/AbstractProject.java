@@ -38,7 +38,7 @@ import hudson.model.Queue.WaitingItem;
 import hudson.model.RunMap.Constructor;
 import hudson.model.labels.LabelAtom;
 import hudson.model.labels.LabelExpression;
-import hudson.model.project.property.IntegerProjectProperty;
+import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
 import hudson.model.queue.CauseOfBlockage;
 import hudson.model.queue.SubTask;
 import hudson.model.queue.SubTaskContributor;
