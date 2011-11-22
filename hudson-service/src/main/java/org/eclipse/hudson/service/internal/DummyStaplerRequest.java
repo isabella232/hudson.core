@@ -386,7 +386,6 @@ public class DummyStaplerRequest
         return 0;
     }
 
-
     public String createJavaScriptProxy(Object o) {
         return null;
     }

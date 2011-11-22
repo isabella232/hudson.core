@@ -15,7 +15,6 @@
 
 package org.eclipse.hudson.api.model;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -45,9 +44,8 @@ public interface IProperty<T> extends Serializable {
      * Sets property value.
      *
      * @param value value to set.
-     * @throws IOException if any.
      */
-    void setValue(T value) throws IOException;
+    void setValue(T value);
 
     /**
      * Returns original property value.
@@ -60,9 +58,8 @@ public interface IProperty<T> extends Serializable {
      * Returns cascading value if any.
      *
      * @return string.
-     * @throws IOException if any.
      */
-    T getCascadingValue() throws IOException;
+    T getCascadingValue();
 
     /**
      * @return true if value inherited from cascading project, false - otherwise,
@@ -74,8 +71,13 @@ public interface IProperty<T> extends Serializable {
      * property - call {@link #getOriginalValue()}, otherwise call {@link #getCascadingValue()}.
      *
      * @return string.
-     * @throws IOException if any.
      */
-    T getValue() throws IOException;
+    T getValue();
 
+    /**
+     * This value will be taken if both cascading project and current project don't have values. Null by default.
+     *
+     * @return value
+     */
+    T getDefaultValue();
 }
