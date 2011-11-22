@@ -123,6 +123,8 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     public static final String CLEAN_WORKSPACE_REQUIRED_PROPERTY_NAME = "cleanWorkspaceRequired";
     public static final String BLOCK_BUILD_WHEN_DOWNSTREAM_BUILDING_PROPERTY_NAME = "blockBuildWhenDownstreamBuilding";
     public static final String BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME = "blockBuildWhenUpstreamBuilding";
+    public static final String QUIET_PERIOD_PROPERTY_NAME = "quietPeriod";
+    public static final String SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME = "scmCheckoutRetryCount";
 
     /**
      * {@link SCM} associated with the project.
@@ -143,11 +145,18 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
 
     /**
      * The quiet period. Null to delegate to the system default.
+     * @deprecated as of 2.2.0
+     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     *             Use getter/setter for accessing to this field.
+     *
      */
     private volatile Integer quietPeriod = null;
 
     /**
      * The retry count. Null to delegate to the system default.
+     * @deprecated as of 2.2.0
+     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     *             Use getter/setter for accessing to this field.
      */
     private volatile Integer scmCheckoutRetryCount = null;
 
@@ -185,8 +194,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     /**
      * True to keep builds of this project in queue when downstream projects are building.
      *
-     * @since 2.2.0
-     * @deprecated don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     * @deprecated as of 2.2.0. Don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
     protected volatile boolean blockBuildWhenDownstreamBuilding;
@@ -194,8 +202,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     /**
      * True to keep builds of this project in queue when upstream projects are building.
      *
-     * @since 2.2.0
-     * @deprecated don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     * @deprecated as of 2.2.0. Don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
     protected volatile boolean blockBuildWhenUpstreamBuilding;
@@ -235,8 +242,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     protected transient volatile List<Action> transientActions = new Vector<Action>();
 
     /**
-     * @since 2.2.0
-     * @deprecated don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     * @deprecated as of 2.2.0 Don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
     private boolean concurrentBuild;
@@ -244,8 +250,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     /**
      * True to clean the workspace prior to each build.
      *
-     * @since 2.2.0
-     * @deprecated don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
     private volatile boolean cleanWorkspaceRequired;
@@ -317,6 +322,12 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         }
         if (null == getProperty(CLEAN_WORKSPACE_REQUIRED_PROPERTY_NAME)) {
             setCleanWorkspaceRequired(cleanWorkspaceRequired);
+        }
+        if (null == getProperty(QUIET_PERIOD_PROPERTY_NAME)) {
+            setQuietPeriod(quietPeriod);
+        }
+        if (null == getProperty(SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME)) {
+            setScmCheckoutRetryCount(scmCheckoutRetryCount);
         }
     }
 
@@ -553,28 +564,30 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     }
 
     public int getQuietPeriod() {
-        if (null != quietPeriod) {
-            return quietPeriod;
-        }
-        return hasCascadingProject() ? getCascadingProject().getQuietPeriod() : Hudson.getInstance().getQuietPeriod();
+        IntegerProjectProperty property = getIntegerProperty(QUIET_PERIOD_PROPERTY_NAME);
+        Integer value = property.getValue();
+        return property.getDefaultValue().equals(value) ? Hudson.getInstance().getQuietPeriod() : value;
+    }
+
+    /**
+     * Sets the custom quiet period of this project, or revert to the global default if null is given.
+     * @param seconds quiet period
+     * @throws IOException if any.
+     */
+    public void setQuietPeriod(Integer seconds) throws IOException {
+        getIntegerProperty(QUIET_PERIOD_PROPERTY_NAME).setValue(seconds);
+        save();
     }
 
     public int getScmCheckoutRetryCount() {
-        if (null != scmCheckoutRetryCount) {
-            return scmCheckoutRetryCount;
-        }
-        return hasCascadingProject() ?
-            getCascadingProject().getScmCheckoutRetryCount() : Hudson.getInstance().getScmCheckoutRetryCount();
+        IntegerProjectProperty property = getIntegerProperty(SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME);
+        Integer value = property.getValue();
+        return property.getDefaultValue().equals(value) ? Hudson.getInstance().getScmCheckoutRetryCount() : value;
     }
 
     public void setScmCheckoutRetryCount(Integer retryCount) {
-        if (!(hasCascadingProject() && ObjectUtils.equals(getCascadingProject().getScmCheckoutRetryCount(), retryCount))) {
-            this.scmCheckoutRetryCount = retryCount;
-        } else {
-            this.scmCheckoutRetryCount = null;
-        }
+        getIntegerProperty(SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME).setValue(retryCount);
     }
-
     /**
      * Sets scmCheckoutRetryCount, Uses {@link NumberUtils#isNumber(String)} for checking retryCount param.
      * If it is not valid number, null will be set.
@@ -594,22 +607,6 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     public boolean getHasCustomQuietPeriod() {
         return (hasCascadingProject() && getCascadingProject().getHasCustomQuietPeriod())
             || (!hasCascadingProject() && quietPeriod!=null);
-    }
-
-    /**
-     * Sets the custom quiet period of this project, or revert to the global default if null is given.
-     * @param seconds quiet period
-     * @throws IOException if any.
-     */
-    public void setQuietPeriod(Integer seconds) throws IOException {
-        if (!(hasCascadingProject()
-            && (ObjectUtils.equals(getCascadingProject().getQuietPeriod(), seconds))
-            && ObjectUtils.notEqual(seconds, Hudson.getInstance().getQuietPeriod()))) {
-            this.quietPeriod = seconds;
-        } else {
-            this.quietPeriod = null;
-        }
-        save();
     }
 
     /**

@@ -43,7 +43,7 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
      *
      * @since 1.216
      * @deprecated left for backward compatibility
-     * @since 2.1.2
+     * @since 2.2.0
      */
     private String customWorkspace;
 
