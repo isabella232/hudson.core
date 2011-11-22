@@ -33,6 +33,9 @@ import javax.servlet.ServletException;
  * @author Kohsuke Kawaguchi
  */
 public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> implements TopLevelItem, IFreeStyleProject {
+
+    private static final String DEFAULT_CUSTOM_WORKSPACE = "default_workspace";
+
     /**
      * See {@link #setCustomWorkspace(String)}.
      *
@@ -58,11 +61,19 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
 
 
     public String getCustomWorkspace(boolean useParentValue) {
-       if (!useParentValue || StringUtils.isNotBlank(customWorkspace)) {
+       if (!useParentValue || !isCustomWorkspaceInherited()) {
+           return DEFAULT_CUSTOM_WORKSPACE.equals(customWorkspace)? null : StringUtils.trimToNull(customWorkspace);
+       } else if (StringUtils.isNotBlank(customWorkspace)) {
            return customWorkspace;
        }
        return hasCascadingProject()? getCascadingProject().getCustomWorkspace() : null;
     }
+
+    public boolean isCustomWorkspaceInherited() {
+        return hasCascadingProject() && !DEFAULT_CUSTOM_WORKSPACE.equals(customWorkspace)
+            && StringUtils.isBlank(customWorkspace);
+    }
+
 
     public String getCustomWorkspace() {
         return getCustomWorkspace(true);
@@ -92,7 +103,7 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
     public void setCustomWorkspace(String customWorkspace) throws IOException {
         if (!(hasCascadingProject()
             && StringUtils.equalsIgnoreCase(getCascadingProject().getCustomWorkspace(), customWorkspace))) {
-            this.customWorkspace = customWorkspace;
+            this.customWorkspace = null == customWorkspace ? DEFAULT_CUSTOM_WORKSPACE : customWorkspace;
         } else {
             this.customWorkspace = null;
         }
