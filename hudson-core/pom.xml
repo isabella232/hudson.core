@@ -23,6 +23,7 @@
     </parent>
 
     <artifactId>hudson-core</artifactId>
+    <packaging>stapler-jar</packaging>
     <name>Hudson :: Core</name>
     <description>
     Contains the core Hudson code and view files to render HTML.
@@ -36,7 +37,7 @@
         <jtidy.version>r938</jtidy.version>
         <jna-posix.version>1.0.3</jna-posix.version>
         <trilead-putty-extension.version>1.0</trilead-putty-extension.version>
-        <stapler.version>1.174</stapler.version>
+        <stapler-jelly.version>1.167</stapler-jelly.version>
         <bridge-method-annotation.version>1.4</bridge-method-annotation.version>
         <json-lib.version>2.4</json-lib.version>
         <annotation-indexer.version>1.2</annotation-indexer.version>
@@ -372,8 +373,8 @@
         </dependency>
         <dependency>
           <groupId>org.kohsuke.stapler</groupId>
-          <artifactId>stapler-groovy</artifactId>
-          <version>${stapler.version}</version>
+          <artifactId>stapler-jelly</artifactId>
+          <version>${stapler-jelly.version}</version>
           <exclusions>
             <exclusion>
               <groupId>commons-jelly</groupId>
@@ -382,10 +383,6 @@
             <exclusion>
               <groupId>commons-jexl</groupId>
               <artifactId>commons-jexl</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>org.codehaus.groovy</groupId>
-              <artifactId>groovy</artifactId>
             </exclusion>
             <exclusion>
               <groupId>org.kohsuke.stapler</groupId>
