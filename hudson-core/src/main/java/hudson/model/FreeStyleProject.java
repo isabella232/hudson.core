@@ -36,8 +36,6 @@ import javax.servlet.ServletException;
 public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> implements TopLevelItem,
     IFreeStyleProject {
 
-    public static final String CUSTOM_WORKSPACE_PROPERTY_NAME = "customWorkspace";
-
     /**
      * See {@link #setCustomWorkspace(String)}.
      *
@@ -61,17 +59,21 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
         return FreeStyleBuild.class;
     }
 
-    public String getCustomWorkspace(boolean useParentValue) {
-        if (!useParentValue || isOverriddenProperty(CUSTOM_WORKSPACE_PROPERTY_NAME) || null != customWorkspace) {
-            return customWorkspace;
+    public String getCustomWorkspace(boolean useParentValue) throws IOException{
+        StringProperty jobProperty = getCustomWorkspaceProperty();
+        if (!useParentValue) {
+           return jobProperty.getOriginalValue();
         }
-        return hasCascadingProject() ? getCascadingProject().getCustomWorkspace() : null;
+        return jobProperty.getValue();
     }
 
-    public String getCustomWorkspace() {
+    public StringProperty getCustomWorkspaceProperty() throws IOException {
+        return (StringProperty)getProperty(PROPERTY_NAME.CUSTOM_WORKSPACE, StringProperty.class);
+    }
+
+    public String getCustomWorkspace() throws IOException {
         return getCustomWorkspace(true);
     }
-
 
     /**
      * User-specified workspace directory, or null if it's up to Hudson.
@@ -88,22 +90,13 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
      * <p>
      * If this path is relative, it's resolved against {@link Node#getRootPath()} on the node where this workspace
      * is prepared.
-     *
      * @param customWorkspace new custom workspace to set
      * @since 1.320
      * @throws IOException if any.
      */
     public void setCustomWorkspace(String customWorkspace) throws IOException {
-        String workspace = StringUtils.trimToNull(customWorkspace);
-        if (!hasCascadingProject()) {
-            this.customWorkspace = workspace;
-        } else if (!StringUtils.equalsIgnoreCase(getCascadingProject().getCustomWorkspace(), workspace)) {
-            this.customWorkspace = workspace;
-            registerOverriddenProperty(CUSTOM_WORKSPACE_PROPERTY_NAME);
-        } else {
-            this.customWorkspace = null;
-            unRegisterOverriddenProperty(CUSTOM_WORKSPACE_PROPERTY_NAME);
-        }
+        StringProperty jobProperty = getCustomWorkspaceProperty();
+        jobProperty.setValue(customWorkspace);
         save();
     }
 
