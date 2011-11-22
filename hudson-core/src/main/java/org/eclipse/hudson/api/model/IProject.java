@@ -12,7 +12,7 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
-package org.hudsonci.api.model;
+package org.eclipse.hudson.api.model;
 
 import hudson.model.Descriptor;
 import hudson.tasks.BuildWrapper;
@@ -20,6 +20,7 @@ import hudson.tasks.Builder;
 import hudson.tasks.Publisher;
 import java.util.List;
 import java.util.Map;
+import org.eclipse.hudson.api.model.IAbstractProject;
 
 /**
  * Project interface

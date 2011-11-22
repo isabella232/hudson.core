@@ -32,7 +32,7 @@ import hudson.tasks.Maven.MavenInstallation;
 import hudson.triggers.Trigger;
 import hudson.util.DescribableList;
 import net.sf.json.JSONObject;
-import org.hudsonci.api.model.IProject;
+import org.eclipse.hudson.api.model.IProject;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
