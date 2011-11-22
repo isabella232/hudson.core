@@ -29,7 +29,7 @@ public class MatrixProjectTest {
     public void testIsRunSequentiallyParentTrue() throws IOException {
         MatrixProject parentProject = new MatrixProjectMock("parent");
         parentProject.setAllowSave(false);
-        parentProject.setRunSequentially(Boolean.TRUE);
+        parentProject.setRunSequentially(true);
 
         MatrixProject childProject1 = new MatrixProject("child1");
         childProject1.setCascadingProject(parentProject);
@@ -41,7 +41,7 @@ public class MatrixProjectTest {
     public void testIsRunSequentiallyParentFalse() throws IOException {
         MatrixProject parentProject = new MatrixProjectMock("parent");
         parentProject.setAllowSave(false);
-        parentProject.setRunSequentially(Boolean.FALSE);
+        parentProject.setRunSequentially(false);
 
         MatrixProject childProject1 = new MatrixProject("child1");
         childProject1.setCascadingProject(parentProject);
@@ -60,12 +60,12 @@ public class MatrixProjectTest {
     public void testIsRunSequentiallyParentFalseChildTrue() throws IOException {
         MatrixProject parentProject = new MatrixProjectMock("parent");
         parentProject.setAllowSave(false);
-        parentProject.setRunSequentially(Boolean.FALSE);
+        parentProject.setRunSequentially(false);
 
         MatrixProject childProject1 = new MatrixProject("child1");
-        childProject1.setCascadingProject(parentProject);
-        childProject1.runSequentially = Boolean.TRUE;
         childProject1.setAllowSave(false);
+        childProject1.setCascadingProject(parentProject);
+        childProject1.setRunSequentially(Boolean.TRUE);
         assertTrue(childProject1.isRunSequentially());
     }
 
@@ -76,23 +76,10 @@ public class MatrixProjectTest {
         parentProject.setRunSequentially(Boolean.TRUE);
 
         MatrixProject childProject1 = new MatrixProject("child1");
-        childProject1.setCascadingProject(parentProject);
-        childProject1.runSequentially = Boolean.FALSE;
         childProject1.setAllowSave(false);
+        childProject1.setCascadingProject(parentProject);
+        childProject1.setRunSequentially(false);
         assertFalse(childProject1.isRunSequentially());
-    }
-
-    @Test
-    public void testIsRunSequentiallyParentNullChildTrue() throws IOException {
-        MatrixProject parentProject = new MatrixProjectMock("parent");
-        parentProject.setAllowSave(false);
-        parentProject.setRunSequentially(null);
-
-        MatrixProject childProject1 = new MatrixProject("child1");
-        childProject1.setCascadingProject(parentProject);
-        childProject1.runSequentially = Boolean.TRUE;
-        childProject1.setAllowSave(false);
-        assertTrue(childProject1.isRunSequentially());
     }
 
     @Test
@@ -117,9 +104,9 @@ public class MatrixProjectTest {
             }
         };
         childProject1.setAllowSave(false);
-        childProject1.setCombinationFilter(childCombinationFilter);
         childProject1.setCascadingProject(parentProject);
-        assertEquals(childProject1.getCombinationFilter(), childCombinationFilter);
+        childProject1.setCombinationFilter(childCombinationFilter);
+        assertEquals(childCombinationFilter, childProject1.getCombinationFilter());
     }
 
     @Test
@@ -155,7 +142,7 @@ public class MatrixProjectTest {
         childProject1.setAllowSave(false);
         childProject1.setCascadingProject(parentProject);
         childProject1.setCombinationFilter(childCombinationFilter);
-        assertEquals(childProject1.combinationFilter, childCombinationFilter);
+        assertEquals(childProject1.getCombinationFilter(), childCombinationFilter);
     }
 
     @Test
@@ -173,7 +160,6 @@ public class MatrixProjectTest {
         childProject1.setAllowSave(false);
         childProject1.setCascadingProject(parentProject);
         childProject1.setCombinationFilter(combinationFilter);
-        assertNull(childProject1.combinationFilter);
         assertEquals(childProject1.getCombinationFilter(), combinationFilter);
     }
 
@@ -188,7 +174,6 @@ public class MatrixProjectTest {
         };
         childProject1.setAllowSave(false);
         childProject1.setCombinationFilter(combinationFilter);
-        assertEquals(childProject1.combinationFilter, combinationFilter);
         assertEquals(childProject1.getCombinationFilter(), combinationFilter);
     }
 
@@ -202,6 +187,7 @@ public class MatrixProjectTest {
         childProject1.setAllowSave(false);
         assertNull(childProject1.getCombinationFilter());
     }
+
 
     @Test
     public void testGetTouchStoneCombinationFilterChildValue() throws IOException {
@@ -217,8 +203,8 @@ public class MatrixProjectTest {
             }
         };
         childProject1.setAllowSave(false);
-        childProject1.setTouchStoneCombinationFilter(childCombinationFilter);
         childProject1.setCascadingProject(parentProject);
+        childProject1.setTouchStoneCombinationFilter(childCombinationFilter);
         assertEquals(childProject1.getTouchStoneCombinationFilter(), childCombinationFilter);
     }
 
@@ -266,7 +252,7 @@ public class MatrixProjectTest {
         childProject1.setAllowSave(false);
         childProject1.setCascadingProject(parentProject);
         childProject1.setTouchStoneCombinationFilter(childCombinationFilter);
-        assertEquals(childProject1.touchStoneCombinationFilter, childCombinationFilter);
+        assertEquals(childProject1.getTouchStoneCombinationFilter(), childCombinationFilter);
     }
 
     @Test
@@ -284,7 +270,6 @@ public class MatrixProjectTest {
         childProject1.setAllowSave(false);
         childProject1.setCascadingProject(parentProject);
         childProject1.setTouchStoneCombinationFilter(combinationFilter);
-        assertNull(childProject1.touchStoneCombinationFilter);
         assertEquals(childProject1.getTouchStoneCombinationFilter(), combinationFilter);
     }
 
@@ -299,7 +284,6 @@ public class MatrixProjectTest {
         };
         childProject1.setAllowSave(false);
         childProject1.setTouchStoneCombinationFilter(combinationFilter);
-        assertEquals(childProject1.touchStoneCombinationFilter, combinationFilter);
         assertEquals(childProject1.getTouchStoneCombinationFilter(), combinationFilter);
     }
 
@@ -317,8 +301,8 @@ public class MatrixProjectTest {
             }
         };
         childProject1.setAllowSave(false);
-        childProject1.setTouchStoneResultCondition(childResultCondition);
         childProject1.setCascadingProject(parentProject);
+        childProject1.setTouchStoneResultCondition(childResultCondition);
         assertEquals(childProject1.getTouchStoneResultCondition(), childResultCondition);
     }
 
@@ -355,7 +339,7 @@ public class MatrixProjectTest {
         childProject1.setAllowSave(false);
         childProject1.setCascadingProject(parentProject);
         childProject1.setTouchStoneResultCondition(childResultCondition);
-        assertEquals(childProject1.touchStoneResultCondition, childResultCondition);
+        assertEquals(childProject1.getTouchStoneResultCondition(), childResultCondition);
     }
 
     @Test
@@ -373,7 +357,6 @@ public class MatrixProjectTest {
         childProject1.setAllowSave(false);
         childProject1.setCascadingProject(parentProject);
         childProject1.setTouchStoneResultCondition(parentResultCondition);
-        assertNull(childProject1.touchStoneResultCondition);
         assertEquals(childProject1.getTouchStoneResultCondition(), parentResultCondition);
     }
 
@@ -388,7 +371,6 @@ public class MatrixProjectTest {
         };
         childProject1.setAllowSave(false);
         childProject1.setTouchStoneResultCondition(childResultCondition);
-        assertEquals(childProject1.touchStoneResultCondition, childResultCondition);
         assertEquals(childProject1.getTouchStoneResultCondition(), childResultCondition);
     }
 
@@ -402,6 +384,104 @@ public class MatrixProjectTest {
         };
         childProject1.setAllowSave(false);
         assertNull(childProject1.getTouchStoneResultCondition());
+    }
+
+    @Test
+    public void testGetCustomWorkspaceChildValue() throws IOException {
+        String parentWorkspace = "/tmp";
+        String childWorkspace = "/tmp2";
+        MatrixProject parentProject = new MatrixProjectMock("parent");
+        parentProject.setAllowSave(false);
+        parentProject.setCustomWorkspace(parentWorkspace);
+
+        MatrixProject childProject1 = new MatrixProject("child1"){
+            @Override
+            void rebuildConfigurations() throws IOException {
+            }
+        };
+        childProject1.setAllowSave(false);
+        childProject1.setCascadingProject(parentProject);
+        childProject1.setCustomWorkspace(childWorkspace);
+        assertEquals(childProject1.getCustomWorkspace(), childWorkspace);
+    }
+
+    @Test
+    public void testGetCustomWorkspaceParentValue() throws IOException {
+        String parentWorkspace = "/tmp";
+        MatrixProject parentProject = new MatrixProjectMock("parent");
+        parentProject.setAllowSave(false);
+        parentProject.setCustomWorkspace(parentWorkspace);
+
+        MatrixProject childProject1 = new MatrixProject("child1"){
+            @Override
+            void rebuildConfigurations() throws IOException {
+            }
+        };
+        childProject1.setAllowSave(false);
+        childProject1.setCascadingProject(parentProject);
+        assertEquals(childProject1.getCustomWorkspace(), parentWorkspace);
+    }
+
+    @Test
+    public void testGetCustomWorkspaceNull() throws IOException {
+        MatrixProject childProject1 = new MatrixProject("child1"){
+            @Override
+            void rebuildConfigurations() throws IOException {
+            }
+        };
+        childProject1.setAllowSave(false);
+        assertNull(childProject1.getCustomWorkspace());
+    }
+
+    @Test
+    public void testSetCustomWorkspaceDifferentValues() throws IOException {
+        String parentWorkspace = "/tmp";
+        String childWorkspace = "/tmp2";
+        MatrixProject parentProject = new MatrixProjectMock("parent");
+        parentProject.setAllowSave(false);
+        parentProject.setTouchStoneCombinationFilter(parentWorkspace);
+
+        MatrixProject childProject1 = new MatrixProject("child1"){
+            @Override
+            void rebuildConfigurations() throws IOException {
+            }
+        };
+        childProject1.setAllowSave(false);
+        childProject1.setCascadingProject(parentProject);
+        childProject1.setCustomWorkspace(childWorkspace);
+        assertEquals(childProject1.getCustomWorkspace(), childWorkspace);
+    }
+
+    @Test
+    public void testSetCustomWorkspaceTheSameValues() throws IOException {
+        String parentWorkspace = "/tmp";
+        MatrixProject parentProject = new MatrixProjectMock("parent");
+        parentProject.setAllowSave(false);
+        parentProject.setCustomWorkspace(parentWorkspace);
+
+        MatrixProject childProject1 = new MatrixProject("child1"){
+            @Override
+            void rebuildConfigurations() throws IOException {
+            }
+        };
+        childProject1.setAllowSave(false);
+        childProject1.setCascadingProject(parentProject);
+        childProject1.setCustomWorkspace(parentWorkspace);
+        assertEquals(childProject1.getCustomWorkspace(), parentWorkspace);
+    }
+
+    @Test
+    public void testSetCustomWorkspaceParentNull() throws IOException {
+        String parentWorkspace = "/tmp";
+
+        MatrixProject childProject1 = new MatrixProject("child1"){
+            @Override
+            void rebuildConfigurations() throws IOException {
+            }
+        };
+        childProject1.setAllowSave(false);
+        childProject1.setCustomWorkspace(parentWorkspace);
+        assertEquals(childProject1.getCustomWorkspace(), parentWorkspace);
     }
 
     private class MatrixProjectMock extends MatrixProject {
