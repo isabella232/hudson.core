@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2011 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,8 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi,   Brian Westrich, Erik Ramfelt, Ertan Deniz, Jean-Baptiste Quenot,   Luca Domenico Milanesio, R. Tyler Ballance, Stephen Connolly, Tom Huybrechts,   id:cactusman, Yahoo! Inc.
+ *    Kohsuke Kawaguchi,   Brian Westrich, Erik Ramfelt, Ertan Deniz, Jean-Baptiste Quenot,   Luca Domenico Milanesio,
+ *    R. Tyler Ballance, Stephen Connolly, Tom Huybrechts,   id:cactusman, Yahoo! Inc., Anton Kozak, Nikita Levyankov
  *     
  *
  *******************************************************************************/ 
@@ -118,6 +119,11 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends AbstractBuild<P,R>> extends Job<P,R> implements BuildableItem,
     IAbstractProject {
 
+    public static final String CONCURRENT_BUILD_PROPERTY_NAME = "concurrentBuild";
+    public static final String CLEAN_WORKSPACE_REQUIRED_PROPERTY_NAME = "cleanWorkspaceRequired";
+    public static final String BLOCK_BUILD_WHEN_DOWNSTREAM_BUILDING_PROPERTY_NAME = "blockBuildWhenDownstreamBuilding";
+    public static final String BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME = "blockBuildWhenUpstreamBuilding";
+
     /**
      * {@link SCM} associated with the project.
      * To allow derived classes to link {@link SCM} config to elsewhere,
@@ -180,13 +186,13 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      * True to keep builds of this project in queue when downstream projects are
      * building. False by default to keep from breaking existing behavior.
      */
-    protected volatile Boolean blockBuildWhenDownstreamBuilding;
+    protected volatile boolean blockBuildWhenDownstreamBuilding;
 
     /**
      * True to keep builds of this project in queue when upstream projects are
      * building. False by default to keep from breaking existing behavior.
      */
-    protected volatile Boolean blockBuildWhenUpstreamBuilding;
+    protected volatile boolean blockBuildWhenUpstreamBuilding;
 
     /**
      * Identifies {@link JDK} to be used.
@@ -222,9 +228,9 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     @CopyOnWrite
     protected transient volatile List<Action> transientActions = new Vector<Action>();
 
-    private Boolean concurrentBuild;
+    private boolean concurrentBuild;
 
-    private volatile Boolean cleanWorkspaceRequired;
+    private volatile boolean cleanWorkspaceRequired;
 
     protected AbstractProject(ItemGroup parent, String name) {
         super(parent, name);
@@ -299,72 +305,51 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      */
     @Exported
     public boolean isConcurrentBuild() {
-        Boolean result = isConcurrentBuild(true);
-        return null != result ? result : false;
+        return isConcurrentBuild(true);
     }
 
-    public Boolean isConcurrentBuild(boolean useParentValue) {
-        if (!useParentValue) {
-            return concurrentBuild;
+    public boolean isConcurrentBuild(boolean useParentValue) {
+        if (!useParentValue || !hasCascadingProject() || isOverriddenProperty(CONCURRENT_BUILD_PROPERTY_NAME)) {
+            return Hudson.CONCURRENT_BUILD && concurrentBuild;
         } else {
-            if (null != concurrentBuild) {
-                return Hudson.CONCURRENT_BUILD && concurrentBuild;
-            }
             return hasCascadingProject() && getCascadingProject().isConcurrentBuild();
         }
     }
 
-    /**
-     * @param b boolean value.
-     * @throws IOException if any.
-     * @since 2.1.2
-     * @deprecated
-     */
     public void setConcurrentBuild(boolean b) throws IOException {
-       setConcurrentBuild(Boolean.valueOf(b));
-    }
-
-    public void setConcurrentBuild(Boolean b) throws IOException {
-        if (!(hasCascadingProject()
-            && ObjectUtils.equals(getCascadingProject().isConcurrentBuild(), b))) {
-            concurrentBuild = b;
+        if (!hasCascadingProject()) {
+            this.concurrentBuild = b;
+        } else if (!ObjectUtils.equals(getCascadingProject().isConcurrentBuild(), b)) {
+            this.concurrentBuild = b;
+            registerOverriddenProperty(CONCURRENT_BUILD_PROPERTY_NAME);
         } else {
-            this.concurrentBuild = null;
+            this.concurrentBuild = false;
+            unRegisterOverriddenProperty(CONCURRENT_BUILD_PROPERTY_NAME);
         }
         save();
     }
 
     public boolean isCleanWorkspaceRequired() {
-        Boolean result =  isCleanWorkspaceRequired(true);
-        return null != result ? result : false;
+        return isCleanWorkspaceRequired(true);
     }
 
-    public Boolean isCleanWorkspaceRequired(boolean useParentValue) {
-        if (!useParentValue) {
+    public boolean isCleanWorkspaceRequired(boolean useParentValue) {
+        if (!useParentValue || !hasCascadingProject() || isOverriddenProperty(CLEAN_WORKSPACE_REQUIRED_PROPERTY_NAME)) {
             return cleanWorkspaceRequired;
         } else {
-            if (null != cleanWorkspaceRequired) {
-                return cleanWorkspaceRequired;
-            }
             return hasCascadingProject() && getCascadingProject().isCleanWorkspaceRequired();
         }
     }
 
-    /**
-     * @param cleanWorkspaceRequired boolean value.
-     * @since 2.1.2
-     * @deprecated
-     */
     public void setCleanWorkspaceRequired(boolean cleanWorkspaceRequired) {
-        setCleanWorkspaceRequired(Boolean.valueOf(cleanWorkspaceRequired));
-    }
-
-    public void setCleanWorkspaceRequired(Boolean cleanWorkspaceRequired) {
-        if (!(hasCascadingProject()
-            && ObjectUtils.equals(getCascadingProject().isCleanWorkspaceRequired(), cleanWorkspaceRequired))) {
+        if (!hasCascadingProject()) {
+            this.cleanWorkspaceRequired = cleanWorkspaceRequired;
+        } else if (!ObjectUtils.equals(getCascadingProject().isCleanWorkspaceRequired(), cleanWorkspaceRequired)) {
+            registerOverriddenProperty(CLEAN_WORKSPACE_REQUIRED_PROPERTY_NAME);
             this.cleanWorkspaceRequired = cleanWorkspaceRequired;
         } else {
-            this.cleanWorkspaceRequired = null;
+            this.cleanWorkspaceRequired = false;
+            unRegisterOverriddenProperty(CLEAN_WORKSPACE_REQUIRED_PROPERTY_NAME);
         }
     }
 
@@ -605,16 +590,19 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
 
     // ugly name because of EL
     public boolean getHasCustomQuietPeriod() {
-        return quietPeriod!=null;
+        return (hasCascadingProject() && getCascadingProject().getHasCustomQuietPeriod())
+            || (!hasCascadingProject() && quietPeriod!=null);
     }
 
     /**
      * Sets the custom quiet period of this project, or revert to the global default if null is given.
-     * @param seconds quit period
+     * @param seconds quiet period
      * @throws IOException if any.
      */
     public void setQuietPeriod(Integer seconds) throws IOException {
-        if (!(hasCascadingProject() && ObjectUtils.equals(getCascadingProject().getQuietPeriod(), seconds))) {
+        if (!(hasCascadingProject()
+            && (ObjectUtils.equals(getCascadingProject().getQuietPeriod(), seconds))
+            && ObjectUtils.notEqual(seconds, Hudson.getInstance().getQuietPeriod()))) {
             this.quietPeriod = seconds;
         } else {
             this.quietPeriod = null;
@@ -655,75 +643,56 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     }
 
     public boolean blockBuildWhenDownstreamBuilding() {
-        Boolean result = blockBuildWhenDownstreamBuilding(true);
-        return null != result ? result : false;
+        return blockBuildWhenDownstreamBuilding(true);
     }
 
-    public Boolean blockBuildWhenDownstreamBuilding(boolean useParentValue) {
-        if (!useParentValue) {
+    public boolean blockBuildWhenDownstreamBuilding(boolean useParentValue) {
+        if (!useParentValue || !hasCascadingProject()
+            || isOverriddenProperty(BLOCK_BUILD_WHEN_DOWNSTREAM_BUILDING_PROPERTY_NAME)) {
             return blockBuildWhenDownstreamBuilding;
         } else {
-            if (null != blockBuildWhenDownstreamBuilding) {
-                return blockBuildWhenDownstreamBuilding;
-            }
             return hasCascadingProject() && getCascadingProject().blockBuildWhenDownstreamBuilding();
         }
     }
 
-    /**
-     * @param b boolean value.
-     * @throws IOException if any.
-     * @since 2.1.2
-     * @deprecated
-     */
     public void setBlockBuildWhenDownstreamBuilding(boolean b) throws IOException {
-        setBlockBuildWhenDownstreamBuilding(Boolean.valueOf(b));
-    }
-
-    public void setBlockBuildWhenDownstreamBuilding(Boolean b) throws IOException {
-        if (!(hasCascadingProject() && ObjectUtils.equals(getCascadingProject().blockBuildWhenDownstreamBuilding(), b))) {
-            blockBuildWhenDownstreamBuilding = b;
+        if (!hasCascadingProject()) {
+            this.blockBuildWhenDownstreamBuilding = b;
+        } else if (!ObjectUtils.equals(getCascadingProject().blockBuildWhenDownstreamBuilding(), b)) {
+            this.blockBuildWhenDownstreamBuilding = b;
+            registerOverriddenProperty(BLOCK_BUILD_WHEN_DOWNSTREAM_BUILDING_PROPERTY_NAME);
         } else {
-            blockBuildWhenDownstreamBuilding = null;
+            this.blockBuildWhenDownstreamBuilding = false;
+            unRegisterOverriddenProperty(BLOCK_BUILD_WHEN_DOWNSTREAM_BUILDING_PROPERTY_NAME);
         }
         save();
     }
 
     public boolean blockBuildWhenUpstreamBuilding() {
-        Boolean result = blockBuildWhenUpstreamBuilding(true);
-        return null != result ? result : false;
+        return blockBuildWhenUpstreamBuilding(true);
     }
 
-    public Boolean blockBuildWhenUpstreamBuilding(boolean useParentValue) {
-        if (!useParentValue) {
+    public boolean blockBuildWhenUpstreamBuilding(boolean useParentValue) {
+        if (!useParentValue || !hasCascadingProject()
+            || isOverriddenProperty(BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME)) {
             return blockBuildWhenUpstreamBuilding;
         } else {
-            if (null != blockBuildWhenUpstreamBuilding) {
-                return blockBuildWhenUpstreamBuilding;
-            }
             return hasCascadingProject() && getCascadingProject().blockBuildWhenUpstreamBuilding();
         }
     }
 
-    /**
-     * @param b boolean value.
-     * @throws IOException if any.
-     * @since 2.1.2
-     * @deprecated
-     */
     public void setBlockBuildWhenUpstreamBuilding(boolean b) throws IOException {
-        setBlockBuildWhenUpstreamBuilding(Boolean.valueOf(b));
-    }
-
-    public void setBlockBuildWhenUpstreamBuilding(Boolean b) throws IOException {
-        if (!(hasCascadingProject() && ObjectUtils.equals(getCascadingProject().blockBuildWhenUpstreamBuilding(), b))) {
-            blockBuildWhenUpstreamBuilding = b;
+        if (!hasCascadingProject()) {
+            this.blockBuildWhenUpstreamBuilding = b;
+        } else if (!ObjectUtils.equals(getCascadingProject().blockBuildWhenUpstreamBuilding(), b)) {
+            this.blockBuildWhenUpstreamBuilding = b;
+            registerOverriddenProperty(BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME);
         } else {
-            blockBuildWhenUpstreamBuilding = null;
+            this.blockBuildWhenUpstreamBuilding = false;
+            unRegisterOverriddenProperty(BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME);
         }
         save();
     }
-
 
     public boolean isDisabled() {
         return disabled;
@@ -1853,8 +1822,8 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         setQuietPeriod(null != req.getParameter("hasCustomQuietPeriod") ? req.getParameter("quiet_period") : null);
         setScmCheckoutRetryCount(null != req.getParameter("hasCustomScmCheckoutRetryCount")
             ? req.getParameter("scmCheckoutRetryCount") : null);
-        setBlockBuildWhenDownstreamBuilding((Boolean) (null != req.getParameter("blockBuildWhenDownstreamBuilding")));
-        setBlockBuildWhenUpstreamBuilding((Boolean) (null != req.getParameter("blockBuildWhenUpstreamBuilding")));
+        setBlockBuildWhenDownstreamBuilding(null != req.getParameter("blockBuildWhenDownstreamBuilding"));
+        setBlockBuildWhenUpstreamBuilding(null != req.getParameter("blockBuildWhenUpstreamBuilding"));
 
         if (req.getParameter("hasSlaveAffinity") != null) {
             // New logic for handling whether this choice came from the dropdown or textfield.
@@ -1871,11 +1840,11 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         }
 
 
-        setCleanWorkspaceRequired((Boolean) (null != req.getParameter("cleanWorkspaceRequired")));
+        setCleanWorkspaceRequired(null != req.getParameter("cleanWorkspaceRequired"));
 
         canRoam = assignedNode==null;
 
-        setConcurrentBuild((Boolean) (req.getSubmittedForm().has("concurrentBuild")));
+        setConcurrentBuild(req.getSubmittedForm().has("concurrentBuild"));
 
         authToken = BuildAuthorizationToken.create(req);
 

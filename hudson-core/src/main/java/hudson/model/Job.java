@@ -9,7 +9,8 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi, Martin Eigenbrodt,    Matthew R. Harrah, Red Hat, Inc., Stephen Connolly, Tom Huybrechts, Winston Prakash
+ *    Kohsuke Kawaguchi, Martin Eigenbrodt,    Matthew R. Harrah, Red Hat, Inc., Stephen Connolly, Tom Huybrechts,
+ *    Winston Prakash, Anton Kozak, Nikita Levyankov
  *     
  *
  *******************************************************************************/ 
@@ -19,6 +20,7 @@ package hudson.model;
 import hudson.Functions;
 import hudson.util.graph.GraphSeries;
 import hudson.widgets.Widget;
+import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Sets;
@@ -107,6 +109,9 @@ import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, RunT>>
         extends AbstractItem implements ExtensionPoint, StaplerOverridable, IJob {
     private static transient final String HUDSON_BUILDS_PROPERTY_KEY = "HUDSON_BUILDS";
+
+    private Set<String> overriddenValues = new CopyOnWriteArraySet<String>();
+
     /**
      * Next build number. Kept in a separate file because this is the only
      * information that gets updated often. This allows the rest of the
@@ -166,6 +171,34 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         super(parent, name);
     }
 
+    /**
+     * Checks whether property is overridden by this job and doesn't equal to cascading parent
+     *
+     * @param propertyName property name.
+     * @return true - if overridden, false - otherwise.
+     */
+    public boolean isOverriddenProperty(String propertyName) {
+        return null != propertyName && overriddenValues.contains(propertyName);
+    }
+
+    /**
+     * Marks property name as overridden. Is used to show, that given property will have overridden property value.
+     *
+     * @param propertyName name of property.
+     */
+    protected void registerOverriddenProperty(String propertyName) {
+        overriddenValues.add(propertyName);
+    }
+
+    /**
+     * Un-mark property name as overridden. Property will inherit value from cascading parent.
+     *
+     * @param propertyName name of property.
+     */
+    protected void unRegisterOverriddenProperty(String propertyName) {
+        overriddenValues.remove(propertyName);
+    }
+
     @Override
     public synchronized void save() throws IOException {
         if (allowSave.get()) {
@@ -189,6 +222,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                     return true;
                 }
             };
+        }
+        if (null == overriddenValues) {
+            overriddenValues = new CopyOnWriteArraySet<String>();
         }
         TextFile f = getNextBuildNumberFile();
         if (f.exists()) {
