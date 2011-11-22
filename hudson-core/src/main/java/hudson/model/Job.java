@@ -20,6 +20,8 @@ package hudson.model;
 import hudson.Functions;
 import hudson.util.graph.GraphSeries;
 import hudson.widgets.Widget;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -83,6 +85,7 @@ import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 import org.eclipse.hudson.api.model.IJob;
+import org.eclipse.hudson.api.model.IProperty;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -127,6 +130,13 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     private transient volatile boolean holdOffBuildUntilSave;
     private volatile LogRotator logRotator;
+
+    private ConcurrentMap<Enum, IProperty> jobProperties = new ConcurrentHashMap<Enum, IProperty>();
+
+    public enum PROPERTY_NAME {
+        CUSTOM_WORKSPACE
+    }
+
     /**
      * Not all plugins are good at calculating their health report quickly.
      * These fields are used to cache the health reports to speed up rendering
@@ -199,6 +209,49 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         overriddenValues.remove(propertyName);
     }
 
+    /**
+     * Put job property to properties map.
+     * @param key key.
+     * @param property property instance.
+     */
+    protected void putJobProperty(Enum key, IProperty property) {
+        jobProperties.put(key, property);
+    }
+
+    /**
+     * Returns job property by specified key.
+     * @param key key.
+     * @return {@link IProperty} instance or null.
+     * @throws IOException if any.
+     */
+    public IProperty getProperty(Enum key) throws IOException {
+        return getProperty(key, null);
+    }
+
+    /**
+     * Returns null safe job property by specified key. if property is not present, try instantiate it.
+     * @param key key.
+     * @param clazz type of property..
+     * @return {@link IProperty} instance or null.
+     * @throws IOException if any.
+     */
+    public IProperty getProperty(Enum key, Class clazz) throws IOException {
+        IProperty t = jobProperties.get(key);
+        if (null == t && null != clazz) {
+            try {
+                t = (IProperty)clazz.newInstance();
+                t.setJob(this);
+                t.setKey(key);
+                putJobProperty(key, t);
+            } catch (InstantiationException e) {
+                throw new IOException(e);
+            } catch (IllegalAccessException e) {
+                throw new IOException(e);
+            }
+        }
+        return t;
+    }
+
     @Override
     public synchronized void save() throws IOException {
         if (allowSave.get()) {
@@ -252,7 +305,15 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         for (JobProperty p : properties) {
             p.setOwner(this);
         }
+
+        if (null == jobProperties) {
+            jobProperties = new ConcurrentHashMap<Enum, IProperty>();
+        }
+        for (IProperty property : jobProperties.values()) {
+            property.setJob(this);
+        }
     }
+
 
     @Override
     public void onCopiedFrom(Item src) {

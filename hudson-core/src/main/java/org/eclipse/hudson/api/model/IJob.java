@@ -17,7 +17,9 @@ package org.eclipse.hudson.api.model;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
 import hudson.tasks.LogRotator;
+import java.io.IOException;
 import java.util.Map;
+import org.eclipse.hudson.api.model.IProperty;
 
 /**
  * Interface that represents Job.
@@ -26,7 +28,7 @@ import java.util.Map;
  *
  * @author Nikita Levyankov
  */
-public interface IJob<T> {
+public interface IJob<T extends IJob> {
 
     /**
      * Returns cascading project name.
@@ -40,7 +42,24 @@ public interface IJob<T> {
      *
      * @return cascading project.
      */
-    IJob getCascadingProject();
+    T getCascadingProject();
+
+    /**
+     * Returns job property by specified key.
+     *
+     * @param key key.
+     * @param clazz IProperty subclass.
+     * @return {@link IProperty} instance or null.
+     * @throws java.io.IOException if any.
+     */
+    IProperty getProperty(Enum key, Class<? extends IProperty> clazz) throws IOException;
+
+    /**
+     * Checks whether current job is inherited from other project.
+     *
+     * @return boolean.
+     */
+    boolean hasCascadingProject();
 
     /**
      * @return whether the name of this job can be changed by user.
