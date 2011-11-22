@@ -15,7 +15,6 @@
 
 package hudson.model;
 
-import java.io.IOException;
 import org.eclipse.hudson.api.model.IJob;
 import org.eclipse.hudson.api.model.IProperty;
 
@@ -52,9 +51,9 @@ public abstract class BaseProperty<T> implements IProperty<T> {
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-    public T getCascadingValue() throws IOException {
+    public T getCascadingValue() {
         return job.hasCascadingProject() ?
-            (T) job.getCascadingProject().getProperty(propertyKey, this.getClass()).getValue() : null;
+            (T) job.getCascadingProject().getProperty(propertyKey, this.getClass()).getValue() : getDefaultValue();
     }
 
     /**
@@ -67,8 +66,15 @@ public abstract class BaseProperty<T> implements IProperty<T> {
     /**
      * {@inheritDoc}
      */
-    public T getValue() throws IOException {
-        if (isPropertyOverridden() || null != getOriginalValue()) {
+    public T getDefaultValue() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public T getValue() {
+        if (isPropertyOverridden() || null != originalValue) {
             return getOriginalValue();
         }
         return getCascadingValue();
@@ -78,7 +84,7 @@ public abstract class BaseProperty<T> implements IProperty<T> {
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-    public void setValue(T value) throws IOException {
+    public void setValue(T value) {
         value = prepareValue(value);
         if (!job.hasCascadingProject()) {
             originalValue = value;
