@@ -13,7 +13,7 @@
  *
  *******************************************************************************/
 
-package hudson.model;
+package hudson.model.project.property;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.eclipse.hudson.api.model.IJob;

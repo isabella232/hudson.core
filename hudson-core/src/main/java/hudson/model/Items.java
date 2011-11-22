@@ -19,13 +19,13 @@ package hudson.model;
 import com.thoughtworks.xstream.XStream;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
-import hudson.scm.RepositoryBrowser;
+import hudson.model.project.property.BooleanProjectProperty;
+import hudson.model.project.property.IntegerProjectProperty;
+import hudson.model.project.property.StringProjectProperty;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.MatrixConfiguration;
 import hudson.XmlFile;
 import hudson.matrix.Axis;
-import hudson.matrix.MatrixConfiguration;
-import hudson.matrix.MatrixProject;
 import hudson.util.DescriptorList;
 import hudson.util.XStream2;
 
@@ -135,5 +135,6 @@ public class Items {
         XSTREAM.alias("integer-property", IntegerProjectProperty.class);
         XSTREAM.alias("boolean-property", BooleanProjectProperty.class);
         XSTREAM.alias("string-property", StringProjectProperty.class);
+        XSTREAM.aliasField("project-properties", Job.class, "jobProperties");
     }
 }

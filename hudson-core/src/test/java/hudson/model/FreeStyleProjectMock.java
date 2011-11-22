@@ -15,6 +15,8 @@
 
 package hudson.model;
 
+import org.eclipse.hudson.api.model.IProjectProperty;
+
 /**
  * Mock class for FreeStyleProject
  * <p/>
@@ -22,7 +24,7 @@ package hudson.model;
  *
  * @author Nikita Levyankov
  */
-class FreeStyleProjectMock extends FreeStyleProject {
+public class FreeStyleProjectMock extends FreeStyleProject {
 
     public FreeStyleProjectMock(String name) {
         super((ItemGroup) null, name);
@@ -31,5 +33,24 @@ class FreeStyleProjectMock extends FreeStyleProject {
 
     @Override
     protected void updateTransientActions() {
+    }
+
+    /**
+     * For the unit tests only. Sets cascadingProject for the job.
+     *
+     * @param cascadingProject parent job
+     */
+    public void setCascadingProject(FreeStyleProject cascadingProject) {
+        this.cascadingProject = cascadingProject;
+    }
+
+    /**
+     * Increase visibility for testing,
+     *
+     * @param key key.
+     * @param property property instance.
+     */
+    public void putJobProperty(String key, IProjectProperty property) {
+        super.putJobProperty(key, property);
     }
 }

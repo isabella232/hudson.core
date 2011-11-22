@@ -13,8 +13,9 @@
  *
  *******************************************************************************/
 
-package hudson.model;
+package hudson.model.project.property;
 
+import hudson.model.FreeStyleProjectMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,7 +35,7 @@ import static junit.framework.Assert.fail;
  */
 @SuppressWarnings("unchecked")
 public class ProjectPropertyTest {
-    private FreeStyleProject project;
+    private FreeStyleProjectMock project;
     private FreeStyleProjectMock parent;
     private final String propertyKey = "propertyKey";
 

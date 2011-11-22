@@ -12,34 +12,28 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
+package hudson.model.project.property;
 
-package hudson.model;
-
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.hudson.api.model.IJob;
 
 /**
- * String property for project.
+ * Represents integer property.
  * <p/>
  * Date: 9/22/11
  *
  * @author Nikita Levyankov
  */
-public class StringProjectProperty extends BaseProjectProperty<String> {
+public class IntegerProjectProperty extends BaseProjectProperty<Integer> {
 
-    public StringProjectProperty(IJob job) {
+    public IntegerProjectProperty(IJob job) {
         super(job);
-    }
-
-    @Override
-    protected String prepareValue(String candidateValue) {
-        return StringUtils.trimToNull(candidateValue);
     }
 
     /**
      * {@inheritDoc}
      */
-    protected boolean allowOverrideValue(String cascadingValue, String candidateValue) {
-        return !StringUtils.equalsIgnoreCase(cascadingValue, candidateValue);
+    @Override
+    public Integer getDefaultValue() {
+        return 0;
     }
 }

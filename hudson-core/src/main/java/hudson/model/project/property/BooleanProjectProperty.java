@@ -12,7 +12,7 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
-package hudson.model;
+package hudson.model.project.property;
 
 import org.eclipse.hudson.api.model.IJob;
 
