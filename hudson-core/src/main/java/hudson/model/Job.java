@@ -80,7 +80,7 @@ import net.sf.json.JSONException;
  
 import net.sf.json.JSONObject;
 
-import org.hudsonci.api.model.IJob;
+import org.eclipse.hudson.api.model.IJob;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;

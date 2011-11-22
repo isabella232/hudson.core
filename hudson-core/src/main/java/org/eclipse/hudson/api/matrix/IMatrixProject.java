@@ -12,11 +12,11 @@
  *    Anton Kozak
  *
  *******************************************************************************/
-package org.hudsonci.api.matrix;
+package org.eclipse.hudson.api.matrix;
 
 import hudson.matrix.AxisList;
 import hudson.model.Descriptor;
-import org.hudsonci.api.model.IAbstractProject;
+import org.eclipse.hudson.api.model.IAbstractProject;
 import hudson.model.Result;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.Builder;

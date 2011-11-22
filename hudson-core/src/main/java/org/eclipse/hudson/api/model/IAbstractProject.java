@@ -12,7 +12,7 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
-package org.hudsonci.api.model;
+package org.eclipse.hudson.api.model;
 
 import hudson.model.Label;
 import hudson.scm.SCM;
