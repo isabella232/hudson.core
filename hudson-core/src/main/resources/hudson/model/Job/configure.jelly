@@ -1,6 +1,6 @@
 <!-- **************************************************************************
 #
-# Copyright  (c) 2004-2010 Oracle Corporation.
+# Copyright  (c) 2004-2011 Oracle Corporation.
 #
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
 #
 # Contributors: 
 #
-#    Kohsuke Kawaguchi, id:cactusman
+#    Kohsuke Kawaguchi, id:cactusman, Nikita Levyankov
 #        
 #
 #************************************************************************** --> 
@@ -32,9 +32,20 @@
             <f:textbox name="name" value="${it.name}" />
           </f:entry>
         </j:if>
-        <f:entry title="${%templateName}">
-           <f:textbox name="templateName" value="${it.templateName}" />
-        </f:entry>
+        <j:set var="cascadingCandidates" value="${app.getAllItems(it.class)}"/>
+        <j:if test="${cascadingCandidates.size() gt 1}">
+          <f:entry title="${%cascadingProjectName}">
+            <select class="setting-input" name="cascadingProjectName">
+              <f:option/>
+              <j:forEach var="job" items="${cascadingCandidates}">
+                <j:if test="${job.name != it.name}">
+                  <f:option selected="${job.name==it.cascadingProjectName}" value="${job.name}">${job.name}</f:option>
+                </j:if>
+              </j:forEach>
+            </select>
+            <!--<f:textbox name="cascadingProjectName" value="${it.cascadingProjectName}"/>-->
+          </f:entry>
+        </j:if>
         <f:entry title="${%Description}" help="/help/project-config/description.html">
           <f:textarea name="description" value="${it.description}"/>
         </f:entry>
