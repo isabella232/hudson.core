@@ -92,9 +92,9 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
     @Override
     protected void submit(StaplerRequest req, StaplerResponse rsp)
         throws IOException, ServletException, Descriptor.FormException {
+        super.submit(req, rsp);
         setCustomWorkspace(
             req.hasParameter("customWorkspace") ? req.getParameter("customWorkspace.directory") : null);
-        super.submit(req, rsp);
     }
 
     @Override
