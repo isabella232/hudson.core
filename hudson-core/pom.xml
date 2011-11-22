@@ -387,6 +387,10 @@
               <groupId>org.codehaus.groovy</groupId>
               <artifactId>groovy</artifactId>
             </exclusion>
+            <exclusion>
+              <groupId>org.kohsuke.stapler</groupId>
+              <artifactId>json-lib</artifactId>
+            </exclusion>
           </exclusions>
         </dependency>
 
