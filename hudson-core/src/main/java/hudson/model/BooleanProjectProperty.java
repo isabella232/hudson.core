@@ -14,7 +14,6 @@
  *******************************************************************************/
 package hudson.model;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.eclipse.hudson.api.model.IJob;
 
 /**
@@ -28,13 +27,6 @@ public class BooleanProjectProperty extends BaseProjectProperty<Boolean> {
 
     public BooleanProjectProperty(IJob job) {
         super(job);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected boolean allowOverrideValue(Boolean cascadingValue, Boolean candidateValue) {
-        return !ObjectUtils.equals(cascadingValue, candidateValue);
     }
 
     /**
