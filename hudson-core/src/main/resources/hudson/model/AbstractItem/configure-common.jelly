@@ -9,7 +9,7 @@
 #
 # Contributors: 
 #
-#    Kohsuke Kawaguchi,
+#    Kohsuke Kawaguchi, Nikita Levyankov, Anton Kozak
 #        
 #
 #************************************************************************** --> 
@@ -24,13 +24,13 @@
     <j:if test="${app.CONCURRENT_BUILD}">
         <f:optionalBlock field="concurrentBuild" title="${%title.concurrentbuilds}"/>
     </j:if>
-
+    <j:set var="jobUrl" value="${h.getNearestAncestorUrl(request,it)}"/>
     <j:set var="jdks" value="${app.JDKs}"/>
     <j:if test="${jdks.size() gt 1}">
         <!-- if there's only one JDK configured, always use that. -->
         <f:entry title="JDK"
                  description="${%JDK to be used for this project}"
-                 isPropertyOverridden="${it.getStringProperty(it.JDK_PROPERTY_NAME).isPropertyOverridden()}">
+                 isPropertyOverridden="${it.getStringProperty(it.JDK_PROPERTY_NAME).isOverridden()}">
             <select class="setting-input validated" name="jdk"
                     checkUrl="'${rootURL}/defaultJDKCheck?value='+this.value">
                 <option>${%default.value}</option>

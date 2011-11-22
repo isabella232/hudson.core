@@ -38,6 +38,7 @@ import hudson.model.Queue.WaitingItem;
 import hudson.model.RunMap.Constructor;
 import hudson.model.labels.LabelAtom;
 import hudson.model.labels.LabelExpression;
+import org.eclipse.hudson.api.model.IProjectProperty;
 import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
 import hudson.model.queue.CauseOfBlockage;
 import hudson.model.queue.SubTask;
@@ -1886,6 +1887,14 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
             return new HttpRedirect(".");
         }else{
             return new ForwardToView(this,"wipeOutWorkspaceBlocked.jelly");
+        }
+    }
+
+    public void doResetProjectProperty(@QueryParameter final String propertyName) {
+        checkPermission(CONFIGURE);
+        final IProjectProperty property = getProperty(propertyName);
+        if (null != property) {
+            property.resetValue();
         }
     }
 

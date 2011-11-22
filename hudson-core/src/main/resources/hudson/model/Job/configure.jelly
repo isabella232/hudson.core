@@ -43,7 +43,6 @@
                 </j:if>
               </j:forEach>
             </select>
-            <!--<f:textbox name="cascadingProjectName" value="${it.cascadingProjectName}"/>-->
           </f:entry>
         </j:if>
         <f:entry title="${%Description}" help="/help/project-config/description.html">
