@@ -126,6 +126,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     public static final String QUIET_PERIOD_PROPERTY_NAME = "quietPeriod";
     public static final String SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME = "scmCheckoutRetryCount";
     public static final String CUSTOM_WORKSPACE_PROPERTY_NAME = "customWorkspace";
+    public static final String JDK_PROPERTY_NAME = "jdk";
 
     /**
      * {@link SCM} associated with the project.
@@ -217,6 +218,9 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      * are saved independently.
      *
      * @see Hudson#getJDK(String)
+     * @deprecated as of 2.2.0
+     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     *             Use getter/setter for accessing to this field.
      */
     private volatile String jdk;
 
@@ -335,6 +339,10 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         if (null == getProperty(SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME)) {
             setScmCheckoutRetryCount(scmCheckoutRetryCount);
             scmCheckoutRetryCount = null;
+        }
+        if (null == getProperty(JDK_PROPERTY_NAME)) {
+            setJDK(jdk);
+            jdk = null;
         }
     }
 
@@ -997,11 +1005,8 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     /**
      * @return name of jdk chosen for current project. Could taken from parent
      */
-    protected String getJDKName() {
-        if (StringUtils.isNotBlank(jdk)) {
-            return jdk;
-        }
-        return hasCascadingProject()? getCascadingProject().getJDKName() : null;
+    public String getJDKName() {
+        return getStringProperty(JDK_PROPERTY_NAME).getValue();
     }
 
     /**
@@ -1020,12 +1025,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     }
 
     public void setJDK(String jdk) {
-        if (!(hasCascadingProject()
-            && StringUtils.equalsIgnoreCase(getCascadingProject().getJDKName(), jdk))) {
-            this.jdk = jdk;
-        } else {
-            this.jdk = null;
-        }
+        getStringProperty(JDK_PROPERTY_NAME).setValue(jdk);
     }
 
     public BuildAuthorizationToken getAuthToken() {

@@ -70,6 +70,7 @@ public class LegacyProjectTest {
         assertNull(project.getProperty(AbstractProject.CLEAN_WORKSPACE_REQUIRED_PROPERTY_NAME));
         assertNull(project.getProperty(AbstractProject.QUIET_PERIOD_PROPERTY_NAME));
         assertNull(project.getProperty(AbstractProject.SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME));
+        assertNull(project.getProperty(AbstractProject.JDK_PROPERTY_NAME));
         project.buildProjectProperties();
         assertNotNull(project.getProperty(AbstractProject.BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME));
         assertNotNull(project.getProperty(AbstractProject.BLOCK_BUILD_WHEN_DOWNSTREAM_BUILDING_PROPERTY_NAME));
@@ -77,5 +78,6 @@ public class LegacyProjectTest {
         assertNotNull(project.getProperty(AbstractProject.CLEAN_WORKSPACE_REQUIRED_PROPERTY_NAME));
         assertNotNull(project.getProperty(AbstractProject.QUIET_PERIOD_PROPERTY_NAME));
         assertNotNull(project.getProperty(AbstractProject.SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME));
+        assertNotNull(project.getProperty(AbstractProject.JDK_PROPERTY_NAME));
     }
 }
