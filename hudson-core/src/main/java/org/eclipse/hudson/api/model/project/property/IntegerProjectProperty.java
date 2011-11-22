@@ -12,20 +12,21 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
-package hudson.model.project.property;
+package org.eclipse.hudson.api.model.project.property;
 
 import org.eclipse.hudson.api.model.IJob;
+import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
 
 /**
- * Represents boolean property.
+ * Represents integer property.
  * <p/>
  * Date: 9/22/11
  *
  * @author Nikita Levyankov
  */
-public class BooleanProjectProperty extends BaseProjectProperty<Boolean> {
+public class IntegerProjectProperty extends BaseProjectProperty<Integer> {
 
-    public BooleanProjectProperty(IJob job) {
+    public IntegerProjectProperty(IJob job) {
         super(job);
     }
 
@@ -33,16 +34,7 @@ public class BooleanProjectProperty extends BaseProjectProperty<Boolean> {
      * {@inheritDoc}
      */
     @Override
-    public Boolean getOriginalValue() {
-        Boolean originalValue = super.getOriginalValue();
-        return null != originalValue ? originalValue : getDefaultValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Boolean getDefaultValue() {
-        return false;
+    public Integer getDefaultValue() {
+        return 0;
     }
 }

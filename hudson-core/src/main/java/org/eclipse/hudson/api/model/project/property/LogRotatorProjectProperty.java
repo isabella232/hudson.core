@@ -12,34 +12,20 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
+package org.eclipse.hudson.api.model.project.property;
 
-package hudson.model.project.property;
-
-import org.apache.commons.lang3.StringUtils;
+import hudson.tasks.LogRotator;
 import org.eclipse.hudson.api.model.IJob;
 
 /**
- * String property for project.
+ * Represents LogRotator property.
  * <p/>
- * Date: 9/22/11
+ * Date: 9/27/11
  *
  * @author Nikita Levyankov
  */
-public class StringProjectProperty extends BaseProjectProperty<String> {
-
-    public StringProjectProperty(IJob job) {
+public class LogRotatorProjectProperty extends BaseProjectProperty<LogRotator> {
+    public LogRotatorProjectProperty(IJob job) {
         super(job);
-    }
-
-    @Override
-    protected String prepareValue(String candidateValue) {
-        return StringUtils.trimToNull(candidateValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected boolean allowOverrideValue(String cascadingValue, String candidateValue) {
-        return !StringUtils.equalsIgnoreCase(cascadingValue, candidateValue);
     }
 }
