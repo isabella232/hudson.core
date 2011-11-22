@@ -32,7 +32,7 @@ public interface IProperty<T> extends Serializable {
      *
      * @param key key.
      */
-    void setKey(Enum key);
+    void setKey(String key);
 
     /**
      * Sets the job, which is owner of current property.

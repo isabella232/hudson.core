@@ -131,11 +131,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     private transient volatile boolean holdOffBuildUntilSave;
     private volatile LogRotator logRotator;
 
-    private ConcurrentMap<Enum, IProperty> jobProperties = new ConcurrentHashMap<Enum, IProperty>();
-
-    public enum PROPERTY_NAME {
-        CUSTOM_WORKSPACE
-    }
+    private ConcurrentMap<String, IProperty> jobProperties = new ConcurrentHashMap<String, IProperty>();
 
     /**
      * Not all plugins are good at calculating their health report quickly.
@@ -211,35 +207,38 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     /**
      * Put job property to properties map.
+     *
      * @param key key.
      * @param property property instance.
      */
-    protected void putJobProperty(Enum key, IProperty property) {
+    protected void putJobProperty(String key, IProperty property) {
         jobProperties.put(key, property);
     }
 
     /**
      * Returns job property by specified key.
+     *
      * @param key key.
-     * @return {@link IProperty} instance or null.
+     * @return {@link org.hudsonci.api.model.IProperty} instance or null.
      * @throws IOException if any.
      */
-    public IProperty getProperty(Enum key) throws IOException {
+    public IProperty getProperty(String key) throws IOException {
         return getProperty(key, null);
     }
 
     /**
      * Returns null safe job property by specified key. if property is not present, try instantiate it.
+     *
      * @param key key.
      * @param clazz type of property..
-     * @return {@link IProperty} instance or null.
+     * @return {@link org.hudsonci.api.model.IProperty} instance or null.
      * @throws IOException if any.
      */
-    public IProperty getProperty(Enum key, Class clazz) throws IOException {
+    public IProperty getProperty(String key, Class clazz) throws IOException {
         IProperty t = jobProperties.get(key);
         if (null == t && null != clazz) {
             try {
-                t = (IProperty)clazz.newInstance();
+                t = (IProperty) clazz.newInstance();
                 t.setJob(this);
                 t.setKey(key);
                 putJobProperty(key, t);
@@ -250,6 +249,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             }
         }
         return t;
+    }
+
+    public StringProperty getStringProperty(String key) throws IOException {
+        return (StringProperty) getProperty(key, StringProperty.class);
     }
 
     @Override
@@ -307,7 +310,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
 
         if (null == jobProperties) {
-            jobProperties = new ConcurrentHashMap<Enum, IProperty>();
+            jobProperties = new ConcurrentHashMap<String, IProperty>();
         }
         for (IProperty property : jobProperties.values()) {
             property.setJob(this);

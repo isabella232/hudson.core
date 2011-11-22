@@ -52,7 +52,7 @@ public interface IJob<T extends IJob> {
      * @return {@link IProperty} instance or null.
      * @throws java.io.IOException if any.
      */
-    IProperty getProperty(Enum key, Class<? extends IProperty> clazz) throws IOException;
+    IProperty getProperty(String key, Class<? extends IProperty> clazz) throws IOException;
 
     /**
      * Checks whether current job is inherited from other project.
