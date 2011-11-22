@@ -15,6 +15,7 @@
 package hudson.model;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.eclipse.hudson.api.model.IJob;
 
 /**
  * Represents integer property.
@@ -24,6 +25,11 @@ import org.apache.commons.lang3.ObjectUtils;
  * @author Nikita Levyankov
  */
 public class IntegerProjectProperty extends BaseProjectProperty<Integer> {
+
+    public IntegerProjectProperty(IJob job) {
+        super(job);
+    }
+
     /**
      * {@inheritDoc}
      */
