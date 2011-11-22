@@ -16,7 +16,7 @@
 package hudson.model;
 
 import org.eclipse.hudson.api.model.IJob;
-import org.eclipse.hudson.api.model.IProperty;
+import org.eclipse.hudson.api.model.IProjectProperty;
 
 /**
  * Base property implementation. Contains common methods for setting and getting cascading and overridden properties.
@@ -25,7 +25,7 @@ import org.eclipse.hudson.api.model.IProperty;
  *
  * @author Nikita Levyankov
  */
-public abstract class BaseProperty<T> implements IProperty<T> {
+public abstract class BaseProjectProperty<T> implements IProjectProperty<T> {
 
     private String propertyKey;
     private transient IJob job;

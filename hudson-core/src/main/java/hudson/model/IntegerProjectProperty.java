@@ -17,35 +17,17 @@ package hudson.model;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * Represents boolean property.
+ * Represents integer property.
  * <p/>
  * Date: 9/22/11
  *
  * @author Nikita Levyankov
  */
-public class BooleanProperty extends BaseProperty<Boolean> {
-
+public class IntegerProjectProperty extends BaseProjectProperty<Integer> {
     /**
      * {@inheritDoc}
      */
-    protected boolean allowOverrideValue(Boolean cascadingValue, Boolean candidateValue) {
+    protected boolean allowOverrideValue(Integer cascadingValue, Integer candidateValue) {
         return !ObjectUtils.equals(cascadingValue, candidateValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Boolean getOriginalValue() {
-        Boolean originalValue = super.getOriginalValue();
-        return null != originalValue ? originalValue : getDefaultValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Boolean getDefaultValue() {
-        return false;
     }
 }

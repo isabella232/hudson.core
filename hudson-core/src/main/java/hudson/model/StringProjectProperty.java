@@ -17,7 +17,7 @@ package hudson.model;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class StringProperty extends BaseProperty<String> {
+public class StringProjectProperty extends BaseProjectProperty<String> {
 
     @Override
     protected String prepareValue(String candidateValue) {
