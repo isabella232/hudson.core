@@ -9,7 +9,7 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi, Jorg Heymans, Stephen Connolly, Tom Huybrechts
+ *    Kohsuke Kawaguchi, Jorg Heymans, Stephen Connolly, Tom Huybrechts, Anton Kozak, Nikita Levyankov
  *     
  *
  *******************************************************************************/ 
