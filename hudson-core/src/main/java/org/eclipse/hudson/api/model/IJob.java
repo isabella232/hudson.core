@@ -47,9 +47,9 @@ public interface IJob<T extends IJob> {
      *
      * @param key key.
      * @param clazz IProperty subclass.
-     * @return {@link IProperty} instance or null.
+     * @return {@link IProjectProperty} instance or null.
      */
-    IProperty getProperty(String key, Class<? extends IProperty> clazz);
+    IProjectProperty getProperty(String key, Class<? extends IProjectProperty> clazz);
 
     /**
      * Checks whether current job is inherited from other project.

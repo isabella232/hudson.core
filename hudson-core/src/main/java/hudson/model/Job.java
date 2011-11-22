@@ -85,7 +85,7 @@ import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 import org.eclipse.hudson.api.model.IJob;
-import org.eclipse.hudson.api.model.IProperty;
+import org.eclipse.hudson.api.model.IProjectProperty;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -131,7 +131,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     private transient volatile boolean holdOffBuildUntilSave;
     private volatile LogRotator logRotator;
 
-    private ConcurrentMap<String, IProperty> jobProperties = new ConcurrentHashMap<String, IProperty>();
+    private ConcurrentMap<String, IProjectProperty> jobProperties = new ConcurrentHashMap<String, IProjectProperty>();
 
     /**
      * Not all plugins are good at calculating their health report quickly.
@@ -211,7 +211,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * @param key key.
      * @param property property instance.
      */
-    protected void putJobProperty(String key, IProperty property) {
+    protected void putJobProperty(String key, IProjectProperty property) {
         jobProperties.put(key, property);
     }
 
@@ -219,20 +219,20 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Returns job property by specified key.
      *
      * @param key key.
-     * @return {@link IProperty} instance or null.
+     * @return {@link org.eclipse.hudson.api.model.IProjectProperty} instance or null.
      */
-    public IProperty getProperty(String key){
+    public IProjectProperty getProperty(String key){
         return getProperty(key, null);
     }
 
     /**
      * {@inheritDoc}
      */
-    public IProperty getProperty(String key, Class clazz) {
-        IProperty t = jobProperties.get(key);
+    public IProjectProperty getProperty(String key, Class clazz) {
+        IProjectProperty t = jobProperties.get(key);
         if (null == t && null != clazz) {
             try {
-                t = (IProperty) clazz.newInstance();
+                t = (IProjectProperty) clazz.newInstance();
                 t.setJob(this);
                 t.setKey(key);
                 putJobProperty(key, t);
@@ -245,12 +245,12 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         return t;
     }
 
-    public StringProperty getStringProperty(String key) {
-        return (StringProperty) getProperty(key, StringProperty.class);
+    public StringProjectProperty getStringProperty(String key) {
+        return (StringProjectProperty) getProperty(key, StringProjectProperty.class);
     }
 
-    public BooleanProperty getBooleanProperty(String key){
-        return (BooleanProperty) getProperty(key, BooleanProperty.class);
+    public BooleanProjectProperty getBooleanProperty(String key){
+        return (BooleanProjectProperty) getProperty(key, BooleanProjectProperty.class);
     }
 
     @Override
@@ -308,9 +308,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
 
         if (null == jobProperties) {
-            jobProperties = new ConcurrentHashMap<String, IProperty>();
+            jobProperties = new ConcurrentHashMap<String, IProjectProperty>();
         }
-        for (IProperty property : jobProperties.values()) {
+        for (IProjectProperty property : jobProperties.values()) {
             property.setJob(this);
         }
     }
