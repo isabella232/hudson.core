@@ -37,7 +37,8 @@ function getJobUrl() {
 }
 
 function onCascadingProjectUpdated() {
-   jQuery('select[name=cascadingProjectName]').change(function() {
+    if(isRunAsTest) return;
+    jQuery('select[name=cascadingProjectName]').change(function() {
         var jobUrl = getJobUrl()+'/updateCascadingProject';
         var cascadingProject = jQuery(this).val();
         new Ajax.Request(jobUrl+'?projectName='+cascadingProject, {
@@ -46,10 +47,11 @@ function onCascadingProjectUpdated() {
                 location.reload(true);
             }
         });
-   });
+    });
 }
 
 function onProjectPropertyChanged() {
+    if(isRunAsTest) return;
     jQuery('input').change(function() {
         var ref = jQuery(this).attr('id');
         var cascadingProperty = '';
@@ -72,4 +74,3 @@ jQuery(document).ready(function(){
     onCascadingProjectUpdated();
     onProjectPropertyChanged();
 });
-
