@@ -88,12 +88,7 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
      * @throws IOException if any.
      */
     public void setCustomWorkspace(String customWorkspace) throws IOException {
-        setCustomWorkspace(customWorkspace, true);
-    }
-
-    protected void setCustomWorkspace(String customWorkspace, boolean forceModify) throws IOException {
-        setProjectPropertyValue(CUSTOM_WORKSPACE_PROPERTY_NAME, StringProjectProperty.class, customWorkspace,
-            forceModify);
+        getStringProperty(CUSTOM_WORKSPACE_PROPERTY_NAME).setValue(customWorkspace);
         save();
     }
 
@@ -102,7 +97,7 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
         throws IOException, ServletException, Descriptor.FormException {
         super.submit(req, rsp);
         setCustomWorkspace(
-            req.hasParameter("customWorkspace") ? req.getParameter("customWorkspace.directory") : null, false);
+            req.hasParameter("customWorkspace") ? req.getParameter("customWorkspace.directory") : null);
     }
 
     @Override
