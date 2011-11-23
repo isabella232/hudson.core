@@ -258,6 +258,7 @@ public class FreeStyleProjectTest {
         parentProject.setCustomWorkspace(parentCustomWorkspace);
         FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
+        childProject.getStringProperty(FreeStyleProject.CUSTOM_WORKSPACE_PROPERTY_NAME).setModified(true);
         childProject.setCustomWorkspace(childCustomWorkspace);
         assertEquals(childCustomWorkspace, childProject.getCustomWorkspace());
     }
@@ -306,6 +307,7 @@ public class FreeStyleProjectTest {
         parentProject.setJDK(parentJdkName);
         FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
+        childProject.getStringProperty(AbstractProject.JDK_PROPERTY_NAME).setModified(true);
         childProject.setJDK(childJdkName);
         assertEquals(childJdkName, childProject.getJDKName());
     }
@@ -379,6 +381,7 @@ public class FreeStyleProjectTest {
         parentProject.setQuietPeriod(parentQuietPeriod);
         FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
+        childProject.getIntegerProperty(AbstractProject.QUIET_PERIOD_PROPERTY_NAME).setModified(true);
         childProject.setQuietPeriod(childQuietPeriod);
 
         Hudson hudson = createMock(Hudson.class);
@@ -452,6 +455,7 @@ public class FreeStyleProjectTest {
         replayAll();
         assertEquals(childProject.getScmCheckoutRetryCount(), globalScmCheckoutRetryCount);
         childProject.setCascadingProject(parentProject);
+        childProject.getIntegerProperty(AbstractProject.SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME).setModified(true);
         childProject.setScmCheckoutRetryCount(scmCheckoutRetryCount);
         assertEquals(childProject.getScmCheckoutRetryCount(), Integer.parseInt(scmCheckoutRetryCount));
         verifyAll();
@@ -465,6 +469,7 @@ public class FreeStyleProjectTest {
         parentProject.setScmCheckoutRetryCount(parentScmCheckoutRetryCount);
         FreeStyleProjectMock childProject = new FreeStyleProjectMock("child");
         childProject.setCascadingProject(parentProject);
+        childProject.getIntegerProperty(AbstractProject.SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME).setModified(true);
         childProject.setScmCheckoutRetryCount(childScmCheckoutRetryCount);
 
         Hudson hudson = createMock(Hudson.class);

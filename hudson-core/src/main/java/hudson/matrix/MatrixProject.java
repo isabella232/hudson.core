@@ -50,7 +50,12 @@ import hudson.util.FormValidation;
 import hudson.util.FormValidation.Kind;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.hudson.api.matrix.IMatrixProject;
+import org.eclipse.hudson.api.model.project.property.AxisListProjectProperty;
+import org.eclipse.hudson.api.model.project.property.BooleanProjectProperty;
+import org.eclipse.hudson.api.model.project.property.ResultProjectProperty;
+import org.eclipse.hudson.api.model.project.property.StringProjectProperty;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -171,7 +176,11 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
      * @inheritDoc
      */
     public void setAxes(AxisList axes) throws IOException {
-        getAxesListProjectProperty(AXES_PROPERTY_NAME).setValue(axes);
+        setAxes(axes, true);
+    }
+
+    protected void setAxes(AxisList axes, boolean forceModify) throws IOException {
+        setProjectPropertyValue(AXES_PROPERTY_NAME, AxisListProjectProperty.class, axes, forceModify);
         rebuildConfigurations();
         save();
     }
@@ -187,7 +196,7 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
      * @inheritDoc
      */
     public void setRunSequentially(boolean runSequentially) throws IOException {
-        getBooleanProperty(RUN_SEQUENTIALLY_PROPERTY_NAME).setValue(runSequentially);
+        setProjectPropertyValue(RUN_SEQUENTIALLY_PROPERTY_NAME, BooleanProjectProperty.class, runSequentially, true);
         save();
     }
 
@@ -202,7 +211,12 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
      * @inheritDoc
      */
     public void setCombinationFilter(String combinationFilter) throws IOException {
-        getStringProperty(COMBINATION_FILTER_PROPERTY_NAME).setValue(combinationFilter);
+        setCombinationFilter(combinationFilter, true);
+    }
+
+    protected void setCombinationFilter(String combinationFilter, boolean forceModify) throws IOException {
+        setProjectPropertyValue(COMBINATION_FILTER_PROPERTY_NAME, StringProjectProperty.class, combinationFilter,
+            forceModify);
         rebuildConfigurations();
         save();
     }
@@ -218,7 +232,12 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
      * @inheritDoc
      */
     public void setTouchStoneCombinationFilter(String touchStoneCombinationFilter) {
-        getStringProperty(TOUCH_STONE_COMBINATION_FILTER_PROPERTY_NAME).setValue(touchStoneCombinationFilter);
+        setTouchStoneCombinationFilter(touchStoneCombinationFilter, true);
+    }
+
+    protected void setTouchStoneCombinationFilter(String touchStoneCombinationFilter, boolean forceModify) {
+        setProjectPropertyValue(TOUCH_STONE_COMBINATION_FILTER_PROPERTY_NAME, StringProjectProperty.class,
+            touchStoneCombinationFilter, forceModify);
     }
 
     /**
@@ -232,7 +251,12 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
      * @inheritDoc
      */
     public void setTouchStoneResultCondition(Result touchStoneResultCondition) {
-        getResultProperty(TOUCH_STONE_RESULT_CONDITION_PROPERTY_NAME).setValue(touchStoneResultCondition);
+        setTouchStoneResultCondition(touchStoneResultCondition, true);
+    }
+
+    protected void setTouchStoneResultCondition(Result touchStoneResultCondition, boolean forceModify) {
+        setProjectPropertyValue(TOUCH_STONE_RESULT_CONDITION_PROPERTY_NAME, ResultProjectProperty.class,
+            touchStoneResultCondition, forceModify);
     }
 
     /**
@@ -246,7 +270,12 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
      * @inheritDoc
      */
     public void setCustomWorkspace(String customWorkspace) throws IOException {
-        getStringProperty(CUSTOM_WORKSPACE_PROPERTY_NAME).setValue(customWorkspace);
+        setCustomWorkspace(customWorkspace, true);
+    }
+
+    protected void setCustomWorkspace(String customWorkspace, boolean forceModify) throws IOException {
+        setProjectPropertyValue(CUSTOM_WORKSPACE_PROPERTY_NAME, StringProjectProperty.class, customWorkspace,
+            forceModify);
     }
 
     @Override
@@ -572,20 +601,23 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
                 COMBINATION_FILTER_PROPERTY_NAME)) : null);
 
         if (req.getParameter(HAS_TOUCH_STONE_COMBINATION_FILTER_PARAM)!=null) {
-            setTouchStoneCombinationFilter(Util.nullify(req.getParameter(TOUCH_STONE_COMBINATION_FILTER_PARAM)));
-            setTouchStoneResultCondition(Result.fromString(req.getParameter(TOUCH_STONE_RESULT_CONDITION_PARAM)));
+            setTouchStoneCombinationFilter(
+                StringUtils.trimToNull(req.getParameter(TOUCH_STONE_COMBINATION_FILTER_PARAM)), false);
+            setTouchStoneResultCondition(
+                Result.fromString(req.getParameter(TOUCH_STONE_RESULT_CONDITION_PARAM)), false);
         } else {
-            setTouchStoneCombinationFilter(null);
+            setTouchStoneCombinationFilter(null, false);
         }
 
         setCustomWorkspace(
-            req.hasParameter(CUSTOM_WORKSPACE_PARAM) ? req.getParameter(CUSTOM_WORKSPACE_DIRECTORY_PARAM) : null);
+            req.hasParameter(CUSTOM_WORKSPACE_PARAM) ? req.getParameter(CUSTOM_WORKSPACE_DIRECTORY_PARAM) : null,
+            false);
 
         // parse system axes
         DescribableList<Axis, AxisDescriptor> newAxes = DescribableListUtil.buildFromHetero(this, req, json, "axis",
             Axis.all());
         checkAxisNames(newAxes);
-        setAxes(new AxisList(newAxes.toList()));
+        setAxes(new AxisList(newAxes.toList()), false);
 
         setRunSequentially(json.has(RUN_SEQUENTIALLY_PROPERTY_NAME));
 
