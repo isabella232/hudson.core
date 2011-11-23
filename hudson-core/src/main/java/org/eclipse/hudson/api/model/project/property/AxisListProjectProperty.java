@@ -30,4 +30,9 @@ public class AxisListProjectProperty extends BaseProjectProperty<AxisList> {
     public AxisListProjectProperty(IJob job) {
         super(job);
     }
+
+    @Override
+    public AxisList getDefaultValue() {
+        return new AxisList();
+    }
 }

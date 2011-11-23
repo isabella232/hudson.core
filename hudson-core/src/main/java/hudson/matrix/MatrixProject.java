@@ -51,6 +51,7 @@ import hudson.util.DescribableListUtil;
 import hudson.util.FormValidation;
 import hudson.util.FormValidation.Kind;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.eclipse.hudson.api.matrix.IMatrixProject;
 import org.kohsuke.stapler.HttpResponse;
@@ -208,7 +209,7 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
     public void setAxes(AxisList axes) throws IOException {
         getAxesListProjectProperty(AXES_PROPERTY_NAME).setValue(axes);
 //        rebuildConfigurations();
-//        save();
+        save();
     }
 
     /**
@@ -223,7 +224,7 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
      */
     public void setRunSequentially(boolean runSequentially) throws IOException {
         getBooleanProperty(RUN_SEQUENTIALLY_PROPERTY_NAME).setValue(runSequentially);
-//        save();
+        save();
     }
 
     /**
@@ -239,9 +240,8 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
     public void setCombinationFilter(String combinationFilter) throws IOException {
         getStringProperty(COMBINATION_FILTER_PROPERTY_NAME).setValue(combinationFilter);
 //        rebuildConfigurations();
-//        save();
+        save();
     }
-
     /**
      * @inheritDoc
      */
@@ -424,8 +424,12 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
 
     @Override
     public void onLoad(ItemGroup<? extends Item> parent, String name) throws IOException {
-        super.onLoad(parent,name);
-        Collections.sort(getAxes()); // perhaps the file was edited on disk and the sort order might have been broken
+        super.onLoad(parent, name);
+        AxisList axes = getAxes();
+        if (!CollectionUtils.isEmpty(axes)) {
+            // perhaps the file was edited on disk and the sort order might have been broken
+            Collections.sort(getAxes());
+        }
         getBuildersList().setOwner(this);
         getPublishersList().setOwner(this);
         getBuildWrappersList().setOwner(this);
@@ -536,19 +540,21 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
 
         // find all active configurations
         Set<MatrixConfiguration> active = new LinkedHashSet<MatrixConfiguration>();
-        for (Combination c : getAxes().list()) {
-            AxisList axes = getAxes();
-            String combinationFilter = getCombinationFilter();
-            if(c.evalGroovyExpression(axes,combinationFilter)) {
-        		LOGGER.fine("Adding configuration: " + c);
-	            MatrixConfiguration config = configurations.get(c);
-	            if(config==null) {
-	                config = new MatrixConfiguration(this,c);
-	                config.save();
-	                configurations.put(config.getCombination(), config);
-	            }
-	            active.add(config);
-        	}
+        AxisList axes = getAxes();
+        if (!CollectionUtils.isEmpty(axes)) {
+            for (Combination c : axes.list()) {
+                String combinationFilter = getCombinationFilter();
+                if (c.evalGroovyExpression(axes, combinationFilter)) {
+                    LOGGER.fine("Adding configuration: " + c);
+                    MatrixConfiguration config = configurations.get(c);
+                    if (config == null) {
+                        config = new MatrixConfiguration(this, c);
+                        config.save();
+                        configurations.put(config.getCombination(), config);
+                    }
+                    active.add(config);
+                }
+            }
         }
         this.activeConfigurations = active;
     }
