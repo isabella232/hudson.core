@@ -105,8 +105,9 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     }
 
     public File getRootDir() {
-        return (parent != null ? parent.getRootDirFor(this) : null);
+        return (parent != null ? parent.getRootDirFor(this) : Hudson.getInstance().getRootDir());
     }
+
     /**
      * This bridge method is to maintain binary compatibility with {@link TopLevelItem#getParent()}.
      */

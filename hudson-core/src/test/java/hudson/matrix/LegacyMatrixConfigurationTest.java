@@ -66,13 +66,14 @@ public class LegacyMatrixConfigurationTest {
         Hudson hudson = createMock(Hudson.class);
         expect(hudson.getNodes()).andReturn(Lists.<Node>newArrayList()).anyTimes();
         expect(hudson.getInitLevel()).andReturn(InitMilestone.STARTED).anyTimes();
+        expect(hudson.getRootDir()).andReturn(new File("./target/matrix")).anyTimes();
         ExtensionList<TransientProjectActionFactory> actionList = ExtensionList.create(hudson,
             TransientProjectActionFactory.class);
         expect(hudson.getExtensionList(TransientProjectActionFactory.class)).andReturn(actionList).anyTimes();
         ExtensionList<SaveableListener> saveableListenerList = ExtensionList.create(hudson, SaveableListener.class);
         expect(hudson.getExtensionList(SaveableListener.class)).andReturn(saveableListenerList).anyTimes();
         expect(hudson.getAllItems(MatrixConfiguration.class)).andReturn(Lists.<MatrixConfiguration>newArrayList())
-            .times(3);
+            .anyTimes();
         mockStatic(Hudson.class);
         expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
         replayAll();
