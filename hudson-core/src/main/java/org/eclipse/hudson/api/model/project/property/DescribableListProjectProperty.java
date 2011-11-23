@@ -32,7 +32,9 @@ public class DescribableListProjectProperty extends BaseProjectProperty<Describa
 
     @Override
     public DescribableList getDefaultValue() {
-        return new DescribableList(getJob());
+        DescribableList result = new DescribableList(getJob());
+        setOriginalValue(result, false);
+        return result;
     }
 
     @Override
