@@ -244,7 +244,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
     }
 
     protected void convertBuildersProjectProperty() {
-        if (null == getProperty(BUILDERS_PROPERTY_NAME)) {
+        if (null != builders && null == getProperty(BUILDERS_PROPERTY_NAME)) {
             setBuilders(builders);
             builders = null;
         }
