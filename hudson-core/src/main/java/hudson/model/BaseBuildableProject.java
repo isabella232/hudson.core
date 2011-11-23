@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.sf.json.JSONObject;
 import org.eclipse.hudson.api.model.IProject;
 import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
@@ -44,7 +46,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
     public static final String BUILDERS_PROPERTY_NAME = "builders";
     public static final String BUILD_WRAPPERS_PROPERTY_NAME = "buildWrappers";
 
-
+    private static final Logger LOGGER = Logger.getLogger(BaseBuildableProject.class.getName());
     /**
      * List of active {@link Builder}s configured for this project.
      *
@@ -175,7 +177,11 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
                 publisherList.add(property.getValue());
             }
         }
-        result.addAllTo(publisherList);
+        try {
+            result.addAll(publisherList);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Failed to add publishers", e);
+        }
         return result;
     }
 
