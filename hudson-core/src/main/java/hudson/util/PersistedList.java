@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009, Oracle Corporation
+ * Copyright (c) 2004-2011, Oracle Corporation
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  *
  * Contributors: 
  *
- *   
+ * Kohsuke Kawaguchi, Nikita Levyankov
  *        
  *
  *******************************************************************************/ 
@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * Collection whose change is notified to the parent object for persistence.
@@ -208,5 +210,30 @@ public class PersistedList<T> implements Iterable<T> {
             }
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        PersistedList that = (PersistedList) o;
+        return new EqualsBuilder()
+            .append(data, that.data)
+            .append(owner, that.owner)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(data)
+            .append(owner)
+            .toHashCode();
+    }
 }
+
 
