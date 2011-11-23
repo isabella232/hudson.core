@@ -23,6 +23,7 @@ import org.eclipse.hudson.api.model.project.property.AxisListProjectProperty;
 import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
 import org.eclipse.hudson.api.model.project.property.BooleanProjectProperty;
 import org.eclipse.hudson.api.model.project.property.DescribableListProjectProperty;
+import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
 import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
 import org.eclipse.hudson.api.model.project.property.LogRotatorProjectProperty;
 import org.eclipse.hudson.api.model.project.property.ResultProjectProperty;
@@ -138,6 +139,7 @@ public class Items {
 
         //aliases for project properties.
         XSTREAM.alias("base-property", BaseProjectProperty.class);
+        XSTREAM.alias("external-property", ExternalProjectProperty.class);
         XSTREAM.alias("integer-property", IntegerProjectProperty.class);
         XSTREAM.alias("boolean-property", BooleanProjectProperty.class);
         XSTREAM.alias("string-property", StringProjectProperty.class);

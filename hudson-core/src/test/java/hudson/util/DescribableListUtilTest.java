@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Map;
 import org.eclipse.hudson.api.model.IJob;
 import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
+import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -51,7 +52,7 @@ public class DescribableListUtilTest {
     public void testConvertToProjectProperties1() {
         prepareJob();
         DescribableList<Publisher, Descriptor<Publisher>> list = null;
-        Map<String, BaseProjectProperty<Publisher>> map = DescribableListUtil.convertToProjectProperties(list, job);
+        Map<String, ExternalProjectProperty<Publisher>> map = DescribableListUtil.convertToProjectProperties(list, job);
         assertNotNull(map);
         assertTrue(map.isEmpty());
     }
@@ -61,7 +62,7 @@ public class DescribableListUtilTest {
         prepareJob();
         DescribableList<Publisher, Descriptor<Publisher>> list
             = new DescribableList<Publisher, Descriptor<Publisher>>();
-        Map<String, BaseProjectProperty<Publisher>> map = DescribableListUtil.convertToProjectProperties(list, job);
+        Map<String, ExternalProjectProperty<Publisher>> map = DescribableListUtil.convertToProjectProperties(list, job);
         assertNotNull(map);
         assertTrue(map.isEmpty());
     }
@@ -82,7 +83,7 @@ public class DescribableListUtilTest {
 
         list.add(new Mailer());
 
-        Map<String, BaseProjectProperty<Publisher>> map = DescribableListUtil.convertToProjectProperties(list, job);
+        Map<String, ExternalProjectProperty<Publisher>> map = DescribableListUtil.convertToProjectProperties(list, job);
         assertNotNull(map);
         assertEquals(map.size(), 1);
         assertNotNull(map.get(mailerName));

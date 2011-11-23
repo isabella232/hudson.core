@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import net.sf.json.JSONObject;
 import org.eclipse.hudson.api.model.IProject;
 import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
+import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -158,7 +159,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
     }
 
     public Publisher getPublisher(Descriptor<Publisher> descriptor) {
-        return (Publisher) getBaseProjectProperty(descriptor.getJsonSafeClassName()).getValue();
+        return (Publisher) getExternalProjectProperty(descriptor.getJsonSafeClassName()).getValue();
     }
     /**
      * Returns the list of the publishers available in the hudson.
@@ -172,7 +173,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
         DescribableList<Publisher, Descriptor<Publisher>> result
             = new DescribableList<Publisher, Descriptor<Publisher>>(this);
         for (Descriptor<Publisher> descriptor : descriptors) {
-            BaseProjectProperty<Publisher> property = getBaseProjectProperty(descriptor.getJsonSafeClassName());
+            ExternalProjectProperty<Publisher> property = getExternalProjectProperty(descriptor.getJsonSafeClassName());
             if (null != property.getValue()) {
                 publisherList.add(property.getValue());
             }
@@ -220,7 +221,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
     protected void buildPublishers( StaplerRequest req, JSONObject json, List<Descriptor<Publisher>> descriptors) throws FormException{
         for (Descriptor<Publisher> d : descriptors) {
             String name = d.getJsonSafeClassName();
-            BaseProjectProperty<Publisher> baseProperty = getBaseProjectProperty(name);
+            ExternalProjectProperty<Publisher> baseProperty = getExternalProjectProperty(name);
             Publisher publisher = null;
             if (json.has(name)) {
                 publisher = d.newInstance(req, json.getJSONObject(name));
