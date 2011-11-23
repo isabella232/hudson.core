@@ -144,5 +144,16 @@
         <build.version>${project.version}</build.version>
       </properties>
     </profile>
+    <profile>
+      <id>hudson</id>
+      <build>
+        <plugins>
+           <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+               <artifactId>cobertura-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 </project>
