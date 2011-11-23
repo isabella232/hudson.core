@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2011 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  *
  * Contributors: 
 *
-*    Kohsuke Kawaguchi
+*    Kohsuke Kawaguchi, Nikita Levyankov
  *     
  *
  *******************************************************************************/ 
@@ -31,8 +31,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.collections.CollectionUtils;
 
 import static java.util.logging.Level.WARNING;
 
@@ -194,6 +194,24 @@ public class CopyOnWriteList<E> implements Iterable<E> {
 
             return new CopyOnWriteList(items,true);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CopyOnWriteList that = (CopyOnWriteList) o;
+        return CollectionUtils.isEqualCollection(this.core, that.core);
+    }
+
+    @Override
+    public int hashCode() {
+        return core != null ? core.hashCode() : 0;
     }
 
     private static final Logger LOGGER = Logger.getLogger(CopyOnWriteList.class.getName());
