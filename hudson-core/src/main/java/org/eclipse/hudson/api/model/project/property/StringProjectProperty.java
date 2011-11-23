@@ -40,7 +40,7 @@ public class StringProjectProperty extends BaseProjectProperty<String> {
     /**
      * {@inheritDoc}
      */
-    protected boolean allowOverrideValue(String cascadingValue, String candidateValue) {
+    public boolean allowOverrideValue(String cascadingValue, String candidateValue) {
         return !StringUtils.equalsIgnoreCase(cascadingValue, candidateValue);
     }
 }
