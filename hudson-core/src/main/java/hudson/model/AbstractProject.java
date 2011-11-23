@@ -39,6 +39,7 @@ import hudson.model.RunMap.Constructor;
 import hudson.model.labels.LabelAtom;
 import hudson.model.labels.LabelExpression;
 import org.eclipse.hudson.api.model.IProjectProperty;
+import org.eclipse.hudson.api.model.project.property.BooleanProjectProperty;
 import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
 import hudson.model.queue.CauseOfBlockage;
 import hudson.model.queue.SubTask;
@@ -95,6 +96,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.eclipse.hudson.api.model.IAbstractProject;
 import org.eclipse.hudson.api.model.project.property.SCMProjectProperty;
+import org.eclipse.hudson.api.model.project.property.StringProjectProperty;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.stapler.ForwardToView;
@@ -344,56 +346,57 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     }
 
     void convertBlockBuildWhenUpstreamBuildingProperty() throws IOException {
-        if (null == getProperty(BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME)) {
+        if (blockBuildWhenUpstreamBuilding && null == getProperty(BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME)) {
             setBlockBuildWhenUpstreamBuilding(blockBuildWhenUpstreamBuilding);
             blockBuildWhenUpstreamBuilding = false;
         }
     }
 
     void convertBlockBuildWhenDownstreamBuildingProperty() throws IOException {
-        if (null == getProperty(BLOCK_BUILD_WHEN_DOWNSTREAM_BUILDING_PROPERTY_NAME)) {
+        if (blockBuildWhenDownstreamBuilding
+            && null == getProperty(BLOCK_BUILD_WHEN_DOWNSTREAM_BUILDING_PROPERTY_NAME)) {
             setBlockBuildWhenDownstreamBuilding(blockBuildWhenDownstreamBuilding);
             blockBuildWhenDownstreamBuilding = false;
         }
     }
 
     void convertConcurrentBuildProperty() throws IOException {
-        if (null == getProperty(CONCURRENT_BUILD_PROPERTY_NAME)) {
+        if (concurrentBuild && null == getProperty(CONCURRENT_BUILD_PROPERTY_NAME)) {
             setConcurrentBuild(concurrentBuild);
             concurrentBuild = false;
         }
     }
 
     void convertCleanWorkspaceRequiredProperty() throws IOException {
-        if (null == getProperty(CLEAN_WORKSPACE_REQUIRED_PROPERTY_NAME)) {
+        if (cleanWorkspaceRequired && null == getProperty(CLEAN_WORKSPACE_REQUIRED_PROPERTY_NAME)) {
             setCleanWorkspaceRequired(cleanWorkspaceRequired);
             cleanWorkspaceRequired = false;
         }
     }
 
     void convertQuietPeriodProperty() throws IOException {
-        if (null == getProperty(QUIET_PERIOD_PROPERTY_NAME)) {
+        if (null != quietPeriod && null == getProperty(QUIET_PERIOD_PROPERTY_NAME)) {
             setQuietPeriod(quietPeriod);
             quietPeriod = null;
         }
     }
 
     void convertScmCheckoutRetryCountProperty() throws IOException {
-        if (null == getProperty(SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME)) {
+        if (null != scmCheckoutRetryCount && null == getProperty(SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME)) {
             setScmCheckoutRetryCount(scmCheckoutRetryCount);
             scmCheckoutRetryCount = null;
         }
     }
 
     void convertJDKProperty() throws IOException {
-        if (null == getProperty(JDK_PROPERTY_NAME)) {
+        if (null != jdk && null == getProperty(JDK_PROPERTY_NAME)) {
             setJDK(jdk);
             jdk = null;
         }
     }
 
     void convertScmProperty() throws IOException {
-        if (null == getProperty(SCM_PROPERTY_NAME)) {
+        if (null != scm && null == getProperty(SCM_PROPERTY_NAME)) {
             setScm(scm);
             scm = null;
         }
@@ -422,7 +425,11 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         return Hudson.CONCURRENT_BUILD && getBooleanProperty(CONCURRENT_BUILD_PROPERTY_NAME).getValue();
     }
     public void setConcurrentBuild(boolean b) throws IOException {
-        getBooleanProperty(CONCURRENT_BUILD_PROPERTY_NAME).setValue(b);
+        setConcurrentBuild(b, true);
+    }
+
+    public void setConcurrentBuild(boolean b, boolean forceModify) throws IOException {
+        setProjectPropertyValue(CONCURRENT_BUILD_PROPERTY_NAME, BooleanProjectProperty.class, b, forceModify);
         save();
     }
 
@@ -431,7 +438,12 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     }
 
     public void setCleanWorkspaceRequired(boolean cleanWorkspaceRequired) {
-        getBooleanProperty(CLEAN_WORKSPACE_REQUIRED_PROPERTY_NAME).setValue(cleanWorkspaceRequired);
+        setCleanWorkspaceRequired(cleanWorkspaceRequired, true);
+    }
+
+    public void setCleanWorkspaceRequired(boolean cleanWorkspaceRequired, boolean forceModify) {
+        setProjectPropertyValue(CLEAN_WORKSPACE_REQUIRED_PROPERTY_NAME, BooleanProjectProperty.class,
+            cleanWorkspaceRequired, forceModify);
     }
     /**
      * If this project is configured to be always built on this node,
@@ -643,7 +655,11 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      * @throws IOException if any.
      */
     public void setQuietPeriod(Integer seconds) throws IOException {
-        getIntegerProperty(QUIET_PERIOD_PROPERTY_NAME).setValue(seconds);
+        setQuietPeriod(seconds, true);
+    }
+
+    protected void setQuietPeriod(Integer seconds, boolean forceModify) throws IOException {
+        setProjectPropertyValue(QUIET_PERIOD_PROPERTY_NAME, IntegerProjectProperty.class, seconds, forceModify);
         save();
     }
 
@@ -654,8 +670,14 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     }
 
     public void setScmCheckoutRetryCount(Integer retryCount) {
-        getIntegerProperty(SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME).setValue(retryCount);
+        setScmCheckoutRetryCount(retryCount, true);
     }
+
+    public void setScmCheckoutRetryCount(Integer retryCount, boolean forceModify) {
+        setProjectPropertyValue(SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME, IntegerProjectProperty.class, retryCount,
+            forceModify);
+    }
+
     /**
      * Sets scmCheckoutRetryCount, Uses {@link NumberUtils#isNumber(String)} for checking retryCount param.
      * If it is not valid number, null will be set.
@@ -664,11 +686,15 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      * @throws IOException if any.
      */
     protected void setScmCheckoutRetryCount(String scmCheckoutRetryCount) throws IOException {
+        setScmCheckoutRetryCount(scmCheckoutRetryCount, true);
+    }
+
+    protected void setScmCheckoutRetryCount(String scmCheckoutRetryCount, boolean forceModify) throws IOException {
         Integer retryCount = null;
         if (NumberUtils.isNumber(scmCheckoutRetryCount)) {
             retryCount = NumberUtils.createInteger(scmCheckoutRetryCount);
         }
-        setScmCheckoutRetryCount(retryCount);
+        setScmCheckoutRetryCount(retryCount, forceModify);
     }
 
     /**
@@ -689,13 +715,16 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      * @throws IOException if any.
      */
     protected void setQuietPeriod(String seconds) throws IOException {
+        setQuietPeriod(seconds, true);
+    }
+
+    protected void setQuietPeriod(String seconds, boolean forceModify) throws IOException {
         Integer period = null;
         if (NumberUtils.isNumber(seconds)) {
             period = NumberUtils.createInteger(seconds);
         }
-        setQuietPeriod(period);
+        setQuietPeriod(period, forceModify);
     }
-
     /**
      * Checks whether scmRetryCount is configured
      *
@@ -724,7 +753,12 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     }
 
     public void setBlockBuildWhenDownstreamBuilding(boolean b) throws IOException {
-        getBooleanProperty(BLOCK_BUILD_WHEN_DOWNSTREAM_BUILDING_PROPERTY_NAME).setValue(b);
+        setBlockBuildWhenDownstreamBuilding(b, true);
+    }
+
+    public void setBlockBuildWhenDownstreamBuilding(boolean b, boolean forceModify) throws IOException {
+        setProjectPropertyValue(BLOCK_BUILD_WHEN_DOWNSTREAM_BUILDING_PROPERTY_NAME,
+            BooleanProjectProperty.class, b, forceModify);
         save();
     }
 
@@ -733,7 +767,12 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     }
 
     public void setBlockBuildWhenUpstreamBuilding(boolean b) throws IOException {
-        getBooleanProperty(BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME).setValue(b);
+        setBlockBuildWhenUpstreamBuilding(b, true);
+    }
+
+    public void setBlockBuildWhenUpstreamBuilding(boolean b, boolean forceModify) throws IOException {
+        setProjectPropertyValue(BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME,
+            BooleanProjectProperty.class, b, forceModify);
         save();
     }
 
@@ -1078,7 +1117,11 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     }
 
     public void setJDK(String jdk) {
-        getStringProperty(JDK_PROPERTY_NAME).setValue(jdk);
+        setJDK(jdk, true);
+    }
+
+    public void setJDK(String jdk, boolean forceModify) {
+        setProjectPropertyValue(JDK_PROPERTY_NAME, StringProjectProperty.class, jdk, forceModify);
     }
 
     public BuildAuthorizationToken getAuthToken() {
@@ -1570,7 +1613,11 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
 
     @SuppressWarnings("unchecked")
     public void setScm(SCM scm) throws IOException {
-        getProperty(SCM_PROPERTY_NAME, SCMProjectProperty.class).setValue(scm);
+        setScm(scm, true);
+    }
+
+    public void setScm(SCM scm, boolean forceModify) throws IOException {
+        setProjectPropertyValue(SCM_PROPERTY_NAME, SCMProjectProperty.class, scm, forceModify);
         //save();
     }
 
@@ -1854,12 +1901,13 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
 
         makeDisabled(null != req.getParameter("disable"));
         setCascadingProjectName(StringUtils.trimToNull(req.getParameter("cascadingProjectName")));
-        setJDK(req.getParameter("jdk"));
-        setQuietPeriod(null != req.getParameter("hasCustomQuietPeriod") ? req.getParameter("quiet_period") : null);
+        setJDK(req.getParameter("jdk"), false);
+        setQuietPeriod(null != req.getParameter("hasCustomQuietPeriod") ? req.getParameter("quiet_period") : null,
+            false);
         setScmCheckoutRetryCount(null != req.getParameter("hasCustomScmCheckoutRetryCount")
-            ? req.getParameter("scmCheckoutRetryCount") : null);
-        setBlockBuildWhenDownstreamBuilding(null != req.getParameter("blockBuildWhenDownstreamBuilding"));
-        setBlockBuildWhenUpstreamBuilding(null != req.getParameter("blockBuildWhenUpstreamBuilding"));
+            ? req.getParameter("scmCheckoutRetryCount") : null, false);
+        setBlockBuildWhenDownstreamBuilding(null != req.getParameter("blockBuildWhenDownstreamBuilding"), false);
+        setBlockBuildWhenUpstreamBuilding(null != req.getParameter("blockBuildWhenUpstreamBuilding"), false);
 
         if (req.getParameter("hasSlaveAffinity") != null) {
             // New logic for handling whether this choice came from the dropdown or textfield.
@@ -1876,15 +1924,15 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         }
 
 
-        setCleanWorkspaceRequired(null != req.getParameter("cleanWorkspaceRequired"));
+        setCleanWorkspaceRequired(null != req.getParameter("cleanWorkspaceRequired"), false);
 
         canRoam = assignedNode==null;
 
-        setConcurrentBuild(req.getSubmittedForm().has("concurrentBuild"));
+        setConcurrentBuild(req.getSubmittedForm().has("concurrentBuild"), false);
 
         authToken = BuildAuthorizationToken.create(req);
 
-        setScm(SCMS.parseSCM(req,this));
+        setScm(SCMS.parseSCM(req,this), false);
 
         for (Trigger t : triggers)
             t.stop();

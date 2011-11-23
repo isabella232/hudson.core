@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.hudson.api.model.IFreeStyleProject;
+import org.eclipse.hudson.api.model.project.property.StringProjectProperty;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -87,7 +88,12 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
      * @throws IOException if any.
      */
     public void setCustomWorkspace(String customWorkspace) throws IOException {
-        getStringProperty(CUSTOM_WORKSPACE_PROPERTY_NAME).setValue(customWorkspace);
+        setCustomWorkspace(customWorkspace, true);
+    }
+
+    protected void setCustomWorkspace(String customWorkspace, boolean forceModify) throws IOException {
+        setProjectPropertyValue(CUSTOM_WORKSPACE_PROPERTY_NAME, StringProjectProperty.class, customWorkspace,
+            forceModify);
         save();
     }
 
@@ -96,7 +102,7 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
         throws IOException, ServletException, Descriptor.FormException {
         super.submit(req, rsp);
         setCustomWorkspace(
-            req.hasParameter("customWorkspace") ? req.getParameter("customWorkspace.directory") : null);
+            req.hasParameter("customWorkspace") ? req.getParameter("customWorkspace.directory") : null, false);
     }
 
     @Override
