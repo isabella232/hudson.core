@@ -22,6 +22,7 @@ import hudson.Util;
 import hudson.XmlFile;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
+import hudson.model.BaseBuildableProject;
 import hudson.model.BuildableItemWithBuildWrappers;
 import hudson.model.DependencyGraph;
 import hudson.model.Descriptor;
@@ -38,13 +39,10 @@ import hudson.model.Result;
 import hudson.model.SCMedItem;
 import hudson.model.Saveable;
 import hudson.model.TopLevelItem;
-import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepDescriptor;
-import hudson.tasks.BuildWrapper;
 import hudson.tasks.BuildWrappers;
 import hudson.tasks.Builder;
 import hudson.tasks.Publisher;
-import hudson.triggers.Trigger;
 import hudson.util.CopyOnWriteMap;
 import hudson.util.DescribableList;
 import hudson.util.DescribableListUtil;
@@ -52,7 +50,6 @@ import hudson.util.FormValidation;
 import hudson.util.FormValidation.Kind;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.eclipse.hudson.api.matrix.IMatrixProject;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
@@ -82,7 +79,7 @@ import java.util.logging.Logger;
  *
  * @author Kohsuke Kawaguchi
  */
-public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> implements IMatrixProject, TopLevelItem,
+public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBuild> implements IMatrixProject, TopLevelItem,
     SCMedItem, ItemGroup<MatrixConfiguration>, Saveable, FlyweightTask, BuildableItemWithBuildWrappers {
 
     public static final String HAS_COMBINATION_FILTER_PARAM = "hasCombinationFilter";
@@ -100,7 +97,7 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
 
     /**
      * Configuration axes.
-     * @deprecated as of 2.2.1, use #getAxes() and #setAxes() instead
+     * @deprecated as of 2.2.0, use #getAxes() and #setAxes() instead
      */
     @Deprecated
     private volatile AxisList axes = new AxisList();
@@ -116,39 +113,6 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
     private volatile String combinationFilter;
 
     /**
-     * List of active {@link Builder}s configured for this project.
-     *
-     * @deprecated as of 2.2.0
-     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     *             Use getter/setter for accessing to this field.
-     */
-    @Deprecated
-    private DescribableList<Builder,Descriptor<Builder>> builders =
-            new DescribableList<Builder,Descriptor<Builder>>(this);
-
-    /**
-     * List of active {@link Publisher}s configured for this project.
-     *
-     * @deprecated as of 2.2.0
-     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     *             Use getter/setter for accessing to this field.
-     */
-    @Deprecated
-    private DescribableList<Publisher,Descriptor<Publisher>> publishers =
-            new DescribableList<Publisher,Descriptor<Publisher>>(this);
-
-    /**
-     * List of active {@link BuildWrapper}s configured for this project.
-     *
-     * @deprecated as of 2.2.0
-     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     *             Use getter/setter for accessing to this field.
-     */
-    @Deprecated
-    private DescribableList<BuildWrapper,Descriptor<BuildWrapper>> buildWrappers =
-            new DescribableList<BuildWrapper,Descriptor<BuildWrapper>>(this);
-
-    /**
      * All {@link MatrixConfiguration}s, keyed by their {@link MatrixConfiguration#getName() names}.
      */
     private transient /*final*/ Map<Combination,MatrixConfiguration> configurations = new CopyOnWriteMap.Tree<Combination,MatrixConfiguration>();
@@ -160,7 +124,7 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
     private transient /*final*/ Set<MatrixConfiguration> activeConfigurations = new LinkedHashSet<MatrixConfiguration>();
 
     /**
-     * @deprecated as of 2.2.1, use #isRunSequentially() and #setRunSequentially() instead
+     * @deprecated as of 2.2.0, use #isRunSequentially() and #setRunSequentially() instead
      */
     @Deprecated
     private boolean runSequentially;
@@ -168,7 +132,7 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
     /**
      * Filter to select a number of combinations to build first
      *
-     * @deprecated as of 2.2.1, use #getTouchStoneCombinationFilter() and #setTouchStoneCombinationFilter() instead
+     * @deprecated as of 2.2.0, use #getTouchStoneCombinationFilter() and #setTouchStoneCombinationFilter() instead
      */
     @Deprecated
     private String touchStoneCombinationFilter;
@@ -177,13 +141,13 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
      * Required result on the touchstone combinations, in order to
      * continue with the rest
      *
-     * @deprecated as of 2.2.1, use #getTouchStoneResultCondition() and #setTouchStoneResultCondition() instead
+     * @deprecated as of 2.2.0, use #getTouchStoneResultCondition() and #setTouchStoneResultCondition() instead
      */
     @Deprecated
     private Result touchStoneResultCondition;
 
     /**
-     * @deprecated as of 2.2.1, use #getCustomWorkspace() and #setCustomWorkspace() instead
+     * @deprecated as of 2.2.0, use #getCustomWorkspace() and #setCustomWorkspace() instead
      */
     @Deprecated
     private String customWorkspace;
@@ -242,6 +206,7 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
         rebuildConfigurations();
         save();
     }
+
     /**
      * @inheritDoc
      */
@@ -284,62 +249,6 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
         getStringProperty(CUSTOM_WORKSPACE_PROPERTY_NAME).setValue(customWorkspace);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public List<Builder> getBuilders() {
-        return getBuildersList().toList();
-    }
-
-	@SuppressWarnings("unchecked")
-    public DescribableList<Builder,Descriptor<Builder>> getBuildersList() {
-        return getDescribableListProjectProperty(BUILDERS_PROPERTY_NAME).getValue();
-    }
-
-
-    public void setBuilders(DescribableList<Builder,Descriptor<Builder>> builders) {
-        getDescribableListProjectProperty(BUILDERS_PROPERTY_NAME).setValue(builders);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public Map<Descriptor<Publisher>,Publisher> getPublishers() {
-        return getPublishersList().toMap();
-    }
-
-    /**
-     * @inheritDoc
-     */
-	@SuppressWarnings("unchecked")
-    public DescribableList<Publisher, Descriptor<Publisher>> getPublishersList() {
-        return getDescribableListProjectProperty(PUBLISHERS_PROPERTY_NAME).getValue();
-    }
-
-    public void setPublishers(DescribableList<Publisher, Descriptor<Publisher>> publishers) {
-        getDescribableListProjectProperty(PUBLISHERS_PROPERTY_NAME).setValue(publishers);
-    }
-
-    /**
-     * @inheritDoc
-     */
-	@SuppressWarnings("unchecked")
-    public DescribableList<BuildWrapper, Descriptor<BuildWrapper>> getBuildWrappersList() {
-        return getDescribableListProjectProperty(BUILD_WRAPPERS_PROPERTY_NAME).getValue();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public Map<Descriptor<BuildWrapper>,BuildWrapper> getBuildWrappers() {
-        return getBuildWrappersList().toMap();
-    }
-
-    public void setBuildWrappers(DescribableList<BuildWrapper, Descriptor<BuildWrapper>> buildWrappers) {
-        getDescribableListProjectProperty(BUILD_WRAPPERS_PROPERTY_NAME).setValue(buildWrappers);
-    }
-
-
     @Override
     protected void buildProjectProperties() throws IOException {
         super.buildProjectProperties();
@@ -368,36 +277,8 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
             setCustomWorkspace(customWorkspace);
             customWorkspace = null;//Reset to null. No longer needed.
         }
-        if (null == getProperty(BUILDERS_PROPERTY_NAME)) {
-            setBuilders(builders);
-            builders = null;
-        }
-        if (null == getProperty(BUILD_WRAPPERS_PROPERTY_NAME)) {
-            setBuildWrappers(buildWrappers);
-            buildWrappers = null;
-        }
-        if (null == getProperty(PUBLISHERS_PROPERTY_NAME)) {
-            setPublishers(publishers);
-            publishers = null;
-        }
         save();
         rebuildConfigurations();
-    }
-
-    @Override
-    protected List<Action> createTransientActions() {
-        List<Action> r = super.createTransientActions();
-
-        for (BuildStep step : getBuildersList())
-            r.addAll(step.getProjectActions(this));
-        for (BuildStep step : getPublishersList())
-            r.addAll(step.getProjectActions(this));
-        for (BuildWrapper step : getBuildWrappersList())
-            r.addAll(step.getProjectActions(this));
-        for (Trigger trigger : getTriggersList())
-            r.addAll(trigger.getProjectActions());
-
-        return r;
     }
 
     /**
@@ -430,9 +311,6 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
             // perhaps the file was edited on disk and the sort order might have been broken
             Collections.sort(getAxes());
         }
-        getBuildersList().setOwner(this);
-        getPublishersList().setOwner(this);
-        getBuildWrappersList().setOwner(this);
         rebuildConfigurations();
     }
 
@@ -652,7 +530,7 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
     }
 
     public Publisher getPublisher(Descriptor<Publisher> descriptor) {
-        for (Publisher p : publishers) {
+        for (Publisher p : getPublishersList()) {
             if(p.getDescriptor()==descriptor)
                 return p;
         }
@@ -665,12 +543,6 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
 
     public boolean isFingerprintConfigured() {
         return false;
-    }
-
-    protected void buildDependencyGraph(DependencyGraph graph) {
-        getPublishersList().buildDependencyGraph(this,graph);
-        getBuildersList().buildDependencyGraph(this,graph);
-        getBuildWrappersList().buildDependencyGraph(this,graph);
     }
 
     public MatrixProject asProject() {
@@ -710,8 +582,8 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
             req.hasParameter(CUSTOM_WORKSPACE_PARAM) ? req.getParameter(CUSTOM_WORKSPACE_DIRECTORY_PARAM) : null);
 
         // parse system axes
-        DescribableList<Axis,AxisDescriptor> newAxes = new DescribableList<Axis,AxisDescriptor>(this);
-        newAxes.rebuildHetero(req, json, Axis.all(),"axis");
+        DescribableList<Axis, AxisDescriptor> newAxes = DescribableListUtil.buildFromHetero(this, req, json, "axis",
+            Axis.all());
         checkAxisNames(newAxes);
         setAxes(new AxisList(newAxes.toList()));
 
@@ -719,8 +591,7 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
 
         setBuildWrappers(DescribableListUtil.buildFromJson(this, req, json, BuildWrappers.getFor(this)));
         setBuilders(DescribableListUtil.buildFromHetero(this, req, json, "builder", Builder.all()));
-        setPublishers(DescribableListUtil.buildFromJson(this, req, json,
-            BuildStepDescriptor.filter(Publisher.all(), this.getClass())));
+        buildPublishers(req, json, BuildStepDescriptor.filter(Publisher.all(), this.getClass()));
 
         rebuildConfigurations();
     }
