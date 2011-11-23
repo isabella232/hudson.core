@@ -20,6 +20,7 @@ package hudson.model;
 import hudson.Functions;
 import org.eclipse.hudson.api.model.project.property.AxisListProjectProperty;
 import org.eclipse.hudson.api.model.project.property.BooleanProjectProperty;
+import org.eclipse.hudson.api.model.project.property.DescribableListProjectProperty;
 import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
 import org.eclipse.hudson.api.model.project.property.LogRotatorProjectProperty;
 import org.eclipse.hudson.api.model.project.property.ResultProjectProperty;
@@ -267,6 +268,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     public AxisListProjectProperty getAxesListProjectProperty(String key) {
         return (AxisListProjectProperty) getProperty(key, AxisListProjectProperty.class);
+    }
+
+    public DescribableListProjectProperty getDescribableListProjectProperty(String key) {
+        return (DescribableListProjectProperty) getProperty(key, DescribableListProjectProperty.class);
     }
 
     @Override
