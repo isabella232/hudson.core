@@ -122,15 +122,17 @@ public class DescribableList<T extends Describable<T>, D extends Descriptor<T>> 
 
     /**
      * Rebuilds the list by creating a fresh instances from the submitted form.
-     *
-     * <p>
+     * <p/>
+     * <p/>
      * This method is almost always used by the owner.
      * This method does not invoke the save method.
      *
-     * @param json
-     *      Structured form data that includes the data for nested descriptor list.
+     * @param json Structured form data that includes the data for nested descriptor list.
+     * @deprecated as of 2.2.0,
+     *             use {@link DescribableListUtil#buildFromJson(hudson.model.Saveable, org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject, java.util.List)}
      */
-    public void rebuild(StaplerRequest req, JSONObject json, List<? extends Descriptor<T>> descriptors) throws FormException, IOException {
+    public void rebuild(StaplerRequest req, JSONObject json, List<? extends Descriptor<T>> descriptors)
+        throws FormException, IOException {
         List<T> newList = new ArrayList<T>();
 
         for (Descriptor<T> d : descriptors) {
@@ -154,14 +156,21 @@ public class DescribableList<T extends Describable<T>, D extends Descriptor<T>> 
 
     /**
      * Rebuilds the list by creating a fresh instances from the submitted form.
-     *
-     * <p>
+     * <p/>
      * This version works with the the &lt;f:hetero-list> UI tag, where the user
      * is allowed to create multiple instances of the same descriptor. Order is also
      * significant.
+     *
+     * @deprecated as of 2.2.0,
+     *             use {@link DescribableListUtil#buildFromHetero(hudson.model.Saveable, org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject, String, java.util.Collection)}
+     *             or {@link Descriptor#newInstancesFromHeteroList(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject, String, java.util.Collection)}
      */
-    public void rebuildHetero(StaplerRequest req, JSONObject formData, Collection<? extends Descriptor<T>> descriptors, String key) throws FormException, IOException {
-        replaceBy(Descriptor.newInstancesFromHeteroList(req,formData,key,descriptors));
+    public void rebuildHetero(StaplerRequest req,
+                              JSONObject formData,
+                              Collection<? extends Descriptor<T>> descriptors,
+                              String key)
+        throws FormException, IOException {
+        replaceBy(Descriptor.newInstancesFromHeteroList(req, formData, key, descriptors));
     }
 
     /**
