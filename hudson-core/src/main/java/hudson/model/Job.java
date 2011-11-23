@@ -123,7 +123,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         extends AbstractItem implements ExtensionPoint, StaplerOverridable, IJob {
     private static transient final String HUDSON_BUILDS_PROPERTY_KEY = "HUDSON_BUILDS";
     private static transient final String PROJECT_PROPERTY_KEY_PREFIX = "has";
-
+    public static final String PROPERTY_NAME_SEPARATOR = ";";
     public static final String LOG_ROTATOR_PROPERTY_NAME = "logRotator";
 
     /**
@@ -360,6 +360,24 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             p.setOwner(this);
 
         buildProjectProperties();
+    }
+
+    /**
+     * Resets overridden properties to the values defined in parent.
+     *
+     * @param propertyName the name of the properties. It possible to pass several names
+     * separated with {@link #PROPERTY_NAME_SEPARATOR}.
+     * @throws java.io.IOException exception.
+     */
+    public void doResetProjectProperty(@QueryParameter final String propertyName) throws IOException {
+        checkPermission(CONFIGURE);
+        for (String name : StringUtils.split(propertyName, PROPERTY_NAME_SEPARATOR)) {
+            final IProjectProperty property = getProperty(name);
+            if (null != property) {
+                property.resetValue();
+            }
+        }
+        save();
     }
 
     protected void initAllowSave() {
