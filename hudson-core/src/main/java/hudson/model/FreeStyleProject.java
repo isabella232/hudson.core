@@ -102,7 +102,15 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
     @Override
     protected void buildProjectProperties() throws IOException {
         super.buildProjectProperties();
-        //Convert legacy customWorkspace property to IProjectProperty logic
+        convertCustomWorkspaceProperty();
+    }
+
+    /**
+     * Converts customWorkspace property to ProjectProperty.
+     *
+     * @throws IOException if any.
+     */
+    void convertCustomWorkspaceProperty() throws IOException {
         if (null != customWorkspace && null == getProperty(CUSTOM_WORKSPACE_PROPERTY_NAME)) {
             setCustomWorkspace(customWorkspace);
             customWorkspace = null;//Reset to null. No longer needed.

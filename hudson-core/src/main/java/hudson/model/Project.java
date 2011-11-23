@@ -16,6 +16,7 @@
 
 package hudson.model;
 
+import hudson.Functions;
 import hudson.Util;
 import hudson.diagnosis.OldDataMonitor;
 import hudson.model.Descriptor.FormException;
@@ -32,8 +33,10 @@ import hudson.tasks.Maven.MavenInstallation;
 import hudson.triggers.Trigger;
 import hudson.util.DescribableList;
 import hudson.util.DescribableListUtil;
+import java.util.concurrent.CopyOnWriteArrayList;
 import net.sf.json.JSONObject;
 import org.eclipse.hudson.api.model.IProject;
+import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -105,17 +108,29 @@ public abstract class Project<P extends Project<P,B>,B extends Build<P,B>>
     @Override
     protected void buildProjectProperties() throws IOException {
         super.buildProjectProperties();
-        if (null == getProperty(BUILDERS_PROPERTY_NAME)) {
-            setBuilders(builders);
-            builders = null;
+        convertBuildersProjectProperty();
+        convertBuildWrappersProjectProperties();
+        convertPublishersProperties();
+    }
+
+    void convertPublishersProperties() {
+        if (null != publishers) {
+            putAllProjectProperties(DescribableListUtil.convertToProjectProperties(publishers, this), false);
+            publishers = null;
         }
+    }
+
+    void convertBuildWrappersProjectProperties() {
         if (null == getProperty(BUILD_WRAPPERS_PROPERTY_NAME)) {
             setBuildWrappers(buildWrappers);
             buildWrappers = null;
         }
-        if (null == getProperty(PUBLISHERS_PROPERTY_NAME)) {
-            setPublishers(publishers);
-            publishers = null;
+    }
+
+    void convertBuildersProjectProperty() {
+        if (null == getProperty(BUILDERS_PROPERTY_NAME)) {
+            setBuilders(builders);
+            builders = null;
         }
     }
 
@@ -140,11 +155,18 @@ public abstract class Project<P extends Project<P,B>,B extends Build<P,B>>
     }
 
     public DescribableList<Publisher, Descriptor<Publisher>> getPublishersList() {
-        return getDescribableListProjectProperty(PUBLISHERS_PROPERTY_NAME).getValue();
-    }
-
-    public void setPublishers(DescribableList<Publisher, Descriptor<Publisher>> publishers) {
-        getDescribableListProjectProperty(PUBLISHERS_PROPERTY_NAME).setValue(publishers);
+        List<Descriptor<Publisher>> descriptors = Functions.getPublisherDescriptors(this);
+        List<Publisher> publisherList = new CopyOnWriteArrayList<Publisher>();
+        DescribableList<Publisher, Descriptor<Publisher>> result
+            = new DescribableList<Publisher, Descriptor<Publisher>>(this);
+        for (Descriptor<Publisher> descriptor : descriptors) {
+            BaseProjectProperty<Publisher> property = getBaseProjectProperty(descriptor.getJsonSafeClassName());
+            if (null != property.getValue()) {
+                publisherList.add(property.getValue());
+            }
+        }
+        result.addAllTo(publisherList);
+        return result;
     }
 
     public Map<Descriptor<BuildWrapper>,BuildWrapper> getBuildWrappers() {
@@ -178,7 +200,7 @@ public abstract class Project<P extends Project<P,B>,B extends Build<P,B>>
      *      Use {@code getPublishersList().add(x)}
      */
     public void addPublisher(Publisher buildStep) throws IOException {
-        getPublishersList().add(buildStep);
+        getBaseProjectProperty(buildStep.getDescriptor().getJsonSafeClassName()).setValue(buildStep);
     }
 
     /**
@@ -192,11 +214,7 @@ public abstract class Project<P extends Project<P,B>,B extends Build<P,B>>
     }
 
     public Publisher getPublisher(Descriptor<Publisher> descriptor) {
-        for (Publisher p : getPublishersList()) {
-            if(p.getDescriptor()==descriptor)
-                return p;
-        }
-        return null;
+        return (Publisher) getBaseProjectProperty(descriptor.getJsonSafeClassName()).getValue();
     }
 
     protected void buildDependencyGraph(DependencyGraph graph) {
@@ -227,8 +245,19 @@ public abstract class Project<P extends Project<P,B>,B extends Build<P,B>>
         JSONObject json = req.getSubmittedForm();
         setBuildWrappers(DescribableListUtil.buildFromJson(this, req, json, BuildWrappers.getFor(this)));
         setBuilders(DescribableListUtil.buildFromHetero(this, req, json, "builder", Builder.all()));
-        setPublishers(DescribableListUtil.buildFromJson(this, req, json,
-            BuildStepDescriptor.filter(Publisher.all(), this.getClass())));
+        buildPublishers(req, json, BuildStepDescriptor.filter(Publisher.all(), this.getClass()));
+    }
+
+    private void buildPublishers( StaplerRequest req, JSONObject json, List<Descriptor<Publisher>> descriptors) throws FormException{
+        for (Descriptor<Publisher> d : descriptors) {
+            String name = d.getJsonSafeClassName();
+            BaseProjectProperty<Publisher> baseProperty = getBaseProjectProperty(name);
+            Publisher publisher = null;
+            if (json.has(name)) {
+                publisher = d.newInstance(req, json.getJSONObject(name));
+            }
+            baseProperty.setValue(publisher);
+        }
     }
 
     @Override

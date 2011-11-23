@@ -19,6 +19,7 @@ package hudson.model;
 
 import hudson.Functions;
 import org.eclipse.hudson.api.model.project.property.AxisListProjectProperty;
+import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
 import org.eclipse.hudson.api.model.project.property.BooleanProjectProperty;
 import org.eclipse.hudson.api.model.project.property.DescribableListProjectProperty;
 import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
@@ -224,6 +225,22 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
+     * Put map of job properties to existing ones.
+     *
+     * @param projectProperties new properties map.
+     * @param replace true - to replace current properties, false - add to existing map
+     */
+    protected void putAllProjectProperties(Map<String, ? extends IProjectProperty> projectProperties,
+                                           boolean replace) {
+        if (null != projectProperties) {
+            if (replace) {
+                jobProperties.clear();
+            }
+            jobProperties.putAll(projectProperties);
+        }
+    }
+
+    /**
      * Returns job property by specified key.
      *
      * @param key key.
@@ -259,6 +276,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     public StringProjectProperty getStringProperty(String key) {
         return (StringProjectProperty) getProperty(key, StringProjectProperty.class);
+    }
+
+    public BaseProjectProperty getBaseProjectProperty(String key) {
+        return (BaseProjectProperty) getProperty(key, BaseProjectProperty.class);
     }
 
     public ResultProjectProperty getResultProperty(String key) {
@@ -357,6 +378,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             property.setKey(entry.getKey());
             property.setJob(this);
         }
+        convertLogRotatorProperty();
+    }
+
+    void convertLogRotatorProperty() {
         if (null == getProperty(LOG_ROTATOR_PROPERTY_NAME)) {
             setLogRotator(logRotator);
             logRotator = null;
