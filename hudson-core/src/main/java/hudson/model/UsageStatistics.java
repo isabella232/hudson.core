@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2011 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -52,13 +52,12 @@ import java.util.zip.GZIPOutputStream;
  */
 @Extension
 public class UsageStatistics extends PageDecorator {
-    private final String keyImage;
 
+    private final String keyImage;
     /**
      * Lazily computed {@link PublicKey} representation of {@link #keyImage}.
      */
     private volatile transient PublicKey key;
-
     /**
      * When was the last time we asked a browser to send the usage stats for us?
      */
@@ -87,10 +86,12 @@ public class UsageStatistics extends PageDecorator {
      */
     public boolean isDue() {
         // user opted out. no data collection.
-        if(!Hudson.getInstance().isUsageStatisticsCollected() || DISABLED)     return false;
-        
+        if (!Hudson.getInstance().isUsageStatisticsCollected() || DISABLED) {
+            return false;
+        }
+
         long now = System.currentTimeMillis();
-        if(now - lastAttempt > DAY) {
+        if (now - lastAttempt > DAY) {
             lastAttempt = now;
             return true;
         }
@@ -119,52 +120,55 @@ public class UsageStatistics extends PageDecorator {
         Hudson h = Hudson.getInstance();
 
         JSONObject o = new JSONObject();
-        o.put("stat",1);
+        o.put("stat", 1);
         o.put("install", Util.getDigestOf(h.getSecretKey()));
-        o.put("version",Hudson.VERSION);
+        o.put("version", Hudson.VERSION);
 
         List<JSONObject> nodes = new ArrayList<JSONObject>();
-        for( Computer c : h.getComputers() ) {
-            JSONObject  n = new JSONObject();
-            if(c.getNode()==h) {
-                n.put("master",true);
+        for (Computer c : h.getComputers()) {
+            JSONObject n = new JSONObject();
+            if (c.getNode() == h) {
+                n.put("master", true);
                 n.put("jvm-vendor", System.getProperty("java.vm.vendor"));
                 n.put("jvm-version", System.getProperty("java.version"));
             }
-            n.put("executors",c.getNumExecutors());
+            n.put("executors", c.getNumExecutors());
             DescriptorImpl descriptor = h.getDescriptorByType(DescriptorImpl.class);
             n.put("os", descriptor.get(c));
             nodes.add(n);
         }
-        o.put("nodes",nodes);
+        o.put("nodes", nodes);
 
         List<JSONObject> plugins = new ArrayList<JSONObject>();
-        for( PluginWrapper pw : h.getPluginManager().getPlugins() ) {
-            if(!pw.isActive())  continue;   // treat disabled plugins as if they are uninstalled
+        for (PluginWrapper pw : h.getPluginManager().getPlugins()) {
+            if (!pw.isActive()) {
+                continue;   // treat disabled plugins as if they are uninstalled
+            }
             JSONObject p = new JSONObject();
-            p.put("name",pw.getShortName());
-            p.put("version",pw.getVersion());
+            p.put("name", pw.getShortName());
+            p.put("version", pw.getVersion());
             plugins.add(p);
         }
-        o.put("plugins",plugins);
+        o.put("plugins", plugins);
 
         JSONObject jobs = new JSONObject();
         List<TopLevelItem> items = h.getItems();
         for (TopLevelItemDescriptor d : Items.all()) {
-            int cnt=0;
+            int cnt = 0;
             for (TopLevelItem item : items) {
-                if(item.getDescriptor()==d)
+                if (item.getDescriptor() == d) {
                     cnt++;
+                }
             }
-            jobs.put(d.getJsonSafeClassName(),cnt);
+            jobs.put(d.getJsonSafeClassName(), cnt);
         }
-        o.put("jobs",jobs);
+        o.put("jobs", jobs);
 
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             // json -> UTF-8 encode -> gzip -> encrypt -> base64 -> string
-            OutputStreamWriter w = new OutputStreamWriter(new GZIPOutputStream(new CombinedCipherOutputStream(baos,getCipher(),"AES")), "UTF-8");
+            OutputStreamWriter w = new OutputStreamWriter(new GZIPOutputStream(new CombinedCipherOutputStream(baos, getCipher(), "AES")), "UTF-8");
             o.write(w);
             w.close();
 
@@ -181,6 +185,7 @@ public class UsageStatistics extends PageDecorator {
      * with the assymetric cipher. The rest of the stream will be encrypted by a symmetric cipher.
      */
     public static final class CombinedCipherOutputStream extends FilterOutputStream {
+
         public CombinedCipherOutputStream(OutputStream out, Cipher asym, String algorithm) throws IOException, GeneralSecurityException {
             super(out);
 
@@ -192,8 +197,8 @@ public class UsageStatistics extends PageDecorator {
 
             // the rest of the data will be encrypted by this symmetric cipher
             Cipher sym = Secret.getCipher(algorithm);
-            sym.init(Cipher.ENCRYPT_MODE,symKey);
-            super.out = new CipherOutputStream(out,sym);
+            sym.init(Cipher.ENCRYPT_MODE, symKey);
+            super.out = new CipherOutputStream(out, sym);
         }
     }
 
@@ -201,6 +206,7 @@ public class UsageStatistics extends PageDecorator {
      * The opposite of the {@link CombinedCipherOutputStream}.
      */
     public static final class CombinedCipherInputStream extends FilterInputStream {
+
         /**
          * @param keyLength
          *      Block size of the asymmetric cipher, in bits. I thought I can get it from {@code asym.getBlockSize()}
@@ -210,18 +216,16 @@ public class UsageStatistics extends PageDecorator {
             super(in);
 
             // first read the symmetric key cipher
-            byte[] symKeyBytes = new byte[keyLength/8];
+            byte[] symKeyBytes = new byte[keyLength / 8];
             new DataInputStream(in).readFully(symKeyBytes);
-            SecretKey symKey = new SecretKeySpec(asym.doFinal(symKeyBytes),algorithm);
+            SecretKey symKey = new SecretKeySpec(asym.doFinal(symKeyBytes), algorithm);
 
             // the rest of the data will be decrypted by this symmetric cipher
             Cipher sym = Secret.getCipher(algorithm);
-            sym.init(Cipher.DECRYPT_MODE,symKey);
-            super.in = new CipherInputStream(in,sym);
+            sym.init(Cipher.DECRYPT_MODE, symKey);
+            super.in = new CipherInputStream(in, sym);
         }
     }
-
     private static final long DAY = DAYS.toMillis(1);
-
-    public static boolean DISABLED = Boolean.getBoolean(UsageStatistics.class.getName()+".disabled");
+    public static boolean DISABLED = Boolean.getBoolean(UsageStatistics.class.getName() + ".disabled");
 }
