@@ -9,7 +9,7 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi, Daniel Dyer, Stephen Connolly, Nikita Levyankov
+ *    Kohsuke Kawaguchi, Daniel Dyer, Stephen Connolly, Nikita Levyankov, Anton Kozak
  *
  *******************************************************************************/ 
  
@@ -1006,9 +1006,12 @@ td.modified,
 div.modified,
 tr.optional-block-start > td.modified,
 tr.modified > td.setting-name,
-tr.modified > td.setting-main, tr.modified > td.setting-leftspace {
+tr.modified > td.setting-description,
+tr.modified > td.setting-main,
+tr.modified > td.setting-leftspace {
     background-color: #FFE8C9;
 }
+
 
 /* ======================= Job Configuration table ========================== */
 table.configure {
