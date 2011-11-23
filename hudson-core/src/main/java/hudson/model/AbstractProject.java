@@ -154,6 +154,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      *             Use getter/setter for accessing to this field.
      *
      */
+    @Deprecated
     private volatile Integer quietPeriod = null;
 
     /**
@@ -162,6 +163,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
+    @Deprecated
     private volatile Integer scmCheckoutRetryCount = null;
 
     /**
@@ -201,6 +203,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      * @deprecated as of 2.2.0. Don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
+    @Deprecated
     protected volatile boolean blockBuildWhenDownstreamBuilding;
 
     /**
@@ -209,6 +212,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      * @deprecated as of 2.2.0. Don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
+    @Deprecated
     protected volatile boolean blockBuildWhenUpstreamBuilding;
 
     /**
@@ -224,11 +228,13 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
+    @Deprecated
     private volatile String jdk;
 
     /**
      * @deprecated since 2007-01-29.
      */
+    @Deprecated
     private transient boolean enableRemoteTrigger;
 
     private volatile BuildAuthorizationToken authToken = null;
@@ -252,6 +258,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      * @deprecated as of 2.2.0 Don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
+    @Deprecated
     private boolean concurrentBuild;
 
     /**
@@ -260,6 +267,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
+    @Deprecated
     private volatile boolean cleanWorkspaceRequired;
 
     protected AbstractProject(ItemGroup parent, String name) {
