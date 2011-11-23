@@ -277,7 +277,8 @@ public class MatrixConfiguration extends Project<MatrixConfiguration,MatrixRun> 
      */
     @Override
     public void setLogRotator(LogRotator logRotator) {
-        throw new UnsupportedOperationException();
+        //TODO fins the reason
+        //throw new UnsupportedOperationException();
     }
 
     /**

@@ -21,6 +21,7 @@ import hudson.Functions;
 import org.eclipse.hudson.api.model.project.property.BooleanProjectProperty;
 import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
 import org.eclipse.hudson.api.model.project.property.LogRotatorProjectProperty;
+import org.eclipse.hudson.api.model.project.property.ResultProjectProperty;
 import org.eclipse.hudson.api.model.project.property.StringProjectProperty;
 import hudson.util.graph.GraphSeries;
 import hudson.widgets.Widget;
@@ -245,6 +246,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     public StringProjectProperty getStringProperty(String key) {
         return (StringProjectProperty) getProperty(key, StringProjectProperty.class);
+    }
+
+    public ResultProjectProperty getResultProperty(String key) {
+        return (ResultProjectProperty) getProperty(key, ResultProjectProperty.class);
     }
 
     public BooleanProjectProperty getBooleanProperty(String key){
