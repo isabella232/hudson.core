@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2011 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi, Jene Jasper, Yahoo! Inc.
+ *    Kohsuke Kawaguchi, Jene Jasper, Yahoo! Inc., Nikita Levyankov
  *     
  *
  *******************************************************************************/ 
@@ -48,19 +48,11 @@ public class Shell extends CommandInterpreter {
     private static String fixCrLf(String s) {
         // eliminate CR
         int idx;
-        while((idx=s.indexOf("\r\n"))!=-1)
-            s = s.substring(0,idx)+s.substring(idx+1);
-
-        //// add CR back if this is for Windows
-        //if(isWindows()) {
-        //    idx=0;
-        //    while(true) {
-        //        idx = s.indexOf('\n',idx);
-        //        if(idx==-1) break;
-        //        s = s.substring(0,idx)+'\r'+s.substring(idx);
-        //        idx+=2;
-        //    }
-        //}
+        if (null != s) { //avoid potential NullPointerException if command is null.
+            while ((idx = s.indexOf("\r\n")) != -1) {
+                s = s.substring(0, idx) + s.substring(idx + 1);
+            }
+        }
         return s;
     }
 
