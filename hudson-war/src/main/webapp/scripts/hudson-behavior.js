@@ -242,7 +242,7 @@ function findFollowingTR(input, className) {
     // then next TR that matches the CSS
     do {
         tr = tr.nextSibling;
-    } while (tr != null && (tr.tagName != "TR" || tr.className != className));
+    } while (tr != null && (tr.tagName != "TR" || !Element.hasClassName(tr,className)));
 
     return tr;
 }
@@ -524,8 +524,12 @@ var hudsonRules = {
             var nameRef = tr.getAttribute("nameref");
             while (container.lastChild != null) {
                 var row = container.lastChild;
-                if(nameRef!=null && row.getAttribute("nameref")==null)
+                if(nameRef!=null && row.getAttribute("nameref")==null){
                     row.setAttribute("nameref",nameRef); // to handle inner rowSets, don't override existing values
+                }
+                if(Element.hasClassName(link,"modified")){
+                    Element.addClassName(row,"modified");
+                }
                 tr.parentNode.insertBefore(row, tr.nextSibling);
             }
         });
@@ -592,7 +596,7 @@ var hudsonRules = {
         registerRegexpValidator(e,/^(\d*[1-9]\d*|)$/,"Not a positive number");
     },
 
-    "INPUT.auto-complete": function(e) {// form field with auto-completion support 
+    "INPUT.auto-complete": function(e) {// form field with auto-completion support
         // insert the auto-completion container
         var div = document.createElement("DIV");
         e.parentNode.insertBefore(div,e.nextSibling);
@@ -600,7 +604,7 @@ var hudsonRules = {
 
         var ds = new YAHOO.widget.DS_XHR(e.getAttribute("autoCompleteUrl"),["suggestions","name"]);
         ds.scriptQueryParam = "value";
-        
+
         // Instantiate the AutoComplete
         var ac = new YAHOO.widget.AutoComplete(e, div, ds);
         ac.prehighlightClassName = "yui-ac-prehighlight";
@@ -698,7 +702,7 @@ var hudsonRules = {
         }
 
         var handle = textarea.nextSibling;
-        if(handle==null || handle.className!="textarea-handle") return;
+        if(handle==null || !Element.hasClassName(handle, "textarea-handle")) return;
 
         var Event = YAHOO.util.Event;
 
@@ -877,6 +881,11 @@ var hudsonRules = {
             g.updateSingleButton(r,s,e);
         };
         applyNameRef(s,e,r.id);
+        if (Element.hasClassName(r.parentNode,'modified')){
+           jQuery('[nameref='+ r.id +']').children().addClass('modified');
+           //required for the advanced sections (hudson generates content inside div).
+           jQuery('[nameref='+ r.id +'] div.advancedLink').addClass('modified');
+        }
         g.buttons.push(u);
 
         // apply the initial visibility
@@ -908,7 +917,7 @@ var hudsonRules = {
         e.subForms = [];
         var start = findFollowingTR(e, 'dropdownList-container').firstChild.nextSibling, end;
         do { start = start.firstChild; } while (start && start.tagName != 'TR');
-        if (start && start.className != 'dropdownList-start')
+        if (start && !Element.hasClassName(start,'dropdownList-start'))
             start = findFollowingTR(start, 'dropdownList-start');
         while (start != null) {
             end = findFollowingTR(start, 'dropdownList-end');
@@ -955,7 +964,7 @@ var hudsonRules = {
                     candidates.push(items[i]);
                     if (candidates.length>20)   break;
                 }
-            } 
+            }
             return candidates;
         }, {});
 
@@ -1118,7 +1127,7 @@ function updateOptionalBlock(c,scroll) {
     }
 
     if (c.name == 'hudson-tools-InstallSourceProperty') {
-        // Work around to hide tool home when "Install automatically" is checked.
+        // Hack to hide tool home when "Install automatically" is checked.
         var homeField = findPreviousFormItem(c, 'home');
         if (homeField != null && homeField.value == '') {
             var tr = findAncestor(homeField, 'TR');
@@ -1393,12 +1402,12 @@ var repeatableSupport = {
             // noop
         } else
         if(children.length==1) {
-            children[0].className = "repeated-chunk first last only";
+            children[0].addClassName("repeated-chunk first last only");
         } else {
-            children[0].className = "repeated-chunk first";
+            children[0].addClassName("repeated-chunk first");
             for(var i=1; i<children.length-1; i++)
-                children[i].className = "repeated-chunk middle";
-            children[children.length-1].className = "repeated-chunk last";
+                children[i].addClassName("repeated-chunk middle");
+            children[children.length-1].addClassName("repeated-chunk last");
         }
     },
 
@@ -1419,7 +1428,7 @@ var repeatableSupport = {
         while(n.tag==null)
             n = n.parentNode;
         n.tag.expand();
-        // Work around to hide tool home when a new tool has some installers.
+        // Hack to hide tool home when a new tool has some installers.
         var inputs = n.getElementsByTagName('INPUT');
         for (var i = 0; i < inputs.length; i++) {
             var input = inputs[i];
