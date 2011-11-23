@@ -471,23 +471,25 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
      * Rebuilds the {@link #configurations} list and {@link #activeConfigurations}.
      */
     void rebuildConfigurations() throws IOException {
-        {
-            // backward compatibility check to see if there's any data in the old structure
-            // if so, bring them to the newer structure.
-            File[] oldDirs = getConfigurationsDir().listFiles(new FileFilter() {
-                public boolean accept(File child) {
-                    return child.isDirectory() && !child.getName().startsWith("axis-");
-                }
-            });
-            if(oldDirs!=null) {
-                // rename the old directory to the new one
-                for (File dir : oldDirs) {
-                    try {
-                        Combination c = Combination.fromString(dir.getName());
-                        dir.renameTo(getRootDirFor(c));
-                    } catch (IllegalArgumentException e) {
-                        // it's not a configuration dir. Just ignore.
-                    }
+        // for the tests
+        if(!isAllowSave()){
+            return;
+        }
+        // backward compatibility check to see if there's any data in the old structure
+        // if so, bring them to the newer structure.
+        File[] oldDirs = getConfigurationsDir().listFiles(new FileFilter() {
+            public boolean accept(File child) {
+                return child.isDirectory() && !child.getName().startsWith("axis-");
+            }
+        });
+        if (oldDirs != null) {
+            // rename the old directory to the new one
+            for (File dir : oldDirs) {
+                try {
+                    Combination c = Combination.fromString(dir.getName());
+                    dir.renameTo(getRootDirFor(c));
+                } catch (IllegalArgumentException e) {
+                    // it's not a configuration dir. Just ignore.
                 }
             }
         }
@@ -745,6 +747,13 @@ public class MatrixProject extends AbstractProject<MatrixProject, MatrixBuild> i
      */
     void setCascadingProject(MatrixProject cascadingProject) {
         this.cascadingProject = cascadingProject;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected void setAllowSave(Boolean allowSave) {
+        super.setAllowSave(allowSave);
     }
 
     private static final Logger LOGGER = Logger.getLogger(MatrixProject.class.getName());
