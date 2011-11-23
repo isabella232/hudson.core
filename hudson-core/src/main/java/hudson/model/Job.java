@@ -24,6 +24,7 @@ import org.eclipse.hudson.api.model.project.property.DescribableListProjectPrope
 import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
 import org.eclipse.hudson.api.model.project.property.LogRotatorProjectProperty;
 import org.eclipse.hudson.api.model.project.property.ResultProjectProperty;
+import org.eclipse.hudson.api.model.project.property.SCMProjectProperty;
 import org.eclipse.hudson.api.model.project.property.StringProjectProperty;
 import hudson.util.graph.GraphSeries;
 import hudson.widgets.Widget;
@@ -232,6 +233,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         return getProperty(key, null);
     }
 
+    //TODO relocate it to functions
     /**
      * {@inheritDoc}
      */
@@ -281,6 +283,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     public DescribableListProjectProperty getDescribableListProjectProperty(String key) {
         return (DescribableListProjectProperty) getProperty(key, DescribableListProjectProperty.class);
+    }
+
+    public SCMProjectProperty getScmProjectProperty(String key) {
+        return (SCMProjectProperty) getProperty(key, SCMProjectProperty.class);
     }
 
     @Override

@@ -94,6 +94,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.eclipse.hudson.api.model.IAbstractProject;
+import org.eclipse.hudson.api.model.project.property.SCMProjectProperty;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.stapler.ForwardToView;
@@ -132,13 +133,18 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     public static final String BUILDERS_PROPERTY_NAME = "builders";
     public static final String BUILD_WRAPPERS_PROPERTY_NAME = "buildWrappers";
     public static final String PUBLISHERS_PROPERTY_NAME = "publishers";
+    public static final String SCM_PROPERTY_NAME = "scm";
 
 
     /**
      * {@link SCM} associated with the project.
      * To allow derived classes to link {@link SCM} config to elsewhere,
      * access to this variable should always go through {@link #getScm()}.
+     * @deprecated as of 2.2.0
+     *             don't use this field directly, logic was moved to {@link org.hudsonci.api.model.IProjectProperty}.
+     *             Use getter/setter for accessing to this field.
      */
+    @Deprecated
     private volatile SCM scm = new NullSCM();
 
     /**
@@ -357,6 +363,10 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         if (null == getProperty(JDK_PROPERTY_NAME)) {
             setJDK(jdk);
             jdk = null;
+        }
+        if (null == getProperty(SCM_PROPERTY_NAME)) {
+            setScm(scm);
+            scm = null;
         }
     }
 
@@ -1526,12 +1536,13 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
 
     @Exported
     public SCM getScm() {
-        return scm;
+        return (SCM) getProperty(SCM_PROPERTY_NAME, SCMProjectProperty.class).getValue();
     }
 
+    @SuppressWarnings("unchecked")
     public void setScm(SCM scm) throws IOException {
-        this.scm = scm;
-        save();
+        getProperty(SCM_PROPERTY_NAME, SCMProjectProperty.class).setValue(scm);
+        //save();
     }
 
     /**
