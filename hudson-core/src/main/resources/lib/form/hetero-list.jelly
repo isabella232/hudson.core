@@ -1,6 +1,6 @@
 <!-- **************************************************************************
 #
-# Copyright  (c) 2004-2010 Oracle Corporation.
+# Copyright  (c) 2004-2011 Oracle Corporation.
 #
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
 #
 # Contributors: 
 #
-#    Kohsuke Kawaguchi
+#    Kohsuke Kawaguchi, Nikita Levyankov
 #        
 #
 #************************************************************************** --> 
@@ -44,6 +44,9 @@
       For each item, add a caption from descriptor.getDisplayName().
       This also activates drag&amp;drop (where the header is a grip), and help text support.
     </st:attribute>
+    <st:attribute name="isPropertyOverridden">
+      if present and true - value is overridden
+    </st:attribute>
   </st:documentation>
   <d:taglib uri="local">
     <d:tag name="body">
@@ -58,7 +61,7 @@
             </td>
             <j:if test="${help!=null}">
               <td>
-                <a href="#" class="help-button" helpURL="${rootURL}${help}"><img src="${imagesURL}/16x16/help.png" alt="[help]"/></a>
+                <a href="#" class="help-button" helpURL="${rootURL}${help}"><img src="${imagesURL}/16x16/help.gif" alt="[help]"/></a>
               </td>
             </j:if>
           </tr>
@@ -81,9 +84,11 @@
       <input type="hidden" name="kind" value="${descriptor.class.name}" />
     </d:tag>
   </d:taglib>
-
+   <j:if test="${attrs.isPropertyOverridden==null}">
+    <j:set target="${attrs}" property="isPropertyOverridden" value="false"/>
+  </j:if>
   <j:set var="targetType" value="${attrs.targetType?:it.class}"/>
-  <div class="hetero-list-container${hasHeader?' with-drag-drop':''}">
+  <div class="hetero-list-container${hasHeader?' with-drag-drop':''}${attrs.isPropertyOverridden? ' modified' :''}">
     <!-- display existing items -->
     <j:forEach var="i" items="${attrs.items}">
       <j:set var="descriptor" value="${i.descriptor}" />
