@@ -16,6 +16,7 @@
 package org.eclipse.hudson.api.model.project.property;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.eclipse.hudson.api.model.IJob;
 import org.eclipse.hudson.api.model.IProjectProperty;
 
@@ -71,7 +72,7 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
     /**
      * {@inheritDoc}
      */
-    public final void setOverridden(boolean overridden) {
+    public void setOverridden(boolean overridden) {
         propertyOverridden = overridden;
     }
 
@@ -121,17 +122,28 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
         }
         value = prepareValue(value);
         if (!getJob().hasCascadingProject()) {
-            originalValue = value;
+            setOriginalValue(value, false);
         } else {
             T cascadingValue = (T) getJob().getCascadingProject().getProperty(propertyKey, this.getClass()).getValue();
             T candidateValue = null == value ? getDefaultValue() : value;
             if (allowOverrideValue(cascadingValue, candidateValue)) {
-                originalValue = value;
-                setOverridden(true);
+                setOriginalValue(value, true);
             } else {
                 resetValue();
             }
         }
+    }
+
+    /**
+     * Method that sets original value and mark it as overridden if needed. It was created to provide better flexibility
+     * in subclasses.
+     *
+     * @param originalValue value to set
+     * @param overridden true - to mark as overridden.
+     */
+    protected void setOriginalValue(T originalValue, boolean overridden) {
+        this.originalValue = originalValue;
+        setOverridden(overridden);
     }
 
     /**
@@ -150,7 +162,8 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
      * @return true if cascading value should be replaced by candidate value.
      */
     protected boolean allowOverrideValue(T cascadingValue, T candidateValue) {
-        return ObjectUtils.notEqual(cascadingValue, candidateValue);
+        return ObjectUtils.notEqual(cascadingValue, candidateValue)
+            && !EqualsBuilder.reflectionEquals(cascadingValue, candidateValue);
     }
 
     /**
