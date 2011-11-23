@@ -15,10 +15,15 @@
 package hudson.matrix;
 
 import hudson.model.Result;
+import hudson.security.Permission;
 import java.io.IOException;
-import org.junit.Ignore;
+import org.eclipse.hudson.api.model.IProjectProperty;
+import org.eclipse.hudson.api.model.project.property.ResultProjectProperty;
+import org.eclipse.hudson.api.model.project.property.StringProjectProperty;
 import org.junit.Test;
 
+import static hudson.model.AbstractProject.PROPERTY_NAME_SEPARATOR;
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 /**
@@ -337,8 +342,51 @@ public class MatrixProjectTest {
         assertEquals(childProject1.getCustomWorkspace(), parentWorkspace);
     }
 
-    private class MatrixProjectMock extends MatrixProject {
+    @Test
+    public void testDoResetProjectPropertyOneProperty() throws IOException {
+        final IProjectProperty filterProperty = createMock(StringProjectProperty.class);
+        String input = MatrixProject.TOUCH_STONE_COMBINATION_FILTER_PROPERTY_NAME;
+        MatrixProject project = new MatrixProjectMock("parent") {
+            public IProjectProperty getProperty(String key) {
+                if (MatrixProject.TOUCH_STONE_COMBINATION_FILTER_PROPERTY_NAME.equals(key)) {
+                    return filterProperty;
+                } else {
+                    return null;
+                }
+            }
+        };
+        filterProperty.resetValue();
+        replay(filterProperty);
+        project.doResetProjectProperty(input);
+        verify(filterProperty);
+    }
 
+    @Test
+    public void testDoResetProjectPropertyTwoProperties() throws IOException {
+        final IProjectProperty filterProperty = createMock(StringProjectProperty.class);
+        final IProjectProperty resultProperty = createMock(ResultProjectProperty.class);
+
+        String input = MatrixProject.TOUCH_STONE_COMBINATION_FILTER_PROPERTY_NAME + PROPERTY_NAME_SEPARATOR +
+            MatrixProject.TOUCH_STONE_RESULT_CONDITION_PROPERTY_NAME;
+        MatrixProject project = new MatrixProjectMock("parent") {
+            public IProjectProperty getProperty(String key) {
+                if (MatrixProject.TOUCH_STONE_COMBINATION_FILTER_PROPERTY_NAME.equals(key)) {
+                    return filterProperty;
+                } else if (MatrixProject.TOUCH_STONE_RESULT_CONDITION_PROPERTY_NAME.equals(key)) {
+                    return resultProperty;
+                } else {
+                    return null;
+                }
+            }
+        };
+        filterProperty.resetValue();
+        resultProperty.resetValue();
+        replay(filterProperty, resultProperty);
+        project.doResetProjectProperty(input);
+        verify(filterProperty, resultProperty);
+    }
+
+    private class MatrixProjectMock extends MatrixProject {
         private MatrixProjectMock(String name) {
             super(null, name);
             setAllowSave(false);
@@ -350,6 +398,14 @@ public class MatrixProjectTest {
 
         @Override
         void rebuildConfigurations() throws IOException {
+        }
+
+        @Override
+        public void checkPermission(Permission p) {
+        }
+
+        @Override
+        public synchronized void save() throws IOException {
         }
     }
 }
