@@ -343,6 +343,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         convertQuietPeriodProperty();
         convertScmCheckoutRetryCountProperty();
         convertJDKProperty();
+        convertScmProperty();
     }
 
     void convertBlockBuildWhenUpstreamBuildingProperty() throws IOException {
@@ -391,6 +392,13 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         if (null == getProperty(JDK_PROPERTY_NAME)) {
             setJDK(jdk);
             jdk = null;
+        }
+    }
+
+    void convertScmProperty() throws IOException {
+        if (null == getProperty(SCM_PROPERTY_NAME)) {
+            setScm(scm);
+            scm = null;
         }
     }
 

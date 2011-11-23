@@ -1019,6 +1019,12 @@ tr.modified > td.setting-leftspace {
     margin-top: 5px;
 }
 
+.section-reset{
+    float: right;
+    margin-right: -20px;
+    margin-top: -10px;
+}
+
 /* ======================= Job Configuration table ========================== */
 table.configure {
     border-spacing: 0px;
