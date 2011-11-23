@@ -35,7 +35,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import static junit.framework.Assert.*;
-import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.powermock.api.easymock.PowerMock.*;
 
@@ -72,7 +71,8 @@ public class LegacyMatrixConfigurationTest {
         expect(hudson.getExtensionList(TransientProjectActionFactory.class)).andReturn(actionList).anyTimes();
         ExtensionList<SaveableListener> saveableListenerList = ExtensionList.create(hudson, SaveableListener.class);
         expect(hudson.getExtensionList(SaveableListener.class)).andReturn(saveableListenerList).anyTimes();
-        expect(hudson.getAllItems(MatrixConfiguration.class)).andReturn(Lists.<MatrixConfiguration>newArrayList()).anyTimes();
+        expect(hudson.getAllItems(MatrixConfiguration.class)).andReturn(Lists.<MatrixConfiguration>newArrayList())
+            .times(3);
         mockStatic(Hudson.class);
         expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
         replayAll();
