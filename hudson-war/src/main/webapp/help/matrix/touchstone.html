@@ -1,6 +1,6 @@
 <!-- **************************************************************************
 #
-# Copyright (C) 2004-2009 Oracle Corporation
+# Copyright (C) 2004-2011 Oracle Corporation
 #
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
@@ -8,12 +8,15 @@
 # http://www.eclipse.org/legal/epl-v10.html
 #
 # Contributors:
-#         Kohsuke Kawaguchi
+#         Kohsuke Kawaguchi, Anton Kozak
 #
 #************************************************************************** -->
 
 <div>
   Use a touchstone build if you want to run a sanity check before building all the combinations.
   You can select a number of combinations using a combination filter. These will be built first.
-  If the result satisfies the result condition, the rest of the combinations will be built. 
+  If the result satisfies the result condition, the rest of the combinations will be built.
+ <p>
+ It's possible to use Project cascading feature for this property. Please review <a href="http://wiki.hudson-ci.org/display/HUDSON/Project+cascading">
+ this document</a>.
 </div>
