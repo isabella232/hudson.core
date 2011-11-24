@@ -15,8 +15,6 @@
 
 package hudson.model;
 
-import org.eclipse.hudson.api.model.IProjectProperty;
-
 /**
  * Mock class for FreeStyleProject
  * <p/>
@@ -25,13 +23,6 @@ import org.eclipse.hudson.api.model.IProjectProperty;
  * @author Nikita Levyankov
  */
 public class FreeStyleProjectMock extends FreeStyleProject {
-
-    //TODO find better solution
-    /**
-     * The name of the cascadingProject.
-     */
-    private String cascadingProjectName;
-
 
     public FreeStyleProjectMock(String name) {
         super((ItemGroup) null, name);
@@ -50,23 +41,5 @@ public class FreeStyleProjectMock extends FreeStyleProject {
     public void setCascadingProject(FreeStyleProject cascadingProject) {
         this.cascadingProject = cascadingProject;
         this.cascadingProjectName = cascadingProject != null ? cascadingProject.getName() : null;
-    }
-
-    public String getCascadingProjectName() {
-        return cascadingProjectName;
-    }
-
-    public void renameCascadingProjectNameTo(String cascadingProjectName) {
-        this.cascadingProjectName = cascadingProjectName;
-    }
-
-    /**
-     * Increase visibility for testing,
-     *
-     * @param key key.
-     * @param property property instance.
-     */
-    public void putJobProperty(String key, IProjectProperty property) {
-        super.putJobProperty(key, property);
     }
 }
