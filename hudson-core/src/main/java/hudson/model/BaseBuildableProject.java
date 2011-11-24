@@ -17,10 +17,13 @@ package hudson.model;
 import hudson.Functions;
 import hudson.model.Descriptor.FormException;
 import hudson.tasks.BuildStep;
+import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildWrapper;
+import hudson.tasks.BuildWrappers;
 import hudson.tasks.Builder;
 import hudson.tasks.Publisher;
 import hudson.triggers.Trigger;
+import hudson.util.CascadingUtil;
 import hudson.util.DescribableList;
 import hudson.util.DescribableListUtil;
 import java.io.IOException;
@@ -29,11 +32,13 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
 import org.eclipse.hudson.api.model.IProject;
 import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
 import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * Base buildable project.
@@ -45,9 +50,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
     implements Saveable, BuildableItemWithBuildWrappers, IProject {
 
     public static final String BUILDERS_PROPERTY_NAME = "builders";
-    public static final String BUILD_WRAPPERS_PROPERTY_NAME = "buildWrappers";
 
-    private static final Logger LOGGER = Logger.getLogger(BaseBuildableProject.class.getName());
     /**
      * List of active {@link Builder}s configured for this project.
      *
@@ -114,6 +117,15 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
     }
 
     @Override
+    protected void submit( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException, FormException {
+        super.submit(req,rsp);
+        JSONObject json = req.getSubmittedForm();
+        buildBuildWrappers(req, json, BuildWrappers.getFor(this));
+        setBuilders(DescribableListUtil.buildFromHetero(this, req, json, "builder", Builder.all()));
+        buildPublishers(req, json, BuildStepDescriptor.filter(Publisher.all(), this.getClass()));
+    }
+
+    @Override
     protected List<Action> createTransientActions() {
         List<Action> r = super.createTransientActions();
 
@@ -166,24 +178,8 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
      *
      * @return the list of the publishers available in the hudson.
      */
-    @SuppressWarnings("unchecked")
     public DescribableList<Publisher, Descriptor<Publisher>> getPublishersList() {
-        List<Descriptor<Publisher>> descriptors = Functions.getPublisherDescriptors(this);
-        List<Publisher> publisherList = new CopyOnWriteArrayList<Publisher>();
-        DescribableList<Publisher, Descriptor<Publisher>> result
-            = new DescribableList<Publisher, Descriptor<Publisher>>(this);
-        for (Descriptor<Publisher> descriptor : descriptors) {
-            ExternalProjectProperty<Publisher> property = getExternalProjectProperty(descriptor.getJsonSafeClassName());
-            if (null != property.getValue()) {
-                publisherList.add(property.getValue());
-            }
-        }
-        try {
-            result.addAll(publisherList);
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Failed to add publishers", e);
-        }
-        return result;
+        return DescribableListUtil.convertToDescribableList(Functions.getPublisherDescriptors(this), this);
     }
 
     /**
@@ -196,38 +192,34 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
     /**
      * @inheritDoc
      */
-    @SuppressWarnings("unchecked")
     public DescribableList<BuildWrapper, Descriptor<BuildWrapper>> getBuildWrappersList() {
-        return getDescribableListProjectProperty(BUILD_WRAPPERS_PROPERTY_NAME).getValue();
-    }
-
-    /**
-     * Sets build wrappers.
-     *
-     * @param buildWrappers buildWrappers.
-     */
-    public void setBuildWrappers(DescribableList<BuildWrapper, Descriptor<BuildWrapper>> buildWrappers) {
-        getDescribableListProjectProperty(BUILD_WRAPPERS_PROPERTY_NAME).setValue(buildWrappers);
+        return DescribableListUtil.convertToDescribableList(Functions.getBuildWrapperDescriptors(this), this);
     }
 
     /**
      * Builds publishers.
+     *
      * @param req {@link StaplerRequest}
      * @param json {@link JSONObject}
      * @param descriptors list of descriptors.
      * @throws hudson.model.Descriptor.FormException if any.
      */
-    @SuppressWarnings("unchecked")
-    protected void buildPublishers( StaplerRequest req, JSONObject json, List<Descriptor<Publisher>> descriptors) throws FormException{
-        for (Descriptor<Publisher> d : descriptors) {
-            String name = d.getJsonSafeClassName();
-            ExternalProjectProperty<Publisher> baseProperty = getExternalProjectProperty(name);
-            Publisher publisher = null;
-            if (json.has(name)) {
-                publisher = d.newInstance(req, json.getJSONObject(name));
-            }
-            baseProperty.setValue(publisher);
-        }
+    protected void buildPublishers(StaplerRequest req, JSONObject json, List<Descriptor<Publisher>> descriptors)
+        throws FormException {
+        CascadingUtil.buildExternalProperties(req, json, descriptors, this);
+    }
+
+    /**
+     * Builds BuildWrappers.
+     *
+     * @param req {@link StaplerRequest}
+     * @param json {@link JSONObject}
+     * @param descriptors list of descriptors.
+     * @throws hudson.model.Descriptor.FormException if any.
+     */
+    protected void buildBuildWrappers(StaplerRequest req, JSONObject json, List<Descriptor<BuildWrapper>> descriptors)
+        throws FormException {
+        CascadingUtil.buildExternalProperties(req, json, descriptors, this);
     }
 
     protected void convertPublishersProperties() {
@@ -238,8 +230,8 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
     }
 
     protected void convertBuildWrappersProjectProperties() {
-        if (null == getProperty(BUILD_WRAPPERS_PROPERTY_NAME)) {
-            setBuildWrappers(buildWrappers);
+        if (null != buildWrappers) {
+            putAllProjectProperties(DescribableListUtil.convertToProjectProperties(buildWrappers, this), false);
             buildWrappers = null;
         }
     }

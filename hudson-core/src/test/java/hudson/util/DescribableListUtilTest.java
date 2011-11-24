@@ -17,12 +17,11 @@ package hudson.util;
 import hudson.model.Descriptor;
 import hudson.model.FreeStyleProject;
 import hudson.model.Hudson;
+import hudson.model.Job;
 import hudson.tasks.Mailer;
 import hudson.tasks.Publisher;
 import java.io.IOException;
 import java.util.Map;
-import org.eclipse.hudson.api.model.IJob;
-import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
 import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,7 +45,7 @@ import static org.powermock.api.easymock.PowerMock.replayAll;
 @PrepareForTest({Hudson.class, FreeStyleProject.class, Mailer.DescriptorImpl.class})
 public class DescribableListUtilTest {
 
-    private IJob job;
+    private Job job;
 
     @Test
     public void testConvertToProjectProperties1() {

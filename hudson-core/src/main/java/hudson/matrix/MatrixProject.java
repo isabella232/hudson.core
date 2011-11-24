@@ -594,10 +594,6 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
 
         setRunSequentially(json.has(RUN_SEQUENTIALLY_PROPERTY_NAME));
 
-        setBuildWrappers(DescribableListUtil.buildFromJson(this, req, json, BuildWrappers.getFor(this)));
-        setBuilders(DescribableListUtil.buildFromHetero(this, req, json, "builder", Builder.all()));
-        buildPublishers(req, json, BuildStepDescriptor.filter(Publisher.all(), this.getClass()));
-
         rebuildConfigurations();
     }
 
