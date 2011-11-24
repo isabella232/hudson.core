@@ -56,7 +56,17 @@ public class ParametersDefinitionProperty extends JobProperty<AbstractProject<?,
     public ParametersDefinitionProperty(ParameterDefinition... parameterDefinitions) {
         this.parameterDefinitions = Arrays.asList(parameterDefinitions);
     }
-    
+
+    /**
+     * This method is called for cascading update of owners.
+     *
+     * @param owner new owner.
+     * @since 2.2.0
+     */
+    public void setOwner(AbstractProject<?, ?> owner) {
+        super.setOwner(owner);
+    }
+
     public AbstractProject<?,?> getOwner() {
         return owner;
     }
@@ -104,7 +114,7 @@ public class ParametersDefinitionProperty extends JobProperty<AbstractProject<?,
         }
 
         List<ParameterValue> values = new ArrayList<ParameterValue>();
-        
+
         JSONObject formData = req.getSubmittedForm();
         JSONArray a = JSONArray.fromObject(formData.get("parameter"));
 
@@ -173,7 +183,7 @@ public class ParametersDefinitionProperty extends JobProperty<AbstractProject<?,
             if (parameterized.isNullObject()) {
             	return null;
             }
-            
+
             List<ParameterDefinition> parameterDefinitions = Descriptor.newInstancesFromHeteroList(
                     req, parameterized, "parameter", ParameterDefinition.all());
             if(parameterDefinitions.isEmpty())
@@ -198,5 +208,28 @@ public class ParametersDefinitionProperty extends JobProperty<AbstractProject<?,
 
     public String getUrlName() {
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ParametersDefinitionProperty that = (ParametersDefinitionProperty) o;
+        if (parameterDefinitions != null ? !this.parameterDefinitions.equals(that.parameterDefinitions)
+            : that.parameterDefinitions != null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return parameterDefinitions != null ? parameterDefinitions.hashCode() : 0;
     }
 }
