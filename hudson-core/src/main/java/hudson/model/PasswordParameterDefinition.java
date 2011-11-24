@@ -17,6 +17,8 @@
 package hudson.model;
 
 import net.sf.json.JSONObject;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.Extension;
@@ -75,5 +77,20 @@ public class PasswordParameterDefinition extends SimpleParameterDefinition {
         public String getHelpFile() {
             return "/help/parameter/string.html";
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o) && new EqualsBuilder()
+            .append(getDefaultValue(), ((PasswordParameterDefinition) o).getDefaultValue())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .appendSuper(super.hashCode())
+            .append(getDefaultValue())
+            .toHashCode();
     }
 }
