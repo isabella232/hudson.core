@@ -1,6 +1,6 @@
-<!-- **************************************************************************
+﻿<!-- **************************************************************************
 #
-# Copyright (C) 2004-2009 Oracle Corporation
+# Copyright (C) 2004-2011 Oracle Corporation
 #
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
@@ -8,7 +8,7 @@
 # http://www.eclipse.org/legal/epl-v10.html
 #
 # Contributors:
-#         Kohsuke Kawaguchi
+#         Kohsuke Kawaguchi, Anton Kozak
 #
 #************************************************************************** -->
 
@@ -35,4 +35,7 @@
   Так что если вы укажете jdk=[JDK5,JDK6], database=[mysql,postgresql,oracle], 
   container=[jetty,tomcat], тогда каждая сборка будет содержать 2x3x2=12 различных 
   подсборок.
+ <p>
+ Для этого свойства возможно использовать Проектное каскадирование. Детали доступны в <a href="http://wiki.hudson-ci.org/display/HUDSON/Project+cascading">
+ этом документе</a>.
 </div>
