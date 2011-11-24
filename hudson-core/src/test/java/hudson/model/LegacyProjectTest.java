@@ -9,7 +9,7 @@
  *
  * Contributors:
  *
- *    Nikita Levyankov
+ *    Nikita Levyankov, Anton Kozak
  *
  *******************************************************************************/
 package hudson.model;
@@ -23,6 +23,7 @@ import hudson.triggers.TimerTrigger;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import org.eclipse.hudson.api.model.IProjectProperty;
 import org.eclipse.hudson.api.model.project.property.BooleanProjectProperty;
@@ -320,5 +321,22 @@ public class LegacyProjectTest {
         trigger = (Trigger) project.getProperty(timerTriggerPropertyKey).getValue();
         assertEquals("*/10 * * * *", trigger.getSpec());
         verifyAll();
+    }
+
+    /**
+     * Tests unmarshalling FreeStyleProject configuration and checks whether assignedNode and advancedAffinityChooser
+     * properties from AbstractProject are configured.
+     *
+     * @throws java.io.IOException if any
+     */
+    @Test
+    public void testConvertLegacyNodePropertes() throws IOException {
+        AbstractProject project = (AbstractProject) Items.getConfigFile(config).read();
+        project.setAllowSave(false);
+        project.initProjectProperties();
+        assertNull(project.getProperty(AbstractProject.APPOINTED_NODE_PROPERTY_NAME));
+        project.convertAppointedNode();
+        assertNotNull(project.getProperty(AbstractProject.APPOINTED_NODE_PROPERTY_NAME));
+        assertTrue(project.isAdvancedAffinityChooser());
     }
 }
