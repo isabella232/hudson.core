@@ -16,6 +16,7 @@
 package org.eclipse.hudson.api.model.project.property;
 
 import hudson.matrix.AxisList;
+import org.apache.commons.lang3.ObjectUtils;
 import org.eclipse.hudson.api.model.IJob;
 
 /**

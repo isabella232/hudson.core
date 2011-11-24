@@ -381,9 +381,12 @@ public class ProjectPropertyTest {
         assertFalse(property.allowOverrideValue(null, null));
         assertTrue(property.allowOverrideValue(new AxisList(), null));
         assertTrue(property.allowOverrideValue(null, new AxisList()));
-        assertTrue(property.allowOverrideValue(new AxisList().add(new Axis("DB", "mysql")), new AxisList()));
+        assertTrue(property.allowOverrideValue(new AxisList(new Axis("DB", "mysql")), new AxisList()));
+        assertTrue(property.allowOverrideValue(new AxisList(new Axis("DB", "mysql")),
+            new AxisList(new Axis("DB", "mysql", "mssql"))));
+        assertTrue(property.allowOverrideValue(new AxisList(new Axis("DB", "mysql")),
+            new AxisList(new Axis("DB", "mssql"))));
     }
-
     @Test
     public void testSCMProjectPropertyAllowOverrideValue() {
         BaseProjectProperty property = new SCMProjectProperty(project);
