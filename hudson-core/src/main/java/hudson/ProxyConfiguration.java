@@ -129,7 +129,7 @@ public final class ProxyConfiguration implements Saveable {
          
         
         if(proxyConfig == null){
-            return url.openConnection(Proxy.NO_PROXY);
+            return url.openConnection();
         }
         
         if (proxyConfig.noProxyFor != null){
