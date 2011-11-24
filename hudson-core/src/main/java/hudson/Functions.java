@@ -1372,6 +1372,21 @@ public class Functions {
     }
 
     /**
+     * Recursively unlink specified project from cascading hierarchy.
+     *
+     * @param cascadingProject cascading project to start from.
+     * @param projectToUnlink project that should be unlinked.
+     */
+    public static void unlinkCascadingProject(Job cascadingProject, String projectToUnlink) {
+        if (null != cascadingProject && null != projectToUnlink) {
+            cascadingProject.removeCascadingChild(projectToUnlink);
+            if (cascadingProject.hasCascadingProject()) {
+                unlinkCascadingProject(cascadingProject.getCascadingProject(), projectToUnlink);
+            }
+        }
+    }
+
+    /**
      * Links cascading project to children project. Method updates all parent cascading projects starting
      * from the specified cascadingProject.
      *
@@ -1381,12 +1396,10 @@ public class Functions {
     @SuppressWarnings("unchecked")
     public static void linkCascadingProjectsToChild(Job cascadingProject, String childProjectName){
         if(cascadingProject != null){
-            cascadingProject.addCascadingChildren(childProjectName);
-            if(cascadingProject.getCascadingProjectName() !=null){
-                linkCascadingProjectsToChild(Functions.getItemByName(Hudson.getInstance().getAllItems(cascadingProject.getClass()),
-                cascadingProject.getCascadingProjectName()), childProjectName);
+            cascadingProject.addCascadingChild(childProjectName);
+            if(cascadingProject.hasCascadingProject()){
+                linkCascadingProjectsToChild(cascadingProject.getCascadingProject(), childProjectName);
             }
         }
     }
 }
-
