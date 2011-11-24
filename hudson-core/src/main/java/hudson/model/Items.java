@@ -22,6 +22,7 @@ import hudson.Extension;
 import org.eclipse.hudson.api.model.project.property.AxisListProjectProperty;
 import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
 import org.eclipse.hudson.api.model.project.property.BooleanProjectProperty;
+import org.eclipse.hudson.api.model.project.property.CopyOnWriteListProjectProperty;
 import org.eclipse.hudson.api.model.project.property.DescribableListProjectProperty;
 import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
 import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
@@ -148,10 +149,10 @@ public class Items {
         XSTREAM.alias("log-rotator-property", LogRotatorProjectProperty.class);
         XSTREAM.alias("result-property", ResultProjectProperty.class);
 
+        XSTREAM.alias("copy-write-list-property", CopyOnWriteListProjectProperty.class);
         XSTREAM.alias("axis-list-property", AxisListProjectProperty.class);
         XSTREAM.alias("describable-list-property", DescribableListProjectProperty.class);
         XSTREAM.aliasField("project-properties", Job.class, "jobProperties");
-        //TODO: think about migrating to xstream's annotations.
         XSTREAM.alias("appointed-node-property", AppointedNode.class);
     }
 }

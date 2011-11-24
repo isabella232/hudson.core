@@ -34,6 +34,11 @@ public interface IProjectProperty<T> extends Serializable {
     void setKey(String key);
 
     /**
+     * @return property key.
+     */
+    String getKey();
+
+    /**
      * Sets the job, which is owner of current property.
      *
      * @param job {@link IJob}
