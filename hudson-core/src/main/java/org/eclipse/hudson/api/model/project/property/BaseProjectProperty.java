@@ -197,7 +197,7 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
      */
     public boolean allowOverrideValue(T cascadingValue, T candidateValue) {
         return ObjectUtils.notEqual(cascadingValue, candidateValue)
-            && !EqualsBuilder.reflectionEquals(cascadingValue, candidateValue);
+            && !EqualsBuilder.reflectionEquals(cascadingValue, candidateValue, true);
     }
 
     /**

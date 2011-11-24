@@ -367,6 +367,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         convertQuietPeriodProperty();
         convertScmCheckoutRetryCountProperty();
         convertJDKProperty();
+        convertScmProperty();
         convertTriggerProperties();
         convertAppointedNode();
     }
