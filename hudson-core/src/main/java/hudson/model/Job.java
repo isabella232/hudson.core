@@ -351,6 +351,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         cascadingChildrenNames.remove(cascadingChildName);
     }
 
+    public boolean hasCascadingChild(String cascadingChildName) {
+        return null != cascadingChildName && cascadingChildrenNames.contains(cascadingChildName);
+    }
+
     /**
      * Remove cascading child project name.
      *
@@ -800,7 +804,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     @Override
     protected void performBeforeItemRenaming(String oldName, String newName){
-        Functions.renameCascadingChildLinks(this, oldName, newName);
+        Functions.renameCascadingChildLinks(cascadingProject, oldName, newName);
         Functions.renameCascadingParentLinks(oldName, newName);
     }
 
