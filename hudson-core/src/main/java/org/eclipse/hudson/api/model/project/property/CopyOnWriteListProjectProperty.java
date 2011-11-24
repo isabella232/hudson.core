@@ -18,7 +18,7 @@ import hudson.util.CopyOnWriteList;
 import org.eclipse.hudson.api.model.IJob;
 
 /**
- * Project property for CopyOnWriteList
+ * Project property for {@link CopyOnWriteList}
  * <p/>
  * Date: 11/1/11
  *
@@ -39,7 +39,7 @@ public class CopyOnWriteListProjectProperty extends BaseProjectProperty<CopyOnWr
 
     @Override
     protected boolean returnOriginalValue() {
-        return isOverridden() || (null != getOriginalValue() && !getOriginalValue().isEmpty());
+        return isOverridden() || !getOriginalValue().isEmpty();
     }
 
     @Override

@@ -483,13 +483,13 @@ public class CascadingUtil {
         //Iterate through cascading children and recursively update property for each child.
         if (null != cascadingChildrenNames) {
             for (String childName : cascadingChildrenNames) {
-                AbstractProject childJob = (AbstractProject) Hudson.getInstance().getItem(childName);
+                Job childJob = (Job) Hudson.getInstance().getItem(childName);
                 //Check only direct children in order to avoid deep checking for properties overridden properties.
                 if (null != childJob && StringUtils.equals(job.getName(), childJob.getCascadingProjectName())) {
                     CopyOnWriteListProjectProperty childProperty = getCopyOnWriteListProjectProperty(childJob, key);
                     //If child value is equal to parent - mark this value as unmodified.
-                    if (!projectProperty.allowOverrideValue(childProperty.getValue(), pdProperties)) {
-                        projectProperty.setOverridden(false);
+                    if (!childProperty.allowOverrideValue(childProperty.getValue(), pdProperties)) {
+                        childProperty.setOverridden(false);
                     } else if (!childProperty.isOverridden()) {
                         //If child property was not overridden, update this property and cascading children if any.
                         setParameterDefinitionProperties(childJob, key, parameterDefinitionProperties);
