@@ -351,6 +351,17 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         cascadingChildrenNames.remove(cascadingChildName);
     }
 
+    /**
+     * Remove cascading child project name.
+     *
+     * @param oldChildName old child project name.
+     * @param newChildName new child project name.
+     */
+    public synchronized void renameCascadingChildName(String oldChildName, String newChildName) {
+        cascadingChildrenNames.remove(oldChildName);
+        cascadingChildrenNames.add(newChildName);
+    }
+
     @Override
     public synchronized void save() throws IOException {
         if (null == allowSave) {
@@ -785,10 +796,19 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     };
 
     /**
+     * @inheritDoc
+     */
+    @Override
+    protected void performBeforeItemRenaming(String oldName, String newName){
+        Functions.renameCascadingChildLinks(this, oldName, newName);
+        Functions.renameCascadingParentLinks(oldName, newName);
+    }
+
+    /**
      * Renames a job.
      */
     @Override
-    public void renameTo(String newName) throws IOException {
+    public synchronized void renameTo(String newName) throws IOException {
         super.renameTo(newName);
     }
 
@@ -1466,6 +1486,16 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     protected void setCreationTime(long creationTime) {
         this.creationTime = creationTime;
+    }
+
+    /**
+     * Renames cascading project name. For the properties prcessing and children links updating
+     * please use {@link #setCascadingProjectName} instead.
+     *
+     * @param cascadingProjectName new project name.
+     */
+    public void renameCascadingProjectNameTo(String cascadingProjectName) {
+        this.cascadingProjectName = cascadingProjectName;
     }
 
     /**
