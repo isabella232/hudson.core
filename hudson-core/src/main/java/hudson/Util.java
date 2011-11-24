@@ -25,7 +25,6 @@ import hudson.util.VariableResolver;
 import hudson.Proc.LocalProc;
 import hudson.util.jna.NativeAccessException;
 
-import hudson.util.jna.NativeFunction;
 import hudson.util.jna.NativeUtils;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;

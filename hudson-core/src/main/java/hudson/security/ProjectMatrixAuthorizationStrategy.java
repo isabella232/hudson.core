@@ -19,7 +19,6 @@ package hudson.security;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.model.Job;
-import hudson.model.TopLevelItem;
 import hudson.util.RobustReflectionConverter;
 import hudson.Extension;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;

@@ -20,7 +20,6 @@ import hudson.tasks.Builder;
 import hudson.tasks.Publisher;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.hudson.api.model.IAbstractProject;
 
 /**
  * Project interface

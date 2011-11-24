@@ -20,7 +20,6 @@ import hudson.model.AbstractBuild;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 
 /**
  * {@link ChangeLogSet} that's empty.

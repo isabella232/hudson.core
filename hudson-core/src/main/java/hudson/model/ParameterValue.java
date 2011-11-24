@@ -18,7 +18,6 @@ package hudson.model;
 
 import hudson.EnvVars;
 import hudson.Util;
-import hudson.slaves.OfflineCause;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.Builder;
 import hudson.util.VariableResolver;
@@ -26,16 +25,13 @@ import hudson.util.VariableResolver;
 import java.io.Serializable;
 import java.util.Map;
 
-import net.sf.json.JSONObject;
-
-import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
 /**
  * A value for a parameter in a build.
  *
- * Created by {@link ParameterDefinition#createValue(StaplerRequest, JSONObject)} for
+ * Created by {@link ParameterDefinition#createValue(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject)} for
  * a particular build (although this 'owner' build object is passed in for every method
  * call as a parameter so that the parameter won't have to persist it.)
  *

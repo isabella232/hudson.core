@@ -17,7 +17,6 @@ package org.eclipse.hudson.api.model.project.property;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.hudson.api.model.IJob;
-import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
 
 /**
  * String property for project.

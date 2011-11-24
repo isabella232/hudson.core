@@ -29,14 +29,9 @@ import hudson.util.DescribableListUtil;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
 import org.eclipse.hudson.api.model.IProject;
-import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
-import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 

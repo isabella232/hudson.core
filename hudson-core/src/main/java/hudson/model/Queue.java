@@ -83,7 +83,6 @@ import java.util.logging.Logger;
 import javax.management.timer.Timer;
 import javax.servlet.ServletException;
 
-import org.springframework.security.AccessDeniedException;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.HttpResponses;
 import org.kohsuke.stapler.export.Exported;
@@ -1039,7 +1038,7 @@ public class Queue extends ResourceController implements Saveable {
          * Checks the permission to see if the current user can abort this executable.
          * Returns normally from this method if it's OK.
          *
-         * @throws AccessDeniedException if the permission is not granted.
+         * @throws org.acegisecurity.AccessDeniedException if the permission is not granted.
          */
         void checkAbortPermission();
 

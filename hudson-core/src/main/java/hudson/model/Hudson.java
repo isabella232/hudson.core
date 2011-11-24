@@ -17,8 +17,6 @@
 package hudson.model;
 
 import antlr.ANTLRException;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.thoughtworks.xstream.XStream;
 import hudson.BulkChange;
 import hudson.DNSMultiCast;
@@ -178,8 +176,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import static hudson.init.InitMilestone.*;
 import hudson.stapler.WebAppController;
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.*;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -223,7 +220,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
-import static java.util.logging.Level.SEVERE;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -606,7 +602,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             try {
                 proxy = ProxyConfiguration.load();
             } catch (IOException e) {
-                LOGGER.log(SEVERE, "Failed to load proxy configuration", e);
+                LOGGER.log(java.util.logging.Level.SEVERE, "Failed to load proxy configuration", e);
             }
 
             if (pluginManager == null) {
@@ -744,7 +740,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             }
 
             public void onTaskFailed(Task t, Throwable err, boolean fatal) {
-                LOGGER.log(SEVERE, "Failed " + t.getDisplayName(), err);
+                LOGGER.log(java.util.logging.Level.SEVERE, "Failed " + t.getDisplayName(), err);
             }
 
             public void onAttained(Milestone milestone) {
@@ -2952,11 +2948,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                     SecurityContextHolder.getContext().setAuthentication(ACL.SYSTEM);
                     reload();
                 } catch (IOException e) {
-                    LOGGER.log(SEVERE, "Failed to reload Hudson config", e);
+                    LOGGER.log(java.util.logging.Level.SEVERE, "Failed to reload Hudson config", e);
                 } catch (ReactorException e) {
-                    LOGGER.log(SEVERE, "Failed to reload Hudson config", e);
+                    LOGGER.log(java.util.logging.Level.SEVERE, "Failed to reload Hudson config", e);
                 } catch (InterruptedException e) {
-                    LOGGER.log(SEVERE, "Failed to reload Hudson config", e);
+                    LOGGER.log(java.util.logging.Level.SEVERE, "Failed to reload Hudson config", e);
                 }
             }
         }.start();

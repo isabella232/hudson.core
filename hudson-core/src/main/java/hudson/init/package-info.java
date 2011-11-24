@@ -16,4 +16,3 @@
 
 package hudson.init;
 
-import org.jvnet.hudson.reactor.Task;

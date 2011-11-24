@@ -22,7 +22,6 @@ import hudson.model.Computer;
 import hudson.model.Hudson;
 import hudson.remoting.Callable;
 import hudson.util.jna.NativeAccessException;
-import hudson.util.jna.NativeFunction;
 import hudson.util.jna.NativeUtils;
 import hudson.util.jna.NativeSystemMemory;
 import net.sf.json.JSONObject;
