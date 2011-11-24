@@ -1,0 +1,38 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2011 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+#
+#    Nikita Levyankov
+#
+#
+#************************************************************************** -->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+  <l:layout>
+    <st:include page="sidepanel.jelly" />
+    <l:main-panel>
+    <j:choose>
+        <j:when test="${it.cascadingChildrenNames.isEmpty()}">
+            <form method="post" action="doDelete">
+                ${%Are you sure about deleting the job?}
+                <f:submit value="${%Yes}" />
+            </form>
+        </j:when>
+        <j:otherwise>
+            <h4>${%You can't delete this job because it has cascading children:}</h4>
+            <ul>
+                <j:forEach var="job" items="${it.cascadingChildrenNames}">
+                    <li>${job}</li>
+                </j:forEach>
+            </ul>
+        </j:otherwise>
+    </j:choose>
+    </l:main-panel>
+    </l:layout>
+</j:jelly>

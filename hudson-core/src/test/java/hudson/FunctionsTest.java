@@ -16,6 +16,7 @@
 package hudson;
 
 import hudson.model.FreeStyleProject;
+import hudson.model.FreeStyleProjectMock;
 import hudson.model.Hudson;
 import hudson.model.Job;
 import hudson.model.User;
@@ -24,7 +25,6 @@ import java.util.List;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -140,4 +140,58 @@ public class FunctionsTest {
         items.add(parentProject);
         FreeStyleProject project = Functions.getItemByName(items, TEMPLATE_NAME);
         assertNotNull(project);
-    }}
+    }
+    @Test
+    public void testUnlinkProjectFromCascadingParents() {
+        //Prepare data
+        FreeStyleProject project1 = new FreeStyleProjectMock("project1");
+        FreeStyleProjectMock child1 = new FreeStyleProjectMock("child1");
+        child1.setCascadingProject(project1);
+        String cascadingName = "newCascadingProject";
+        Functions.linkCascadingProjectsToChild(child1, cascadingName);
+
+        //Can't unlink from null project
+        assertFalse(Functions.unlinkProjectFromCascadingParents(null, cascadingName));
+        //Can't unlink null cascading name
+        assertFalse(Functions.unlinkProjectFromCascadingParents(project1, null));
+
+        //Verify whether cascadingName is present in parent and child
+        assertTrue(project1.getCascadingChildrenNames().contains(cascadingName));
+        assertTrue(child1.getCascadingChildrenNames().contains(cascadingName));
+        boolean result = Functions.unlinkProjectFromCascadingParents(child1, cascadingName);
+        assertTrue(result);
+        //Name should disappear from hierarchy.
+        assertFalse(project1.getCascadingChildrenNames().contains(cascadingName));
+        assertFalse(child1.getCascadingChildrenNames().contains(cascadingName));
+
+        Functions.linkCascadingProjectsToChild(project1, cascadingName);
+        assertTrue(project1.getCascadingChildrenNames().contains(cascadingName));
+        result = Functions.unlinkProjectFromCascadingParents(child1, cascadingName);
+        assertTrue(result);
+        assertFalse(project1.getCascadingChildrenNames().contains(cascadingName));
+
+    }
+
+    @Test
+    public void testLinkCascadingProjectsToChild() {
+        FreeStyleProject project1 = new FreeStyleProjectMock("project1");
+        FreeStyleProjectMock child1 = new FreeStyleProjectMock("child1");
+        child1.setCascadingProject(project1);
+        String cascadingName = "newCascadingProject";
+        Functions.linkCascadingProjectsToChild(null, cascadingName);
+        assertFalse(project1.getCascadingChildrenNames().contains(cascadingName));
+        assertFalse(child1.getCascadingChildrenNames().contains(cascadingName));
+
+        Functions.linkCascadingProjectsToChild(project1, cascadingName);
+        assertTrue(project1.getCascadingChildrenNames().contains(cascadingName));
+
+        project1 = new FreeStyleProjectMock("project1");
+        child1 = new FreeStyleProjectMock("child1");
+        child1.setCascadingProject(project1);
+        Functions.linkCascadingProjectsToChild(child1, cascadingName);
+        //Name should be included to all cascading parents up-hierarchy.
+        assertTrue(project1.getCascadingChildrenNames().contains(cascadingName));
+        assertTrue(child1.getCascadingChildrenNames().contains(cascadingName));
+    }
+}
+

@@ -1376,14 +1376,17 @@ public class Functions {
      *
      * @param cascadingProject cascading project to start from.
      * @param projectToUnlink project that should be unlinked.
+     * @return true if project was unlinked, false - if cascadingProject or projectToUnlink is Null
      */
-    public static void unlinkCascadingProject(Job cascadingProject, String projectToUnlink) {
+    public static boolean unlinkProjectFromCascadingParents(Job cascadingProject, String projectToUnlink) {
         if (null != cascadingProject && null != projectToUnlink) {
             cascadingProject.removeCascadingChild(projectToUnlink);
             if (cascadingProject.hasCascadingProject()) {
-                unlinkCascadingProject(cascadingProject.getCascadingProject(), projectToUnlink);
+                unlinkProjectFromCascadingParents(cascadingProject.getCascadingProject(), projectToUnlink);
             }
+            return true;
         }
+        return false;
     }
 
     /**
@@ -1393,7 +1396,6 @@ public class Functions {
      * @param cascadingProject cascadingProject.
      * @param childProjectName the name of child project name.
      */
-    @SuppressWarnings("unchecked")
     public static void linkCascadingProjectsToChild(Job cascadingProject, String childProjectName){
         if(cascadingProject != null){
             cascadingProject.addCascadingChild(childProjectName);
