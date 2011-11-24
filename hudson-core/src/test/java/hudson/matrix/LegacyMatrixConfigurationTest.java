@@ -26,6 +26,7 @@ import hudson.model.Result;
 import hudson.model.TransientProjectActionFactory;
 import hudson.model.listeners.SaveableListener;
 import hudson.tasks.LogRotator;
+import hudson.util.CascadingUtil;
 import java.io.File;
 import java.net.URISyntaxException;
 import org.junit.Before;
@@ -74,8 +75,7 @@ public class LegacyMatrixConfigurationTest {
         expect(hudson.getExtensionList(TransientProjectActionFactory.class)).andReturn(actionList).anyTimes();
         ExtensionList<SaveableListener> saveableListenerList = ExtensionList.create(hudson, SaveableListener.class);
         expect(hudson.getExtensionList(SaveableListener.class)).andReturn(saveableListenerList).anyTimes();
-        expect(hudson.getAllItems(MatrixConfiguration.class)).andReturn(Lists.<MatrixConfiguration>newArrayList())
-            .anyTimes();
+        expect(hudson.getAllItems(MatrixConfiguration.class)).andReturn(Lists.<MatrixConfiguration>newArrayList()).anyTimes();
         mockStatic(Hudson.class);
         expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
         replayAll();
@@ -85,18 +85,20 @@ public class LegacyMatrixConfigurationTest {
         project.buildProjectProperties();
         verifyAll();
         assertEquals("/tmp/1", project.getProperty(AbstractProject.CUSTOM_WORKSPACE_PROPERTY_NAME).getValue());
-        assertEquals(new Integer(7), project.getIntegerProperty(AbstractProject.QUIET_PERIOD_PROPERTY_NAME).getValue());
+        assertEquals(new Integer(7), CascadingUtil.getIntegerProjectProperty(project,
+            AbstractProject.QUIET_PERIOD_PROPERTY_NAME).getValue());
 
-        assertTrue(project.getBooleanProperty(MatrixProject.RUN_SEQUENTIALLY_PROPERTY_NAME).getValue());
+        assertTrue(CascadingUtil.getBooleanProjectProperty(project,
+            MatrixProject.RUN_SEQUENTIALLY_PROPERTY_NAME).getValue());
         assertEquals("!(label==\"win\" && DB==\"oracle\")",
             project.getProperty(MatrixProject.COMBINATION_FILTER_PROPERTY_NAME).getValue());
         assertEquals("label==\"unix\" && DB==\"mysql\"",
             project.getProperty(MatrixProject.TOUCH_STONE_COMBINATION_FILTER_PROPERTY_NAME).getValue());
         assertEquals(Result.SUCCESS,
-            project.getResultProperty(MatrixProject.TOUCH_STONE_RESULT_CONDITION_PROPERTY_NAME).getValue());
+            CascadingUtil.getResultProjectProperty(project, MatrixProject.TOUCH_STONE_RESULT_CONDITION_PROPERTY_NAME).getValue());
         assertEquals(new LogRotator(7, 7, 7, 7),
-            project.getLogRotatorProjectProperty(MatrixProject.LOG_ROTATOR_PROPERTY_NAME).getValue());
-        AxisList axes = project.getAxesListProjectProperty(MatrixProject.AXES_PROPERTY_NAME).getValue();
+            CascadingUtil.getLogRotatorProjectProperty(project, MatrixProject.LOG_ROTATOR_PROPERTY_NAME).getValue());
+        AxisList axes = CascadingUtil.getAxesListProjectProperty(project, MatrixProject.AXES_PROPERTY_NAME).getValue();
         assertEquals(2, axes.size());
         assertEquals("DB", axes.get(0).getName());
         assertEquals(2, axes.get(0).getValues().size());

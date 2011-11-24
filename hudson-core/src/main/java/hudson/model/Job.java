@@ -261,7 +261,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Returns job property by specified key.
      *
      * @param key key.
-     * @return {@link org.hudsonci.api.model.IProjectProperty} instance or null.
+     * @return {@link org.eclipse.hudson.api.model.IProjectProperty} instance or null.
      */
     public IProjectProperty getProperty(String key){
         return CascadingUtil.getProjectProperty(this, key);
@@ -272,46 +272,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     public IProjectProperty getProperty(String key, Class clazz) {
         return CascadingUtil.getProjectProperty(this, key, clazz);
-    }
-
-    public StringProjectProperty getStringProperty(String key) {
-        return CascadingUtil.getStringProjectProperty(this, key);
-    }
-
-    public BaseProjectProperty getBaseProjectProperty(String key) {
-        return CascadingUtil.getBaseProjectProperty(this, key);
-    }
-
-    public ExternalProjectProperty getExternalProjectProperty(String key) {
-        return CascadingUtil.getExternalProjectProperty(this, key);
-    }
-
-    public ResultProjectProperty getResultProperty(String key) {
-        return CascadingUtil.getResultProjectProperty(this, key);
-    }
-
-    public BooleanProjectProperty getBooleanProperty(String key) {
-        return CascadingUtil.getBooleanProjectProperty(this, key);
-    }
-
-    public IntegerProjectProperty getIntegerProperty(String key) {
-        return CascadingUtil.getIntegerProjectProperty(this, key);
-    }
-
-    public LogRotatorProjectProperty getLogRotatorProjectProperty(String key) {
-        return CascadingUtil.getLogRotatorProjectProperty(this, key);
-    }
-
-    public DescribableListProjectProperty getDescribableListProjectProperty(String key) {
-        return CascadingUtil.getDescribableListProjectProperty(this, key);
-    }
-
-    public AxisListProjectProperty getAxesListProjectProperty(String key) {
-        return CascadingUtil.getAxesListProjectProperty(this, key);
-    }
-
-    public SCMProjectProperty getScmProjectProperty(String key) {
-        return CascadingUtil.getScmProjectProperty(this, key);
     }
 
     /**
@@ -513,7 +473,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 // should we block until the build is cancelled?
             }
         }
-        Functions.unlinkProjectFromCascadingParents(getCascadingProject(), name);
+        CascadingUtil.unlinkProjectFromCascadingParents(getCascadingProject(), name);
         super.performDelete();
     }
 
@@ -795,8 +755,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     @Override
     protected void performBeforeItemRenaming(String oldName, String newName){
-        Functions.renameCascadingChildLinks(cascadingProject, oldName, newName);
-        Functions.renameCascadingParentLinks(oldName, newName);
+        CascadingUtil.renameCascadingChildLinks(cascadingProject, oldName, newName);
+        CascadingUtil.renameCascadingParentLinks(oldName, newName);
     }
 
     /**
@@ -1532,11 +1492,11 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         if (StringUtils.isBlank(cascadingProjectName)) {
             clearCascadingProject();
         } else if (!StringUtils.equalsIgnoreCase(this.cascadingProjectName, cascadingProjectName)) {
-            Functions.unlinkProjectFromCascadingParents(cascadingProject, name);
+            CascadingUtil.unlinkProjectFromCascadingParents(cascadingProject, name);
             this.cascadingProjectName = cascadingProjectName;
             this.cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
                 cascadingProjectName);
-            Functions.linkCascadingProjectsToChild(cascadingProject, name);
+            CascadingUtil.linkCascadingProjectsToChild(cascadingProject, name);
             for (IProjectProperty property : jobProperties.values()) {
                 if (property instanceof ExternalProjectProperty) {
                     property.setOverridden(((ExternalProjectProperty) property).isModified());
@@ -1574,7 +1534,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Remove cascading project data and mark all project properties as non-overridden
      */
     private void clearCascadingProject() {
-        Functions.unlinkProjectFromCascadingParents(cascadingProject, name);
+        CascadingUtil.unlinkProjectFromCascadingParents(cascadingProject, name);
         this.cascadingProject = null;
         this.cascadingProjectName = null;
         for (IProjectProperty property : jobProperties.values()) {
