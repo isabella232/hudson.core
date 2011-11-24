@@ -18,6 +18,7 @@
 package hudson.model;
 
 import hudson.Functions;
+import java.util.concurrent.CopyOnWriteArraySet;
 import org.eclipse.hudson.api.model.project.property.AxisListProjectProperty;
 import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
 import org.eclipse.hudson.api.model.project.property.BooleanProjectProperty;
@@ -179,6 +180,12 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     private String cascadingProjectName;
 
     /**
+     * The list with the names of children cascading projects. Required to avoid cyclic references and
+     * to prohibition parent project "delete" action in case it has cascading children projects.
+     */
+    private Set<String> cascadingChildrenNames = new CopyOnWriteArraySet<String>();
+
+    /**
      * Selected cascadingProject for this job.
      */
     protected transient JobT cascadingProject;
@@ -316,6 +323,33 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         return (SCMProjectProperty) getProperty(key, SCMProjectProperty.class);
     }
 
+    /**
+     * Returns list of cascading children project names.
+     *
+     * @return list of cascading children project names.
+     */
+    public Set<String> getCascadingChildrenNames() {
+        return cascadingChildrenNames;
+    }
+
+    /**
+     * Adds cascading child project name.
+     *
+     * @param cascadingChildrenName cascading children project name.
+     */
+    public void addCascadingChildren(String cascadingChildrenName) {
+        cascadingChildrenNames.add(cascadingChildrenName);
+    }
+
+    /**
+     * Remove cascading child project name.
+     *
+     * @param cascadingChildrenName cascading children project name.
+     */
+    public void removeCascadingChildren(String cascadingChildrenName) {
+        cascadingChildrenNames.remove(cascadingChildrenName);
+    }
+
     @Override
     public synchronized void save() throws IOException {
         if (null == allowSave) {
@@ -359,6 +393,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         for (JobProperty p : properties)
             p.setOwner(this);
 
+        if(cascadingChildrenNames == null){
+             cascadingChildrenNames = new CopyOnWriteArraySet<String>();
+        }
         buildProjectProperties();
     }
 
@@ -1471,6 +1508,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             this.cascadingProjectName = cascadingProjectName;
             this.cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
                 cascadingProjectName);
+            Functions.linkCascadingProjectsToChild(cascadingProject, name);
             for (IProjectProperty property : jobProperties.values()) {
                 if (property instanceof ExternalProjectProperty) {
                     property.setOverridden(((ExternalProjectProperty) property).isModified());
