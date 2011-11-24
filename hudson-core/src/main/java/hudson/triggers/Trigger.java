@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2011 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  *
  * Contributors: 
 *
-*    Kohsuke Kawaguchi, Brian Westrich, Jean-Baptiste Quenot, Stephen Connolly, Tom Huybrechts
+*    Kohsuke Kawaguchi, Brian Westrich, Jean-Baptiste Quenot, Stephen Connolly, Tom Huybrechts, Nikita Levyankov
  *     
  *
  *******************************************************************************/ 
@@ -304,5 +304,28 @@ public abstract class Trigger<J extends Item> implements Describable<Trigger<?>>
             r.add(t);
         }
         return r;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Trigger trigger = (Trigger) o;
+
+        if (spec != null ? !spec.equals(trigger.spec) : trigger.spec != null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return spec != null ? spec.hashCode() : 0;
     }
 }
