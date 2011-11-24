@@ -14,6 +14,8 @@
 
 package hudson.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.export.Exported;
@@ -93,6 +95,21 @@ public class ChoiceParameterDefinition extends SimpleParameterDefinition {
         public String getHelpFile() {
             return "/help/parameter/choice.html";
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o) && new EqualsBuilder()
+            .append(getChoices(), ((ChoiceParameterDefinition) o).getChoices())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .appendSuper(super.hashCode())
+            .append(getChoices())
+            .toHashCode();
     }
 
 }
