@@ -1434,7 +1434,7 @@ public class Functions {
     }
 
     /**
-     * Updates the name of the project in the in all children cascading references.
+     * Updates the name of the project in all children cascading references.
      * If this project uses some cascading parent, the name of this project will be renamed in the cascading children
      * collection of the cascading parent project.
      *
@@ -1453,7 +1453,7 @@ public class Functions {
     }
 
     /**
-     * Updates the name of the project in the in all parent cascading references.
+     * Updates the name of the project in all parent cascading references.
      * If this project is used as cascading parent, it's name will be renamed in all children projects.
      *
      * @param oldName old project name.

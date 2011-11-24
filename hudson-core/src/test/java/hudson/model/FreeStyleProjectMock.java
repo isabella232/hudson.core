@@ -26,6 +26,13 @@ import org.eclipse.hudson.api.model.IProjectProperty;
  */
 public class FreeStyleProjectMock extends FreeStyleProject {
 
+    //TODO find better solution
+    /**
+     * The name of the cascadingProject.
+     */
+    private String cascadingProjectName;
+
+
     public FreeStyleProjectMock(String name) {
         super((ItemGroup) null, name);
         setAllowSave(false);
@@ -42,6 +49,15 @@ public class FreeStyleProjectMock extends FreeStyleProject {
      */
     public void setCascadingProject(FreeStyleProject cascadingProject) {
         this.cascadingProject = cascadingProject;
+        this.cascadingProjectName = cascadingProject != null ? cascadingProject.getName() : null;
+    }
+
+    public String getCascadingProjectName() {
+        return cascadingProjectName;
+    }
+
+    public void renameCascadingProjectNameTo(String cascadingProjectName) {
+        this.cascadingProjectName = cascadingProjectName;
     }
 
     /**
