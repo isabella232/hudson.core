@@ -497,17 +497,28 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
 
     /**
      * Sets the assigned label.
+     * @param label node label.
+     *
+     * @throws java.io.IOException exception.
      */
-    public void setAssignedLabel(Label l) throws IOException {
-        getAppointedNode().setAssignedLabel(l);
+    public void setAssignedLabel(Label label) throws IOException {
+        AppointedNode node = getAppointedNode();
+        if(node == null){
+            node = new AppointedNode();
+            setAppointedNode(node);
+        }
+        node.setAssignedLabel(label);
         save();
     }
 
     /**
      * Assigns this job to the given node. A convenience method over {@link #setAssignedLabel(Label)}.
+     *
+     * @param node node.
+     * @throws java.io.IOException exception
      */
-    public void setAssignedNode(Node l) throws IOException {
-        setAssignedLabel(l.getSelfLabel());
+    public void setAssignedNode(Node node) throws IOException {
+        setAssignedLabel(node.getSelfLabel());
     }
 
     /**
@@ -525,12 +536,17 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      * Sets whether this project is using the advanced affinity chooser UI.
      *
      * @param b true - advanced chooser, false - otherwise
+     * @throws java.io.IOException exception.
      */
     public void setAdvancedAffinityChooser(boolean b) throws IOException {
-        getAppointedNode().setAdvancedAffinityChooser(b);
+        AppointedNode node = getAppointedNode();
+        if(node == null){
+            node = new AppointedNode();
+            setAppointedNode(node);
+        }
+        node.setAdvancedAffinityChooser(b);
         save();
     }
-
     /**
      * Sets {@link AppointedNode}.
      *
