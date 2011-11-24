@@ -22,12 +22,10 @@ import org.kohsuke.stapler.export.Exported;
 import org.apache.commons.lang3.StringUtils;
 import net.sf.json.JSONObject;
 import hudson.Extension;
-import hudson.cli.CLICommand;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
-import java.io.IOException;
 
 /**
  * @author huybrechts

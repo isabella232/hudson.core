@@ -18,7 +18,6 @@ package hudson.lifecycle;
 
 import hudson.model.Hudson;
 import hudson.util.jna.NativeAccessException;
-import hudson.util.jna.NativeFunction;
 import hudson.util.jna.NativeUtils;
 import java.io.IOException;
 

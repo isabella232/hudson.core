@@ -23,7 +23,6 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.util.StreamTaskListener;
 import hudson.util.jna.NativeAccessException;
-import hudson.util.jna.NativeFunction;
 import hudson.util.jna.NativeUtils;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;

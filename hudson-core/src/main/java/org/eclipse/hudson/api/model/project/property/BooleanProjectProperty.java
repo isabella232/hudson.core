@@ -15,7 +15,6 @@
 package org.eclipse.hudson.api.model.project.property;
 
 import org.eclipse.hudson.api.model.IJob;
-import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
 
 /**
  * Represents boolean property.

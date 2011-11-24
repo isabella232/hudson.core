@@ -22,9 +22,7 @@ import hudson.util.CascadingUtil;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.hudson.api.model.IFreeStyleProject;
-import org.eclipse.hudson.api.model.project.property.StringProjectProperty;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 

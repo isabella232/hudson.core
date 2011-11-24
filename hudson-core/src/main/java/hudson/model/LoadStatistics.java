@@ -21,7 +21,6 @@ import hudson.util.ColorPalette;
 import hudson.util.graph.MultiStageTimeSeries;
 import hudson.util.graph.MultiStageTimeSeries.TimeScale;
 import hudson.util.graph.MultiStageTimeSeries.TrendChart;
-import java.awt.Color;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.export.ExportedBean;
 import org.kohsuke.stapler.export.Exported;

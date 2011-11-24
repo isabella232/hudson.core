@@ -22,19 +22,8 @@ import hudson.util.CascadingUtil;
 import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.MapUtils;
-import org.eclipse.hudson.api.model.project.property.AxisListProjectProperty;
-import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
-import org.eclipse.hudson.api.model.project.property.BooleanProjectProperty;
-import org.eclipse.hudson.api.model.project.property.DescribableListProjectProperty;
-import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
-import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
-import org.eclipse.hudson.api.model.project.property.LogRotatorProjectProperty;
-import org.eclipse.hudson.api.model.project.property.ResultProjectProperty;
-import org.eclipse.hudson.api.model.project.property.SCMProjectProperty;
-import org.eclipse.hudson.api.model.project.property.StringProjectProperty;
 import hudson.util.graph.GraphSeries;
 import hudson.widgets.Widget;
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.apache.commons.lang3.StringUtils;
@@ -99,6 +88,7 @@ import net.sf.json.JSONObject;
 
 import org.eclipse.hudson.api.model.IJob;
 import org.eclipse.hudson.api.model.IProjectProperty;
+import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -175,7 +165,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     /**
      * List of {@link UserProperty}s configured for this project.
-     * According to new implementation {@link ParametersDefinitionProperty} were moved from this collection. So, this
+     * According to new implementation {@link org.eclipse.hudson.api.model.project.property.ParametersDefinitionProperty} were moved from this collection. So, this
      * field was left protected for backward compatibility. Don't use this field directly for adding or removing
      * values. Use {@link #addProperty(JobProperty)}, {@link #removeProperty(JobProperty)},
      * {@link #removeProperty(Class)} instead.

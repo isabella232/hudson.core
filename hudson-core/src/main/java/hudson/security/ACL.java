@@ -16,7 +16,6 @@
 
 package hudson.security;
 
-import org.springframework.security.AccessDeniedException;
 import org.springframework.security.Authentication;
 import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
 import org.springframework.security.acls.sid.PrincipalSid;
@@ -37,7 +36,7 @@ public abstract class ACL {
      * <p>
      * This is just a convenience function.
      *
-     * @throws AccessDeniedException
+     * @throws org.acegisecurity.AccessDeniedException
      *      if the user doesn't have the permission.
      */
     public final void checkPermission(Permission p) {

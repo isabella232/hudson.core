@@ -33,7 +33,6 @@ import org.springframework.security.GrantedAuthority;
 import org.springframework.security.SpringSecurityException;
 import org.springframework.security.AuthenticationException;
 import org.springframework.ldap.core.ContextSource;
-import org.springframework.security.ldap.LdapDataAccessException;
 import org.springframework.security.ldap.LdapUserSearch;
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.security.providers.UsernamePasswordAuthenticationToken;

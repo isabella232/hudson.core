@@ -16,14 +16,12 @@
 
 package hudson.tasks.test;
 
-import hudson.AbortException;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.Hudson;
 import hudson.model.TaskListener;
-import hudson.tasks.Publisher;
 
 import java.io.IOException;
 
@@ -33,15 +31,15 @@ import java.io.IOException;
  * <p>
  * This extension point encapsulates the knowledge of a particular test report format and its parsing process,
  * thereby improving the pluggability of test result parsing; integration with a new test tool can be done
- * by just writing a parser, without writing a custom {@link Publisher}, and the test reports are displayed
+ * by just writing a parser, without writing a custom {@link hudson.tasks.Publisher}, and the test reports are displayed
  * with the default UI and recognized by the rest of Hudson as test reports.
  *
  * <p>
  * Most typical implementations of this class should extend from {@link DefaultTestResultParserImpl},
- * which handles a set of default error checks on user inputs. 
+ * which handles a set of default error checks on user inputs.
  *
  * <p>
- * Parsers are stateless, and the {@link #parse(String, AbstractBuild, Launcher, TaskListener)} method
+ * Parsers are stateless, and the {@link #parse(String, hudson.model.AbstractBuild, hudson.Launcher, hudson.model.TaskListener)} method
  * can be concurrently invoked by multiple threads for different builds.
  *
  * @since 1.343
