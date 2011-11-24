@@ -401,39 +401,40 @@ public class CascadingUtil {
     }
 
     /**
-        * Sets trigger for job and all its children if necessary.
-        *
-        * @param job parentJob
-        * @param descriptor trigger descriptor
-        * @param key trigger property key
-        * @param req stapler request
-        * @param json submited json
-        * @throws hudson.model.Descriptor.FormException if incorrect parameters
-        */
-       @SuppressWarnings("unchecked")
-       public static void setChildrenTrigger(Job job, TriggerDescriptor descriptor, String key, StaplerRequest req,
-                                         JSONObject json) throws Descriptor.FormException {
-           TriggerProjectProperty<Trigger<?>> property = CascadingUtil.getTriggerProjectProperty(job, key);
-           if (property.getValue() != null) {
-               property.getValue().stop();
-           }
-           Trigger trigger = null;
-           if (json.has(key)) {
-               trigger = descriptor.newInstance(req, json.getJSONObject(key));
-               trigger.start(job, true);
-           }
-           property.setValue(trigger);
-           Set<String> cascadingChildrenNames = job.getCascadingChildrenNames();
-           for (String childName : cascadingChildrenNames) {
-               Job childJob = (Job)Hudson.getInstance().getItem(childName);
-               if (StringUtils.equals(job.getName(), childJob.getCascadingProjectName())) {
-                   TriggerProjectProperty childProperty = CascadingUtil.getTriggerProjectProperty(childJob, key);
-                   if (!childProperty.isOverridden()) {
-                       setChildrenTrigger(childJob, descriptor, key, req, json);
-                   } else if (!childProperty.allowOverrideValue(trigger, childProperty.getValue())) {
-                       childProperty.setOverridden(false);
-                   }
-               }
-           }
-       }
-   }
+     * Sets trigger for job and all its children if necessary.
+     *
+     * @param job parentJob
+     * @param descriptor trigger descriptor
+     * @param key trigger property key
+     * @param req stapler request
+     * @param json submited json
+     * @throws hudson.model.Descriptor.FormException
+     *          if incorrect parameters
+     */
+    @SuppressWarnings("unchecked")
+    public static void setChildrenTrigger(Job job, TriggerDescriptor descriptor, String key, StaplerRequest req,
+                                          JSONObject json) throws Descriptor.FormException {
+        TriggerProjectProperty property = CascadingUtil.getTriggerProjectProperty(job, key);
+        if (property.getValue() != null) {
+            property.getValue().stop();
+        }
+        Trigger trigger = null;
+        if (json.has(key)) {
+            trigger = descriptor.newInstance(req, json.getJSONObject(key));
+            trigger.start(job, true);
+        }
+        property.setValue(trigger);
+        Set<String> cascadingChildrenNames = job.getCascadingChildrenNames();
+        for (String childName : cascadingChildrenNames) {
+            Job childJob = (Job) Hudson.getInstance().getItem(childName);
+            if (StringUtils.equals(job.getName(), childJob.getCascadingProjectName())) {
+                TriggerProjectProperty childProperty = CascadingUtil.getTriggerProjectProperty(childJob, key);
+                if (!childProperty.isOverridden()) {
+                    setChildrenTrigger(childJob, descriptor, key, req, json);
+                } else if (!childProperty.allowOverrideValue(trigger, childProperty.getValue())) {
+                    childProperty.setOverridden(false);
+                }
+            }
+        }
+    }
+}
