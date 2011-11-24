@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.StringTokenizer;
+import org.eclipse.hudson.api.model.project.property.TriggerProjectProperty;
 
 /**
  * Convenience methods related to {@link Item}.
@@ -140,6 +141,7 @@ public class Items {
         //aliases for project properties.
         XSTREAM.alias("base-property", BaseProjectProperty.class);
         XSTREAM.alias("external-property", ExternalProjectProperty.class);
+        XSTREAM.alias("trigger-property", TriggerProjectProperty.class);
         XSTREAM.alias("integer-property", IntegerProjectProperty.class);
         XSTREAM.alias("boolean-property", BooleanProjectProperty.class);
         XSTREAM.alias("string-property", StringProjectProperty.class);

@@ -15,6 +15,7 @@
 
 package org.eclipse.hudson.api.model.project.property;
 
+import antlr.ANTLRException;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.matrix.Axis;
@@ -32,6 +33,8 @@ import hudson.scm.SCMRevisionState;
 import hudson.tasks.JavadocArchiver;
 import hudson.tasks.LogRotator;
 import hudson.tasks.Shell;
+import hudson.triggers.TimerTrigger;
+import hudson.triggers.Trigger;
 import hudson.util.DescribableList;
 import java.io.File;
 import java.io.IOException;
@@ -156,6 +159,16 @@ public class ProjectPropertyTest {
         try {
             new ExternalProjectProperty(null);
             fail("Null should be handled by ExternalProjectProperty constructor.");
+        } catch (Exception e) {
+            assertEquals(BaseProjectProperty.INVALID_JOB_EXCEPTION, e.getMessage());
+        }
+    }
+
+    @Test
+    public void testTriggerProjectPropertyConstructor() {
+        try {
+            new TriggerProjectProperty(null);
+            fail("Null should be handled by TriggerProjectProperty constructor.");
         } catch (Exception e) {
             assertEquals(BaseProjectProperty.INVALID_JOB_EXCEPTION, e.getMessage());
         }
@@ -687,6 +700,28 @@ public class ProjectPropertyTest {
         assertTrue(property.isModified());
         assertTrue(property.updateOriginalValue(new Object(), new Object()));
 
+    }
+
+    /**
+     * Test 1updateOriginalValue method for TriggerProjectProperty.
+     *
+     * @throws ANTLRException if any
+     */
+    @Test
+    public void testTriggerProjectPropertyUpdateOriginalValue() throws ANTLRException {
+        TriggerProjectProperty property = new TriggerProjectProperty(project);
+        Trigger originalTrigger = new TimerTrigger("* * * * *");
+        Trigger cascadingTrigger = new TimerTrigger("* * * * *");
+        property.updateOriginalValue(originalTrigger, cascadingTrigger);
+        //Property isn't overridden because of values equal.
+        assertFalse(property.isOverridden());
+        //If trigger property value equals to cascading be sure that sets original value instead of cascading.
+        assertEquals(property.getOriginalValue(), originalTrigger);
+
+        cascadingTrigger= new TimerTrigger("*/2 * * * *");
+        property.updateOriginalValue(originalTrigger, cascadingTrigger);
+        assertTrue(property.isOverridden());
+        assertEquals(property.getOriginalValue(), originalTrigger);
     }
 
     private class FakeSCM extends SCM {
