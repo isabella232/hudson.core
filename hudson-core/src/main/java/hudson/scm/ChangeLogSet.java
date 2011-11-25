@@ -16,6 +16,7 @@
 
 package hudson.scm;
 
+import com.google.common.collect.Iterators;
 import hudson.MarkupText;
 import hudson.Util;
 import hudson.model.AbstractBuild;
@@ -24,7 +25,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.iterators.EmptyIterator;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
@@ -73,7 +73,7 @@ public abstract class ChangeLogSet<T extends ChangeLogSet.Entry> implements Iter
      */
     @SuppressWarnings("unchecked")
     public Iterator<T> iterator() {
-        return isEmptySet()? EmptyIterator.INSTANCE: getLogs().iterator();
+        return isEmptySet()? Iterators.<T>emptyIterator(): getLogs().iterator();
     }
 
     /**
