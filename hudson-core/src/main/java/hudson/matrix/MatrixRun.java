@@ -147,7 +147,7 @@ public class MatrixRun extends Build<MatrixConfiguration,MatrixRun> {
             if(useShortWorkspaceName) {
                 subtree = getParent().getDigestName(); 
             } else {
-                subtree = getParent().getCombination().toString('/','/');
+                subtree = getParent().getCombination().toString('/','/', true);
             }
             
             String customWorkspace = getParent().getParent().getCustomWorkspace();
