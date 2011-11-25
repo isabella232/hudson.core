@@ -50,7 +50,7 @@ public class CascadingUtilTest {
 
     @Test
     @PrepareForTest(Hudson.class)
-    public void testUnlinkProjectFromCascadingParents() {
+    public void testUnlinkProjectFromCascadingParents() throws Exception {
         //Prepare data
         FreeStyleProject project1 = new FreeStyleProjectMock("project1");
         FreeStyleProjectMock child1 = new FreeStyleProjectMock("child1");
@@ -94,7 +94,7 @@ public class CascadingUtilTest {
 
     @Test
     @PrepareForTest(Hudson.class)
-    public void testUnlinkProjectFromCascadingParents2() {
+    public void testUnlinkProjectFromCascadingParents2() throws Exception {
         FreeStyleProject project1 = new FreeStyleProjectMock("p1");
         FreeStyleProjectMock project2 = new FreeStyleProjectMock("p2");
         FreeStyleProjectMock project3 = new FreeStyleProjectMock("p3");
@@ -120,7 +120,7 @@ public class CascadingUtilTest {
     }
 
     @Test
-    public void testLinkCascadingProjectsToChild() {
+    public void testLinkCascadingProjectsToChild() throws Exception {
         FreeStyleProject project1 = new FreeStyleProjectMock("project1");
         FreeStyleProjectMock child1 = new FreeStyleProjectMock("child1");
         child1.setCascadingProject(project1);
@@ -143,7 +143,7 @@ public class CascadingUtilTest {
 
 
     @Test
-    public void testRenameCascadingChildLinks() {
+    public void testRenameCascadingChildLinks() throws Exception {
         String oldName = "oldCascadingProject";
         String newName = "newCascadingProject";
         FreeStyleProject project1 = new FreeStyleProjectMock("project1");
@@ -165,13 +165,13 @@ public class CascadingUtilTest {
     }
 
     @Test
-    public void testRenameCascadingChildLinksNullProject() {
+    public void testRenameCascadingChildLinksNullProject() throws Exception {
         CascadingUtil.renameCascadingChildLinks(null, "name", "newName");
     }
 
     @Test
     @PrepareForTest(Hudson.class)
-    public void testRenameCascadingParentLinks() {
+    public void testRenameCascadingParentLinks() throws Exception {
         String oldName = "oldCascadingProject";
         String newName = "newCascadingProject";
         List<Job> jobs = new ArrayList<Job>();
@@ -212,7 +212,7 @@ public class CascadingUtilTest {
 
     @Test
     @PrepareForTest(Hudson.class)
-    public void testGetAllItems() {
+    public void testGetAllItems() throws Exception {
         FreeStyleProject project1 = new FreeStyleProjectMock("p1");
         FreeStyleProjectMock project2 = new FreeStyleProjectMock("p2");
         FreeStyleProjectMock project3 = new FreeStyleProjectMock("p3");
@@ -269,7 +269,7 @@ public class CascadingUtilTest {
 
     @Test
     @PrepareForTest(Hudson.class)
-    public void testHasCyclicCascadingLink() {
+    public void testHasCyclicCascadingLink() throws Exception {
         FreeStyleProject project1 = new FreeStyleProjectMock("p1");
         FreeStyleProjectMock project2 = new FreeStyleProjectMock("p2");
         FreeStyleProjectMock project3 = new FreeStyleProjectMock("p3");
