@@ -1939,7 +1939,6 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         super.submit(req,rsp);
 
         makeDisabled(null != req.getParameter("disable"));
-        setCascadingProjectName(StringUtils.trimToNull(req.getParameter("cascadingProjectName")));
         setJDK(req.getParameter("jdk"));
         setQuietPeriod(null != req.getParameter(HAS_QUIET_PERIOD_PROPERTY_NAME)
             ? req.getParameter("quiet_period") : null);
