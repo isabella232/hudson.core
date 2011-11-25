@@ -28,6 +28,7 @@ import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
 import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
 import org.eclipse.hudson.api.model.project.property.LogRotatorProjectProperty;
 import org.eclipse.hudson.api.model.project.property.ResultProjectProperty;
+import org.eclipse.hudson.api.model.project.property.SCMProjectProperty;
 import org.eclipse.hudson.api.model.project.property.StringProjectProperty;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.MatrixConfiguration;
@@ -140,6 +141,7 @@ public class Items {
         XSTREAM.alias("matrix-config",MatrixConfiguration.class);
 
         //aliases for project properties.
+        //TODO: think about migrating to xstream's annotations.
         XSTREAM.alias("base-property", BaseProjectProperty.class);
         XSTREAM.alias("external-property", ExternalProjectProperty.class);
         XSTREAM.alias("trigger-property", TriggerProjectProperty.class);
@@ -148,6 +150,7 @@ public class Items {
         XSTREAM.alias("string-property", StringProjectProperty.class);
         XSTREAM.alias("log-rotator-property", LogRotatorProjectProperty.class);
         XSTREAM.alias("result-property", ResultProjectProperty.class);
+        XSTREAM.alias("scm-property", SCMProjectProperty.class);
 
         XSTREAM.alias("copy-write-list-property", CopyOnWriteListProjectProperty.class);
         XSTREAM.alias("axis-list-property", AxisListProjectProperty.class);
