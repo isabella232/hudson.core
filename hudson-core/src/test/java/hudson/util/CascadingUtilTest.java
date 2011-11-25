@@ -14,14 +14,19 @@
  *******************************************************************************/
 package hudson.util;
 
+import hudson.model.Descriptor;
 import hudson.model.FreeStyleProject;
 import hudson.model.FreeStyleProjectMock;
 import hudson.model.Hudson;
 import hudson.model.Job;
+import hudson.tasks.JavadocArchiver;
+import hudson.tasks.Publisher;
 import java.util.ArrayList;
 import java.util.List;
+import net.sf.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kohsuke.stapler.StaplerRequest;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -29,10 +34,9 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.easymock.EasyMock.expect;
-import static org.powermock.api.easymock.PowerMock.createMock;
-import static org.powermock.api.easymock.PowerMock.mockStatic;
-import static org.powermock.api.easymock.PowerMock.replay;
-import static org.powermock.api.easymock.PowerMock.verify;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.powermock.api.easymock.PowerMock.*;
 
 /**
  * Test cases for cascading utils.
@@ -160,6 +164,10 @@ public class CascadingUtilTest {
         assertFalse(project1.getCascadingChildrenNames().contains(oldName));
     }
 
+    @Test
+    public void testRenameCascadingChildLinksNullProject() {
+        CascadingUtil.renameCascadingChildLinks(null, "name", "newName");
+    }
 
     @Test
     @PrepareForTest(Hudson.class)
@@ -190,6 +198,16 @@ public class CascadingUtilTest {
     @Test
     public void testRenameCascadingParentLinksEmptyNames() {
         CascadingUtil.renameCascadingParentLinks("", "");
+    }
+
+    @Test
+    public void testRenameCascadingParentLinksNullName1() {
+        CascadingUtil.renameCascadingParentLinks(null, "name");
+    }
+
+    @Test
+    public void testRenameCascadingParentLinksNullName2() {
+        CascadingUtil.renameCascadingParentLinks("name", null);
     }
 
     @Test
@@ -282,6 +300,8 @@ public class CascadingUtilTest {
         verifyCyclicCascadingLink(false, project3, project2);
         verifyCyclicCascadingLink(false, project1, project2);
         verifyCyclicCascadingLink(false, project2, project3);
+        verifyCyclicCascadingLink(false, null, project1);
+        verifyCyclicCascadingLink(false, null, project4);
 
         verify(Hudson.class, hudson);
     }
@@ -289,5 +309,37 @@ public class CascadingUtilTest {
     private void verifyCyclicCascadingLink(boolean expectedResult, Job candidateJob, Job currentJob) {
         assertEquals(expectedResult,
             CascadingUtil.hasCyclicCascadingLink(candidateJob, currentJob.getCascadingChildrenNames()));
+    }
+
+    @Test
+    @PrepareForTest({Hudson.class, StaplerRequest.class})
+    public void testBuildExternalProperties() throws Exception {
+        Job job = new FreeStyleProjectMock("job");
+        StaplerRequest req = createMock(StaplerRequest.class);
+        String javadocArchiverKey = "hudson-tasks-JavadocArchiver";
+        JSONObject archiver = new JSONObject();
+        archiver.put("javadoc_dir", "dir");
+        archiver.put("keep_all", true);
+        JSONObject json = new JSONObject();
+        json.put(javadocArchiverKey, archiver);
+        Hudson hudson = createMock(Hudson.class);
+        Descriptor<Publisher> javadocDescriptor = new JavadocArchiver.DescriptorImpl();
+        expect(hudson.getDescriptorOrDie(JavadocArchiver.class)).andReturn(javadocDescriptor);
+        JavadocArchiver javadocArchiver = new JavadocArchiver("dir", true);
+        expect(req.bindJSON(JavadocArchiver.class, archiver)).andReturn(javadocArchiver).anyTimes();
+
+        List<Descriptor<Publisher>> descriptors = new ArrayList<Descriptor<Publisher>>();
+        descriptors.add(javadocDescriptor);
+
+        mockStatic(Hudson.class);
+        expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
+        replay(Hudson.class, hudson, req);
+
+        assertNull(CascadingUtil.getExternalProjectProperty(job, javadocArchiverKey).getValue());
+        CascadingUtil.buildExternalProperties(req, archiver, descriptors, job);
+        assertNull(CascadingUtil.getExternalProjectProperty(job, javadocArchiverKey).getValue());
+        CascadingUtil.buildExternalProperties(req, json, descriptors, job);
+        assertNotNull(CascadingUtil.getExternalProjectProperty(job, javadocArchiverKey).getValue());
+        verifyAll();
     }
 }
