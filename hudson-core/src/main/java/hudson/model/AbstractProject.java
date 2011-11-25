@@ -1633,12 +1633,12 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
 
     @Exported
     public SCM getScm() {
-        return (SCM) getProperty(SCM_PROPERTY_NAME, SCMProjectProperty.class).getValue();
+        return CascadingUtil.getScmProjectProperty(this, SCM_PROPERTY_NAME).getValue();
     }
 
     @SuppressWarnings("unchecked")
     public void setScm(SCM scm) throws IOException {
-        getProperty(SCM_PROPERTY_NAME, SCMProjectProperty.class).setValue(scm);
+        CascadingUtil.getScmProjectProperty(this, SCM_PROPERTY_NAME).setValue(scm);
         save();
     }
 
