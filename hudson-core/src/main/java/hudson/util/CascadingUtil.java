@@ -21,8 +21,10 @@ import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.model.Job;
+import hudson.model.JobPropertyDescriptor;
 import hudson.model.ParameterDefinition;
 import hudson.model.ParametersDefinitionProperty;
+import hudson.security.AuthorizationMatrixProperty;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 import java.io.IOException;
@@ -508,5 +510,22 @@ public class CascadingUtil {
                 }
             }
         }
+    }
+
+    /**
+     * Checks whether JobProperty supports cascading.
+     * Method skips {@link AuthorizationMatrixProperty} and {@link ParametersDefinitionProperty} classes.
+     * {@link AuthorizationMatrixProperty} doesn't support cascading for now.
+     * As for {@link ParametersDefinitionProperty} single instance doesn't support cascading, so, classes are
+     * grouped into list of {@link ParametersDefinitionProperty} and whole list could be inherited or overridden.
+
+     * * @param d property descriptor.
+     * @return true - if JobProperty could be used for cascading, false - otherwise.
+     * @see #setParameterDefinitionProperties(hudson.model.Job, String, CopyOnWriteList)
+     * @see hudson.model.Job#getParameterDefinitionProperties()
+     */
+    public static boolean isCascadableJobProperty(JobPropertyDescriptor d) {
+        return !(d instanceof AuthorizationMatrixProperty.DescriptorImpl
+            || d instanceof ParametersDefinitionProperty.DescriptorImpl);
     }
 }
