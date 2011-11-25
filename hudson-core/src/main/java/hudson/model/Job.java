@@ -89,6 +89,7 @@ import net.sf.json.JSONObject;
 import org.eclipse.hudson.api.model.IJob;
 import org.eclipse.hudson.api.model.IProjectProperty;
 import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
+import org.eclipse.hudson.api.model.project.property.TriggerProjectProperty;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -1616,6 +1617,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         this.cascadingProject = null;
         this.cascadingProjectName = null;
         for (IProjectProperty property : jobProperties.values()) {
+            if (property instanceof TriggerProjectProperty && !property.isOverridden() && property.getValue() != null) {
+                ((TriggerProjectProperty) property).getValue().stop();
+                property.resetValue();
+            }
             property.setOverridden(false);
         }
     }
