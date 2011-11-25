@@ -88,8 +88,8 @@ import net.sf.json.JSONObject;
 
 import org.eclipse.hudson.api.model.IJob;
 import org.eclipse.hudson.api.model.IProjectProperty;
-import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
-import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
+import org.eclipse.hudson.model.project.property.BaseProjectProperty;
+import org.eclipse.hudson.model.project.property.ExternalProjectProperty;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;

@@ -19,17 +19,17 @@ package hudson.model;
 import com.thoughtworks.xstream.XStream;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
-import org.eclipse.hudson.api.model.project.property.AxisListProjectProperty;
-import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
-import org.eclipse.hudson.api.model.project.property.BooleanProjectProperty;
-import org.eclipse.hudson.api.model.project.property.CopyOnWriteListProjectProperty;
-import org.eclipse.hudson.api.model.project.property.DescribableListProjectProperty;
-import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
-import org.eclipse.hudson.api.model.project.property.IntegerProjectProperty;
-import org.eclipse.hudson.api.model.project.property.LogRotatorProjectProperty;
-import org.eclipse.hudson.api.model.project.property.ResultProjectProperty;
-import org.eclipse.hudson.api.model.project.property.SCMProjectProperty;
-import org.eclipse.hudson.api.model.project.property.StringProjectProperty;
+import org.eclipse.hudson.model.project.property.AxisListProjectProperty;
+import org.eclipse.hudson.model.project.property.BaseProjectProperty;
+import org.eclipse.hudson.model.project.property.BooleanProjectProperty;
+import org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty;
+import org.eclipse.hudson.model.project.property.DescribableListProjectProperty;
+import org.eclipse.hudson.model.project.property.ExternalProjectProperty;
+import org.eclipse.hudson.model.project.property.IntegerProjectProperty;
+import org.eclipse.hudson.model.project.property.LogRotatorProjectProperty;
+import org.eclipse.hudson.model.project.property.ResultProjectProperty;
+import org.eclipse.hudson.model.project.property.SCMProjectProperty;
+import org.eclipse.hudson.model.project.property.StringProjectProperty;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.MatrixConfiguration;
 import hudson.XmlFile;
@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.StringTokenizer;
-import org.eclipse.hudson.api.model.project.property.TriggerProjectProperty;
+import org.eclipse.hudson.model.project.property.TriggerProjectProperty;
 
 /**
  * Convenience methods related to {@link Item}.

@@ -24,7 +24,7 @@
     <j:arg value="${it}" type="hudson.model.Item" />
   </j:invokeStatic>
     <t:cascadingDescriptorList title="${%Build Triggers}" descriptors="${triggers}"
-                               propertyClass="${org.eclipse.hudson.api.model.project.property.TriggerProjectProperty.class}">
+                               propertyClass="${org.eclipse.hudson.model.project.property.TriggerProjectProperty.class}">
     <d:invokeBody />
     <!-- pseudo-trigger to configure URL to trigger builds remotely. -->
     <st:include page="/hudson/model/BuildAuthorizationToken/config.jelly" />

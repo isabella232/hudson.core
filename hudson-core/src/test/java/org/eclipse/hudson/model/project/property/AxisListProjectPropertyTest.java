@@ -13,10 +13,12 @@
  *
  *******************************************************************************/
 
-package org.eclipse.hudson.api.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.matrix.AxisList;
 import hudson.model.FreeStyleProjectMock;
+import org.eclipse.hudson.model.project.property.AxisListProjectProperty;
+import org.eclipse.hudson.model.project.property.BaseProjectProperty;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -58,7 +60,7 @@ public class AxisListProjectPropertyTest {
     }
 
     /**
-     * Verify {@link CopyOnWriteListProjectProperty#getDefaultValue()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty#getDefaultValue()} method.
      */
     @Test
     public void testAxisListProjectPropertyGetDefaultValue() {

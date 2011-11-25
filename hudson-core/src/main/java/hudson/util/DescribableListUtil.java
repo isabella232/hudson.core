@@ -30,8 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sf.json.JSONObject;
 import org.eclipse.hudson.api.model.IProjectProperty;
-import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
-import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
+import org.eclipse.hudson.model.project.property.ExternalProjectProperty;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -107,7 +106,7 @@ public final class DescribableListUtil {
 
     /**
      * Converts describableList data to project properties map. {@link hudson.model.Descriptor#getJsonSafeClassName()}
-     * is used as key, value - {@link BaseProjectProperty}.
+     * is used as key, value - {@link org.eclipse.hudson.model.project.property.BaseProjectProperty}.
      *
      * @param describableList source.
      * @param owner new owner for properties.

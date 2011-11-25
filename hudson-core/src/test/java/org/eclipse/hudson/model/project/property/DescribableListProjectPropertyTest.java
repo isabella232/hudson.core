@@ -13,12 +13,14 @@
  *
  *******************************************************************************/
 
-package org.eclipse.hudson.api.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.model.FreeStyleProjectMock;
 import hudson.tasks.Shell;
 import hudson.util.DescribableList;
 import java.util.Arrays;
+import org.eclipse.hudson.model.project.property.BaseProjectProperty;
+import org.eclipse.hudson.model.project.property.DescribableListProjectProperty;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -66,7 +68,7 @@ public class DescribableListProjectPropertyTest {
     }
 
     /**
-     * Verify {@link DescribableListProjectProperty#getDefaultValue()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.DescribableListProjectProperty#getDefaultValue()} method.
      */
     @Test
     public void testGetDefaultValue() {
@@ -78,7 +80,7 @@ public class DescribableListProjectPropertyTest {
     }
 
     /**
-     * Verify {@link CopyOnWriteListProjectProperty#getOriginalValue()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty#getOriginalValue()} method.
      */
     @Test
     public void testGetOriginalValue() {
@@ -90,7 +92,7 @@ public class DescribableListProjectPropertyTest {
     }
 
     /**
-     * Verify {@link CopyOnWriteListProjectProperty#returnOriginalValue()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty#returnOriginalValue()} method.
      */
     @Test
     public void testReturnOriginalValue() {
@@ -109,7 +111,7 @@ public class DescribableListProjectPropertyTest {
     }
 
     /**
-     * Verify {@link CopyOnWriteListProjectProperty#allowOverrideValue(Object, Object)} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty#allowOverrideValue(Object, Object)} method.
      */
     @Test
     public void testAllowOverrideValue() {

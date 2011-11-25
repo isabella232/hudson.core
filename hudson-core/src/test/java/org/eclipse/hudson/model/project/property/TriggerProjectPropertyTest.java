@@ -12,12 +12,14 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
-package org.eclipse.hudson.api.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import antlr.ANTLRException;
 import hudson.model.FreeStyleProjectMock;
 import hudson.triggers.TimerTrigger;
 import hudson.triggers.Trigger;
+import org.eclipse.hudson.model.project.property.BaseProjectProperty;
+import org.eclipse.hudson.model.project.property.TriggerProjectProperty;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,7 +55,7 @@ public class TriggerProjectPropertyTest {
     }
 
     /**
-     * Verify {@link TriggerProjectProperty#clearOriginalValue(hudson.triggers.Trigger)} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.TriggerProjectProperty#clearOriginalValue(hudson.triggers.Trigger)} method.
      *
      * @throws antlr.ANTLRException if any
      */
@@ -92,7 +94,7 @@ public class TriggerProjectPropertyTest {
     }
 
     /**
-     * Verify {@link TriggerProjectProperty#onCascadingProjectRemoved()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.TriggerProjectProperty#onCascadingProjectRemoved()} method.
      *
      * @throws antlr.ANTLRException if any
      */
