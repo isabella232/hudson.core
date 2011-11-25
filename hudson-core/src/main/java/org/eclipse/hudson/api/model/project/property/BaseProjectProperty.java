@@ -15,8 +15,8 @@
 
 package org.eclipse.hudson.api.model.project.property;
 
+import hudson.util.DeepEquals;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.eclipse.hudson.api.model.IJob;
 import org.eclipse.hudson.api.model.IProjectProperty;
 
@@ -198,7 +198,7 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
      */
     public boolean allowOverrideValue(T cascadingValue, T candidateValue) {
         return ObjectUtils.notEqual(cascadingValue, candidateValue)
-            && !EqualsBuilder.reflectionEquals(cascadingValue, candidateValue, true);
+            && !DeepEquals.deepEquals(cascadingValue, candidateValue);
     }
 
     /**

@@ -93,7 +93,6 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.eclipse.hudson.api.model.IAbstractProject;
-import org.eclipse.hudson.api.model.project.property.SCMProjectProperty;
 import org.eclipse.hudson.api.model.project.property.TriggerProjectProperty;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
