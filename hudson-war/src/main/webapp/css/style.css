@@ -7,12 +7,12 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Daniel Dyer, Stephen Connolly, Nikita Levyankov, Anton Kozak
  *
- *******************************************************************************/ 
- 
+ *******************************************************************************/
+
 body {
   margin: 0;
   padding: 0;
@@ -1012,19 +1012,23 @@ tr.modified > td.setting-leftspace {
     background-color: #FFE8C9;
 }
 
+.optional-reset {
+    float: left;
+    margin-left: -20px;
+    position: absolute;
+}
 /* --- Reset button container for hetero-list --- */
-.hetero-list-reset {
-    float: right;
-    margin-right: -20px;
-    margin-top: 5px;
+.hetero-list-reset{
+    float: left;
+    margin-left: -20px;
+    position: absolute;
 }
 
 .section-reset{
-    float: right;
-    margin-right: -20px;
-    margin-top: -10px;
+    float: left;
+    margin-left: -20px;
+    position: absolute;
 }
-
 .descriptor-separator {
     height: 2px;
 }
