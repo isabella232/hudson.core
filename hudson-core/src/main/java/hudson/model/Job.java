@@ -1476,6 +1476,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         description = req.getParameter("description");
         keepDependencies = req.getParameter("keepDependencies") != null;
         properties.clear();
+        setCascadingProjectName(StringUtils.trimToNull(req.getParameter("cascadingProjectName")));
         CopyOnWriteList parameterDefinitionProperties = new CopyOnWriteList();
         int i = 0;
         for (JobPropertyDescriptor d : JobPropertyDescriptor.getPropertyDescriptors(Job.this.getClass())) {
