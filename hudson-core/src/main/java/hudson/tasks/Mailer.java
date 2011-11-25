@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2011 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi,   Bruce Chapman, Erik Ramfelt, Jean-Baptiste Quenot, Luca Domenico Milanesio
+ *    Kohsuke Kawaguchi,   Bruce Chapman, Erik Ramfelt, Jean-Baptiste Quenot, Luca Domenico Milanesio, Anton Kozak
  *     
  *
  *******************************************************************************/ 
@@ -33,13 +33,11 @@ import hudson.model.UserPropertyDescriptor;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import hudson.util.XStream2;
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.Authenticator;
 import javax.mail.Message;
@@ -53,7 +51,6 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tools.ant.types.selectors.SelectorUtils;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.QueryParameter;
@@ -108,37 +105,17 @@ public class Mailer extends Notifier {
     private transient String charset;
 
     @Override
-    public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-        if(debug)
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
+        throws IOException, InterruptedException {
+        if (debug) {
             listener.getLogger().println("Running mailer");
+        }
         // substitute build parameters
         EnvVars env = build.getEnvironment(listener);
         String recip = env.expand(recipients);
 
-        return new MailSender(recip, dontNotifyEveryUnstableBuild, sendToIndividuals, descriptor().getCharset()) {
-            /** Check whether a path (/-separated) will be archived. */
-            @Override
-            public boolean artifactMatches(String path, AbstractBuild<?,?> build) {
-                ArtifactArchiver aa = build.getProject().getPublishersList().get(ArtifactArchiver.class);
-                if (aa == null) {
-                    LOGGER.finer("No ArtifactArchiver found");
-                    return false;
-                }
-                String artifacts = aa.getArtifacts();
-                for (String include : artifacts.split("[, ]+")) {
-                    String pattern = include.replace(File.separatorChar, '/');
-                    if (pattern.endsWith("/")) {
-                        pattern += "**";
-                    }
-                    if (SelectorUtils.matchPath(pattern, path)) {
-                        LOGGER.log(Level.FINER, "DescriptorImpl.artifactMatches true for {0} against {1}", new Object[] {path, pattern});
-                        return true;
-                    }
-                }
-                LOGGER.log(Level.FINER, "DescriptorImpl.artifactMatches for {0} matched none of {1}", new Object[] {path, artifacts});
-                return false;
-            }
-        }.execute(build,listener);
+        return new MailSender(recip, dontNotifyEveryUnstableBuild, sendToIndividuals,
+            descriptor().getCharset()).execute(build, listener);
     }
 
     /**
