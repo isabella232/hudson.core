@@ -13,11 +13,13 @@
  *
  *******************************************************************************/
 
-package org.eclipse.hudson.api.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.model.FreeStyleProjectMock;
 import hudson.util.CopyOnWriteList;
 import java.util.Arrays;
+import org.eclipse.hudson.model.project.property.BaseProjectProperty;
+import org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -61,7 +63,7 @@ public class CopyOnWriteListProjectPropertyTest {
     }
 
     /**
-     * Verify {@link CopyOnWriteListProjectProperty#getDefaultValue()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty#getDefaultValue()} method.
      */
     @Test
     public void testGetDefaultValue() {
@@ -73,7 +75,7 @@ public class CopyOnWriteListProjectPropertyTest {
     }
 
     /**
-     * Verify {@link CopyOnWriteListProjectProperty#getOriginalValue()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty#getOriginalValue()} method.
      */
     @Test
     public void testGetOriginalValue() {
@@ -85,7 +87,7 @@ public class CopyOnWriteListProjectPropertyTest {
     }
 
     /**
-     * Verify {@link CopyOnWriteListProjectProperty#returnOriginalValue()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty#returnOriginalValue()} method.
      */
     @Test
     public void testReturnOriginalValue() {
@@ -104,7 +106,7 @@ public class CopyOnWriteListProjectPropertyTest {
     }
 
     /**
-     * Verify {@link CopyOnWriteListProjectProperty#clearOriginalValue(hudson.util.CopyOnWriteList)} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty#clearOriginalValue(hudson.util.CopyOnWriteList)} method.
      */
     @Test
     public void testClearOriginalValue() {

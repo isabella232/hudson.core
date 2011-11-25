@@ -9,25 +9,23 @@
  *
  * Contributors:
  *
- *    Anton Kozak
+ *    Nikita Levyankov
  *
  *******************************************************************************/
-package org.eclipse.hudson.api.model.project.property;
-import hudson.scm.NullSCM;
-import hudson.scm.SCM;
+package org.eclipse.hudson.model.project.property;
+
 import org.eclipse.hudson.api.model.IJob;
 
-
 /**
- * Represents {@link SCM} property.
+ * Represents boolean property.
  * <p/>
- * Date: 10/11/11
+ * Date: 9/22/11
  *
- * @author Anton Kozak
+ * @author Nikita Levyankov
  */
-public class SCMProjectProperty extends BaseProjectProperty<SCM> {
+public class BooleanProjectProperty extends BaseProjectProperty<Boolean> {
 
-    public SCMProjectProperty(IJob job) {
+    public BooleanProjectProperty(IJob job) {
         super(job);
     }
 
@@ -35,15 +33,16 @@ public class SCMProjectProperty extends BaseProjectProperty<SCM> {
      * {@inheritDoc}
      */
     @Override
-    public SCM getDefaultValue() {
-        return new NullSCM();
+    public Boolean getOriginalValue() {
+        Boolean originalValue = super.getOriginalValue();
+        return null != originalValue ? originalValue : getDefaultValue();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected boolean returnOriginalValue() {
-        return isOverridden() || (null != getOriginalValue() && !getDefaultValue().equals(getOriginalValue()));
+    public Boolean getDefaultValue() {
+        return false;
     }
 }

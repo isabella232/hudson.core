@@ -9,24 +9,23 @@
  *
  * Contributors:
  *
- *    Anton Kozak
+ *    Nikita Levyankov
  *
  *******************************************************************************/
+package org.eclipse.hudson.model.project.property;
 
-package org.eclipse.hudson.api.model.project.property;
-import hudson.model.Result;
+import hudson.tasks.LogRotator;
 import org.eclipse.hudson.api.model.IJob;
 
 /**
- * Represents {@link Result} property.
+ * Represents LogRotator property.
  * <p/>
- * Date: 9/23/11
+ * Date: 9/27/11
  *
- * @author Anton Kozak
+ * @author Nikita Levyankov
  */
-public class ResultProjectProperty extends BaseProjectProperty<Result> {
-
-    public ResultProjectProperty(IJob job) {
+public class LogRotatorProjectProperty extends BaseProjectProperty<LogRotator> {
+    public LogRotatorProjectProperty(IJob job) {
         super(job);
     }
 }

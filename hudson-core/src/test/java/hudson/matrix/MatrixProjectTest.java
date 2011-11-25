@@ -18,8 +18,8 @@ import hudson.model.Result;
 import hudson.security.Permission;
 import java.io.IOException;
 import org.eclipse.hudson.api.model.IProjectProperty;
-import org.eclipse.hudson.api.model.project.property.ResultProjectProperty;
-import org.eclipse.hudson.api.model.project.property.StringProjectProperty;
+import org.eclipse.hudson.model.project.property.ResultProjectProperty;
+import org.eclipse.hudson.model.project.property.StringProjectProperty;
 import org.junit.Test;
 
 import static hudson.model.AbstractProject.PROPERTY_NAME_SEPARATOR;

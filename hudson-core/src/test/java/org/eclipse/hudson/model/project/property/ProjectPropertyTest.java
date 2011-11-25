@@ -13,10 +13,15 @@
  *
  *******************************************************************************/
 
-package org.eclipse.hudson.api.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.model.FreeStyleProjectMock;
 import hudson.tasks.LogRotator;
+import org.eclipse.hudson.model.project.property.BaseProjectProperty;
+import org.eclipse.hudson.model.project.property.BooleanProjectProperty;
+import org.eclipse.hudson.model.project.property.IntegerProjectProperty;
+import org.eclipse.hudson.model.project.property.LogRotatorProjectProperty;
+import org.eclipse.hudson.model.project.property.StringProjectProperty;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -13,7 +13,7 @@
  *
  *******************************************************************************/
 
-package org.eclipse.hudson.api.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.util.DeepEquals;
 import org.apache.commons.lang3.ObjectUtils;

@@ -13,12 +13,13 @@
  *
  *******************************************************************************/
 
-package org.eclipse.hudson.api.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.matrix.Axis;
 import hudson.matrix.AxisList;
 import hudson.model.FreeStyleProjectMock;
 import hudson.tasks.JavadocArchiver;
+import org.eclipse.hudson.model.project.property.BaseProjectProperty;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -358,7 +359,7 @@ public class BaseProjectPropertyTest {
     }
 
     /**
-     * Verify {@link BaseProjectProperty#onCascadingProjectRemoved()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.BaseProjectProperty#onCascadingProjectRemoved()} method.
      */
     @Test
     public void testOnCascadingProjectRemoved() {
@@ -369,7 +370,7 @@ public class BaseProjectPropertyTest {
     }
 
     /**
-     * Verify {@link BaseProjectProperty#onCascadingProjectRemoved()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.BaseProjectProperty#onCascadingProjectRemoved()} method.
      */
     @Test
     public void testOnCascadingProjectSet() {
@@ -389,7 +390,7 @@ public class BaseProjectPropertyTest {
     }
 
     /**
-     * Verify {@link BaseProjectProperty#onCascadingProjectChanged()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.BaseProjectProperty#onCascadingProjectChanged()} method.
      */
     @Test
     public void testOnCascadingProjectChanged() {
