@@ -14,7 +14,7 @@
  *******************************************************************************/
 package org.eclipse.hudson.model.project.property;
 
-import org.eclipse.hudson.api.model.IJob;
+import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
  * Class property is intended to be used for ProjectProperties without correct equals and hashCode methods, such as
@@ -32,7 +32,7 @@ public class ExternalProjectProperty<T> extends BaseProjectProperty<T> {
 
     private boolean modified;
 
-    public ExternalProjectProperty(IJob job) {
+    public ExternalProjectProperty(ICascadingJob job) {
         super(job);
     }
 

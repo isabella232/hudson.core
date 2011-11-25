@@ -13,10 +13,10 @@
  *
  *******************************************************************************/
 package org.eclipse.hudson.model.project.property;
+
 import hudson.scm.NullSCM;
 import hudson.scm.SCM;
-import org.eclipse.hudson.api.model.IJob;
-
+import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
  * Represents {@link SCM} property.
@@ -27,7 +27,7 @@ import org.eclipse.hudson.api.model.IJob;
  */
 public class SCMProjectProperty extends BaseProjectProperty<SCM> {
 
-    public SCMProjectProperty(IJob job) {
+    public SCMProjectProperty(ICascadingJob job) {
         super(job);
     }
 

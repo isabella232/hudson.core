@@ -16,7 +16,7 @@
 package org.eclipse.hudson.model.project.property;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.hudson.api.model.IJob;
+import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
  * String property for project.
@@ -27,7 +27,7 @@ import org.eclipse.hudson.api.model.IJob;
  */
 public class StringProjectProperty extends BaseProjectProperty<String> {
 
-    public StringProjectProperty(IJob job) {
+    public StringProjectProperty(ICascadingJob job) {
         super(job);
     }
 

@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
-import org.eclipse.hudson.api.model.IProject;
+import org.eclipse.hudson.api.model.IBaseBuildableProject;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -42,7 +42,7 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B extends AbstractBuild<P,B>>
     extends AbstractProject<P, B>
-    implements Saveable, BuildableItemWithBuildWrappers, IProject {
+    implements Saveable, BuildableItemWithBuildWrappers, IBaseBuildableProject {
 
     public static final String BUILDERS_PROPERTY_NAME = "builders";
 
@@ -168,6 +168,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
     public Publisher getPublisher(Descriptor<Publisher> descriptor) {
         return (Publisher) CascadingUtil.getExternalProjectProperty(this, descriptor.getJsonSafeClassName()).getValue();
     }
+
     /**
      * Returns the list of the publishers available in the hudson.
      *

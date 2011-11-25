@@ -14,10 +14,10 @@
  *******************************************************************************/
 package org.eclipse.hudson.model.project.property;
 
-import org.eclipse.hudson.api.model.IJob;
+import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
- * Represents integer property.
+ * Represents integer property for project.
  * <p/>
  * Date: 9/22/11
  *
@@ -25,7 +25,7 @@ import org.eclipse.hudson.api.model.IJob;
  */
 public class IntegerProjectProperty extends BaseProjectProperty<Integer> {
 
-    public IntegerProjectProperty(IJob job) {
+    public IntegerProjectProperty(ICascadingJob job) {
         super(job);
     }
 

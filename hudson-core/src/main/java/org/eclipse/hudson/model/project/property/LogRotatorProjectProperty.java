@@ -15,7 +15,7 @@
 package org.eclipse.hudson.model.project.property;
 
 import hudson.tasks.LogRotator;
-import org.eclipse.hudson.api.model.IJob;
+import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
  * Represents LogRotator property.
@@ -25,7 +25,7 @@ import org.eclipse.hudson.api.model.IJob;
  * @author Nikita Levyankov
  */
 public class LogRotatorProjectProperty extends BaseProjectProperty<LogRotator> {
-    public LogRotatorProjectProperty(IJob job) {
+    public LogRotatorProjectProperty(ICascadingJob job) {
         super(job);
     }
 }

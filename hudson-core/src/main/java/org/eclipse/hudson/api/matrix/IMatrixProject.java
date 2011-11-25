@@ -15,22 +15,16 @@
 package org.eclipse.hudson.api.matrix;
 
 import hudson.matrix.AxisList;
-import hudson.model.Descriptor;
-import org.eclipse.hudson.api.model.IAbstractProject;
 import hudson.model.Result;
-import hudson.tasks.BuildWrapper;
-import hudson.tasks.Builder;
-import hudson.tasks.Publisher;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import org.eclipse.hudson.api.model.IBaseBuildableProject;
 
 /**
  * Matrix Project Interface.
  *
  * @author Anton Kozak
  */
-public interface IMatrixProject extends IAbstractProject {
+public interface IMatrixProject extends IBaseBuildableProject {
 
     /**
      * Returns {@link hudson.matrix.AxisList} of configured axes.
@@ -140,24 +134,4 @@ public interface IMatrixProject extends IAbstractProject {
      */
     void setCustomWorkspace(String customWorkspace) throws IOException;
 
-    /**
-     * Returns list of active {@link Builder}s configured for this project.
-     *
-     * @return list of active {@link Builder}s configured for this project.
-     */
-    List<Builder> getBuilders();
-
-    /**
-     * Returns map of  active {@link Publisher} configured for this project.
-     *
-     * @return map of active {@link Publisher} configured for this project.
-     */
-    Map<Descriptor<Publisher>, Publisher> getPublishers();
-
-    /**
-     * Returns map of  active {@link BuildWrapper} configured for this project.
-     *
-     * @return map of  active {@link BuildWrapper} configured for this project.
-     */
-    Map<Descriptor<BuildWrapper>,BuildWrapper> getBuildWrappers();
 }
