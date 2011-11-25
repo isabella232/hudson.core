@@ -89,7 +89,6 @@ import net.sf.json.JSONObject;
 import org.eclipse.hudson.api.model.IJob;
 import org.eclipse.hudson.api.model.IProjectProperty;
 import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
-import org.eclipse.hudson.api.model.project.property.TriggerProjectProperty;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -99,8 +98,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
 
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static javax.servlet.http.HttpServletResponse.*;
 
 /**
  * A job is an runnable entity under the monitoring of Hudson.
@@ -1572,16 +1570,11 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         } else if (!StringUtils.equalsIgnoreCase(this.cascadingProjectName, cascadingProjectName)) {
             CascadingUtil.unlinkProjectFromCascadingParents(cascadingProject, name);
             this.cascadingProjectName = cascadingProjectName;
-            this.cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
+            cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
                 cascadingProjectName);
             CascadingUtil.linkCascadingProjectsToChild(cascadingProject, name);
             for (IProjectProperty property : jobProperties.values()) {
-                if (property instanceof ExternalProjectProperty) {
-                    property.setOverridden(((ExternalProjectProperty) property).isModified());
-                } else {
-                    property.setOverridden(
-                        property.allowOverrideValue(property.getCascadingValue(), property.getValue()));
-                }
+                property.onCascadingProjectChanged();
             }
         }
     }
@@ -1617,11 +1610,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         this.cascadingProject = null;
         this.cascadingProjectName = null;
         for (IProjectProperty property : jobProperties.values()) {
-            if (property instanceof TriggerProjectProperty && !property.isOverridden() && property.getValue() != null) {
-                ((TriggerProjectProperty) property).getValue().stop();
-                property.resetValue();
-            }
-            property.setOverridden(false);
+            property.onCascadingProjectChanged();
         }
     }
 

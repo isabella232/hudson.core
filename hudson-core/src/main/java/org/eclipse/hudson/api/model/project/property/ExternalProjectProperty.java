@@ -67,4 +67,13 @@ public class ExternalProjectProperty<T> extends BaseProjectProperty<T> {
     protected boolean updateOriginalValue(T value, T cascadingValue) {
         return isModified() && super.updateOriginalValue(value, cascadingValue);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onCascadingProjectSet() {
+        setOverridden(isModified());
+    }
 }
+

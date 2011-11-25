@@ -70,6 +70,22 @@ public class ExternalProjectPropertyTest {
         assertTrue(property.isModified());
         assertFalse(property.updateOriginalValue(new Object(), new Object()));
         assertTrue(property.updateOriginalValue(new Object(), project));
+    }
 
+    /**
+     * Verify {@link ExternalProjectProperty#onCascadingProjectSet()} method.
+     */
+    @Test
+    public void testOnCascadingProjectSet() {
+        assertFalse(property.isModified());
+        assertFalse(property.isOverridden());
+        //When cascading project was set, isModified should equal to isOverridden
+        property.onCascadingProjectSet();
+        assertEquals(property.isModified(), property.isOverridden());
+
+        property.setModified(Boolean.TRUE);
+        property.onCascadingProjectSet();
+        assertTrue(property.isModified());
+        assertEquals(property.isModified(), property.isOverridden());
     }
 }
