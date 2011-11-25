@@ -22,6 +22,7 @@ import hudson.AbortException;
 import hudson.CopyOnWrite;
 import hudson.FeedAdapter;
 import hudson.FilePath;
+import hudson.Functions;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.cli.declarative.CLIMethod;
@@ -90,7 +91,6 @@ import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.eclipse.hudson.api.model.IAbstractProject;
 import org.eclipse.hudson.api.model.project.property.TriggerProjectProperty;
@@ -2024,6 +2024,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
      * Wipes out the workspace.
      */
     public HttpResponse doDoWipeOutWorkspace() throws IOException, ServletException, InterruptedException {
+        checkPermission(Functions.isWipeOutPermissionEnabled() ? WIPEOUT : BUILD);
         if (cleanWorkspace()){
             return new HttpRedirect(".");
         }else{
