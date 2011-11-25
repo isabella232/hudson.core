@@ -1025,6 +1025,10 @@ tr.modified > td.setting-leftspace {
     margin-top: -10px;
 }
 
+.descriptor-separator {
+    height: 2px;
+}
+
 /* ======================= Job Configuration table ========================== */
 table.configure {
     border-spacing: 0px;

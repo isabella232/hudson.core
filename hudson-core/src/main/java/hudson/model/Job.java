@@ -88,6 +88,7 @@ import net.sf.json.JSONObject;
 
 import org.eclipse.hudson.api.model.IJob;
 import org.eclipse.hudson.api.model.IProjectProperty;
+import org.eclipse.hudson.api.model.project.property.BaseProjectProperty;
 import org.eclipse.hudson.api.model.project.property.ExternalProjectProperty;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.args4j.Argument;
@@ -183,6 +184,14 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * to prohibition parent project "delete" action in case it has cascading children projects.
      */
     private Set<String> cascadingChildrenNames = new CopyOnWriteArraySet<String>();
+
+    /**
+     * Set contains json-save names of cascadable {@link JobProperty} classes. Intended to be used for cascading support
+     * of external hudson plugins, that extends {@link JobProperty} class.
+     * See {@link #properties} field description
+     * @since 2.2.0
+     */
+    private Set<String> cascadingJobProperties = new CopyOnWriteArraySet<String>();
 
     /**
      * Selected cascadingProject for this job.
@@ -425,7 +434,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             property.setJob(this);
         }
         convertLogRotatorProperty();
-        convertJobProperty();
+        convertJobProperties();
     }
 
     void convertLogRotatorProperty() {
@@ -435,11 +444,40 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
     }
 
-    void convertJobProperty() {
-        if (null != properties && null == getProperty(PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME)) {
-            setParameterDefinitionProperties(properties);
+    void convertJobProperties() {
+        if (null != properties && null == cascadingJobProperties) {
+            cascadingJobProperties = new CopyOnWriteArraySet<String>();
+            convertCascadingJobProperties(properties);
         }
     }
+
+    /**
+     * Adds cascading JobProperty.
+     *
+     * @param cascadingJobProperty BaseProjectProperty wrapper for JobProperty.
+     */
+    private void addCascadingJobProperty(BaseProjectProperty projectProperty) {
+        if (null != projectProperty) {
+            cascadingJobProperties.add(projectProperty.getKey());
+        }
+    }
+
+    /**
+     * Adds cascading JobProperty.
+     *
+     * @param cascadingJobPropertyKey key of cascading JobProperty.
+     */
+    private void removeCascadingJobProperty(String cascadingJobPropertyKey) {
+        if (null != cascadingJobPropertyKey) {
+            IProjectProperty projectProperty = CascadingUtil.getProjectProperty(this, cascadingJobPropertyKey);
+            if (null != projectProperty) {
+                projectProperty.resetValue();
+            }
+            cascadingJobProperties.remove(cascadingJobPropertyKey);
+        }
+    }
+
+
     /**
      * Initialize project properties if null.
      */
@@ -626,19 +664,74 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     public boolean supportsLogRotator() {
         return true;
     }
-
-    public void setParameterDefinitionProperties(CopyOnWriteList<JobProperty<? super JobT>> properties) {
+    /**
+     * Method converts JobProperties to cascading values.
+     * <p/>
+     * If property is {@link AuthorizationMatrixProperty} - it will be skipped.
+     * If property is {@link ParametersDefinitionProperty} - it will be added to list of parameterDefinition properties.
+     * All the rest properties will be converted to {@link BaseProjectProperty} classes and added
+     * to cascadingJobProperties set.
+     *
+     * @param properties list of {@link JobProperty}
+     */
+    @SuppressWarnings("unchecked")
+    private void convertCascadingJobProperties(CopyOnWriteList<JobProperty<? super JobT>> properties) {
         CopyOnWriteList parameterDefinitionProperties = new CopyOnWriteList();
         for (JobProperty property : properties) {
+            if (property instanceof AuthorizationMatrixProperty) {
+                continue;
+            }
             if (property instanceof ParametersDefinitionProperty) {
                 parameterDefinitionProperties.add(property);
+                continue;
             }
+            BaseProjectProperty projectProperty = CascadingUtil.getBaseProjectProperty(this,
+                property.getDescriptor().getJsonSafeClassName());
+            addCascadingJobProperty(projectProperty);
         }
-        CascadingUtil.setParameterDefinitionProperties(this, PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME,
-            parameterDefinitionProperties);
+        if (null == getProperty(PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME)) {
+            setParameterDefinitionProperties(parameterDefinitionProperties);
+        }
     }
 
-    public CopyOnWriteList<ParametersDefinitionProperty> getParameterDefinitionProperties() {
+    /**
+     * @return list of cascading {@link JobProperty} instances. Includes {@link ParametersDefinitionProperty} and
+     *         children of {@link JobProperty} from external plugins.
+     */
+    @SuppressWarnings("unchecked")
+    private CopyOnWriteList getCascadingJobProperties() {
+        CopyOnWriteList result = new CopyOnWriteList();
+        CopyOnWriteList<ParametersDefinitionProperty> definitionProperties = getParameterDefinitionProperties();
+        if (null != cascadingJobProperties && !cascadingJobProperties.isEmpty()) {
+            for (String key : cascadingJobProperties) {
+                IProjectProperty projectProperty = CascadingUtil.getProjectProperty(this, key);
+                Object value = projectProperty.getValue();
+                if (null != value) {
+                    result.add(value);
+                }
+            }
+        }
+        if (null != definitionProperties && !definitionProperties.isEmpty()) {
+            result.addAll(definitionProperties.getView());
+        }
+        return result;
+    }
+
+    /**
+     * Sets list of {@link ParametersDefinitionProperty}. Supports cascading functionality.
+     *
+     * @param properties properties to set.
+     */
+    private void setParameterDefinitionProperties(CopyOnWriteList<ParametersDefinitionProperty> properties) {
+        CascadingUtil.setParameterDefinitionProperties(this, PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME,
+            properties);
+    }
+
+    /**
+     * @return list of {@link ParametersDefinitionProperty}. Supports cascading functionality.
+     */
+    @SuppressWarnings("unchecked")
+    private CopyOnWriteList<ParametersDefinitionProperty> getParameterDefinitionProperties() {
         return CascadingUtil.getCopyOnWriteListProjectProperty(this, PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME)
             .getValue();
     }
@@ -678,17 +771,23 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      *
      * @since 1.188
      */
+    @SuppressWarnings("unchecked")
     public void addProperty(JobProperty<? super JobT> jobProp) throws IOException {
-        ((JobProperty) jobProp).setOwner(this);
-        if (((JobProperty) jobProp) instanceof ParametersDefinitionProperty) {
+        JobProperty jobProperty = (JobProperty) jobProp;
+        jobProperty.setOwner(this);
+        if (jobProperty instanceof AuthorizationMatrixProperty) {
+            properties.add(jobProp);
+        } else if (jobProperty instanceof ParametersDefinitionProperty) {
             CopyOnWriteList list = CascadingUtil.getCopyOnWriteListProjectProperty(this,
-                PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME)
-                .getOriginalValue();
+                PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME).getOriginalValue();
             if (null != list) {
                 list.add(jobProp);
             }
         } else {
-            properties.add(jobProp);
+            BaseProjectProperty projectProperty = CascadingUtil.getBaseProjectProperty(this,
+                jobProperty.getDescriptor().getJsonSafeClassName());
+            projectProperty.setValue(jobProperty);
+            addCascadingJobProperty(projectProperty);
         }
         save();
     }
@@ -698,16 +797,19 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      *
      * @since 1.279
      */
+    @SuppressWarnings("unchecked")
     public void removeProperty(JobProperty<? super JobT> jobProp) throws IOException {
-        if (((JobProperty) jobProp) instanceof ParametersDefinitionProperty) {
+        JobProperty jobProperty = (JobProperty) jobProp;
+        if (jobProperty instanceof AuthorizationMatrixProperty) {
+            properties.remove(jobProp);
+        } else if (jobProperty instanceof ParametersDefinitionProperty) {
             CopyOnWriteList list = CascadingUtil.getCopyOnWriteListProjectProperty(this,
-                PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME)
-                .getOriginalValue();
+                PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME).getOriginalValue();
             if (null != list) {
                 list.remove(jobProp);
             }
         } else {
-            properties.remove(jobProp);
+            removeCascadingJobProperty(jobProperty.getDescriptor().getJsonSafeClassName());
         }
         save();
     }
@@ -718,13 +820,16 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * @return The property that was just removed.
      * @since 1.279
      */
+    @SuppressWarnings("unchecked")
     public <T extends JobProperty> T removeProperty(Class<T> clazz) throws IOException {
         CopyOnWriteList<JobProperty<? super JobT>> sourceProperties;
         if (clazz.equals(ParametersDefinitionProperty.class)) {
             sourceProperties = CascadingUtil.getCopyOnWriteListProjectProperty(this,
                 PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME).getOriginalValue();
-        } else {
+        } else if (clazz.equals(AuthorizationMatrixProperty.class)) {
             sourceProperties = properties;
+        } else {
+            sourceProperties = getCascadingJobProperties();
         }
         if (null != sourceProperties) {
             for (JobProperty<? super JobT> p : sourceProperties) {
@@ -747,14 +852,16 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     /**
      * List of all {@link JobProperty} exposed primarily for the remoting API.
-     * @since 1.282
+     * List contains cascadable {@link JobProperty} if any.
+     * @since 2.2.0
      */
     @Exported(name = "property", inline = true)
+    @SuppressWarnings("unchecked")
     public List<JobProperty<? super JobT>> getAllProperties() {
-        CopyOnWriteList<ParametersDefinitionProperty> definitionProperties = getParameterDefinitionProperties();
+        CopyOnWriteList cascadingJobProperties = getCascadingJobProperties();
         List<JobProperty<? super JobT>> result = properties.getView();
-        if (null != definitionProperties) {
-            result = Collections.unmodifiableList(ListUtils.union(result, definitionProperties.getView()));
+        if (null != cascadingJobProperties && !cascadingJobProperties.isEmpty()) {
+            result = Collections.unmodifiableList(ListUtils.union(result, cascadingJobProperties.getView()));
         }
         return result;
     }
@@ -762,14 +869,16 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     /**
      * Gets the specific property, or null if the propert is not configured for
      * this job.
+     * Supports cascading properties
+     * @since 2.2.0
      */
+    @SuppressWarnings("unchecked")
     public <T extends JobProperty> T getProperty(Class<T> clazz) {
         CopyOnWriteList<JobProperty<? super JobT>> sourceProperties;
-        if (clazz.equals(ParametersDefinitionProperty.class)) {
-            sourceProperties = CascadingUtil.getCopyOnWriteListProjectProperty(this,
-                PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME).getOriginalValue();
-        } else {
+        if (clazz.equals(AuthorizationMatrixProperty.class)) {
             sourceProperties = properties;
+        } else {
+            sourceProperties = getCascadingJobProperties();
         }
         if (null != sourceProperties) {
             for (JobProperty p : sourceProperties) {
@@ -1369,19 +1478,30 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         properties.clear();
         CopyOnWriteList parameterDefinitionProperties = new CopyOnWriteList();
         int i = 0;
-        for (JobPropertyDescriptor d : JobPropertyDescriptor
-            .getPropertyDescriptors(Job.this.getClass())) {
-            String name = "jobProperty" + (i++);
-            JSONObject config = json.getJSONObject(name);
-            JobProperty prop = d.newInstance(req, config);
-
-            if (prop instanceof ParametersDefinitionProperty) {
-                prop.setOwner(this);
-                parameterDefinitionProperties.add(prop);
-            } else if (null != prop) {
-                prop.setOwner(this);
-                properties.add(prop);
+        for (JobPropertyDescriptor d : JobPropertyDescriptor.getPropertyDescriptors(Job.this.getClass())) {
+            if (!CascadingUtil.isCascadableJobProperty(d)) {
+                String name = "jobProperty" + i;
+                JSONObject config = json.getJSONObject(name);
+                JobProperty prop = d.newInstance(req, config);
+                if (null != prop) {
+                    prop.setOwner(this);
+                    if (prop instanceof AuthorizationMatrixProperty) {
+                        properties.add(prop);
+                    } else if (prop instanceof ParametersDefinitionProperty) {
+                        parameterDefinitionProperties.add(prop);
+                    }
+                }
+            } else {
+                BaseProjectProperty property = CascadingUtil.getBaseProjectProperty(this,
+                    d.getJsonSafeClassName());
+                JobProperty prop = d.newInstance(req, json.getJSONObject(d.getJsonSafeClassName()));
+                if (null != prop) {
+                    prop.setOwner(this);
+                }
+                property.setValue(prop);
+                addCascadingJobProperty(property);
             }
+            i++;
         }
         setParameterDefinitionProperties(parameterDefinitionProperties);
         LogRotator logRotator = null;

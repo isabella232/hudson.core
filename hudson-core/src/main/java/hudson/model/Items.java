@@ -155,6 +155,7 @@ public class Items {
         XSTREAM.alias("copy-write-list-property", CopyOnWriteListProjectProperty.class);
         XSTREAM.alias("axis-list-property", AxisListProjectProperty.class);
         XSTREAM.alias("describable-list-property", DescribableListProjectProperty.class);
+        XSTREAM.aliasField("cascading-job-properties", Job.class, "cascadingJobProperties");
         XSTREAM.aliasField("project-properties", Job.class, "jobProperties");
         XSTREAM.alias("appointed-node-property", AppointedNode.class);
     }
