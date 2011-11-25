@@ -1,6 +1,6 @@
 <!-- **************************************************************************
 #
-# Copyright  (c) 2004-2010 Oracle Corporation.
+# Copyright  (c) 2004-2011 Oracle Corporation.
 #
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
@@ -20,7 +20,9 @@
         
         <f:checkbox name="privateRealm.allowsSignup" checked="${h.defaultToTrue(instance.allowsSignup())}"
                     title="${%Allow users to sign up}"/>
-    </f:entry>    
+        <f:checkbox name="privateRealm.notifyUser" checked="${h.defaultToTrue(instance.isNotifyUser())}"
+                    title="${%Notify user of Hudson account creation}"/>
+    </f:entry>
                     
          
     <j:if test="${size(h.captchaSupportDescriptors) gt 0}">
@@ -40,5 +42,4 @@
             </j:forEach>
         </f:dropdownList>
     </j:if>
-     
 </j:jelly>
