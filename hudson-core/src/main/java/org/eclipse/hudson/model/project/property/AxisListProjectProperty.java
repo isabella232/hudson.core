@@ -16,7 +16,7 @@
 package org.eclipse.hudson.model.project.property;
 
 import hudson.matrix.AxisList;
-import org.eclipse.hudson.api.model.IJob;
+import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
  * Represents {@link hudson.matrix.AxisList} property.
@@ -27,7 +27,7 @@ import org.eclipse.hudson.api.model.IJob;
  */
 public class AxisListProjectProperty extends BaseProjectProperty<AxisList> {
 
-    public AxisListProjectProperty(IJob job) {
+    public AxisListProjectProperty(ICascadingJob job) {
         super(job);
     }
 

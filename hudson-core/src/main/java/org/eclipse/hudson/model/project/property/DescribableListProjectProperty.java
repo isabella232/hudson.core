@@ -16,7 +16,7 @@ package org.eclipse.hudson.model.project.property;
 
 import hudson.util.DescribableList;
 import org.apache.commons.collections.CollectionUtils;
-import org.eclipse.hudson.api.model.IJob;
+import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
  * Property represents DescribableList object.
@@ -26,7 +26,7 @@ import org.eclipse.hudson.api.model.IJob;
  * @author Nikita Levyankov
  */
 public class DescribableListProjectProperty extends BaseProjectProperty<DescribableList> {
-    public DescribableListProjectProperty(IJob job) {
+    public DescribableListProjectProperty(ICascadingJob job) {
         super(job);
     }
 

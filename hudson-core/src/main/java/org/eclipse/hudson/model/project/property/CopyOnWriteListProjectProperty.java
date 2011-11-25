@@ -15,7 +15,7 @@
 package org.eclipse.hudson.model.project.property;
 
 import hudson.util.CopyOnWriteList;
-import org.eclipse.hudson.api.model.IJob;
+import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
  * Project property for {@link CopyOnWriteList}
@@ -26,7 +26,7 @@ import org.eclipse.hudson.api.model.IJob;
  */
 public class CopyOnWriteListProjectProperty extends BaseProjectProperty<CopyOnWriteList> {
 
-    public CopyOnWriteListProjectProperty(IJob job) {
+    public CopyOnWriteListProjectProperty(ICascadingJob job) {
         super(job);
     }
 

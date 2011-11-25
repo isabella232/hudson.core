@@ -15,7 +15,7 @@
 
 package org.eclipse.hudson.model.project.property;
 import hudson.model.Result;
-import org.eclipse.hudson.api.model.IJob;
+import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
  * Represents {@link Result} property.
@@ -26,7 +26,7 @@ import org.eclipse.hudson.api.model.IJob;
  */
 public class ResultProjectProperty extends BaseProjectProperty<Result> {
 
-    public ResultProjectProperty(IJob job) {
+    public ResultProjectProperty(ICascadingJob job) {
         super(job);
     }
 }

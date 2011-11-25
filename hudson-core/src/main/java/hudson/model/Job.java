@@ -86,6 +86,7 @@ import net.sf.json.JSONException;
  
 import net.sf.json.JSONObject;
 
+import org.eclipse.hudson.api.model.ICascadingJob;
 import org.eclipse.hudson.api.model.IJob;
 import org.eclipse.hudson.api.model.IProjectProperty;
 import org.eclipse.hudson.model.project.property.BaseProjectProperty;
@@ -114,7 +115,7 @@ import static javax.servlet.http.HttpServletResponse.*;
  * @author Nikita Levyankov
  */
 public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, RunT>>
-        extends AbstractItem implements ExtensionPoint, StaplerOverridable, IJob {
+        extends AbstractItem implements ExtensionPoint, StaplerOverridable, IJob, ICascadingJob {
     private static transient final String HUDSON_BUILDS_PROPERTY_KEY = "HUDSON_BUILDS";
     private static transient final String PROJECT_PROPERTY_KEY_PREFIX = "has";
     public static final String PROPERTY_NAME_SEPARATOR = ";";
@@ -165,7 +166,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     /**
      * List of {@link UserProperty}s configured for this project.
-     * According to new implementation {@link org.eclipse.hudson.api.model.project.property.ParametersDefinitionProperty} were moved from this collection. So, this
+     * According to new implementation {@link hudson.model.ParametersDefinitionProperty} were moved from this collection. So, this
      * field was left protected for backward compatibility. Don't use this field directly for adding or removing
      * values. Use {@link #addProperty(JobProperty)}, {@link #removeProperty(JobProperty)},
      * {@link #removeProperty(Class)} instead.
@@ -232,10 +233,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
 
     /**
-     * Put job property to properties map.
-     *
-     * @param key key.
-     * @param property property instance.
+     * {@inheritDoc}
      */
     public void putProjectProperty(String key, IProjectProperty property) {
         if (null != key && null != property) {
@@ -244,9 +242,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Returns project properties.
-     *
-     * @return project properties.
+     * {@inheritDoc}
      */
     @SuppressWarnings({"unchecked"})
     public Map<String, IProjectProperty> getProjectProperties() {
@@ -254,9 +250,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Removes project property.
-     *
-     * @param key property key.
+     * {@inheritDoc}
      */
     public void removeProjectProperty(String key){
         jobProperties.remove(key);
@@ -279,10 +273,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Returns job property by specified key.
-     *
-     * @param key key.
-     * @return {@link org.eclipse.hudson.api.model.IProjectProperty} instance or null.
+     * {@inheritDoc}
      */
     public IProjectProperty getProperty(String key){
         return CascadingUtil.getProjectProperty(this, key);
@@ -296,9 +287,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Returns list of cascading children project names.
-     *
-     * @return list of cascading children project names.
+     * {@inheritDoc}
      */
     @Exported
     public Set<String> getCascadingChildrenNames() {
@@ -306,10 +295,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Adds cascading child project name and saves configuration.
-     *
-     * @param cascadingChildName cascading child project name.
-     * @throws java.io.IOException if configuration couldn't be saved.
+     * {@inheritDoc}
      */
     public void addCascadingChild(String cascadingChildName) throws IOException {
         cascadingChildrenNames.add(cascadingChildName);
@@ -317,26 +303,22 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Remove cascading child project name and saves job configuration
-     *
-     * @param cascadingChildName cascading child project name.
-     * @throws java.io.IOException if configuration couldn't be saved.
+     * {@inheritDoc}
      */
     public void removeCascadingChild(String cascadingChildName) throws IOException {
         cascadingChildrenNames.remove(cascadingChildName);
         save();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean hasCascadingChild(String cascadingChildName) {
         return null != cascadingChildName && cascadingChildrenNames.contains(cascadingChildName);
     }
 
     /**
-     * Remove cascading child project name and saves job configuration
-     *
-     * @param oldChildName old child project name.
-     * @param newChildName new child project name.
-     * @throws java.io.IOException if configuration couldn't be saved.
+     * {@inheritDoc}
      */
     public synchronized void renameCascadingChildName(String oldChildName, String newChildName) throws IOException {
         cascadingChildrenNames.remove(oldChildName);
@@ -554,13 +536,16 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         getNextBuildNumberFile().write(String.valueOf(nextBuildNumber) + '\n');
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Exported
     public boolean isInQueue() {
         return false;
     }
 
     /**
-     * If this job is in the build queue, return its item.
+     * {@inheritDoc}
      */
     @Exported
     public Queue.Item getQueueItem() {
@@ -568,7 +553,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Returns true if a build of this project is in progress.
+     * {@inheritDoc}
      */
     public boolean isBuilding() {
         RunT b = getLastBuild();
@@ -581,14 +566,14 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Returns whether the name of this job can be changed by user.
+     * {@inheritDoc}
      */
     public boolean isNameEditable() {
         return true;
     }
 
     /**
-     * If true, it will keep all the build logs of dependency components.
+     * {@inheritDoc}
      */
     @Exported
     public boolean isKeepDependencies() {
@@ -596,7 +581,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Allocates a new buildCommand number.
+     * {@inheritDoc}
      */
     public synchronized int assignBuildNumber() throws IOException {
         int r = nextBuildNumber++;
@@ -605,7 +590,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Peeks the next build number.
+     * {@inheritDoc}
      */
     @Exported
     public int getNextBuildNumber() {
@@ -613,14 +598,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Programatically updates the next build number.
-     *
-     * <p>
-     * Much of Hudson assumes that the build number is unique and monotonic, so
-     * this method can only accept a new value that's bigger than
-     * {@link #getLastBuild()} returns. Otherwise it'll be no-op.
-     *
-     * @since 1.199 (before that, this method was package private.)
+     * {@inheritDoc}
      */
     public synchronized void updateNextBuildNumber(int next) throws IOException {
         RunT lb = getLastBuild();
@@ -631,16 +609,14 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Returns the log rotator for this job, or null if none.
+     * {@inheritDoc}
      */
     public LogRotator getLogRotator() {
         return CascadingUtil.getLogRotatorProjectProperty(this, LOG_ROTATOR_PROPERTY_NAME).getValue();
     }
 
     /**
-     * Sets log rotator.
-     *
-     * @param logRotator log rotator.
+     * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
     public void setLogRotator(LogRotator logRotator) {
@@ -649,7 +625,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
 
     /**
-     * Perform log rotation.
+     * {@inheritDoc}
      */
     public void logRotate() throws IOException, InterruptedException {
         LogRotator lr = getLogRotator();
@@ -659,7 +635,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * True if this instance supports log rotation configuration.
+     * {@inheritDoc}
      */
     public boolean supportsLogRotator() {
         return true;
@@ -1699,7 +1675,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Renames cascading project name. For the properties prcessing and children links updating
+     * Renames cascading project name. For the properties processing and children links updating
      * please use {@link #setCascadingProjectName} instead.
      *
      * @param cascadingProjectName new project name.

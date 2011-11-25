@@ -14,7 +14,7 @@
  *******************************************************************************/
 package org.eclipse.hudson.model.project.property;
 
-import org.eclipse.hudson.api.model.IJob;
+import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
  * Represents boolean property.
@@ -25,7 +25,7 @@ import org.eclipse.hudson.api.model.IJob;
  */
 public class BooleanProjectProperty extends BaseProjectProperty<Boolean> {
 
-    public BooleanProjectProperty(IJob job) {
+    public BooleanProjectProperty(ICascadingJob job) {
         super(job);
     }
 

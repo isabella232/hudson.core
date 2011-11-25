@@ -17,7 +17,7 @@ package org.eclipse.hudson.model.project.property;
 
 import hudson.util.DeepEquals;
 import org.apache.commons.lang3.ObjectUtils;
-import org.eclipse.hudson.api.model.IJob;
+import org.eclipse.hudson.api.model.ICascadingJob;
 import org.eclipse.hudson.api.model.IProjectProperty;
 
 /**
@@ -32,7 +32,7 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
     static final String INVALID_PROPERTY_KEY_EXCEPTION = "Project property should have not null propertyKey";
 
     private transient String propertyKey;
-    private transient IJob job;
+    private transient ICascadingJob job;
     private T originalValue;
     private boolean propertyOverridden;
 
@@ -41,7 +41,7 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
      *
      * @param job owner of current property.
      */
-    public BaseProjectProperty(IJob job) {
+    public BaseProjectProperty(ICascadingJob job) {
         setJob(job);
     }
 
@@ -62,7 +62,7 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
     /**
      * {@inheritDoc}
      */
-    public void setJob(IJob job) {
+    public void setJob(ICascadingJob job) {
         if (null == job) {
             throw new IllegalArgumentException(INVALID_JOB_EXCEPTION);
         }
@@ -72,7 +72,7 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
     /**
      * @return job that property belongs to.
      */
-    final IJob getJob() {
+    final ICascadingJob getJob() {
         return job;
     }
 
