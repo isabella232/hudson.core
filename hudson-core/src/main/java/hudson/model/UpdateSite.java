@@ -516,7 +516,7 @@ public class UpdateSite {
         private String get(JSONObject o, String prop) {
             if(o.has(prop)) {
                 String value = o.getString(prop);
-                if (!"null".equals(value)) {
+                if (!"null".equals(value) && !"\"null\"".equals(value)) {
                     return value;
                 }
             }
