@@ -78,12 +78,8 @@ final class WarExploder {
             }
         }
 
-        // locate hudson.war
-        URL winstone = WarExploder.class.getResource("/winstone.jar");
-        if(winstone==null)
-        // impossible, since the test harness pulls in hudson.war
-            throw new AssertionError("hudson.war is not in the classpath.");
-        File war = Which.jarFile(Class.forName("executable.Executable"));
+        // locate hudson-war-for-test.jar
+        File war = Which.jarFile(Class.forName("org.eclipse.hudson.war.executable.StartJetty"));
 
         File explodeDir = new File("./target/hudson-for-test").getAbsoluteFile();
         File timestamp = new File(explodeDir,".timestamp");
