@@ -32,7 +32,7 @@
   </description>
 
   <properties>
-    <htmlunit.version>2.6-hudson-2</htmlunit.version>
+    <htmlunit.version>2.6-hudson-3</htmlunit.version>
     <embedded-rhino-debugger.version>1.2</embedded-rhino-debugger.version>
     <netx.version>0.5-hudson-2</netx.version>
     <gmaven-plugin.version>1.3</gmaven-plugin.version>
@@ -93,7 +93,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jvnet.hudson</groupId>
+      <groupId>org.hudsonci.tools</groupId>
       <artifactId>htmlunit</artifactId>
       <version>${htmlunit.version}</version>
       <exclusions>
