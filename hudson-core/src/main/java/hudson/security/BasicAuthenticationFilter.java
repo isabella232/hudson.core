@@ -18,9 +18,8 @@ package hudson.security;
 
 import hudson.model.Hudson;
 import hudson.util.Scrambler;
-import org.springframework.security.GrantedAuthorityImpl;
-import org.springframework.security.context.SecurityContextHolder;
-
+import java.io.IOException;
+import java.net.URLEncoder;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -31,8 +30,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URLEncoder;
+import org.springframework.security.context.SecurityContextHolder;
 
 /**
  * Implements the dual authentcation mechanism.
@@ -155,5 +153,4 @@ public class BasicAuthenticationFilter implements Filter {
     public void destroy() {
     }
 
-    private static final GrantedAuthorityImpl[] EMPTY_AUTHORITIES = {new GrantedAuthorityImpl("")};
 }
