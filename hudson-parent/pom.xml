@@ -56,7 +56,7 @@
     <findbugs-maven-plugin.version>2.3.1</findbugs-maven-plugin.version>
     <maven-localizer-plugin.version>1.10</maven-localizer-plugin.version>
     <maven-hpi-plugin.version>3.0.0-SNAPSHOT</maven-hpi-plugin.version>
-    <maven-stapler-plugin.version>1.15</maven-stapler-plugin.version>
+    <maven-stapler-plugin.version>1.16</maven-stapler-plugin.version>
 
     <!--Test dependencies-->
     <junit.version>4.8.1</junit.version>
@@ -109,6 +109,19 @@
   <!-- FIXME: Why are these needed? Maybe replace them with RSO's public-grid group? -->
 
   <repositories>
+    
+    <repository>
+      <id>sonatype-nexus-releases</id>
+      <name>Sonatype Nexus Releases</name>
+      <url>https://oss.sonatype.org/content/repositories/releases/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>  
+    
     <repository>
       <id>m.g.o-public</id>
       <url>http://maven.glassfish.org/content/groups/public/</url>
@@ -118,17 +131,8 @@
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
-    </repository>
-    <repository>
-      <id>hudson.snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
     </repository>   
+    
   </repositories>
 
   <pluginRepositories>
