@@ -13,60 +13,6 @@
  *
  *******************************************************************************/
 //Move patched logic from prototype library.
-Ajax.Request.prototype = Object.extend(new Ajax.Base(), {
-  respondToReadyState: function(readyState) {
-    var state = Ajax.Request.Events[readyState];
-    var transport = this.transport, json = this.evalJSON();
-
-    if (state == 'Complete') {
-      try {
-        this._complete = true;
-        (this.options['on' + this.transport.status]
-         || this.options['on' + (this.success() ? 'Success' : 'Failure')]
-         || Prototype.emptyFunction)(transport, json);
-      } catch (e) {
-        this.dispatchException(e);
-      }
-
-//      var contentType = this.getHeader('Content-type');
-//      if (contentType && contentType.strip().
-//        match(/^(text|application)\/(x-)?(java|ecma)script(;.*)?$/i))
-//          this.evalResponse();
-    }
-
-    try {
-      (this.options['on' + state] || Prototype.emptyFunction)(transport, json);
-      Ajax.Responders.dispatch('on' + state, this, transport, json);
-    } catch (e) {
-      this.dispatchException(e);
-    }
-
-    if (state == 'Complete') {
-      // avoid memory leak in MSIE: clean up
-      this.transport.onreadystatechange = Prototype.emptyFunction;
-    }
-  },
-  evalResponse: function() {
-    try {
-      return eval('('+(this.transport.responseText || '').unfilterJSON()+')');
-    } catch (e) {
-      this.dispatchException(e);
-    }
-  }
-});
-
-Element.Methods = {
-  hasClassName: function(element, className) {
-    if (!(element = $(element))) return;
-    var elementClassName = element.className;
-    if (!elementClassName || elementClassName.length == 0) return false;
-    if (elementClassName == className ||
-        elementClassName.match(new RegExp("(^|\\s)" + className + "(\\s|$)")))
-      return true;
-    return false;
-  }
-}
-
 Form.Methods = {
   getInputs: function(form, typeName, name) {
     form = $(form);
