@@ -20,6 +20,9 @@ import java.util.Map;
 
 /**
  * DataStructure that represents a Native Process
+ * 
+ * @author Winston Prakash
+ * @since 3.0.0
  */
 public interface NativeProcess {
 

@@ -34,7 +34,7 @@ import java.util.Set;
  * A default constructor is needed to create NativeAccessSupport in the default configuration.
  *
  * @author Winston Prakash
- * @since 2.0.1
+ * @since 3.00
  * @see NativeAccessSupportDescriptor
  */
 public abstract class NativeUnixSupport extends AbstractDescribableImpl<NativeUnixSupport> implements ExtensionPoint {

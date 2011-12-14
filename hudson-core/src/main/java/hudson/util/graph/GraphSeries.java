@@ -10,7 +10,8 @@ import java.util.List;
 
 /**
  * Data and definition of a chart GraphSeries  
- * @author winstonp
+ * @author Winstonp Prakash
+ * @since 3.0.0
  */
 public class GraphSeries<E> {
 

@@ -20,6 +20,8 @@ import java.awt.Color;
 
 /**
  * Information about Chart Label
+ * @author Winston Prakash
+ * @since 3.0.0
  */
 abstract public class ChartLabel implements Comparable<ChartLabel>{
     abstract public Color getColor(int row, int column);

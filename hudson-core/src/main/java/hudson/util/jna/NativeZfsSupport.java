@@ -33,7 +33,7 @@ import java.util.List;
  * A default constructor is needed to create NativeAccessSupport in the default configuration.
  *
  * @author Winston Prakash
- * @since 2.0.1
+ * @since 3.0.0
  * @see NativeAccessSupportDescriptor
  */
 public abstract class NativeZfsSupport extends AbstractDescribableImpl<NativeZfsSupport> implements ExtensionPoint {

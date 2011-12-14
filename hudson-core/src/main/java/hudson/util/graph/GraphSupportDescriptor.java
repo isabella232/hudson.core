@@ -22,7 +22,7 @@ import hudson.model.Descriptor;
  * {@link Descriptor} for {@link GraphSupport}.
  *
  * @author Winston Prakash
- * @since 2.0.1
+ * @since 3.0.0
  */
 public abstract class GraphSupportDescriptor extends Descriptor<GraphSupport> {
     // so far nothing different from plain Descriptor

@@ -18,7 +18,9 @@ package hudson.util.jna;
 
 /**
  * DataStructure to hold the memory Usage data of a System
- *  
+ * 
+ * @author Winston Prakash
+ * @since 3.0.0
  */
 public interface NativeSystemMemory {
 

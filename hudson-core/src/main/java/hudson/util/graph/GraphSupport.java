@@ -33,7 +33,7 @@ import java.util.List;
  * A default constructor is needed to create GraphSupport in the default configuration.
  *
  * @author Winston Prakash
- * @since 2.0.1
+ * @since 3.0.0
  * @see GraphSupportDescriptor
  */
 public abstract class GraphSupport extends AbstractDescribableImpl<GraphSupport> implements ExtensionPoint {

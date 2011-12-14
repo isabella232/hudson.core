@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 /**
  * A Native Support Utility (singleton) that delegates the actions to available Native Support Extensions
- * @since 2.0.1
+ * @since 3.0.0
  * @see NativeAccessSupport, ZfsSupport
  */
 public class NativeUtils {
@@ -113,7 +113,7 @@ public class NativeUtils {
 
     private void ensureWindowsSupport(NativeFunction function) throws NativeAccessException {
         if (!hasWindowsSupport()) {
-            throw new NativeAccessException("Native Unix Support plugin not installed");
+            throw new NativeAccessException("Native Windows Support plugin not installed");
         }
         if (!nativeWindowsSupport.hasSupportFor(function)) {
             throw new NativeAccessException("Installed Native Windows Support plugin does not support " + function);
