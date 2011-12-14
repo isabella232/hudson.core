@@ -44,10 +44,11 @@
     <filter-name>authentication-filter</filter-name>
     <filter-class>hudson.security.HudsonFilter</filter-class>
   </filter>
-  <filter>
+  <!--Crumb feature doesn't work because we migrated from patched prototype 1.5.1.1 library to version 1.7 (patch added crumb data into request header) -->
+  <!-- filter>
     <filter-name>csrf-filter</filter-name>
     <filter-class>hudson.security.csrf.CrumbFilter</filter-class>
-  </filter>
+  </filter -->
   <filter>
     <filter-name>plugins-filter</filter-name>
     <filter-class>hudson.util.PluginServletFilter</filter-class>
@@ -106,10 +107,10 @@
     <filter-name>authentication-filter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-  <filter-mapping>
+  <!-- filter-mapping>
     <filter-name>csrf-filter</filter-name>
     <url-pattern>/*</url-pattern>
-  </filter-mapping>
+  </filter-mapping -->
   <filter-mapping>
     <filter-name>plugins-filter</filter-name>
     <url-pattern>/*</url-pattern>
