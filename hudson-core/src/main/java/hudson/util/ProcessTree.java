@@ -436,7 +436,14 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                 LOGGER.finest("Considering to kill " + p.getPid());
 
                 boolean matched;
-                matched = p.hasMatchingEnvVars(modelEnvVars);
+                
+                try {
+                    matched = p.hasMatchingEnvVars(modelEnvVars);
+                } catch (NativeAccessException e) {
+                    // likely a missing privilege
+                    LOGGER.log(FINEST, "  Failed to check environment variable match", e);
+                    continue;
+                }
 
                 if (matched) {
                     p.killRecursively();
