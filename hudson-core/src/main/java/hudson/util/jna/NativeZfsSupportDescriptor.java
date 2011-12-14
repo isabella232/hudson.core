@@ -22,7 +22,7 @@ import hudson.model.Descriptor;
  * {@link Descriptor} for {@link ZfsSupport}.
  *
  * @author Winston Prakash
- * @since 2.0.1
+ * @since 3.0.0
  */
 public abstract class NativeZfsSupportDescriptor extends Descriptor<NativeZfsSupport> {
     // so far nothing different from plain Descriptor

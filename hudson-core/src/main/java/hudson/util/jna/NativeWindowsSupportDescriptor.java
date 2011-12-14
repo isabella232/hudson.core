@@ -22,7 +22,7 @@ import hudson.model.Descriptor;
  * {@link Descriptor} for {@link NativeWindowsSupport}.
  *
  * @author Winston Prakash
- * @since 2.0.1
+ * @since 3.0.0
  */
 public abstract class NativeWindowsSupportDescriptor extends Descriptor<NativeWindowsSupport> {
     // so far nothing different from plain Descriptor

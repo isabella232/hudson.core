@@ -20,6 +20,9 @@ import java.io.File;
 
 /**
  * Data Structure and operation defining a ZFS file Systems
+ * 
+ * @author Winston Prakash
+ * @since 3.0.0
  */
 public interface NativeZfsFileSystem{
     

@@ -18,6 +18,9 @@ package hudson.util.jna;
 
 /**
  * Constants Describing Native functions
+ * 
+ * @author Winston Prakash
+ * @since 3.0.0
  */
 public enum NativeFunction {
 

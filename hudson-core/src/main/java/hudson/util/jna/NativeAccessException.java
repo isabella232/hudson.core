@@ -21,8 +21,10 @@ package hudson.util.jna;
  * Exception to be thrown when a native function is not supported
  * or when the function failed to execute
  * 
+ * @author Winston Prakash
+ * @since 3.0.0
  */
-public class NativeAccessException extends Exception {
+public class NativeAccessException extends RuntimeException {
     
     public static int PERMISSION = 1;
     
