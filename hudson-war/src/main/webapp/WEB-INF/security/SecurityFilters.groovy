@@ -35,7 +35,7 @@ def commonProviders() {
     return [
         bean(AnonymousProcessingFilter) {
             key = "anonymous" // must match with the AnonymousProvider
-            userAttribute = "anonymous,"
+            userAttribute = "anonymous,ROLE_ANONYMOUS"
         },
         bean(ExceptionTranslationFilter) {
             accessDeniedHandler = new AccessDeniedHandlerImpl()
