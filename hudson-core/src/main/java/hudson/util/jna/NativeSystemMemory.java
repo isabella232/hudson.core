@@ -16,13 +16,15 @@
 
 package hudson.util.jna;
 
+import java.io.Serializable;
+
 /**
  * DataStructure to hold the memory Usage data of a System
  * 
  * @author Winston Prakash
  * @since 3.0.0
  */
-public interface NativeSystemMemory {
+public interface NativeSystemMemory extends Serializable {
 
     /**
      * Get the available System Memory

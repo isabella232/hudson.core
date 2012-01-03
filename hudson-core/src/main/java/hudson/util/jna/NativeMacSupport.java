@@ -21,6 +21,7 @@ import hudson.ExtensionPoint;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -35,7 +36,8 @@ import java.util.List;
  * @since 3.0.0
  * @see NativeAccessSupportDescriptor
  */
-public abstract class NativeMacSupport extends AbstractDescribableImpl<NativeMacSupport> implements ExtensionPoint {
+public abstract class NativeMacSupport extends AbstractDescribableImpl<NativeMacSupport> implements ExtensionPoint,
+    Serializable {
 
     /**
      * Returns all the registered {@link NativeAccessSupport} descriptors.

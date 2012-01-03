@@ -16,7 +16,10 @@
 
 package hudson.util.jna;
 
+import hudson.DescriptorExtensionList;
+import hudson.model.Descriptor;
 import java.io.File;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,7 +31,7 @@ import java.util.logging.Logger;
  * @since 3.0.0
  * @see NativeAccessSupport, ZfsSupport
  */
-public class NativeUtils {
+public class NativeUtils implements Serializable {
 
     private NativeZfsSupport nativeZfsSupport;
     private NativeUnixSupport nativeUnixSupport;
@@ -46,20 +49,28 @@ public class NativeUtils {
 
     private NativeUtils() {
         try {
-            if (!NativeUnixSupport.all().isEmpty()) {
-                nativeUnixSupport = NativeUnixSupport.all().get(0).newInstance(null, null);
+            DescriptorExtensionList<NativeUnixSupport, Descriptor<NativeUnixSupport>> unixSupportDescriptors
+                = NativeUnixSupport.all();
+            if (null != unixSupportDescriptors && !unixSupportDescriptors.isEmpty()) {
+                nativeUnixSupport = unixSupportDescriptors.get(0).newInstance(null, null);
             }
 
-            if (!NativeWindowsSupport.all().isEmpty()) {
-                nativeWindowsSupport = NativeWindowsSupport.all().get(0).newInstance(null, null);
+            DescriptorExtensionList<NativeWindowsSupport, Descriptor<NativeWindowsSupport>> windowsSupportDescriptors
+                = NativeWindowsSupport.all();
+            if (null != windowsSupportDescriptors && !windowsSupportDescriptors.isEmpty()) {
+                nativeWindowsSupport = windowsSupportDescriptors.get(0).newInstance(null, null);
             }
 
-            if (!NativeMacSupport.all().isEmpty()) {
-                nativeMacSupport = NativeMacSupport.all().get(0).newInstance(null, null);
+            DescriptorExtensionList<NativeMacSupport, Descriptor<NativeMacSupport>> macSupportDescriptors
+                = NativeMacSupport.all();
+            if (null != macSupportDescriptors && !macSupportDescriptors.isEmpty()) {
+                nativeMacSupport = macSupportDescriptors.get(0).newInstance(null, null);
             }
 
-            if (!NativeZfsSupport.all().isEmpty()) {
-                nativeZfsSupport = NativeZfsSupport.all().get(0).newInstance(null, null);
+            DescriptorExtensionList<NativeZfsSupport, Descriptor<NativeZfsSupport>> zfsSupportDescriptors
+                = NativeZfsSupport.all();
+            if (null != zfsSupportDescriptors && !zfsSupportDescriptors.isEmpty()) {
+                nativeZfsSupport = zfsSupportDescriptors.get(0).newInstance(null, null);
             }
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);

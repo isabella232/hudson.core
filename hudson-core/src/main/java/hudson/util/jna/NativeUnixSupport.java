@@ -22,6 +22,7 @@ import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import java.io.File;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,13 +38,14 @@ import java.util.Set;
  * @since 3.00
  * @see NativeAccessSupportDescriptor
  */
-public abstract class NativeUnixSupport extends AbstractDescribableImpl<NativeUnixSupport> implements ExtensionPoint {
+public abstract class NativeUnixSupport extends AbstractDescribableImpl<NativeUnixSupport> implements ExtensionPoint,
+    Serializable {
 
     /**
      * Returns all the registered {@link NativeAccessSupport} descriptors.
      */
     public static DescriptorExtensionList<NativeUnixSupport, Descriptor<NativeUnixSupport>> all() {
-        return Hudson.getInstance().<NativeUnixSupport, Descriptor<NativeUnixSupport>>getDescriptorList(NativeUnixSupport.class);
+        return Hudson.getInstance().getDescriptorList(NativeUnixSupport.class);
     }
 
     @Override

@@ -24,7 +24,7 @@
       <l:task icon="images/24x24/notepad.png" href="${buildUrl.baseUrl}/changes" title="${%Changes}" />
       <j:if test="${it.project.buildable}">
          <l:task icon="images/24x24/clock.png" href="${it.upUrl}build?delay=0sec" title="${%Build Now}"
-                  onclick="${it.project.parameterized?null:'return build(this)'}" permission="${it.BUILD}" />
+                  onclick="${it.project.parameterized?null:'return build(this)'}" permission="${it.project.BUILD}" />
           <script>
             function build(a) {
               new Ajax.Request(a.href);

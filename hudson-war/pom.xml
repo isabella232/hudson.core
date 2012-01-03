@@ -246,6 +246,16 @@
                                     <destFileName>ssh-slaves.hpi</destFileName>
                                 </artifactItem>
                                 
+                                <artifactItem>
+                                    <groupId>org.eclipse.hudson.plugins</groupId>
+                                    <artifactId>birt-charts</artifactId>
+                                    <version>1.0.0-SNAPSHOT</version>
+                                    <type>hpi</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
+                                    <destFileName>birt-charts.hpi</destFileName>
+                                </artifactItem>
+                                
                                 <!-- Temporary external plugins -->
                                 
                                 <artifactItem>

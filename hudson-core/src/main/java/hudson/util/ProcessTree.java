@@ -308,14 +308,28 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
      * Gets the {@link ProcessTree} of the current system
      * that JVM runs in, or in the worst case return the default one
      * that's not capable of killing descendants at all.
+     *
+     * @return ProcessTree of the current system.
      */
     public static ProcessTree get() {
+        return get(NativeUtils.getInstance());
+    }
+
+    /**
+     * Gets the {@link ProcessTree} of the current system
+     * that JVM runs in, or in the worst case return the default one
+     * that's not capable of killing descendants at all.
+     *
+     * @param nativeUtils instance of NativeUtils.
+     * @return ProcessTree of the current system.
+     */
+    public static ProcessTree get(NativeUtils nativeUtils) {
         if(!enabled)
             return DEFAULT;
 
         try {
             if(File.pathSeparatorChar==';')
-                return new Windows();
+                return new Windows(nativeUtils);
 
             String os = Util.fixNull(System.getProperty("os.name"));
             if(os.equals("Linux"))
@@ -323,7 +337,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
             if(os.equals("SunOS"))
                 return new Solaris();
             if(os.equals("Mac OS X"))
-                return new Darwin();
+                return new Darwin(nativeUtils);
         } catch (LinkageError e) {
             LOGGER.log(Level.WARNING,"Failed to load winp. Reverting to the default",e);
             enabled = false;
@@ -375,9 +389,13 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
 
 
     private static final class Windows extends Local {
-        Windows() {
+
+        private NativeUtils nativeUtils;
+
+        Windows(NativeUtils nativeUtils) {
+            this.nativeUtils = nativeUtils;
             try {
-                for (final NativeProcess p : NativeUtils.getInstance().getWindowsProcesses()) {
+                for (final NativeProcess p : nativeUtils.getWindowsProcesses()) {
                     int pid = p.getPid();
                     super.processes.put(pid,new OSProcess(pid) {
                         private EnvVars env;
@@ -421,7 +439,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
         @Override
         public OSProcess get(Process proc) {
             try {
-                return get(NativeUtils.getInstance().getWindowsProcessId(proc));
+                return get(nativeUtils.getWindowsProcessId(proc));
             } catch (NativeAccessException exc) {
                 LOGGER.log(Level.WARNING,"Failed to get Windows Native Process", exc);
             }
@@ -871,14 +889,16 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
      */
     private static class Darwin extends Unix {
 
-        Darwin() {
+        private NativeUtils nativeUtils;
 
+        Darwin(NativeUtils nativeUtils) {
+            this.nativeUtils = nativeUtils;
             try {
-                for (final NativeProcess process : NativeUtils.getInstance().getMacProcesses()) {
+                for (final NativeProcess process : nativeUtils.getMacProcesses()) {
                     super.processes.put(process.getPid(), new DarwinProcess(process));
                 }
             } catch (NativeAccessException exc) {
-                LOGGER.log(Level.WARNING, "Failed to fecth Native Mac Processes", NativeUtils.getInstance().getLastMacError());
+                LOGGER.log(Level.WARNING, "Failed to fecth Native Mac Processes", nativeUtils.getLastMacError());
             }
         }
 

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009, Oracle Corporation
+ * Copyright (c) 2004-2011, Oracle Corporation
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -34,6 +34,10 @@ public class OneOffExecutor extends Executor {
         this.work = work;
     }
 
+    public WorkUnit getWorkUnit() {
+        return work;
+    }
+
     @Override
     protected boolean shouldRun() {
         // TODO: consulting super.shouldRun() here means we'll lose the work if it gets scheduled
@@ -41,9 +45,11 @@ public class OneOffExecutor extends Executor {
         return super.shouldRun() && work !=null;
     }
 
+
     @Override
     protected WorkUnit grabJob() throws InterruptedException {
-        WorkUnit r = work;
+        WorkUnit r = super.grabJob();
+        assert r==work;
         work = null;
         return r;
     }

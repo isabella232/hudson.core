@@ -22,6 +22,7 @@ import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import java.io.File;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -36,7 +37,8 @@ import java.util.List;
  * @since 3.0.0
  * @see NativeAccessSupportDescriptor
  */
-public abstract class NativeZfsSupport extends AbstractDescribableImpl<NativeZfsSupport> implements ExtensionPoint {
+public abstract class NativeZfsSupport extends AbstractDescribableImpl<NativeZfsSupport> implements ExtensionPoint,
+    Serializable {
 
     /**
      * Returns all the registered {@link NativeAccessSupport} descriptors.
