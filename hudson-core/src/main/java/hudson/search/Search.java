@@ -17,6 +17,7 @@
 package hudson.search;
 
 import hudson.util.EditDistance;
+import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.Ancestor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -51,7 +52,7 @@ public class Search {
 
                 SearchIndex index = smo.getSearchIndex();
                 String query = req.getParameter("q");
-                if(query!=null) {
+                if(!StringUtils.isEmpty(query)) {
                     SuggestedItem target = find(index, query);
                     if(target!=null) {
                         // found

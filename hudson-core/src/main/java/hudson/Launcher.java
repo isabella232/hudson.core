@@ -31,6 +31,7 @@ import hudson.remoting.VirtualChannel;
 import hudson.util.StreamCopyThread;
 import hudson.util.ArgumentListBuilder;
 import hudson.util.ProcessTree;
+import hudson.util.jna.NativeUtils;
 import org.apache.commons.io.input.NullInputStream;
 
 import java.io.BufferedOutputStream;
@@ -663,6 +664,7 @@ public abstract class Launcher {
 
             final Thread t2 = new StreamCopyThread(pb.command()+": stderr copier", proc.getErrorStream(), out);
             t2.start();
+            final NativeUtils nativeUtils = NativeUtils.getInstance();
 
             return new Channel("locally launched channel on "+ pb.command(),
                 Computer.threadPoolForRemoting, proc.getInputStream(), proc.getOutputStream(), out) {
@@ -673,7 +675,7 @@ public abstract class Launcher {
                 @Override
                 protected synchronized void terminate(IOException e) {
                     super.terminate(e);
-                    ProcessTree pt = ProcessTree.get();
+                    ProcessTree pt = ProcessTree.get(nativeUtils);
                     try {
                         pt.killAll(proc,cookie);
                     } catch (InterruptedException x) {
@@ -735,19 +737,21 @@ public abstract class Launcher {
 
         @Override
         public void kill(final Map<String,String> modelEnvVars) throws IOException, InterruptedException {
-            getChannel().call(new KillTask(modelEnvVars));
+            getChannel().call(new KillTask(modelEnvVars, NativeUtils.getInstance()));
         }
 
         private static final class KillTask implements Callable<Void,RuntimeException> {
             private final Map<String, String> modelEnvVars;
+            private final NativeUtils nativeUtils;
 
-            public KillTask(Map<String, String> modelEnvVars) {
+            private KillTask(Map<String, String> modelEnvVars, NativeUtils nativeUtils) {
                 this.modelEnvVars = modelEnvVars;
+                this.nativeUtils = nativeUtils;
             }
 
             public Void call() throws RuntimeException {
                 try {
-                    ProcessTree.get().killAll(modelEnvVars);
+                    ProcessTree.get(nativeUtils).killAll(modelEnvVars);
                 } catch (InterruptedException e) {
                     // we are asked to terminate early by the caller, so no need to do anything
                 }

@@ -75,7 +75,7 @@ public class SwapSpaceMonitor extends NodeMonitor {
     @Extension
     public static final AbstractNodeMonitorDescriptor<NativeSystemMemory> DESCRIPTOR = new AbstractNodeMonitorDescriptor<NativeSystemMemory>() {
         protected NativeSystemMemory monitor(Computer c) throws IOException, InterruptedException {
-            return c.getChannel().call(new MonitorTask());
+            return c.getChannel().call(new MonitorTask(NativeUtils.getInstance()));
         }
 
         public String getDisplayName() {
@@ -95,11 +95,16 @@ public class SwapSpaceMonitor extends NodeMonitor {
 
         private static final long serialVersionUID = 1L;
         private static boolean warned = false;
+        private NativeUtils nativeUtils;
+
+        private MonitorTask(NativeUtils nativeUtils) {
+            this.nativeUtils = nativeUtils;
+        }
 
         public NativeSystemMemory call() throws IOException {
 
             try {
-                return new MemoryUsage(NativeUtils.getInstance().getSystemMemory());
+                return new MemoryUsage(nativeUtils.getSystemMemory());
             } catch (NativeAccessException exc) {
                 if (!warned) {
                     // report the problem just once, and avoid filling up the log with the same error. see HUDSON-2194.

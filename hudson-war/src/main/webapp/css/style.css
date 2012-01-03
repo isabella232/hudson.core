@@ -74,22 +74,27 @@ dt {
 
 #left-top-nav {
   text-align: left;
-  border-left: 10px solid #fff;
-  padding: 4px;
-  color: #222;
+  padding-left: 25px;
+  padding-bottom: 4px;
+  color: white;
 }
 
 #left-top-nav a, #right-top-nav a {
-  color: black;
+  color: white;
 }
 
 #right-top-nav {
   text-align: right;
-  padding: 4px;
+  padding-right: 15px;
 }
 
+#top-nav .a {
+  color: white;
+}
+
+
 #main-panel {
-  padding: 10px 10px 10px 20px;
+  padding-right: 10px;
 }
 
 #side-panel {
@@ -124,6 +129,11 @@ dt {
     margin-bottom: 0.5em;
     padding: 0.5em;
     -moz-border-radius: 0.5em;
+}
+
+a:link {
+  text-decoration: underline;
+  color: #204A87;
 }
 
 a:link {
@@ -176,10 +186,6 @@ a.tip:hover span {
   background-color:#fffff0;
   color:#000;
   text-align: left
-}
-
-#top-nav .a {
-  color: white;
 }
 
 img {
@@ -987,7 +993,7 @@ table.progress-bar.red td.progress-bar-done {
 .tag8 { font-size: 1.80em; }
 .tag9 { font-size: 1.90em; }
 
-/* ========================= "Delete job and slave" dialog ================== */
+/* ========================= "Delete job, build and slave" dialog ================== */
 div.deleteSlaveDialog ul, div.deleteJobDialog ul {
     text-align:left;
     padding-left:80px;
@@ -997,7 +1003,7 @@ div.deleteSlaveDialog div.radioButtons, div.deleteJobDialog div.radioButtons {
     padding-bottom:10px;
 }
 
-div.deleteSlaveDialog h4, div.deleteJobDialog h4 {
+div.deleteSlaveDialog h4, div.deleteJobDialog h4, div.deleteBuildConfirmationDialog h4, div.cannotDeleteBuildDialog h4 {
     color: #F89938;
 }
 /* ======================== "Cascading project" ==========================*/

@@ -22,6 +22,7 @@ import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import java.io.File;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -36,7 +37,8 @@ import java.util.List;
  * @since 3.0.0
  * @see NativeWindowsSupportDescriptor
  */
-public abstract class NativeWindowsSupport extends AbstractDescribableImpl<NativeWindowsSupport> implements ExtensionPoint {
+public abstract class NativeWindowsSupport extends AbstractDescribableImpl<NativeWindowsSupport> implements ExtensionPoint,
+    Serializable {
 
     /**
      * Returns all the registered {@link NativeAccessSupport} descriptors.
