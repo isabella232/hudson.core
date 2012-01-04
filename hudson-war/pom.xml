@@ -236,7 +236,7 @@
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
                                     <destFileName>git.hpi</destFileName>
                                 </artifactItem>
-                                <!--
+ 
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.plugins</groupId>
                                     <artifactId>ssh-slaves</artifactId>
@@ -246,8 +246,8 @@
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
                                     <destFileName>ssh-slaves.hpi</destFileName>
                                 </artifactItem>
-                                -->
-                                
+ 
+                                <!--   
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.plugins</groupId>
                                     <artifactId>birt-charts</artifactId>
@@ -257,6 +257,7 @@
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
                                     <destFileName>birt-charts.hpi</destFileName>
                                 </artifactItem>
+                                -->
                                 
                                 <!-- Temporary external plugins -->
                                 
