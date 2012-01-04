@@ -247,7 +247,6 @@
                                     <destFileName>ssh-slaves.hpi</destFileName>
                                 </artifactItem>
  
-                                <!--   
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.plugins</groupId>
                                     <artifactId>birt-charts</artifactId>
@@ -257,7 +256,6 @@
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
                                     <destFileName>birt-charts.hpi</destFileName>
                                 </artifactItem>
-                                -->
                                 
                                 <!-- Temporary external plugins -->
                                 
@@ -282,7 +280,7 @@
                                 <artifactItem>
                                     <groupId>org.hudsonci.plugins</groupId>
                                     <artifactId>jfreechart-plugin</artifactId>
-                                    <version>1.0</version>
+                                    <version>1.1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
