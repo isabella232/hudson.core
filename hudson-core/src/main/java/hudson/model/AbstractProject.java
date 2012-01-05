@@ -1359,7 +1359,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
 
     /**
      * Returns the project if any of the downstream project (or itself) is either
-     * building or is in the queue.
+     * building or is in the unblocked queue.
      * <p>
      * This means eventually there will be an automatic triggering of
      * the given project (provided that all builds went smoothly.)
@@ -1369,7 +1369,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         Set<AbstractProject> tups = graph.getTransitiveDownstream(this);
         tups.add(this);
         for (AbstractProject tup : tups) {
-            if(tup!=this && (tup.isBuilding() || tup.isInQueue()))
+            if(tup!=this && (tup.isBuilding() || tup.isInUnblockedQueue()))
                 return tup;
         }
         return null;
@@ -1377,7 +1377,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
 
     /**
      * Returns the project if any of the upstream project (or itself) is either
-     * building or is in the queue.
+     * building or is in the unblocked queue.
      * <p>
      * This means eventually there will be an automatic triggering of
      * the given project (provided that all builds went smoothly.)
@@ -1387,10 +1387,14 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         Set<AbstractProject> tups = graph.getTransitiveUpstream(this);
         tups.add(this);
         for (AbstractProject tup : tups) {
-            if(tup!=this && (tup.isBuilding() || tup.isInQueue()))
+            if(tup!=this && (tup.isBuilding() || tup.isInUnblockedQueue()))
                 return tup;
         }
         return null;
+    }
+    
+    private boolean isInUnblockedQueue() {
+        return Hudson.getInstance().getQueue().getUnblockedQueuedTasks().contains(this);
     }
 
     public List<SubTask> getSubTasks() {

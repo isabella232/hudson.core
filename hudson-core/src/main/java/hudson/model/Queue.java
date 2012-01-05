@@ -90,6 +90,7 @@ import org.kohsuke.stapler.export.ExportedBean;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+import java.util.HashSet;
 
 /**
  * Build queue.
@@ -641,6 +642,20 @@ public class Queue extends ResourceController implements Saveable {
             if (i.task.equals(t))
                 return true;
         return false;
+    }
+
+    synchronized Set<Task> getUnblockedQueuedTasks() {
+        Set<Task> unblockedQueuedTasks = new HashSet<Task>();
+        for (Item item : waitingList) {
+            unblockedQueuedTasks.add(item.task);
+        }
+        for (Item item : pendings) {
+            unblockedQueuedTasks.add(item.task);
+        }
+        for (Item item : buildables) {
+            unblockedQueuedTasks.add(item.task);
+        }
+        return unblockedQueuedTasks;
     }
 
     /**
