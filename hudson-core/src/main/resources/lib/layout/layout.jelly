@@ -250,7 +250,7 @@
                         </div>
                         
                         <div style=" height:100%"> 
-                            <img src="${imagesURL}/top-left-round.gif" style="padding-left: 1px; float:left"/>
+                            <img src="${imagesURL}/top-left-round.png" style="float:left"/>
                             <div style="margin-left:25; height:25; background-image:url(${imagesURL}/spacer.png); background-repeat:repeat-x" /> 
                             <div id="main-panel-container" style=" background-color:#FFF; padding-left: 10px; height:100%">
                                 <table width="95%" height="100%" border="0">
