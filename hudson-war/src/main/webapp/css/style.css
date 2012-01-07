@@ -830,6 +830,7 @@ DIV.yahooTree td {
 #search-box {
   background: white url(../images/16x16/search.png) no-repeat 2px center;
   padding-left: 20px;
+  padding-top: 5px;
   width: 15em;
   position: static; 
 }
