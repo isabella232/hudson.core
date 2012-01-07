@@ -197,6 +197,7 @@
                                                                             <b>${app.authentication.name}</b>
                                                                         </a>
                                                                         <j:if test="${app.securityRealm.canLogOut()}">
+                                                                            |
                                                                             <a href="${rootURL}/logout">
                                                                                 <b>${%logout}</b>
                                                                             </a>
