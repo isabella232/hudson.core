@@ -2228,8 +2228,13 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
     public static AbstractProject resolveForCLI(
             @Argument(required=true,metaVar="NAME",usage="Job name") String name) throws CmdLineException {
         AbstractProject item = Hudson.getInstance().getItemByFullName(name, AbstractProject.class);
-        if (item==null)
-            throw new CmdLineException(null,Messages.AbstractItem_NoSuchJobExists(name,AbstractProject.findNearest(name).getFullName()));
+        if (item==null){
+            if (AbstractProject.findNearest(name) != null){
+                throw new CmdLineException(null,Messages.AbstractItem_NoSuchJobExists2(name, AbstractProject.findNearest(name).getFullName()));
+            }else{
+                throw new CmdLineException(null,Messages.AbstractItem_NoSuchJobExists(name));
+            }
+        }
         return item;
     }
 }

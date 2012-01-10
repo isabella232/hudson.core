@@ -29,7 +29,6 @@ import hudson.util.FormValidation;
 import hudson.util.Scrambler;
 import hudson.util.spring.BeanBuilder;
 import org.springframework.security.AuthenticationManager;
-import org.springframework.security.GrantedAuthority;
 import org.springframework.security.SpringSecurityException;
 import org.springframework.security.AuthenticationException;
 import org.springframework.ldap.core.ContextSource;
@@ -43,8 +42,6 @@ import org.springframework.security.userdetails.UserDetails;
 import org.springframework.security.userdetails.UserDetailsService;
 import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.springframework.security.userdetails.ldap.LdapUserDetails;
-import org.springframework.security.userdetails.ldap.LdapUserDetailsImpl;
-import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -55,7 +52,6 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
-import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import java.io.IOException;
@@ -70,6 +66,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.ldap.core.DirContextOperations;
+import org.springframework.security.userdetails.ldap.LdapUserDetailsService;
 
 
 /**
@@ -400,16 +397,9 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
     }
 
     public static class LDAPUserDetailsService implements UserDetailsService {
-        //TODO: review and check whether we can do it private
-        public final LdapUserSearch ldapSearch;
-        public final LdapAuthoritiesPopulator authoritiesPopulator;
-        /**
-         * {@link BasicAttributes} in LDAP tend to be bulky (about 20K at size), so interning them
-         * to keep the size under control. When a programmatic client is not smart enough to
-         * reuse a session, this helps keeping the memory consumption low.
-         */
-        private final LRUMap attributesCache = new LRUMap(32);
-
+        private final LdapUserSearch ldapSearch;
+        private final LdapAuthoritiesPopulator authoritiesPopulator;
+       
         LDAPUserDetailsService(WebApplicationContext appContext) {
             ldapSearch = findBean(LdapUserSearch.class, appContext);
             authoritiesPopulator = findBean(LdapAuthoritiesPopulator.class, appContext);
@@ -428,33 +418,9 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
             return authoritiesPopulator;
         }
 
-        public LdapUserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
-            try {
-                DirContextOperations ldapUser = ldapSearch.searchForUser(username);
-                // LdapUserSearch does not populate granted authorities (group search).
-                // Add those, as done in LdapAuthenticationProvider.createUserDetails().
-                if (ldapUser != null) {
-                    LdapUserDetailsImpl.Essence user = new LdapUserDetailsImpl.Essence(ldapUser);
-
-                    // intern attributes
-                    Attributes v = ldapUser.getAttributes("");
-                    if (v instanceof BasicAttributes) {// BasicAttributes.equals is what makes the interning possible
-                        Attributes vv = (Attributes)attributesCache.get(v);
-                        if (vv==null)   attributesCache.put(v,vv=v);
-                        user.setAttributes(vv);
-                    }
-
-                    GrantedAuthority[] extraAuthorities = authoritiesPopulator.getGrantedAuthorities(ldapUser, username);
-                    for (GrantedAuthority extraAuthority : extraAuthorities) {
-                        user.addAuthority(extraAuthority);
-                    }
-                    return user.createUserDetails();
-                }
-                return null;
-            } catch (NamingException e) {
-                LOGGER.log(Level.WARNING, "Failed to search LDAP for username="+username,e);
-                throw new UserMayOrMayNotExistException(e.getMessage(),e);
-            }
+        public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
+            LdapUserDetailsService ldapUserDetailsService = new LdapUserDetailsService(ldapSearch, authoritiesPopulator);
+            return ldapUserDetailsService.loadUserByUsername(username);
         }
     }
 

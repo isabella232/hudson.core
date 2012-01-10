@@ -502,8 +502,13 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     public static AbstractItem resolveForCLI(
             @Argument(required=true,metaVar="NAME",usage="Job name") String name) throws CmdLineException {
         AbstractItem item = Hudson.getInstance().getItemByFullName(name, AbstractItem.class);
-        if (item==null)
-            throw new CmdLineException(null,Messages.AbstractItem_NoSuchJobExists(name,AbstractProject.findNearest(name).getFullName()));
+        if (item==null){
+            if (AbstractProject.findNearest(name) != null){
+                throw new CmdLineException(null,Messages.AbstractItem_NoSuchJobExists2(name, AbstractProject.findNearest(name).getFullName()));
+            }else{
+                throw new CmdLineException(null,Messages.AbstractItem_NoSuchJobExists(name));
+            }
+        }
         return item;
     }
 }
