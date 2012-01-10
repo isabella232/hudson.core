@@ -15,12 +15,12 @@
 import org.springframework.security.providers.ProviderManager
 import org.springframework.security.providers.anonymous.AnonymousAuthenticationProvider
 import org.springframework.security.providers.ldap.LdapAuthenticationProvider
-import org.springframework.security.providers.ldap.authenticator.BindAuthenticator2
-import org.springframework.security.ldap.DefaultInitialDirContextFactory
+import org.springframework.security.ldap.DefaultSpringSecurityContextSource
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch
 import org.springframework.security.providers.rememberme.RememberMeAuthenticationProvider
 import hudson.model.Hudson
 import hudson.security.LDAPSecurityRealm.AuthoritiesPopulatorImpl
+import hudson.security.BindAuthenticator2
 import hudson.Util
 import javax.naming.Context
 
@@ -31,12 +31,12 @@ import javax.naming.Context
     The 'instance' object refers to the instance of LDAPSecurityRealm
 */
 
-initialDirContextFactory(DefaultInitialDirContextFactory, instance.getLDAPURL() ) {
+initialDirContextFactory(DefaultSpringSecurityContextSource, instance.getLDAPURL() ) {
   if(instance.managerDN!=null) {
     managerDn = instance.managerDN;
     managerPassword = instance.getManagerPassword();
   }
-  extraEnvVars = [(Context.REFERRAL):"follow"];
+  baseEnvironmentProperties = [(Context.REFERRAL):"follow"];
 }
 
 ldapUserSearch(FilterBasedLdapUserSearch, instance.userSearchBase, instance.userSearch, initialDirContextFactory) {
