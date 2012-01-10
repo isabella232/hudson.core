@@ -73,7 +73,7 @@ public class NativeUtils implements Serializable {
                 nativeZfsSupport = zfsSupportDescriptors.get(0).newInstance(null, null);
             }
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.FINE, null, ex);
         }
     }
 

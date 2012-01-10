@@ -135,7 +135,7 @@ public class ClientAuthenticationCache implements Serializable {
                 }
 
                 // try to protect this file from other users, if we can.
-                Util.chmod(f, 0600);
+                Util.chmod(f, 0600, false);
                 return null;
             }
         });
