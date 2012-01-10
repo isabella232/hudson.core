@@ -73,6 +73,11 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
     private final Map<Permission,Set<String>> grantedPermissions = new HashMap<Permission, Set<String>>();
 
     private final Set<String> sids = new HashSet<String>();
+    
+    @Override
+    public int getMode(){
+        return MODE_GLOBAL_MATRIX;
+    }
 
     /**
      * Adds to {@link #grantedPermissions}.
