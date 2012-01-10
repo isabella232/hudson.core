@@ -44,8 +44,9 @@ import hudson.search.SearchItem;
 import hudson.search.SearchItems;
 import hudson.security.ACL;
 import hudson.security.AuthorizationMatrixProperty;
+import hudson.security.AuthorizationStrategy;
 import hudson.security.Permission;
-import hudson.security.ProjectMatrixAuthorizationStrategy;
+//import hudson.security.ProjectMatrixAuthorizationStrategy;
 import hudson.tasks.LogRotator;
 import hudson.util.ColorPalette;
 import hudson.util.CopyOnWriteList;
@@ -490,7 +491,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * @param user user
      */
     protected void grantProjectMatrixPermissions(User user) {
-        if (Hudson.getInstance().getAuthorizationStrategy() instanceof ProjectMatrixAuthorizationStrategy) {
+        if (Hudson.getInstance().getAuthorizationStrategy().getMode() ==  AuthorizationStrategy.MODE_PROJECT_MATRIX) {
             Map<Permission, Set<String>> grantedPermissions = new HashMap<Permission, Set<String>>();
             Set<String> users = Sets.newHashSet(user.getId());
             grantedPermissions.put(Item.BUILD, users);

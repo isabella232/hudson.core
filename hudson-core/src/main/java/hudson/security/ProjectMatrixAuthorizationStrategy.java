@@ -59,6 +59,11 @@ public class ProjectMatrixAuthorizationStrategy extends GlobalMatrixAuthorizatio
         }
         return r;
     }
+    
+    @Override
+    public int getMode(){
+        return MODE_PROJECT_MATRIX;
+    }
 
     @Extension
     public static final Descriptor<AuthorizationStrategy> DESCRIPTOR = new DescriptorImpl() {

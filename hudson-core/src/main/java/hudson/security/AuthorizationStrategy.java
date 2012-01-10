@@ -60,6 +60,10 @@ public abstract class AuthorizationStrategy extends AbstractDescribableImpl<Auth
      * IOW, this ACL will have the ultimate say on the access control.
      */
     public abstract ACL getRootACL();
+    
+    public static int MODE_GLOBAL_MATRIX = 1;
+    public static int MODE_PROJECT_MATRIX = 2;
+     public static int MODE_STANDARD = 3;
 
     /**
      * @deprecated since 1.277
@@ -141,6 +145,14 @@ public abstract class AuthorizationStrategy extends AbstractDescribableImpl<Auth
 
     public ACL getACL(Node node) {
         return getRootACL();
+    }
+    
+    /**
+     * Return the type of this strategy.
+     * @return int mode  
+     */
+    public int getMode(){
+        return MODE_STANDARD;
     }
 
     /**
