@@ -194,6 +194,15 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
     public String getLoginUrl() {
         return "login";
     }
+    
+    /**
+     * Return security mode of this realm
+     * @return 
+     * @since 3.0.0
+     */
+    public SecurityMode getSecurityMode(){
+        return SecurityMode.SECURED;
+    }
 
     /**
      * Returns true if this {@link SecurityRealm} supports explicit logout operation.
@@ -426,6 +435,11 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
     public static final SecurityRealm NO_AUTHENTICATION = new None();
 
     private static class None extends SecurityRealm {
+        
+        @Override
+        public SecurityMode getSecurityMode(){
+            return SecurityMode.UNSECURED;
+        }
 
         public SecurityComponents createSecurityComponents() {
             return new SecurityComponents(new AuthenticationManager() {
