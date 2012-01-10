@@ -73,9 +73,7 @@ import hudson.security.AccessControlled;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.BasicAuthenticationFilter;
 import hudson.security.FederatedLoginService;
-import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonFilter;
-import hudson.security.LegacySecurityRealm;
 import hudson.security.Permission;
 import hudson.security.PermissionGroup;
 import hudson.security.SecurityMode;
@@ -1951,14 +1949,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public SecurityMode getSecurity() {
         // fix the variable so that this code works under concurrent modification to securityRealm.
         SecurityRealm realm = securityRealm;
-
-        if (realm == SecurityRealm.NO_AUTHENTICATION) {
-            return SecurityMode.UNSECURED;
-        }
-        if (realm instanceof LegacySecurityRealm) {
-            return SecurityMode.LEGACY;
-        }
-        return SecurityMode.SECURED;
+        
+        return realm.getSecurityMode();
     }
 
     /**
@@ -2393,16 +2385,21 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                 if (authorizationStrategy == null) {
                     if (useSecurity == null || !useSecurity) {
                         authorizationStrategy = AuthorizationStrategy.UNSECURED;
-                    } else {
-                        authorizationStrategy = new FullControlOnceLoggedInAuthorizationStrategy();
-                    }
+                    } 
+//                    else {
+//                        authorizationStrategy = new FullControlOnceLoggedInAuthorizationStrategy();
+//                    }
                 }
+                
+  
+                
                 if (securityRealm == null) {
                     if (useSecurity == null || !useSecurity) {
                         setSecurityRealm(SecurityRealm.NO_AUTHENTICATION);
-                    } else {
-                        setSecurityRealm(new LegacySecurityRealm());
-                    }
+                    } 
+//                    else {
+//                        setSecurityRealm(new LegacySecurityRealm());
+//                    }
                 } else {
                     // force the set to proxy
                     setSecurityRealm(securityRealm);
