@@ -68,6 +68,10 @@ public class StartJetty {
         context.setDescriptor(location.toExternalForm() + "/WEB-INF/web.xml");
         context.setServer(server);
         context.setWar(location.toExternalForm());
+        
+        // This is used by Windows Service Installer in Hudson Management 
+        System.out.println("War location - " + location.getPath());
+        System.setProperty("executable-war", location.getPath());
 
         server.addHandler(context);
         server.start();

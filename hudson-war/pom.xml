@@ -410,6 +410,12 @@
                             <name>stapler.jelly.noCache</name>
                             <value>true</value>
                         </systemProperty>
+                        
+                        <systemProperty>
+                            <name>executable-war</name>
+                            <value>${project.build.directory}/${project.artifactId}-${project.version}.war</value>
+                        </systemProperty>
+                        
                         <systemProperty>
                             <!-- show the stapler evaluation during execution -->
                             <name>stapler.trace</name>

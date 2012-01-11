@@ -8,19 +8,18 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
-*
-*    Kohsuke Kawaguchi, Seiji Sogabe, CloudBees, Inc.
+ *
+ *    Kohsuke Kawaguchi, Seiji Sogabe, CloudBees, Inc.
  *     
  *
- *******************************************************************************/ 
-
+ *******************************************************************************/
 package hudson.lifecycle;
 
-import hudson.Functions;
 import hudson.model.ManagementLink;
 import hudson.model.Hudson;
 import hudson.AbortException;
 import hudson.Extension;
+import hudson.Functions;
 import hudson.util.StreamTaskListener;
 import hudson.util.jna.NativeAccessException;
 import hudson.util.jna.NativeUtils;
@@ -53,7 +52,6 @@ public class WindowsInstallerLink extends ManagementLink {
      * In general case, we can't determine this value, yet having this is a requirement for the installer.
      */
     private final File hudsonWar;
-
     /**
      * If the installation is completed, this value holds the installation directory.
      */
@@ -83,20 +81,20 @@ public class WindowsInstallerLink extends ManagementLink {
      * Is the installation successful?
      */
     public boolean isInstalled() {
-        return installationDir!=null;
+        return installationDir != null;
     }
 
     /**
      * Performs installation.
      */
     public void doDoInstall(StaplerRequest req, StaplerResponse rsp, @QueryParameter("dir") String _dir) throws IOException, ServletException {
-        if(installationDir!=null) {
+        if (installationDir != null) {
             // installation already complete
-            sendError("Installation is already complete",req,rsp);
+            sendError("Installation is already complete", req, rsp);
             return;
         }
-         
-        
+
+
         try {
             if (!NativeUtils.getInstance().isDotNetInstalled(2, 0)) {
                 sendError(".NET Framework 2.0 or later is required for this feature", req, rsp);
@@ -104,14 +102,14 @@ public class WindowsInstallerLink extends ManagementLink {
         } catch (NativeAccessException exc) {
             sendError("Native function isDotNetInstalled() failed. " + NativeUtils.getInstance().getLastWindowsError(), req, rsp);
         }
-        
-        
+
+
         Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
 
         File dir = new File(_dir).getAbsoluteFile();
         dir.mkdirs();
-        if(!dir.exists()) {
-            sendError("Failed to create installation directory: "+dir,req,rsp);
+        if (!dir.exists()) {
+            sendError("Failed to create installation directory: " + dir, req, rsp);
             return;
         }
 
@@ -119,8 +117,9 @@ public class WindowsInstallerLink extends ManagementLink {
             // copy files over there
             copy(req, rsp, dir, getClass().getResource("/windows-service/hudson.exe"), "hudson.exe");
             copy(req, rsp, dir, getClass().getResource("/windows-service/hudson.xml"), "hudson.xml");
-            if(!hudsonWar.getCanonicalFile().equals(new File(dir,"hudson.war").getCanonicalFile()))
+            if (!hudsonWar.getCanonicalFile().equals(new File(dir, "hudson.war").getCanonicalFile())) {
                 copy(req, rsp, dir, hudsonWar.toURI().toURL(), "hudson.war");
+            }
 
             // install as a service
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -128,8 +127,8 @@ public class WindowsInstallerLink extends ManagementLink {
             task.getLogger().println("Installing a service");
             int r = WindowsSlaveInstaller.runElevated(
                     new File(dir, "hudson.exe"), "install", task, dir);
-            if(r!=0) {
-                sendError(baos.toString(),req,rsp);
+            if (r != 0) {
+                sendError(baos.toString(), req, rsp);
                 return;
             }
 
@@ -148,38 +147,42 @@ public class WindowsInstallerLink extends ManagementLink {
      */
     private void copy(StaplerRequest req, StaplerResponse rsp, File dir, URL src, String name) throws ServletException, IOException {
         try {
-            FileUtils.copyURLToFile(src,new File(dir, name));
+            FileUtils.copyURLToFile(src, new File(dir, name));
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to copy "+name,e);
-            sendError("Failed to copy "+name+": "+e.getMessage(),req,rsp);
+            LOGGER.log(Level.SEVERE, "Failed to copy " + name, e);
+            sendError("Failed to copy " + name + ": " + e.getMessage(), req, rsp);
             throw new AbortException();
         }
     }
 
     public void doRestart(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
-        if(installationDir==null) {
+        if (installationDir == null) {
             // if the user reloads the page after Hudson has restarted,
             // it comes back here. In such a case, don't let this restart Hudson.
             // so just send them back to the top page
-            rsp.sendRedirect(req.getContextPath()+"/");
+            rsp.sendRedirect(req.getContextPath() + "/");
             return;
         }
         Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
 
-        rsp.forward(this,"_restart",req);
+        rsp.forward(this, "_restart", req);
         final File oldRoot = Hudson.getInstance().getRootDir();
 
         // initiate an orderly shutdown after we finished serving this request
         new Thread("terminator") {
+
+            @Override
             public void run() {
                 try {
                     Thread.sleep(1000);
 
                     // let the service start after we close our sockets, to avoid conflicts
                     Runtime.getRuntime().addShutdownHook(new Thread("service starter") {
+
+                        @Override
                         public void run() {
                             try {
-                                if(!oldRoot.equals(installationDir)) {
+                                if (!oldRoot.equals(installationDir)) {
                                     LOGGER.info("Moving data");
                                     Move mv = new Move();
                                     Project p = new Project();
@@ -197,7 +200,7 @@ public class WindowsInstallerLink extends ManagementLink {
                                 StreamTaskListener task = StreamTaskListener.fromStdout();
                                 int r = WindowsSlaveInstaller.runElevated(
                                         new File(installationDir, "hudson.exe"), "start", task, installationDir);
-                                task.getLogger().println(r==0?"Successfully started":"start service failed. Exit code="+r);
+                                task.getLogger().println(r == 0 ? "Successfully started" : "start service failed. Exit code=" + r);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             } catch (InterruptedException e) {
@@ -225,13 +228,13 @@ public class WindowsInstallerLink extends ManagementLink {
      * Displays the error in a page.
      */
     protected final void sendError(Exception e, StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
-        sendError(e.getMessage(),req,rsp);
+        sendError(e.getMessage(), req, rsp);
     }
 
     protected final void sendError(String message, StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
-        req.setAttribute("message",message);
-        req.setAttribute("pre",true);
-        rsp.forward(Hudson.getInstance(),"error",req);
+        req.setAttribute("message", message);
+        req.setAttribute("pre", true);
+        rsp.forward(Hudson.getInstance(), "error", req);
     }
 
     /**
@@ -242,26 +245,26 @@ public class WindowsInstallerLink extends ManagementLink {
         if(!Functions.isWindows())
             return null; // this is a Windows only feature
 
-        if(Lifecycle.get() instanceof WindowsServiceLifecycle)
+        if (Lifecycle.get() instanceof WindowsServiceLifecycle) {
             return null; // already installed as Windows service
-
+        }
         // this system property is set by the launcher when we run "java -jar hudson.war"
         // and this is how we know where is hudson.war.
         String war = System.getProperty("executable-war");
-        if(war!=null && new File(war).exists()) {
+        if (war != null && new File(war).exists()) {
             WindowsInstallerLink link = new WindowsInstallerLink(new File(war));
 
             // in certain situations where we know the user is just trying Hudson (like when Hudson is launched
             // from JNLP from https://hudson.java.net/), also put this link on the navigation bar to increase
             // visibility
-            if(System.getProperty(WindowsInstallerLink.class.getName()+".prominent")!=null)
+            if (System.getProperty(WindowsInstallerLink.class.getName() + ".prominent") != null) {
                 Hudson.getInstance().getActions().add(link);
+            }
 
             return link;
         }
 
         return null;
     }
-
     private static final Logger LOGGER = Logger.getLogger(WindowsInstallerLink.class.getName());
 }
