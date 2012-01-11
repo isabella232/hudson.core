@@ -34,7 +34,7 @@ public class MainDialog extends JFrame {
     public MainDialog() throws HeadlessException {
         super("Hudson slave agent");
 
-        ImageIcon background = new ImageIcon(getClass().getResource("title.png"));
+        ImageIcon background = new ImageIcon(getClass().getResource("Hudson-bust.png"));
 
         JPanel foregroundPanel = new JPanel(new BorderLayout(10, 10));
         foregroundPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
