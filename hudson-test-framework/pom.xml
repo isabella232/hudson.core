@@ -46,7 +46,8 @@
       -->
             <groupId>org.eclipse.hudson.main</groupId>
             <artifactId>hudson-war</artifactId>
-            <type>war</type>
+            <version>${project.version}</version>
+            <classifier>war-for-test</classifier>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -99,26 +100,26 @@
             <artifactId>junit</artifactId>
             <scope>compile</scope>
         </dependency>
-      <dependency>
-        <groupId>org.eclipse.hudson.main</groupId>
-        <artifactId>hudson-core</artifactId>
-        <type>jar</type>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.hudson.main</groupId>
-        <artifactId>hudson-inject</artifactId>
-        <classifier>tests</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.hudson.main</groupId>
-        <artifactId>hudson-inject</artifactId>
-      </dependency>
-      <dependency>
-        <groupId>org.jvnet.hudson</groupId>
-        <artifactId>hudson-maven-embedder</artifactId>
-        <version>3.2</version>
-        <type>jar</type>
-      </dependency>
+        <dependency>
+            <groupId>org.eclipse.hudson.main</groupId>
+            <artifactId>hudson-core</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.hudson.main</groupId>
+            <artifactId>hudson-inject</artifactId>
+            <classifier>tests</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.hudson.main</groupId>
+            <artifactId>hudson-inject</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jvnet.hudson</groupId>
+            <artifactId>hudson-maven-embedder</artifactId>
+            <version>3.2</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
     <build>
