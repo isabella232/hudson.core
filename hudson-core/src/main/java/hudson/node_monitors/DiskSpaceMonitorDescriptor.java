@@ -22,7 +22,6 @@ import hudson.remoting.VirtualChannel;
 import hudson.Util;
 import hudson.slaves.OfflineCause;
 import hudson.node_monitors.DiskSpaceMonitorDescriptor.DiskSpace;
-import org.jvnet.animal_sniffer.IgnoreJRERequirement;
 
 import java.io.File;
 import java.io.IOException;
@@ -134,7 +133,6 @@ import org.kohsuke.stapler.export.Exported;
     protected abstract DiskSpace getFreeSpace(Computer c) throws IOException, InterruptedException;
 
     protected static final class GetUsableSpace implements FileCallable<DiskSpace> {
-        @IgnoreJRERequirement
         public DiskSpace invoke(File f, VirtualChannel channel) throws IOException {
             try {
                 long s = f.getUsableSpace();

@@ -34,7 +34,6 @@ import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.io.IOUtils;
 
 import org.kohsuke.stapler.Stapler;
-import org.jvnet.animal_sniffer.IgnoreJRERequirement;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -266,7 +265,6 @@ public class Util {
     /**
      * Makes the given file writable by any means possible.
      */
-    @IgnoreJRERequirement
     private static void makeWritable(File f) {
         // try chmod. this becomes no-op if this is not Unix.
         try {
@@ -1229,7 +1227,6 @@ public class Util {
      * Loads a key/value pair string as {@link Properties}
      * @since 1.392
      */
-    @IgnoreJRERequirement
     public static Properties loadProperties(String properties) throws IOException {
         Properties p = new Properties();
         try {

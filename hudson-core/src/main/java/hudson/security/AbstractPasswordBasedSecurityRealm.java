@@ -35,7 +35,6 @@ import org.springframework.security.providers.dao.AbstractUserDetailsAuthenticat
 import org.springframework.security.userdetails.UserDetails;
 import org.springframework.security.userdetails.UserDetailsService;
 import org.springframework.security.userdetails.UsernameNotFoundException;
-import org.jvnet.animal_sniffer.IgnoreJRERequirement;
 import org.kohsuke.args4j.Option;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.context.WebApplicationContext;
@@ -183,7 +182,6 @@ public abstract class AbstractPasswordBasedSecurityRealm extends SecurityRealm i
      * Asks for the password.
      */
     private static class InteractivelyAskForPassword implements Callable<String, IOException> {
-        @IgnoreJRERequirement
         public String call() throws IOException {
             Console console = System.console();
             if (console == null) {
