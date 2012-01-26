@@ -16,7 +16,6 @@
 
 package hudson.model;
 
-import com.infradna.tool.bridge_method_injector.WithBridgeMethods;
 import hudson.XmlFile;
 import hudson.Util;
 import hudson.Functions;
@@ -108,10 +107,6 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
         return (parent != null ? parent.getRootDirFor(this) : Hudson.getInstance().getRootDir());
     }
 
-    /**
-     * This bridge method is to maintain binary compatibility with {@link TopLevelItem#getParent()}.
-     */
-    @WithBridgeMethods(value=Hudson.class,castRequired=true)
     public ItemGroup getParent() {
         assert parent!=null;
         return parent;

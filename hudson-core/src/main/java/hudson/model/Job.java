@@ -28,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Sets;
-import com.infradna.tool.bridge_method_injector.WithBridgeMethods;
 import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.PermalinkList;
@@ -943,7 +942,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * @return never null. The first entry is the latest build.
      */
     @Exported
-    @WithBridgeMethods(List.class)
     public RunList<RunT> getBuilds() {
         return RunList.fromRuns(_getRuns().values());
     }
@@ -1001,7 +999,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * @deprecated
      *      as of 1.372. Should just do {@code getBuilds().byTimestamp(s,e)} to avoid code bloat in {@link Job}.
      */
-    @WithBridgeMethods(List.class)
     public RunList<RunT> getBuildsByTimestamp(long start, long end) {
         return getBuilds().byTimestamp(start, end);
     }
