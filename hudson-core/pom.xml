@@ -648,11 +648,6 @@
             <artifactId>logkit</artifactId>
             <version>${logkit.version}</version>
         </dependency>
-        <dependency>
-            <groupId>avalon-framework</groupId>
-            <artifactId>avalon-framework</artifactId>
-            <version>${avalon-framework.version}</version>
-        </dependency>
         <!--
         | ^ end of optional commons-logging dependencies
         -->
