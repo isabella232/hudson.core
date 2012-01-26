@@ -16,12 +16,11 @@
 
 package hudson;
 
-//import org.kohsuke.accmod.Restricted;
 
 import java.lang.annotation.Documented;
 
 /**
- * Accompanies {@link Restricted} annotation to indicate when the access restriction was placed.
+ * Accompanies {@link Depricated} annotation to indicate when the access restriction was placed.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.355
@@ -29,7 +28,7 @@ import java.lang.annotation.Documented;
 @Documented
 public @interface RestrictedSince {
     /**
-     * Hudson version number that this restriction has started.
+     * Hudson version number that this deprecation has started.
      */
     String value();
 }

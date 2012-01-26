@@ -51,8 +51,6 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.export.Exported;
@@ -129,7 +127,7 @@ public class Mailer extends Notifier {
      * @deprecated as of 1.286
      *      Use {@link #descriptor()} to obtain the current instance.
      */
-    @Restricted(NoExternalUse.class)
+    @Deprecated
     @RestrictedSince("1.355")
     public static DescriptorImpl DESCRIPTOR;
 
