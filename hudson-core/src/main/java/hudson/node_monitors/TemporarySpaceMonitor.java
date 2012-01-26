@@ -24,7 +24,6 @@ import hudson.model.Computer;
 import hudson.model.Hudson;
 import hudson.node_monitors.DiskSpaceMonitorDescriptor.DiskSpace;
 import hudson.remoting.VirtualChannel;
-import org.jvnet.animal_sniffer.IgnoreJRERequirement;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
@@ -74,7 +73,6 @@ public class TemporarySpaceMonitor extends AbstractDiskSpaceMonitor {
     }
     
     protected static final class GetTempSpace implements FileCallable<DiskSpace> {
-        @IgnoreJRERequirement
         public DiskSpace invoke(File f, VirtualChannel channel) throws IOException {
             try {
                 // if the disk is really filled up we can't even create a single file,

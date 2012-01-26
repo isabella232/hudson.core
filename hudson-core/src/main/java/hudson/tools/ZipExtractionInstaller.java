@@ -35,7 +35,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import org.jvnet.animal_sniffer.IgnoreJRERequirement;
 
 /**
  * Installs a tool into the Hudson working area by downloading and unpacking a ZIP file.
@@ -116,7 +115,6 @@ public class ZipExtractionInstaller extends ToolInstaller {
                 process(d);
             return null;
         }
-        @IgnoreJRERequirement
         private void process(File f) {
             if (f.isFile()) {
                 if (Functions.isMustangOrAbove()) {
