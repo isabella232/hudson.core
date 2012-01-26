@@ -17,8 +17,6 @@
 package hudson.security;
 
 import hudson.RestrictedSince;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.DoNotUse;
 
 /**
  * {@link AuthorizationStrategy} implementation that emulates the legacy behavior.
@@ -27,7 +25,7 @@ import org.kohsuke.accmod.restrictions.DoNotUse;
  * @deprecated as of 2.2.0
  *             This strategy was removed due to <a href='http://issues.hudson-ci.org/browse/HUDSON-8944'>HUDSON-8944</a>
  */
-@Restricted(DoNotUse.class)
+@Deprecated
 @RestrictedSince("2.2.0")
 public final class LegacyAuthorizationStrategy extends FullControlOnceLoggedInAuthorizationStrategy {
 }

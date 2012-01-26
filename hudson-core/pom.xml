@@ -74,7 +74,6 @@
         <!--Plugins-->
         <maven-encoding-plugin.version>1.1</maven-encoding-plugin.version>
         <bridge-method-injector.version>1.4</bridge-method-injector.version>
-        <access-modifier-checker.version>1.0</access-modifier-checker.version>
         <antlr-maven-plugin.version>2.1</antlr-maven-plugin.version>
         <apt-maven-plugin.version>1.0-alpha-2</apt-maven-plugin.version>
         <maven-project-info-reports-plugin.version>2.1</maven-project-info-reports-plugin.version>
@@ -123,18 +122,6 @@
                     <execution>
                         <goals>
                             <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.kohsuke</groupId>
-                <artifactId>access-modifier-checker</artifactId>
-                <version>${access-modifier-checker.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>enforce</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -782,12 +769,6 @@
             <groupId>asm</groupId>
             <artifactId>asm-commons</artifactId>
             <version>${asm-commons.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.kohsuke</groupId>
-            <artifactId>access-modifier-annotation</artifactId>
-            <version>${access-modifier-annotation.version}</version>
         </dependency>
 
         <dependency>
