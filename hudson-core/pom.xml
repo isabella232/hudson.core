@@ -37,7 +37,6 @@
         <jna-posix.version>1.0.3</jna-posix.version>
         <trilead-putty-extension.version>1.0</trilead-putty-extension.version>
         <stapler.version>1.176</stapler.version>
-        <bridge-method-annotation.version>1.4</bridge-method-annotation.version>
         <json-lib.version>2.4</json-lib.version>
         <annotation-indexer.version>1.2</annotation-indexer.version>
         <task-reactor.version>1.2</task-reactor.version>
@@ -71,7 +70,6 @@
 
         <!--Plugins-->
         <maven-encoding-plugin.version>1.1</maven-encoding-plugin.version>
-        <bridge-method-injector.version>1.4</bridge-method-injector.version>
         <antlr-maven-plugin.version>2.1</antlr-maven-plugin.version>
         <apt-maven-plugin.version>1.0-alpha-2</apt-maven-plugin.version>
         <maven-project-info-reports-plugin.version>2.1</maven-project-info-reports-plugin.version>
@@ -89,18 +87,6 @@
                             <goal>check-encoding</goal>
                         </goals>
                         <phase>compile</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.infradna.tool</groupId>
-                <artifactId>bridge-method-injector</artifactId>
-                <version>${bridge-method-injector.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -395,12 +381,6 @@
                     <artifactId>json-lib</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.infradna.tool</groupId>
-            <artifactId>bridge-method-annotation</artifactId>
-            <version>${bridge-method-annotation.version}</version>
         </dependency>
 
         <dependency>
