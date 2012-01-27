@@ -48,13 +48,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.googlecode.junit-ext</groupId>
-      <artifactId>junit-ext</artifactId>
-      <classifier>junit45</classifier>
-      <version>${junit-ext.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit-dep</artifactId>
       <version>${junit.version}</version>
