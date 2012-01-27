@@ -141,6 +141,7 @@
                     -->
                     <groupId>org.kohsuke.stapler</groupId>
                     <artifactId>maven-stapler-plugin</artifactId>
+                    <version>${maven-stapler-plugin.version}</version>
                     <extensions>true</extensions>
                     <dependencies>
                         <dependency>
