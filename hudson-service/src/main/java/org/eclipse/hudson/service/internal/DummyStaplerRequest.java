@@ -19,7 +19,6 @@ package org.eclipse.hudson.service.internal;
 import net.sf.json.JSONObject;
 import org.apache.commons.fileupload.FileItem;
 import org.kohsuke.stapler.Ancestor;
-import org.kohsuke.stapler.BindInterceptor;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -391,14 +390,6 @@ public class DummyStaplerRequest
     }
 
     public WebApp getWebApp() {
-        return null;
-    }
-
-    public BindInterceptor getBindInterceptor() {
-        return null;
-    }
-
-    public BindInterceptor setBindListener(BindInterceptor bindInterceptor) {
         return null;
     }
 
