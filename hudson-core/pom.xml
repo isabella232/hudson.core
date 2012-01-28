@@ -40,7 +40,7 @@
         <json-lib.version>2.4</json-lib.version>
         <annotation-indexer.version>1.2</annotation-indexer.version>
         <task-reactor.version>1.2</task-reactor.version>
-        <antlr.version>3.0</antlr.version>
+        <antlr.version>2.7.7</antlr.version>
         <commons-digester.version>3.0</commons-digester.version>
         <commons-beanutils.version>1.8.0</commons-beanutils.version>
         <commons-jelly-tags-fmt.version>1.0</commons-jelly-tags-fmt.version>
@@ -354,29 +354,6 @@
             <artifactId>jna-posix</artifactId>
             <version>${jna-posix.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.kohsuke.stapler</groupId>
-            <artifactId>stapler-groovy</artifactId>
-            <version>${stapler.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-jelly</groupId>
-                    <artifactId>commons-jelly</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-jexl</groupId>
-                    <artifactId>commons-jexl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.kohsuke.stapler</groupId>
-                    <artifactId>json-lib</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <dependency>
             <!-- until we get this version through Stapler -->
@@ -402,12 +379,7 @@
         <dependency>
             <groupId>org.jvnet.localizer</groupId>
             <artifactId>localizer</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr</artifactId>
-            <version>${antlr.version}</version>
-        </dependency>
+        </dependency>     
         <dependency>
             <groupId>org.hudsonci.tools</groupId>
             <artifactId>xstream</artifactId>
@@ -732,6 +704,34 @@
             <groupId>net.sf.jtidy</groupId>
             <artifactId>jtidy</artifactId>
             <version>${jtidy.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>antlr</groupId>
+            <artifactId>antlr</artifactId>
+            <version>${antlr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kohsuke.stapler</groupId>
+            <artifactId>stapler-jelly</artifactId>
+            <version>1.155</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-jelly</groupId>
+                    <artifactId>commons-jelly</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-jexl</groupId>
+                    <artifactId>commons-jexl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.kohsuke.stapler</groupId>
+                    <artifactId>json-lib</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
