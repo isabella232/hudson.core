@@ -343,11 +343,6 @@
             <groupId>org.eclipse.hudson.main</groupId>
             <artifactId>hudson-cli</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.jvnet.hudson</groupId>
-            <artifactId>crypto-util</artifactId>
-            <version>${crypto-util.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.kohsuke</groupId>
