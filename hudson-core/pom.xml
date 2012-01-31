@@ -63,7 +63,7 @@
         <winsw.version>1.9</winsw.version>
         <sezpoz.version>1.9</sezpoz.version>
         <metainf-services.version>1.1</metainf-services.version>
-        <asm-all.version>3.1</asm-all.version>
+        <asm-all.version>2.2.3</asm-all.version>
         <jline.version>0.9.94</jline.version>
 
         <!--Plugins-->
