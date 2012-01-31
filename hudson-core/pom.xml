@@ -25,7 +25,7 @@
     <artifactId>hudson-core</artifactId>
     <name>Hudson :: Core</name>
     <description>
-    Contains the core Hudson code and view files to render HTML.
+        Contains the core Hudson code and view files to render HTML.
     </description>
 
     <properties>
@@ -63,7 +63,7 @@
         <winsw.version>1.9</winsw.version>
         <sezpoz.version>1.9</sezpoz.version>
         <metainf-services.version>1.1</metainf-services.version>
-        <asm-commons.version>2.2.3</asm-commons.version>
+        <asm-all.version>3.1</asm-all.version>
         <jline.version>0.9.94</jline.version>
 
         <!--Plugins-->
@@ -278,15 +278,15 @@
         </profile>
 
         <profile>
-          <id>hudson</id>
-          <build>
-            <plugins>
-               <plugin>
-                  <groupId>org.codehaus.mojo</groupId>
-                   <artifactId>cobertura-maven-plugin</artifactId>
-                </plugin>
-            </plugins>
-          </build>
+            <id>hudson</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>cobertura-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>pmd</id>
@@ -383,10 +383,22 @@
         <dependency>
             <groupId>org.hudsonci.tools</groupId>
             <artifactId>xstream</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>xpp3_min</artifactId>
+                    <groupId>xpp3</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>ant-launcher</artifactId>
+                    <groupId>org.apache.ant</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -405,7 +417,7 @@
         <dependency><!-- Left for backward compatibility-->
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.5</version>
+            <version>2.4</version>
         </dependency>
 
         <dependency><!-- Left for backward compatibility-->
@@ -523,8 +535,8 @@
                     <artifactId>commons-cli</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>org.jvnet.hudson</groupId>
-                  <artifactId>commons-jelly</artifactId>
+                    <groupId>org.jvnet.hudson</groupId>
+                    <artifactId>commons-jelly</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -691,8 +703,8 @@
         <dependency>
             <!-- with this, stapler can load parameter names from the debug info -->
             <groupId>asm</groupId>
-            <artifactId>asm-commons</artifactId>
-            <version>${asm-commons.version}</version>
+            <artifactId>asm-all</artifactId>
+            <version>${asm-all.version}</version>
         </dependency>
 
         <dependency>
