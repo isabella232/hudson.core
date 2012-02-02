@@ -14,7 +14,6 @@
 
 package hudson.init;
 
-import org.kohsuke.MetaInfServices;
 import org.jvnet.hudson.reactor.Task;
 
 import java.io.File;
@@ -37,7 +36,7 @@ import hudson.util.Service;
  * inside {@code WEB-INF/lib} instead.
  *
  * <p>
- * To register, put {@link MetaInfServices} on your implementation.
+ * Register your implementation at META-INF/services.
  * 
  * @author Kohsuke Kawaguchi
  */

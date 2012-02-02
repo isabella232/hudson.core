@@ -15,7 +15,6 @@
 package hudson.init;
 
 import org.jvnet.hudson.reactor.ReactorListener;
-import org.kohsuke.MetaInfServices;
 import hudson.model.Hudson;
 
 /**
@@ -27,7 +26,7 @@ import hudson.model.Hudson;
  * inside {@code WEB-INF/lib} instead.
  *
  * <p>
- * To register, put {@link MetaInfServices} on your implementation.
+ * Register your implementation at META-INF/services.
  *
  * @author Kohsuke Kawaguchi
  * @see Hudson#buildReactorListener()
