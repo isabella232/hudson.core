@@ -62,7 +62,6 @@
         <jmdns.version>3.4.0</jmdns.version>
         <winsw.version>1.9</winsw.version>
         <sezpoz.version>1.9</sezpoz.version>
-        <metainf-services.version>1.1</metainf-services.version>
         <asm-all.version>2.2.3</asm-all.version>
         <jline.version>0.9.94</jline.version>
 
@@ -653,13 +652,6 @@
             <groupId>net.java.sezpoz</groupId>
             <artifactId>sezpoz</artifactId>
             <version>${sezpoz.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.kohsuke.metainf-services</groupId>
-            <artifactId>metainf-services</artifactId>
-            <version>${metainf-services.version}</version>
-            <optional>true</optional>
         </dependency>
 
         <dependency>
