@@ -50,13 +50,16 @@
                     
                     <webResources>
                         <resource>
+                            <directory>${project.build.directory}/classes</directory>
+                        </resource>
+                        <resource>
                             <directory>${project.build.directory}/generated-resources</directory>
                         </resource>
                     </webResources>
-                    <!-- Main Class to Start Jetty -->
+                    <!-- Main bootstrap Class to make war executable -->
                     <archive>
                         <manifest>
-                            <mainClass>org.eclipse.hudson.war.executable.StartJetty</mainClass>
+                            <mainClass>org.eclipse.hudson.war.Executable</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Implementation-Version>${project.version}</Implementation-Version>
@@ -89,10 +92,12 @@
                         <goals>
                             <goal>unpack</goal>
                         </goals>
+                         
                         <configuration>
-                            <excludes>
-                                  META-INF/*
-                            </excludes>
+                            <!-- Copy only the bootstrap class -->
+                             <includes>
+                                  **/Executable*
+                            </includes>
                             <artifactItems>
                                                            
                                 <artifactItem>
@@ -100,29 +105,6 @@
                                     <artifactId>hudson-jetty-war-executable</artifactId>
                                     <version>${project.version}</version>
                                     <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>target/generated-resources</outputDirectory>
-                                </artifactItem>
-                                
-                                <!-- Jetty Classes -->
-                                <artifactItem>
-                                    <groupId>org.mortbay.jetty</groupId>
-                                    <artifactId>jetty</artifactId>
-                                    <version>6.1.26</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>target/generated-resources</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.mortbay.jetty</groupId>
-                                    <artifactId>jetty-util</artifactId>
-                                    <version>6.1.26</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>target/generated-resources</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.mortbay.jetty</groupId>
-                                    <artifactId>servlet-api</artifactId>
-                                    <version>2.5-20081211</version>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources</outputDirectory>
                                 </artifactItem>
@@ -139,6 +121,43 @@
                         </goals>
                         <configuration>
                             <artifactItems>
+                                
+                                <!-- Jetty war executable libraries -->
+                                 
+                                <artifactItem>
+                                    <groupId>org.eclipse.hudson.main</groupId>
+                                    <artifactId>hudson-jetty-war-executable</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>hudson-jetty-war-executable.jar</destFileName>
+                                </artifactItem>
+                                
+                                <artifactItem>
+                                    <groupId>org.mortbay.jetty</groupId>
+                                    <artifactId>jetty</artifactId>
+                                    <version>6.1.26</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>jetty.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mortbay.jetty</groupId>
+                                    <artifactId>jetty-util</artifactId>
+                                    <version>6.1.26</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>jetty-util.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mortbay.jetty</groupId>
+                                    <artifactId>servlet-api</artifactId>
+                                    <version>2.5-20081211</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>jetty-servlet-api.jar</destFileName>
+                                </artifactItem>
                                 
                                 <!-- dependencies that goes to WEB-INF for unusual usage -->
                                 
