@@ -12,8 +12,8 @@
  *
  * Winston Prakash
  *
- *******************************************************************************/
-
+ ******************************************************************************
+ */
 package org.eclipse.hudson.jetty;
 
 import java.io.File;
@@ -24,9 +24,12 @@ import org.mortbay.jetty.webapp.WebAppContext;
 
 /**
  * Jetty Utility to launch the Jetty Server
+ *
  * @author Winston Prakash
  */
 public class JettyLauncher {
+
+    private static String contextPath = "/";
 
     public static void start(String[] args, URL warUrl) throws Exception {
 
@@ -36,10 +39,12 @@ public class JettyLauncher {
             if (args[i].startsWith("--httpPort=")) {
                 String portStr = args[i].substring("--httpPort=".length());
                 port = Integer.parseInt(portStr);
-            }  
+            } else if (args[i].startsWith("--prefix=")) {
+                contextPath = "/" + args[i].substring("--prefix=".length());
+            }
         }
 
-        Server server = new Server(port);
+        final Server server = new Server(port);
         SocketConnector connector = new SocketConnector();
 
         WebAppContext context = new WebAppContext();
@@ -47,8 +52,8 @@ public class JettyLauncher {
         File tempDir = new File(getHomeDir(), "war");
         tempDir.mkdirs();
         context.setTempDirectory(tempDir);
-        
-        context.setContextPath("/");
+
+        context.setContextPath(contextPath);
         context.setDescriptor(warUrl.toExternalForm() + "/WEB-INF/web.xml");
         context.setServer(server);
         context.setWar(warUrl.toExternalForm());
@@ -58,10 +63,12 @@ public class JettyLauncher {
         System.setProperty("executable-war", warUrl.getPath());
 
         server.addHandler(context);
+        server.setStopAtShutdown(true);
+
         server.start();
         server.join();
     }
-    
+
     /**
      * Get the home directory for Hudson.
      */

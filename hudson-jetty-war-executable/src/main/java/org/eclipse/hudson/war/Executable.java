@@ -21,9 +21,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -35,38 +33,82 @@ import java.util.jar.Manifest;
  */
 public class Executable {
 
-    private String[] jettyJars = {
+    private final String[] jettyJars = {
         "libs/jetty.jar",
         "libs/jetty-util.jar",
         "libs/jetty-servlet-api.jar",
         "libs/hudson-jetty-war-executable.jar"
     };
+    private List<String> arguments;
 
     public static void main(String[] args) throws Exception {
 
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].startsWith("--version")) {
-                System.out.println("Hudson Continuous Integration Server" + getVersion());
-                System.exit(0);
-            } else if (args[i].startsWith("--usage")) {
-                String usageStr = "Hudson Continuous Integration Server " + getVersion() + "\n"
-                        + "Usage: java -jar hudson.war [--option=value] [--option=value] ... \n"
-                        + "\n"
-                        + "Options:\n"
-                        + "   --httpPort=<value>   HTTP listening port. Default value is 8080\n"
-                        + "   --version            Show Hudson version and quit\n";
-                System.out.println(usageStr);
+        String javaVersion = System.getProperty("java.version");
+
+        StringTokenizer tokens = new StringTokenizer(javaVersion, ".-_");
+
+        int majorVersion = Integer.parseInt(tokens.nextToken());
+        int minorVersion = Integer.parseInt(tokens.nextToken());
+
+        // Make sure Java version is 1.6 or later
+        if (majorVersion < 2) {
+            if (minorVersion < 6) {
+                System.err.println("Hudson requires Java 6 or later.");
+                System.err.println("Your java version is " + javaVersion);
+                System.err.println("Java Home:  " + System.getProperty("java.home"));
                 System.exit(0);
             }
         }
 
-        Executable jettyLauncher = new Executable();
-        jettyLauncher.launchJetty(args);
+        Executable executable = new Executable();
+        executable.parseArguments(args);
+        executable.launchJetty();
     }
 
-    private void launchJetty(String[] args) throws Exception {
+    private void parseArguments(String[] args) throws IOException {
+        arguments = Arrays.asList(args);
+
+        for (String arg : arguments) {
+            if (arg.startsWith("--version")) {
+                System.out.println("Hudson Continuous Integration Server" + getHudsonVersion());
+                System.exit(0);
+            } else if (arg.startsWith("--usage")) {
+                printUsage();
+                break;
+            } else if (arg.startsWith("--logfile=")) {
+                String logFile = arg.substring("--logfile=".length());
+                System.out.println("Logging information is send to file " + logFile);
+                FileOutputStream fos = new FileOutputStream(new File(logFile));
+                PrintStream ps = new PrintStream(fos);
+                System.setOut(ps);
+                System.setErr(ps);
+                break;
+            }
+        }
+    }
+
+    private void printUsage() throws IOException {
+        String usageStr = "Hudson Continuous Integration Server " + getHudsonVersion() + "\n"
+                + "Usage: java -jar hudson.war [--option=value] [--option=value] ... \n"
+                + "\n"
+                + "Options:\n"
+                + "   --httpPort=<value>    HTTP listening port. Default value is 8080\n"
+                + "   --version             Show Hudson version and quit\n"
+                + "   --logfile=<filename>  Send the output log to this file\n"
+                + "   --prefix=<prefix>     Add this prefix to all URLs (eg http://localhost:8080/prefix/resource). Default is none\n";;
+        System.out.println(usageStr);
+        System.exit(0);
+    }
+
+    private void launchJetty() throws Exception {
         ProtectionDomain protectionDomain = Executable.class.getProtectionDomain();
         URL warUrl = protectionDomain.getCodeSource().getLocation();
+        
+        // For Testing purpose
+//        File file = new File("/Users/winstonp/hudson/hudson-eclipse/org.eclipse.hudson.core/hudson-war/target/hudson-war-3.0.0-SNAPSHOT.war");
+//        URL warUrl = file.toURI().toURL();
+        
+        System.out.println(warUrl.getPath());
 
         List<URL> jarUrls = extractJettyJarsFromWar(warUrl.getPath());
 
@@ -75,7 +117,7 @@ public class Executable {
 
         Class jettyUtil = urlClassLoader.loadClass("org.eclipse.hudson.jetty.JettyLauncher");
         Method mainMethod = jettyUtil.getMethod("start", new Class[]{String[].class, URL.class});
-        mainMethod.invoke(null, new Object[]{args, warUrl});
+        mainMethod.invoke(null, new Object[]{arguments.toArray(new String[arguments.size()]), warUrl});
     }
 
     /**
@@ -84,7 +126,7 @@ public class Executable {
      * @return
      * @throws IOException
      */
-    private static String getVersion() throws IOException {
+    private static String getHudsonVersion() throws IOException {
         Enumeration manifests = Executable.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
         while (manifests.hasMoreElements()) {
             URL manifestUrl = (URL) manifests.nextElement();
@@ -104,11 +146,7 @@ public class Executable {
      */
     private List<URL> extractJettyJarsFromWar(String warPath) throws IOException {
 
-        System.out.println(warPath);
-
         JarFile jarFile = new JarFile(warPath);
-
-
 
         List<URL> jarUrls = new ArrayList<URL>();
 
@@ -142,7 +180,7 @@ public class Executable {
                 }
 
                 tmpFile.deleteOnExit();
-                System.out.println("Extracted " + entryPath + " to " + tmpFile);
+                //System.out.println("Extracted " + entryPath + " to " + tmpFile);
                 jarUrls.add(tmpFile.toURI().toURL());
             }
 
