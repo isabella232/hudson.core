@@ -92,10 +92,14 @@ public class Executable {
                 + "Usage: java -jar hudson.war [--option=value] [--option=value] ... \n"
                 + "\n"
                 + "Options:\n"
-                + "   --httpPort=<value>    HTTP listening port. Default value is 8080\n"
-                + "   --version             Show Hudson version and quit\n"
-                + "   --logfile=<filename>  Send the output log to this file\n"
-                + "   --prefix=<prefix>     Add this prefix to all URLs (eg http://localhost:8080/prefix/resource). Default is none\n";;
+                + "   --version                        Show Hudson version and quit\n"
+                + "   --logfile=<filename>             Send the output log to this file\n"
+                + "   --prefix=<prefix-string>         Add this prefix to all URLs (eg http://localhost:8080/prefix/resource). Default is none\n\n"
+                + "   --httpPort=<value>               HTTP listening port. Default value is 8080\n\n"
+                + "   --httpsPort=<value>              HTTPS listening port. Disabled by default\n"
+                + "   --httpsKeyStore=<filepath>       Location of the SSL KeyStore file.\n"
+                + "   --httpsKeyStorePassword=<value>  Password for the SSL KeyStore file\n\n";
+        
         System.out.println(usageStr);
         System.exit(0);
     }
