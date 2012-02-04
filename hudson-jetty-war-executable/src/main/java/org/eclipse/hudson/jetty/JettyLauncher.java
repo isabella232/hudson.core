@@ -18,8 +18,12 @@ package org.eclipse.hudson.jetty;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.bio.SocketConnector;
+import org.mortbay.jetty.nio.SelectChannelConnector;
+import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 
 /**
@@ -33,19 +37,56 @@ public class JettyLauncher {
 
     public static void start(String[] args, URL warUrl) throws Exception {
 
-        int port = 8080;
+        int httpPort = 8080;
+        int httpsPort = -1;
+
+        String keyStorePath = null;
+        String keyStorePassword = null;
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("--httpPort=")) {
                 String portStr = args[i].substring("--httpPort=".length());
-                port = Integer.parseInt(portStr);
+                httpPort = Integer.parseInt(portStr);
+            }
+            if (args[i].startsWith("--httpsPort=")) {
+                String portStr = args[i].substring("--httpsPort=".length());
+                httpsPort = Integer.parseInt(portStr);
+            }
+            if (args[i].startsWith("--httpsKeyStore=")) {
+                keyStorePath = args[i].substring("--httpsKeyStore=".length());
+            }
+            if (args[i].startsWith("--httpsKeyStorePassword=")) {
+                keyStorePassword = args[i].substring("--httpsKeyStorePassword=".length());
             } else if (args[i].startsWith("--prefix=")) {
                 contextPath = "/" + args[i].substring("--prefix=".length());
             }
         }
 
-        final Server server = new Server(port);
-        SocketConnector connector = new SocketConnector();
+        Server server = new Server();
+
+        List<Connector> connectors = new ArrayList<Connector>();
+
+        // HTTP  connector
+        if (httpPort != -1) {
+            SelectChannelConnector httpConnector = new SelectChannelConnector();
+            httpConnector.setPort(httpPort);
+            connectors.add(httpConnector);
+        }
+
+        // HTTPS (SSL) connector
+        if (httpsPort != -1) {
+            SslSocketConnector httpsConnector = new SslSocketConnector();
+            httpsConnector.setPort(httpsPort);
+            if (keyStorePath != null) {
+                httpsConnector.setKeystore(keyStorePath);
+            }
+            if (keyStorePassword != null){
+                httpsConnector.setKeyPassword(keyStorePassword);
+            }
+            connectors.add(httpsConnector);
+        }
+
+        server.setConnectors(connectors.toArray(new Connector[connectors.size()]));
 
         WebAppContext context = new WebAppContext();
 
