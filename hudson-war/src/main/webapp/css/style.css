@@ -305,6 +305,7 @@ div.dashboard {
 }
 
 .pane  {
+  color: #5c3566;
   margin-top: 4px;
   white-space: nowrap;
 }
@@ -315,41 +316,43 @@ div.dashboard {
 table.pane {
   width: 100%;
   border-collapse: collapse;
-  border: 1px #bbb solid;
+  border: 1px #A583B9 solid;
 }
 
 td.pane {
-  border: 1px #bbb solid;
+  border: 1px #A583B9 solid;
   padding: 3px 4px 3px 4px;
   vertical-align: middle;
 }
 
 td.pane-header {
-  border: 1px #bbb solid;
-  border-right: none;
-  border-left: none;
-  background-color: #f0f0f0;
+  border: 1px #A583B9 solid;
+  background-color: #E2D7E7;
   font-weight: bold;
 }
 
 th.pane {
-  border: 1px #bbb solid;
+  border: 1px #A583B9 solid;
   font-weight: bold;
 }
 
+.bigtable{
+    color: #5c3566;
+}
+
 .bigtable tr {
-  border: 1px solid #bbb;
+  border: 1px solid #A583B9;
   padding: 3px 4px 3px 4px;
 }
 
 .bigtable tr:hover {
-  background-color: #f0f0f0;
+  background-color: #EADFEF;
 }
 
 .bigtable th {
   font-weight: bold;
   border: none;
-  background-color: #f0f0f0;
+  background-color: #E2D7E7;
   padding: 3px 4px 3px 4px;
 }
 
@@ -528,6 +531,7 @@ div.behavior-loading {
 
 /* ====================== project view tab bar ===================================== */
 #viewList {
+  color: #5c3566;
   border: none;
   margin-bottom: 0px;
   width: 100%;
@@ -537,11 +541,11 @@ div.behavior-loading {
   padding: 0px;
 }
 #viewList td.inactive {
-  border: solid 1px #ccc;
+  border: solid 1px #A583B9;
   border-bottom-color: #bbb;
 }
 #viewList td.inactive:hover {
-  background-color: #777;
+  background-color: #A583B9;
 }
 #viewList td.inactive a {
   text-decoration: none;
@@ -554,17 +558,17 @@ div.behavior-loading {
   border-right: none;
 }
 #viewList td.active {
-  border: solid 1px #bbb;
+  border: solid 1px #A583B9;
   padding: 0.5em;
   border-bottom: none;
   vertical-align:middle;
-  background-color: rgb(240,240,240);
+  background-color: #EADFEF;
   font-weight: bold;
   white-space: nowrap;
 }
 #viewList td.filler {
   border: none;
-  border-bottom: solid 1px #bbb;
+  border-bottom: solid 1px #A583B9;
   width: 100%;
   text-align: right;
 }
@@ -719,7 +723,7 @@ TABLE.fileList TD.fileSize {
 /* ========================= sortable table ========================= */
 table.sortable a.sortheader {
   text-decoration: none;
-  color: black;
+  color: #5c3566;
   display: block;
 }
 table.sortable span.sortarrow {
@@ -1054,4 +1058,11 @@ table.configure > td {
 }
 .axis-child {
     padding-left: 15px;
+}
+
+/* ========== Timeline ================== */
+
+.timeline{
+    height:250px; 
+    border: solid 1px #A583B9;
 }
