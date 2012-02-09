@@ -1066,3 +1066,18 @@ table.configure > td {
     height:250px; 
     border: solid 1px #A583B9;
 }
+
+/* === Login Dialog ==== */
+
+#loginError, #loginMsg {
+    text-align:center;
+    font-weight:bold;
+}
+#loginError {
+    color: red;
+    display: none;
+}
+#loginMsg {
+    color: black;
+    display: none;
+}
