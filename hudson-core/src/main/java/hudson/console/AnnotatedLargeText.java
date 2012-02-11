@@ -16,7 +16,6 @@
 
 package hudson.console;
 
-import com.trilead.ssh2.crypto.Base64;
 import hudson.model.Hudson;
 import hudson.remoting.ObjectInputStreamEx;
 import hudson.util.IOException2;
@@ -45,6 +44,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import static java.lang.Math.abs;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * Extension to {@link LargeText} that handles annotations by {@link ConsoleAnnotator}.
@@ -112,7 +112,7 @@ public class AnnotatedLargeText<T> extends LargeText {
                 sym.init(Cipher.DECRYPT_MODE, Hudson.getInstance().getSecretKeyAsAES128());
 
                 ObjectInputStream ois = new ObjectInputStreamEx(new GZIPInputStream(
-                        new CipherInputStream(new ByteArrayInputStream(Base64.decode(base64.toCharArray())),sym)),
+                        new CipherInputStream(new ByteArrayInputStream(Base64.decodeBase64(base64)),sym)),
                         Hudson.getInstance().pluginManager.uberClassLoader);
                 long timestamp = ois.readLong();
                 if (TimeUnit2.HOURS.toMillis(1) > abs(System.currentTimeMillis()-timestamp))
@@ -156,7 +156,7 @@ public class AnnotatedLargeText<T> extends LargeText {
             oos.close();
             StaplerResponse rsp = Stapler.getCurrentResponse();
             if (rsp!=null)
-                rsp.setHeader("X-ConsoleAnnotator", new String(Base64.encode(baos.toByteArray())));
+                rsp.setHeader("X-ConsoleAnnotator", new String(Base64.encodeBase64(baos.toByteArray())));
         } catch (GeneralSecurityException e) {
             throw new IOException2(e);
         }

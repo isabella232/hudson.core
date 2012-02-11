@@ -16,7 +16,6 @@
 
 package hudson.model;
 
-import com.trilead.ssh2.crypto.Base64;
 import hudson.PluginWrapper;
 import hudson.Util;
 import hudson.Extension;
@@ -46,6 +45,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -172,7 +172,7 @@ public class UsageStatistics extends PageDecorator {
             o.write(w);
             w.close();
 
-            return new String(Base64.encode(baos.toByteArray()));
+            return new String(Base64.encodeBase64(baos.toByteArray()));
         } catch (GeneralSecurityException e) {
             throw new Error(e); // impossible
         }

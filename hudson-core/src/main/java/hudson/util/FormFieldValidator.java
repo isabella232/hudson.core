@@ -606,7 +606,7 @@ public abstract class FormFieldValidator {
                     return;
                 }
                 
-                com.trilead.ssh2.crypto.Base64.decode(v.toCharArray());
+                org.apache.commons.codec.binary.Base64.decodeBase64(v);
                 ok();
             } catch (IOException e) {
                 fail();
