@@ -23,8 +23,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
-
-import com.trilead.ssh2.crypto.Base64;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * Encrypt/decrypt data by using a "session" key that only lasts for
@@ -42,7 +41,7 @@ public class Protector {
         try {
             Cipher cipher = Secret.getCipher(ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, DES_KEY);
-            return new String(Base64.encode(cipher.doFinal((secret+ MAGIC).getBytes("UTF-8"))));
+            return new String(Base64.encodeBase64(cipher.doFinal((secret+ MAGIC).getBytes("UTF-8"))));
         } catch (GeneralSecurityException e) {
             throw new Error(e); // impossible
         } catch (UnsupportedEncodingException e) {
@@ -58,7 +57,7 @@ public class Protector {
         try {
             Cipher cipher = Secret.getCipher(ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, DES_KEY);
-            String plainText = new String(cipher.doFinal(Base64.decode(data.toCharArray())), "UTF-8");
+            String plainText = new String(cipher.doFinal(Base64.decodeBase64(data)), "UTF-8");
             if(plainText.endsWith(MAGIC))
                 return plainText.substring(0,plainText.length()-3);
             return null;

@@ -21,7 +21,6 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import com.trilead.ssh2.crypto.Base64;
 import hudson.model.Hudson;
 import hudson.Util;
 import org.kohsuke.stapler.Stapler;
@@ -32,6 +31,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * Glorified {@link String} that uses encryption in the persisted form, to avoid accidental exposure of a secret.
@@ -107,7 +107,7 @@ public final class Secret implements Serializable {
             Cipher cipher = getCipher("AES");
             cipher.init(Cipher.ENCRYPT_MODE, getKey());
             // add the magic suffix which works like a check sum.
-            return new String(Base64.encode(cipher.doFinal((value+MAGIC).getBytes("UTF-8"))));
+            return new String(Base64.encodeBase64(cipher.doFinal((value+MAGIC).getBytes("UTF-8"))));
         } catch (GeneralSecurityException e) {
             throw new Error(e); // impossible
         } catch (UnsupportedEncodingException e) {
@@ -124,7 +124,7 @@ public final class Secret implements Serializable {
         try {
             Cipher cipher = getCipher("AES");
             cipher.init(Cipher.DECRYPT_MODE, getKey());
-            String plainText = new String(cipher.doFinal(Base64.decode(data.toCharArray())), "UTF-8");
+            String plainText = new String(cipher.doFinal(Base64.decodeBase64(data)), "UTF-8");
             if(plainText.endsWith(MAGIC))
                 return new Secret(plainText.substring(0,plainText.length()-MAGIC.length()));
             return null;

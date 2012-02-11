@@ -35,7 +35,6 @@
         <crypto-util.version>1.0</crypto-util.version>
         <jtidy.version>r938</jtidy.version>
         <jna-posix.version>1.0.3</jna-posix.version>
-        <trilead-putty-extension.version>1.0</trilead-putty-extension.version>
         <stapler.version>1.155</stapler.version>
         <json-lib.version>2.4</json-lib.version>
         <annotation-indexer.version>1.2</annotation-indexer.version>
@@ -344,11 +343,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.kohsuke</groupId>
-            <artifactId>trilead-putty-extension</artifactId>
-            <version>${trilead-putty-extension.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.jruby.ext.posix</groupId>
             <artifactId>jna-posix</artifactId>
             <version>${jna-posix.version}</version>
@@ -621,11 +615,6 @@
             <artifactId>log4j</artifactId>
             <version>${log4j.version}</version>
         </dependency>
-        <dependency>
-            <groupId>logkit</groupId>
-            <artifactId>logkit</artifactId>
-            <version>${logkit.version}</version>
-        </dependency>
         <!--
         | ^ end of optional commons-logging dependencies
         -->
@@ -736,6 +725,12 @@
                     <artifactId>json-lib</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jvnet.hudson</groupId>
+            <artifactId>ganymed-ssh-2</artifactId>
+            <version>build260</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 

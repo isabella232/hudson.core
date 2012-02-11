@@ -14,12 +14,8 @@
 
 package hudson.util.ssh;
 
-import com.trilead.ssh2.Connection;
-import com.trilead.ssh2.SFTPException;
-import com.trilead.ssh2.SFTPv3Client;
-import com.trilead.ssh2.SFTPv3FileAttributes;
-import com.trilead.ssh2.SFTPv3FileHandle;
-import com.trilead.ssh2.sftp.ErrorCodes;
+import ch.ethz.ssh2.*;
+import ch.ethz.ssh2.sftp.ErrorCodes;
 import hudson.util.IOException2;
 
 import java.io.IOException;
