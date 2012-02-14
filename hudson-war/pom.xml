@@ -194,7 +194,7 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.main</groupId>
                                     <artifactId>rest-plugin</artifactId>
-                                    <version>3.0.0-1</version>
+                                    <version>3.0.0-2</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -231,7 +231,7 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.plugins</groupId>
                                     <artifactId>subversion</artifactId>
-                                    <version>3.0.0</version>
+                                    <version>3.0.0-1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -259,7 +259,7 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.plugins</groupId>
                                     <artifactId>ssh-slaves</artifactId>
-                                    <version>3.0.0</version>
+                                    <version>3.0.0-1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
