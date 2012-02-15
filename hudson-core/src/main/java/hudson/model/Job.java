@@ -42,7 +42,6 @@ import hudson.search.SearchIndexBuilder;
 import hudson.search.SearchItem;
 import hudson.search.SearchItems;
 import hudson.security.ACL;
-import hudson.security.AuthorizationMatrixProperty;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.Permission;
 //import hudson.security.ProjectMatrixAuthorizationStrategy;

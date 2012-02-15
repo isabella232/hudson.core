@@ -24,7 +24,6 @@ import hudson.model.Job;
 import hudson.model.JobPropertyDescriptor;
 import hudson.model.ParameterDefinition;
 import hudson.model.ParametersDefinitionProperty;
-import hudson.security.AuthorizationMatrixProperty;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 import java.io.IOException;
@@ -525,7 +524,6 @@ public class CascadingUtil {
      * @see hudson.model.Job#getParameterDefinitionProperties()
      */
     public static boolean isCascadableJobProperty(JobPropertyDescriptor d) {
-        return !(d instanceof AuthorizationMatrixProperty.DescriptorImpl
-            || d instanceof ParametersDefinitionProperty.DescriptorImpl);
+        return d.isCascadable();
     }
 }
