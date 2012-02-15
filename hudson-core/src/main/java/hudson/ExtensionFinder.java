@@ -22,8 +22,6 @@ import net.java.sezpoz.Index;
 import net.java.sezpoz.IndexItem;
 import hudson.model.Hudson;
 import hudson.model.Descriptor;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.util.Collections;
 import java.util.logging.Logger;
@@ -54,7 +52,7 @@ public abstract class ExtensionFinder implements ExtensionPoint {
      * @deprecated as of 1.356
      *      Use and implement {@link #find(Class, Hudson)} that allows us to put some metadata.
      */
-    @Restricted(NoExternalUse.class)
+    @Deprecated
     public <T> Collection<T> findExtensions(Class<T> type, Hudson hudson) {
         return Collections.emptyList();
     }

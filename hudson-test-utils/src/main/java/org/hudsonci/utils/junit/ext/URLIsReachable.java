@@ -22,9 +22,7 @@ import static org.hamcrest.MatcherAssert.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.googlecode.junit.ext.checkers.Checker;
-
-public class URLIsReachable implements Checker {
+public class URLIsReachable {
 
     private URL url; // arg 0
     private int timeout = 10 * 1000; // arg 1

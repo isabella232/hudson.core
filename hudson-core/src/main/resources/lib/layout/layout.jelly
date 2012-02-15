@@ -253,7 +253,7 @@
                         <div style=" height:100%"> 
                             <img src="${imagesURL}/top-left-round.png" style="float:left"/>
                             <div style="margin-left:25; height:25; background-image:url(${imagesURL}/spacer.png); background-repeat:repeat-x" /> 
-                            <div id="main-panel-container" style=" background-color:#FFF; padding-left: 10px; height:100%">
+                            <div id="main-panel-container" style=" background-color:#FFFFFF; padding-left: 10px; height:100%">
                                 <table width="95%" height="100%" border="0">
                                     <tr>
                                         <td id="global-messages" width="100%">

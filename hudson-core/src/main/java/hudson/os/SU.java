@@ -8,15 +8,14 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
-*
-*    Kohsuke Kawaguchi
+ *
+ *    Kohsuke Kawaguchi
  *     
  *
  *******************************************************************************/ 
 
 package hudson.os;
 
-import com.sun.solaris.EmbeddedSu;
 import hudson.Launcher.LocalLauncher;
 import hudson.Util;
 import hudson.model.Computer;

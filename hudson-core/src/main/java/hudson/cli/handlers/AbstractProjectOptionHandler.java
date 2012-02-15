@@ -24,14 +24,12 @@ import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.spi.OptionHandler;
 import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
-import org.kohsuke.MetaInfServices;
 
 /**
- * Refer to {@link AbstractProject} by its name.
+ * Refer to {@link AbstractProject} by its name. Registered at META-INF/services.
  *
  * @author Kohsuke Kawaguchi
  */
-@MetaInfServices
 public class AbstractProjectOptionHandler extends OptionHandler<AbstractProject> {
     public AbstractProjectOptionHandler(CmdLineParser parser, OptionDef option, Setter<AbstractProject> setter) {
         super(parser, option, setter);

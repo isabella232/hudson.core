@@ -40,8 +40,8 @@
         }
 
         function submitForm(){
-            jQuery('#loginMsg').css({ opacity: 1.0 });
-            jQuery('#loginError').css({ opacity: 0.0 });
+            jQuery('#loginMsg').show();
+            jQuery('#loginError').hide();
             var dataString = jQuery("#loginForm").serialize();
             jQuery.ajax({
               type: 'POST',
@@ -51,8 +51,8 @@
                 window.location.href="${from}";
               },
               error: function(){
-                jQuery('#loginError').css({ opacity: 1.0 });
-                jQuery('#loginMsg').css({ opacity: 0.0 });
+                jQuery('#loginError').show();
+                jQuery('#loginMsg').hide();
               },
               dataType: "html"
             }); 
@@ -82,8 +82,8 @@
                 jQuery.unblockUI();
                 jQuery('#j_username').attr({value:""});
                 jQuery('#j_password').attr({value:""});
-                jQuery('#loginError').css({ opacity: 0.0 });
-                jQuery('#loginMsg').css({ opacity: 0.0 });
+                jQuery('#loginError').hide();
+                jQuery('#loginMsg').hide();
                 return false;
             });
 

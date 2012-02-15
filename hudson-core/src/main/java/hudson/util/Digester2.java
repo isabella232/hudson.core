@@ -19,8 +19,6 @@ package hudson.util;
 import hudson.RestrictedSince;
 import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.Rule;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.xml.sax.Attributes;
 
 /**
@@ -31,7 +29,7 @@ import org.xml.sax.Attributes;
  * @deprecated use {@link org.apache.commons.digester3.Digester} instead
  * @since 2.1.2
  */
-@Restricted(NoExternalUse.class)
+@Deprecated
 @RestrictedSince("2.1.2")
 public class Digester2 extends Digester {
     @Override

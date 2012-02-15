@@ -24,14 +24,14 @@ import hudson.util.IOUtils;
 import hudson.util.JSONCanonicalUtils;
 import hudson.util.TextFile;
 import hudson.util.VersionNumber;
+import hudson.util.CertificateUtil;
+import hudson.util.SignatureOutputStream;
 import static hudson.util.TimeUnit2.DAYS;
 
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-import org.jvnet.hudson.crypto.CertificateUtil;
-import org.jvnet.hudson.crypto.SignatureOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.io.output.TeeOutputStream;
 
@@ -57,9 +57,8 @@ import java.security.cert.X509Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.TrustAnchor;
 
-import com.trilead.ssh2.crypto.Base64;
-
 import javax.servlet.ServletContext;
+import org.apache.commons.codec.binary.Base64;
 
 
 /**
@@ -160,7 +159,7 @@ public class UpdateSite {
         {// load and verify certificates
             CertificateFactory cf = CertificateFactory.getInstance("X509");
             for (Object cert : o.getJSONArray("certificates")) {
-                X509Certificate c = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(Base64.decode(cert.toString().toCharArray())));
+                X509Certificate c = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(cert.toString())));
                 c.checkValidity();
                 certs.add(c);
             }
@@ -188,14 +187,14 @@ public class UpdateSite {
 
         // did the digest match? this is not a part of the signature validation, but if we have a bug in the c14n
         // (which is more likely than someone tampering with update center), we can tell
-        String computedDigest = new String(Base64.encode(sha1.digest()));
+        String computedDigest = new String(Base64.encodeBase64(sha1.digest()));
         String providedDigest = signature.getString("digest");
         if (!computedDigest.equalsIgnoreCase(providedDigest)) {
             LOGGER.severe("Digest mismatch: "+computedDigest+" vs "+providedDigest);
             return false;
         }
 
-        if (!sig.verify(Base64.decode(signature.getString("signature").toCharArray()))) {
+        if (!sig.verify(Base64.decodeBase64(signature.getString("signature")))) {
             LOGGER.severe("Signature in the update center doesn't match with the certificate");
             return false;
         }

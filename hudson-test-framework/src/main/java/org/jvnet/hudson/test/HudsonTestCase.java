@@ -36,8 +36,6 @@ import hudson.Launcher.LocalLauncher;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixRun;
-import hudson.maven.MavenEmbedder;
-import hudson.model.Node.Mode;
 import hudson.security.csrf.CrumbIssuer;
 import hudson.slaves.CommandLauncher;
 import hudson.slaves.DumbSlave;
@@ -102,8 +100,6 @@ import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.eclipse.hudson.inject.Smoothie;
 import org.eclipse.hudson.inject.SmoothieUtil;
 import org.eclipse.hudson.inject.internal.SmoothieContainerBootstrap;
@@ -143,12 +139,12 @@ import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebRequestSettings;
 import com.gargoylesoftware.htmlunit.xml.XmlPage;
 import com.gargoylesoftware.htmlunit.html.*;
-import org.eclipse.hudson.legacy.maven.plugin.MavenBuild;
-import org.eclipse.hudson.legacy.maven.plugin.MavenModule;
-import org.eclipse.hudson.legacy.maven.plugin.MavenModuleSet;
-import org.eclipse.hudson.legacy.maven.plugin.MavenModuleSetBuild;
 import hudson.slaves.ComputerListener;
 import java.util.concurrent.CountDownLatch;
+
+import hudson.maven.MavenEmbedder;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 
 /**
  * Base class for all Hudson test cases.
@@ -525,25 +521,7 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
         return hudson.createProject(MatrixProject.class,name);
     }
 
-    /**
-     * Creates a empty Maven project with an unique name.
-     *
-     * @see #configureDefaultMaven()
-     */
-    protected MavenModuleSet createMavenProject() throws IOException {
-        return createMavenProject(createUniqueProjectName());
-    }
-
-    /**
-     * Creates a empty Maven project with the given name.
-     *
-     * @see #configureDefaultMaven()
-     */
-    protected MavenModuleSet createMavenProject(String name) throws IOException {
-        return hudson.createProject(MavenModuleSet.class,name);
-    }
-
-    private String createUniqueProjectName() {
+    protected String createUniqueProjectName() {
         return "test"+hudson.getItems().size();
     }
 
@@ -830,12 +808,6 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
      * Avoids need for cumbersome {@code this.<J,R>buildAndAssertSuccess(...)} type hints under JDK 7 javac (and supposedly also IntelliJ).
      */
     public FreeStyleBuild buildAndAssertSuccess(FreeStyleProject job) throws Exception {
-        return assertBuildStatusSuccess(job.scheduleBuild2(0));
-    }
-    public MavenModuleSetBuild buildAndAssertSuccess(MavenModuleSet job) throws Exception {
-        return assertBuildStatusSuccess(job.scheduleBuild2(0));
-    }
-    public MavenBuild buildAndAssertSuccess(MavenModule job) throws Exception {
         return assertBuildStatusSuccess(job.scheduleBuild2(0));
     }
 

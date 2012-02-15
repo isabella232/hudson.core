@@ -36,6 +36,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Locale;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * Represents the result of the form field validation.
@@ -369,21 +370,19 @@ public abstract class FormValidation extends IOException implements HttpResponse
      * @since 1.305
      */
     public static FormValidation validateBase64(String value, boolean allowWhitespace, boolean allowEmpty, String errorMessage) {
-        try {
-            String v = value;
-            if(!allowWhitespace) {
-                if(v.indexOf(' ')>=0 || v.indexOf('\n')>=0)
-                    return error(errorMessage);
-            }
-            v=v.trim();
-            if(!allowEmpty && v.length()==0)
+        String v = value;
+        if (!allowWhitespace) {
+            if (v.indexOf(' ') >= 0 || v.indexOf('\n') >= 0) {
                 return error(errorMessage);
-
-            com.trilead.ssh2.crypto.Base64.decode(v.toCharArray());
-            return ok();
-        } catch (IOException e) {
+            }
+        }
+        v = v.trim();
+        if (!allowEmpty && v.length() == 0) {
             return error(errorMessage);
         }
+
+        Base64.decodeBase64(v);
+        return ok();
     }
 
     /**
