@@ -19,7 +19,6 @@ package hudson.model;
 import hudson.Proc;
 import hudson.util.DecodingStream;
 import hudson.util.DualOutputStream;
-import org.jvnet.animal_sniffer.IgnoreJRERequirement;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -87,7 +86,6 @@ public class ExternalRun extends Run<ExternalJob,ExternalRun> {
      * </xmp></pre>
      */
     @SuppressWarnings({"Since15"})
-    @IgnoreJRERequirement
     public void acceptRemoteSubmission(final Reader in) throws IOException {
         final long[] duration = new long[1];
         run(new Runner() {

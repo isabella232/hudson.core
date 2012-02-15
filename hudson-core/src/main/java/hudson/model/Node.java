@@ -16,7 +16,6 @@
 
 package hudson.model;
 
-import com.infradna.tool.bridge_method_injector.WithBridgeMethods;
 import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.FilePath;
@@ -256,7 +255,6 @@ public abstract class Node extends AbstractModelObject implements Describable<No
     /**
      * Gets the special label that represents this node itself.
      */
-    @WithBridgeMethods(Label.class)
     public LabelAtom getSelfLabel() {
         return LabelAtom.get(getNodeName());
     }

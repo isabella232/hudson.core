@@ -16,7 +16,6 @@
 
 package hudson.model;
 
-import com.infradna.tool.bridge_method_injector.WithBridgeMethods;
 import hudson.XmlFile;
 import hudson.Util;
 import hudson.Functions;
@@ -108,10 +107,6 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
         return (parent != null ? parent.getRootDirFor(this) : Hudson.getInstance().getRootDir());
     }
 
-    /**
-     * This bridge method is to maintain binary compatibility with {@link TopLevelItem#getParent()}.
-     */
-    @WithBridgeMethods(value=Hudson.class,castRequired=true)
     public ItemGroup getParent() {
         assert parent!=null;
         return parent;
@@ -502,8 +497,13 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     public static AbstractItem resolveForCLI(
             @Argument(required=true,metaVar="NAME",usage="Job name") String name) throws CmdLineException {
         AbstractItem item = Hudson.getInstance().getItemByFullName(name, AbstractItem.class);
-        if (item==null)
-            throw new CmdLineException(null,Messages.AbstractItem_NoSuchJobExists(name,AbstractProject.findNearest(name).getFullName()));
+        if (item==null){
+            if (AbstractProject.findNearest(name) != null){
+                throw new CmdLineException(null,Messages.AbstractItem_NoSuchJobExists2(name, AbstractProject.findNearest(name).getFullName()));
+            }else{
+                throw new CmdLineException(null,Messages.AbstractItem_NoSuchJobExists(name));
+            }
+        }
         return item;
     }
 }

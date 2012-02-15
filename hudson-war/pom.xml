@@ -50,13 +50,16 @@
                     
                     <webResources>
                         <resource>
+                            <directory>${project.build.directory}/classes</directory>
+                        </resource>
+                        <resource>
                             <directory>${project.build.directory}/generated-resources</directory>
                         </resource>
                     </webResources>
-                    <!-- Main Class to Start Jetty -->
+                    <!-- Main bootstrap Class to make war executable -->
                     <archive>
                         <manifest>
-                            <mainClass>org.eclipse.hudson.war.executable.StartJetty</mainClass>
+                            <mainClass>org.eclipse.hudson.war.Executable</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Implementation-Version>${project.version}</Implementation-Version>
@@ -89,10 +92,12 @@
                         <goals>
                             <goal>unpack</goal>
                         </goals>
+                         
                         <configuration>
-                            <excludes>
-                                  META-INF/*
-                            </excludes>
+                            <!-- Copy only the bootstrap class -->
+                             <includes>
+                                  **/Executable*
+                            </includes>
                             <artifactItems>
                                                            
                                 <artifactItem>
@@ -100,29 +105,6 @@
                                     <artifactId>hudson-jetty-war-executable</artifactId>
                                     <version>${project.version}</version>
                                     <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>target/generated-resources</outputDirectory>
-                                </artifactItem>
-                                
-                                <!-- Jetty Classes -->
-                                <artifactItem>
-                                    <groupId>org.mortbay.jetty</groupId>
-                                    <artifactId>jetty</artifactId>
-                                    <version>6.1.26</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>target/generated-resources</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.mortbay.jetty</groupId>
-                                    <artifactId>jetty-util</artifactId>
-                                    <version>6.1.26</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>target/generated-resources</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.mortbay.jetty</groupId>
-                                    <artifactId>servlet-api</artifactId>
-                                    <version>2.5-20081211</version>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources</outputDirectory>
                                 </artifactItem>
@@ -139,6 +121,43 @@
                         </goals>
                         <configuration>
                             <artifactItems>
+                                
+                                <!-- Jetty war executable libraries -->
+                                 
+                                <artifactItem>
+                                    <groupId>org.eclipse.hudson.main</groupId>
+                                    <artifactId>hudson-jetty-war-executable</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>hudson-jetty-war-executable.jar</destFileName>
+                                </artifactItem>
+                                
+                                <artifactItem>
+                                    <groupId>org.mortbay.jetty</groupId>
+                                    <artifactId>jetty</artifactId>
+                                    <version>6.1.26</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>jetty.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mortbay.jetty</groupId>
+                                    <artifactId>jetty-util</artifactId>
+                                    <version>6.1.26</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>jetty-util.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mortbay.jetty</groupId>
+                                    <artifactId>servlet-api</artifactId>
+                                    <version>2.5-20081211</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>jetty-servlet-api.jar</destFileName>
+                                </artifactItem>
                                 
                                 <!-- dependencies that goes to WEB-INF for unusual usage -->
                                 
@@ -175,7 +194,7 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.main</groupId>
                                     <artifactId>rest-plugin</artifactId>
-                                    <version>3.0.0-SNAPSHOT</version>
+                                    <version>3.0.0-2</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -184,7 +203,7 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.main</groupId>
                                     <artifactId>maven3-plugin</artifactId>
-                                    <version>3.0.0-SNAPSHOT</version>
+                                    <version>3.0.0-1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -193,7 +212,7 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.main</groupId>
                                     <artifactId>maven3-snapshots</artifactId>
-                                    <version>3.0.0-SNAPSHOT</version>
+                                    <version>3.0.0-1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -202,7 +221,7 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.main</groupId>
                                     <artifactId>maven-plugin</artifactId>
-                                    <version>3.0.0-SNAPSHOT</version>
+                                    <version>3.0.0-1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -212,7 +231,7 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.plugins</groupId>
                                     <artifactId>subversion</artifactId>
-                                    <version>3.0.0-SNAPSHOT</version>
+                                    <version>3.0.0-1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -221,7 +240,7 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.plugins</groupId>
                                     <artifactId>cvs</artifactId>
-                                    <version>3.0.0-SNAPSHOT</version>
+                                    <version>3.0.0</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -230,7 +249,7 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.plugins</groupId>
                                     <artifactId>git</artifactId>
-                                    <version>3.0.0-SNAPSHOT</version>
+                                    <version>3.0.0</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -240,7 +259,7 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.plugins</groupId>
                                     <artifactId>ssh-slaves</artifactId>
-                                    <version>3.0.0-SNAPSHOT</version>
+                                    <version>3.0.0-1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -250,7 +269,7 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.plugins</groupId>
                                     <artifactId>birt-charts</artifactId>
-                                    <version>1.0.0-SNAPSHOT</version>
+                                    <version>1.0.0</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -314,8 +333,7 @@
                         <configuration>
                             <tasks>
                                 <!-- fix Akuma groupId so it can still be found by pre-split org.jvnet.hudson:executable-war:1.17 -->
-                                <replace file="${basedir}/target/classes/dependencies.txt" token="org.kohsuke:akuma"
-                                         value="com.sun.akuma:akuma"/>
+                                <replace file="${basedir}/target/classes/dependencies.txt" token="org.kohsuke:akuma" value="com.sun.akuma:akuma" />
                             </tasks>
                         </configuration>
                     </execution>
@@ -410,6 +428,12 @@
                             <name>stapler.jelly.noCache</name>
                             <value>true</value>
                         </systemProperty>
+                        
+                        <systemProperty>
+                            <name>executable-war</name>
+                            <value>${project.build.directory}/${project.artifactId}-${project.version}.war</value>
+                        </systemProperty>
+                        
                         <systemProperty>
                             <!-- show the stapler evaluation during execution -->
                             <name>stapler.trace</name>

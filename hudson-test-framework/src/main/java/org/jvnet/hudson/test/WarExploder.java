@@ -79,7 +79,7 @@ final class WarExploder {
         }
 
         // locate hudson-war-for-test.jar
-        File war = Which.jarFile(Class.forName("org.eclipse.hudson.war.executable.StartJetty"));
+        File war = Which.jarFile(Class.forName("org.eclipse.hudson.war.Executable"));
 
         File explodeDir = new File("./target/hudson-for-test").getAbsoluteFile();
         File timestamp = new File(explodeDir,".timestamp");

@@ -56,7 +56,7 @@
     
     
     <j:invokeStatic var="tz" className="java.util.TimeZone" method="getDefault"/>
-    <div id="tl" style="height:250px; border:1px solid black;" />
+    <div id="tl" class="timeline" />
     <div id="status" />
  
      <script type="text/javascript">

@@ -16,8 +16,7 @@
 
 package hudson.util;
 
-import com.trilead.ssh2.crypto.digest.MD5;
-
+import ch.ethz.ssh2.crypto.digest.MD5;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;

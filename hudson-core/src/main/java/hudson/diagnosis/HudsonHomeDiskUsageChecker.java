@@ -19,7 +19,6 @@ package hudson.diagnosis;
 import hudson.Extension;
 import hudson.model.Hudson;
 import hudson.model.PeriodicWork;
-import org.jvnet.animal_sniffer.IgnoreJRERequirement;
 
 import java.util.logging.Logger;
 
@@ -35,7 +34,6 @@ public class HudsonHomeDiskUsageChecker extends PeriodicWork {
         return HOUR;
     }
 
-    @IgnoreJRERequirement
     protected void doRun() {
         try {
             long free = Hudson.getInstance().getRootDir().getUsableSpace();

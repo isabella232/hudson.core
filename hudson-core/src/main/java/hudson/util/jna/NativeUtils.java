@@ -12,8 +12,7 @@
  *    Winston Prakash
  *      
  *
- *******************************************************************************/ 
-
+ *******************************************************************************/
 package hudson.util.jna;
 
 import hudson.DescriptorExtensionList;
@@ -49,31 +48,27 @@ public class NativeUtils implements Serializable {
 
     private NativeUtils() {
         try {
-            DescriptorExtensionList<NativeUnixSupport, Descriptor<NativeUnixSupport>> unixSupportDescriptors
-                = NativeUnixSupport.all();
+            DescriptorExtensionList<NativeUnixSupport, Descriptor<NativeUnixSupport>> unixSupportDescriptors = NativeUnixSupport.all();
             if (null != unixSupportDescriptors && !unixSupportDescriptors.isEmpty()) {
                 nativeUnixSupport = unixSupportDescriptors.get(0).newInstance(null, null);
             }
 
-            DescriptorExtensionList<NativeWindowsSupport, Descriptor<NativeWindowsSupport>> windowsSupportDescriptors
-                = NativeWindowsSupport.all();
+            DescriptorExtensionList<NativeWindowsSupport, Descriptor<NativeWindowsSupport>> windowsSupportDescriptors = NativeWindowsSupport.all();
             if (null != windowsSupportDescriptors && !windowsSupportDescriptors.isEmpty()) {
                 nativeWindowsSupport = windowsSupportDescriptors.get(0).newInstance(null, null);
             }
 
-            DescriptorExtensionList<NativeMacSupport, Descriptor<NativeMacSupport>> macSupportDescriptors
-                = NativeMacSupport.all();
+            DescriptorExtensionList<NativeMacSupport, Descriptor<NativeMacSupport>> macSupportDescriptors = NativeMacSupport.all();
             if (null != macSupportDescriptors && !macSupportDescriptors.isEmpty()) {
                 nativeMacSupport = macSupportDescriptors.get(0).newInstance(null, null);
             }
 
-            DescriptorExtensionList<NativeZfsSupport, Descriptor<NativeZfsSupport>> zfsSupportDescriptors
-                = NativeZfsSupport.all();
+            DescriptorExtensionList<NativeZfsSupport, Descriptor<NativeZfsSupport>> zfsSupportDescriptors = NativeZfsSupport.all();
             if (null != zfsSupportDescriptors && !zfsSupportDescriptors.isEmpty()) {
                 nativeZfsSupport = zfsSupportDescriptors.get(0).newInstance(null, null);
             }
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.FINE, null, ex);
         }
     }
 
@@ -388,7 +383,7 @@ public class NativeUtils implements Serializable {
         ensureWindowsSupport(NativeFunction.WINDOWS_FILE_MOVE);
         nativeWindowsSupport.windowsMoveFile(fromFile, toFile);
     }
-    
+
     /**
      * Get the error associated with the last Native Unix Operation
      * @return String error message
@@ -409,7 +404,7 @@ public class NativeUtils implements Serializable {
         ensureMacSupport(NativeFunction.WINDOWS_FILE_MOVE);
         return nativeMacSupport.getMacProcesses();
     }
-    
+
     /**
      * Get the error associated with the last Native Unix Operation
      * @return String error message
@@ -473,7 +468,7 @@ public class NativeUtils implements Serializable {
         ensureZfsSupport(NativeFunction.ZFS);
         return nativeZfsSupport.zfsExists(zfsName);
     }
-    
+
     /**
      * Get the error associated with the last Native Unix Operation
      * @return String error message

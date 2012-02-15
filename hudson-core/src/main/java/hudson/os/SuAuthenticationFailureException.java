@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2010, Oracle Corporation
+ * Copyright (c) 2004-2009 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,26 +9,24 @@
  *
  * Contributors: 
  *
- *   
- *       Kohsuke Kawaguchi
- *
+ *    Kohsuke Kawaguchi
+ *     
  *******************************************************************************/ 
 
-package hudson;
+package hudson.os;
 
-
-import java.lang.annotation.Documented;
+import java.io.IOException;
 
 /**
- * Accompanies {@link Depricated} annotation to indicate when the access restriction was placed.
+ * 'su' failed to authenticate the given credential.
+ *
+ * <p>
+ * Wrong password, invalid user name, that sort of things.
  *
  * @author Kohsuke Kawaguchi
- * @since 1.355
  */
-@Documented
-public @interface RestrictedSince {
-    /**
-     * Hudson version number that this deprecation has started.
-     */
-    String value();
+public class SuAuthenticationFailureException extends IOException {
+    public SuAuthenticationFailureException(String message) {
+        super(message);
+    }
 }
