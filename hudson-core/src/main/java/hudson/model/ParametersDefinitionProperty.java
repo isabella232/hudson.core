@@ -1,19 +1,20 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
  * Copyright (c) 2004-2010 Oracle Corporation.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *    Kohsuke Kawaguchi,   Jean-Baptiste Quenot, Seiji Sogabe, Tom Huybrechts
- *     
+ * Kohsuke Kawaguchi, Jean-Baptiste Quenot, Seiji Sogabe, Tom Huybrechts
  *
- *******************************************************************************/ 
-
+ *
+ ******************************************************************************
+ */
 package hudson.model;
 
 import java.io.IOException;
@@ -39,11 +40,10 @@ import hudson.Extension;
 /**
  * Keeps a list of the parameters defined for a project.
  *
- * <p>
- * This class also implements {@link Action} so that <tt>index.jelly</tt> provides
- * a form to enter build parameters. 
+ * <p> This class also implements {@link Action} so that <tt>index.jelly</tt>
+ * provides a form to enter build parameters.
  */
-@ExportedBean(defaultVisibility=2)
+@ExportedBean(defaultVisibility = 2)
 public class ParametersDefinitionProperty extends JobProperty<AbstractProject<?, ?>>
         implements Action {
 
@@ -67,7 +67,7 @@ public class ParametersDefinitionProperty extends JobProperty<AbstractProject<?,
         super.setOwner(owner);
     }
 
-    public AbstractProject<?,?> getOwner() {
+    public AbstractProject<?, ?> getOwner() {
         return owner;
     }
 
@@ -81,6 +81,7 @@ public class ParametersDefinitionProperty extends JobProperty<AbstractProject<?,
      */
     public List<String> getParameterDefinitionNames() {
         return new AbstractList<String>() {
+
             public String get(int index) {
                 return parameterDefinitions.get(index).getName();
             }
@@ -101,15 +102,15 @@ public class ParametersDefinitionProperty extends JobProperty<AbstractProject<?,
     }
 
     /**
-     * Interprets the form submission and schedules a build for a parameterized job.
+     * Interprets the form submission and schedules a build for a parameterized
+     * job.
      *
-     * <p>
-     * This method is supposed to be invoked from {@link AbstractProject#doBuild(StaplerRequest, StaplerResponse)}.
+     * <p> This method is supposed to be invoked from {@link AbstractProject#doBuild(StaplerRequest, StaplerResponse)}.
      */
     public void _doBuild(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
-        if(!req.getMethod().equals("POST")) {
+        if (!req.getMethod().equals("POST")) {
             // show the parameter entry form.
-            req.getView(this,"index.jelly").forward(req,rsp);
+            req.getView(this, "index.jelly").forward(req, rsp);
             return;
         }
 
@@ -123,13 +124,14 @@ public class ParametersDefinitionProperty extends JobProperty<AbstractProject<?,
             String name = jo.getString("name");
 
             ParameterDefinition d = getParameterDefinition(name);
-            if(d==null)
+            if (d == null) {
                 throw new IllegalArgumentException("No such parameter definition: " + name);
+            }
             ParameterValue parameterValue = d.createValue(req, jo);
             values.add(parameterValue);
         }
 
-    	Hudson.getInstance().getQueue().schedule(
+        Hudson.getInstance().getQueue().schedule(
                 owner, owner.getDelay(req), new ParametersAction(values), new CauseAction(new Cause.UserCause()));
 
         // send the user back to the job top page.
@@ -138,16 +140,16 @@ public class ParametersDefinitionProperty extends JobProperty<AbstractProject<?,
 
     public void buildWithParameters(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         List<ParameterValue> values = new ArrayList<ParameterValue>();
-        for (ParameterDefinition d: parameterDefinitions) {
-        	ParameterValue value = d.createValue(req);
-        	if (value != null) {
-        		values.add(value);
-        	} else {
-        		throw new IllegalArgumentException("Parameter " + d.getName() + " was missing.");
-        	}
+        for (ParameterDefinition d : parameterDefinitions) {
+            ParameterValue value = d.createValue(req);
+            if (value != null) {
+                values.add(value);
+            } else {
+                throw new IllegalArgumentException("Parameter " + d.getName() + " was missing.");
+            }
         }
 
-    	Hudson.getInstance().getQueue().schedule(
+        Hudson.getInstance().getQueue().schedule(
                 owner, owner.getDelay(req), new ParametersAction(values), owner.getBuildCause(req));
 
         // send the user back to the job top page.
@@ -158,14 +160,17 @@ public class ParametersDefinitionProperty extends JobProperty<AbstractProject<?,
      * Gets the {@link ParameterDefinition} of the given name, if any.
      */
     public ParameterDefinition getParameterDefinition(String name) {
-        for (ParameterDefinition pd : parameterDefinitions)
-            if (pd.getName().equals(name))
+        for (ParameterDefinition pd : parameterDefinitions) {
+            if (pd.getName().equals(name)) {
                 return pd;
+            }
+        }
         return null;
     }
 
     @Extension
     public static class DescriptorImpl extends JobPropertyDescriptor {
+
         @Override
         public boolean isApplicable(Class<? extends Job> jobType) {
             return AbstractProject.class.isAssignableFrom(jobType);
@@ -173,7 +178,7 @@ public class ParametersDefinitionProperty extends JobProperty<AbstractProject<?,
 
         @Override
         public JobProperty<?> newInstance(StaplerRequest req,
-                                          JSONObject formData) throws FormException {
+                JSONObject formData) throws FormException {
             if (formData.isNullObject()) {
                 return null;
             }
@@ -181,15 +186,21 @@ public class ParametersDefinitionProperty extends JobProperty<AbstractProject<?,
             JSONObject parameterized = formData.getJSONObject("parameterized");
 
             if (parameterized.isNullObject()) {
-            	return null;
+                return null;
             }
 
             List<ParameterDefinition> parameterDefinitions = Descriptor.newInstancesFromHeteroList(
                     req, parameterized, "parameter", ParameterDefinition.all());
-            if(parameterDefinitions.isEmpty())
+            if (parameterDefinitions.isEmpty()) {
                 return null;
+            }
 
             return new ParametersDefinitionProperty(parameterDefinitions);
+        }
+        
+        @Override
+        public boolean isCascadable() {
+            return false;
         }
 
         @Override
@@ -221,7 +232,7 @@ public class ParametersDefinitionProperty extends JobProperty<AbstractProject<?,
 
         ParametersDefinitionProperty that = (ParametersDefinitionProperty) o;
         if (parameterDefinitions != null ? !this.parameterDefinitions.equals(that.parameterDefinitions)
-            : that.parameterDefinitions != null) {
+                : that.parameterDefinitions != null) {
             return false;
         }
 

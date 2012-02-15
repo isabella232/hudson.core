@@ -85,6 +85,10 @@ public abstract class JobPropertyDescriptor extends Descriptor<JobProperty<?>> {
             throw new AssertionError(clazz+" doesn't properly parameterize JobProperty. The isApplicable() method must be overriden.");
         }
     }
+    
+    public boolean isCascadable(){
+        return true;
+    }
 
     /**
      * Gets the {@link JobPropertyDescriptor}s applicable for a given job type.
