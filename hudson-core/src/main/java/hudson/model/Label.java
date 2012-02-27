@@ -158,7 +158,7 @@ public abstract class Label extends Actionable implements Comparable<Label>, Mod
      * Gets all {@link Node}s that belong to this label.
      */
     @Exported
-    public Set<Node> getNodes() {
+    public synchronized Set<Node> getNodes() {
         Set<Node> nodes = this.nodes;
         if(nodes!=null) return nodes;
 
@@ -177,7 +177,7 @@ public abstract class Label extends Actionable implements Comparable<Label>, Mod
      * Gets all {@link Cloud}s that can launch for this label.
      */
     @Exported
-    public Set<Cloud> getClouds() {
+    public synchronized Set<Cloud> getClouds() {
         if(clouds==null) {
             Set<Cloud> r = new HashSet<Cloud>();
             Hudson h = Hudson.getInstance();
