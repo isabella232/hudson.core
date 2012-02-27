@@ -203,7 +203,7 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.main</groupId>
                                     <artifactId>maven3-plugin</artifactId>
-                                    <version>3.0.0-1</version>
+                                    <version>3.0.0-2</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -212,7 +212,7 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.main</groupId>
                                     <artifactId>maven3-snapshots</artifactId>
-                                    <version>3.0.0-1</version>
+                                    <version>3.0.0-2</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
