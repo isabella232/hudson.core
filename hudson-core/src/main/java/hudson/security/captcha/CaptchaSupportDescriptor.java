@@ -9,9 +9,8 @@
  *
  * Contributors: 
  *
- *    Winston Prakash
+ *  Winston Prakash
  *      
- *
  *******************************************************************************/ 
 
 package hudson.security.captcha;
@@ -22,7 +21,7 @@ import hudson.model.Descriptor;
  * {@link Descriptor} for {@link CaptchaSupport}.
  *
  * @author Winston Prakash
- * @since 2.0.1
+ * @since 3.0.0
  */
 public abstract class CaptchaSupportDescriptor extends Descriptor<CaptchaSupport> {
     // so far nothing different from plain Descriptor
