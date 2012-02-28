@@ -211,7 +211,7 @@ public class MatrixBuild extends AbstractBuild<MatrixProject, MatrixBuild> {
                 AxisList axes = p.getAxes();
                 String touchStoneCombinationFilter = p.getTouchStoneCombinationFilter();
                 if (touchStoneFilter != null && c.getCombination()
-                    .evalGroovyExpression(axes, touchStoneCombinationFilter)) {
+                    .evalScriptExpression(axes, touchStoneCombinationFilter)) {
                     touchStoneConfigurations.add(c);
                 } else {
                     delayedConfigurations.add(c);

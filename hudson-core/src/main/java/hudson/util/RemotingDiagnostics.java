@@ -9,14 +9,12 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi, CloudBees, Inc.
+ *    Kohsuke Kawaguchi, Winston Prakash
  *     
- *
  *******************************************************************************/ 
 
 package hudson.util;
 
-import groovy.lang.GroovyShell;
 import hudson.FilePath;
 import hudson.Functions;
 import hudson.model.Hudson;
@@ -41,6 +39,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import org.eclipse.hudson.script.ScriptSupport;
 
 /**
  * Various remoting operations related to diagnostics.
@@ -95,19 +94,26 @@ public final class RemotingDiagnostics {
     }
 
     /**
-     * Executes Groovy script remotely.
+     * Executes script remotely.
      */
-    public static String executeGroovy(String script, VirtualChannel channel) throws IOException, InterruptedException {
+    public static String executeScript(String script, VirtualChannel channel) throws IOException, InterruptedException {
         return channel.call(new Script(script));
     }
 
-    private static final class Script implements DelegatingCallable<String,RuntimeException> {
+    private static final class Script implements DelegatingCallable<String, RuntimeException> {
+
         private final String script;
-        private transient ClassLoader cl;
+        private transient ClassLoader parentClassLoader;
+        private final String scriptType;
+
+        private Script(String script, String scriptType) {
+            this.script = script;
+            this.scriptType = scriptType;
+            parentClassLoader = getClassLoader();
+        }
 
         private Script(String script) {
-            this.script = script;
-            cl = getClassLoader();
+            this(script, ScriptSupport.SCRIPT_GROOVY);
         }
 
         public ClassLoader getClassLoader() {
@@ -116,19 +122,19 @@ public final class RemotingDiagnostics {
 
         public String call() throws RuntimeException {
             // if we run locally, cl!=null. Otherwise the delegating classloader will be available as context classloader.
-            if (cl==null)       cl = Thread.currentThread().getContextClassLoader();
-            GroovyShell shell = new GroovyShell(cl);
+            if (parentClassLoader == null) {
+                parentClassLoader = Thread.currentThread().getContextClassLoader();
+            }
 
             StringWriter out = new StringWriter();
-            PrintWriter pw = new PrintWriter(out);
-            shell.setVariable("out", pw);
-            try {
-                Object output = shell.evaluate(script);
-                if(output!=null)
-                pw.print(output);
-            } catch (Throwable t) {
-                t.printStackTrace(pw);
+            PrintWriter printWriter = new PrintWriter(out);
+
+            for (ScriptSupport scriptSupport : ScriptSupport.getAvailableScriptSupports()) {
+                if (scriptSupport.hasSupport(scriptType)) {
+                    scriptSupport.evaluate(parentClassLoader, script, null, printWriter);
+                }
             }
+
             return out.toString();
         }
     }

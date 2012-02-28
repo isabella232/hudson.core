@@ -98,7 +98,7 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
     private volatile AxisList axes = new AxisList();
 
     /**
-     * The filter that is applied to combinations. It is a Groovy if condition.
+     * The filter that is applied to combinations. It is a Dynamic Language Script if condition.
      * This can be null, which means "true".
      * Package visible for the tests only.
      *
@@ -420,7 +420,7 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
         if (!CollectionUtils.isEmpty(axes)) {
             for (Combination c : axes.list()) {
                 String combinationFilter = getCombinationFilter();
-                if (c.evalGroovyExpression(axes, combinationFilter)) {
+                if (c.evalScriptExpression(axes, combinationFilter)) {
                     LOGGER.fine("Adding configuration: " + c);
                     MatrixConfiguration config = configurations.get(c);
                     if (config == null) {

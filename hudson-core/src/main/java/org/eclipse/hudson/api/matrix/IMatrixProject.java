@@ -69,7 +69,7 @@ public interface IMatrixProject extends IBaseBuildableProject {
      * <p/>
      * <p/>
      * By default, a {@link hudson.matrix.MatrixConfiguration} is created for every possible combination of axes exhaustively.
-     * But by specifying a Groovy expression as a combination filter, one can trim down the # of combinations built.
+     * But by specifying a Dynamic Language Script expression as a combination filter, one can trim down the # of combinations built.
      * <p/>
      * <p/>
      * Namely, this expression is evaluated for each axis value combination, and only when it evaluates to true,
