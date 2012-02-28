@@ -58,6 +58,6 @@ public class ScriptServiceImpl
         checkNotNull(script);
         security.checkPermission(Hudson.ADMINISTER);
         log.debug("Executing script on master: {}", script);
-        return RemotingDiagnostics.executeGroovy(script, MasterComputer.localChannel);
+        return RemotingDiagnostics.executeScript(script, MasterComputer.localChannel);
     }
 }
