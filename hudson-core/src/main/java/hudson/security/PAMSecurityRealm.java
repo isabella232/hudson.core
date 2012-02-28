@@ -8,15 +8,13 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
- *
- *   
- *        
+ *      
+ *  Kohsuke Kawaguchi, Winston Prakash
  *
  *******************************************************************************/ 
 
 package hudson.security;
 
-import groovy.lang.Binding;
 import hudson.EnvVars;
 import hudson.Functions;
 import hudson.model.Descriptor;
@@ -26,10 +24,13 @@ import hudson.Extension;
 import hudson.util.FormValidation;
 import hudson.util.jna.NativeAccessException;
 import hudson.util.jna.NativeUtils;
-import hudson.util.spring.BeanBuilder;
+import java.util.Arrays;
+
+import org.kohsuke.stapler.DataBoundConstructor;
+import java.util.Set;
+
 import org.springframework.security.Authentication;
 import org.springframework.security.AuthenticationException;
-import org.springframework.security.AuthenticationManager;
 import org.springframework.security.BadCredentialsException;
 import org.springframework.security.GrantedAuthority;
 import org.springframework.security.GrantedAuthorityImpl;
@@ -40,10 +41,9 @@ import org.springframework.security.userdetails.UserDetailsService;
 import org.springframework.security.userdetails.UserDetails;
 import org.springframework.security.userdetails.User;
 import org.springframework.dao.DataAccessException;
-import org.springframework.web.context.WebApplicationContext;
-import org.kohsuke.stapler.DataBoundConstructor;
-
-import java.util.Set;
+import org.springframework.security.providers.ProviderManager;
+import org.springframework.security.providers.anonymous.AnonymousAuthenticationProvider;
+import org.springframework.security.providers.rememberme.RememberMeAuthenticationProvider;
 
 /**
  * {@link SecurityRealm} that uses Unix PAM authentication.
@@ -99,31 +99,49 @@ public class PAMSecurityRealm extends SecurityRealm {
     }
 
     public SecurityComponents createSecurityComponents() {
-        Binding binding = new Binding();
-        binding.setVariable("instance", this);
 
-        BeanBuilder builder = new BeanBuilder();
-        builder.parse(Hudson.getInstance().servletContext.getResourceAsStream("/WEB-INF/security/PAMSecurityRealm.groovy"), binding);
-        WebApplicationContext context = builder.createApplicationContext();
-        return new SecurityComponents(
-                findBean(AuthenticationManager.class, context),
-                new UserDetailsService() {
+        // talk to PAM
+        PAMAuthenticationProvider PamAuthenticationProvider = new PAMAuthenticationProvider(serviceName);
 
-                    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
-                        try {
-                            if (!NativeUtils.getInstance().checkUnixUser(username)) {
-                                throw new UsernameNotFoundException("No such Unix user: " + username);
-                            }
-                        } catch (NativeAccessException exc) {
-                            throw new DataAccessException("Failed to find Unix User", exc) {
-                            };
-                        }
+        // these providers apply everywhere
+        RememberMeAuthenticationProvider rememberMeAuthenticationProvider = new RememberMeAuthenticationProvider();
+        rememberMeAuthenticationProvider.setKey(Hudson.getInstance().getSecretKey());
 
-                        // return some dummy instance
-                        return new User(username, "", true, true, true, true,
-                                new GrantedAuthority[]{AUTHENTICATED_AUTHORITY});
+        // this doesn't mean we allow anonymous access.
+        // we just authenticate anonymous users as such,
+        // so that later authorization can reject them if so configured
+        AnonymousAuthenticationProvider anonymousAuthenticationProvider = new AnonymousAuthenticationProvider();
+        anonymousAuthenticationProvider.setKey("anonymous");
+
+        AuthenticationProvider[] authenticationProvider = {
+            PamAuthenticationProvider,
+            rememberMeAuthenticationProvider,
+            anonymousAuthenticationProvider
+        };
+
+        ProviderManager providerManager = new ProviderManager();
+        providerManager.setProviders(Arrays.asList(authenticationProvider));
+
+        UserDetailsService userDetailsService = new UserDetailsService() {
+
+            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
+                try {
+                    if (!NativeUtils.getInstance().checkUnixUser(username)) {
+                        throw new UsernameNotFoundException("No such Unix user: " + username);
                     }
-                });
+                } catch (NativeAccessException exc) {
+                    throw new DataAccessException("Failed to find Unix User", exc) {
+                    };
+                }
+
+                // return some dummy instance
+                return new User(username, "", true, true, true, true,
+                        new GrantedAuthority[]{AUTHENTICATED_AUTHORITY});
+            }
+        };
+
+        return new SecurityComponents(providerManager, userDetailsService);
+
     }
 
     @Override

@@ -9,15 +9,12 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi, Nikita Levyankov
+ *    Kohsuke Kawaguchi, Nikita Levyankov, Winston Prakash
  *     
- *
  *******************************************************************************/ 
 
 package hudson.security;
 
-import java.util.List;
-import groovy.lang.Binding;
 import hudson.DescriptorExtensionList;
 import hudson.EnvVars;
 import hudson.Extension;
@@ -30,8 +27,11 @@ import hudson.security.FederatedLoginService.FederatedIdentity;
 import hudson.security.captcha.CaptchaSupport;
 import hudson.util.DescriptorList;
 import hudson.util.PluginServletFilter;
-import hudson.util.spring.BeanBuilder;
+
 import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.servlet.Filter;
@@ -39,6 +39,11 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
+
+import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+
 import org.springframework.security.Authentication;
 import org.springframework.security.AuthenticationManager;
 import org.springframework.security.GrantedAuthority;
@@ -49,15 +54,16 @@ import org.springframework.security.ui.rememberme.RememberMeServices;
 import org.springframework.security.userdetails.UserDetails;
 import org.springframework.security.userdetails.UserDetailsService;
 import org.springframework.security.userdetails.UsernameNotFoundException;
-import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataAccessException;
-import org.springframework.web.context.WebApplicationContext;
-
-import static org.springframework.security.ui.rememberme.TokenBasedRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY;
+import org.springframework.security.providers.anonymous.AnonymousProcessingFilter;
+import org.springframework.security.ui.ExceptionTranslationFilter;
+import org.springframework.security.ui.basicauth.BasicProcessingFilter;
+import org.springframework.security.ui.basicauth.BasicProcessingFilterEntryPoint;
+import org.springframework.security.ui.rememberme.RememberMeProcessingFilter;
+import org.springframework.security.userdetails.memory.UserAttribute;
+import org.springframework.security.ui.rememberme.TokenBasedRememberMeServices;
 
 /**
  * Pluggable security realm that connects external user database to Hudson.
@@ -262,7 +268,7 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
         EnvVars.clearHudsonUserEnvVar();
 
         // reset remember-me cookie
-        Cookie cookie = new Cookie(SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY, "");
+        Cookie cookie = new Cookie(TokenBasedRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY, "");
         cookie.setPath(req.getContextPath().length() > 0 ? req.getContextPath() : "/");
         rsp.addCookie(cookie);
 
@@ -397,7 +403,7 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
      * <p/>
      * <p/>
      * The default implementation uses {@link #getSecurityComponents()} and builds
-     * a standard filter chain from /WEB-INF/security/SecurityFilters.groovy.
+     * a standard filter 
      * But subclasses can override this to completely change the filter sequence.
      * <p/>
      * <p/>
@@ -406,20 +412,73 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
      *
      * @since 1.271
      */
-    public Filter createFilter(FilterConfig filterConfig) {
+    public Filter createFilter(FilterConfig filterConfig) throws ServletException {
         LOGGER.entering(SecurityRealm.class.getName(), "createFilter");
-
-        Binding binding = new Binding();
+        
+        List<Filter> filters = new ArrayList<Filter>();
+        
         SecurityComponents sc = getSecurityComponents();
-        binding.setVariable("securityComponents", sc);
-        binding.setVariable("securityRealm", this);
-        BeanBuilder builder = new BeanBuilder();
-
-        builder.parse(filterConfig.getServletContext().getResourceAsStream("/WEB-INF/security/SecurityFilters.groovy"), binding);
-
-        WebApplicationContext context = builder.createApplicationContext();
-        return (Filter) context.getBean("filter");
+        
+        HttpSessionContextIntegrationFilter2 httpSessionContextIntegrationFilter = new HttpSessionContextIntegrationFilter2();
+        filters.add(httpSessionContextIntegrationFilter);
+        
+        // if basic authentication fails (which only happens incorrect basic auth credential is sent),
+        // respond with 401 with basic auth request, instead of redirecting the user to the login page,
+        // since users of basic auth tends to be a program and won't see the redirection to the form
+        // page as a failure
+        BasicProcessingFilter basicProcessingFilter = new BasicProcessingFilter();
+        basicProcessingFilter.setAuthenticationManager(sc.getManager());
+        BasicProcessingFilterEntryPoint basicProcessingFilterEntryPoint = new BasicProcessingFilterEntryPoint();
+        basicProcessingFilterEntryPoint.setRealmName("Hudson");
+        basicProcessingFilter.setAuthenticationEntryPoint(basicProcessingFilterEntryPoint);
+        filters.add(basicProcessingFilter);
+        
+        AuthenticationProcessingFilter2 authenticationProcessingFilter = new AuthenticationProcessingFilter2();
+        authenticationProcessingFilter.setAuthenticationManager(sc.getManager());
+        authenticationProcessingFilter.setRememberMeServices(sc.getRememberMe());
+        authenticationProcessingFilter.setAuthenticationFailureUrl("/loginError");
+        authenticationProcessingFilter.setDefaultTargetUrl("/");
+        authenticationProcessingFilter.setFilterProcessesUrl("/j_spring_security_check");
+        filters.add(authenticationProcessingFilter);
+                
+        RememberMeProcessingFilter rememberMeProcessingFilter = new RememberMeProcessingFilter();
+        rememberMeProcessingFilter.setRememberMeServices(sc.getRememberMe());
+        rememberMeProcessingFilter.setAuthenticationManager(sc.getManager());
+        filters.add(rememberMeProcessingFilter);
+         
+        filters.addAll(Arrays.asList(getCommonFilters()));
+     
+        return  new ChainedServletFilter(filters);
     }
+    
+    public Filter[] getCommonFilters(){
+        AnonymousProcessingFilter anonymousProcessingFilter = new AnonymousProcessingFilter();
+        anonymousProcessingFilter.setKey("anonymous"); // must match with the AnonymousProvider
+        UserAttribute userAttribute = new UserAttribute();
+        String authorities = "anonymous, ROLE_ANONYMOUS";
+        userAttribute.setAuthoritiesAsString(Arrays.asList(authorities));
+        anonymousProcessingFilter.setUserAttribute(userAttribute);
+        
+        ExceptionTranslationFilter exceptionTranslationFilter = new ExceptionTranslationFilter();
+        AccessDeniedHandlerImpl accessDeniedHandler = new AccessDeniedHandlerImpl();
+        exceptionTranslationFilter.setAccessDeniedHandler(accessDeniedHandler);
+        HudsonAuthenticationEntryPoint hudsonAuthenticationEntryPoint = new HudsonAuthenticationEntryPoint();
+        hudsonAuthenticationEntryPoint.setLoginFormUrl('/' + getLoginUrl() + "?from={0}");
+        exceptionTranslationFilter.setAuthenticationEntryPoint(hudsonAuthenticationEntryPoint);
+             
+        
+        UnwrapSecurityExceptionFilter unwrapSecurityExceptionFilter = new UnwrapSecurityExceptionFilter();
+        
+        Filter[] filters = { 
+            anonymousProcessingFilter,
+            exceptionTranslationFilter,
+            unwrapSecurityExceptionFilter
+        };
+        
+        return filters;
+    }
+    
+    
     /**
      * Singleton constant that represents "no authentication."
      */

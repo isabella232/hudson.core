@@ -35,7 +35,7 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 
 /**
  * Formalization of a tool installed in nodes used for builds
- * (examples include things like JDKs, Ants, Mavens, and Groovys)
+ * (examples include things like JDKs, Ants, Mavens, etc..)
  *
  * <p>
  * You can define such a concept in your plugin entirely on your own, without extending from

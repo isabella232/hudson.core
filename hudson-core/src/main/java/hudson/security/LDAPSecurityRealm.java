@@ -9,14 +9,12 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi, Seiji Sogabe
+ *  Kohsuke Kawaguchi, Seiji Sogabe, Winston Prakash
  *     
- *
  *******************************************************************************/ 
 
 package hudson.security;
 
-import groovy.lang.Binding;
 import hudson.Extension;
 import static hudson.Util.fixNull;
 import static hudson.Util.fixEmptyAndTrim;
@@ -27,8 +25,6 @@ import hudson.model.User;
 import hudson.tasks.MailAddressResolver;
 import hudson.util.FormValidation;
 import hudson.util.Scrambler;
-import hudson.util.spring.BeanBuilder;
-import org.springframework.security.AuthenticationManager;
 import org.springframework.security.SpringSecurityException;
 import org.springframework.security.AuthenticationException;
 import org.springframework.ldap.core.ContextSource;
@@ -46,8 +42,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.springframework.dao.DataAccessException;
-import org.springframework.web.context.WebApplicationContext;
-
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -58,14 +52,18 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.ldap.core.DirContextOperations;
+import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
+import org.springframework.security.providers.AuthenticationProvider;
+import org.springframework.security.providers.ProviderManager;
+import org.springframework.security.providers.anonymous.AnonymousAuthenticationProvider;
+import org.springframework.security.providers.ldap.LdapAuthenticationProvider;
+import org.springframework.security.providers.rememberme.RememberMeAuthenticationProvider;
 import org.springframework.security.userdetails.ldap.LdapUserDetailsService;
 
 
@@ -267,6 +265,8 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
      * Created in {@link #createSecurityComponents()}. Can be used to connect to LDAP.
      */
     private transient SpringSecurityLdapTemplate ldapTemplate;
+    
+    private static String GROUP_SEARCH_FILTER = "(| (member={0}) (uniqueMember={0}) (memberUid={1}))"; 
 
     @DataBoundConstructor
     public LDAPSecurityRealm(String server, String rootDN, String userSearchBase, String userSearch, String groupSearchBase, String managerDN, String managerPassword) {
@@ -326,19 +326,55 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
         return getServerUrl()+'/'+ fixNull(rootDN);
     }
 
-    public SecurityComponents createSecurityComponents() {
-        Binding binding = new Binding();
-        binding.setVariable("instance", this);
+    public synchronized SecurityComponents createSecurityComponents() {
+        
+        DefaultSpringSecurityContextSource securityContextSource = new DefaultSpringSecurityContextSource(getLDAPURL());
+        if (managerDN != null){
+            securityContextSource.setUserDn(managerDN);
+        }
+        securityContextSource.setPassword(getManagerPassword());
+        Map envProps = new HashMap();
+        envProps.put(Context.REFERRAL, "follow");
+        securityContextSource.setBaseEnvironmentProperties(envProps);
+        
+        ldapTemplate = new SpringSecurityLdapTemplate(securityContextSource);
+        
+        FilterBasedLdapUserSearch  ldapUserSearch =new FilterBasedLdapUserSearch(userSearchBase, userSearch, securityContextSource);
+        ldapUserSearch.setSearchSubtree(true);
+        
 
-        BeanBuilder builder = new BeanBuilder();
-        builder.parse(Hudson.getInstance().servletContext.getResourceAsStream("/WEB-INF/security/LDAPBindSecurityRealm.groovy"),binding);
-        WebApplicationContext appContext = builder.createApplicationContext();
+        BindAuthenticator2 bindAuthenticator = new BindAuthenticator2(securityContextSource);
+        bindAuthenticator.setUserSearch(ldapUserSearch); 
+        
+        AuthoritiesPopulatorImpl authoritiesPopulator = new AuthoritiesPopulatorImpl(securityContextSource, groupSearchBase);
+        authoritiesPopulator.setSearchSubtree(true);
+        authoritiesPopulator.setGroupSearchFilter(GROUP_SEARCH_FILTER); 
+        
+        
+        // talk to LDAP
+        LdapAuthenticationProvider LdapAuthenticationProvider = new LdapAuthenticationProvider(bindAuthenticator, authoritiesPopulator);
+                
+        
+        // these providers apply everywhere
+        RememberMeAuthenticationProvider rememberMeAuthenticationProvider = new RememberMeAuthenticationProvider();
+        rememberMeAuthenticationProvider.setKey(Hudson.getInstance().getSecretKey());
 
-        ldapTemplate = new SpringSecurityLdapTemplate(findBean(ContextSource.class, appContext));
+        // this doesn't mean we allow anonymous access.
+        // we just authenticate anonymous users as such,
+        // so that later authorization can reject them if so configured
+        AnonymousAuthenticationProvider anonymousAuthenticationProvider = new AnonymousAuthenticationProvider();
+        anonymousAuthenticationProvider.setKey("anonymous");
 
-        return new SecurityComponents(
-            findBean(AuthenticationManager.class, appContext),
-            new LDAPUserDetailsService(appContext));
+        AuthenticationProvider[] authenticationProvider = {
+            LdapAuthenticationProvider,
+            rememberMeAuthenticationProvider,
+            anonymousAuthenticationProvider
+        };
+
+        ProviderManager providerManager = new ProviderManager();
+        providerManager.setProviders(Arrays.asList(authenticationProvider));
+        return new SecurityComponents(providerManager, new LDAPUserDetailsService(ldapUserSearch, authoritiesPopulator));
+        
     }
 
     /**
@@ -360,7 +396,7 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
 
     /**
      * Lookup a group; given input must match the configured syntax for group names
-     * in WEB-INF/security/LDAPBindSecurityRealm.groovy's authoritiesPopulator entry.
+     * in GROUP_SEARCH_FILTER of authoritiesPopulator entry.
      * The defaults are a prefix of "ROLE_" and using all uppercase.  This method will
      * not return any data if the given name lacks the proper prefix and/or case. 
      */
@@ -399,11 +435,6 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
     public static class LDAPUserDetailsService implements UserDetailsService {
         private final LdapUserSearch ldapSearch;
         private final LdapAuthoritiesPopulator authoritiesPopulator;
-       
-        LDAPUserDetailsService(WebApplicationContext appContext) {
-            ldapSearch = findBean(LdapUserSearch.class, appContext);
-            authoritiesPopulator = findBean(LdapAuthoritiesPopulator.class, appContext);
-        }
 
         LDAPUserDetailsService(LdapUserSearch ldapSearch, LdapAuthoritiesPopulator authoritiesPopulator) {
             this.ldapSearch = ldapSearch;
