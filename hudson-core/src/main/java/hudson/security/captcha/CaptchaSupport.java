@@ -11,7 +11,6 @@
  *
  *    Winston Prakash
  *      
- *
  *******************************************************************************/ 
 
 package hudson.security.captcha;
@@ -35,7 +34,7 @@ import java.io.OutputStream;
  * the default configuration.
  *
  * @author Winston Prakash
- * @since 2.0.1
+ * @since 3.0.0
  * @see CaptchaSupportDescriptor
  */
 public abstract class CaptchaSupport extends AbstractDescribableImpl<CaptchaSupport> implements ExtensionPoint {
