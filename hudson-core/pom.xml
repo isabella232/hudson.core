@@ -539,11 +539,6 @@
             <version>${commons-jexl.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>${groovy.version}</version>
-        </dependency>
-        <dependency>
             <!--
                 for Grails spring bean builder.
                 Ideally we should be able to modify BeanBuilder so as not to depend on this.
@@ -730,6 +725,12 @@
             <groupId>org.jvnet.hudson</groupId>
             <artifactId>ganymed-ssh-2</artifactId>
             <version>build260</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.1</version>
             <type>jar</type>
         </dependency>
     </dependencies>
