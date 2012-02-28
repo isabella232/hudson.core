@@ -3260,14 +3260,14 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     /**
      * For system diagnostics.
-     * Run arbitrary Groovy script.
+     * Run arbitrary Dynamic Language script.
      */
     public void doScript(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         doScript(req, rsp, req.getView(this, "_script.jelly"));
     }
 
     /**
-     * Run arbitrary Groovy script and return result as plain text.
+     * Run arbitrary Dynamic Language script and return result as plain text.
      */
     public void doScriptText(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         doScript(req, rsp, req.getView(this, "_scriptText.jelly"));
@@ -3281,7 +3281,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         if (text != null) {
             try {
                 req.setAttribute("output",
-                        RemotingDiagnostics.executeGroovy(text, MasterComputer.localChannel));
+                        RemotingDiagnostics.executeScript(text, MasterComputer.localChannel));
             } catch (InterruptedException e) {
                 throw new ServletException(e);
             }

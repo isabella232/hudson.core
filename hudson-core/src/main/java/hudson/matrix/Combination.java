@@ -8,10 +8,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
  *
+ *  Kohsuke Kawaguchi, Winston Prakash
+ *     
  *******************************************************************************/ 
 
 package hudson.matrix;
@@ -32,8 +31,7 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import static java.lang.Boolean.TRUE;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
+import org.eclipse.hudson.script.ScriptSupport;
 
 /**
  * A particular combination of {@link Axis} values.
@@ -97,28 +95,53 @@ public final class Combination extends TreeMap<String,String> implements Compara
         }
         return r;
     }
-
+    
     /**
-     * Evaluates the given Groovy expression with values bound from this combination.
-     *
+     * Evaluates the expression using
+     * @param axes
+     * @param expression
+     * @return 
+     */
+    public boolean evalScriptExpression(AxisList axes, String expression) {
+        return evalScriptExpression(axes, expression, ScriptSupport.DEFAULT);
+    }
+ 
+    /**
+     * Evaluates the given Dynamic Language Script Expression  with values bound from this combination.
      * <p>
      * For example, if this combination is a=X,b=Y, then expressions like <tt>a=="X"</tt> would evaluate to
      * true.
+     * @param axes
+     * @param expression
+     * @param scriptType
+     * @return 
      */
-    public boolean evalGroovyExpression(AxisList axes, String expression) {
-        if(Util.fixEmptyAndTrim(expression)==null)
+    public boolean evalScriptExpression(AxisList axes, String expression, String scriptType) {
+        if (Util.fixEmptyAndTrim(expression) == null) {
             return true;
+        }
 
-        Binding binding = new Binding();
-        for (Map.Entry<String, String> e : entrySet())
-            binding.setVariable(e.getKey(),e.getValue());
+        Object result = Boolean.TRUE;
 
-        binding.setVariable("index",toModuloIndex(axes));
-        binding.setVariable("uniqueId",toIndex(axes));
+        if (scriptType.equals(ScriptSupport.SCRIPT_GROOVY)) {
+            expression = "use(" + BooleanCategory.class.getName().replace('$', '.') + ") {" + expression + "}";
+        }
 
-        GroovyShell shell = new GroovyShell(binding);
+        Map<String, Object> variableMap = new HashMap<String, Object>();
 
-        Object result = shell.evaluate("use("+BooleanCategory.class.getName().replace('$','.')+") {"+expression+"}");
+        for (Map.Entry<String, String> e : entrySet()) {
+            variableMap.put(e.getKey(), e.getValue());
+        }
+
+        variableMap.put("index", toModuloIndex(axes));
+        variableMap.put("uniqueId", toIndex(axes));
+
+        for (ScriptSupport scriptSupport : ScriptSupport.getAvailableScriptSupports()) {
+            if (scriptSupport.hasSupport(scriptType)) {
+                result = scriptSupport.evaluateExpression(expression, variableMap);
+            }
+        }
+
         return TRUE.equals(result);
     }
 
@@ -299,7 +322,7 @@ public final class Combination extends TreeMap<String,String> implements Compara
     /**
      * Duck-typing for boolean expressions.
      *
-     * @see Combination#evalGroovyExpression(AxisList,String)
+     * @see Combination#evalScriptExpression(AxisList,String)
      */
     public static final class BooleanCategory {
         /**
