@@ -8,23 +8,22 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
-*
-*    Kohsuke Kawaguchi, Seiji Sogabe
- *     
+ *
+ *  Kohsuke Kawaguchi, Seiji Sogabe, Winston Prakash
  *
  *******************************************************************************/ 
 
 package hudson.security;
 
-import org.springframework.security.AuthenticationManager;
 import org.springframework.security.Authentication;
+import org.springframework.security.AuthenticationManager;
 import org.springframework.security.AuthenticationException;
-import org.springframework.web.context.WebApplicationContext;
 import org.kohsuke.stapler.StaplerRequest;
-import groovy.lang.Binding;
 import hudson.model.Descriptor;
-import hudson.util.spring.BeanBuilder;
 import hudson.Extension;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import net.sf.json.JSONObject;
 
 import javax.servlet.Filter;
@@ -65,20 +64,26 @@ public final class LegacySecurityRealm extends SecurityRealm implements Authenti
 
     /**
      * Filter to run for the LegacySecurityRealm is the
-     * ChainServletFilter legacy from /WEB-INF/security/SecurityFilters.groovy.
+     * ChainServletFilter
      */
     @Override
     public Filter createFilter(FilterConfig filterConfig) {
-        Binding binding = new Binding();
-        SecurityComponents sc = this.createSecurityComponents();
-        binding.setVariable("securityComponents", sc);
-        binding.setVariable("securityRealm",this);
-        BeanBuilder builder = new BeanBuilder();
-        builder.parse(filterConfig.getServletContext().getResourceAsStream("/WEB-INF/security/SecurityFilters.groovy"),binding);
         
-        WebApplicationContext context = builder.createApplicationContext();
+        // this filter set up is used to emulate the legacy Hudson behavior
+        // of container authentication before 1.160 
+
+        // when using container-authentication we can't hit /login directly.
+        // we first have to hit protected /loginEntry, then let the container
+        // trap that into /login.
+  
+        List<Filter> filters = new ArrayList<Filter>();
+        BasicAuthenticationFilter basicAuthenticationFilter = new BasicAuthenticationFilter();
+        filters.add(basicAuthenticationFilter);
         
-        return (Filter) context.getBean("legacy");
+        filters.addAll(Arrays.asList(getCommonFilters()));
+     
+        return  new ChainedServletFilter(filters);
+         
     }
 
     @Extension

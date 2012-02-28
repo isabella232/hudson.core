@@ -9,26 +9,23 @@
  *
  * Contributors: 
  *
- *    Nikita Levyankov
+ *  Kohsuke Kawaguchi, Nikita Levyankov, Winston Prakash
  *      
- *
  *******************************************************************************/ 
 
 package hudson.security;
 
-import groovy.lang.Binding;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.cli.CLICommand;
 import hudson.model.Hudson;
 import hudson.remoting.Callable;
 import hudson.tasks.MailAddressResolver;
-import hudson.util.spring.BeanBuilder;
 import java.io.Console;
 import java.io.IOException;
+import java.util.Arrays;
 import org.springframework.security.Authentication;
 import org.springframework.security.AuthenticationException;
-import org.springframework.security.AuthenticationManager;
 import org.springframework.security.BadCredentialsException;
 import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
 import org.springframework.security.providers.dao.AbstractUserDetailsAuthenticationProvider;
@@ -37,7 +34,10 @@ import org.springframework.security.userdetails.UserDetailsService;
 import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.kohsuke.args4j.Option;
 import org.springframework.dao.DataAccessException;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.security.providers.AuthenticationProvider;
+import org.springframework.security.providers.ProviderManager;
+import org.springframework.security.providers.anonymous.AnonymousAuthenticationProvider;
+import org.springframework.security.providers.rememberme.RememberMeAuthenticationProvider;
 
 /**
  * Partial implementation of {@link SecurityRealm} for username/password based authentication.
@@ -54,18 +54,33 @@ import org.springframework.web.context.WebApplicationContext;
  * @since 1.317
  */
 public abstract class AbstractPasswordBasedSecurityRealm extends SecurityRealm implements UserDetailsService {
+    
     @Override
     public SecurityComponents createSecurityComponents() {
-        Binding binding = new Binding();
-        binding.setVariable("authenticator", new Authenticator());
 
-        BeanBuilder builder = new BeanBuilder();
-        builder.parse(Hudson.getInstance()
-            .servletContext
-            .getResourceAsStream("/WEB-INF/security/AbstractPasswordBasedSecurityRealm.groovy"), binding);
-        WebApplicationContext context = builder.createApplicationContext();
-        return new SecurityComponents(
-            findBean(AuthenticationManager.class, context), this);
+        // this does all the hard work 
+        Authenticator authenticator = new Authenticator();
+
+        // these providers apply everywhere
+        RememberMeAuthenticationProvider rememberMeAuthenticationProvider = new RememberMeAuthenticationProvider();
+        rememberMeAuthenticationProvider.setKey(Hudson.getInstance().getSecretKey());
+
+        // this doesn't mean we allow anonymous access.
+        // we just authenticate anonymous users as such,
+        // so that later authorization can reject them if so configured
+        AnonymousAuthenticationProvider anonymousAuthenticationProvider = new AnonymousAuthenticationProvider();
+        anonymousAuthenticationProvider.setKey("anonymous");
+
+        AuthenticationProvider[] authenticationProvider = {
+            authenticator,
+            rememberMeAuthenticationProvider,
+            anonymousAuthenticationProvider
+        };
+
+        ProviderManager providerManager = new ProviderManager();
+        providerManager.setProviders(Arrays.asList(authenticationProvider));
+        return new SecurityComponents(providerManager);
+
     }
 
     @Override
