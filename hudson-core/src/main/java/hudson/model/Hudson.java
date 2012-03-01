@@ -223,6 +223,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.eclipse.hudson.script.ScriptSupport;
 
 /**
  * Root object of the system.
@@ -335,6 +336,12 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Currently active My Views tab bar.
      */
     private volatile MyViewsTabBar myViewsTabBar = new DefaultMyViewsTabBar();
+    
+    /**
+     * Script support (if available)
+     */
+    private volatile ScriptSupport scriptSupport;
+    
     /**
      * All {@link ExtensionList} keyed by their {@link ExtensionList#extensionType}.
      */
@@ -659,6 +666,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             for (ItemListener l : ItemListener.all()) {
                 l.onLoaded();
             }
+            
+            if (!ScriptSupport.getAvailableScriptSupports().isEmpty()){
+                scriptSupport = ScriptSupport.getAvailableScriptSupports().get(0);
+            }
+                    
         } finally {
             SecurityContextHolder.clearContext();
         }
@@ -1392,6 +1404,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     public MyViewsTabBar getMyViewsTabBar() {
         return myViewsTabBar;
+    }
+    
+    public ScriptSupport getScriptSupport() {
+        return scriptSupport;
     }
 
     /**
@@ -3276,16 +3292,25 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     private void doScript(StaplerRequest req, StaplerResponse rsp, RequestDispatcher view) throws IOException, ServletException {
         // ability to run arbitrary script is dangerous
         checkPermission(ADMINISTER);
+        
+//        if ("post".equals(req.getMethod().toLowerCase())) {
+//            JSONObject json = req.getSubmittedForm();
+//
+//            if (json.has("scriptSupport")) {
+//                scriptSupport = req.bindJSON(ScriptSupport.class, json.getJSONObject("scriptSupport"));
+//            }
 
-        String text = req.getParameter("script");
-        if (text != null) {
-            try {
-                req.setAttribute("output",
-                        RemotingDiagnostics.executeScript(text, MasterComputer.localChannel));
-            } catch (InterruptedException e) {
-                throw new ServletException(e);
+            String text = req.getParameter("script");
+            if (text != null) {
+                try {
+                    req.setAttribute("output",
+                            RemotingDiagnostics.executeScript(text, MasterComputer.localChannel, scriptSupport));
+                } catch (InterruptedException e) {
+                    throw new ServletException(e);
+                }
             }
-        }
+            
+//        }
 
         view.forward(req, rsp);
     }
