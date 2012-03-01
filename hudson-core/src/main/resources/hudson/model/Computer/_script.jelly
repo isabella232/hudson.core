@@ -19,10 +19,24 @@
   Called from doScript() to display the execution result and the form.
 -->
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  <t:scriptConsole>
-    <pre>println System.getenv("PATH")</pre>
-    <p>
-      ${%This execution happens in the slave agent JVM.}
-    </p>
-  </t:scriptConsole>
+   
+  <j:if test="${app.scriptSupport == null}">
+        <l:layout norefresh="true">
+            <st:include page="sidepanel.jelly" />
+
+            <l:main-panel>
+                <table style="padding-left: 2em;"  >
+                    <h1>${%Script Console}</h1>
+                        <h4>No script support plugins installed.</h4>
+                </table>
+            </l:main-panel>
+        </l:layout>
+    </j:if> 
+    
+    
+    <j:if test="${app.scriptSupport != null}">
+        <table style="padding-left: 2em;"  >
+            <st:include from="${app.scriptSupport.descriptor}" page="${app.scriptSupport.descriptor.configPage}"/>
+        </table>
+    </j:if>
 </j:jelly>
