@@ -67,14 +67,25 @@
 
     <j:set var="combinationFilterProperty" value="${cu.getStringProjectProperty(it, it.COMBINATION_FILTER_PROPERTY_NAME)}"/>
     <j:set var="combinationFilter" value="${combinationFilterProperty.getValue()}"/>
+
     <f:optionalBlock name="hasCombinationFilter" title="${%Combination Filter}"
-                     checked="${!empty(combinationFilter)}"
-                     isPropertyOverridden="${combinationFilterProperty.isOverridden()}"
-                     resetUrl="${jobUrl}/resetProjectProperty?propertyName=${it.COMBINATION_FILTER_PROPERTY_NAME}"
-                     help="/help/matrix/combinationfilter.html">
-	    <f:entry title="${%Filter}" isPropertyOverridden="${combinationFilterProperty.isOverridden()}">
-	      <f:textbox name="combinationFilter" value="${combinationFilter}" />
-	    </f:entry>
+                        checked="${!empty(combinationFilter)}"
+                        isPropertyOverridden="${combinationFilterProperty.isOverridden()}"
+                        resetUrl="${jobUrl}/resetProjectProperty?propertyName=${it.COMBINATION_FILTER_PROPERTY_NAME}"
+                        help="/help/matrix/combinationfilter.html">
+                            
+        <j:if test="${app.scriptSupport == null}">
+            <f:entry>
+                <p><i>Install script support plugin to specify combination filter</i></p>
+            </f:entry>
+        </j:if>
+        
+        <j:if test="${app.scriptSupport != null}">
+              <f:entry title="${%Filter}" isPropertyOverridden="${combinationFilterProperty.isOverridden()}">
+                  <f:textbox name="combinationFilter" value="${combinationFilter}" />
+               </f:entry>
+        </j:if>
+                            
     </f:optionalBlock>
 
     <j:set var="touchStoneCombinationFilterProperty" value="${cu.getStringProjectProperty(it, it.TOUCH_STONE_COMBINATION_FILTER_PROPERTY_NAME)}"/>
@@ -91,16 +102,23 @@
                      resetUrl="${jobUrl}/resetProjectProperty?propertyName=${it.TOUCH_STONE_COMBINATION_FILTER_PROPERTY_NAME +
                      it.PROPERTY_NAME_SEPARATOR + it.TOUCH_STONE_RESULT_CONDITION_PROPERTY_NAME}"
                      help="/help/matrix/touchstone.html">
-        <f:entry title="${%Filter}" isPropertyOverridden="${isTouchStoneCombinationFilterOverridden}">
-          <f:textbox name="touchStoneCombinationFilter" value="${touchStoneCombinationFilter}" />
-        </f:entry>
-        <f:entry title="${%Required result}" description="${%required.result.description}"
-                 isPropertyOverridden="${isTouchStoneCombinationFilterOverridden}">
-            <select name="touchStoneResultCondition">
-                <f:option value="SUCCESS" selected='${touchStoneResultCondition.toExportedObject()=="SUCCESS"}'>${%Stable}</f:option>
-                <f:option value="UNSTABLE" selected='${touchStoneResultCondition.toExportedObject()=="UNSTABLE"}'>${%Unstable}</f:option>
-            </select>
-         </f:entry>
+        <j:if test="${app.scriptSupport == null}">
+            <f:entry>
+                <p><i>Install script support plugin to specify touchstone combination filter</i></p>
+            </f:entry>
+        </j:if>
+        <j:if test="${app.scriptSupport != null}">
+            <f:entry title="${%Filter}" isPropertyOverridden="${isTouchStoneCombinationFilterOverridden}">
+            <f:textbox name="touchStoneCombinationFilter" value="${touchStoneCombinationFilter}" />
+            </f:entry>
+            <f:entry title="${%Required result}" description="${%required.result.description}"
+                    isPropertyOverridden="${isTouchStoneCombinationFilterOverridden}">
+                <select name="touchStoneResultCondition">
+                    <f:option value="SUCCESS" selected='${touchStoneResultCondition.toExportedObject()=="SUCCESS"}'>${%Stable}</f:option>
+                    <f:option value="UNSTABLE" selected='${touchStoneResultCondition.toExportedObject()=="UNSTABLE"}'>${%Unstable}</f:option>
+                </select>
+            </f:entry>
+         </j:if>
     </f:optionalBlock>
   </f:section>
 
