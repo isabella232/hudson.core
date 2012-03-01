@@ -121,6 +121,7 @@ import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
+import org.eclipse.hudson.script.ScriptSupport;
 
 /**
  * Utility functions used in views.
@@ -683,6 +684,10 @@ public class Functions {
 
     public static List<Descriptor<MyViewsTabBar>> getMyViewsTabBarDescriptors() {
         return MyViewsTabBar.all();
+    }
+    
+    public static List<Descriptor<ScriptSupport>> getScriptSupportDescriptors() {
+        return ScriptSupport.all();
     }
 
     public static List<NodePropertyDescriptor> getNodePropertyDescriptors(Class<? extends Node> clazz) {
