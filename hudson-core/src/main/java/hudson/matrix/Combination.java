@@ -16,6 +16,7 @@
 package hudson.matrix;
 
 import hudson.Util;
+import hudson.model.Hudson;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +32,6 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import static java.lang.Boolean.TRUE;
 
-import org.eclipse.hudson.script.ScriptSupport;
 
 /**
  * A particular combination of {@link Axis} values.
@@ -97,16 +97,6 @@ public final class Combination extends TreeMap<String,String> implements Compara
     }
     
     /**
-     * Evaluates the expression using
-     * @param axes
-     * @param expression
-     * @return 
-     */
-    public boolean evalScriptExpression(AxisList axes, String expression) {
-        return evalScriptExpression(axes, expression, ScriptSupport.DEFAULT);
-    }
- 
-    /**
      * Evaluates the given Dynamic Language Script Expression  with values bound from this combination.
      * <p>
      * For example, if this combination is a=X,b=Y, then expressions like <tt>a=="X"</tt> would evaluate to
@@ -116,30 +106,26 @@ public final class Combination extends TreeMap<String,String> implements Compara
      * @param scriptType
      * @return 
      */
-    public boolean evalScriptExpression(AxisList axes, String expression, String scriptType) {
+    public boolean evalScriptExpression(AxisList axes, String expression) {
         if (Util.fixEmptyAndTrim(expression) == null) {
             return true;
         }
 
         Object result = Boolean.TRUE;
 
-        if (scriptType.equals(ScriptSupport.SCRIPT_GROOVY)) {
+        if (Hudson.getInstance().getScriptSupport() != null) {
+
             expression = "use(" + BooleanCategory.class.getName().replace('$', '.') + ") {" + expression + "}";
-        }
 
-        Map<String, Object> variableMap = new HashMap<String, Object>();
+            Map<String, Object> variableMap = new HashMap<String, Object>();
 
-        for (Map.Entry<String, String> e : entrySet()) {
-            variableMap.put(e.getKey(), e.getValue());
-        }
-
-        variableMap.put("index", toModuloIndex(axes));
-        variableMap.put("uniqueId", toIndex(axes));
-
-        for (ScriptSupport scriptSupport : ScriptSupport.getAvailableScriptSupports()) {
-            if (scriptSupport.hasSupport(scriptType)) {
-                result = scriptSupport.evaluateExpression(expression, variableMap);
+            for (Map.Entry<String, String> e : entrySet()) {
+                variableMap.put(e.getKey(), e.getValue());
             }
+
+            variableMap.put("index", toModuloIndex(axes));
+            variableMap.put("uniqueId", toIndex(axes));
+            result = Hudson.getInstance().getScriptSupport().evaluateExpression(expression, variableMap);
         }
 
         return TRUE.equals(result);

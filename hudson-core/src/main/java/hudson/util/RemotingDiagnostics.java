@@ -1,18 +1,19 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
  * Copyright (c) 2004-2010 Oracle Corporation.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *    Kohsuke Kawaguchi, Winston Prakash
- *     
- *******************************************************************************/ 
-
+ * Kohsuke Kawaguchi, Winston Prakash
+ *
+ ******************************************************************************
+ */
 package hudson.util;
 
 import hudson.FilePath;
@@ -44,48 +45,55 @@ import org.eclipse.hudson.script.ScriptSupport;
 /**
  * Various remoting operations related to diagnostics.
  *
- * <p>
- * These code are useful wherever {@link VirtualChannel} is used, such as master, slaves, Maven JVMs, etc.
+ * <p> These code are useful wherever {@link VirtualChannel} is used, such as
+ * master, slaves, Maven JVMs, etc.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.175
  */
 public final class RemotingDiagnostics {
-    public static Map<Object,Object> getSystemProperties(VirtualChannel channel) throws IOException, InterruptedException {
-        if(channel==null)
-            return Collections.<Object,Object>singletonMap("N/A","N/A");
+
+    public static Map<Object, Object> getSystemProperties(VirtualChannel channel) throws IOException, InterruptedException {
+        if (channel == null) {
+            return Collections.<Object, Object>singletonMap("N/A", "N/A");
+        }
         return channel.call(new GetSystemProperties());
     }
 
-    private static final class GetSystemProperties implements Callable<Map<Object,Object>,RuntimeException> {
-        public Map<Object,Object> call() {
-            return new TreeMap<Object,Object>(System.getProperties());
+    private static final class GetSystemProperties implements Callable<Map<Object, Object>, RuntimeException> {
+
+        public Map<Object, Object> call() {
+            return new TreeMap<Object, Object>(System.getProperties());
         }
         private static final long serialVersionUID = 1L;
     }
 
-    public static Map<String,String> getThreadDump(VirtualChannel channel) throws IOException, InterruptedException {
-        if(channel==null)
-            return Collections.singletonMap("N/A","N/A");
+    public static Map<String, String> getThreadDump(VirtualChannel channel) throws IOException, InterruptedException {
+        if (channel == null) {
+            return Collections.singletonMap("N/A", "N/A");
+        }
         return channel.call(new GetThreadDump());
     }
 
-    private static final class GetThreadDump implements Callable<Map<String,String>,RuntimeException> {
-        public Map<String,String> call() {
-            Map<String,String> r = new LinkedHashMap<String,String>();
+    private static final class GetThreadDump implements Callable<Map<String, String>, RuntimeException> {
+
+        public Map<String, String> call() {
+            Map<String, String> r = new LinkedHashMap<String, String>();
             try {
                 ThreadInfo[] data = Functions.getThreadInfos();
                 Functions.ThreadGroupMap map = Functions.sortThreadsAndGetGroupMap(data);
-                for (ThreadInfo ti : data)
-                    r.put(ti.getThreadName(),Functions.dumpThreadInfo(ti,map));
+                for (ThreadInfo ti : data) {
+                    r.put(ti.getThreadName(), Functions.dumpThreadInfo(ti, map));
+                }
             } catch (LinkageError _) {
                 // not in JDK6. fall back to JDK5
                 r.clear();
-                for (Map.Entry<Thread,StackTraceElement[]> t : Functions.dumpAllThreads().entrySet()) {
+                for (Map.Entry<Thread, StackTraceElement[]> t : Functions.dumpAllThreads().entrySet()) {
                     StringBuilder buf = new StringBuilder();
-                    for (StackTraceElement e : t.getValue())
+                    for (StackTraceElement e : t.getValue()) {
                         buf.append(e).append('\n');
-                    r.put(t.getKey().getName(),buf.toString());
+                    }
+                    r.put(t.getKey().getName(), buf.toString());
                 }
             }
             return r;
@@ -100,20 +108,35 @@ public final class RemotingDiagnostics {
         return channel.call(new Script(script));
     }
 
+    public static String executeScript(String script, VirtualChannel channel, ScriptSupport scriptSupport) throws IOException, InterruptedException {
+        return channel.call(new Script(script, scriptSupport));
+    }
+
     private static final class Script implements DelegatingCallable<String, RuntimeException> {
 
         private final String script;
         private transient ClassLoader parentClassLoader;
-        private final String scriptType;
+        private ScriptSupport scriptSupport;
 
-        private Script(String script, String scriptType) {
+        private Script(String script) {
             this.script = script;
-            this.scriptType = scriptType;
             parentClassLoader = getClassLoader();
         }
 
-        private Script(String script) {
-            this(script, ScriptSupport.SCRIPT_GROOVY);
+        private Script(String script, String scriptType) {
+            this(script);
+            if (scriptType != null) {
+                for (ScriptSupport scriptSupport : ScriptSupport.getAvailableScriptSupports()) {
+                    if (scriptSupport.hasSupport(scriptType)) {
+                        this.scriptSupport = scriptSupport;
+                    }
+                }
+            }
+        }
+
+        private Script(String script, ScriptSupport scriptSupport) {
+            this(script);
+            this.scriptSupport = scriptSupport;
         }
 
         public ClassLoader getClassLoader() {
@@ -121,21 +144,22 @@ public final class RemotingDiagnostics {
         }
 
         public String call() throws RuntimeException {
-            // if we run locally, cl!=null. Otherwise the delegating classloader will be available as context classloader.
-            if (parentClassLoader == null) {
-                parentClassLoader = Thread.currentThread().getContextClassLoader();
-            }
+            if (scriptSupport != null) {
+                // if we run locally, cl!=null. Otherwise the delegating classloader will be available as context classloader.
+                if (parentClassLoader == null) {
+                    parentClassLoader = Thread.currentThread().getContextClassLoader();
+                }
 
-            StringWriter out = new StringWriter();
-            PrintWriter printWriter = new PrintWriter(out);
-
-            for (ScriptSupport scriptSupport : ScriptSupport.getAvailableScriptSupports()) {
-                if (scriptSupport.hasSupport(scriptType)) {
+                StringWriter out = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(out);
+                if (scriptSupport != null) {
                     scriptSupport.evaluate(parentClassLoader, script, null, printWriter);
+                    return out.toString();
+                } else {
+                    return "No script support to execute the script. Install script support plugin";
                 }
             }
-
-            return out.toString();
+            return "";
         }
     }
 
@@ -144,6 +168,7 @@ public final class RemotingDiagnostics {
      */
     public static FilePath getHeapDump(VirtualChannel channel) throws IOException, InterruptedException {
         return channel.call(new Callable<FilePath, IOException>() {
+
             public FilePath call() throws IOException {
                 final File hprof = File.createTempFile("hudson-heapdump", "hprof");
                 hprof.delete();
@@ -157,7 +182,6 @@ public final class RemotingDiagnostics {
                     throw new IOException2(e);
                 }
             }
-
             private static final long serialVersionUID = 1L;
         });
     }
@@ -167,6 +191,7 @@ public final class RemotingDiagnostics {
      *
      */
     public static class HeapDump {
+
         private final AccessControlled owner;
         private final VirtualChannel channel;
 
@@ -182,7 +207,7 @@ public final class RemotingDiagnostics {
             rsp.sendRedirect("heapdump.hprof");
         }
 
-        @WebMethod(name="heapdump.hprof")
+        @WebMethod(name = "heapdump.hprof")
         public void doHeapDump(StaplerRequest req, StaplerResponse rsp) throws IOException, InterruptedException {
             owner.checkPermission(Hudson.ADMINISTER);
             rsp.setContentType("application/octet-stream");

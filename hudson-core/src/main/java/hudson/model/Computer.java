@@ -1029,13 +1029,15 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
         // so tie it to the admin access
         checkPermission(Hudson.ADMINISTER);
 
-        String text = req.getParameter("script");
-        if(text!=null) {
-            try {
-                req.setAttribute("output",
-                RemotingDiagnostics.executeScript(text,getChannel()));
-            } catch (InterruptedException e) {
-                throw new ServletException(e);
+        if (Hudson.getInstance().getScriptSupport() != null) {
+            String text = req.getParameter("script");
+            if (text != null) {
+                try {
+                    req.setAttribute("output",
+                            RemotingDiagnostics.executeScript(text, getChannel(), Hudson.getInstance().getScriptSupport()));
+                } catch (InterruptedException e) {
+                    throw new ServletException(e);
+                }
             }
         }
 
