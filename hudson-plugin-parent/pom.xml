@@ -163,7 +163,7 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.jvnet.hudson.tools</groupId>
+            <groupId>org.eclipse.hudson.tools</groupId>
             <artifactId>maven-hpi-plugin</artifactId>
             <version>${maven-hpi-plugin.version}</version>
             <extensions>true</extensions>
