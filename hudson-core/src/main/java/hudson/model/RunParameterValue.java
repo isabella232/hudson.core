@@ -19,8 +19,8 @@ package hudson.model;
 import java.util.Locale;
 
 import hudson.EnvVars;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.export.Exported;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.export.Exported;
 
 public class RunParameterValue extends ParameterValue {
 

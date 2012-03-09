@@ -25,13 +25,13 @@ import hudson.util.VariableResolver;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.kohsuke.stapler.export.Exported;
-import org.kohsuke.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.export.Exported;
+import org.eclipse.hudson.stapler.export.ExportedBean;
 
 /**
  * A value for a parameter in a build.
  *
- * Created by {@link ParameterDefinition#createValue(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject)} for
+ * Created by {@link ParameterDefinition#createValue(org.eclipse.hudson.stapler.StaplerRequest, net.sf.json.JSONObject)} for
  * a particular build (although this 'owner' build object is passed in for every method
  * call as a parameter so that the parameter won't have to persist it.)
  *

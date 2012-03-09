@@ -17,7 +17,7 @@
 package hudson.views;
 
 import hudson.Extension;
-import org.kohsuke.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
 
 /**
  * The Default ViewsTabBar Extension for {@link ViewsTabBar}.

@@ -20,7 +20,7 @@ import hudson.Extension;
 import hudson.util.DescribableList;
 import hudson.model.Descriptor;
 import hudson.model.Saveable;
-import org.kohsuke.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
 
 import java.util.List;
 import java.io.IOException;

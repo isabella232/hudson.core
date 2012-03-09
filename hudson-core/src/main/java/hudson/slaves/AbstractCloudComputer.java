@@ -17,9 +17,9 @@
 package hudson.slaves;
 
 import hudson.model.Computer;
-import org.kohsuke.stapler.HttpRedirect;
-import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.HttpResponses;
+import org.eclipse.hudson.stapler.HttpRedirect;
+import org.eclipse.hudson.stapler.HttpResponse;
+import org.eclipse.hudson.stapler.HttpResponses;
 
 import java.io.IOException;
 

@@ -23,7 +23,7 @@ import hudson.Extension;
 
 import java.util.List;
 
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerRequest;
 
 import javax.servlet.ServletException;
 

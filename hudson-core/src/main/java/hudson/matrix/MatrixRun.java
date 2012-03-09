@@ -22,9 +22,9 @@ import hudson.slaves.WorkspaceList.Lease;
 import static hudson.matrix.MatrixConfiguration.useShortWorkspaceName;
 import hudson.model.Build;
 import hudson.model.Node;
-import org.kohsuke.stapler.Ancestor;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.Ancestor;
+import org.eclipse.hudson.stapler.Stapler;
+import org.eclipse.hudson.stapler.StaplerRequest;
 
 import java.io.File;
 import java.io.IOException;

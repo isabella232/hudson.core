@@ -16,7 +16,7 @@
 
 package hudson.scm;
 
-import org.kohsuke.stapler.export.CustomExportedBean;
+import org.eclipse.hudson.stapler.export.CustomExportedBean;
 
 import java.util.List;
 import java.util.Collections;

@@ -24,7 +24,7 @@ import hudson.model.Descriptor;
 import hudson.model.Result;
 import hudson.tasks.Builder;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerRequest;
 
 import java.io.IOException;
 

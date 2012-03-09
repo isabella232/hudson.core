@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
 
-import org.kohsuke.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.QueryParameter;
 
 /**
  * Monitors the memory usage of the system in OS specific way.

@@ -18,9 +18,9 @@ package hudson.security.csrf;
 
 import javax.servlet.ServletRequest;
 
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.export.Exported;
-import org.kohsuke.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.Stapler;
+import org.eclipse.hudson.stapler.export.Exported;
+import org.eclipse.hudson.stapler.export.ExportedBean;
 
 import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
