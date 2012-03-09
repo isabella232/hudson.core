@@ -30,7 +30,7 @@ import java.util.Collections;
 import net.sf.json.JSONObject;
 
 import org.springframework.security.Authentication;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerRequest;
 
 /**
  * Controls authorization throughout Hudson.

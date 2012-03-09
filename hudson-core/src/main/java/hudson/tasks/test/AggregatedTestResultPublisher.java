@@ -37,9 +37,9 @@ import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.AncestorInPath;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.AncestorInPath;
+import org.eclipse.hudson.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.StaplerRequest;
 
 import java.io.IOException;
 import java.util.ArrayList;

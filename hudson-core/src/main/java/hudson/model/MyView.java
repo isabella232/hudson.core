@@ -24,9 +24,9 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
 import hudson.model.Descriptor.FormException;
 import hudson.Extension;
 

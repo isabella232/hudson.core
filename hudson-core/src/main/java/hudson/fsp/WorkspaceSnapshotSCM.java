@@ -36,7 +36,7 @@ import hudson.PermalinkList;
 import java.io.IOException;
 import java.io.File;
 
-import org.kohsuke.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
 
 /**
  * {@link SCM} that inherits the workspace from another build through {@link WorkspaceSnapshot}

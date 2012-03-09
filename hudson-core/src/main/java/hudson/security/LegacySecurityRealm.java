@@ -18,7 +18,7 @@ package hudson.security;
 import org.springframework.security.Authentication;
 import org.springframework.security.AuthenticationManager;
 import org.springframework.security.AuthenticationException;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerRequest;
 import hudson.model.Descriptor;
 import hudson.Extension;
 import java.util.ArrayList;

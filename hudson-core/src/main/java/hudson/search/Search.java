@@ -18,14 +18,14 @@ package hudson.search;
 
 import hudson.util.EditDistance;
 import org.apache.commons.lang3.StringUtils;
-import org.kohsuke.stapler.Ancestor;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.export.DataWriter;
-import org.kohsuke.stapler.export.Exported;
-import org.kohsuke.stapler.export.ExportedBean;
-import org.kohsuke.stapler.export.Flavor;
+import org.eclipse.hudson.stapler.Ancestor;
+import org.eclipse.hudson.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.export.DataWriter;
+import org.eclipse.hudson.stapler.export.Exported;
+import org.eclipse.hudson.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.export.Flavor;
 
 import javax.servlet.ServletException;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;

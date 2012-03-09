@@ -17,7 +17,7 @@
 package hudson.model;
 
 import hudson.Functions;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerRequest;
 
 import java.io.IOException;
 import java.util.Collection;

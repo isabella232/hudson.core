@@ -19,7 +19,7 @@ package hudson.slaves;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.model.TaskListener;
-import org.kohsuke.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
 
 import java.io.IOException;
 

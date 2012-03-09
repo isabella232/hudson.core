@@ -22,7 +22,7 @@ import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.slaves.ComputerConnector;
 import hudson.slaves.ComputerConnectorDescriptor;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerRequest;
 
 import javax.servlet.ServletException;
 import java.io.IOException;

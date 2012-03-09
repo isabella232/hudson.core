@@ -23,10 +23,10 @@ import hudson.Util;
 import hudson.FilePath;
 import static hudson.Util.fixEmpty;
 import hudson.model.Hudson;
-import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.Stapler;
+import org.eclipse.hudson.stapler.HttpResponse;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.Stapler;
 
 import javax.servlet.ServletException;
 import java.io.File;

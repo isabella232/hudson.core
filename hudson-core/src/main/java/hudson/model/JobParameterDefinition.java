@@ -18,8 +18,8 @@ package hudson.model;
 
 import net.sf.json.JSONObject;
 
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.StaplerRequest;
 
 public class JobParameterDefinition extends SimpleParameterDefinition {
 

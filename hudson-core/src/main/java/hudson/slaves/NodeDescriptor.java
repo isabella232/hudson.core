@@ -32,9 +32,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
 
 import javax.servlet.ServletException;
 

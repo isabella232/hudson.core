@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.kohsuke.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.export.ExportedBean;
 
 /**
  * Extensible property of {@link Job}.

@@ -37,7 +37,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.ParameterizedType;
 
 import org.jvnet.tiger_types.Types;
-import org.kohsuke.stapler.Stapler;
+import org.eclipse.hudson.stapler.Stapler;
 import net.sf.json.JSONObject;
 
 /**

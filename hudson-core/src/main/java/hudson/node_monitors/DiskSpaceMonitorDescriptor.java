@@ -30,8 +30,8 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Locale;
 
-import org.kohsuke.stapler.export.ExportedBean;
-import org.kohsuke.stapler.export.Exported;
+import org.eclipse.hudson.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.export.Exported;
 
 /**
  * {@link AbstractNodeMonitorDescriptor} for {@link NodeMonitor} that checks a free disk space of some directory.

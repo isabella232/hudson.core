@@ -21,8 +21,8 @@ import hudson.model.TaskAction;
 import hudson.model.BuildBadgeAction;
 import hudson.security.Permission;
 import hudson.security.ACL;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
 
 import javax.servlet.ServletException;
 import java.io.IOException;

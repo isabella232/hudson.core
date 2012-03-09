@@ -24,7 +24,7 @@ import net.sf.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerRequest;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -41,7 +41,7 @@ import static org.powermock.api.easymock.PowerMock.verifyAll;
 
 /**
  * Test cases for {@link CascadingUtil#setChildrenTrigger(hudson.model.Job, hudson.triggers.TriggerDescriptor, String,
- * org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject)} method.
+ * org.eclipse.hudson.stapler.StaplerRequest, net.sf.json.JSONObject)} method.
  *
  * Date: 11/8/11
  */

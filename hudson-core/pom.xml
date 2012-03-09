@@ -11,7 +11,6 @@
 #
 #    Kohsuke Kawaguchi,
 #        
-#
 #************************************************************************** --> 
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -35,7 +34,7 @@
         <crypto-util.version>1.0</crypto-util.version>
         <jtidy.version>r938</jtidy.version>
         <jna-posix.version>1.0.3</jna-posix.version>
-        <stapler.version>1.155</stapler.version>
+        <stapler.version>3.0.0-SNAPSHOT</stapler.version>
         <json-lib.version>2.4</json-lib.version>
         <annotation-indexer.version>1.2</annotation-indexer.version>
         <task-reactor.version>1.2</task-reactor.version>
@@ -87,7 +86,7 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.kohsuke.stapler</groupId>
+                <groupId>org.eclipse.hudson.stapler</groupId>
                 <artifactId>maven-stapler-plugin</artifactId>
                 <version>${maven-stapler-plugin.version}</version>
                 <configuration>
@@ -237,7 +236,7 @@
                           this is necessary in addition to the <reporting> configuration
                           to get the results deployed.
                         -->
-                        <groupId>org.kohsuke.stapler</groupId>
+                        <groupId>org.eclipse.hudson.stapler</groupId>
                         <artifactId>maven-stapler-plugin</artifactId>
                         <version>${maven-stapler-plugin.version}</version>
                         <executions>
@@ -699,9 +698,9 @@
             <version>${antlr.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.kohsuke.stapler</groupId>
+            <groupId>org.eclipse.hudson</groupId>
             <artifactId>stapler-jelly</artifactId>
-            <version>1.155</version>
+            <version>${stapler.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-jelly</groupId>
@@ -712,11 +711,7 @@
                     <artifactId>commons-jexl</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.kohsuke.stapler</groupId>
+                    <groupId>org.eclipse.hudson.stapler</groupId>
                     <artifactId>json-lib</artifactId>
                 </exclusion>
             </exclusions>
@@ -739,7 +734,7 @@
         <plugins>
             <plugin>
                 <!-- generate Jelly tag lib documentation -->
-                <groupId>org.kohsuke.stapler</groupId>
+                <groupId>org.eclipse.hudson.stapler</groupId>
                 <artifactId>maven-stapler-plugin</artifactId>
                 <version>${maven-stapler-plugin.version}</version>
                 <configuration>

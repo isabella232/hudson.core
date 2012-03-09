@@ -17,7 +17,7 @@
 package hudson.util;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.kohsuke.stapler.ClassDescriptor;
+import org.eclipse.hudson.stapler.ClassDescriptor;
 
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;

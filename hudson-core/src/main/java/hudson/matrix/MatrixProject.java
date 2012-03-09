@@ -46,10 +46,10 @@ import hudson.util.FormValidation.Kind;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.hudson.api.matrix.IMatrixProject;
-import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.TokenList;
+import org.eclipse.hudson.stapler.HttpResponse;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.TokenList;
 
 import javax.servlet.ServletException;
 import java.io.File;

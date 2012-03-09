@@ -21,8 +21,8 @@ import hudson.model.Node;
 
 import java.io.IOException;
 
-import org.kohsuke.stapler.export.ExportedBean;
-import org.kohsuke.stapler.export.Exported;
+import org.eclipse.hudson.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.export.Exported;
 
 /**
  * Represents a clock difference. Immutable.

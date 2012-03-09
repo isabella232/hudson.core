@@ -18,10 +18,10 @@ package org.eclipse.hudson.service.internal;
 
 import net.sf.json.JSONObject;
 import org.apache.commons.fileupload.FileItem;
-import org.kohsuke.stapler.Ancestor;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.Ancestor;
+import org.eclipse.hudson.stapler.Stapler;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -40,8 +40,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import org.kohsuke.stapler.WebApp;
-import org.kohsuke.stapler.bind.BoundObjectTable;
+import org.eclipse.hudson.stapler.WebApp;
+import org.eclipse.hudson.stapler.bind.BoundObjectTable;
 
 /**
  * A dummy {@link StaplerRequest}.

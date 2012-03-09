@@ -25,7 +25,7 @@
 
     <groupId>org.eclipse.hudson</groupId>
     <artifactId>hudson-parent</artifactId>
-    <version>3.0.0-M1</version>
+    <version>3.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Hudson Parent</name>
@@ -56,7 +56,7 @@
         <maven-war-plugin.version>2.1.1</maven-war-plugin.version>
         <findbugs-maven-plugin.version>2.3.1</findbugs-maven-plugin.version>
         <maven-localizer-plugin.version>1.10</maven-localizer-plugin.version>
-        <maven-hpi-plugin.version>3.0.0</maven-hpi-plugin.version>
+        <maven-hpi-plugin.version>3.0.0-SNAPSHOT</maven-hpi-plugin.version>
         <maven-stapler-plugin.version>1.15</maven-stapler-plugin.version>
 
         <!--Test dependencies-->
@@ -255,7 +255,7 @@
                 </plugin>
 
                 <plugin>
-                    <groupId>org.jvnet.hudson.tools</groupId>
+                    <groupId>org.eclipse.hudson.tools</groupId>
                     <artifactId>maven-hpi-plugin</artifactId>
                     <version>${maven-hpi-plugin.version}</version>
                     <configuration>

@@ -29,10 +29,10 @@ import hudson.util.FormValidation;
 import java.io.File;
 import java.io.IOException;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.AncestorInPath;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.AncestorInPath;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.StaplerRequest;
 
 /**
  * Copies the artifacts into an archive directory.
