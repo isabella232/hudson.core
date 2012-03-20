@@ -86,7 +86,7 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.eclipse.hudson.stapler</groupId>
+                <groupId>org.hudsonci.stapler</groupId>
                 <artifactId>maven-stapler-plugin</artifactId>
                 <version>${maven-stapler-plugin.version}</version>
                 <configuration>
@@ -236,7 +236,7 @@
                           this is necessary in addition to the <reporting> configuration
                           to get the results deployed.
                         -->
-                        <groupId>org.eclipse.hudson.stapler</groupId>
+                        <groupId>org.hudsonci.stapler</groupId>
                         <artifactId>maven-stapler-plugin</artifactId>
                         <version>${maven-stapler-plugin.version}</version>
                         <executions>
@@ -698,7 +698,7 @@
             <version>${antlr.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.hudson</groupId>
+            <groupId>org.eclipse.hudson.stapler</groupId>
             <artifactId>stapler-jelly</artifactId>
             <version>${stapler.version}</version>
             <exclusions>
@@ -734,7 +734,7 @@
         <plugins>
             <plugin>
                 <!-- generate Jelly tag lib documentation -->
-                <groupId>org.eclipse.hudson.stapler</groupId>
+                <groupId>org.hudsonci.stapler</groupId>
                 <artifactId>maven-stapler-plugin</artifactId>
                 <version>${maven-stapler-plugin.version}</version>
                 <configuration>
