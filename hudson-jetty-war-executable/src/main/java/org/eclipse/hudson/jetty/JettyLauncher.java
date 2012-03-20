@@ -58,7 +58,12 @@ public class JettyLauncher {
             if (args[i].startsWith("--httpsKeyStorePassword=")) {
                 keyStorePassword = args[i].substring("--httpsKeyStorePassword=".length());
             } else if (args[i].startsWith("--prefix=")) {
-                contextPath = "/" + args[i].substring("--prefix=".length());
+                String prefix = args[i].substring("--prefix=".length());
+                if (prefix.startsWith("/")){
+                    contextPath = prefix;
+                }else{
+                    contextPath = "/" + prefix;
+                }
             }
         }
 
