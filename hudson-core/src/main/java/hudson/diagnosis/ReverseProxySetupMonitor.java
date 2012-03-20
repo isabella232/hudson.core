@@ -19,11 +19,11 @@ package hudson.diagnosis;
 import hudson.Extension;
 import hudson.model.AdministrativeMonitor;
 import hudson.util.FormValidation;
-import org.kohsuke.stapler.HttpRedirect;
-import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.HttpResponses;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.WebMethod;
+import org.eclipse.hudson.stapler.HttpRedirect;
+import org.eclipse.hudson.stapler.HttpResponse;
+import org.eclipse.hudson.stapler.HttpResponses;
+import org.eclipse.hudson.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.WebMethod;
 
 import java.io.IOException;
 

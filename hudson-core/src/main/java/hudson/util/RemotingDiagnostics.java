@@ -23,9 +23,9 @@ import hudson.remoting.Callable;
 import hudson.remoting.DelegatingCallable;
 import hudson.remoting.VirtualChannel;
 import hudson.security.AccessControlled;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.WebMethod;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.WebMethod;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;

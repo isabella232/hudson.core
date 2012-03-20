@@ -21,7 +21,7 @@ import hudson.ExtensionPoint;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Action;
 import hudson.model.Hudson;
-import org.kohsuke.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.export.ExportedBean;
 
 import java.util.Collection;
 import java.util.Collections;

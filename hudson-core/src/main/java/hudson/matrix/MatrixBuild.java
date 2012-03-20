@@ -42,8 +42,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
 
 /**
  * Build of {@link MatrixProject}.

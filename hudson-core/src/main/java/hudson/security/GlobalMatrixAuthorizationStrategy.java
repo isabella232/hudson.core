@@ -34,9 +34,9 @@ import hudson.Extension;
 import net.sf.json.JSONObject;
 import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.springframework.security.acls.sid.Sid;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.Stapler;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.QueryParameter;
 import org.springframework.dao.DataAccessException;
 
 import javax.servlet.ServletException;

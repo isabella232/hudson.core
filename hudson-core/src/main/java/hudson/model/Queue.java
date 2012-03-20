@@ -83,10 +83,10 @@ import java.util.logging.Logger;
 import javax.management.timer.Timer;
 import javax.servlet.ServletException;
 
-import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.HttpResponses;
-import org.kohsuke.stapler.export.Exported;
-import org.kohsuke.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.HttpResponse;
+import org.eclipse.hudson.stapler.HttpResponses;
+import org.eclipse.hudson.stapler.export.Exported;
+import org.eclipse.hudson.stapler.export.ExportedBean;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;

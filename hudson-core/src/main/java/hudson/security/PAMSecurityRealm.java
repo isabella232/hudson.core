@@ -26,7 +26,7 @@ import hudson.util.jna.NativeAccessException;
 import hudson.util.jna.NativeUtils;
 import java.util.Arrays;
 
-import org.kohsuke.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
 import java.util.Set;
 
 import org.springframework.security.Authentication;

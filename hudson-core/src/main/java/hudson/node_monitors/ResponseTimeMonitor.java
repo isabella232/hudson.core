@@ -26,15 +26,15 @@ import hudson.remoting.Future;
 import hudson.util.TimeUnit2;
 import hudson.util.IOException2;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerRequest;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
-import org.kohsuke.stapler.export.Exported;
-import org.kohsuke.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.export.Exported;
+import org.eclipse.hudson.stapler.export.ExportedBean;
 
 /**
  * Monitors the round-trip response time to this slave.

@@ -17,8 +17,8 @@
 package hudson.model;
 
 import hudson.EnvVars;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.export.Exported;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.export.Exported;
 
 import java.util.Locale;
 

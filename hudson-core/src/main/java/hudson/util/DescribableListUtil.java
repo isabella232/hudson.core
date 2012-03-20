@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 import net.sf.json.JSONObject;
 import org.eclipse.hudson.api.model.IProjectProperty;
 import org.eclipse.hudson.model.project.property.ExternalProjectProperty;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerRequest;
 
 /**
  * Utility class for DescribableList logic.
@@ -93,7 +93,7 @@ public final class DescribableListUtil {
      * @return list.
      * @throws IOException              if any.
      * @throws Descriptor.FormException if any.
-     * @see Descriptor#newInstancesFromHeteroList(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject, String, java.util.Collection)
+     * @see Descriptor#newInstancesFromHeteroList(org.eclipse.hudson.stapler.StaplerRequest, net.sf.json.JSONObject, String, java.util.Collection)
      */
     public static <T extends Describable<T>, D extends Descriptor<T>> DescribableList<T, D> buildFromHetero(
         Saveable owner,

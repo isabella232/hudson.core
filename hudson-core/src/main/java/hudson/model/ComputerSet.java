@@ -26,11 +26,11 @@ import hudson.node_monitors.NodeMonitor;
 import hudson.slaves.NodeDescriptor;
 import hudson.util.DescribableList;
 import hudson.util.FormValidation;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.export.Exported;
-import org.kohsuke.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.export.Exported;
+import org.eclipse.hudson.stapler.export.ExportedBean;
 
 import javax.servlet.ServletException;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;

@@ -21,8 +21,8 @@ import hudson.stapler.WebAppController;
 import hudson.triggers.SafeTimerTask;
 import hudson.triggers.Trigger;
 import org.apache.commons.io.FileUtils;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletContext;

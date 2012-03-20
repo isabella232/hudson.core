@@ -23,9 +23,9 @@ import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.util.FormValidation;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.QueryParameter;
 
 import java.util.List;
 import java.util.ArrayList;

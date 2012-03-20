@@ -22,7 +22,7 @@ import hudson.Functions;
 import hudson.model.Computer;
 import hudson.model.Hudson;
 import hudson.node_monitors.DiskSpaceMonitorDescriptor.DiskSpace;
-import org.kohsuke.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
 
 import java.io.IOException;
 import java.text.ParseException;

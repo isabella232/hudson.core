@@ -22,8 +22,8 @@ import hudson.model.*;
 import hudson.tasks.junit.History;
 import hudson.tasks.junit.TestAction;
 import hudson.tasks.junit.TestResultAction;
-import org.kohsuke.stapler.*;
-import org.kohsuke.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.*;
+import org.eclipse.hudson.stapler.export.ExportedBean;
 
 import com.google.common.collect.MapMaker;
 

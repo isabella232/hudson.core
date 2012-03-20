@@ -20,9 +20,9 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.tasks.junit.JUnitResultArchiver;
-import org.kohsuke.stapler.Ancestor;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.Ancestor;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;

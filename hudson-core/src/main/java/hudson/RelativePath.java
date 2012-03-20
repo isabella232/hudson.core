@@ -14,7 +14,7 @@
 
 package hudson;
 
-import org.kohsuke.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.QueryParameter;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

@@ -26,8 +26,8 @@ import hudson.triggers.TimerTrigger;
 import java.util.Set;
 import java.io.IOException;
 
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
 
 /**
  * Checks the health of a subsystem of Hudson and if there's something

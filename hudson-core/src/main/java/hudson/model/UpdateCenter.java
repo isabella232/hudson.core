@@ -39,7 +39,7 @@ import hudson.util.XStream2;
 import org.springframework.security.Authentication;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.output.NullOutputStream;
-import org.kohsuke.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.StaplerResponse;
 
 import javax.net.ssl.SSLHandshakeException;
 import javax.servlet.ServletException;
