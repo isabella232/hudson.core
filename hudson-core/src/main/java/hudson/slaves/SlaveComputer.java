@@ -50,11 +50,11 @@ import java.util.concurrent.Future;
 import java.security.Security;
 
 import hudson.util.io.ReopenableFileOutputStream;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.HttpRedirect;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.HttpResponse;
+import org.eclipse.hudson.stapler.HttpRedirect;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;

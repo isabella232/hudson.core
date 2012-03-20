@@ -28,9 +28,9 @@ import hudson.util.CopyOnWriteList;
 import hudson.util.RingBufferLogHandler;
 import hudson.util.XStream2;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
 
 import javax.servlet.ServletException;
 import java.io.File;

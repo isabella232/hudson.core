@@ -14,7 +14,7 @@
 
 package hudson.model;
 
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerRequest;
 import hudson.cli.CLICommand;
 
 import java.io.IOException;

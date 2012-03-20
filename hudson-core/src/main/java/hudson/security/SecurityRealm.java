@@ -40,9 +40,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
-import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.HttpResponse;
+import org.eclipse.hudson.stapler.Stapler;
+import org.eclipse.hudson.stapler.StaplerRequest;
 
 import org.springframework.security.Authentication;
 import org.springframework.security.AuthenticationManager;
@@ -54,7 +54,7 @@ import org.springframework.security.ui.rememberme.RememberMeServices;
 import org.springframework.security.userdetails.UserDetails;
 import org.springframework.security.userdetails.UserDetailsService;
 import org.springframework.security.userdetails.UsernameNotFoundException;
-import org.kohsuke.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.StaplerResponse;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.providers.anonymous.AnonymousProcessingFilter;

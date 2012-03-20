@@ -23,9 +23,9 @@ import hudson.model.Hudson;
 import hudson.model.Run;
 import hudson.util.TimeUnit2;
 import org.jvnet.tiger_types.Types;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.WebMethod;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.WebMethod;
 
 import javax.servlet.ServletException;
 import java.io.IOException;

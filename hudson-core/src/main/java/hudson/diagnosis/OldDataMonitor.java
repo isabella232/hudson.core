@@ -29,8 +29,8 @@ import hudson.model.listeners.RunListener;
 import hudson.model.listeners.SaveableListener;
 import hudson.util.RobustReflectionConverter;
 import hudson.util.VersionNumber;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 
 import java.io.IOException;
@@ -42,9 +42,9 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.kohsuke.stapler.HttpRedirect;
-import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.HttpResponses;
+import org.eclipse.hudson.stapler.HttpRedirect;
+import org.eclipse.hudson.stapler.HttpResponse;
+import org.eclipse.hudson.stapler.HttpResponses;
 
 /**
  * Tracks whether any data structure changes were corrected when loading XML,

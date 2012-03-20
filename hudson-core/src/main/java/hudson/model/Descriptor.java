@@ -28,7 +28,7 @@ import hudson.util.ReflectionUtils.Parameter;
 import hudson.views.ListViewColumn;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.*;
+import org.eclipse.hudson.stapler.*;
 import org.springframework.util.StringUtils;
 import org.jvnet.tiger_types.Types;
 import org.apache.commons.io.IOUtils;

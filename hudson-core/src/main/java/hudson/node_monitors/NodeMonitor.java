@@ -30,8 +30,8 @@ import hudson.util.DescriptorList;
 
 import java.util.List;
 
-import org.kohsuke.stapler.export.Exported;
-import org.kohsuke.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.export.Exported;
+import org.eclipse.hudson.stapler.export.ExportedBean;
 
 /**
  * Extension point for managing and monitoring {@link Node}s.

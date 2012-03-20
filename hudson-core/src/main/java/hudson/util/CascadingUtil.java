@@ -50,7 +50,7 @@ import org.eclipse.hudson.model.project.property.ResultProjectProperty;
 import org.eclipse.hudson.model.project.property.SCMProjectProperty;
 import org.eclipse.hudson.model.project.property.StringProjectProperty;
 import org.eclipse.hudson.model.project.property.TriggerProjectProperty;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerRequest;
 
 /**
  * Utility class for cascading functionality.

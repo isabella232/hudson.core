@@ -20,7 +20,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractModelObject;
 import hudson.model.Api;
 import hudson.tasks.test.AbstractTestResultAction;
-import org.kohsuke.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.export.ExportedBean;
 
 import java.io.Serializable;
 import java.util.List;

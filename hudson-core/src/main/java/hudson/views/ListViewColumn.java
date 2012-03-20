@@ -28,7 +28,7 @@ import hudson.model.ItemGroup;
 import hudson.model.ListView;
 import hudson.model.View;
 import hudson.util.DescriptorList;
-import org.kohsuke.stapler.export.Exported;
+import org.eclipse.hudson.stapler.export.Exported;
 
 import java.util.ArrayList;
 import java.util.Arrays;

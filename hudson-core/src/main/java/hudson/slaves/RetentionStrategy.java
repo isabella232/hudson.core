@@ -22,7 +22,7 @@ import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.model.*;
 import hudson.util.DescriptorList;
-import org.kohsuke.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -23,8 +23,8 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.kohsuke.stapler.export.Exported;
-import org.kohsuke.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.export.Exported;
+import org.eclipse.hudson.stapler.export.ExportedBean;
 
 import java.io.File;
 import java.io.IOException;

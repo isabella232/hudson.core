@@ -20,9 +20,9 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.export.Exported;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.export.Exported;
 import hudson.Extension;
 
 public class RunParameterDefinition extends SimpleParameterDefinition {

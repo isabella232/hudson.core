@@ -20,8 +20,8 @@ import hudson.util.ColorPalette;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.HeadlessException;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
 
 import javax.servlet.ServletOutputStream;
 import javax.imageio.ImageIO;

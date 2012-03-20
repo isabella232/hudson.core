@@ -20,7 +20,7 @@ import hudson.util.ColorPalette;
 import hudson.util.graph.MultiStageTimeSeries;
 import hudson.util.graph.MultiStageTimeSeries.TimeScale;
 import hudson.util.graph.MultiStageTimeSeries.TrendChart;
-import org.kohsuke.stapler.export.Exported;
+import org.eclipse.hudson.stapler.export.Exported;
 
 /**
  * {@link LoadStatistics} for the entire system (the master and all the slaves combined.)

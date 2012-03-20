@@ -51,9 +51,9 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.export.Exported;
+import org.eclipse.hudson.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.export.Exported;
 
 import static hudson.Util.fixEmptyAndTrim;
 

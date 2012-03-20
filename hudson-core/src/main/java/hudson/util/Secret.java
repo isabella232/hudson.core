@@ -23,7 +23,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import hudson.model.Hudson;
 import hudson.Util;
-import org.kohsuke.stapler.Stapler;
+import org.eclipse.hudson.stapler.Stapler;
 
 import javax.crypto.SecretKey;
 import javax.crypto.Cipher;

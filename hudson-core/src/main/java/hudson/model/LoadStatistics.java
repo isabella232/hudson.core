@@ -21,9 +21,9 @@ import hudson.util.ColorPalette;
 import hudson.util.graph.MultiStageTimeSeries;
 import hudson.util.graph.MultiStageTimeSeries.TimeScale;
 import hudson.util.graph.MultiStageTimeSeries.TrendChart;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.export.ExportedBean;
-import org.kohsuke.stapler.export.Exported;
+import org.eclipse.hudson.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.export.Exported;
 
 import java.io.IOException;
 import java.util.List;

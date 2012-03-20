@@ -18,8 +18,8 @@ package org.jvnet.hudson.test;
 
 import hudson.Extension;
 import hudson.model.RootAction;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.StaplerResponse;
 
 import java.io.IOException;
 import java.util.Collections;

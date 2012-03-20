@@ -20,7 +20,7 @@ import hudson.model.Computer;
 import hudson.model.Node;
 import hudson.util.ClockDifference;
 import hudson.Extension;
-import org.kohsuke.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerRequest;
 
 import java.io.IOException;
 

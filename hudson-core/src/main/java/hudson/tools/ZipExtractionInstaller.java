@@ -33,8 +33,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.eclipse.hudson.stapler.QueryParameter;
 
 /**
  * Installs a tool into the Hudson working area by downloading and unpacking a ZIP file.

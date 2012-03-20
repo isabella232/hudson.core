@@ -17,8 +17,8 @@
 package hudson.model;
 
 import hudson.CopyOnWrite;
-import org.kohsuke.stapler.export.ExportedBean;
-import org.kohsuke.stapler.export.Exported;
+import org.eclipse.hudson.stapler.export.ExportedBean;
+import org.eclipse.hudson.stapler.export.Exported;
 
 /**
  * Scalar value that changes over the time (such as load average, Q length, # of executors, etc.)

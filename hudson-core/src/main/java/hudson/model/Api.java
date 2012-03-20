@@ -24,10 +24,10 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.export.*;
+import org.eclipse.hudson.stapler.QueryParameter;
+import org.eclipse.hudson.stapler.StaplerRequest;
+import org.eclipse.hudson.stapler.StaplerResponse;
+import org.eclipse.hudson.stapler.export.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -178,13 +178,6 @@ public class Api extends AbstractModelObject {
      */
     public void doJson(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         rsp.serveExposedBean(req,bean, Flavor.JSON);
-    }
-
-    /**
-     * Exposes the bean as Python literal.
-     */
-    public void doPython(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
-        rsp.serveExposedBean(req,bean, Flavor.PYTHON);
     }
 
     private static final ModelBuilder MODEL_BUILDER = new ModelBuilder();
