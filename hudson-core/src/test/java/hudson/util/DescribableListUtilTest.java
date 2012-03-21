@@ -22,7 +22,7 @@ import hudson.tasks.Mailer;
 import hudson.tasks.Publisher;
 import java.io.IOException;
 import java.util.Map;
-import org.eclipse.hudson.model.project.property.ExternalProjectProperty;
+import org.hudsonci.model.project.property.ExternalProjectProperty;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;

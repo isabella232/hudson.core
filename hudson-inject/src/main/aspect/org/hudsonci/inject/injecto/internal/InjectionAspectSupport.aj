@@ -13,7 +13,7 @@
  *     
  ********************************************************************************/
 
-package org.eclipse.hudson.inject.injecto.internal;
+package org.hudsonci.inject.injecto.internal;
 
 /**
  * Support for injection aspects.

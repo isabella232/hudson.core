@@ -121,7 +121,7 @@ import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
-import org.eclipse.hudson.script.ScriptSupport;
+import org.hudsonci.script.ScriptSupport;
 
 /**
  * Utility functions used in views.

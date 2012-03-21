@@ -136,7 +136,7 @@ import org.apache.commons.jelly.JellyException;
 import org.apache.commons.jelly.Script;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.hudson.cli.CliEntryPoint;
+import hudson.cli.CliEntryPoint;
 import org.jvnet.hudson.reactor.Executable;
 import org.jvnet.hudson.reactor.ReactorException;
 import org.jvnet.hudson.reactor.Task;
@@ -223,7 +223,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import org.eclipse.hudson.script.ScriptSupport;
+import org.hudsonci.script.ScriptSupport;
 
 /**
  * Root object of the system.

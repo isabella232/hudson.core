@@ -41,7 +41,7 @@ import hudson.model.Queue.WaitingItem;
 import hudson.model.RunMap.Constructor;
 import hudson.util.CascadingUtil;
 import hudson.util.DescribableListUtil;
-import org.eclipse.hudson.model.project.property.IntegerProjectProperty;
+import org.hudsonci.model.project.property.IntegerProjectProperty;
 import hudson.model.queue.CauseOfBlockage;
 import hudson.model.queue.SubTask;
 import hudson.model.queue.SubTaskContributor;
@@ -94,8 +94,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.eclipse.hudson.api.model.IAbstractProject;
-import org.eclipse.hudson.model.project.property.TriggerProjectProperty;
+import org.hudsonci.api.model.IAbstractProject;
+import org.hudsonci.model.project.property.TriggerProjectProperty;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.stapler.ForwardToView;
@@ -143,7 +143,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      * {@link SCM} associated with the project. To allow derived classes to link {@link SCM}
      * config to elsewhere, access to this variable should always go through {@link #getScm()}.
      *
-     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.hudsonci.api.model.IProjectProperty}.
      * Use getter/setter for accessing to this field.
      */
     @Deprecated
@@ -161,7 +161,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     /**
      * The quiet period. Null to delegate to the system default.
      *
-     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.hudsonci.api.model.IProjectProperty}.
      * Use getter/setter for accessing to this field.
      *
      */
@@ -170,7 +170,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     /**
      * The retry count. Null to delegate to the system default.
      *
-     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.hudsonci.api.model.IProjectProperty}.
      * Use getter/setter for accessing to this field.
      */
     @Deprecated
@@ -217,7 +217,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      * building.
      *
      * @deprecated as of 2.2.0. Don't use this field directly, logic was moved
-     * to {@link org.eclipse.hudson.api.model.IProjectProperty}. Use
+     * to {@link org.hudsonci.api.model.IProjectProperty}. Use
      * getter/setter for accessing to this field.
      */
     @Deprecated
@@ -227,7 +227,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      * building.
      *
      * @deprecated as of 2.2.0. Don't use this field directly, logic was moved
-     * to {@link org.eclipse.hudson.api.model.IProjectProperty}. Use
+     * to {@link org.hudsonci.api.model.IProjectProperty}. Use
      * getter/setter for accessing to this field.
      */
     @Deprecated
@@ -240,7 +240,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      * are saved independently.
      *
      * @see Hudson#getJDK(String)
-     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.hudsonci.api.model.IProjectProperty}.
      * Use getter/setter for accessing to this field.
      */
     @Deprecated
@@ -256,7 +256,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      *
      * @deprecated as of 2.2.0
      *
-     * don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     * don't use this field directly, logic was moved to {@link org.hudsonci.api.model.IProjectProperty}.
      * Use getter/setter for accessing to this field.
      */
     protected List<Trigger<?>> triggers = new Vector<Trigger<?>>();
@@ -271,7 +271,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     @CopyOnWrite
     protected transient volatile List<Action> transientActions = new Vector<Action>();
     /**
-     * @deprecated as of 2.2.0 Don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     * @deprecated as of 2.2.0 Don't use this field directly, logic was moved to {@link org.hudsonci.api.model.IProjectProperty}.
      * Use getter/setter for accessing to this field.
      */
     @Deprecated
@@ -279,7 +279,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     /**
      * True to clean the workspace prior to each build.
      *
-     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.hudsonci.api.model.IProjectProperty}.
      * Use getter/setter for accessing to this field.
      */
     @Deprecated

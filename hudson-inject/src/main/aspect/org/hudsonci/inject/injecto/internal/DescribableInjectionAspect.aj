@@ -13,9 +13,9 @@
  *     
  ********************************************************************************/  
 
-package org.eclipse.hudson.inject.injecto.internal;
+package org.hudsonci.inject.injecto.internal;
 
-import org.eclipse.hudson.inject.injecto.Injectable;
+import org.hudsonci.inject.injecto.Injectable;
 import hudson.model.Describable;
 
 /**

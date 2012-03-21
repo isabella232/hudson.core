@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
-import org.eclipse.hudson.api.model.IBaseBuildableProject;
+import org.hudsonci.api.model.IBaseBuildableProject;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -50,7 +50,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
      * List of active {@link Builder}s configured for this project.
      *
      * @deprecated as of 2.2.0
-     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     *             don't use this field directly, logic was moved to {@link org.hudsonci.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
     @Deprecated
@@ -61,7 +61,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
      * List of active {@link Publisher}s configured for this project.
      *
      * @deprecated as of 2.2.0
-     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     *             don't use this field directly, logic was moved to {@link org.hudsonci.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
     @Deprecated
@@ -72,7 +72,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
      * List of active {@link BuildWrapper}s configured for this project.
      *
      * @deprecated as of 2.2.0
-     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     *             don't use this field directly, logic was moved to {@link org.hudsonci.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
     @Deprecated

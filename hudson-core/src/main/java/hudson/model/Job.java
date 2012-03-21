@@ -85,11 +85,11 @@ import net.sf.json.JSONException;
  
 import net.sf.json.JSONObject;
 
-import org.eclipse.hudson.api.model.ICascadingJob;
-import org.eclipse.hudson.api.model.IJob;
-import org.eclipse.hudson.api.model.IProjectProperty;
-import org.eclipse.hudson.model.project.property.BaseProjectProperty;
-import org.eclipse.hudson.model.project.property.ExternalProjectProperty;
+import org.hudsonci.api.model.ICascadingJob;
+import org.hudsonci.api.model.IJob;
+import org.hudsonci.api.model.IProjectProperty;
+import org.hudsonci.model.project.property.BaseProjectProperty;
+import org.hudsonci.model.project.property.ExternalProjectProperty;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -138,7 +138,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     /**
      * @deprecated as of 2.2.0
-     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
+     *             don't use this field directly, logic was moved to {@link org.hudsonci.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
     private volatile LogRotator logRotator;
