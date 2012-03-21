@@ -45,8 +45,8 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.eclipse.hudson.stapler.export.Exported;
-import org.eclipse.hudson.stapler.export.ExportedBean;
+import org.kohsuke.stapler.export.Exported;
+import org.kohsuke.stapler.export.ExportedBean;
 
 /**
  * Captures the configuration information in it.

@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.MalformedURLException;
-import org.eclipse.hudson.stapler.export.ExportedBean;
+import org.kohsuke.stapler.export.ExportedBean;
 
 /**
  * Connects Hudson to repository browsers like ViewCVS or FishEye,

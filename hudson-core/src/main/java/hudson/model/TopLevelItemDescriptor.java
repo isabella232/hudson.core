@@ -17,7 +17,7 @@
 package hudson.model;
 
 import hudson.ExtensionList;
-import org.eclipse.hudson.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * {@link Descriptor} for {@link TopLevelItem}s.

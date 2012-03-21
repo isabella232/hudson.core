@@ -33,7 +33,7 @@ import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.io.IOUtils;
 
-import org.eclipse.hudson.stapler.Stapler;
+import org.kohsuke.stapler.Stapler;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;

@@ -16,9 +16,9 @@
 
 package hudson.model;
 
-import org.eclipse.hudson.stapler.DataBoundConstructor;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.StaplerResponse;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.lang3.StringUtils;

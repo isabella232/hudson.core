@@ -21,9 +21,9 @@ import hudson.ExtensionPoint;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.util.TimeUnit2;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.StaplerResponse;
-import org.eclipse.hudson.stapler.WebMethod;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.WebMethod;
 
 import javax.servlet.ServletException;
 import java.io.IOException;

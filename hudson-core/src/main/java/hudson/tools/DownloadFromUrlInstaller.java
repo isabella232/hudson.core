@@ -19,7 +19,7 @@ import hudson.model.DownloadService.Downloadable;
 import hudson.model.Node;
 import hudson.model.TaskListener;
 import net.sf.json.JSONObject;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
 import java.util.Arrays;

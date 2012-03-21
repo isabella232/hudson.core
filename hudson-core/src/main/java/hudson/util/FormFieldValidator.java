@@ -38,10 +38,10 @@ import java.util.Locale;
 
 import javax.servlet.ServletException;
 
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 import org.springframework.security.AccessDeniedException;
-import org.eclipse.hudson.stapler.Stapler;
+import org.kohsuke.stapler.Stapler;
 
 /**
  * Base class that provides the framework for doing on-the-fly form field validation.

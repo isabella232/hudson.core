@@ -41,7 +41,7 @@ import org.springframework.security.providers.encoding.PasswordEncoder;
 import org.springframework.security.providers.encoding.ShaPasswordEncoder;
 import org.springframework.security.userdetails.UserDetails;
 import org.springframework.security.userdetails.UsernameNotFoundException;
-import org.eclipse.hudson.stapler.*;
+import org.kohsuke.stapler.*;
 import org.springframework.dao.DataAccessException;
 
 import javax.servlet.*;

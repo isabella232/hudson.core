@@ -21,8 +21,8 @@ import hudson.remoting.PingThread;
 import hudson.remoting.Channel.Mode;
 import hudson.util.ChunkedOutputStream;
 import hudson.util.ChunkedInputStream;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

@@ -19,7 +19,7 @@ package hudson.model;
 import hudson.util.ColorPalette;
 import org.jvnet.localizer.LocaleProvider;
 import org.jvnet.localizer.Localizable;
-import org.eclipse.hudson.stapler.Stapler;
+import org.kohsuke.stapler.Stapler;
 
 import java.awt.Color;
 

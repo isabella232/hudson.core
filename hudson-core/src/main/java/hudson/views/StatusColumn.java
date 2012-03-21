@@ -18,7 +18,7 @@ package hudson.views;
 
 import hudson.Extension;
 import hudson.model.StatusIcon;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Shows the status icon for item. It's colored ball for jobs.

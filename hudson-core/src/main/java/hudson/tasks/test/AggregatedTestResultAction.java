@@ -19,8 +19,8 @@ package hudson.tasks.test;
 import hudson.model.AbstractBuild;
 import hudson.tasks.junit.CaseResult;
 import hudson.tasks.junit.TestResult;
-import org.eclipse.hudson.stapler.export.Exported;
-import org.eclipse.hudson.stapler.export.ExportedBean;
+import org.kohsuke.stapler.export.Exported;
+import org.kohsuke.stapler.export.ExportedBean;
 
 import java.util.AbstractList;
 import java.util.ArrayList;

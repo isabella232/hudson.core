@@ -26,7 +26,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Logger;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;

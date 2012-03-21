@@ -23,7 +23,7 @@ import hudson.model.Descriptor;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
 import net.sf.json.JSONObject;
-import org.eclipse.hudson.stapler.Stapler;
+import org.kohsuke.stapler.Stapler;
 
 import java.util.AbstractList;
 import java.util.Iterator;

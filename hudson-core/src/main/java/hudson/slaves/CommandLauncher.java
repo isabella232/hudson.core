@@ -32,8 +32,8 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.eclipse.hudson.stapler.DataBoundConstructor;
-import org.eclipse.hudson.stapler.QueryParameter;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 /**
  * {@link ComputerLauncher} through a remote login mechanism like ssh/rsh.

@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.lang.ref.WeakReference;
 import java.nio.charset.Charset;
-import org.eclipse.hudson.stapler.framework.io.LargeText;
-import org.eclipse.hudson.stapler.framework.io.ByteBuffer;
+import org.kohsuke.stapler.framework.io.LargeText;
+import org.kohsuke.stapler.framework.io.ByteBuffer;
 
 /**
  * {@link Thread} for performing one-off task.

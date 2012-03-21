@@ -16,8 +16,8 @@
 
 package hudson.util;
 
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

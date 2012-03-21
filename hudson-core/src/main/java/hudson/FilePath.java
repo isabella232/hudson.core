@@ -88,7 +88,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.tar.TarEntry;
-import org.eclipse.hudson.stapler.Stapler;
+import org.kohsuke.stapler.Stapler;
 
 import static hudson.FilePath.TarCompression.GZIP;
 import static hudson.Util.fixEmpty;

@@ -20,7 +20,7 @@ import hudson.model.Descriptor;
 import hudson.model.Descriptor.FormException;
 import hudson.util.DescriptorList;
 import hudson.Extension;
-import org.eclipse.hudson.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest;
 
 import java.util.ArrayList;
 import java.util.List;

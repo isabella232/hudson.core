@@ -21,7 +21,7 @@ import hudson.model.Descriptor.FormException;
 import hudson.remoting.Callable;
 import hudson.Extension;
 import net.sf.json.JSONObject;
-import org.eclipse.hudson.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.IOException;
 

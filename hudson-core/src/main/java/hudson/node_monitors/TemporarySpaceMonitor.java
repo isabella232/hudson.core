@@ -24,7 +24,7 @@ import hudson.model.Computer;
 import hudson.model.Hudson;
 import hudson.node_monitors.DiskSpaceMonitorDescriptor.DiskSpace;
 import hudson.remoting.VirtualChannel;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
 import java.io.IOException;

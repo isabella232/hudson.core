@@ -22,11 +22,11 @@ import hudson.util.IOException2;
 import hudson.util.Secret;
 import hudson.util.TimeUnit2;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.eclipse.hudson.stapler.Stapler;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.StaplerResponse;
-import org.eclipse.hudson.stapler.framework.io.ByteBuffer;
-import org.eclipse.hudson.stapler.framework.io.LargeText;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.framework.io.ByteBuffer;
+import org.kohsuke.stapler.framework.io.LargeText;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;

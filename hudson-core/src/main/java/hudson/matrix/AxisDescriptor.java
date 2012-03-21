@@ -21,7 +21,7 @@ import hudson.model.Descriptor;
 import hudson.model.Failure;
 import hudson.model.Hudson;
 import hudson.util.FormValidation;
-import org.eclipse.hudson.stapler.QueryParameter;
+import org.kohsuke.stapler.QueryParameter;
 
 /**
  * {@link Descriptor} for {@link Axis}

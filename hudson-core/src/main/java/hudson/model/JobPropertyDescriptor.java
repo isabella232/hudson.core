@@ -16,7 +16,7 @@
 
 package hudson.model;
 
-import org.eclipse.hudson.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest;
 import org.jvnet.tiger_types.Types;
 
 import java.util.List;

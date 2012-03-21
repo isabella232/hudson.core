@@ -18,8 +18,8 @@ package hudson.slaves;
 
 import hudson.model.Computer;
 import org.jvnet.localizer.Localizable;
-import org.eclipse.hudson.stapler.export.ExportedBean;
-import org.eclipse.hudson.stapler.export.Exported;
+import org.kohsuke.stapler.export.ExportedBean;
+import org.kohsuke.stapler.export.Exported;
 
 /**
  * Represents a cause that puts a {@linkplain Computer#isOffline() computer offline}.

@@ -711,7 +711,7 @@
                     <artifactId>commons-jexl</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.eclipse.hudson.stapler</groupId>
+                    <groupId>org.kohsuke.stapler</groupId>
                     <artifactId>json-lib</artifactId>
                 </exclusion>
             </exclusions>

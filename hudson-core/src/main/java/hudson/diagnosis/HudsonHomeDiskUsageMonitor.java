@@ -22,9 +22,9 @@ import hudson.model.AbstractModelObject;
 import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.ExtensionList;
-import org.eclipse.hudson.stapler.HttpResponse;
-import org.eclipse.hudson.stapler.HttpResponses;
-import org.eclipse.hudson.stapler.QueryParameter;
+import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.HttpResponses;
+import org.kohsuke.stapler.QueryParameter;
 
 import java.io.IOException;
 import java.util.List;

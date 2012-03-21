@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Default {@link Slave} implementation for computers that do not belong to a higher level structure,

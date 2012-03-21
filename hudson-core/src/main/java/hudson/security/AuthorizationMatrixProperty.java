@@ -43,9 +43,9 @@ import java.io.IOException;
 import net.sf.json.JSONObject;
 
 import org.springframework.security.acls.sid.Sid;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.QueryParameter;
-import org.eclipse.hudson.stapler.AncestorInPath;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.AncestorInPath;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;

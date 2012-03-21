@@ -20,7 +20,7 @@ import hudson.model.Descriptor;
 import hudson.model.TaskListener;
 import hudson.Util;
 import hudson.Extension;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * {@link ComputerLauncher} via JNLP.

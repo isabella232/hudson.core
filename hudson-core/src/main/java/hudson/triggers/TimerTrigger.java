@@ -24,8 +24,8 @@ import hudson.scheduler.CronTabList;
 import hudson.util.FormValidation;
 import hudson.Extension;
 
-import org.eclipse.hudson.stapler.DataBoundConstructor;
-import org.eclipse.hudson.stapler.QueryParameter;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 import antlr.ANTLRException;
 

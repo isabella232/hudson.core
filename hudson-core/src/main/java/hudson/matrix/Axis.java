@@ -23,8 +23,8 @@ import hudson.model.AbstractDescribableImpl;
 import hudson.model.Hudson;
 import hudson.util.QuotedStringTokenizer;
 import org.apache.commons.collections.CollectionUtils;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.util.ArrayList;
 import java.util.Collections;

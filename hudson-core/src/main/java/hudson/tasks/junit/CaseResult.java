@@ -21,7 +21,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import hudson.tasks.test.TestResult;
 import org.dom4j.Element;
-import org.eclipse.hudson.stapler.export.Exported;
+import org.kohsuke.stapler.export.Exported;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;

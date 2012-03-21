@@ -19,9 +19,9 @@ package hudson.model;
 import hudson.util.ByteBuffer;
 import hudson.util.CharSpool;
 import hudson.util.LineEndNormalizingWriter;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.StaplerResponse;
-import org.eclipse.hudson.stapler.framework.io.WriterOutputStream;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.framework.io.WriterOutputStream;
 import org.apache.commons.io.output.CountingOutputStream;
 
 import javax.servlet.http.HttpServletResponse;

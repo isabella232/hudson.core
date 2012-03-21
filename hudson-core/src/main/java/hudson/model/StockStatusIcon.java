@@ -16,7 +16,7 @@ package hudson.model;
 
 import org.jvnet.localizer.LocaleProvider;
 import org.jvnet.localizer.Localizable;
-import org.eclipse.hudson.stapler.Stapler;
+import org.kohsuke.stapler.Stapler;
 
 /**
  * {@link StatusIcon} for stock icon in Hudson.

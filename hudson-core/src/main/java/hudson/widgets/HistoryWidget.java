@@ -19,10 +19,10 @@ package hudson.widgets;
 import hudson.Functions;
 import hudson.model.ModelObject;
 import hudson.model.Run;
-import org.eclipse.hudson.stapler.Header;
-import org.eclipse.hudson.stapler.Stapler;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.StaplerResponse;
+import org.kohsuke.stapler.Header;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 import javax.servlet.ServletException;
 import java.io.IOException;

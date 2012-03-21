@@ -19,7 +19,7 @@ package hudson.security;
 import hudson.model.Hudson;
 import org.springframework.security.AccessDeniedException;
 import org.springframework.security.ui.AccessDeniedHandler;
-import org.eclipse.hudson.stapler.Stapler;
+import org.kohsuke.stapler.Stapler;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;

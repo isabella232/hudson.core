@@ -15,7 +15,7 @@
 package hudson.markup;
 
 import hudson.Extension;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
 import java.io.Writer;

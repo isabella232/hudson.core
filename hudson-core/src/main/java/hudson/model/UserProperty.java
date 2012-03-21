@@ -22,8 +22,8 @@ import hudson.DescriptorExtensionList;
 import hudson.model.Descriptor.FormException;
 import net.sf.json.JSONObject;
 
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.export.ExportedBean;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.export.ExportedBean;
 
 /**
  * Extensible property of {@link User}.

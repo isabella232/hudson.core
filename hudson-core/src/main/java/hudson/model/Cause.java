@@ -23,8 +23,8 @@ import java.util.List;
 import hudson.console.HyperlinkNote;
 import hudson.diagnosis.OldDataMonitor;
 import hudson.util.XStream2;
-import org.eclipse.hudson.stapler.export.Exported;
-import org.eclipse.hudson.stapler.export.ExportedBean;
+import org.kohsuke.stapler.export.Exported;
+import org.kohsuke.stapler.export.ExportedBean;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 
 /**

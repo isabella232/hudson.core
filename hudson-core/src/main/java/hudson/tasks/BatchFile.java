@@ -20,8 +20,8 @@ import hudson.FilePath;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import net.sf.json.JSONObject;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
-import org.eclipse.hudson.stapler.StaplerRequest;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Executes commands by using Windows batch file.

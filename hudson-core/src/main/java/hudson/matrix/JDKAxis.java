@@ -18,7 +18,7 @@ package hudson.matrix;
 
 import hudson.Extension;
 import hudson.model.Hudson;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.util.Arrays;
 import java.util.List;

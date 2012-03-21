@@ -24,8 +24,8 @@ import hudson.model.BuildListener;
 import hudson.model.ComputerSet;
 import hudson.model.Environment;
 import hudson.model.Node;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
-import org.eclipse.hudson.stapler.Stapler;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.Stapler;
 
 import java.io.IOException;
 import java.util.Arrays;
