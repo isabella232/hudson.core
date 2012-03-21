@@ -36,20 +36,20 @@ import java.util.Set;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.hudson.api.model.ICascadingJob;
-import org.eclipse.hudson.api.model.IProjectProperty;
-import org.eclipse.hudson.model.project.property.AxisListProjectProperty;
-import org.eclipse.hudson.model.project.property.BaseProjectProperty;
-import org.eclipse.hudson.model.project.property.BooleanProjectProperty;
-import org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty;
-import org.eclipse.hudson.model.project.property.DescribableListProjectProperty;
-import org.eclipse.hudson.model.project.property.ExternalProjectProperty;
-import org.eclipse.hudson.model.project.property.IntegerProjectProperty;
-import org.eclipse.hudson.model.project.property.LogRotatorProjectProperty;
-import org.eclipse.hudson.model.project.property.ResultProjectProperty;
-import org.eclipse.hudson.model.project.property.SCMProjectProperty;
-import org.eclipse.hudson.model.project.property.StringProjectProperty;
-import org.eclipse.hudson.model.project.property.TriggerProjectProperty;
+import org.hudsonci.api.model.ICascadingJob;
+import org.hudsonci.api.model.IProjectProperty;
+import org.hudsonci.model.project.property.AxisListProjectProperty;
+import org.hudsonci.model.project.property.BaseProjectProperty;
+import org.hudsonci.model.project.property.BooleanProjectProperty;
+import org.hudsonci.model.project.property.CopyOnWriteListProjectProperty;
+import org.hudsonci.model.project.property.DescribableListProjectProperty;
+import org.hudsonci.model.project.property.ExternalProjectProperty;
+import org.hudsonci.model.project.property.IntegerProjectProperty;
+import org.hudsonci.model.project.property.LogRotatorProjectProperty;
+import org.hudsonci.model.project.property.ResultProjectProperty;
+import org.hudsonci.model.project.property.SCMProjectProperty;
+import org.hudsonci.model.project.property.StringProjectProperty;
+import org.hudsonci.model.project.property.TriggerProjectProperty;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -66,7 +66,7 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link import org.eclipse.hudson.api.model.IProjectProperty} instance or null.
+     * @return {@link import org.hudsonci.api.model.IProjectProperty} instance or null.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static IProjectProperty getProjectProperty(Job currentJob, String key) {
@@ -79,7 +79,7 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.StringProjectProperty} instance.
+     * @return {@link org.hudsonci.model.project.property.StringProjectProperty} instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static StringProjectProperty getStringProjectProperty(Job currentJob, String key) {
@@ -92,7 +92,7 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.BaseProjectProperty} instance.
+     * @return {@link org.hudsonci.model.project.property.BaseProjectProperty} instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static BaseProjectProperty getBaseProjectProperty(Job currentJob, String key) {
@@ -105,7 +105,7 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.ExternalProjectProperty} instance.
+     * @return {@link org.hudsonci.model.project.property.ExternalProjectProperty} instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static ExternalProjectProperty getExternalProjectProperty(Job currentJob, String key) {
@@ -118,7 +118,7 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty} instance.
+     * @return {@link org.hudsonci.model.project.property.CopyOnWriteListProjectProperty} instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static CopyOnWriteListProjectProperty getCopyOnWriteListProjectProperty(Job currentJob, String key) {
@@ -131,7 +131,7 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.ResultProjectProperty} instance.
+     * @return {@link org.hudsonci.model.project.property.ResultProjectProperty} instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static ResultProjectProperty getResultProjectProperty(Job currentJob, String key) {
@@ -144,7 +144,7 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.BooleanProjectProperty} instance.
+     * @return {@link org.hudsonci.model.project.property.BooleanProjectProperty} instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static BooleanProjectProperty getBooleanProjectProperty(Job currentJob, String key) {
@@ -157,7 +157,7 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.IntegerProjectProperty} instance.
+     * @return {@link org.hudsonci.model.project.property.IntegerProjectProperty} instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static IntegerProjectProperty getIntegerProjectProperty(Job currentJob, String key) {
@@ -170,7 +170,7 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.LogRotatorProjectProperty} instance.
+     * @return {@link org.hudsonci.model.project.property.LogRotatorProjectProperty} instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static LogRotatorProjectProperty getLogRotatorProjectProperty(Job currentJob, String key) {
@@ -183,7 +183,7 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.DescribableListProjectProperty} instance.
+     * @return {@link org.hudsonci.model.project.property.DescribableListProjectProperty} instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static DescribableListProjectProperty getDescribableListProjectProperty(Job currentJob, String key) {
@@ -196,7 +196,7 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.AxisListProjectProperty} instance.
+     * @return {@link org.hudsonci.model.project.property.AxisListProjectProperty} instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static AxisListProjectProperty getAxesListProjectProperty(Job currentJob, String key) {
@@ -209,7 +209,7 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.SCMProjectProperty} instance.
+     * @return {@link org.hudsonci.model.project.property.SCMProjectProperty} instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static SCMProjectProperty getScmProjectProperty(Job currentJob, String key) {
@@ -222,7 +222,7 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.TriggerProjectProperty} instance.
+     * @return {@link org.hudsonci.model.project.property.TriggerProjectProperty} instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static TriggerProjectProperty getTriggerProjectProperty(Job currentJob, String key) {
@@ -236,7 +236,7 @@ public class CascadingUtil {
      * @param key key.
      * @param clazz required property class.
      * If class is not null and property was not found, property of given class will be created.
-     * @return {@link org.eclipse.hudson.api.model.IProjectProperty} instance or null.
+     * @return {@link org.hudsonci.api.model.IProjectProperty} instance or null.
      * @throws IllegalArgumentException if currentJob is null.
      */
     @SuppressWarnings("unchecked")
@@ -406,7 +406,7 @@ public class CascadingUtil {
     }
 
     /**
-     * Creates {@link org.eclipse.hudson.model.project.property.ExternalProjectProperty} based on Descriptors collection, StaplerRequest and JSON resonse.
+     * Creates {@link org.hudsonci.model.project.property.ExternalProjectProperty} based on Descriptors collection, StaplerRequest and JSON resonse.
      *
      * @param req StaplerRequest
      * @param json JSONObject

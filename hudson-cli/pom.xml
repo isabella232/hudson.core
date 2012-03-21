@@ -38,7 +38,7 @@
               <descriptorId>jar-with-dependencies</descriptorId>
               <archive>
                 <manifest>
-                  <mainClass>org.eclipse.hudson.cli.CLI</mainClass>
+                  <mainClass>hudson.cli.CLI</mainClass>
                 </manifest>
               </archive>
             </configuration>

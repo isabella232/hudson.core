@@ -13,10 +13,10 @@
  *     
  ********************************************************************************/
 
-package org.eclipse.hudson.inject.injecto.internal;
+package org.hudsonci.inject.injecto.internal;
 
-import org.eclipse.hudson.inject.injecto.Injectable;
-import static org.eclipse.hudson.inject.injecto.internal.InjectomaticAspectHelper.inject;
+import org.hudsonci.inject.injecto.Injectable;
+import static org.hudsonci.inject.injecto.internal.InjectomaticAspectHelper.inject;
 
 /**
  * Request injection for {@link Injectable} objects after they have been created.

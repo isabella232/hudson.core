@@ -48,7 +48,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.eclipse.hudson.cli.CliEntryPoint;
+import hudson.cli.CliEntryPoint;
 
 /**
  * Listens to incoming TCP connections from JNLP slave agents and CLI.

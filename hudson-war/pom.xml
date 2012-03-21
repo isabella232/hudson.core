@@ -29,8 +29,8 @@
     <name>Hudson :: War</name>
 
     <description>
-    Creates a war file. Also includes additional static web resources, such as images, CSS, JavaScript, and
-    some HTML files.
+        Creates a war file. Also includes additional static web resources, such as images, CSS, JavaScript, and
+        some HTML files.
     </description>
 
     <properties>
@@ -95,8 +95,8 @@
                          
                         <configuration>
                             <!-- Copy only the bootstrap class -->
-                             <includes>
-                                  **/Executable*
+                            <includes>
+                                **/Executable*
                             </includes>
                             <artifactItems>
                                                            
@@ -192,36 +192,63 @@
                                 <!-- bundled plugins -->
                                 
                                 <artifactItem>
+                                    <!--
                                     <groupId>org.eclipse.hudson.main</groupId>
                                     <artifactId>rest-plugin</artifactId>
                                     <version>3.0.0-2</version>
+                                    -->
+                                    
+                                    <groupId>org.jvnet.hudson.main</groupId>
+                                    <artifactId>rest-plugin</artifactId>
+                                    <version>2.1.2</version>
+    
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
                                     <destFileName>rest-plugin.hpi</destFileName>
                                 </artifactItem>
+                                
                                 <artifactItem>
+                                    <!--
                                     <groupId>org.eclipse.hudson.main</groupId>
                                     <artifactId>maven3-plugin</artifactId>
                                     <version>3.0.0-2</version>
+                                    -->
+                                    
+                                    <groupId>org.jvnet.hudson.main</groupId>
+                                    <artifactId>maven3-plugin</artifactId>
+                                    <version>2.2.0</version>
+    
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
                                     <destFileName>maven3-plugin.hpi</destFileName>
                                 </artifactItem>
                                 <artifactItem>
+                                    <!--
                                     <groupId>org.eclipse.hudson.main</groupId>
                                     <artifactId>maven3-snapshots</artifactId>
                                     <version>3.0.0-2</version>
+                                    -->
+                                    <groupId>org.jvnet.hudson.main</groupId>
+                                    <artifactId>maven3-snapshots</artifactId>
+                                    <version>2.2.0</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
                                     <destFileName>maven3-snapshots.hpi</destFileName>
                                 </artifactItem>
                                 <artifactItem>
+                                    <!--
                                     <groupId>org.eclipse.hudson.main</groupId>
                                     <artifactId>maven-plugin</artifactId>
                                     <version>3.0.0-1</version>
+                                    -->
+                                    
+                                    <groupId>org.hudsonci.plugins</groupId>
+                                    <artifactId>maven-plugin</artifactId>
+                                    <version>2.2.1</version>
+    
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -229,27 +256,48 @@
                                 </artifactItem>
                                                                                                                   
                                 <artifactItem>
+                                    <!--
                                     <groupId>org.eclipse.hudson.plugins</groupId>
                                     <artifactId>subversion</artifactId>
                                     <version>3.0.0-1</version>
+                                    -->
+                                    
+                                    <groupId>org.hudsonci.plugins</groupId>
+                                    <artifactId>subversion</artifactId>
+                                    <version>2.2.0_1</version>
+    
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
                                     <destFileName>subversion.hpi</destFileName>
                                 </artifactItem>
                                 <artifactItem>
+                                    <!--
                                     <groupId>org.eclipse.hudson.plugins</groupId>
                                     <artifactId>cvs</artifactId>
                                     <version>3.0.0</version>
+                                    -->
+                                    
+                                    <groupId>org.hudsonci.plugins</groupId>
+                                    <artifactId>cvs</artifactId>
+                                    <version>2.2.0</version>
+    
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
                                     <destFileName>cvs.hpi</destFileName>
                                 </artifactItem>
                                 <artifactItem>
+                                    <!--
                                     <groupId>org.eclipse.hudson.plugins</groupId>
                                     <artifactId>git</artifactId>
                                     <version>3.0.0</version>
+                                    -->
+                                    
+                                    <groupId>org.hudsonci.plugins</groupId>
+                                    <artifactId>git</artifactId>
+                                    <version>2.2.0</version>
+    
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -257,9 +305,15 @@
                                 </artifactItem>
  
                                 <artifactItem>
+                                    <!--
                                     <groupId>org.eclipse.hudson.plugins</groupId>
                                     <artifactId>ssh-slaves</artifactId>
                                     <version>3.0.0-1</version>
+                                    -->
+                                    
+                                    <groupId>org.hudsonci.plugins</groupId>
+                                    <artifactId>ssh-slaves</artifactId>
+                                    <version>2.1.1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
@@ -448,7 +502,7 @@
                             <!-- load view resources from the source directly, again for real time change -->
                             <name>stapler.resourcePath</name>
                             <value>
-                              ../hudson-core/src/main/resources
+                                ../hudson-core/src/main/resources
                             </value>
                         </systemProperty>
                         <systemProperty>
@@ -489,7 +543,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        
         <dependency>
             <groupId>org.eclipse.hudson.main</groupId>
             <artifactId>hudson-inject</artifactId>
