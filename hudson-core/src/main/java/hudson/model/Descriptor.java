@@ -463,6 +463,15 @@ public abstract class Descriptor<T extends Describable<T>> implements Saveable {
     public T newInstance(StaplerRequest req) throws FormException {
         throw new UnsupportedOperationException(getClass()+" should implement newInstance(StaplerRequest,JSONObject)");
     }
+    
+    /**
+     * @deprecated
+     *      Implement {@link #newInstance(StaplerRequest, JSONObject)} method instead.
+     *      Deprecated as of 3.0.0 
+     */
+    public T newInstance(org.kohsuke.stapler.StaplerRequest req, JSONObject formData) throws FormException {
+        return newInstance((StaplerRequest)req, formData);
+    }
 
     /**
      * Creates a configured instance from the submitted form.
@@ -612,6 +621,16 @@ public abstract class Descriptor<T extends Describable<T>> implements Saveable {
     public boolean configure( StaplerRequest req ) throws FormException {
         return true;
     }
+    
+     /**
+     * @deprecated
+     *      Use {@link #configure(StaplerRequest, JSONObject)} method instead.
+     *      Deprecated as of 3.0.0 
+     */
+    public boolean configure(org.kohsuke.stapler.StaplerRequest req, JSONObject formData) throws FormException {
+        return configure((StaplerRequest)req, formData);
+    }
+    
 
     /**
      * Invoked when the global configuration page is submitted.
