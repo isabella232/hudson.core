@@ -25,7 +25,7 @@ import java.util.List;
 
 import net.sf.json.JSONObject;
 
-import org.eclipse.hudson.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * {@link AuthorizationStrategy} that grants full-control to authenticated user

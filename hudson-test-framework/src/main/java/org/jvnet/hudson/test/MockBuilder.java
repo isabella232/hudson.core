@@ -25,7 +25,7 @@ import hudson.tasks.Builder;
 import java.io.IOException;
 
 import net.sf.json.JSONObject;
-import org.eclipse.hudson.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Forces the build result to be some pre-configured value.

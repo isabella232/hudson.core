@@ -35,8 +35,8 @@ import java.util.logging.Logger;
 import static java.util.logging.Level.WARNING;
 
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.hudson.stapler.HttpResponse;
-import org.eclipse.hudson.stapler.HttpResponses;
+import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.HttpResponses;
 
 import java.util.Enumeration;
 import java.util.jar.JarFile;

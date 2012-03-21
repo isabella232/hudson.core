@@ -24,7 +24,7 @@ import java.util.List;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import net.sf.json.JSONObject;
-import org.eclipse.hudson.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * {@link Descriptor} for {@link ToolInstallation}.

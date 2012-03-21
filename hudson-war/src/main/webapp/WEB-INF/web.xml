@@ -24,7 +24,7 @@
 
   <servlet>
     <servlet-name>Stapler</servlet-name>
-    <servlet-class>org.eclipse.hudson.stapler.Stapler</servlet-class>
+    <servlet-class>org.kohsuke.stapler.Stapler</servlet-class>
     <init-param>
       <param-name>default-encodings</param-name>
       <param-value>text/html=UTF-8</param-value>

@@ -16,7 +16,7 @@ package hudson.node_monitors;
 
 import hudson.model.Computer;
 import hudson.node_monitors.DiskSpaceMonitorDescriptor.DiskSpace;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.text.ParseException;
 import java.util.logging.Logger;

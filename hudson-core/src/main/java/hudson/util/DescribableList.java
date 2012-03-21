@@ -31,7 +31,7 @@ import hudson.model.Descriptor;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Saveable;
 import net.sf.json.JSONObject;
-import org.eclipse.hudson.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -129,7 +129,7 @@ public class DescribableList<T extends Describable<T>, D extends Descriptor<T>> 
      *
      * @param json Structured form data that includes the data for nested descriptor list.
      * @deprecated as of 2.2.0,
-     *             use {@link DescribableListUtil#buildFromJson(hudson.model.Saveable, org.eclipse.hudson.stapler.StaplerRequest, net.sf.json.JSONObject, java.util.List)}
+     *             use {@link DescribableListUtil#buildFromJson(hudson.model.Saveable, org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject, java.util.List)}
      */
     public void rebuild(StaplerRequest req, JSONObject json, List<? extends Descriptor<T>> descriptors)
         throws FormException, IOException {
@@ -162,8 +162,8 @@ public class DescribableList<T extends Describable<T>, D extends Descriptor<T>> 
      * significant.
      *
      * @deprecated as of 2.2.0,
-     *             use {@link DescribableListUtil#buildFromHetero(hudson.model.Saveable, org.eclipse.hudson.stapler.StaplerRequest, net.sf.json.JSONObject, String, java.util.Collection)}
-     *             or {@link Descriptor#newInstancesFromHeteroList(org.eclipse.hudson.stapler.StaplerRequest, net.sf.json.JSONObject, String, java.util.Collection)}
+     *             use {@link DescribableListUtil#buildFromHetero(hudson.model.Saveable, org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject, String, java.util.Collection)}
+     *             or {@link Descriptor#newInstancesFromHeteroList(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject, String, java.util.Collection)}
      */
     public void rebuildHetero(StaplerRequest req,
                               JSONObject formData,

@@ -23,8 +23,8 @@ import org.apache.commons.io.FileUtils;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 import org.jvnet.hudson.test.junit.GroupedTest;
-import org.eclipse.hudson.stapler.MetaClassLoader;
-import org.eclipse.hudson.stapler.jelly.JellyClassLoaderTearOff;
+import org.kohsuke.stapler.MetaClassLoader;
+import org.kohsuke.stapler.jelly.JellyClassLoaderTearOff;
 
 import java.io.File;
 import java.net.URL;

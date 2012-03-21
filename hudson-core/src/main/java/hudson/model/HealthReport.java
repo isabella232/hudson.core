@@ -20,8 +20,8 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import hudson.diagnosis.OldDataMonitor;
 import hudson.util.XStream2;
 import org.jvnet.localizer.Localizable;
-import org.eclipse.hudson.stapler.export.Exported;
-import org.eclipse.hudson.stapler.export.ExportedBean;
+import org.kohsuke.stapler.export.Exported;
+import org.kohsuke.stapler.export.ExportedBean;
 
 import java.io.*;
 import java.util.Collections;

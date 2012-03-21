@@ -25,7 +25,7 @@ import hudson.model.Label;
 import hudson.model.Node;
 import hudson.model.TaskListener;
 import java.io.IOException;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * An object which can ensure that a generic {@link ToolInstallation} in fact exists on a node.

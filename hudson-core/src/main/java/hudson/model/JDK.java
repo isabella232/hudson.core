@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.eclipse.hudson.stapler.DataBoundConstructor;
-import org.eclipse.hudson.stapler.QueryParameter;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 /**
  * Information about JDK installation.

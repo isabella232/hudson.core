@@ -23,8 +23,8 @@ import hudson.model.Computer;
 import hudson.model.Descriptor;
 import hudson.scheduler.CronTabList;
 import hudson.util.FormValidation;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
-import org.eclipse.hudson.stapler.QueryParameter;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;

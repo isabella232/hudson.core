@@ -18,7 +18,7 @@ package hudson;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.eclipse.hudson.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest;
 
 import javax.servlet.ServletException;
 import java.util.Collections;

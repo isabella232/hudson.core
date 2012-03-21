@@ -18,7 +18,7 @@ import javax.servlet.ServletRequest;
 
 import net.sf.json.JSONObject;
 
-import org.eclipse.hudson.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest;
 
 import hudson.Extension;
 import hudson.model.ModelObject;

@@ -22,10 +22,10 @@ import hudson.PluginWrapper;
 import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.security.Permission;
-import org.eclipse.hudson.stapler.Ancestor;
-import org.eclipse.hudson.stapler.Stapler;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.StaplerResponse;
+import org.kohsuke.stapler.Ancestor;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

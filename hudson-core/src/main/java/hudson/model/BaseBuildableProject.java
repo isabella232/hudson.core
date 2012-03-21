@@ -32,8 +32,8 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
 import org.eclipse.hudson.api.model.IBaseBuildableProject;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * Base buildable project.

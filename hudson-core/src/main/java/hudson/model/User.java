@@ -34,10 +34,10 @@ import net.sf.json.JSONObject;
 
 import org.springframework.security.Authentication;
 import org.springframework.security.providers.anonymous.AnonymousAuthenticationToken;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.StaplerResponse;
-import org.eclipse.hudson.stapler.export.Exported;
-import org.eclipse.hudson.stapler.export.ExportedBean;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.export.Exported;
+import org.kohsuke.stapler.export.ExportedBean;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 
 import javax.servlet.ServletException;

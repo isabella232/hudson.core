@@ -29,7 +29,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.hudson.stapler.Stapler;
+import org.kohsuke.stapler.Stapler;
 
 /**
  * History of {@link hudson.tasks.test.TestObject} over time.

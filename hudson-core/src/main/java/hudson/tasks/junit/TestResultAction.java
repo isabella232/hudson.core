@@ -25,7 +25,7 @@ import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestObject;
 import hudson.util.HeapSpaceStringConverter;
 import hudson.util.XStream2;
-import org.eclipse.hudson.stapler.StaplerProxy;
+import org.kohsuke.stapler.StaplerProxy;
 
 import java.io.File;
 import java.io.IOException;

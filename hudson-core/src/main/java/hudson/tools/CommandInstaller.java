@@ -23,8 +23,8 @@ import hudson.model.TaskListener;
 import hudson.tasks.CommandInterpreter;
 import hudson.util.FormValidation;
 import java.io.IOException;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
-import org.eclipse.hudson.stapler.QueryParameter;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 /**
  * Installs a tool by running an arbitrary shell command.

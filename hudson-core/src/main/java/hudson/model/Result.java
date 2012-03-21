@@ -24,7 +24,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.spi.*;
-import org.eclipse.hudson.stapler.export.CustomExportedBean;
+import org.kohsuke.stapler.export.CustomExportedBean;
 
 import java.io.Serializable;
 import java.util.ArrayList;

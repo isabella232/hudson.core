@@ -17,10 +17,10 @@
 package hudson.model;
 
 import hudson.search.Search;
-import org.eclipse.hudson.stapler.HttpResponse;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.StaplerResponse;
-import org.eclipse.hudson.stapler.export.Flavor;
+import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.export.Flavor;
 
 import javax.servlet.ServletException;
 import java.io.IOException;

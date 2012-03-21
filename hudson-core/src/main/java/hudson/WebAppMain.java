@@ -36,9 +36,9 @@ import hudson.util.HudsonFailedToLoad;
 import hudson.util.AWTProblem;
 import hudson.util.graph.ChartUtil;
 import org.jvnet.localizer.LocaleProvider;
-import org.eclipse.hudson.stapler.Stapler;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.jelly.JellyFacet;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.jelly.JellyFacet;
 import org.apache.tools.ant.types.FileSet;
 
 import javax.naming.Context;

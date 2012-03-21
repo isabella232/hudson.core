@@ -17,7 +17,7 @@
 package hudson.views;
 
 import hudson.Extension;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 public class WeatherColumn extends ListViewColumn {
     @DataBoundConstructor

@@ -36,8 +36,8 @@ import hudson.util.TimeUnit2;
 import hudson.util.SequentialExecutionQueue;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.jelly.XMLOutput;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,8 +55,8 @@ import java.util.logging.Logger;
 import java.text.DateFormat;
 
 import net.sf.json.JSONObject;
-import org.eclipse.hudson.stapler.QueryParameter;
-import org.eclipse.hudson.stapler.StaplerResponse;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerResponse;
 
 import static java.util.logging.Level.*;
 

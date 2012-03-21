@@ -20,9 +20,9 @@ import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
 import hudson.util.QuotedStringTokenizer;
 import org.kohsuke.args4j.Option;
-import org.eclipse.hudson.stapler.export.Flavor;
-import org.eclipse.hudson.stapler.export.Model;
-import org.eclipse.hudson.stapler.export.ModelBuilder;
+import org.kohsuke.stapler.export.Flavor;
+import org.kohsuke.stapler.export.Model;
+import org.kohsuke.stapler.export.ModelBuilder;
 
 import java.io.IOException;
 import java.io.PrintWriter;

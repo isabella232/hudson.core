@@ -19,8 +19,8 @@ package hudson.diagnosis;
 import hudson.model.AdministrativeMonitor;
 import hudson.model.Hudson;
 import hudson.Extension;
-import org.eclipse.hudson.stapler.StaplerRequest;
-import org.eclipse.hudson.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 import java.io.IOException;
 
