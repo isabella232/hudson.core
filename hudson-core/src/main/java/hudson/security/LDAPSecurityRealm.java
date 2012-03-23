@@ -58,6 +58,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.ldap.core.DirContextOperations;
+import org.springframework.ldap.core.support.DefaultDirObjectFactory;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.providers.AuthenticationProvider;
 import org.springframework.security.providers.ProviderManager;
@@ -327,15 +328,21 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
     }
 
     public synchronized SecurityComponents createSecurityComponents() {
-        
+        DefaultDirObjectFactory factory = new DefaultDirObjectFactory();
         DefaultSpringSecurityContextSource securityContextSource = new DefaultSpringSecurityContextSource(getLDAPURL());
         if (managerDN != null){
             securityContextSource.setUserDn(managerDN);
+            securityContextSource.setPassword(getManagerPassword());
         }
-        securityContextSource.setPassword(getManagerPassword());
         Map envProps = new HashMap();
         envProps.put(Context.REFERRAL, "follow");
+        securityContextSource.setDirObjectFactory(factory.getClass ());
         securityContextSource.setBaseEnvironmentProperties(envProps);
+        try {
+            securityContextSource.afterPropertiesSet();
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING,"Failed to set security Context for LDAP Server " + server, ex);
+        }
         
         ldapTemplate = new SpringSecurityLdapTemplate(securityContextSource);
         
@@ -352,8 +359,7 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
         
         
         // talk to LDAP
-        LdapAuthenticationProvider LdapAuthenticationProvider = new LdapAuthenticationProvider(bindAuthenticator, authoritiesPopulator);
-                
+        LdapAuthenticationProvider ldapAuthenticationProvider = new LdapAuthenticationProvider(bindAuthenticator, authoritiesPopulator);  
         
         // these providers apply everywhere
         RememberMeAuthenticationProvider rememberMeAuthenticationProvider = new RememberMeAuthenticationProvider();
@@ -366,7 +372,7 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
         anonymousAuthenticationProvider.setKey("anonymous");
 
         AuthenticationProvider[] authenticationProvider = {
-            LdapAuthenticationProvider,
+            ldapAuthenticationProvider,
             rememberMeAuthenticationProvider,
             anonymousAuthenticationProvider
         };
