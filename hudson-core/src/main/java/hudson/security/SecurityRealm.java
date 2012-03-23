@@ -455,6 +455,7 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
         AnonymousProcessingFilter anonymousProcessingFilter = new AnonymousProcessingFilter();
         anonymousProcessingFilter.setKey("anonymous"); // must match with the AnonymousProvider
         UserAttribute userAttribute = new UserAttribute();
+        userAttribute.setPassword("anonymous");
         String authorities = "anonymous, ROLE_ANONYMOUS";
         userAttribute.setAuthoritiesAsString(Arrays.asList(authorities));
         anonymousProcessingFilter.setUserAttribute(userAttribute);
