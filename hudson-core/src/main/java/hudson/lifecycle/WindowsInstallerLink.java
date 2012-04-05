@@ -36,6 +36,8 @@ import org.apache.tools.ant.types.FileSet;
 import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.net.URL;
@@ -100,7 +102,10 @@ public class WindowsInstallerLink extends ManagementLink {
                 sendError(".NET Framework 2.0 or later is required for this feature", req, rsp);
             }
         } catch (NativeAccessException exc) {
-            sendError("Native function isDotNetInstalled() failed. " + NativeUtils.getInstance().getLastWindowsError(), req, rsp);
+            StringWriter stWriter = new StringWriter();
+            PrintWriter writer = new PrintWriter(stWriter);
+            exc.printStackTrace(writer);
+            sendError("Native function isDotNetInstalled() failed. " + stWriter.toString(), req, rsp);
         }
 
 
