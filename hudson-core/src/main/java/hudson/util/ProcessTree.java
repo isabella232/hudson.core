@@ -55,10 +55,8 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.Arrays;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import static java.util.logging.Level.FINER;
-import static java.util.logging.Level.FINEST;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a snapshot of the process tree of the current system.
@@ -88,6 +86,8 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
 
     // instantiation only allowed for subtypes in this class
     private ProcessTree() {}
+    
+    private static Logger logger = LoggerFactory.getLogger(ProcessTree.class);
 
     /**
      * Gets the process given a specific ID, or null if no such process exists.
@@ -132,7 +132,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
      * Either of the parameter can be null.
      */
     public void killAll(Process proc, Map<String, String> modelEnvVars) throws InterruptedException {
-        LOGGER.fine("killAll: process="+proc+" and envs="+modelEnvVars);
+        logger.info("killAll: process=" + proc + " and envs=" + modelEnvVars);
         OSProcess p = get(proc);
         if(p!=null) p.killRecursively();
         if(modelEnvVars!=null)
@@ -151,7 +151,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                     }
                 });
             } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Failed to obtain killers",e);
+                logger.info("Failed to obtain killers",e);
                 killers = Collections.emptyList();
             }
         return killers;
@@ -204,7 +204,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                     if (killer.kill(this))
                         break;
                 } catch (IOException e) {
-                    LOGGER.log(Level.WARNING, "Failed to kill pid="+getPid(),e);
+                    logger.info("Failed to kill pid="+getPid(),e);
                 }
         }
 
@@ -339,7 +339,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
             if(os.equals("Mac OS X"))
                 return new Darwin(nativeUtils);
         } catch (LinkageError e) {
-            LOGGER.log(Level.WARNING,"Failed to load winp. Reverting to the default",e);
+            logger.warn("Failed to load winp. Reverting to the default",e);
             enabled = false;
         }
 
@@ -407,12 +407,12 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                         }
 
                         public void killRecursively() {
-                            LOGGER.finer("Killing recursively " + getPid());
+                            logger.trace("Killing recursively " + getPid());
                             p.killRecursively();
                         }
 
                         public void kill() throws InterruptedException {
-                            LOGGER.finer("Killing " + getPid());
+                            logger.trace("Killing " + getPid());
                             p.kill();
                             killByKiller();
                         }
@@ -432,7 +432,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
 
                 }
             } catch (NativeAccessException exc) {
-                LOGGER.log(Level.WARNING,"Failed to fetch Windows Native Processes", exc);
+                logger.warn("Failed to fetch Windows Native Processes", exc);
             }
         }
 
@@ -441,7 +441,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
             try {
                 return get(nativeUtils.getWindowsProcessId(proc));
             } catch (NativeAccessException exc) {
-                LOGGER.log(Level.WARNING,"Failed to get Windows Native Process", exc);
+                logger.warn("Failed to get Windows Native Process", exc);
             }
             return null;
         }
@@ -451,7 +451,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                 if (p.getPid() < 10) {
                     continue;   // ignore system processes like "idle process"
                 }
-                LOGGER.finest("Considering to kill " + p.getPid());
+                logger.trace("Considering to kill " + p.getPid());
 
                 boolean matched;
                 
@@ -459,14 +459,14 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                     matched = p.hasMatchingEnvVars(modelEnvVars);
                 } catch (NativeAccessException e) {
                     // likely a missing privilege
-                    LOGGER.log(FINEST, "  Failed to check environment variable match", e);
+                    logger.trace( "  Failed to check environment variable match", e);
                     continue;
                 }
 
                 if (matched) {
                     p.killRecursively();
                 } else {
-                    LOGGER.finest("Environment variable didn't match");
+                    logger.trace("Environment variable didn't match");
                 }
 
             }
@@ -502,7 +502,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                 }
             });
             if(processes==null) {
-                LOGGER.info("No /proc");
+                logger.info("No /proc");
                 return;
             }
 
@@ -543,7 +543,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
         public void kill() throws InterruptedException {
             try {
                 int pid = getPid();
-                LOGGER.fine("Killing pid="+pid);
+                logger.trace("Killing pid="+pid);
                 UnixReflection.DESTROY_PROCESS.invoke(null, pid);
             } catch (IllegalAccessException e) {
                 // this is impossible
@@ -555,13 +555,13 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                 if(e.getTargetException() instanceof Error)
                     throw (Error)e.getTargetException();
                 // otherwise log and let go. I need to see when this happens
-                LOGGER.log(Level.INFO, "Failed to terminate pid="+getPid(),e);
+                logger.info( "Failed to terminate pid="+getPid(),e);
             }
             killByKiller();
         }
 
         public void killRecursively() throws InterruptedException {
-            LOGGER.fine("Recursively killing pid="+getPid());
+            logger.trace("Recursively killing pid="+getPid());
             for (OSProcess p : getChildren())
                 p.killRecursively();
             kill();
@@ -791,8 +791,8 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
 
                 try {
                     RandomAccessFile as = new RandomAccessFile(getFile("as"),"r");
-                    if(LOGGER.isLoggable(FINER))
-                        LOGGER.finer("Reading "+getFile("as"));
+                    if(logger.isTraceEnabled())
+                        logger.trace("Reading "+getFile("as"));
                     try {
                         for( int n=0; n<argc; n++ ) {
                             // read a pointer to one entry
@@ -820,8 +820,8 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
 
                 try {
                     RandomAccessFile as = new RandomAccessFile(getFile("as"),"r");
-                    if(LOGGER.isLoggable(FINER))
-                        LOGGER.finer("Reading "+getFile("as"));
+                    if(logger.isTraceEnabled())
+                        logger.trace("Reading "+getFile("as"));
                     try {
                         for( int n=0; ; n++ ) {
                             // read a pointer to one entry
@@ -845,21 +845,21 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
             }
 
             private String readLine(RandomAccessFile as, int p, String prefix) throws IOException {
-                if(LOGGER.isLoggable(FINEST))
-                    LOGGER.finest("Reading "+prefix+" at "+p);
+                if(logger.isTraceEnabled())
+                    logger.trace("Reading "+prefix+" at "+p);
 
                 as.seek(to64(p));
                 ByteArrayOutputStream buf = new ByteArrayOutputStream();
                 int ch,i=0;
                 while((ch=as.read())>0) {
-                    if((++i)%100==0 && LOGGER.isLoggable(FINEST))
-                        LOGGER.finest(prefix +" is so far "+buf.toString());
+                    if((++i)%100==0 && logger.isTraceEnabled())
+                        logger.trace(prefix +" is so far "+buf.toString());
 
                     buf.write(ch);
                 }
                 String line = buf.toString();
-                if(LOGGER.isLoggable(FINEST))
-                    LOGGER.finest(prefix+" was "+line);
+                if(logger.isTraceEnabled())
+                    logger.trace(prefix+" was "+line);
                 return line;
             }
         }
@@ -893,12 +893,18 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
 
         Darwin(NativeUtils nativeUtils) {
             this.nativeUtils = nativeUtils;
-            try {
+             try {
                 for (final NativeProcess process : nativeUtils.getMacProcesses()) {
-                    super.processes.put(process.getPid(), new DarwinProcess(process));
+                    try {
+                        super.processes.put(process.getPid(), new DarwinProcess(process));
+                    } catch (NativeAccessException exc) {
+                        // We may have access permission, skip and get rest of the process
+                        logger.warn("Failed to fecth Native Mac Processes", exc.getLocalizedMessage());
+                    }
                 }
             } catch (NativeAccessException exc) {
-                LOGGER.log(Level.WARNING, "Failed to fecth Native Mac Processes", nativeUtils.getLastMacError());
+                // Don't fail if the Native Mac access plugin is not installed. 
+                logger.warn( "Failed to fecth Native Mac Processes", exc.getLocalizedMessage());
             }
         }
 
@@ -1052,7 +1058,6 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
      */
 
     private static final boolean IS_LITTLE_ENDIAN = "little".equals(System.getProperty("sun.cpu.endian"));
-    private static final Logger LOGGER = Logger.getLogger(ProcessTree.class.getName());
 
     /**
      * Flag to control this feature.
