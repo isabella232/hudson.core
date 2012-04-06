@@ -1,32 +1,36 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
  * Copyright (c) 2011, Oracle Corporation.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *    Winston Prakash
- *      
+ * Winston Prakash
  *
- *******************************************************************************/
+ *
+ ******************************************************************************
+ */
 package hudson.util.jna;
 
-import hudson.DescriptorExtensionList;
 import hudson.model.Descriptor;
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A Native Support Utility (singleton) that delegates the actions to available Native Support Extensions
+ * A Native Support Utility (singleton) that delegates the actions to available
+ * Native Support Extensions
+ *
  * @since 3.0.0
  * @see NativeAccessSupport, ZfsSupport
  */
@@ -36,7 +40,7 @@ public class NativeUtils implements Serializable {
     private NativeUnixSupport nativeUnixSupport;
     private NativeWindowsSupport nativeWindowsSupport;
     private NativeMacSupport nativeMacSupport;
-    private static final Logger LOGGER = Logger.getLogger(NativeUtils.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(NativeUtils.class);
 
     /**
      * Delay Instance creation until NativeUtils.getInstance() is called
@@ -47,29 +51,85 @@ public class NativeUtils implements Serializable {
     }
 
     private NativeUtils() {
-        try {
-            DescriptorExtensionList<NativeUnixSupport, Descriptor<NativeUnixSupport>> unixSupportDescriptors = NativeUnixSupport.all();
-            if (null != unixSupportDescriptors && !unixSupportDescriptors.isEmpty()) {
-                nativeUnixSupport = unixSupportDescriptors.get(0).newInstance(null, null);
-            }
-
-            DescriptorExtensionList<NativeWindowsSupport, Descriptor<NativeWindowsSupport>> windowsSupportDescriptors = NativeWindowsSupport.all();
-            if (null != windowsSupportDescriptors && !windowsSupportDescriptors.isEmpty()) {
-                nativeWindowsSupport = windowsSupportDescriptors.get(0).newInstance(null, null);
-            }
-
-            DescriptorExtensionList<NativeMacSupport, Descriptor<NativeMacSupport>> macSupportDescriptors = NativeMacSupport.all();
-            if (null != macSupportDescriptors && !macSupportDescriptors.isEmpty()) {
-                nativeMacSupport = macSupportDescriptors.get(0).newInstance(null, null);
-            }
-
-            DescriptorExtensionList<NativeZfsSupport, Descriptor<NativeZfsSupport>> zfsSupportDescriptors = NativeZfsSupport.all();
-            if (null != zfsSupportDescriptors && !zfsSupportDescriptors.isEmpty()) {
-                nativeZfsSupport = zfsSupportDescriptors.get(0).newInstance(null, null);
-            }
-        } catch (Exception ex) {
-            LOGGER.log(Level.FINE, null, ex);
+      try{
+        List<NativeUnixSupport> nativeUnixSupports = getAvailableNativeUnixSupports();
+        if (nativeUnixSupports.size() > 0) {
+            nativeUnixSupport = nativeUnixSupports.get(0);
         }
+
+        List<NativeWindowsSupport> nativeWindowsSupports = getAvailableNativeWindowSupports();
+        if (nativeWindowsSupports.size() > 0) {
+            nativeWindowsSupport = nativeWindowsSupports.get(0);
+        }
+
+        List<NativeMacSupport> nativeMacSupports = getAvailableNativeMacSupports();
+        if (nativeMacSupports.size() > 0) {
+            nativeMacSupport = nativeMacSupports.get(0);
+        }
+        List<NativeZfsSupport> nativeZfsSupports = getAvailableNativeZfsSupports();
+        if (nativeZfsSupports.size() > 0) {
+            nativeZfsSupport = nativeZfsSupports.get(0);
+        }
+      }catch (Exception exc){
+          logger.info("Error getting Native Support Extensions", exc);
+      }
+
+    }
+
+    private List<NativeUnixSupport> getAvailableNativeUnixSupports() {
+        List<NativeUnixSupport> nativeUnixSupports = new ArrayList<NativeUnixSupport>();
+        if (NativeUnixSupport.all() != null && !NativeUnixSupport.all().isEmpty()) {
+            for (Descriptor<NativeUnixSupport> nativeUnixSupport : NativeUnixSupport.all()) {
+                try {
+                    nativeUnixSupports.add(nativeUnixSupport.newInstance(null, null));
+                } catch (Throwable exc) {
+                    logger.info("Failed to instantiate Native Unix Support - " + nativeUnixSupport.getDisplayName());
+                }
+            }
+        }
+        return nativeUnixSupports;
+    }
+
+    private List<NativeWindowsSupport> getAvailableNativeWindowSupports() {
+        List<NativeWindowsSupport> nativeWindowsSupports = new ArrayList<NativeWindowsSupport>();
+        if (NativeWindowsSupport.all() != null && !NativeWindowsSupport.all().isEmpty()) {
+            for (Descriptor<NativeWindowsSupport> nativeWindowsSupport : NativeWindowsSupport.all()) {
+                try {
+                    nativeWindowsSupports.add(nativeWindowsSupport.newInstance(null, null));
+                } catch (Throwable exc) {
+                    logger.info("Failed to instantiate Native Window Support - " + nativeWindowsSupport.getDisplayName());
+                }
+            }
+        }
+        return nativeWindowsSupports;
+    }
+
+    private List<NativeMacSupport> getAvailableNativeMacSupports() {
+        List<NativeMacSupport> nativeMacSupports = new ArrayList<NativeMacSupport>();
+        if (NativeMacSupport.all() != null && !NativeMacSupport.all().isEmpty()) {
+            for (Descriptor<NativeMacSupport> nativeMacSupport : NativeMacSupport.all()) {
+                try {
+                    nativeMacSupports.add(nativeMacSupport.newInstance(null, null));
+                } catch (Throwable exc) {
+                    logger.info("Failed to instantiate Native Mac Support - " + nativeMacSupport.getDisplayName());
+                }
+            }
+        }
+        return nativeMacSupports;
+    }
+
+    private List<NativeZfsSupport> getAvailableNativeZfsSupports() {
+        List<NativeZfsSupport> nativeZfsSupports = new ArrayList<NativeZfsSupport>();
+        if (NativeZfsSupport.all() != null && !NativeZfsSupport.all().isEmpty()) {
+            for (Descriptor<NativeZfsSupport> nativeZfsSupport : NativeZfsSupport.all()) {
+                try {
+                    nativeZfsSupports.add(nativeZfsSupport.newInstance(null, null));
+                } catch (Throwable exc) {
+                    logger.info("Failed to instantiate Native Zfs Support - " + nativeZfsSupport.getDisplayName());
+                }
+            }
+        }
+        return nativeZfsSupports;
     }
 
     public static NativeUtils getInstance() {
@@ -78,7 +138,8 @@ public class NativeUtils implements Serializable {
 
     /**
      * Check if any Native Unix Support plugin is installed
-     * @return 
+     *
+     * @return
      */
     public boolean hasUnixSupport() {
         return nativeUnixSupport != null;
@@ -86,7 +147,8 @@ public class NativeUtils implements Serializable {
 
     /**
      * Check if any Native Windows Support plugin is installed
-     * @return 
+     *
+     * @return
      */
     public boolean hasWindowsSupport() {
         return nativeWindowsSupport != null;
@@ -94,7 +156,8 @@ public class NativeUtils implements Serializable {
 
     /**
      * Check if any Native Mac Support plugin is installed
-     * @return 
+     *
+     * @return
      */
     public boolean hasMacSupport() {
         return nativeMacSupport != null;
@@ -102,7 +165,8 @@ public class NativeUtils implements Serializable {
 
     /**
      * Check if any Native ZFS Support plugin is installed
-     * @return 
+     *
+     * @return
      */
     public boolean hasZfsSupport() {
         return nativeZfsSupport != null;
@@ -146,10 +210,11 @@ public class NativeUtils implements Serializable {
 
     /**
      * Do the Unix style chmod (change file permission) on a File
+     *
      * @param file
      * @param mask
      * @return true if the function executed successfully
-     * @throws hudson.util.jna.Native.ExecutionError 
+     * @throws hudson.util.jna.Native.ExecutionError
      */
     public boolean chmod(File file, int mask) throws NativeAccessException {
         ensureUnixSupport(NativeFunction.CHMOD);
@@ -158,10 +223,11 @@ public class NativeUtils implements Serializable {
 
     /**
      * Do the Unix style chown (change Owner permission) on a File
+     *
      * @param file
      * @param mask
      * @return true if the function executed successfully
-     * @throws hudson.util.jna.Native.ExecutionError 
+     * @throws hudson.util.jna.Native.ExecutionError
      */
     public boolean chown(File file, int uid, int gid) throws NativeAccessException {
         ensureUnixSupport(NativeFunction.CHOWN);
@@ -171,9 +237,10 @@ public class NativeUtils implements Serializable {
 
     /**
      * Get the Unix style mode (file permission) of a file
+     *
      * @param file
      * @return
-     * @throws hudson.util.jna.Native.ExecutionError 
+     * @throws hudson.util.jna.Native.ExecutionError
      */
     public int mode(File file) throws NativeAccessException {
         ensureUnixSupport(NativeFunction.MODE);
@@ -181,20 +248,22 @@ public class NativeUtils implements Serializable {
     }
 
     /**
-     * Get the name of the user who started this Java process 
+     * Get the name of the user who started this Java process
+     *
      * @return
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public String getProcessUser() throws NativeAccessException {
-        ensureUnixSupport(NativeFunction.MODE);
+        ensureUnixSupport(NativeFunction.UNIX_USER);
         return nativeUnixSupport.getProcessUser();
     }
 
     /**
-     * Make the file writable with native operation 
+     * Make the file writable with native operation
+     *
      * @param file
      * @return true if the operation is successful
-     * @throws hudson.util.jna.Native.ExecutionError 
+     * @throws hudson.util.jna.Native.ExecutionError
      */
     public boolean makeFileWritable(File file) throws NativeAccessException {
         ensureUnixSupport(NativeFunction.FILE_WRITABLE);
@@ -202,11 +271,12 @@ public class NativeUtils implements Serializable {
     }
 
     /**
-     * Create Unix style symlink 
+     * Create Unix style symlink
+     *
      * @param targetPath
      * @param file
      * @return true if the operation is successful
-     * @throws hudson.util.jna.Native.ExecutionError 
+     * @throws hudson.util.jna.Native.ExecutionError
      */
     public boolean createSymlink(String targetPath, File file) throws NativeAccessException {
         ensureUnixSupport(NativeFunction.SYMLINK);
@@ -214,11 +284,13 @@ public class NativeUtils implements Serializable {
     }
 
     /**
-     * Resolves symlink, if the given file is a symlink on a Unix System. Otherwise return null.
+     * Resolves symlink, if the given file is a symlink on a Unix System.
+     * Otherwise return null.
+     *
      * @param targetPath
      * @param file
      * @return String the resolved file path
-     * @throws hudson.util.jna.Native.ExecutionError 
+     * @throws hudson.util.jna.Native.ExecutionError
      */
     public String resolveSymlink(File file) throws NativeAccessException {
         ensureUnixSupport(NativeFunction.RESOLVE_LINK);
@@ -227,8 +299,9 @@ public class NativeUtils implements Serializable {
 
     /**
      * Get the information about the System Memory
+     *
      * @return
-     * @throws hudson.util.jna.Native.ExecutionError 
+     * @throws hudson.util.jna.Native.ExecutionError
      */
     public NativeSystemMemory getSystemMemory() throws NativeAccessException {
         ensureUnixSupport(NativeFunction.SYSTEM_MEMORY);
@@ -237,8 +310,9 @@ public class NativeUtils implements Serializable {
 
     /**
      * Get the effective User ID on a Unix System
+     *
      * @return
-     * @throws hudson.util.jna.Native.ExecutionError 
+     * @throws hudson.util.jna.Native.ExecutionError
      */
     public int getEuid() throws NativeAccessException {
         ensureUnixSupport(NativeFunction.EUID);
@@ -247,8 +321,9 @@ public class NativeUtils implements Serializable {
 
     /**
      * Get the effective Group ID on a Unix System
+     *
      * @return
-     * @throws hudson.util.jna.Native.ExecutionError 
+     * @throws hudson.util.jna.Native.ExecutionError
      */
     public int getEgid() throws NativeAccessException {
         ensureUnixSupport(NativeFunction.EGID);
@@ -257,9 +332,10 @@ public class NativeUtils implements Serializable {
 
     /**
      * Check if this Unix user exists on the machine where this program runs
+     *
      * @param userName
      * @return
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public boolean checkUnixUser(String userName) throws NativeAccessException {
         ensureUnixSupport(NativeFunction.UNIX_USER);
@@ -268,9 +344,10 @@ public class NativeUtils implements Serializable {
 
     /**
      * Check if this Unix group exists on the machine where this program runs
+     *
      * @param userName
      * @return
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public boolean checkUnixGroup(String groupName) throws NativeAccessException {
         ensureUnixSupport(NativeFunction.UNIX_GROUP);
@@ -279,10 +356,11 @@ public class NativeUtils implements Serializable {
 
     /**
      * Authenticate using Using Unix Pluggable Authentication Modules (PAM)
+     *
      * @param userName
      * @param password
      * @return List<String> list of groups to which this user belongs
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public Set<String> pamAuthenticate(String serviceName, String userName, String password) throws NativeAccessException {
         ensureUnixSupport(NativeFunction.PAM);
@@ -290,9 +368,11 @@ public class NativeUtils implements Serializable {
     }
 
     /**
-     * Check if PAM Authentication available in the machine where this program runs
+     * Check if PAM Authentication available in the machine where this program
+     * runs
+     *
      * @return Message corresponding to the availability of PAM
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public String checkPamAuthentication() throws NativeAccessException {
         ensureUnixSupport(NativeFunction.PAM);
@@ -301,7 +381,8 @@ public class NativeUtils implements Serializable {
 
     /**
      * Restart current Java process (JVM in which this application is running)
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     *
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public void restartJavaProcess(Map<String, String> properties, boolean asDaemon) throws NativeAccessException {
         ensureUnixSupport(NativeFunction.JAVA_RESTART);
@@ -310,7 +391,8 @@ public class NativeUtils implements Serializable {
 
     /**
      * Check if this Java process can be restarted
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     *
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public boolean canRestartJavaProcess() throws NativeAccessException {
         ensureUnixSupport(NativeFunction.JAVA_RESTART);
@@ -319,6 +401,7 @@ public class NativeUtils implements Serializable {
 
     /**
      * Get the error associated with the last Native Unix Operation
+     *
      * @return String error message
      */
     public String getLastUnixError() {
@@ -330,8 +413,9 @@ public class NativeUtils implements Serializable {
 
     /**
      * Check if .NET is installed on a the Windows machine
+     *
      * @return true if .NET is installed.
-     * @throws hudson.util.jna.Native.ExecutionError 
+     * @throws hudson.util.jna.Native.ExecutionError
      */
     public boolean isDotNetInstalled(int major, int minor) throws NativeAccessException {
         ensureWindowsSupport(NativeFunction.DOTNET);
@@ -340,8 +424,9 @@ public class NativeUtils implements Serializable {
 
     /**
      * Get all the native processes on a Windows System
+     *
      * @return List of Native Window Processes
-     * @throws hudson.util.jna.Native.ExecutionError 
+     * @throws hudson.util.jna.Native.ExecutionError
      */
     public List<NativeProcess> getWindowsProcesses() throws NativeAccessException {
         ensureWindowsSupport(NativeFunction.WINDOWS_PROCESS);
@@ -350,6 +435,7 @@ public class NativeUtils implements Serializable {
 
     /**
      * Find the Native Process Id of the given java.lang.process
+     *
      * @param process (java.lang.process)
      * @return pid, the Native Process ID
      */
@@ -360,12 +446,13 @@ public class NativeUtils implements Serializable {
 
     /**
      * Run the Windows program natively in an elevated privilege
+     *
      * @param winExe, windows executable to run
      * @param args, arguments to pass
      * @param logFile, File where the logs of the process should go
      * @param pwd, Path of the working directory
      * @return int, process exit code
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public int windowsExec(File winExe, String args, String logFile, File pwd) throws NativeAccessException {
         ensureWindowsSupport(NativeFunction.WINDOWS_EXEC);
@@ -374,10 +461,11 @@ public class NativeUtils implements Serializable {
 
     /**
      * Move a Windows File using native win32 library
+     *
      * @param fromFile
      * @param toFile
      * @return
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public void windowsMoveFile(File fromFile, File toFile) throws NativeAccessException {
         ensureWindowsSupport(NativeFunction.WINDOWS_FILE_MOVE);
@@ -386,6 +474,7 @@ public class NativeUtils implements Serializable {
 
     /**
      * Get the error associated with the last Native Unix Operation
+     *
      * @return String error message
      */
     public String getLastWindowsError() {
@@ -397,29 +486,29 @@ public class NativeUtils implements Serializable {
 
     /**
      * Get the Native processes of a Mac System
+     *
      * @return
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public List<NativeProcess> getMacProcesses() throws NativeAccessException {
-        ensureMacSupport(NativeFunction.WINDOWS_FILE_MOVE);
+        ensureMacSupport(NativeFunction.MAC_PROCESS);
         return nativeMacSupport.getMacProcesses();
     }
 
     /**
      * Get the error associated with the last Native Unix Operation
+     *
      * @return String error message
      */
     public String getLastMacError() {
-        if (!hasMacSupport()) {
-            return "Native Mac Support plugin not installed";
-        }
         return nativeMacSupport.getLastError();
     }
 
     /**
      * Fetch the list of mounted ZFS roots
+     *
      * @return
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public List<NativeZfsFileSystem> getZfsRoots() throws NativeAccessException {
         ensureZfsSupport(NativeFunction.ZFS);
@@ -428,30 +517,33 @@ public class NativeUtils implements Serializable {
 
     /**
      * Find the ZFS File System by its mount point
+     *
      * @return
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public NativeZfsFileSystem getZfsByMountPoint(File mountPoint) throws NativeAccessException {
         ensureZfsSupport(NativeFunction.ZFS);
         return nativeZfsSupport.getZfsByMountPoint(mountPoint);
     }
 
-    /** 
+    /**
      * Create ZFS File System corresponding to the mount name
+     *
      * @param mountPoint
      * @return ZFS File System if created successfully
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public NativeZfsFileSystem createZfs(String mountName) throws NativeAccessException {
         ensureZfsSupport(NativeFunction.ZFS);
         return nativeZfsSupport.createZfs(mountName);
     }
 
-    /** 
-     * Open the target ZFS File System 
+    /**
+     * Open the target ZFS File System
+     *
      * @param mountPoint
      * @return ZFS File System if opened successfully
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public NativeZfsFileSystem openZfs(String target) throws NativeAccessException {
         ensureZfsSupport(NativeFunction.ZFS);
@@ -460,9 +552,10 @@ public class NativeUtils implements Serializable {
 
     /**
      * Check if the named ZFS exists
+     *
      * @param zfsName
      * @return
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     public boolean zfsExists(String zfsName) throws NativeAccessException {
         ensureZfsSupport(NativeFunction.ZFS);
@@ -471,6 +564,7 @@ public class NativeUtils implements Serializable {
 
     /**
      * Get the error associated with the last Native Unix Operation
+     *
      * @return String error message
      */
     public String getLastZfsError() {
