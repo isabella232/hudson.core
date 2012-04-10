@@ -437,7 +437,7 @@ public abstract class AbstractBuild<P extends AbstractProject<P,R>,R extends Abs
                     listener.getLogger().println();
                 }
 
-                // kill run-away processes that are left
+                // kill run-away processes that are left by build
                 // use multiple environment variables so that people can escape this massacre by overriding an environment
                 // variable for some processes
                 launcher.kill(getCharacteristicEnvVars());

@@ -132,7 +132,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
      * Either of the parameter can be null.
      */
     public void killAll(Process proc, Map<String, String> modelEnvVars) throws InterruptedException {
-        logger.info("killAll: process=" + proc + " and envs=" + modelEnvVars);
+        logger.info("killAll (process started by build): process=" + proc + " and envs=" + modelEnvVars);
         OSProcess p = get(proc);
         if(p!=null) p.killRecursively();
         if(modelEnvVars!=null)
@@ -151,7 +151,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                     }
                 });
             } catch (IOException e) {
-                logger.info("Failed to obtain killers",e);
+                logger.info("Failed to obtain killers (process started by build) ",e);
                 killers = Collections.emptyList();
             }
         return killers;
@@ -204,7 +204,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                     if (killer.kill(this))
                         break;
                 } catch (IOException e) {
-                    logger.info("Failed to kill pid="+getPid(),e);
+                    logger.info("Failed to kill the process started by process - "+getPid(),e);
                 }
         }
 
@@ -407,12 +407,12 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                         }
 
                         public void killRecursively() {
-                            logger.trace("Killing recursively " + getPid());
+                            logger.debug("Killing recursively process started by build" + getPid());
                             p.killRecursively();
                         }
 
                         public void kill() throws InterruptedException {
-                            logger.trace("Killing " + getPid());
+                            logger.debug("Killing process started by build" + getPid());
                             p.kill();
                             killByKiller();
                         }
@@ -451,7 +451,6 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                 if (p.getPid() < 10) {
                     continue;   // ignore system processes like "idle process"
                 }
-                logger.trace("Considering to kill " + p.getPid());
 
                 boolean matched;
                 
@@ -459,16 +458,14 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                     matched = p.hasMatchingEnvVars(modelEnvVars);
                 } catch (NativeAccessException e) {
                     // likely a missing privilege
-                    logger.trace( "  Failed to check environment variable match", e);
+                    logger.debug( "  Failed to check environment variable match", e);
                     continue;
                 }
 
                 if (matched) {
+                    logger.debug("Killing process started by build " + p.getPid());
                     p.killRecursively();
-                } else {
-                    logger.trace("Environment variable didn't match");
-                }
-
+                }  
             }
         }
     }
@@ -543,7 +540,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
         public void kill() throws InterruptedException {
             try {
                 int pid = getPid();
-                logger.trace("Killing pid="+pid);
+                logger.debug("Killing pid="+pid);
                 UnixReflection.DESTROY_PROCESS.invoke(null, pid);
             } catch (IllegalAccessException e) {
                 // this is impossible
@@ -561,7 +558,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
         }
 
         public void killRecursively() throws InterruptedException {
-            logger.trace("Recursively killing pid="+getPid());
+            logger.debug("Recursively killing pid="+getPid());
             for (OSProcess p : getChildren())
                 p.killRecursively();
             kill();
@@ -792,7 +789,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                 try {
                     RandomAccessFile as = new RandomAccessFile(getFile("as"),"r");
                     if(logger.isTraceEnabled())
-                        logger.trace("Reading "+getFile("as"));
+                        logger.debug("Reading "+getFile("as"));
                     try {
                         for( int n=0; n<argc; n++ ) {
                             // read a pointer to one entry
@@ -821,7 +818,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                 try {
                     RandomAccessFile as = new RandomAccessFile(getFile("as"),"r");
                     if(logger.isTraceEnabled())
-                        logger.trace("Reading "+getFile("as"));
+                        logger.debug("Reading "+getFile("as"));
                     try {
                         for( int n=0; ; n++ ) {
                             // read a pointer to one entry
@@ -846,20 +843,20 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
 
             private String readLine(RandomAccessFile as, int p, String prefix) throws IOException {
                 if(logger.isTraceEnabled())
-                    logger.trace("Reading "+prefix+" at "+p);
+                    logger.debug("Reading "+prefix+" at "+p);
 
                 as.seek(to64(p));
                 ByteArrayOutputStream buf = new ByteArrayOutputStream();
                 int ch,i=0;
                 while((ch=as.read())>0) {
                     if((++i)%100==0 && logger.isTraceEnabled())
-                        logger.trace(prefix +" is so far "+buf.toString());
+                        logger.debug(prefix +" is so far "+buf.toString());
 
                     buf.write(ch);
                 }
                 String line = buf.toString();
                 if(logger.isTraceEnabled())
-                    logger.trace(prefix+" was "+line);
+                    logger.debug(prefix+" was "+line);
                 return line;
             }
         }
