@@ -15,6 +15,7 @@
 #************************************************************************** --> 
 
 
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core">
-    <th tooltip="${%Status of the last build}">${h.nbspIndent(iconSize)}S</th>
+    <th tooltip="${%Status of the last build}"><j:out value="${h.nbspIndent(iconSize)}"/>S</th>
 </j:jelly>

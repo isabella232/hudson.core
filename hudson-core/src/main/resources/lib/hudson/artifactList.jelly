@@ -15,6 +15,7 @@
 #************************************************************************** --> 
 
 
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <st:documentation>
     Generates a listing of the build artifacts.
@@ -41,7 +42,7 @@
             <ul>
               <j:forEach var="f" items="${artifacts}">
                 <li>
-                  <a href="${baseURL}artifact/${f.href}">${h.xmlEscape(f.displayPath)}</a>
+                  <a href="${baseURL}artifact/${f.href}">${f.displayPath}</a>
                   <st:nbsp/>
                   <a href="${baseURL}artifact/${f.href}/*fingerprint*/"><img src="${imagesURL}/16x16/fingerprint.png" alt="[fingerprint]" /></a>
                 </li>
