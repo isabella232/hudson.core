@@ -18,6 +18,7 @@
 <!--
   This view is rendered as /hudson/job/XYZ/build
 -->
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
 	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
 	xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
@@ -35,7 +36,7 @@
           <j:invokeStatic var="escapedValue" className="hudson.Util" method="escape">
             <j:arg value="${it.owner.description}"/>
           </j:invokeStatic>
-          ${escapedValue}
+          <j:out value="${escapedValue}"/>
         </p>
       </j:if>
       <p>${%description}</p>

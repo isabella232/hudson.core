@@ -14,6 +14,7 @@
 #
 #************************************************************************** --> 
 
+<?jelly escape-by-default='true'?>
 <st:compress xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <j:set var="consoleFull" value="true" />
   <st:include page="console.jelly" />

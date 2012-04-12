@@ -15,6 +15,7 @@
 #************************************************************************** --> 
 
 
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
          xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
     <table class="pane sortable" id="testresult">
@@ -38,7 +39,7 @@
 		          <st:include it="${badge}" page="badge.jelly" optional="true"/>
 		        </j:forEach>
             </td>
-            <td class="pane" style="text-align:right">${p.description}</td>
+            <td class="pane" style="text-align:right"><j:out value="${p.description}"/></td>
             <td class="pane" style="text-align:right" data="${p.duration}">${p.durationString}</td>
             <td class="pane" style="text-align:right">${p.failCount}</td>
             <td class="pane" style="text-align:right">${p.skipCount}</td>

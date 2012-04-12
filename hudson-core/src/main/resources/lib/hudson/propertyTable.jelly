@@ -15,6 +15,7 @@
 #************************************************************************** --> 
 
 
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:x="jelly:xml" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <st:documentation>
     Dispaly sortable table of properties.
@@ -35,7 +36,7 @@
           <j:invokeStatic var="escapedValue" className="hudson.Util" method="escapeString">
             <j:arg value="${e.value}" />
           </j:invokeStatic>
-          ${escapedValue}
+          <j:out value="${escapedValue}"/>
         </td>
       </tr>
     </j:forEach>
