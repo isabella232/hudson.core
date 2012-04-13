@@ -92,7 +92,7 @@
                         <a href="${p.wiki}"><st:out value="${p.displayName}"/></a>
                       </div>
                       <j:if test="${p.excerpt!=null}">
-                        <div class="excerpt"><j:out value="${p.excerpt}" /></div>
+                        <div class="excerpt"><j:out value="${app.markupFormatter.translate(p.excerpt)}" /></div>
                       </j:if>
                       <j:if test="${!p.isCompatibleWithInstalledVersion()}">
                         <div class="compatWarning">${%compatWarning}</div>
