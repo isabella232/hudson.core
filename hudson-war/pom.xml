@@ -191,6 +191,7 @@
                                 
                                 <!-- bundled plugins -->
                                 
+                                <!--
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.main</groupId>
                                     <artifactId>rest-plugin</artifactId>
@@ -268,6 +269,7 @@
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
                                     <destFileName>ssh-slaves.hpi</destFileName>
                                 </artifactItem>
+                                -->
  
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.plugins</groupId>
