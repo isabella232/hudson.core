@@ -221,7 +221,7 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.main</groupId>
-                                    <artifactId>maven-plugin</artifactId>
+                                    <artifactId>legacy-maven-plugin</artifactId>
                                     <version>3.0.1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
