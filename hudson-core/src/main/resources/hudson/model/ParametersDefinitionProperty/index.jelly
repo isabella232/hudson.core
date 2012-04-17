@@ -18,6 +18,7 @@
 <!--
   This view is rendered as /hudson/job/XYZ/build
 -->
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
 	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
 	xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
@@ -31,12 +32,9 @@
     <l:main-panel>
       <h1>${it.owner.pronoun} ${it.owner.displayName}</h1>
       <j:if test="${!empty(it.owner.description)}">
-        <p>
-          <j:invokeStatic var="escapedValue" className="hudson.Util" method="escape">
-            <j:arg value="${it.owner.description}"/>
-          </j:invokeStatic>
-          ${escapedValue}
-        </p>
+        <div id="description">
+          <j:out value="${app.markupFormatter.translate(it.owner.description)}"/>
+        </div>
       </j:if>
       <p>${%description}</p>
       <j:set var="delay" value="${request.getParameter('delay')}" />

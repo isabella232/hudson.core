@@ -15,6 +15,7 @@
 #************************************************************************** --> 
 
 
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:s="jelly:stapler" xmlns:d="jelly:define">
   <s:documentation>
     Header portion of the HTML page, that gets rendered into the &lt;head> tag.

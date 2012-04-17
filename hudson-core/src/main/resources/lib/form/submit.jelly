@@ -15,6 +15,7 @@
 #************************************************************************** --> 
 
 
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:s="jelly:stapler" xmlns:d="jelly:define" xmlns:f="/lib/form">
   <s:documentation>
     Submit button themed by YUI. This should be always

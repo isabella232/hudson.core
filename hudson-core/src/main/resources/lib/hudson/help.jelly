@@ -18,6 +18,7 @@
 <!--
   (?) icon linked to the specified @href
 -->
+<?jelly escape-by-default='true'?>
 <a href="${href}">
   <img src="${imagesURL}/16x16/help.png" alt="[help]"/>
 </a>

@@ -80,6 +80,7 @@ import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.jelly.InternationalizedStringExpression;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -535,6 +536,10 @@ public class Functions {
 
     public static String xmlEscape(String s) {
         return Util.xmlEscape(s);
+    }
+
+    public static String xmlUnescape(String s) {
+        return s.replace("&lt;","<").replace("&gt;",">").replace("&amp;","&");
     }
 
     public static void checkPermission(Permission permission) throws IOException, ServletException {
@@ -1384,5 +1389,9 @@ public class Functions {
      */
     public static boolean isWipeOutPermissionEnabled() {
         return Boolean.getBoolean("hudson.security.WipeOutPermission");
+    }
+
+    public static Object rawHtml(Object o) {
+        return InternationalizedStringExpression.rawHtml(o);
     }
 }
