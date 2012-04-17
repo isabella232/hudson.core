@@ -34,7 +34,7 @@
         <crypto-util.version>1.0</crypto-util.version>
         <jtidy.version>r938</jtidy.version>
         <jna-posix.version>1.0.3</jna-posix.version>
-        <stapler.version>3.0.0-M1</stapler.version>
+        <stapler.version>3.0.0-M1-1</stapler.version>
         <json-lib.version>2.4</json-lib.version>
         <annotation-indexer.version>1.2</annotation-indexer.version>
         <task-reactor.version>1.2</task-reactor.version>
