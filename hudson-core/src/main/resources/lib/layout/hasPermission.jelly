@@ -15,6 +15,7 @@
 #************************************************************************** --> 
 
 
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:d="jelly:define" xmlns:st="jelly:stapler">
   <st:documentation>
     Renders the body only if the current user has the specified permission

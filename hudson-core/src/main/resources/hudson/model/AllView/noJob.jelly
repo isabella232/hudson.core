@@ -15,6 +15,7 @@
 #************************************************************************** --> 
 
 
+<?jelly escape-by-default='true'?>
 <div>
   <!--
     This is a good place to add "welcome" materials, like pointers to the website and etc
