@@ -222,11 +222,11 @@
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.main</groupId>
                                     <artifactId>legacy-maven-plugin</artifactId>
-                                    <version>3.0.1</version>
+                                    <version>3.0.1-1</version>
                                     <type>hpi</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
-                                    <destFileName>maven-plugin.hpi</destFileName>
+                                    <destFileName>legacy-maven-plugin.hpi</destFileName>
                                 </artifactItem>
                                                                                                                   
                                 <artifactItem>
@@ -249,6 +249,7 @@
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
                                     <destFileName>subversion.hpi</destFileName>
                                 </artifactItem>
+                                -->
                                 
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.plugins</groupId>
@@ -259,7 +260,6 @@
                                     <outputDirectory>target/generated-resources/WEB-INF/plugins</outputDirectory>
                                     <destFileName>git.hpi</destFileName>
                                 </artifactItem>
-                                -->
  
                                 <artifactItem>
                                     <groupId>org.eclipse.hudson.plugins</groupId>
