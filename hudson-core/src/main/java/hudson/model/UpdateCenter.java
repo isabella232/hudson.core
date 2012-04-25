@@ -85,6 +85,7 @@ import org.springframework.security.context.SecurityContextHolder;
  * @since 1.220
  */
 public class UpdateCenter extends AbstractModelObject implements Saveable {
+    
     /**
      * {@link ExecutorService} that performs installation.
      */
@@ -246,7 +247,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
      *      please try not to use this method, and instead ping us to get this part completed.
      */
     public String getDefaultBaseUrl() {
-        return config.getUpdateCenterUrl();
+        return config.getUpdateServer();
     }
 
     /**
@@ -348,7 +349,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
      * Loads the data from the disk into this object.
      */
     public synchronized void load() throws IOException {
-        UpdateSite defaultSite = new UpdateSite("default", config.getUpdateCenterUrl() + "update-center.json");
+        UpdateSite defaultSite = new UpdateSite("default", config.getUpdateCenterUrl());
         XmlFile file = getConfigFile();
         if(file.exists()) {
             try {
@@ -460,6 +461,9 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
      */
     @SuppressWarnings({"UnusedDeclaration"})
     public static class UpdateCenterConfiguration implements ExtensionPoint {
+        
+        private final String updateServer = System.getProperty("updateServer", "http://hudson-ci.org/");
+        
         /**
          * Creates default update center configuration - uses settings for global update center.
          */
@@ -605,7 +609,15 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
         public String getConnectionCheckUrl() {
             return "http://www.google.com";
         }
-
+           
+        /**
+         * Get the Update Server name
+         * @return Name of the update server set to this configuration
+         */
+        String getUpdateServer() {
+            return updateServer;
+        }
+        
         /**
          * Returns the URL of the server that hosts the update-center.json
          * file.
@@ -617,7 +629,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
          *      Absolute URL that ends with '/'.
          */
         public String getUpdateCenterUrl() {
-            return "http://hudson-ci.org/";
+            return updateServer + "update-center.json";
         }
 
         /**

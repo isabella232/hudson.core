@@ -1390,6 +1390,10 @@ public class Functions {
     public static boolean isWipeOutPermissionEnabled() {
         return Boolean.getBoolean("hudson.security.WipeOutPermission");
     }
+    
+    public static boolean disableUpdateCenterSwitch() {
+        return Boolean.getBoolean("hudson.pluginManager.disableUpdateCenterSwitch");
+    }
 
     public static Object rawHtml(Object o) {
         return InternationalizedStringExpression.rawHtml(o);
