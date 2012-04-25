@@ -98,7 +98,10 @@ public class Executable {
                 + "   --httpPort=<value>               HTTP listening port. Default value is 8080\n\n"
                 + "   --httpsPort=<value>              HTTPS listening port. Disabled by default\n"
                 + "   --httpsKeyStore=<filepath>       Location of the SSL KeyStore file.\n"
-                + "   --httpsKeyStorePassword=<value>  Password for the SSL KeyStore file\n\n";
+                + "   --httpsKeyStorePassword=<value>  Password for the SSL KeyStore file\n\n"
+                + "   --updateServer=<your server>     Specify your own update server (eg http://updates.mycompany.com/).\n"
+                + "                                    For details see http://wiki.hudson-ci.org/Alternate+Update+Server\n\n"
+                + "   --disableUpdateCenterSwitch      Disable the ability to specify alternate Update Center URL via Plugin Manager Advanced tab\n\n";
         
         System.out.println(usageStr);
         System.exit(0);

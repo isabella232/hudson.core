@@ -76,15 +76,18 @@
             </f:block>
           </f:form>
 
-          <h2>${%Update Site}</h2>
-          <f:form method="post" action="siteConfigure">
-            <f:entry title="${%URL}" >
-              <f:textbox name="site" value="${app.updateCenter.getSite('default').url}" />
-            </f:entry>
-            <f:block>
-              <f:submit value="${%Submit}" />
-            </f:block>
-          </f:form>
+          <j:if test="${!h.disableUpdateCenterSwitch}">
+                <h2>${%Update Site}</h2>
+                <f:form method="post" action="siteConfigure">
+                    <f:entry title="${%URL}" >
+                    <f:textbox name="site" value="${app.updateCenter.getSite('default').url}" />
+                    </f:entry>
+                    <f:block>
+                    <f:submit value="${%Submit}" />
+                    </f:block>
+                </f:form>
+          </j:if>
+          
         </td>
       </tr>
     </table>
