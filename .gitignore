@@ -38,3 +38,4 @@ hudson_*.changes
 =======
 push-build.sh
 !/hudson-rest/hudson-rest-api/src/main/java/org/eclipse/hudson/rest/api/build/
+/.git-rewrite/
