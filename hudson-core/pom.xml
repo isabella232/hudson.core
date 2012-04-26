@@ -730,14 +730,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!--
+
         <dependency>
             <groupId>org.jvnet.hudson</groupId>
             <artifactId>ganymed-ssh-2</artifactId>
             <version>build260</version>
             <type>jar</type>
         </dependency>
-        -->
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
