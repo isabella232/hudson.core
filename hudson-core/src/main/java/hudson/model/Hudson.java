@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2011 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,9 +9,9 @@
  *
  * Contributors: 
  *
- *    Inc., Kohsuke Kawaguchi, Nikita Levyankov,   Erik Ramfelt, Koichi Fujikawa, Red Hat, Inc., Seiji Sogabe,   Stephen Connolly, Tom Huybrechts, Yahoo! Inc., Alan Harder, CloudBees, Inc.
+ *  Kohsuke Kawaguchi, Nikita Levyankov, Erik Ramfelt, Koichi Fujikawa, 
+ *  Seiji Sogabe, Stephen Connolly, Tom Huybrechts, Alan Harder, Winston Prakash
  *     
- *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -55,7 +55,6 @@ import hudson.init.InitStrategy;
 import hudson.lifecycle.Lifecycle;
 import hudson.logging.LogRecorderManager;
 import hudson.lifecycle.RestartNotSupportedException;
-import hudson.markup.RawHtmlMarkupFormatter;
 import hudson.model.Descriptor.FormException;
 import hudson.model.labels.LabelAtom;
 import hudson.model.listeners.ItemListener;
@@ -71,16 +70,14 @@ import hudson.search.SearchIndexBuilder;
 import hudson.security.ACL;
 import hudson.security.AccessControlled;
 import hudson.security.AuthorizationStrategy;
-import hudson.security.BasicAuthenticationFilter;
 import hudson.security.FederatedLoginService;
-import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
-import hudson.security.HudsonFilter;
-import hudson.security.LegacySecurityRealm;
 import hudson.security.Permission;
 import hudson.security.PermissionGroup;
 import hudson.security.SecurityMode;
 import hudson.security.SecurityRealm;
+import hudson.security.HudsonSecurityManager;
 import hudson.security.csrf.CrumbIssuer;
+
 import hudson.slaves.Cloud;
 import hudson.slaves.ComputerListener;
 import hudson.slaves.DumbSlave;
@@ -124,14 +121,6 @@ import hudson.views.MyViewsTabBar;
 import hudson.views.ViewsTabBar;
 import hudson.widgets.Widget;
 import net.sf.json.JSONObject;
-import org.springframework.security.AccessDeniedException;
-import org.springframework.security.SpringSecurityException;
-import org.springframework.security.Authentication;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.GrantedAuthorityImpl;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.providers.anonymous.AnonymousAuthenticationToken;
-import org.springframework.security.ui.AbstractProcessingFilter;
 import org.apache.commons.jelly.JellyException;
 import org.apache.commons.jelly.Script;
 import org.apache.commons.lang3.StringUtils;
@@ -219,11 +208,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import org.hudsonci.script.ScriptSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.AccessDeniedException;
+import org.springframework.security.Authentication;
+import org.springframework.security.context.SecurityContextHolder;
+import org.springframework.security.providers.anonymous.AnonymousAuthenticationToken;
+import org.springframework.security.ui.AbstractProcessingFilter;
 
 /**
  * Root object of the system.
@@ -234,6 +228,8 @@ import org.hudsonci.script.ScriptSupport;
 @ExportedBean
 public final class Hudson extends Node implements ItemGroup<TopLevelItem>, StaplerProxy, StaplerFallback, ViewGroup, AccessControlled, DescriptorByNameOwner {
 
+    private transient Logger logger = LoggerFactory.getLogger(Hudson.class);
+    
     private transient final Queue queue;
     /**
      * Stores various objects scoped to {@link Hudson}.
@@ -264,45 +260,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Job allocation strategy.
      */
     private Mode mode = Mode.NORMAL;
-    /**
-     * False to enable anyone to do anything.
-     * Left as a field so that we can still read old data that uses this flag.
-     *
-     * @see #authorizationStrategy
-     * @see #securityRealm
-     */
-    private Boolean useSecurity;
-    /**
-     * Controls how the
-     * <a href="http://en.wikipedia.org/wiki/Authorization">authorization</a>
-     * is handled in Hudson.
-     * <p>
-     * This ultimately controls who has access to what.
-     *
-     * Never null.
-     */
-    private volatile AuthorizationStrategy authorizationStrategy = AuthorizationStrategy.UNSECURED;
-    /**
-     * Controls a part of the
-     * <a href="http://en.wikipedia.org/wiki/Authentication">authentication</a>
-     * handling in Hudson.
-     * <p>
-     * Intuitively, this corresponds to the user database.
-     *
-     * See {@link HudsonFilter} for the concrete authentication protocol.
-     *
-     * Never null. Always use {@link #setSecurityRealm(SecurityRealm)} to
-     * update this field.
-     *
-     * @see #getSecurity()
-     * @see #setSecurityRealm(SecurityRealm)
-     */
-    private volatile SecurityRealm securityRealm = SecurityRealm.NO_AUTHENTICATION;
+     
     /**
      * Message displayed in the top page.
      */
     private String systemMessage;
-    private MarkupFormatter markupFormatter;
     private static transient final String HUDSON_WORKSPACES_PROPERTY_KEY = "HUDSON_WORKSPACES";
     /**
      * Workspace root dir which could be configured by setting HUDSON_WORKSPACES property.
@@ -427,6 +389,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Loaded plugins.
      */
     public transient final PluginManager pluginManager;
+    public transient final HudsonSecurityManager hudsonSecurityManager;
     public transient volatile TcpSlaveAgentListener tcpSlaveAgentListener;
     private transient UDPBroadcastThread udpBroadcastThread;
     private transient DNSMultiCast dnsMultiCast;
@@ -569,7 +532,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     public Hudson(File root, ServletContext context, PluginManager pluginManager) throws IOException, InterruptedException, ReactorException {
         // As hudson is starting, grant this process full control
-        SecurityContextHolder.getContext().setAuthentication(ACL.SYSTEM);
+        HudsonSecurityManager.grantFullControl();
         try {
             this.root = root;
             this.servletContext = context;
@@ -609,13 +572,16 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             try {
                 proxy = ProxyConfiguration.load();
             } catch (IOException e) {
-                LOGGER.log(java.util.logging.Level.SEVERE, "Failed to load proxy configuration", e);
+                logger.error("Failed to load proxy configuration", e);
             }
 
             if (pluginManager == null) {
                 pluginManager = new LocalPluginManager(this);
             }
             this.pluginManager = pluginManager;
+            
+            hudsonSecurityManager = new HudsonSecurityManager(servletContext);
+            
             // JSON binding needs to be able to see all the classes from all the plugins
             WebApp.get(servletContext).setClassLoader(pluginManager.uberClassLoader);
 
@@ -648,7 +614,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                 udpBroadcastThread = new UDPBroadcastThread(this);
                 udpBroadcastThread.start();
             } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Faild to broadcast over UDP", e);
+                logger.warn("Faild to broadcast over UDP", e);
             }
             dnsMultiCast = new DNSMultiCast(this);
 
@@ -694,7 +660,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                     return;
                 }
 
-                SecurityContextHolder.getContext().setAuthentication(ACL.SYSTEM);   // full access in the initialization thread
+                // full access in the initialization thread
+                HudsonSecurityManager.grantFullControl();    
                 String taskName = task.getDisplayName();
 
                 Thread t = Thread.currentThread();
@@ -706,7 +673,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                     long start = System.currentTimeMillis();
                     super.runTask(task);
                     if (LOG_STARTUP_PERFORMANCE) {
-                        LOGGER.info(String.format("Took %dms for %s by %s",
+                        logger.info(String.format("Took %dms for %s by %s",
                                 System.currentTimeMillis() - start, taskName, name));
                     }
                 } finally {
@@ -741,29 +708,26 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         List<ReactorListener> r = (List) Service.loadInstances(Thread.currentThread().getContextClassLoader(), InitReactorListener.class);
         r.add(new ReactorListener() {
 
-            final Level level = Level.parse(System.getProperty(Hudson.class.getName() + ".initLogLevel", "FINE"));
-
             public void onTaskStarted(Task t) {
-                LOGGER.log(level, "Started " + t.getDisplayName());
+                logger.debug("Started " + t.getDisplayName());
             }
 
             public void onTaskCompleted(Task t) {
-                LOGGER.log(level, "Completed " + t.getDisplayName());
+                logger.debug("Completed " + t.getDisplayName());
             }
 
             public void onTaskFailed(Task t, Throwable err, boolean fatal) {
-                LOGGER.log(java.util.logging.Level.SEVERE, "Failed " + t.getDisplayName(), err);
+                logger.error("Failed " + t.getDisplayName(), err);
             }
 
             public void onAttained(Milestone milestone) {
-                Level lv = level;
+                 
                 String s = "Attained " + milestone.toString();
                 if (milestone instanceof InitMilestone) {
-                    lv = Level.INFO; // noteworthy milestones --- at least while we debug problems further
                     initLevel = (InitMilestone) milestone;
                     s = initLevel.toString();
                 }
-                LOGGER.log(lv, s);
+                logger.info(s);
             }
         });
         return new ReactorListener.Aggregator(r);
@@ -813,6 +777,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     public PluginManager getPluginManager() {
         return pluginManager;
+    }
+    
+    public HudsonSecurityManager getHudsonSecurityManager() {
+        return hudsonSecurityManager;
     }
 
     public UpdateCenter getUpdateCenter() {
@@ -1103,7 +1071,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * @since 1.391
      */
     public MarkupFormatter getMarkupFormatter() {
-        return markupFormatter != null ? markupFormatter : RawHtmlMarkupFormatter.INSTANCE;
+        return hudsonSecurityManager.getMarkupFormatter();
     }
 
     /**
@@ -1111,8 +1079,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      *
      * @since 1.391
      */
-    public void setMarkupFormatter(MarkupFormatter f) {
-        this.markupFormatter = f;
+    public void setMarkupFormatter(MarkupFormatter markupFormatter) {
+        hudsonSecurityManager.setMarkupFormatter(markupFormatter);
     }
 
     /**
@@ -1948,7 +1916,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     @Exported
     public boolean isUseSecurity() {
-        return securityRealm != SecurityRealm.NO_AUTHENTICATION || authorizationStrategy != AuthorizationStrategy.UNSECURED;
+        return hudsonSecurityManager.isUseSecurity();
     }
 
     /**
@@ -1965,16 +1933,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * in Hudson.
      */
     public SecurityMode getSecurity() {
-        // fix the variable so that this code works under concurrent modification to securityRealm.
-        SecurityRealm realm = securityRealm;
-
-        if (realm == SecurityRealm.NO_AUTHENTICATION) {
-            return SecurityMode.UNSECURED;
-        }
-        if (realm instanceof LegacySecurityRealm) {
-            return SecurityMode.LEGACY;
-        }
-        return SecurityMode.SECURED;
+        return hudsonSecurityManager.getSecurity();
     }
 
     /**
@@ -1982,38 +1941,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      *      never null.
      */
     public SecurityRealm getSecurityRealm() {
-        return securityRealm;
-    }
-
-    public void setSecurityRealm(SecurityRealm securityRealm) {
-        if (securityRealm == null) {
-            securityRealm = SecurityRealm.NO_AUTHENTICATION;
-        }
-        this.securityRealm = securityRealm;
-        // reset the filters and proxies for the new SecurityRealm
-        try {
-            HudsonFilter filter = HudsonFilter.get(servletContext);
-            if (filter == null) {
-                // Fix for #3069: This filter is not necessarily initialized before the servlets.
-                // when HudsonFilter does come back, it'll initialize itself.
-                LOGGER.fine("HudsonFilter has not yet been initialized: Can't perform security setup for now");
-            } else {
-                LOGGER.fine("HudsonFilter has been previously initialized: Setting security up");
-                filter.reset(securityRealm);
-                LOGGER.fine("Security is now fully set up");
-            }
-        } catch (ServletException e) {
-            // for binary compatibility, this method cannot throw a checked exception
-            throw new SpringSecurityException("Failed to configure filter", e) {
-            };
-        }
-    }
-
-    public void setAuthorizationStrategy(AuthorizationStrategy a) {
-        if (a == null) {
-            a = AuthorizationStrategy.UNSECURED;
-        }
-        authorizationStrategy = a;
+        return hudsonSecurityManager.getSecurityRealm();
     }
 
     public Lifecycle getLifecycle() {
@@ -2062,7 +1990,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     @Override
     public ACL getACL() {
-        return authorizationStrategy.getRootACL();
+        return hudsonSecurityManager.getACL();
     }
 
     /**
@@ -2070,7 +1998,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      *      never null.
      */
     public AuthorizationStrategy getAuthorizationStrategy() {
-        return authorizationStrategy;
+        return hudsonSecurityManager.getAuthorizationStrategy();
     }
 
     /**
@@ -2405,31 +2333,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                     primaryView = v.getViewName();
                 }
 
-                // read in old data that doesn't have the security field set
-                if (authorizationStrategy == null) {
-                    if (useSecurity == null || !useSecurity) {
-                        authorizationStrategy = AuthorizationStrategy.UNSECURED;
-                    } else {
-                        authorizationStrategy = new FullControlOnceLoggedInAuthorizationStrategy();
-                    }
-                }
-                if (securityRealm == null) {
-                    if (useSecurity == null || !useSecurity) {
-                        setSecurityRealm(SecurityRealm.NO_AUTHENTICATION);
-                    } else {
-                        setSecurityRealm(new LegacySecurityRealm());
-                    }
-                } else {
-                    // force the set to proxy
-                    setSecurityRealm(securityRealm);
-                }
-
-                if (useSecurity != null && !useSecurity) {
-                    // forced reset to the unsecure mode.
-                    // this works as an escape hatch for people who locked themselves out.
-                    authorizationStrategy = AuthorizationStrategy.UNSECURED;
-                    setSecurityRealm(SecurityRealm.NO_AUTHENTICATION);
-                }
+                hudsonSecurityManager.load();
 
                 // Initialize the filter with the crumb issuer
                 setCrumbIssuer(crumbIssuer);
@@ -2501,9 +2405,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                 Thread.currentThread().interrupt();
                 break;  // someone wants us to die now. quick!
             } catch (ExecutionException e) {
-                LOGGER.log(Level.WARNING, "Failed to shut down properly", e);
+                logger.warn("Failed to shut down properly", e);
             } catch (TimeoutException e) {
-                LOGGER.log(Level.WARNING, "Failed to shut down properly", e);
+                logger.warn("Failed to shut down properly", e);
             }
         }
 
@@ -2540,27 +2444,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             checkPermission(ADMINISTER);
 
             JSONObject json = req.getSubmittedForm();
-
-            // keep using 'useSecurity' field as the main configuration setting
-            // until we get the new security implementation working
-            // useSecurity = null;
-            if (json.has("use_security")) {
-                useSecurity = true;
-                JSONObject security = json.getJSONObject("use_security");
-                setSecurityRealm(SecurityRealm.all().newInstanceFromRadioList(security, "realm"));
-                setAuthorizationStrategy(AuthorizationStrategy.all().newInstanceFromRadioList(security, "authorization"));
-
-                if (security.has("markupFormatter")) {
-                    markupFormatter = req.bindJSON(MarkupFormatter.class, security.getJSONObject("markupFormatter"));
-                } else {
-                    markupFormatter = null;
-                }
-            } else {
-                useSecurity = null;
-                setSecurityRealm(SecurityRealm.NO_AUTHENTICATION);
-                authorizationStrategy = AuthorizationStrategy.UNSECURED;
-                markupFormatter = null;
-            }
 
             if (json.has("csrf")) {
                 JSONObject csrf = json.getJSONObject("csrf");
@@ -2921,7 +2804,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Logs out the user.
      */
     public void doLogout(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
-        securityRealm.doLogout(req, rsp);
+        hudsonSecurityManager.doLogout(req, rsp);
     }
 
     /**
@@ -2961,14 +2844,14 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             @Override
             public void run() {
                 try {
-                    SecurityContextHolder.getContext().setAuthentication(ACL.SYSTEM);
+                    HudsonSecurityManager.grantFullControl();
                     reload();
                 } catch (IOException e) {
-                    LOGGER.log(java.util.logging.Level.SEVERE, "Failed to reload Hudson config", e);
+                    logger.error("Failed to reload Hudson config", e);
                 } catch (ReactorException e) {
-                    LOGGER.log(java.util.logging.Level.SEVERE, "Failed to reload Hudson config", e);
+                    logger.error("Failed to reload Hudson config", e);
                 } catch (InterruptedException e) {
-                    LOGGER.log(java.util.logging.Level.SEVERE, "Failed to reload Hudson config", e);
+                    logger.error("Failed to reload Hudson config", e);
                 }
             }
         }.start();
@@ -3139,19 +3022,19 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             @Override
             public void run() {
                 try {
-                    SecurityContextHolder.getContext().setAuthentication(ACL.SYSTEM);
+                    HudsonSecurityManager.grantFullControl();
 
                     // give some time for the browser to load the "reloading" page
                     Thread.sleep(5000);
-                    LOGGER.severe(String.format("Restarting VM as requested by %s", exitUser));
+                    logger.error(String.format("Restarting VM as requested by %s", exitUser));
                     for (RestartListener listener : RestartListener.all()) {
                         listener.onRestart();
                     }
                     lifecycle.restart();
                 } catch (InterruptedException e) {
-                    LOGGER.log(Level.WARNING, "Failed to restart Hudson", e);
+                    logger.warn("Failed to restart Hudson", e);
                 } catch (IOException e) {
-                    LOGGER.log(Level.WARNING, "Failed to restart Hudson", e);
+                    logger.warn("Failed to restart Hudson", e);
                 }
             }
         }.start();
@@ -3174,7 +3057,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             @Override
             public void run() {
                 try {
-                    SecurityContextHolder.getContext().setAuthentication(ACL.SYSTEM);
+                    HudsonSecurityManager.grantFullControl();
 
                     // Wait 'til we have no active executors.
                     doQuietDown(true, 0);
@@ -3183,20 +3066,20 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                     if (isQuietingDown) {
                         WebAppController.get().install(new HudsonIsRestarting());
                         // give some time for the browser to load the "reloading" page
-                        LOGGER.info("Restart in 10 seconds");
+                        logger.info("Restart in 10 seconds");
                         Thread.sleep(10000);
-                        LOGGER.severe(String.format("Restarting VM as requested by %s", exitUser));
+                        logger.error(String.format("Restarting VM as requested by %s", exitUser));
                         for (RestartListener listener : RestartListener.all()) {
                             listener.onRestart();
                         }
                         lifecycle.restart();
                     } else {
-                        LOGGER.info("Safe-restart mode cancelled");
+                        logger.info("Safe-restart mode cancelled");
                     }
                 } catch (InterruptedException e) {
-                    LOGGER.log(Level.WARNING, "Failed to restart Hudson", e);
+                    logger.warn("Failed to restart Hudson", e);
                 } catch (IOException e) {
-                    LOGGER.log(Level.WARNING, "Failed to restart Hudson", e);
+                    logger.warn("Failed to restart Hudson", e);
                 }
             }
         }.start();
@@ -3208,7 +3091,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     public void doExit(StaplerRequest req, StaplerResponse rsp) throws IOException {
         checkPermission(ADMINISTER);
-        LOGGER.severe(String.format("Shutting down VM as requested by %s from %s",
+        logger.error(String.format("Shutting down VM as requested by %s from %s",
                 getAuthentication().getName(), req.getRemoteAddr()));
         rsp.setStatus(HttpServletResponse.SC_OK);
         rsp.setContentType("text/plain");
@@ -3238,8 +3121,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             @Override
             public void run() {
                 try {
-                    SecurityContextHolder.getContext().setAuthentication(ACL.SYSTEM);
-                    LOGGER.severe(String.format("Shutting down VM as requested by %s from %s",
+                    HudsonSecurityManager.grantFullControl();
+                    logger.error(String.format("Shutting down VM as requested by %s from %s",
                             exitUser, exitAddr));
                     // Wait 'til we have no active executors.
                     while (isQuietingDown
@@ -3252,7 +3135,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                         System.exit(0);
                     }
                 } catch (InterruptedException e) {
-                    LOGGER.log(Level.WARNING, "Failed to shutdown Hudson", e);
+                    logger.warn("Failed to shutdown Hudson", e);
                 }
             }
         }.start();
@@ -3905,7 +3788,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Automatically try to launch a slave when Hudson is initialized or a new slave is created.
      */
     public static boolean AUTOMATIC_SLAVE_LAUNCH = true;
-    private static final Logger LOGGER = Logger.getLogger(Hudson.class.getName());
     private static final Pattern ICON_SIZE = Pattern.compile("\\d+x\\d+");
     public static final PermissionGroup PERMISSIONS = Permission.HUDSON_PERMISSIONS;
     public static final Permission ADMINISTER = Permission.HUDSON_ADMINISTER;
@@ -3917,8 +3799,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      *
      * @since 1.343
      */
-    public static final Authentication ANONYMOUS = new AnonymousAuthenticationToken(
-            "anonymous", "anonymous", new GrantedAuthority[]{new GrantedAuthorityImpl("anonymous")});
+    public static final Authentication ANONYMOUS = HudsonSecurityManager.ANONYMOUS;
 
     static {
         XSTREAM.alias("hudson", Hudson.class);
