@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010, Oracle Corporation.
+ * Copyright (c) 2004-2012, Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,9 +9,8 @@
  *
  * Contributors: 
  *
- *   
+ *   Kohsuke Kawaguchi, Winston Prakash
  *       
- *
  *******************************************************************************/ 
 
 package hudson.cli;
@@ -28,6 +27,7 @@ import hudson.remoting.Callable;
 import hudson.remoting.Channel;
 import hudson.remoting.ChannelProperty;
 import hudson.security.CliAuthenticator;
+import hudson.security.HudsonSecurityEntitiesHolder;
 import hudson.security.SecurityRealm;
 import org.springframework.security.Authentication;
 import org.springframework.security.context.SecurityContext;
@@ -163,7 +163,7 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
         SecurityContext sc = SecurityContextHolder.getContext();
         Authentication old = sc.getAuthentication();
 
-        CliAuthenticator authenticator = Hudson.getInstance().getSecurityRealm().createCliAuthenticator(this);
+        CliAuthenticator authenticator = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm().createCliAuthenticator(this);
         new ClassParser().parse(authenticator,p);
 
         try {

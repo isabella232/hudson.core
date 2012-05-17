@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2011, Oracle Corporation.
+ * Copyright (c) 2011-2012, Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -63,7 +63,7 @@ public abstract class AbstractPasswordBasedSecurityRealm extends SecurityRealm i
 
         // these providers apply everywhere
         RememberMeAuthenticationProvider rememberMeAuthenticationProvider = new RememberMeAuthenticationProvider();
-        rememberMeAuthenticationProvider.setKey(Hudson.getInstance().getSecretKey());
+        rememberMeAuthenticationProvider.setKey(HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecretKey());
 
         // this doesn't mean we allow anonymous access.
         // we just authenticate anonymous users as such,

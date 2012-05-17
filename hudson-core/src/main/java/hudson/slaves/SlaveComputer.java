@@ -30,6 +30,7 @@ import hudson.lifecycle.WindowsSlaveInstaller;
 import hudson.Util;
 import hudson.AbortException;
 import hudson.remoting.Launcher;
+import hudson.security.HudsonSecurityManager;
 import static hudson.slaves.SlaveComputer.LogHolder.SLAVE_LOG_HANDLER;
 import hudson.slaves.OfflineCause.ChannelTermination;
 
@@ -385,7 +386,7 @@ public class SlaveComputer extends Computer {
             checkPermission(Hudson.ADMINISTER);
             offlineMessage = Util.fixEmptyAndTrim(offlineMessage);
             disconnect(OfflineCause.create(Messages._SlaveComputer_DisconnectedBy(
-                    Hudson.getAuthentication().getName(),
+                    HudsonSecurityManager.getAuthentication().getName(),
                     offlineMessage!=null ? " : " + offlineMessage : "")
             ));
         }

@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import hudson.Extension;
 import hudson.model.Hudson;
 import hudson.model.ModelObject;
+import hudson.security.HudsonSecurityManager;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -80,7 +81,7 @@ public class DefaultCrumbIssuer extends CrumbIssuer {
             if (md != null) {
                 HttpServletRequest req = (HttpServletRequest) request;
                 StringBuilder buffer = new StringBuilder();
-                Authentication a = Hudson.getAuthentication();
+                Authentication a = HudsonSecurityManager.getAuthentication();
                 if (a != null) {
                     buffer.append(a.getName());
                 }

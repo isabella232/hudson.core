@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi,   Yahoo! Inc., Stephen Connolly, Tom Huybrechts, Alan Harder, Romain Seguy
+ *   Kohsuke Kawaguchi, Winston Prakash, Stephen Connolly, Tom Huybrechts, Alan Harder, Romain Seguy
  *     
  *
  *******************************************************************************/ 
@@ -43,11 +43,6 @@ import hudson.model.User;
 import hudson.model.View;
 import hudson.model.JDK;
 import hudson.search.SearchableModelObject;
-import hudson.security.AccessControlled;
-import hudson.security.AuthorizationStrategy;
-import hudson.security.Permission;
-import hudson.security.SecurityRealm;
-import hudson.security.csrf.CrumbIssuer;
 import hudson.slaves.Cloud;
 import hudson.slaves.ComputerLauncher;
 import hudson.slaves.NodeProperty;
@@ -62,6 +57,8 @@ import hudson.util.Area;
 import hudson.util.Iterators;
 import hudson.scm.SCM;
 import hudson.scm.SCMDescriptor;
+import hudson.security.*;
+import hudson.security.csrf.CrumbIssuer;
 import hudson.security.captcha.CaptchaSupport;
 import hudson.util.Secret;
 import hudson.views.MyViewsTabBar;
@@ -1075,7 +1072,7 @@ public class Functions {
      * Checks if the current user is anonymous.
      */
     public static boolean isAnonymous() {
-        return Hudson.getAuthentication() instanceof AnonymousAuthenticationToken;
+        return HudsonSecurityManager.getAuthentication() instanceof AnonymousAuthenticationToken;
     }
 
     /**

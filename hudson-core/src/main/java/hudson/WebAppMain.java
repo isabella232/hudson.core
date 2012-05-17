@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,8 +8,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
-*
-*    Kohsuke Kawaguchi, Jean-Baptiste Quenot, Tom Huybrechts
+ *
+ *  Kohsuke Kawaguchi, Winston Prakash, Jean-Baptiste Quenot, Tom Huybrechts
  *     
  *
  *******************************************************************************/ 
@@ -20,20 +20,13 @@ import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider
 import com.thoughtworks.xstream.core.JVM;
 import hudson.model.Hudson;
 import hudson.model.User;
+import hudson.security.HudsonSecurityEntitiesHolder;
+import hudson.security.HudsonSecurityManager;
 import hudson.stapler.WebAppController;
 import hudson.stapler.WebAppController.DefaultInstallStrategy;
 import hudson.triggers.SafeTimerTask;
 import hudson.triggers.Trigger;
-import hudson.util.HudsonIsLoading;
-import hudson.util.IncompatibleServletVersionDetected;
-import hudson.util.IncompatibleVMDetected;
-import hudson.util.InsufficientPermissionDetected;
-import hudson.util.NoHomeDir;
-import hudson.util.RingBufferLogHandler;
-import hudson.util.NoTempDir;
-import hudson.util.IncompatibleAntVersionDetected;
-import hudson.util.HudsonFailedToLoad;
-import hudson.util.AWTProblem;
+import hudson.util.*;
 import hudson.util.graph.ChartUtil;
 import org.jvnet.localizer.LocaleProvider;
 import org.kohsuke.stapler.Stapler;
@@ -140,44 +133,21 @@ public final class WebAppMain implements ServletContextListener {
                 controller.install(new NoHomeDir(home));
                 return;
             }
-
+            
+            try {
+                // Create the Security Manager
+                HudsonSecurityEntitiesHolder.setHudsonSecurityManager(new HudsonSecurityManager(home));
+            } catch (IOException ex) {
+                controller.install(new SecurityFailedToInit(ex));
+                return;
+            }
+        
             // make sure that we are using XStream in the "enhanced" (JVM-specific) mode
             if(jvm.bestReflectionProvider().getClass()==PureJavaReflectionProvider.class) {
                 // nope
                 controller.install(new IncompatibleVMDetected());
                 return;
             }
-
-//  JNA is no longer a hard requirement. It's just nice to have. See HUDSON-4820 for more context.
-//            // make sure JNA works. this can fail if
-//            //    - platform is unsupported
-//            //    - JNA is already loaded in another classloader
-//            // see http://wiki.hudson-ci.org/display/HUDSON/JNA+is+already+loaded
-//            // TODO: or shall we instead modify Hudson to work gracefully without JNA?
-//            try {
-//                /*
-//                    java.lang.UnsatisfiedLinkError: Native Library /builds/apps/glassfish/domains/hudson-domain/generated/jsp/j2ee-modules/hudson-1.309/loader/com/sun/jna/sunos-sparc/libjnidispatch.so already loaded in another classloader
-//                        at java.lang.ClassLoader.loadLibrary0(ClassLoader.java:1743)
-//                        at java.lang.ClassLoader.loadLibrary(ClassLoader.java:1674)
-//                        at java.lang.Runtime.load0(Runtime.java:770)
-//                        at java.lang.System.load(System.java:1005)
-//                        at com.sun.jna.Native.loadNativeLibraryFromJar(Native.java:746)
-//                        at com.sun.jna.Native.loadNativeLibrary(Native.java:680)
-//                        at com.sun.jna.Native.<clinit>(Native.java:108)
-//                        at hudson.util.jna.GNUCLibrary.<clinit>(GNUCLibrary.java:86)
-//                        at hudson.Util.createSymlink(Util.java:970)
-//                        at hudson.model.Run.run(Run.java:1174)
-//                        at hudson.matrix.MatrixBuild.run(MatrixBuild.java:149)
-//                        at hudson.model.ResourceController.execute(ResourceController.java:88)
-//                        at hudson.model.Executor.run(Executor.java:123)
-//                 */
-//                String.valueOf(Native.POINTER_SIZE); // this meaningless operation forces the classloading and initialization
-//            } catch (LinkageError e) {
-//                if (e.getMessage().contains("another classloader"))
-//                    controller.install(new JNADoublyLoaded(e));
-//                else
-//                    controller.install(new HudsonFailedToLoad(e));
-//            }
 
             // make sure this is servlet 2.4 container or above
             try {
@@ -195,7 +165,7 @@ public final class WebAppMain implements ServletContextListener {
                 return;
             }
 
-            //make sure AWT is functioning, or else JFreeChart won't even load.
+            //make sure AWT is functioning. Needed for Graphing framework to work properly
             if(ChartUtil.awtProblemCause!=null) {
                 controller.install(new AWTProblem(ChartUtil.awtProblemCause));
                 return;
@@ -261,7 +231,7 @@ public final class WebAppMain implements ServletContextListener {
                     }
                 }
             }.start();
-        } catch (Error e) {
+        }catch (Error e) {
             LOGGER.log(Level.SEVERE, "Failed to initialize Hudson",e);
             throw e;
         } catch (RuntimeException e) {

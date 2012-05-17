@@ -593,7 +593,7 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
             // create our default TokenBasedRememberMeServices, which depends on the availability of the secret key
             TokenBasedRememberMeServices2 rms = new TokenBasedRememberMeServices2();
             rms.setUserDetailsService(uds);
-            rms.setKey(Hudson.getInstance().getSecretKey());
+            rms.setKey(HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecretKey());
             rms.setParameter("remember_me"); // this is the form field name in login.jelly
             return rms;
         }

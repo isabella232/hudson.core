@@ -28,6 +28,7 @@ import hudson.model.Label;
 import hudson.model.Descriptor;
 import hudson.security.ACL;
 import hudson.security.AccessControlled;
+import hudson.security.HudsonSecurityEntitiesHolder;
 import hudson.security.Permission;
 import hudson.util.DescriptorList;
 
@@ -64,7 +65,7 @@ public abstract class Cloud extends AbstractModelObject implements ExtensionPoin
     }
 
     public ACL getACL() {
-        return Hudson.getInstance().getAuthorizationStrategy().getACL(this);
+        return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy().getACL(this);
     }
 
     public final void checkPermission(Permission permission) {

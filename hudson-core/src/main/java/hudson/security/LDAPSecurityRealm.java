@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -363,7 +363,7 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
         
         // these providers apply everywhere
         RememberMeAuthenticationProvider rememberMeAuthenticationProvider = new RememberMeAuthenticationProvider();
-        rememberMeAuthenticationProvider.setKey(Hudson.getInstance().getSecretKey());
+        rememberMeAuthenticationProvider.setKey(HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecretKey());
 
         // this doesn't mean we allow anonymous access.
         // we just authenticate anonymous users as such,
@@ -468,7 +468,7 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
     public static final class MailAdressResolverImpl extends MailAddressResolver {
         public String findMailAddressFor(User u) {
             // LDAP not active
-            SecurityRealm realm = Hudson.getInstance().getSecurityRealm();
+            SecurityRealm realm = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm();
             if(!(realm instanceof LDAPSecurityRealm))
                 return null;
             try {
@@ -535,7 +535,7 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
         		@QueryParameter final String managerDN,
         		@QueryParameter final String managerPassword) {
 
-            if(!Hudson.getInstance().hasPermission(Hudson.ADMINISTER) || StringUtils.isEmpty(server)){
+            if(!HudsonSecurityEntitiesHolder.getHudsonSecurityManager().hasPermission(Hudson.ADMINISTER) || StringUtils.isEmpty(server)){
                 return FormValidation.ok();
             }
 

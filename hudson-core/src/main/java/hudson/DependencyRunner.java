@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi,   Brian Westrich, Jean-Baptiste Quenot
+ *   Kohsuke Kawaguchi, Winston Prakash, Brian Westrich, Jean-Baptiste Quenot
  *     
  *
  *******************************************************************************/ 
@@ -18,7 +18,7 @@ package hudson;
 
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
-import hudson.security.ACL;
+import hudson.security.HudsonSecurityManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -48,7 +48,7 @@ public class DependencyRunner implements Runnable {
 
     public void run() {
         Authentication saveAuth = SecurityContextHolder.getContext().getAuthentication();
-        SecurityContextHolder.getContext().setAuthentication(ACL.SYSTEM);
+        HudsonSecurityManager.grantFullControl();
 
         try {
             Set<AbstractProject> topLevelProjects = new HashSet<AbstractProject>();

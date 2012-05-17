@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,10 +8,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
-*
-*    Kohsuke Kawaguchi, Yahoo! Inc., Seiji Sogabe,                            Andrew Bayer
- *     
  *
+ *  Kohsuke Kawaguchi, Winston Prakash, Seiji Sogabe, Andrew Bayer
+ *     
  *******************************************************************************/ 
 
 package hudson.model;
@@ -20,6 +19,7 @@ import hudson.PluginWrapper;
 import hudson.PluginManager;
 import hudson.model.UpdateCenter.UpdateCenterJob;
 import hudson.lifecycle.Lifecycle;
+import hudson.security.HudsonSecurityManager;
 import hudson.util.IOUtils;
 import hudson.util.JSONCanonicalUtils;
 import hudson.util.TextFile;
@@ -613,7 +613,7 @@ public class UpdateSite {
                 LOGGER.log(Level.WARNING, "Adding dependent install of " + dep.name + " for plugin " + name);
                 dep.deploy();
             }
-            return uc.addJob(uc.new InstallationJob(this, UpdateSite.this, Hudson.getAuthentication()));
+            return uc.addJob(uc.new InstallationJob(this, UpdateSite.this, HudsonSecurityManager.getAuthentication()));
         }
 
         /**
@@ -622,7 +622,7 @@ public class UpdateSite {
         public Future<UpdateCenterJob> deployBackup() {
             Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
             UpdateCenter uc = Hudson.getInstance().getUpdateCenter();
-            return uc.addJob(uc.new PluginDowngradeJob(this, UpdateSite.this, Hudson.getAuthentication()));
+            return uc.addJob(uc.new PluginDowngradeJob(this, UpdateSite.this, HudsonSecurityManager.getAuthentication()));
         }
         /**
          * Making the installation web bound.

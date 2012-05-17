@@ -1,4 +1,5 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
  * Copyright (c) 2012 Oracle Corporation.
  *
@@ -9,25 +10,27 @@
  *
  * Contributors:
  *
- *  Winston Prakash
+ * Winston Prakash
  *
- *******************************************************************************/
-
+ ******************************************************************************
+ */
 package hudson.security;
 
 import com.thoughtworks.xstream.XStream;
 import hudson.BulkChange;
+import hudson.Util;
 import hudson.XmlFile;
 import hudson.markup.MarkupFormatter;
 import hudson.markup.RawHtmlMarkupFormatter;
 import hudson.model.Descriptor.FormException;
-import hudson.model.Hudson;
 import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
+import hudson.util.TextFile;
 import hudson.util.XStream2;
 import java.io.File;
 import java.io.IOException;
-import javax.servlet.ServletContext;
+import java.security.SecureRandom;
+import javax.crypto.SecretKey;
 import javax.servlet.ServletException;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
@@ -42,7 +45,8 @@ import org.springframework.security.context.SecurityContextHolder;
 import org.springframework.security.providers.anonymous.AnonymousAuthenticationToken;
 
 /**
- * Manager that manages Hudson Security. The configuration is written to the file hudson-security.xml
+ * Manager that manages Hudson Security. The configuration is written to the
+ * file hudson-security.xml
  *
  * @author Winston Prakash
  * @since 3.0.0
@@ -79,9 +83,6 @@ public class HudsonSecurityManager implements Saveable {
      * @see #setSecurityRealm(SecurityRealm)
      */
     private volatile SecurityRealm securityRealm = SecurityRealm.NO_AUTHENTICATION;
-    
-    public transient final ServletContext servletContext;
-    
     /**
      * Controls how the <a
      * href="http://en.wikipedia.org/wiki/Authorization">authorization</a> is
@@ -90,7 +91,6 @@ public class HudsonSecurityManager implements Saveable {
      * Never null.
      */
     private volatile AuthorizationStrategy authorizationStrategy = AuthorizationStrategy.UNSECURED;
-    
     /**
      * False to enable anyone to do anything. Left as a field so that we can
      * still read old data that uses this flag.
@@ -99,16 +99,45 @@ public class HudsonSecurityManager implements Saveable {
      * @see #securityRealm
      */
     private Boolean useSecurity;
-    
     private MarkupFormatter markupFormatter;
+    private File hudsonHome;
 
     static {
         XSTREAM.alias("hudsonSecurityManager", HudsonSecurityManager.class);
     }
+    /**
+     * Secrete key generated once and used for a long time, beyond container
+     * start/stop. Persisted outside <tt>config.xml</tt> to avoid accidental
+     * exposure.
+     */
+    private transient final String secretKey;
 
-    public HudsonSecurityManager(ServletContext context) {
-        servletContext = context;
+    public HudsonSecurityManager(File hudsonHome) throws IOException {
+        this.hudsonHome = hudsonHome;
+        // get or create the secret
+        TextFile secretFile = new TextFile(new File(hudsonHome, "secret.key"));
+
+        if (secretFile.exists()) {
+            secretKey = secretFile.readTrim();
+        } else {
+            SecureRandom sr = new SecureRandom();
+            byte[] random = new byte[32];
+            sr.nextBytes(random);
+            secretKey = Util.toHexString(random);
+            secretFile.write(secretKey);
+        }
+
+        load();
     }
+    
+    /**
+     * Get the directory where hudson stores the User configuration
+     * @return 
+     */
+    public File getHudsonHome() {
+        return hudsonHome;
+    }
+
 
     /**
      * Gets the markup formatter used in the system.
@@ -146,6 +175,23 @@ public class HudsonSecurityManager implements Saveable {
     public boolean hasPermission(Permission p) {
         return getACL().hasPermission(p);
     }
+    
+    /**
+     * Returns a secret key that survives across container start/stop.
+     * <p>
+     * This value is useful for implementing some of the security features.
+     */
+    public String getSecretKey() {
+        return secretKey;
+    }
+
+    /**
+     * Gets {@linkplain #getSecretKey() the secret key} as a key for AES-128.
+     * @since 1.308
+     */
+    public SecretKey getSecretKeyAsAES128() {
+        return Util.toAes128Key(secretKey);
+    }
 
     /**
      * A convenience method to check if there's some security restrictions in
@@ -173,7 +219,8 @@ public class HudsonSecurityManager implements Saveable {
     }
 
     /**
-     * Get the configured Security Realm 
+     * Get the configured Security Realm
+     *
      * @return never null.
      */
     public SecurityRealm getSecurityRealm() {
@@ -182,7 +229,8 @@ public class HudsonSecurityManager implements Saveable {
 
     /**
      * Set a Security Realm to the Manager
-     * @param securityRealm 
+     *
+     * @param securityRealm
      */
     public void setSecurityRealm(SecurityRealm securityRealm) {
         if (securityRealm == null) {
@@ -191,7 +239,7 @@ public class HudsonSecurityManager implements Saveable {
         this.securityRealm = securityRealm;
         // reset the filters and proxies for the new SecurityRealm
         try {
-            HudsonFilter filter = HudsonFilter.get(servletContext);
+            HudsonFilter filter = HudsonSecurityEntitiesHolder.getHudsonSecurityFilter();
             if (filter == null) {
                 // Fix for #3069: This filter is not necessarily initialized before the servlets.
                 // when HudsonFilter does come back, it'll initialize itself.
@@ -210,6 +258,7 @@ public class HudsonSecurityManager implements Saveable {
 
     /**
      * Get the configured Authorization Strategy
+     *
      * @return never null.
      */
     public AuthorizationStrategy getAuthorizationStrategy() {
@@ -218,7 +267,8 @@ public class HudsonSecurityManager implements Saveable {
 
     /**
      * Set the Authorization Strategy to the Manager
-     * @param a 
+     *
+     * @param a
      */
     public void setAuthorizationStrategy(AuthorizationStrategy authStrategy) {
         if (authStrategy == null) {
@@ -233,7 +283,7 @@ public class HudsonSecurityManager implements Saveable {
     public synchronized void doConfigSubmit(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, FormException {
         BulkChange bc = new BulkChange(this);
         try {
-            checkPermission(Hudson.ADMINISTER);
+            checkPermission(Permission.HUDSON_ADMINISTER);
 
             JSONObject json = req.getSubmittedForm();
 
@@ -267,20 +317,21 @@ public class HudsonSecurityManager implements Saveable {
 
     /**
      * Perform the logout action for the current user.
+     *
      * @param req
      * @param rsp
      * @throws IOException
-     * @throws ServletException 
+     * @throws ServletException
      */
     public void doLogout(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         securityRealm.doLogout(req, rsp);
     }
-    
+
     /**
      * The file where the Security settings are saved.
      */
     protected final XmlFile getConfigFile() {
-        return new XmlFile(XSTREAM, new File(Hudson.getInstance().getRootDir(), "/hudson-security.xml"));
+        return new XmlFile(XSTREAM, new File(hudsonHome, "/hudson-security.xml"));
     }
 
     /**
@@ -297,7 +348,7 @@ public class HudsonSecurityManager implements Saveable {
     /**
      * Load the settings from the configuration file
      */
-    public void load() {
+    private void load() {
 
         XmlFile config = getConfigFile();
         try {
@@ -342,4 +393,23 @@ public class HudsonSecurityManager implements Saveable {
         SecurityContextHolder.getContext().setAuthentication(ACL.SYSTEM);
     }
 
+    public static void resetFullControl() {
+        SecurityContextHolder.clearContext();
+    }
+
+    /**
+     * Gets the {@link Authentication} object that represents the user
+     * associated with the current request.
+     */
+    public static Authentication getAuthentication() {
+        Authentication a = SecurityContextHolder.getContext().getAuthentication();
+        // on Tomcat while serving the login page, this is null despite the fact
+        // that we have filters. Looking at the stack trace, Tomcat doesn't seem to
+        // run the request through filters when this is the login request.
+        // see http://www.nabble.com/Matrix-authorization-problem-tp14602081p14886312.html
+        if (a == null) {
+            a = ANONYMOUS;
+        }
+        return a;
+    }
 }

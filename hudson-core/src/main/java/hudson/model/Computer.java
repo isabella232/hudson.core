@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,9 +9,8 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi,   Red Hat, Inc., Seiji Sogabe, Stephen Connolly, Thomas J. Black, Tom Huybrechts, CloudBees, Inc.
+ *    Kohsuke Kawaguchi, Winston Prakash, Seiji Sogabe, Stephen Connolly, Thomas J. Black, Tom Huybrechts
  *     
- *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -26,10 +25,7 @@ import hudson.node_monitors.NodeMonitor;
 import hudson.remoting.Channel;
 import hudson.remoting.VirtualChannel;
 import hudson.remoting.Callable;
-import hudson.security.ACL;
-import hudson.security.AccessControlled;
-import hudson.security.Permission;
-import hudson.security.PermissionGroup;
+import hudson.security.*;
 import hudson.slaves.ComputerLauncher;
 import hudson.slaves.RetentionStrategy;
 import hudson.slaves.WorkspaceList;
@@ -179,7 +175,7 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
     }
 
     public ACL getACL() {
-        return Hudson.getInstance().getAuthorizationStrategy().getACL(this);
+        return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy().getACL(this);
     }
 
     public void checkPermission(Permission permission) {
@@ -964,7 +960,7 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
             offlineMessage = Util.fixEmptyAndTrim(offlineMessage);
             setTemporarilyOffline(!temporarilyOffline,
                     OfflineCause.create(hudson.slaves.Messages._SlaveComputer_DisconnectedBy(
-                        Hudson.getAuthentication().getName(),
+                        HudsonSecurityManager.getAuthentication().getName(),
                         offlineMessage!=null ? " : " + offlineMessage : "")));
         } else {
             setTemporarilyOffline(!temporarilyOffline,null);

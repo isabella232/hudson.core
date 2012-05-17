@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2011 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi, Winston Prakash
+ *   Kohsuke Kawaguchi, Winston Prakash
  *     
  *
  *******************************************************************************/ 
@@ -25,6 +25,7 @@ import hudson.model.Hudson.MasterComputer;
 import hudson.remoting.Callable;
 import hudson.remoting.Channel;
 import hudson.remoting.VirtualChannel;
+import hudson.security.HudsonSecurityEntitiesHolder;
 import hudson.util.Secret;
 import org.springframework.security.Authentication;
 import org.springframework.security.AuthenticationException;
@@ -78,11 +79,10 @@ public class ClientAuthenticationCache implements Serializable {
      * @return {@link Hudson#ANONYMOUS} if no such credential is found, or if the stored credential is invalid.
      */
     public Authentication get() {
-        Hudson h = Hudson.getInstance();
         Secret userName = Secret.decrypt(props.getProperty(getPropertyKey()));
         if (userName==null) return Hudson.ANONYMOUS; // failed to decrypt
         try {
-            UserDetails u = h.getSecurityRealm().loadUserByUsername(userName.toString());
+            UserDetails u = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm().loadUserByUsername(userName.toString());
             return new UsernamePasswordAuthenticationToken(u.getUsername(), u.getPassword(), u.getAuthorities());
         } catch (AuthenticationException e) {
             return Hudson.ANONYMOUS;

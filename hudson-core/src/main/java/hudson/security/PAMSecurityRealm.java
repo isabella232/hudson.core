@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009, Oracle Corporation
+ * Copyright (c) 2004-2012, Oracle Corporation
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -18,7 +18,6 @@ package hudson.security;
 import hudson.EnvVars;
 import hudson.Functions;
 import hudson.model.Descriptor;
-import hudson.model.Hudson;
 import hudson.Util;
 import hudson.Extension;
 import hudson.util.FormValidation;
@@ -105,7 +104,7 @@ public class PAMSecurityRealm extends SecurityRealm {
 
         // these providers apply everywhere
         RememberMeAuthenticationProvider rememberMeAuthenticationProvider = new RememberMeAuthenticationProvider();
-        rememberMeAuthenticationProvider.setKey(Hudson.getInstance().getSecretKey());
+        rememberMeAuthenticationProvider.setKey(HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecretKey());
 
         // this doesn't mean we allow anonymous access.
         // we just authenticate anonymous users as such,

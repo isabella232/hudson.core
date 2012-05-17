@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,10 +8,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
  *
+ *  Kohsuke Kawaguchi, Winston Prakash
+ *     
  *******************************************************************************/ 
 
 package hudson.security;
@@ -25,8 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.List;
 import java.util.ArrayList;
-
-import hudson.model.Hudson;
 
 /**
  * {@link Authentication} implementation for {@link Principal}
@@ -55,7 +52,7 @@ public final class ContainerAuthentication implements Authentication {
         // Servlet API doesn't provide a way to list up all roles the current user
         // has, so we need to ask AuthorizationStrategy what roles it is going to check against.
         List<GrantedAuthority> l = new ArrayList<GrantedAuthority>();
-        for( String g : Hudson.getInstance().getAuthorizationStrategy().getGroups()) {
+        for( String g : HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy().getGroups()) {
             if(request.isUserInRole(g))
                 l.add(new GrantedAuthorityImpl(g));
         }

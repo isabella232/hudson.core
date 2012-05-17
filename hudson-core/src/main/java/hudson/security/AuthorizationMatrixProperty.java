@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,9 +9,8 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi, Yahoo! Inc., Peter Hayes, Tom Huybrechts
+ *    Kohsuke Kawaguchi, Winston Prakash, Peter Hayes, Tom Huybrechts
  *     
- *
  *******************************************************************************/ 
 
 package hudson.security;
@@ -22,7 +21,6 @@ import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
-import hudson.model.Hudson;
 import hudson.model.Run;
 import hudson.Extension;
 import hudson.util.FormValidation;
@@ -154,7 +152,7 @@ public class AuthorizationMatrixProperty extends JobProperty<Job<?, ?>> {
 		@Override
 		public boolean isApplicable(Class<? extends Job> jobType) {
             // only applicable when ProjectMatrixAuthorizationStrategy is in charge
-            return Hudson.getInstance().getAuthorizationStrategy() instanceof ProjectMatrixAuthorizationStrategy;
+            return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy() instanceof ProjectMatrixAuthorizationStrategy;
 		}
 
 		@Override

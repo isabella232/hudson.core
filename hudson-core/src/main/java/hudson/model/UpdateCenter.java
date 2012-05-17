@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,9 +9,8 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi, Yahoo! Inc., Seiji Sogabe
+ *    Kohsuke Kawaguchi, Winston Prakash, Seiji Sogabe
  *     
- *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -31,7 +30,7 @@ import hudson.lifecycle.Lifecycle;
 import hudson.model.UpdateSite.Data;
 import hudson.model.UpdateSite.Plugin;
 import hudson.model.listeners.SaveableListener;
-import hudson.security.ACL;
+import hudson.security.HudsonSecurityManager;
 import hudson.util.DaemonThreadFactory;
 import hudson.util.IOException2;
 import hudson.util.PersistedList;
@@ -66,7 +65,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.springframework.security.context.SecurityContextHolder;
 
 
 /**
@@ -267,7 +265,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
     public void doUpgrade(StaplerResponse rsp) throws IOException, ServletException {
         requirePOST();
         Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
-        HudsonUpgradeJob job = new HudsonUpgradeJob(getCoreSource(), Hudson.getAuthentication());
+        HudsonUpgradeJob job = new HudsonUpgradeJob(getCoreSource(), HudsonSecurityManager.getAuthentication());
         if(!Lifecycle.get().canRewriteHudsonWar()) {
             sendError("Hudson upgrade not supported in this running mode");
             return;
@@ -296,7 +294,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
             return;
         }
 
-        HudsonDowngradeJob job = new HudsonDowngradeJob(getCoreSource(), Hudson.getAuthentication());
+        HudsonDowngradeJob job = new HudsonDowngradeJob(getCoreSource(), HudsonSecurityManager.getAuthentication());
         LOGGER.info("Scheduling the core downgrade");
         addJob(job);
         rsp.sendRedirect2(".");
@@ -957,10 +955,10 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
             PluginWrapper pw = plugin.getInstalled();
             if (pw!=null && pw.isBundled())
                 try {
-                    SecurityContextHolder.getContext().setAuthentication(ACL.SYSTEM);
+                    HudsonSecurityManager.grantFullControl();
                     pw.doPin();
                 } finally {
-                    SecurityContextHolder.clearContext();
+                    HudsonSecurityManager.resetFullControl();
                 }
         }
 

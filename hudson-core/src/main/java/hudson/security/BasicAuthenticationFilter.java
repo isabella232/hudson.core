@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,15 +8,14 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
-*
-*    Kohsuke Kawaguchi
+ *
+ *    Kohsuke Kawaguchi, Winston Prakash
  *     
  *
  *******************************************************************************/ 
 
 package hudson.security;
 
-import hudson.model.Hudson;
 import hudson.util.Scrambler;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -88,7 +87,7 @@ public class BasicAuthenticationFilter implements Filter {
 
         String path = req.getServletPath();
         if(authorization==null || req.getUserPrincipal() !=null || path.startsWith("/secured/")
-        || !Hudson.getInstance().isUseSecurity()) {
+        || !HudsonSecurityEntitiesHolder.getHudsonSecurityManager().isUseSecurity()) {
             // normal requests, or security not enabled
             if(req.getUserPrincipal()!=null) {
                 // before we route this request, integrate the container authentication

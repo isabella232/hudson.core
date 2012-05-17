@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,9 +9,8 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi,   Daniel Dyer, Tom Huybrechts
+ *  Kohsuke Kawaguchi, Winston Prakash,  Daniel Dyer, Tom Huybrechts
  *     
- *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -27,6 +26,7 @@ import hudson.model.listeners.SaveableListener;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
 import hudson.security.ACL;
+import hudson.security.HudsonSecurityEntitiesHolder;
 import hudson.util.AtomicFileWriter;
 import hudson.util.IOException2;
 import org.apache.tools.ant.taskdefs.Copy;
@@ -342,7 +342,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
      * Returns the {@link ACL} for this object.
      */
     public ACL getACL() {
-        return Hudson.getInstance().getAuthorizationStrategy().getACL(this);
+        return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy().getACL(this);
     }
 
     /**

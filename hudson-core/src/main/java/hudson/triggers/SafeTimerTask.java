@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,22 +8,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
  *
+ *   Kohsuke Kawaguchi, Winston Prakash
+ *     
  *******************************************************************************/ 
 
 package hudson.triggers;
-
-import org.springframework.security.context.SecurityContextHolder;
 
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-import hudson.security.ACL;
+import hudson.security.HudsonSecurityManager;
 
 /**
  * {@link Timer} wrapper so that a fatal error in {@link TimerTask}
@@ -41,14 +38,14 @@ public abstract class SafeTimerTask extends TimerTask {
     public final void run() {
         // background activity gets system credential,
         // just like executors get it.
-        SecurityContextHolder.getContext().setAuthentication(ACL.SYSTEM);
+        HudsonSecurityManager.grantFullControl();
 
         try {
             doRun();
         } catch(Throwable t) {
             LOGGER.log(Level.SEVERE, "Timer task "+this+" failed",t);
         } finally {
-            SecurityContextHolder.clearContext();
+            HudsonSecurityManager.resetFullControl();
         }
     }
 

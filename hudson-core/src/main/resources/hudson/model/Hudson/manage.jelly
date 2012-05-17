@@ -61,7 +61,7 @@
 
             <table style="padding-left: 2em;" id="management-links">
                 
-                <local:feature icon="secure.png" href="hudsonSecurityManager"    title="${%Configure Security}">
+                <local:feature icon="secure.png" href="securityManager"    title="${%Configure Security}">
                     ${%Configure Authentication and Authorization Stretegy for Hudson Security.}
                 </local:feature>
                 

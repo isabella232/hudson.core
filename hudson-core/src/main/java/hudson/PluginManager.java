@@ -11,7 +11,6 @@
  *
  *    Kohsuke Kawaguchi, Stephen Connolly, Tom Huybrechts, Winston Prakash
  *     
- *
  *******************************************************************************/ 
 
 package hudson;

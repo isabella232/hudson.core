@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,9 +9,8 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi, Yahoo! Inc.
+ *    Kohsuke Kawaguchi, Winston Prakash
  *     
- *
  *******************************************************************************/ 
 
 package hudson.security;
@@ -284,7 +283,7 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
             if(!subject.hasPermission(permission))  return FormValidation.ok(); // can't check
 
             final String v = value.substring(1,value.length()-1);
-            SecurityRealm sr = Hudson.getInstance().getSecurityRealm();
+            SecurityRealm sr = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm();
             String ev = Functions.escape(v);
 
             if(v.equals("authenticated"))

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,14 +9,14 @@
  *
  * Contributors:
  *     
- *
+ * Kohsuke Kawaguchi, Winston Prakash
+ * 
  *******************************************************************************/ 
 
 package hudson.model;
 
-import hudson.security.ACL;
+import hudson.security.HudsonSecurityManager;
 import hudson.util.StreamTaskListener;
-import org.springframework.security.context.SecurityContextHolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +60,7 @@ public abstract class AsyncPeriodicWork extends PeriodicWork {
 
                     StreamTaskListener l = createListener();
                     try {
-                        SecurityContextHolder.getContext().setAuthentication(ACL.SYSTEM);
+                        HudsonSecurityManager.grantFullControl();
                         
                         execute(l);
                     } catch (IOException e) {

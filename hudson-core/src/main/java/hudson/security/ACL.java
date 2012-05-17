@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,10 +8,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
  *
+ *    Kohsuke Kawaguchi
+ *     
  *******************************************************************************/ 
 
 package hudson.security;
@@ -20,7 +19,6 @@ import org.springframework.security.Authentication;
 import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
 import org.springframework.security.acls.sid.PrincipalSid;
 import org.springframework.security.acls.sid.Sid;
-import hudson.model.Hudson;
 import hudson.model.Executor;
 
 /**
@@ -40,7 +38,7 @@ public abstract class ACL {
      *      if the user doesn't have the permission.
      */
     public final void checkPermission(Permission p) {
-        Authentication a = Hudson.getAuthentication();
+        Authentication a = HudsonSecurityManager.getAuthentication();
         if(!hasPermission(a,p))
             throw new AccessDeniedException2(a,p);
     }
@@ -52,7 +50,7 @@ public abstract class ACL {
      *      if the user doesn't have the permission.
      */
     public final boolean hasPermission(Permission p) {
-        return hasPermission(Hudson.getAuthentication(),p);
+        return hasPermission(HudsonSecurityManager.getAuthentication(),p);
     }
 
     /**

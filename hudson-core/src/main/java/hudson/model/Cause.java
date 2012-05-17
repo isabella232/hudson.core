@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,9 +9,8 @@
  *
  * Contributors: 
  *
- *    Michael B. Donohue, Seiji Sogabe
+ *    Michael B. Donohue, Seiji Sogabe, Winston Prakash
  *     
- *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -26,6 +25,7 @@ import hudson.util.XStream2;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import hudson.security.HudsonSecurityManager;
 
 /**
  * Cause object base class.  This class hierarchy is used to keep track of why 
@@ -178,7 +178,7 @@ public abstract class Cause {
     public static class UserCause extends Cause {
         private String authenticationName;
         public UserCause() {
-            this.authenticationName = Hudson.getAuthentication().getName();
+            this.authenticationName = HudsonSecurityManager.getAuthentication().getName();
         }
 
         @Exported(visibility=3)

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,9 +9,8 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi,   Seiji Sogabe, Stephen Connolly
+ *   Kohsuke Kawaguchi, Winston Prakash, Seiji Sogabe, Stephen Connolly
  *     
- *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -28,6 +27,7 @@ import hudson.node_monitors.NodeMonitor;
 import hudson.remoting.VirtualChannel;
 import hudson.security.ACL;
 import hudson.security.AccessControlled;
+import hudson.security.HudsonSecurityEntitiesHolder;
 import hudson.security.Permission;
 import hudson.slaves.ComputerListener;
 import hudson.slaves.NodeDescriptor;
@@ -339,7 +339,7 @@ public abstract class Node extends AbstractModelObject implements Describable<No
     }
     
     public ACL getACL() {
-        return Hudson.getInstance().getAuthorizationStrategy().getACL(this);
+        return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy().getACL(this);
     }
     
     public final void checkPermission(Permission permission) {

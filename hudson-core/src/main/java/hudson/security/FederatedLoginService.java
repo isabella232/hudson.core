@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2010, CloudBees, Inc.
+ * Copyright (c) 2012, CloudBees, Inc.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,6 +9,7 @@
  *
  * Contributors: 
  *     
+ *  Kohsuke Kawaguchi, Winston Prakash
  *
  *******************************************************************************/ 
 
@@ -192,7 +193,7 @@ public abstract class FederatedLoginService implements ExtensionPoint {
             User u = locateUser();
             if (u!=null) {
                 // login as this user
-                UserDetails d = Hudson.getInstance().getSecurityRealm().loadUserByUsername(u.getId());
+                UserDetails d = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm().loadUserByUsername(u.getId());
 
                 UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(d,"",d.getAuthorities());
                 token.setDetails(d);
@@ -254,7 +255,7 @@ public abstract class FederatedLoginService implements ExtensionPoint {
         }
 
         public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
-            SecurityRealm sr = Hudson.getInstance().getSecurityRealm();
+            SecurityRealm sr = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm();
             if (sr.allowsSignup()) {
                 try {
                     sr.commenceSignup(identity).generateResponse(req,rsp,node);

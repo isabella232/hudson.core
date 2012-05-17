@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,9 +9,8 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi, Erik Ramfelt, Tom Huybrechts
+ *  Kohsuke Kawaguchi, Winston Prakash, Erik Ramfelt, Tom Huybrechts
  *     
- *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -25,9 +24,7 @@ import hudson.XmlFile;
 import hudson.BulkChange;
 import hudson.model.Descriptor.FormException;
 import hudson.model.listeners.SaveableListener;
-import hudson.security.ACL;
-import hudson.security.AccessControlled;
-import hudson.security.Permission;
+import hudson.security.*;
 import hudson.util.RunList;
 import hudson.util.XStream2;
 import net.sf.json.JSONObject;
@@ -126,19 +123,25 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
             if(itr.next()==null)
                 itr.remove();            
         }
-
-        // allocate default instances if needed.
-        // doing so after load makes sure that newly added user properties do get reflected
-        for (UserPropertyDescriptor d : UserProperty.all()) {
-            if(getProperty(d.clazz)==null) {
-                UserProperty up = d.newInstance(this);
-                if(up!=null)
-                    properties.add(up);
+        
+        // In case Hudson is not yet initialized (i.e Hudson Security is used
+        // outside of Hudson Model (Ex. Initial Setup), don't load the extended
+        // properties
+        if (Hudson.getInstance() != null) {
+            // allocate default instances if needed.
+            // doing so after load makes sure that newly added user properties do get reflected
+            for (UserPropertyDescriptor d : UserProperty.all()) {
+                if (getProperty(d.clazz) == null) {
+                    UserProperty up = d.newInstance(this);
+                    if (up != null) {
+                        properties.add(up);
+                    }
+                }
             }
         }
-
-        for (UserProperty p : properties)
+        for (UserProperty p : properties) {
             p.setUser(this);
+        }
     }
 
     @Exported
@@ -289,7 +292,7 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
      * @since 1.172
      */
     public static User current() {
-        Authentication a = Hudson.getAuthentication();
+        Authentication a = HudsonSecurityManager.getAuthentication();
         if(a instanceof AnonymousAuthenticationToken)
             return null;
         return get(a.getName());
@@ -385,10 +388,10 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     }
 
     /**
-     * Gets the directory where Hudson stores user information.
+     * Gets the directory where the user information is stored.
      */
     private static File getRootDir() {
-        return new File(Hudson.getInstance().getRootDir(), "users");
+        return new File(HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getHudsonHome(), "users");
     }
 
     /**
@@ -461,7 +464,7 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     public void doDoDelete(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         requirePOST();
         checkPermission(Hudson.ADMINISTER);
-        if (id.equals(Hudson.getAuthentication().getName())) {
+        if (id.equals(HudsonSecurityManager.getAuthentication().getName())) {
             rsp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Cannot delete self");
             return;
         }
@@ -518,7 +521,7 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     }
 
     public ACL getACL() {
-        final ACL base = Hudson.getInstance().getAuthorizationStrategy().getACL(this);
+        final ACL base = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy().getACL(this);
         // always allow a non-anonymous user full control of himself.
         return new ACL() {
             public boolean hasPermission(Authentication a, Permission permission) {
@@ -540,7 +543,7 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
      * With ADMINISTER permission, can delete users with persisted data but can't delete self.
      */
     public boolean canDelete() {
-        return hasPermission(Hudson.ADMINISTER) && !id.equals(Hudson.getAuthentication().getName())
+        return hasPermission(Hudson.ADMINISTER) && !id.equals(HudsonSecurityManager.getAuthentication().getName())
                 && new File(getRootDir(), id).exists();
     }
 

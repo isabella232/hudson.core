@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,10 +8,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
  *
+ *    Kohsuke Kawaguchi, Winston Prakash
+ *     
  *******************************************************************************/ 
 
 package hudson.model;
@@ -19,6 +18,7 @@ package hudson.model;
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 import hudson.Util;
 import hudson.security.ACL;
+import hudson.security.HudsonSecurityEntitiesHolder;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -52,7 +52,7 @@ public final class BuildAuthorizationToken {
     }
 
     public static void checkPermission(AbstractProject project, BuildAuthorizationToken token, StaplerRequest req, StaplerResponse rsp) throws IOException {
-        if (!Hudson.getInstance().isUseSecurity())
+        if (!HudsonSecurityEntitiesHolder.getHudsonSecurityManager().isUseSecurity())
             return;    // everyone is authorized
 
         if(token!=null && token.token != null) {

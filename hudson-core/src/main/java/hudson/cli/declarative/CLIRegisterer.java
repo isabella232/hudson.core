@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010, Oracle Corporation.
+ * Copyright (c) 2004-2012, Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,9 +9,8 @@
  *
  * Contributors: 
  *
- *   
+ *   Kohsuke Kawaguchi, Winston Prakash
  *       
- *
  *******************************************************************************/ 
 
 package hudson.cli.declarative;
@@ -25,6 +24,7 @@ import hudson.cli.CloneableCLICommand;
 import hudson.model.Hudson;
 import hudson.remoting.Channel;
 import hudson.security.CliAuthenticator;
+import hudson.security.HudsonSecurityEntitiesHolder;
 import org.springframework.security.Authentication;
 import org.springframework.security.context.SecurityContext;
 import org.springframework.security.context.SecurityContextHolder;
@@ -135,7 +135,7 @@ public class CLIRegisterer extends ExtensionFinder {
                                         binders.add(new MethodBinder(chains.pop(),parser));
 
                                     // authentication
-                                    CliAuthenticator authenticator = Hudson.getInstance().getSecurityRealm().createCliAuthenticator(this);
+                                    CliAuthenticator authenticator = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm().createCliAuthenticator(this);
                                     new ClassParser().parse(authenticator,parser);
 
                                     // fill up all the binders

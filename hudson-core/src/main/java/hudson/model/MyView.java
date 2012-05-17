@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,8 +8,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
-*
-*    Kohsuke Kawaguchi, Seiji Sogabe, Tom Huybrechts
+ *
+ *    Kohsuke Kawaguchi, Winston Prakash, Seiji Sogabe, Tom Huybrechts
  *     
  *
  *******************************************************************************/ 
@@ -29,6 +29,7 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.model.Descriptor.FormException;
 import hudson.Extension;
+import hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
  * {@link View} that only contains projects for which the current user has access to.
@@ -92,7 +93,7 @@ public class MyView extends View {
          */
         @Override
         public boolean isInstantiable() {
-            return Hudson.getInstance().isUseSecurity();
+            return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().isUseSecurity();
         }
 
         public String getDisplayName() {

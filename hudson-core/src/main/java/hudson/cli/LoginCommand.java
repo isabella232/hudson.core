@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,13 +9,15 @@
  *
  * Contributors:
  *     
- *
+ *   Kohsuke Kawaguchi, Winston Prakash
+ * 
  *******************************************************************************/ 
 
 package hudson.cli;
 
 import hudson.Extension;
 import hudson.model.Hudson;
+import hudson.security.HudsonSecurityManager;
 import org.springframework.security.Authentication;
 import org.kohsuke.args4j.CmdLineException;
 
@@ -38,13 +40,13 @@ public class LoginCommand extends CLICommand {
      */
     @Override
     protected Authentication loadStoredAuthentication() throws InterruptedException {
-        return Hudson.ANONYMOUS;
+        return HudsonSecurityManager.ANONYMOUS;
     }
 
     @Override
     protected int run() throws Exception {
         Authentication a = Hudson.getAuthentication();
-        if (a==Hudson.ANONYMOUS)
+        if (a==HudsonSecurityManager.ANONYMOUS)
             throw new CmdLineException("No credentials specified."); // this causes CLI to show the command line options.
 
         ClientAuthenticationCache store = new ClientAuthenticationCache(channel);

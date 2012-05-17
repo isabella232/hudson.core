@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,10 +8,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
-*
-*    Kohsuke Kawaguchi, Brian Westrich, Red Hat, Inc., Stephen Connolly, Tom Huybrechts
- *     
  *
+ *    Kohsuke Kawaguchi, Winston Prakash, Brian Westrich, Stephen Connolly, Tom Huybrechts
+ *     
  *******************************************************************************/ 
 
 package hudson.model;
@@ -25,14 +24,12 @@ import hudson.model.queue.Tasks;
 import hudson.model.queue.WorkUnit;
 import hudson.util.TimeUnit2;
 import hudson.util.InterceptingProxy;
-import hudson.security.ACL;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.HttpResponses;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.ExportedBean;
 import org.kohsuke.stapler.export.Exported;
-import org.springframework.security.context.SecurityContextHolder;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -41,6 +38,7 @@ import java.util.logging.Level;
 import java.lang.reflect.Method;
 
 import static hudson.model.queue.Executables.*;
+import hudson.security.HudsonSecurityManager;
 
 
 /**
@@ -84,7 +82,7 @@ public class Executor extends Thread implements ModelObject {
     @Override
     public void run() {
         // run as the system user. see ACL.SYSTEM for more discussion about why this is somewhat broken
-        SecurityContextHolder.getContext().setAuthentication(ACL.SYSTEM);
+        HudsonSecurityManager.grantFullControl();
 
         try {
             finishTime = System.currentTimeMillis();

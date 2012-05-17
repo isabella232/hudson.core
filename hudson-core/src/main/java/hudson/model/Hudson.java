@@ -9,8 +9,8 @@
  *
  * Contributors: 
  *
- *  Kohsuke Kawaguchi, Nikita Levyankov, Erik Ramfelt, Koichi Fujikawa, 
- *  Seiji Sogabe, Stephen Connolly, Tom Huybrechts, Alan Harder, Winston Prakash
+ *  Kohsuke Kawaguchi, Winston Prakash, Nikita Levyankov, Erik Ramfelt, Koichi Fujikawa, 
+ *  Seiji Sogabe, Stephen Connolly, Tom Huybrechts, Alan Harder
  *     
  *******************************************************************************/ 
 
@@ -67,16 +67,6 @@ import hudson.scm.RepositoryBrowser;
 import hudson.scm.SCM;
 import hudson.search.CollectionSearchIndex;
 import hudson.search.SearchIndexBuilder;
-import hudson.security.ACL;
-import hudson.security.AccessControlled;
-import hudson.security.AuthorizationStrategy;
-import hudson.security.FederatedLoginService;
-import hudson.security.Permission;
-import hudson.security.PermissionGroup;
-import hudson.security.SecurityMode;
-import hudson.security.SecurityRealm;
-import hudson.security.HudsonSecurityManager;
-import hudson.security.csrf.CrumbIssuer;
 
 import hudson.slaves.Cloud;
 import hudson.slaves.ComputerListener;
@@ -111,7 +101,6 @@ import hudson.util.MultipartFormDataParser;
 import hudson.util.RemotingDiagnostics;
 import hudson.util.RemotingDiagnostics.HeapDump;
 import hudson.util.StreamTaskListener;
-import hudson.util.TextFile;
 import hudson.util.VersionNumber;
 import hudson.util.XStream2;
 import hudson.util.Service;
@@ -164,6 +153,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import static hudson.init.InitMilestone.*;
+import hudson.security.*;
+import hudson.security.csrf.CrumbIssuer;
+
 import hudson.stapler.WebAppController;
 import static javax.servlet.http.HttpServletResponse.*;
 import java.io.File;
@@ -174,7 +166,6 @@ import java.io.PrintWriter;
 import java.net.BindException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.security.SecureRandom;
 import java.text.Collator;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -213,10 +204,9 @@ import java.util.regex.Pattern;
 import org.hudsonci.script.ScriptSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.security.AccessDeniedException;
 import org.springframework.security.Authentication;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.providers.anonymous.AnonymousAuthenticationToken;
 import org.springframework.security.ui.AbstractProcessingFilter;
 
 /**
@@ -389,7 +379,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Loaded plugins.
      */
     public transient final PluginManager pluginManager;
-    public transient final HudsonSecurityManager hudsonSecurityManager;
     public transient volatile TcpSlaveAgentListener tcpSlaveAgentListener;
     private transient UDPBroadcastThread udpBroadcastThread;
     private transient DNSMultiCast dnsMultiCast;
@@ -502,12 +491,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public static Hudson getInstance() {
         return theInstance;
     }
-    /**
-     * Secrete key generated once and used for a long time, beyond
-     * container start/stop. Persisted outside <tt>config.xml</tt> to avoid
-     * accidental exposure.
-     */
-    private transient final String secretKey;
+     
     private transient final UpdateCenter updateCenter = new UpdateCenter();
     /**
      * True if the user opted out from the statistics tracking. We'll never send anything if this is true.
@@ -557,18 +541,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                 throw e;
             }
 
-            // get or create the secret
-            TextFile secretFile = new TextFile(new File(Hudson.getInstance().getRootDir(), "secret.key"));
-            if (secretFile.exists()) {
-                secretKey = secretFile.readTrim();
-            } else {
-                SecureRandom sr = new SecureRandom();
-                byte[] random = new byte[32];
-                sr.nextBytes(random);
-                secretKey = Util.toHexString(random);
-                secretFile.write(secretKey);
-            }
-
             try {
                 proxy = ProxyConfiguration.load();
             } catch (IOException e) {
@@ -579,8 +551,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                 pluginManager = new LocalPluginManager(this);
             }
             this.pluginManager = pluginManager;
-            
-            hudsonSecurityManager = new HudsonSecurityManager(servletContext);
             
             // JSON binding needs to be able to see all the classes from all the plugins
             WebApp.get(servletContext).setClassLoader(pluginManager.uberClassLoader);
@@ -638,7 +608,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             }
                     
         } finally {
-            SecurityContextHolder.clearContext();
+            HudsonSecurityManager.resetFullControl();
         }
     }
 
@@ -678,7 +648,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                     }
                 } finally {
                     t.setName(name);
-                    SecurityContextHolder.clearContext();
+                    HudsonSecurityManager.resetFullControl();
                 }
             }
         };
@@ -779,8 +749,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         return pluginManager;
     }
     
-    public HudsonSecurityManager getHudsonSecurityManager() {
-        return hudsonSecurityManager;
+    public HudsonSecurityManager getSecurityManager() {
+        return HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
     }
 
     public UpdateCenter getUpdateCenter() {
@@ -817,7 +787,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * This value is useful for implementing some of the security features.
      */
     public String getSecretKey() {
-        return secretKey;
+        return getSecurityManager().getSecretKey();
     }
 
     /**
@@ -825,7 +795,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * @since 1.308
      */
     public SecretKey getSecretKeyAsAES128() {
-        return Util.toAes128Key(secretKey);
+        return getSecurityManager().getSecretKeyAsAES128();
     }
 
     /**
@@ -1071,7 +1041,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * @since 1.391
      */
     public MarkupFormatter getMarkupFormatter() {
-        return hudsonSecurityManager.getMarkupFormatter();
+        return getSecurityManager().getMarkupFormatter();
     }
 
     /**
@@ -1080,7 +1050,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * @since 1.391
      */
     public void setMarkupFormatter(MarkupFormatter markupFormatter) {
-        hudsonSecurityManager.setMarkupFormatter(markupFormatter);
+        getSecurityManager().setMarkupFormatter(markupFormatter);
     }
 
     /**
@@ -1916,7 +1886,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     @Exported
     public boolean isUseSecurity() {
-        return hudsonSecurityManager.isUseSecurity();
+        return getSecurityManager().isUseSecurity();
     }
 
     /**
@@ -1933,7 +1903,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * in Hudson.
      */
     public SecurityMode getSecurity() {
-        return hudsonSecurityManager.getSecurity();
+        return getSecurityManager().getSecurity();
     }
 
     /**
@@ -1941,7 +1911,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      *      never null.
      */
     public SecurityRealm getSecurityRealm() {
-        return hudsonSecurityManager.getSecurityRealm();
+        return getSecurityManager().getSecurityRealm();
     }
 
     public Lifecycle getLifecycle() {
@@ -1990,7 +1960,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     @Override
     public ACL getACL() {
-        return hudsonSecurityManager.getACL();
+        return getSecurityManager().getACL();
     }
 
     /**
@@ -1998,7 +1968,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      *      never null.
      */
     public AuthorizationStrategy getAuthorizationStrategy() {
-        return hudsonSecurityManager.getAuthorizationStrategy();
+        return getSecurityManager().getAuthorizationStrategy();
     }
 
     /**
@@ -2332,8 +2302,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                     views.add(0, v);
                     primaryView = v.getViewName();
                 }
-
-                hudsonSecurityManager.load();
 
                 // Initialize the filter with the crumb issuer
                 setCrumbIssuer(crumbIssuer);
@@ -2804,7 +2772,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Logs out the user.
      */
     public void doLogout(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
-        hudsonSecurityManager.doLogout(req, rsp);
+        getSecurityManager().doLogout(req, rsp);
     }
 
     /**
@@ -3142,19 +3110,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Gets the {@link Authentication} object that represents the user
-     * associated with the current request.
+     * @deprecated As of release 3.0.0, replaced by {@link HudsonSecurityManager#getAuthentication()}
      */
-    public static Authentication getAuthentication() {
-        Authentication a = SecurityContextHolder.getContext().getAuthentication();
-        // on Tomcat while serving the login page, this is null despite the fact
-        // that we have filters. Looking at the stack trace, Tomcat doesn't seem to
-        // run the request through filters when this is the login request.
-        // see http://www.nabble.com/Matrix-authorization-problem-tp14602081p14886312.html
-        if (a == null) {
-            a = ANONYMOUS;
-        }
-        return a;
+    @Deprecated public static Authentication getAuthentication() {
+        return HudsonSecurityManager.getAuthentication();
     }
 
     /**
@@ -3659,7 +3618,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      *      against.
      */
     public static boolean isAdmin() {
-        return Hudson.getInstance().getACL().hasPermission(ADMINISTER);
+        return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getACL().hasPermission(ADMINISTER);
     }
 
     /**
@@ -3792,15 +3751,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public static final PermissionGroup PERMISSIONS = Permission.HUDSON_PERMISSIONS;
     public static final Permission ADMINISTER = Permission.HUDSON_ADMINISTER;
     public static final Permission READ = new Permission(PERMISSIONS, "Read", Messages._Hudson_ReadPermission_Description(), Permission.READ);
-    /**
-     * {@link Authentication} object that represents the anonymous user.
-     * Because Spring Security creates its own {@link AnonymousAuthenticationToken} instances, the code must not
-     * expect the singleton semantics. This is just a convenient instance.
-     *
-     * @since 1.343
-     */
+     
     public static final Authentication ANONYMOUS = HudsonSecurityManager.ANONYMOUS;
-
+     
     static {
         XSTREAM.alias("hudson", Hudson.class);
         XSTREAM.alias("slave", DumbSlave.class);

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2011 Oracle Corporation.
+ * Copyright (c) 2004-2012 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,10 +9,9 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi, Martin Eigenbrodt,    Matthew R. Harrah, Red Hat, Inc., Stephen Connolly, Tom Huybrechts,
- *    Winston Prakash, Anton Kozak, Nikita Levyankov
+ *   Kohsuke Kawaguchi, Winston Prakash, Martin Eigenbrodt, Matthew R. Harrah,
+ *   Stephen Connolly, Tom Huybrechts, Anton Kozak, Nikita Levyankov
  *     
- *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -41,10 +40,7 @@ import hudson.search.SearchIndex;
 import hudson.search.SearchIndexBuilder;
 import hudson.search.SearchItem;
 import hudson.search.SearchItems;
-import hudson.security.ACL;
-import hudson.security.AuthorizationMatrixProperty;
-import hudson.security.Permission;
-import hudson.security.ProjectMatrixAuthorizationStrategy;
+import hudson.security.*;
 import hudson.tasks.LogRotator;
 import hudson.util.ColorPalette;
 import hudson.util.CopyOnWriteList;
@@ -489,7 +485,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * @param user user
      */
     protected void grantProjectMatrixPermissions(User user) {
-        if (Hudson.getInstance().getAuthorizationStrategy() instanceof ProjectMatrixAuthorizationStrategy) {
+        if (HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy() instanceof ProjectMatrixAuthorizationStrategy) {
             Map<Permission, Set<String>> grantedPermissions = new HashMap<Permission, Set<String>>();
             Set<String> users = Sets.newHashSet(user.getId());
             grantedPermissions.put(Item.BUILD, users);
@@ -1574,7 +1570,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     @Override
     public ACL getACL() {
-        return Hudson.getInstance().getAuthorizationStrategy().getACL(this);
+        return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy().getACL(this);
     }
 
     public BuildTimelineWidget getTimeline() {

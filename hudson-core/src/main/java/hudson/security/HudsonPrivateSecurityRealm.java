@@ -279,7 +279,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
      * Try to make this user a super-user
      */
     private void tryToMakeAdmin(User u) {
-        AuthorizationStrategy as = Hudson.getInstance().getAuthorizationStrategy();
+        AuthorizationStrategy as = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy();
         if (as instanceof GlobalMatrixAuthorizationStrategy) {
             GlobalMatrixAuthorizationStrategy ma = (GlobalMatrixAuthorizationStrategy) as;
             ma.add(Hudson.ADMINISTER, u.getId());
@@ -373,15 +373,15 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
     }
 
     public ACL getACL() {
-        return Hudson.getInstance().getACL();
+        return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getACL();
     }
 
     public void checkPermission(Permission permission) {
-        Hudson.getInstance().checkPermission(permission);
+        HudsonSecurityEntitiesHolder.getHudsonSecurityManager().checkPermission(permission);
     }
 
     public boolean hasPermission(Permission permission) {
-        return Hudson.getInstance().hasPermission(permission);
+        return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().hasPermission(permission);
     }
 
 
@@ -579,7 +579,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
 
             @Override
             public boolean isEnabled() {
-                return Hudson.getInstance().getSecurityRealm() instanceof HudsonPrivateSecurityRealm;
+                return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm() instanceof HudsonPrivateSecurityRealm;
             }
 
             public UserProperty newInstance(User user) {
@@ -595,7 +595,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
     @Extension
     public static final class ManageUserLinks extends ManagementLink {
         public String getIconFileName() {
-            if(Hudson.getInstance().getSecurityRealm() instanceof HudsonPrivateSecurityRealm)
+            if(HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm() instanceof HudsonPrivateSecurityRealm)
                 return "user.png";
             else
                 return null;    // not applicable now
@@ -697,7 +697,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
 
         private boolean needsToCreateFirstUser() {
             return !hasSomeUser()
-                && Hudson.getInstance().getSecurityRealm() instanceof HudsonPrivateSecurityRealm;
+                && HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm() instanceof HudsonPrivateSecurityRealm;
         }
 
         public void destroy() {
