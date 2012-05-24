@@ -65,13 +65,16 @@ public final class InstalledPluginManager {
                 return name.endsWith("hpi");
             }
         });
+        
+        if ((hpiArchives != null) && (hpiArchives.length > 0)) {
 
-        for (File archive : hpiArchives) {
-            try {
-                InstalledPluginInfo installedPluginInfo = new InstalledPluginInfo(archive);
-                installedPluginInfos.put(installedPluginInfo.getShortName(), installedPluginInfo);
-            } catch (IOException exc) {
-                logger.warn("Failed to load plugin ", exc);
+            for (File archive : hpiArchives) {
+                try {
+                    InstalledPluginInfo installedPluginInfo = new InstalledPluginInfo(archive);
+                    installedPluginInfos.put(installedPluginInfo.getShortName(), installedPluginInfo);
+                } catch (IOException exc) {
+                    logger.warn("Failed to load plugin ", exc);
+                }
             }
         }
     }
