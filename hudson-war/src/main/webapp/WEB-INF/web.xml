@@ -115,8 +115,9 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 
+  <!-- Entry Point to Hudson Web Application -->
   <listener>
-    <listener-class>hudson.WebAppMain</listener-class>
+    <listener-class>org.eclipse.hudson.HudsonServletContextListener</listener-class>
   </listener>
 
   <!--

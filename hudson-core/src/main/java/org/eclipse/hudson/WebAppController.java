@@ -9,11 +9,11 @@
  *
  * Contributors: 
  *
- *        
+ *  Jason Dillon 
  *
  *******************************************************************************/ 
 
-package hudson.stapler;
+package org.eclipse.hudson;
 
 import javax.servlet.ServletContext;
 import java.util.logging.Level;
@@ -103,6 +103,7 @@ public class WebAppController {
     public static class DefaultInstallStrategy
             implements InstallStrategy {
 
+        @Override
         public boolean isAllowed(final Object app) {
             return true;
         }

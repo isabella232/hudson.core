@@ -59,7 +59,7 @@ import hudson.scm.SCM;
 import hudson.scm.SCMDescriptor;
 import hudson.security.*;
 import hudson.security.csrf.CrumbIssuer;
-import hudson.security.captcha.CaptchaSupport;
+import org.eclipse.hudson.security.captcha.CaptchaSupport;
 import hudson.util.Secret;
 import hudson.views.MyViewsTabBar;
 import hudson.views.ViewsTabBar;
@@ -119,7 +119,7 @@ import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
-import org.hudsonci.script.ScriptSupport;
+import org.eclipse.hudson.script.ScriptSupport;
 
 /**
  * Utility functions used in views.
@@ -1083,7 +1083,7 @@ public class Functions {
      * @since 1.164
      */
     public static JellyContext getCurrentJellyContext() {
-        JellyContext context = ExpressionFactory2.CURRENT_CONTEXT.get();
+        JellyContext context = org.eclipse.hudson.ExpressionFactory2.CURRENT_CONTEXT.get();
         assert context!=null;
         return context;
     }

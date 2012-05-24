@@ -21,8 +21,8 @@ import hudson.Launcher.LocalLauncher;
 import hudson.Util;
 import hudson.model.Hudson;
 import hudson.util.StreamTaskListener;
-import hudson.util.jna.NativeAccessException;
-import hudson.util.jna.NativeUtils;
+import org.eclipse.hudson.jna.NativeAccessException;
+import org.eclipse.hudson.jna.NativeUtils;
  
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;

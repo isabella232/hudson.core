@@ -11,10 +11,9 @@
  *
  *    Winston Prakash
  *      
- *
  *******************************************************************************/ 
 
-package hudson.util.jna;
+package org.eclipse.hudson.jna;
 
 import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;

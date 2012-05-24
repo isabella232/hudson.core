@@ -13,7 +13,7 @@
  *      
  *******************************************************************************/ 
 
-package org.hudsonci.script;
+package org.eclipse.hudson.script;
 
 import hudson.model.Descriptor;
 

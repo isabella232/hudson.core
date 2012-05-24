@@ -21,8 +21,8 @@ import hudson.model.Descriptor;
 import hudson.Util;
 import hudson.Extension;
 import hudson.util.FormValidation;
-import hudson.util.jna.NativeAccessException;
-import hudson.util.jna.NativeUtils;
+import org.eclipse.hudson.jna.NativeAccessException;
+import org.eclipse.hudson.jna.NativeUtils;
 import java.util.Arrays;
 
 import org.kohsuke.stapler.DataBoundConstructor;

@@ -24,8 +24,8 @@ import hudson.remoting.Engine;
 import hudson.remoting.jnlp.MainDialog;
 import hudson.remoting.jnlp.MainMenu;
 import hudson.util.StreamTaskListener;
-import hudson.util.jna.NativeAccessException;
-import hudson.util.jna.NativeUtils;
+import org.eclipse.hudson.jna.NativeAccessException;
+import org.eclipse.hudson.jna.NativeUtils;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;

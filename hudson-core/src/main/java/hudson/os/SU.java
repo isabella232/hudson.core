@@ -27,8 +27,8 @@ import hudson.remoting.VirtualChannel;
 import hudson.remoting.Which;
 import hudson.slaves.Channels;
 import hudson.util.ArgumentListBuilder;
-import hudson.util.jna.NativeAccessException;
-import hudson.util.jna.NativeUtils;
+import org.eclipse.hudson.jna.NativeAccessException;
+import org.eclipse.hudson.jna.NativeUtils;
 
 import java.io.File;
 import java.io.IOException;

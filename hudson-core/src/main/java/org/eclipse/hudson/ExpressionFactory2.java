@@ -12,7 +12,7 @@
  *
  *******************************************************************************/ 
 
-package hudson;
+package org.eclipse.hudson;
 
 import org.springframework.security.SpringSecurityException;
 import org.apache.commons.jelly.JellyContext;
@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  *
  * @author Kohsuke Kawaguchi
 */
-final class ExpressionFactory2 implements ExpressionFactory {
+public final class ExpressionFactory2 implements ExpressionFactory {
     public Expression createExpression(String text) throws JellyException {
         try {
             return new JexlExpression(
@@ -179,5 +179,5 @@ final class ExpressionFactory2 implements ExpressionFactory {
      *
      * @see Functions#getCurrentJellyContext()
      */
-    protected static final ThreadLocal<JellyContext> CURRENT_CONTEXT = new ThreadLocal<JellyContext>();
+    public static final ThreadLocal<JellyContext> CURRENT_CONTEXT = new ThreadLocal<JellyContext>();
 }

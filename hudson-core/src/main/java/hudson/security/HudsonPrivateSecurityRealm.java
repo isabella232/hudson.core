@@ -23,7 +23,7 @@ import hudson.Util;
 import hudson.diagnosis.OldDataMonitor;
 import hudson.model.*;
 import hudson.security.FederatedLoginService.FederatedIdentity;
-import hudson.security.captcha.CaptchaSupport;
+import org.eclipse.hudson.security.captcha.CaptchaSupport;
 import hudson.tasks.Mailer;
 import hudson.util.PluginServletFilter;
 import hudson.util.Protector;

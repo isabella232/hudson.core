@@ -36,10 +36,10 @@ import hudson.util.HeadBufferingStream;
 import hudson.util.IOException2;
 import hudson.util.IOUtils;
 
-import hudson.util.jna.NativeUtils;
+import org.eclipse.hudson.jna.NativeUtils;
 
 import hudson.org.apache.tools.tar.TarInputStream;
-import hudson.util.jna.NativeAccessException;
+import org.eclipse.hudson.jna.NativeAccessException;
 
 
 import hudson.util.io.Archiver;

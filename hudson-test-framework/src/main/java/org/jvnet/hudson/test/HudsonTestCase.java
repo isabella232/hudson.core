@@ -40,8 +40,8 @@ import hudson.security.csrf.CrumbIssuer;
 import hudson.slaves.CommandLauncher;
 import hudson.slaves.DumbSlave;
 import hudson.slaves.RetentionStrategy;
-import hudson.stapler.WebAppController;
-import hudson.stapler.WebAppController.DefaultInstallStrategy;
+import org.eclipse.hudson.WebAppController;
+import org.eclipse.hudson.WebAppController.DefaultInstallStrategy;
 import hudson.tasks.Mailer;
 import hudson.tasks.Maven;
 import hudson.tasks.Ant;
@@ -143,8 +143,11 @@ import hudson.slaves.ComputerListener;
 import java.util.concurrent.CountDownLatch;
 
 import hudson.maven.MavenEmbedder;
+import hudson.security.*;
+import hudson.util.SecurityFailedToInit;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
+import org.eclipse.hudson.HudsonServletContextListener;
 
 /**
  * Base class for all Hudson test cases.
@@ -236,6 +239,7 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
         SmoothieUtil.reset(); // force-reset, some tests may not properly hit the tear-down to reset so do it again here
         new SmoothieContainerBootstrap().bootstrap(getClass().getClassLoader(), Hudson.class, Smoothie.class, HudsonTestCase.class, getClass());
 
+         
         try {
             hudson = newHudson();
         } catch (Exception e) {
@@ -266,7 +270,7 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
         controller.install(hudson);
 
         hudson.servletContext.setAttribute("version","?");
-        WebAppMain.installExpressionFactory(new ServletContextEvent(hudson.servletContext));
+        HudsonServletContextListener.installExpressionFactory(new ServletContextEvent(hudson.servletContext));
 
         // set a default JDK to be the one that the harness is using.
         hudson.getJDKs().add(new JDK("default",System.getProperty("java.home")));
@@ -368,6 +372,10 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
      */
     protected Hudson newHudson() throws Exception {
         File home = homeLoader.allocate();
+         
+        // Create the Security Manager
+        HudsonSecurityEntitiesHolder.setHudsonSecurityManager(new HudsonSecurityManager(home));
+         
         for (Runner r : recipes)
             r.decorateHome(this,home);
         return new Hudson(home, createWebServer(), useLocalPluginManager ? null : TestPluginManager.INSTANCE);

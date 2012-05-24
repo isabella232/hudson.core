@@ -22,9 +22,9 @@ import hudson.util.IOException2;
 import hudson.util.QuotedStringTokenizer;
 import hudson.util.VariableResolver;
 import hudson.Proc.LocalProc;
-import hudson.util.jna.NativeAccessException;
+import org.eclipse.hudson.jna.NativeAccessException;
 
-import hudson.util.jna.NativeUtils;
+import org.eclipse.hudson.jna.NativeUtils;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;

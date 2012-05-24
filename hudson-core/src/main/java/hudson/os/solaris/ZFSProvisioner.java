@@ -27,9 +27,9 @@ import hudson.model.AbstractBuild;
 import hudson.model.TaskListener;
 import hudson.model.AbstractProject;
 import hudson.model.Node;
-import hudson.util.jna.NativeAccessException;
-import hudson.util.jna.NativeUtils;
-import hudson.util.jna.NativeZfsFileSystem;
+import org.eclipse.hudson.jna.NativeAccessException;
+import org.eclipse.hudson.jna.NativeUtils;
+import org.eclipse.hudson.jna.NativeZfsFileSystem;
 
 import java.io.IOException;
 import java.io.File;

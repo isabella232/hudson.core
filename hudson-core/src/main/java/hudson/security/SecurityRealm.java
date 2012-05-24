@@ -24,7 +24,7 @@ import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.security.FederatedLoginService.FederatedIdentity;
-import hudson.security.captcha.CaptchaSupport;
+import org.eclipse.hudson.security.captcha.CaptchaSupport;
 import hudson.util.DescriptorList;
 import hudson.util.PluginServletFilter;
 

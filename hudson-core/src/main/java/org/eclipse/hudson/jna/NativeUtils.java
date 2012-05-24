@@ -10,12 +10,11 @@
  *
  * Contributors:
  *
- * Winston Prakash
- *
+ *   Winston Prakash
  *
  ******************************************************************************
  */
-package hudson.util.jna;
+package org.eclipse.hudson.jna;
 
 import hudson.model.Descriptor;
 import java.io.File;

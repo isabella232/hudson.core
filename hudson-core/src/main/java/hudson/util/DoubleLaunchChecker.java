@@ -17,7 +17,7 @@
 package hudson.util;
 
 import hudson.model.Hudson;
-import hudson.stapler.WebAppController;
+import org.eclipse.hudson.WebAppController;
 import hudson.triggers.SafeTimerTask;
 import hudson.triggers.Trigger;
 import org.apache.commons.io.FileUtils;

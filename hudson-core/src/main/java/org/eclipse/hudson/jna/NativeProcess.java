@@ -13,7 +13,7 @@
  *      
  *******************************************************************************/ 
 
-package hudson.util.jna;
+package org.eclipse.hudson.jna;
 
 import java.util.Map;
 

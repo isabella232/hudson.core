@@ -21,9 +21,9 @@ import hudson.Extension;
 import hudson.model.Computer;
 import hudson.model.Hudson;
 import hudson.remoting.Callable;
-import hudson.util.jna.NativeAccessException;
-import hudson.util.jna.NativeUtils;
-import hudson.util.jna.NativeSystemMemory;
+import org.eclipse.hudson.jna.NativeAccessException;
+import org.eclipse.hudson.jna.NativeUtils;
+import org.eclipse.hudson.jna.NativeSystemMemory;
 import net.sf.json.JSONObject;
 
 import org.kohsuke.stapler.StaplerRequest;

@@ -13,7 +13,7 @@
  *      
  *******************************************************************************/ 
 
-package hudson.security.captcha;
+package org.eclipse.hudson.security.captcha;
 
 import hudson.model.Descriptor;
 

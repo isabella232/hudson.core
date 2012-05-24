@@ -21,7 +21,7 @@ import org.hudsonci.events.EventPublisher;
 import hudson.init.InitMilestone;
 import hudson.model.Hudson;
 import hudson.security.HudsonFilter;
-import hudson.stapler.WebAppController;
+import org.eclipse.hudson.WebAppController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -40,7 +40,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import org.hudsonci.script.ScriptSupport;
+import org.eclipse.hudson.script.ScriptSupport;
 
 /**
  * Various remoting operations related to diagnostics.

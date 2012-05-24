@@ -27,9 +27,9 @@ import hudson.util.ProcessTree.OSProcess;
 
 import hudson.util.ProcessTreeRemoting.IOSProcess;
 import hudson.util.ProcessTreeRemoting.IProcessTree;
-import hudson.util.jna.NativeAccessException;
-import hudson.util.jna.NativeUtils;
-import hudson.util.jna.NativeProcess;
+import org.eclipse.hudson.jna.NativeAccessException;
+import org.eclipse.hudson.jna.NativeUtils;
+import org.eclipse.hudson.jna.NativeProcess;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;

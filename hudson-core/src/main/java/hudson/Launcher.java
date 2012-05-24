@@ -31,7 +31,7 @@ import hudson.remoting.VirtualChannel;
 import hudson.util.StreamCopyThread;
 import hudson.util.ArgumentListBuilder;
 import hudson.util.ProcessTree;
-import hudson.util.jna.NativeUtils;
+import org.eclipse.hudson.jna.NativeUtils;
 import org.apache.commons.io.input.NullInputStream;
 
 import java.io.BufferedOutputStream;

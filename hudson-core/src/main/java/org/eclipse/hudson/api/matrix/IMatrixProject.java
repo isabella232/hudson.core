@@ -12,7 +12,7 @@
  *    Anton Kozak
  *
  *******************************************************************************/
-package org.hudsonci.api.matrix;
+package org.eclipse.hudson.api.matrix;
 
 import hudson.matrix.AxisList;
 import hudson.model.Result;
