@@ -330,6 +330,9 @@ final public class InitialSetup {
     }
 
     private void check() {
+        if (!pluginsDir.exists()){
+            pluginsDir.mkdirs();
+        }
         Set<String> installedPluginNames = installedPluginManager.getInstalledPluginNames();
         Set<String> availablePluginNames = availablePluginManager.getAvailablePluginNames();
         for (String pluginName : availablePluginNames) {
@@ -371,18 +374,24 @@ final public class InitialSetup {
 
     private List<AvailablePluginInfo> getNeededDependencies(AvailablePluginInfo pluginInfo) {
         List<AvailablePluginInfo> deps = new ArrayList<AvailablePluginInfo>();
+        
+        if ((pluginInfo != null) && (pluginInfo.getDependencies().size() > 0)) {
+            for (Map.Entry<String, String> e : pluginInfo.getDependencies().entrySet()) {
+                AvailablePluginInfo depPlugin = availablePluginManager.getAvailablePlugin(e.getKey());
+                if (depPlugin != null) {
+                    VersionNumber requiredVersion = new VersionNumber(e.getValue());
 
-        for (Map.Entry<String, String> e : pluginInfo.getDependencies().entrySet()) {
-            AvailablePluginInfo depPlugin = availablePluginManager.getAvailablePlugin(e.getKey());
-            VersionNumber requiredVersion = new VersionNumber(e.getValue());
+                    // Is the plugin installed already? If not, add it.
+                    InstalledPluginInfo current = installedPluginManager.getInstalledPlugin(depPlugin.getName());
 
-            // Is the plugin installed already? If not, add it.
-            InstalledPluginInfo current = installedPluginManager.getInstalledPlugin(depPlugin.getName());
-
-            if (current == null) {
-                deps.add(depPlugin);
-            } else if (current.isOlderThan(requiredVersion)) {
-                deps.add(depPlugin);
+                    if (current == null) {
+                        deps.add(depPlugin);
+                    } else if (current.isOlderThan(requiredVersion)) {
+                        deps.add(depPlugin);
+                    }
+                }else{
+                    logger.error("Could not find " + e.getKey() + " which is required by " + pluginInfo.getDisplayName()); 
+                }
             }
         }
 
