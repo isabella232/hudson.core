@@ -124,11 +124,12 @@
         
         #mandatoryMsg{
           width:100%;
+          display: none;
         }
         
         #recommendedMsg{
-          padding: 15px;
           width:100%;
+          display: none;
         }
         
         /* === Login Dialog ==== */
@@ -431,23 +432,19 @@
                     
                 </ul>
                 <div>
-                    <j:choose>
-                        <j:when test="${it.mandatoryPluginInstallNeeded()}">
-                             <span id="mandatoryMsg">
-                                The Mandatory Plugins are needed and cannot be deselected. 
-                                Select the recommended plugins and click install install the 
-                                mandatory and selected recommended plugins or click Finish
-                                to start Hudson after installing the mandatory plugins and any selected recommended plugins.  
-                            </span> 
-                        </j:when>
-                        <j:otherwise>
-                            <span id="recommendedMsg">
-                                All Mandatory Plugins are installed. 
-                                Select the recommended plugins and click Install to install the selected recommended plugins 
-                                or click Finish to start Hudson after installing any selected recommended plugins.
-                             </span>
-                        </j:otherwise>
-                    </j:choose>
+                    <span id="mandatoryMsg">
+                        The Mandatory Plugins are needed and cannot be deselected. 
+                        Select the recommended plugins and click install to install the 
+                        mandatory and selected recommended plugins or click Finish
+                        to start Hudson after installing the mandatory plugins and any selected recommended plugins.  
+                    </span> 
+                        
+                    <span id="recommendedMsg">
+                        All Mandatory Plugins are installed. 
+                        Select the recommended plugins and click Install to install the selected recommended plugins 
+                        or click Finish to start Hudson after installing any selected recommended plugins.
+                    </span>
+                         
                      <div>
                         <ul id="buttonBar">
                             <li>
@@ -538,6 +535,14 @@
                jQuery('#installButton').removeAttr("disabled");
            }
            jQuery('#finishButton').removeAttr("disabled");
+           
+           if (jQuery('#mandatoryPlugins input[@type=checkbox]:checked').length > 0){
+               jQuery('#mandatoryMsg').show();
+               jQuery('#recommendedMsg').hide();
+           }else{
+               jQuery('#mandatoryMsg').hide();
+               jQuery('#recommendedMsg').show();
+           }
         }
         
         function checkPermissionAndinstallPlugins(){
@@ -581,7 +586,7 @@
             });
             return installables;
         }
-        
+             
         function showLoginDialog(){
             jQuery.blockUI({
               message: jQuery('#loginDialog'),
@@ -708,11 +713,15 @@
             });
             
             jQuery('#installButton').click(function() {
+                 installableCount = 0;
+                 installedCount = 0;
                  checkPermissionAndinstallPlugins();
             });
             
 
             jQuery('#finishButton').click(function() {
+                installableCount = 0;
+                installedCount = 0;
                 checkPermissionAndinstallPlugins();
                 finish = true;
             });
