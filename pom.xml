@@ -155,6 +155,7 @@
         <args4j.version>2.0.16</args4j.version>
         <groovy.version>1.8.1</groovy.version>
         <jaxb-api.version>2.2.2</jaxb-api.version>
+        <xerces.version>2.8.1</xerces.version>
 
         <!--Backward compatible properties-->
         <aspectjVersion>${aspectj.version}</aspectjVersion>

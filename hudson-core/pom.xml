@@ -28,7 +28,6 @@
         Contains the core Hudson code and view files to render HTML.
     </description>
 
-
     <build>
         <plugins>
             <plugin>
@@ -411,7 +410,14 @@
             <groupId>commons-digester</groupId>
             <artifactId>commons-digester</artifactId>
             <version>1.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+        
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-digester3</artifactId>
@@ -459,11 +465,27 @@
                     <artifactId>xercesImpl</artifactId>
                 </exclusion>
                 <exclusion>
+                   <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xmlParserAPIs</artifactId>
+                </exclusion>
+                <exclusion>
                     <artifactId>icu4j</artifactId>
                     <groupId>com.ibm.icu</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
+        
+         <!-- Switch to xercesImpl 2.8.1 - Eclipse approved -->
+        <dependency>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+          <version>${xerces.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>commons-jelly</groupId>
             <artifactId>commons-jelly-tags-fmt</artifactId>
