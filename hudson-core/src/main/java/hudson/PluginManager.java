@@ -579,12 +579,12 @@ public abstract class PluginManager extends AbstractModelObject {
                 password = "";
             }
              
-            hudson.proxy = new ProxyConfiguration(server , portNumber, Util.fixEmptyAndTrim(noProxyFor),
+            hudson.proxy.configure(server , portNumber, Util.fixEmptyAndTrim(noProxyFor),
                     Util.fixEmptyAndTrim(userName), Util.fixEmptyAndTrim(password), "on".equals(Util.fixNull(authNeeded)));
             hudson.proxy.save();
         } else {
+            hudson.proxy.getXmlFile().delete();
             hudson.proxy = null;
-            ProxyConfiguration.getXmlFile().delete();
 
         }
         return new HttpRedirect("advanced");

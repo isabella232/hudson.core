@@ -1,0 +1,718 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    
+    <j:set var="rootURL" value="${request.contextPath}" />
+    <j:set var="imagesURL"  value="${rootURL}/images" />
+    <j:set var="resURL"  value="${rootURL}" />
+  
+    <script src="${resURL}/scripts/jquery-1.6.4.min.js" type="text/javascript"></script>
+    <script src="${resURL}/scripts/jquery.blockUI-2.39.js" type="text/javascript"></script>
+    
+    <style type="text/css">
+
+        #wrapper {
+            height: auto !important;
+            margin: 0 0 -330px;
+            min-height: 100%;
+        }
+
+        .clearfix {
+            display: block;
+        }
+
+        .clearfix:after {
+            clear: both;
+            content: ".";
+            display: block;
+            height: 0;
+            visibility: hidden;
+        }
+
+        .site {
+            padding: 20px 0 0;
+            position: relative;
+            width: 100%;
+            z-index: 9;
+        }
+
+        .container {
+            margin: 0 auto;
+            width: 920px;
+        }
+
+        .first {
+            float: left;
+            width: 450px;
+        }
+
+        .last {
+            float: right;
+            width: 450px;
+        }
+
+        ul.setup {
+            margin: 0;
+            padding-left: 0px;
+        }
+
+        ul.setup > li {
+            border: 1px solid #DDDDDD;
+            border-radius: 4px 4px 4px 4px;
+            list-style-type: none;
+            margin: 0 0 10px;
+            overflow: hidden;
+            padding: 8px 10px 0;
+        }
+
+        ul.setup h3 {
+            font-size: 18px;
+            margin: 0;
+            color: #4183C4;
+            white-space: nowrap;
+        }
+
+        ul.setup .body {
+            background: #EFEFEF;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+            border-top: 1px solid #EEEEEE;
+            margin-left: -10px;
+            margin-top: 8px;
+            padding: 5px 10px;
+            width: 100%;
+        }
+
+        ul.setup p.description {
+            color: #444444;
+            margin: 0 0 3px;
+            padding-top: 5px;
+        }
+
+        .setup-items-container {
+            background: none repeat scroll 0 0 #FFFFFF;
+            border-color: #E5E5E5 #EEEEEE #EEEEEE #E5E5E5;
+            border-radius: 3px 3px 3px 3px;
+            border-style: solid;
+            border-width: 1px;
+            margin-left: -5px;
+            margin-top: 5px;
+            padding: 5px 4px;
+            width: 100%;
+        }
+        
+        .column1{
+           width:3%
+        }
+        .column2{
+           width:67%
+        }
+        .column3{
+           width:15%;
+           padding-left: 5px
+        }
+        .column4{
+           width:15%;
+           padding-left: 5px
+        }
+        
+        #buttonBar li {
+            display: inline;
+            list-style-type: none;
+            float: right;
+            padding-left: 5px
+        }
+        
+        #mandatoryMsg{
+          width:100%;
+        }
+        
+        #recommendedMsg{
+          padding: 15px;
+          width:100%;
+        }
+        
+        /* === Login Dialog ==== */
+
+        #loginError, #loginMsg {
+            text-align:center;
+            font-weight:bold;
+        }
+        #loginMsg {
+            color: black;
+            display: none;
+        }
+        
+        #loginError {
+            color: red;
+            display: none;
+        }
+        
+        #proxyError {
+            padding-top: 10px;
+            padding-left: 10px;
+            color: red;
+        }
+        
+        #proxySuccess {
+            padding-left: 10px;
+            color: green;
+            display: none;
+        }
+        
+        #instalMandatoryMsg{
+            padding-top: 10px;
+            padding-left: 10px;
+            color: red;
+            display: none;
+        }
+        
+    </style>
+   
+    
+    <div id="wrapper">
+        <div class="site clearfix">
+            <div class="container">
+                <span style="width:100%; text-align:center">
+                    <h1 style="margin-top:4em; color:#678799">
+                        Hudson CI Server Initial Setup
+                    </h1>
+                </span>
+                <ul class="setup">
+                    <li class="mandatory">
+                        <h3>
+                            Mandatory Plugins
+                        </h3>
+                        <p class="description">
+                            These plugins need to be installed for Hudson to work properly.
+                        </p>
+                        <div class="body">
+                            <div class="setup-items-container">
+                                        
+                                <table width="100%" border="0" id="plugins" cellpadding="10">
+                                    <j:forEach var="p" items="${it.installableMandatoryPlugins}">
+                                        <tr>
+                                            <td class="column1">
+                                                <input type="checkbox" disabled="disabled" checked="true" value="${p.name}"/>
+                                                <img id="${p.name}"  style="display:none;"/>
+                                            </td>
+                                            <td class="column2">
+                                                <div>
+                                                    <a href="${p.wikiUrl}" target="_blank">
+                                                        ${p.displayName}
+                                                    </a>
+                                                </div>
+                                                <div style="padding-top: 5px;">
+                                                    ${p.description}
+                                                </div>
+                                            </td>
+                                            <td class="column3" style="white-space:nowrap">
+                                                ${p.version} (Available)
+                                            </td>
+                                        </tr>
+                                    </j:forEach>
+                                    <j:forEach var="p" items="${it.updatableMandatoryPlugins}">
+                                        <tr>
+                                            <td class="column1">
+                                                <input type="checkbox" disabled="disabled" checked="true" value="${p.name}"/>
+                                                <img id="${p.name}" style="display:none;"/>
+                                            </td>
+                                            <td class="column2">
+                                                <div>
+                                                    <a href="${p.wikiUrl}" target="_blank">
+                                                        ${p.displayName}
+                                                    </a>
+                                                </div>
+                                                <div class="excerpt" style="padding-top: 5px;">
+                                                    ${p.description}
+                                                </div>
+                                            </td>
+                                            <td class="column3" style="white-space:nowrap">
+                                                ${p.version} (Available)
+                                            </td>
+                                            <td class="column4" style="white-space:nowrap">
+                                                ${it.getInstalled(p).version} (Installed)
+                                            </td>
+                                        </tr>
+                                    </j:forEach>
+                                    <j:forEach var="p" items="${it.installedMandatoryPlugins}">
+                                        <tr>
+                                            <td class="column1">
+                                                 <img src="${imagesURL}/green-check.jpg" alt=""/>
+                                            </td>
+                                            <td class="column2">
+                                                <div>
+                                                    <a href="${p.wikiUrl}" target="_blank" style="color:gray">
+                                                        ${p.displayName}
+                                                    </a>
+                                                </div>
+                                                <div class="excerpt" style="padding-top: 5px; color:gray">
+                                                    ${p.description}
+                                                </div>
+                                            </td>
+                                            <td class="column3" style="white-space:nowrap; color:gray">
+                                                No update available
+                                            </td>
+                                            <td class="column4" style="white-space:nowrap; color:gray">
+                                                ${it.getInstalled(p).version} (Installed)
+                                            </td>
+                                        </tr>
+                                    </j:forEach>
+                                </table>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="recommended">
+                        <h3>
+                            Recommended Plugins
+                        </h3>
+                        <p class="description">
+                            Following plugins are recommended. They are tested and certified by Hudson QA team.
+                        </p>
+                        <div class="body">
+                            <div class="setup-items-container">
+                                        
+                                <table width="100%" border="0" id="plugins" cellpadding="10">
+                                    <j:forEach var="p" items="${it.installablePlugins}">
+                                        <tr>
+                                            <td class="column1">
+                                                <input type="checkbox" checked="true" value="${p.name}"/>
+                                                <img id="${p.name}" style="display:none;"/>
+                                            </td>
+                                            <td class="column2">
+                                                <div>
+                                                    <a href="${p.wikiUrl}" target="_blank">
+                                                        ${p.displayName}
+                                                    </a>
+                                                </div>
+                                                <div class="excerpt" style="padding-top: 5px;">
+                                                    ${p.description}
+                                                </div>
+                                            </td>
+                                            <td class="column3" style="white-space:nowrap">
+                                                ${p.version} (Available)
+                                            </td>
+                                        </tr>
+                                    </j:forEach>
+                                    <j:forEach var="p" items="${it.updatablePlugins}">
+                                        <tr>
+                                            <td class="column1">
+                                                <input type="checkbox" checked="true"  value="${p.name}"/>
+                                                <img id="${p.name}" style="display:none;"/>
+                                            </td>
+                                            <td class="column2">
+                                                <div>
+                                                    <a href="${p.wikiUrl}" target="_blank">
+                                                        ${p.displayName}
+                                                    </a>
+                                                </div>
+                                                <div class="excerpt" style="padding-top: 5px;">
+                                                    ${p.description}
+                                                </div>
+                                            </td>
+                                            <td class="column3" style="white-space:nowrap">
+                                                ${p.version} (Available)
+                                            </td>
+                                            <td class="column4" style="white-space:nowrap">
+                                                ${it.getInstalled(p).version} (Installed)
+                                            </td>
+                                        </tr>
+                                    </j:forEach>
+                                    <j:forEach var="p" items="${it.installedPlugins}">
+                                        <tr>
+                                            <td class="column1">
+                                                 <img src="${imagesURL}/green-check.jpg"/>
+                                            </td>
+                                            <td class="column2">
+                                                <div>
+                                                    <a href="${p.wikiUrl}" target="_blank" style="color:gray">
+                                                        ${p.displayName}
+                                                    </a>
+                                                </div>
+                                                <div class="excerpt" style="padding-top: 5px; color:gray">
+                                                    ${p.description}
+                                                </div>
+                                            </td>
+                                            <td class="column3" style="white-space:nowrap; color:gray">
+                                                No update available
+                                            </td>
+                                            <td class="column4" style="white-space:nowrap; color:gray">
+                                                ${it.getInstalled(p).version} (Installed)
+                                            </td>
+                                        </tr>
+                                    </j:forEach>
+                                </table>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <li id="proxySetup">
+                        <h3>
+                            ${%HTTP Proxy Configuration}
+                        </h3>
+                        <p class="description">
+                            For installing the plugins, Hudson server need to connect to the internet. Check your HTTP proxy settings. 
+                        </p>
+                        <div class="body">
+                            <div class="setup-items-container">
+                                             
+                                <form id="proxyForm">
+                                    <table cellpadding="10">
+                                        <tr>
+                                            <td> 
+                                                Proxy Server
+                                            </td>
+
+                                            <td>
+                                                <input name="proxy.server" type="text" value="${it.proxyConfig.name}" size="50"/>
+                                            </td>
+
+                                        </tr>
+
+                                        <tr>
+                                            <td> 
+                                                Proxy Port
+                                            </td> 
+                                            <td>
+                                                <input name="proxy.port" type="text" value="${it.proxyConfig.port}" size="6"/>
+                                            </td>
+
+                                        </tr>
+                                        <tr> 
+                                            <td> 
+                                                No Proxy for
+                                            </td>
+                                            <td>
+                                                <input name="proxy.noProxyFor" type="text" size="50" value="${it.proxyConfig.noProxyFor}"/>
+                                            </td>
+
+                                        </tr>
+                                        <tr> 
+                                            <td colspan="2">
+                                                <input id="proxyAuth" name="proxy.authNeeded" type="checkbox" checked="${it.proxyConfig.authNeeded}"/>
+                                                <span>Proxy Needs Authorization</span>
+                                            </td>
+                                        </tr>
+
+                                        <tr id="proxyUser"> 
+                                            <td> 
+                                                Username
+                                            </td>
+                                            <td>
+                                                <input name="proxy.userName" type="text" size="20" value="${it.proxyConfig.userName}"/>
+                                            </td>
+
+                                        </tr>
+                                        <tr id="proxyPassword"> 
+                                            <td> 
+                                                Password
+                                            </td>
+                                            <td>
+                                                <input name="proxy.password" type="password" size="20" value="${it.proxyConfig.password}"/>
+                                            </td>
+
+                                        </tr>
+                                    </table>
+                                         
+                                    <div id="proxyError">
+                                        ${% Hudson server still could not connect to the internet. Check the HTTP proxy settings and try again}
+                                    </div>
+                                    <div id="proxySuccess">
+                                        ${%Hudson server could successfully connect to the internet}
+                                    </div>
+                                 
+                                </form>    
+                                <div style="float: right; padding:10px"> 
+                                    <input type="button" id="proxyButton" value="${%Test and Setup}" />
+                                </div>
+                                <br style="clear:both"/>
+                            </div>
+                        </div>
+                    </li>
+                    
+                </ul>
+                <div>
+                    <j:choose>
+                        <j:when test="${it.mandatoryPluginInstallNeeded()}">
+                             <span id="mandatoryMsg">
+                                The Mandatory Plugins are needed and cannot be deselected. 
+                                Select the recommended plugins and click install install the 
+                                mandatory and selected recommended plugins or click Finish
+                                to start Hudson after installing the mandatory plugins and any selected recommended plugins.  
+                            </span> 
+                        </j:when>
+                        <j:otherwise>
+                            <span id="recommendedMsg">
+                                All Mandatory Plugins are installed. 
+                                Select the recommended plugins and click Install to install the selected recommended plugins 
+                                or click Finish to start Hudson after installing any selected recommended plugins.
+                             </span>
+                        </j:otherwise>
+                    </j:choose>
+                     <div>
+                        <ul id="buttonBar">
+                            <li>
+                                <input type="button" id="finishButton" value="${%Finish}" />
+                            </li>
+                            <li>
+                               <input type="button" id="installButton" value="${%Install}" />
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span id="instalMandatoryMsg">
+                                All Mandatory Plugins must be installed first. 
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="loginDialog" style="display:none; cursor: default">
+        <j:set var="submitFrom" value="${from}" />
+        <st:include page="loginDialog.jelly" />
+    </div>
+    
+    <script type="text/javascript">
+        
+        jQuery.noConflict();
+        
+        var proxyNeeded = ${it.isProxyNeeded()};
+        var securitySet = ${it.hudsonSecurityManager.isUseSecurity()};
+        var loggedIn = false;
+        
+        var installableCount = 0;
+        var installedCount = 0;
+        
+        var finish = false;
+        
+        var forProxy = false;
+        
+        function installPlugin(selected){
+            jQuery('#errorMessage').hide();
+            jQuery(selected).hide();
+            var icon = jQuery("#" + jQuery(selected).val());
+            jQuery(icon).show();
+            icon.attr('src',"${imagesURL}/progressbar.gif");
+            jQuery.ajax({
+              type: 'POST',
+              url: "installPlugin",
+              data: {pluginName:jQuery(selected).val()},
+              success: function(){
+                icon.attr('src',"${imagesURL}/green-check.jpg");
+                jQuery(selected).attr("checked", false);
+                installedCount++;
+                if (installedCount == installableCount){
+                    enableButtons();
+                }
+              },
+              error: function(){
+                icon.attr('src',"${imagesURL}/error.png");
+                installedCount++;
+                if (installedCount == installableCount){
+                    enableButtons();
+                    if (finish == true){
+                        checkFinish();
+                    }
+                }
+              },
+              statusCode: {
+                403: function() {
+                    showLoginDialog();
+                }
+              },
+              dataType: "html"
+            }); 
+        }
+        
+        
+        function disableButtons(){
+           jQuery('#installButton').attr("disabled", true);
+           jQuery('#finishButton').attr("disabled", true);
+        }
+        
+        function enableButtons(){
+           var installables = jQuery('input[@type=checkbox]:checked');
+           if (installables.length > 0){
+               jQuery('#installButton').removeAttr("disabled");
+           }
+           jQuery('#finishButton').removeAttr("disabled");
+        }
+        
+        function checkPermissionAndinstallPlugins(){
+            var installables = jQuery('input[@type=checkbox]:checked');
+            if (installables.length == 0){
+               if (finish == true){
+                  securitySet == false; 
+               }
+            }
+            if (securitySet == true) {
+                if (loggedIn == false){
+                   showLoginDialog();
+                }else{
+                   installSelectedPlugins();
+                }
+            }else{
+                installSelectedPlugins();
+            }
+        }
+        
+        function installSelectedPlugins(){
+            var installables = jQuery('input[@type=checkbox]:checked');
+            installableCount = installables.length;
+            if (installableCount == 0){
+              checkFinish();
+              return;
+            }
+            disableButtons();
+            jQuery(installables).each(function(){
+                installPlugin(this);
+            });
+        }
+        
+        function showLoginDialog(){
+            jQuery.blockUI({
+              message: jQuery('#loginDialog'),
+              css: { 
+                width: '350px'
+              },
+              title:  'Confirmation'
+            });
+            jQuery('j_username').focus();
+        }
+
+        function submitPoxyForm(){
+            forProxy = false;
+            jQuery('#proxySuccess').hide();
+            jQuery('#proxyError').hide();
+            var dataString = jQuery("#proxyForm").serialize();
+            jQuery.ajax({
+              type: 'POST',
+              url: "proxyConfigure",
+              data: dataString,
+              success: function(){
+                jQuery('#proxySuccess').show();
+                enableButtons();
+              },
+              error: function(){
+                jQuery('#proxyError').show();
+              },
+              statusCode: {
+                403: function() {
+                    forProxy = true;
+                    showLoginDialog();
+                }
+              },
+              dataType: "html"
+            }); 
+        }
+        
+        function submitLoginForm(){
+            jQuery('#loginMsg').show();
+            jQuery('#loginError').hide();
+            var dataString = jQuery("#loginForm").serialize();
+            jQuery.ajax({
+              type: 'POST',
+              url: "${rootURL}/${it.hudsonSecurityManager.securityRealm.authenticationGatewayUrl}",
+              data: dataString,
+              success: function(){
+                jQuery.unblockUI();
+                loggedIn = true;
+                if (forProxy == true){
+                    submitPoxyForm();
+                }else{
+                   checkPermissionAndinstallPlugins();
+                }
+              },
+              error: function(){
+                jQuery('#loginError').show();
+                jQuery('#loginMsg').hide();
+              },
+              dataType: "html"
+            }); 
+        }
+        
+        function checkFinish(){
+             
+            jQuery.ajax({
+              type: 'GET',
+              url: "checkFinish",
+              success: function(){
+                 window.location.href=".";
+              },
+              error: function(){
+                jQuery('#instalMandatoryMsg').show();
+              },
+              dataType: "html"
+            }); 
+        }
+        
+        function refreshProxyUser(){
+           if (jQuery('#proxyAuth').is(':checked')){
+               jQuery('#proxyUser').show();
+               jQuery('#proxyPassword').show();
+           }else{
+               jQuery('#proxyUser').hide();
+               jQuery('#proxyPassword').hide();
+           }
+        }
+
+        jQuery(document).ready(function() {
+        
+            jQuery('#j_username').keypress(function(e){
+              if(e.which == 13){
+                submitLoginForm();
+              }
+            });
+            
+            jQuery('#j_password').keypress(function(e){
+              if(e.which == 13){
+                submitLoginForm();
+              }
+            });
+
+            jQuery('#loginButton').click(function() {
+                 submitLoginForm();
+            });
+            
+
+            jQuery('#cancelButton').click(function() {
+                jQuery.unblockUI();
+                jQuery('#j_username').attr({value:""});
+                jQuery('#j_password').attr({value:""});
+                jQuery('#loginError').hide();
+                jQuery('#loginMsg').hide();
+                return false;
+            });
+            
+            jQuery('#installButton').click(function() {
+                 checkPermissionAndinstallPlugins();
+            });
+            
+
+            jQuery('#finishButton').click(function() {
+                checkPermissionAndinstallPlugins();
+                finish = true;
+            });
+            
+            jQuery('#proxyAuth').click(function() {
+                refreshProxyUser();
+            });
+            
+            if (proxyNeeded == true){
+                jQuery('#proxyButton').click(function() {
+                    submitPoxyForm();
+                });
+            }else{
+                jQuery('#proxySetup').hide();
+            }
+            
+            refreshProxyUser();
+            
+            enableButtons();
+
+        });
+        
+    </script>
+       
+</j:jelly>

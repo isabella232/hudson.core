@@ -43,7 +43,6 @@ import hudson.UDPBroadcastThread;
 import hudson.Util;
 import static hudson.Util.fixEmpty;
 import static hudson.Util.fixNull;
-import hudson.WebAppMain;
 import hudson.XmlFile;
 import hudson.cli.CLICommand;
 import hudson.cli.CliManagerImpl;
@@ -156,7 +155,7 @@ import static hudson.init.InitMilestone.*;
 import hudson.security.*;
 import hudson.security.csrf.CrumbIssuer;
 
-import hudson.stapler.WebAppController;
+import org.eclipse.hudson.WebAppController;
 import static javax.servlet.http.HttpServletResponse.*;
 import java.io.File;
 import java.io.FileFilter;
@@ -201,7 +200,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.LogRecord;
 import java.util.regex.Pattern;
-import org.hudsonci.script.ScriptSupport;
+import org.eclipse.hudson.script.ScriptSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -542,7 +541,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             }
 
             try {
-                proxy = ProxyConfiguration.load();
+                proxy = new ProxyConfiguration(getRootDir());
             } catch (IOException e) {
                 logger.error("Failed to load proxy configuration", e);
             }
@@ -1913,6 +1912,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public SecurityRealm getSecurityRealm() {
         return getSecurityManager().getSecurityRealm();
     }
+    
+    public void setSecurityRealm(SecurityRealm securityRealm) {
+        getSecurityManager().setSecurityRealm(securityRealm);
+    }
 
     public Lifecycle getLifecycle() {
         return Lifecycle.get();
@@ -1969,6 +1972,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     public AuthorizationStrategy getAuthorizationStrategy() {
         return getSecurityManager().getAuthorizationStrategy();
+    }
+    
+    public void setAuthorizationStrategy(AuthorizationStrategy authorizationStrategy) {
+        getSecurityManager().setAuthorizationStrategy(authorizationStrategy); 
     }
 
     /**

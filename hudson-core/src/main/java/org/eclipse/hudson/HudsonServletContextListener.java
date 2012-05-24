@@ -11,21 +11,17 @@
  *
  *  Kohsuke Kawaguchi, Winston Prakash, Jean-Baptiste Quenot, Tom Huybrechts
  *     
- *
  *******************************************************************************/ 
 
-package hudson;
+package org.eclipse.hudson;
 
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.core.JVM;
+import hudson.EnvVars;
 import hudson.model.Hudson;
-import hudson.model.User;
 import hudson.security.HudsonSecurityEntitiesHolder;
 import hudson.security.HudsonSecurityManager;
-import hudson.stapler.WebAppController;
-import hudson.stapler.WebAppController.DefaultInstallStrategy;
-import hudson.triggers.SafeTimerTask;
-import hudson.triggers.Trigger;
+import org.eclipse.hudson.WebAppController.DefaultInstallStrategy;
 import hudson.util.*;
 import hudson.util.graph.ChartUtil;
 import org.jvnet.localizer.LocaleProvider;
@@ -48,30 +44,35 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.security.Security;
+import org.eclipse.hudson.init.InitialSetup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Entry point when Hudson is used as a webapp.
  *
- * @author Kohsuke Kawaguchi
+ * @author Kohsuke Kawaguchi, Winston Prakash 
  */
-public final class WebAppMain implements ServletContextListener {
+public final class HudsonServletContextListener implements ServletContextListener {
+    
+    private Logger logger = LoggerFactory.getLogger(InitialSetup.class);
+    
     private final RingBufferLogHandler handler = new RingBufferLogHandler();
 
     /**
      * Creates the sole instance of {@link Hudson} and register it to the {@link ServletContext}.
      */
+    @Override
     public void contextInitialized(ServletContextEvent event) {
         try {
-            final ServletContext context = event.getServletContext();
+            final ServletContext servletContext = event.getServletContext();
 
             // Install the current servlet context, unless its already been set
             final WebAppController controller = WebAppController.get();
             try {
                 // Attempt to set the context
-                controller.setContext(context);
+                controller.setContext(servletContext);
             }
             catch (IllegalStateException e) {
                 // context already set ignore
@@ -87,6 +88,7 @@ public final class WebAppMain implements ServletContextListener {
 
             // use the current request to determine the language
             LocaleProvider.setProvider(new LocaleProvider() {
+                @Override
                 public Locale get() {
                     Locale locale=null;
                     StaplerRequest req = Stapler.getCurrentRequest();
@@ -108,7 +110,8 @@ public final class WebAppMain implements ServletContextListener {
                 return;
             }
 
-            try {// remove Sun PKCS11 provider if present. See http://wiki.hudson-ci.org/display/HUDSON/Solaris+Issue+6276483
+            try {
+                // remove Sun PKCS11 provider if present. See http://wiki.hudson-ci.org/display/HUDSON/Solaris+Issue+6276483
                 Security.removeProvider("SunPKCS11-Solaris");
             } catch (SecurityException e) {
                 // ignore this error.
@@ -126,7 +129,7 @@ public final class WebAppMain implements ServletContextListener {
             final File home = dir;
             home.mkdirs();
 
-            LOGGER.info("Home directory: " + home);
+            logger.info("Home directory: " + home);
 
             // check that home exists (as mkdirs could have failed silently), otherwise throw a meaningful error
             if (! home.exists()) {
@@ -189,54 +192,29 @@ public final class WebAppMain implements ServletContextListener {
                 // if this works we are all happy
             } catch (TransformerFactoryConfigurationError x) {
                 // no it didn't.
-                LOGGER.log(Level.WARNING, "XSLT not configured correctly. Hudson will try to fix this. See http://issues.apache.org/bugzilla/show_bug.cgi?id=40895 for more details",x);
+                logger.warn("XSLT not configured correctly. Hudson will try to fix this. See http://issues.apache.org/bugzilla/show_bug.cgi?id=40895 for more details",x);
                 System.setProperty(TransformerFactory.class.getName(),"com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
                 try {
                     TransformerFactory.newInstance();
-                    LOGGER.info("XSLT is set to the JAXP RI in JRE");
+                    logger.info("XSLT is set to the JAXP RI in JRE");
                 } catch(TransformerFactoryConfigurationError y) {
-                    LOGGER.log(Level.SEVERE, "Failed to correct the problem.");
+                    logger.error("Failed to correct the problem.");
                 }
             }
 
             installExpressionFactory(event);
+            
+            InitialSetup initSetup = new InitialSetup(home, servletContext);
+            if (initSetup.needsInitSetup()){
+                controller.install(initSetup);
+            }else{
+               initSetup.invokeHudson(); 
+            }
 
-            controller.install(new HudsonIsLoading());
-
-            new Thread("hudson initialization thread") {
-                @Override
-                public void run() {
-                    try {
-                        // Creating of the god object performs most of the booting muck
-                        Hudson hudson = new Hudson(home,context);
-
-                        // once its done, hook up to stapler and things should be ready to go
-                        controller.install(hudson);
-
-                        // trigger the loading of changelogs in the background,
-                        // but give the system 10 seconds so that the first page
-                        // can be served quickly
-                        Trigger.timer.schedule(new SafeTimerTask() {
-                            public void doRun() {
-                                User.getUnknown().getBuilds();
-                            }
-                        }, 1000*10);
-                    } catch (Error e) {
-                        LOGGER.log(Level.SEVERE, "Failed to initialize Hudson",e);
-                        controller.install(new HudsonFailedToLoad(e));
-                        throw e;
-                    } catch (Exception e) {
-                        LOGGER.log(Level.SEVERE, "Failed to initialize Hudson",e);
-                        controller.install(new HudsonFailedToLoad(e));
-                    }
-                }
-            }.start();
+        }catch (Exception exc) {
+            logger.error( "Failed to initialize Hudson", exc);
         }catch (Error e) {
-            LOGGER.log(Level.SEVERE, "Failed to initialize Hudson",e);
-            throw e;
-        } catch (RuntimeException e) {
-            LOGGER.log(Level.SEVERE, "Failed to initialize Hudson",e);
-            throw e;
+            logger.error( "Failed to initialize Hudson",e);
         }
     }
 
@@ -249,7 +227,7 @@ public final class WebAppMain implements ServletContextListener {
      */
     private void installLogger() {
         Hudson.logRecords = handler.getView();
-        Logger.getLogger("hudson").addHandler(handler);
+        java.util.logging.Logger.getLogger("hudson").addHandler(handler);
     }
 
     /**
@@ -307,9 +285,7 @@ public final class WebAppMain implements ServletContextListener {
 
         // Logger is in the system classloader, so if we don't do this
         // the whole web app will never be undepoyed.
-        Logger.getLogger("hudson").removeHandler(handler);
+        java.util.logging.Logger.getLogger("hudson").removeHandler(handler);
     }
-
-    private static final Logger LOGGER = Logger.getLogger(WebAppMain.class.getName());
 
 }

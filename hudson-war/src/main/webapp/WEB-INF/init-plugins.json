@@ -1,0 +1,68 @@
+
+{
+    "plugins" : {
+        "subversion" : {
+            "name" : "subversion",
+            "displayName" : "Hudson Subversion Plug-in",
+            "description" : "Integrates Hudson with Subversion SCM",
+            "version" : "2.3.0",
+            "mandatory" : "true",
+            "dependencies" : [ ],
+            "labels" : [ "scm" ],
+            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/subversion/2.3.0/subversion.hpi",
+            "wikiUrl" : "http://wiki.hudson-ci.org/display/HUDSON/Subversion+Plugin"
+        },
+        "cvs" : {
+            "name" : "cvs",
+            "displayName" : "Hudson CVS Plug-in",
+            "description" : "Integrates Hudson with CVS SCM",
+            "version" : "2.2.0",
+            "mandatory" : "true",
+            "dependencies" : [ ],
+            "labels" : [ "scm" ],
+            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/cvs/2.2.0/cvs.hpi",
+            "wikiUrl" : "http://wiki.hudson-ci.org/display/HUDSON/CVS+Plugin"
+        },
+        "emma" : {
+            "name" : "emma",
+            "displayName" : "Emma coverage Plugin",
+            "description" : "Emma coverage Plugin for Hudson",
+            "version" : "1.25",
+            "mandatory" : "true",
+            "dependencies" : [ ],
+            "labels" : [ "scm" ],
+            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/emma/1.25/emma.hpi",
+            "wikiUrl" : "http://wiki.hudson-ci.org/display/HUDSON/Emma+Plugin"
+        },
+        "ssh-slaves" : {
+            "name" : "ssh-slaves",
+            "displayName" : "Hudson SSH Slaves plugin",
+            "description" : "Plugin allows you to manage slaves running on *nix machines over SSH.",
+            "version" : "2.1.1",
+            "dependencies" : [ ],
+            "labels" : [ "slaves" ],
+            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/ssh-slaves/2.1.1/ssh-slaves.hpi",
+            "wikiUrl" : "http://wiki.hudson-ci.org/display/HUDSON/SSH+Slaves+plugin"
+        },
+        "git" : {
+            "name" : "git",
+            "displayName" : "Git Plugin",
+            "description" : "This plugin allows use of <a href='http://http://git-scm.com/'>GIT</a> as a build SCM. Git 1.3.3 or newer is required. \\\\  ",
+            "version" : "2.2.0",
+            "dependencies" : [ ],
+            "labels" : [ "scm" ],
+            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/git/2.2.0/git.hpi",
+            "wikiUrl" : "http://wiki.hudson-ci.org//display/HUDSON/Git+Plugin"
+        },
+        "cobertura" : {
+            "name" : "cobertura",
+            "displayName" : "Cobertura Coverage Plugin",
+            "description" : "Cobertura Coverage Plugin for Hudson",
+            "version" : "1.1",
+            "dependencies" : [ ],
+            "labels" : [ "scm" ],
+            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/cobertura/1.1/cobertura.hpi",
+            "wikiUrl" : "http://wiki.hudson-ci.org//display/HUDSON/Cobertura+Plugin"
+        } 
+    }
+}
