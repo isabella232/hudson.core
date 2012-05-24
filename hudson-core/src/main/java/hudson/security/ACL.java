@@ -20,6 +20,7 @@ import org.springframework.security.providers.UsernamePasswordAuthenticationToke
 import org.springframework.security.acls.sid.PrincipalSid;
 import org.springframework.security.acls.sid.Sid;
 import hudson.model.Executor;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 
 /**
  * Gate-keeper that controls access to Hudson's model objects.

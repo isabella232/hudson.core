@@ -52,6 +52,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 import javax.servlet.ServletException;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
  * {@link JobProperty} to associate ACL for each project.

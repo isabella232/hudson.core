@@ -11,7 +11,6 @@
  *
  *    Kohsuke Kawaguchi, Winston Prakash
  *     
- *
  *******************************************************************************/ 
 
 package hudson.diagnosis;
@@ -20,9 +19,6 @@ import hudson.util.TimeUnit2;
 import hudson.Extension;
 import hudson.model.PeriodicWork;
 import hudson.util.ColorPalette;
-import hudson.util.graph.MultiStageTimeSeries;
-import hudson.util.graph.MultiStageTimeSeries.TimeScale;
-import hudson.util.graph.MultiStageTimeSeries.TrendChart;
 
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
@@ -31,6 +27,9 @@ import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
+import org.eclipse.hudson.graph.MultiStageTimeSeries;
+import org.eclipse.hudson.graph.MultiStageTimeSeries.TimeScale;
+import org.eclipse.hudson.graph.MultiStageTimeSeries.TrendChart;
 
 import org.kohsuke.stapler.QueryParameter;
 
@@ -107,10 +106,12 @@ public final class MemoryUsageMonitor extends PeriodicWork {
         nonHeap = new MemoryGroup(pools, MemoryType.NON_HEAP);
     }
 
+    @Override
     public long getRecurrencePeriod() {
         return TimeUnit2.SECONDS.toMillis(10);
     }
 
+    @Override
     protected void doRun() {
         heap.update();
         nonHeap.update();

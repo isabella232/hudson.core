@@ -26,14 +26,14 @@
         <st:attribute name="projectPropertyClass">
             ProjectProperty class that will be used for creating project property instance
             based on hudson.util.CascadingUtil.getProjectProperty method. Default value is
-            org.hudsonci.model.project.property.ExternalProjectProperty.class.
+            org.eclipse.hudson.model.project.property.ExternalProjectProperty.class.
         </st:attribute>
     </st:documentation>
 
     <j:set var="targetType" value="${it.class}"/>
     <j:if test="${attrs.projectPropertyClass==null}">
         <j:set var="attrs.projectPropertyClass"
-               value="${org.hudsonci.model.project.property.ExternalProjectProperty.class}"/>
+               value="${org.eclipse.hudson.model.project.property.ExternalProjectProperty.class}"/>
     </j:if>
     <j:if test="${!empty(descriptors) or context['org.apache.commons.jelly.body']!=null}">
         <f:section title="${attrs.title}" name="${attrs.name}">

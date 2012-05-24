@@ -25,6 +25,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

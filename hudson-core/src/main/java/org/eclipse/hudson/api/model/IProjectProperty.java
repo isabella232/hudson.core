@@ -13,7 +13,7 @@
  *
  *******************************************************************************/
 
-package org.hudsonci.api.model;
+package org.eclipse.hudson.api.model;
 
 import java.io.Serializable;
 

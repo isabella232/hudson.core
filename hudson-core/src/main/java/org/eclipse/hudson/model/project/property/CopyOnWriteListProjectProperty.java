@@ -12,10 +12,10 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
-package org.hudsonci.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.util.CopyOnWriteList;
-import org.hudsonci.api.model.ICascadingJob;
+import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
  * Project property for {@link CopyOnWriteList}

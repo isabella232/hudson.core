@@ -14,7 +14,7 @@
  *
  *******************************************************************************/ 
 
-package hudson.util.graph;
+package org.eclipse.hudson.graph;
 
 import hudson.model.Descriptor;
 

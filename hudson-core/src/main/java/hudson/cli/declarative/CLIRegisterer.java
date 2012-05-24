@@ -24,7 +24,6 @@ import hudson.cli.CloneableCLICommand;
 import hudson.model.Hudson;
 import hudson.remoting.Channel;
 import hudson.security.CliAuthenticator;
-import hudson.security.HudsonSecurityEntitiesHolder;
 import org.springframework.security.Authentication;
 import org.springframework.security.context.SecurityContext;
 import org.springframework.security.context.SecurityContextHolder;
@@ -48,6 +47,7 @@ import java.util.Locale;
 import java.util.Stack;
 import static java.util.logging.Level.SEVERE;
 import java.util.logging.Logger;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
  * Discover {@link CLIMethod}s and register them as {@link CLICommand} implementations.

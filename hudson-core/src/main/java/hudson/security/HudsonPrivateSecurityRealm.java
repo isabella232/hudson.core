@@ -54,6 +54,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
  * {@link SecurityRealm} that performs authentication by looking up {@link User}.

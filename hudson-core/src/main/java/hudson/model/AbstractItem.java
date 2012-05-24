@@ -26,7 +26,6 @@ import hudson.model.listeners.SaveableListener;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
 import hudson.security.ACL;
-import hudson.security.HudsonSecurityEntitiesHolder;
 import hudson.util.AtomicFileWriter;
 import hudson.util.IOException2;
 import org.apache.tools.ant.taskdefs.Copy;
@@ -54,6 +53,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
  * Partial default implementation of {@link Item}.

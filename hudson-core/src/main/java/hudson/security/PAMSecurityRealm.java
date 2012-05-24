@@ -27,6 +27,7 @@ import java.util.Arrays;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import java.util.Set;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 import org.springframework.security.Authentication;
 import org.springframework.security.AuthenticationException;

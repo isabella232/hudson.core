@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
  * Role-based authorization via a matrix.

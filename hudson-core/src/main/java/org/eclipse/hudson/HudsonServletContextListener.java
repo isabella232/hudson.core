@@ -19,11 +19,8 @@ import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider
 import com.thoughtworks.xstream.core.JVM;
 import hudson.EnvVars;
 import hudson.model.Hudson;
-import hudson.security.HudsonSecurityEntitiesHolder;
-import hudson.security.HudsonSecurityManager;
-import org.eclipse.hudson.WebAppController.DefaultInstallStrategy;
 import hudson.util.*;
-import hudson.util.graph.ChartUtil;
+import org.eclipse.hudson.WebAppController.DefaultInstallStrategy;
 import org.jvnet.localizer.LocaleProvider;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
@@ -45,7 +42,10 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Locale;
 import java.security.Security;
+import org.eclipse.hudson.graph.ChartUtil;
 import org.eclipse.hudson.init.InitialSetup;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

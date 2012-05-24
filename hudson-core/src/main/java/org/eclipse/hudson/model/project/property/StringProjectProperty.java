@@ -13,10 +13,10 @@
  *
  *******************************************************************************/
 
-package org.hudsonci.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hudsonci.api.model.ICascadingJob;
+import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
  * String property for project.

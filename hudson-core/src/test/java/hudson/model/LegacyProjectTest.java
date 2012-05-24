@@ -27,7 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
-import org.hudsonci.model.project.property.CopyOnWriteListProjectProperty;
+import org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;

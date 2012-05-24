@@ -8,24 +8,15 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
  *
+ *    Kohsuke Kawaguchi
+ *     
  *******************************************************************************/ 
 
 package hudson.model;
 
-import hudson.util.graph.Graph;
-import hudson.util.graph.MultiStageTimeSeries.TimeScale;
 import junit.framework.TestCase;
 
-import org.apache.commons.io.IOUtils;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**

@@ -31,6 +31,8 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import static org.easymock.EasyMock.expect;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 import static org.junit.Assert.assertFalse;
 import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.mockStatic;

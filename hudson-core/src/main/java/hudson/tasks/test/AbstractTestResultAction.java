@@ -16,16 +16,10 @@
 
 package hudson.tasks.test;
 
-import hudson.util.graph.DataSet;
 import hudson.Functions;
 import hudson.model.*;
 import hudson.tasks.junit.CaseResult;
 import hudson.util.*;
-import hudson.util.graph.ChartLabel;
-import hudson.util.graph.ChartUtil;
-import hudson.util.graph.ChartUtil.NumberOnlyBuildLabel;
-import hudson.util.graph.Graph;
-import hudson.util.graph.GraphSeries;
 import java.awt.Color;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.stapler.StaplerRequest;
@@ -38,6 +32,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.eclipse.hudson.graph.Graph;
+import org.eclipse.hudson.graph.ChartLabel;
+import org.eclipse.hudson.graph.ChartUtil;
+import org.eclipse.hudson.graph.ChartUtil.NumberOnlyBuildLabel;
+import org.eclipse.hudson.graph.DataSet;
+import org.eclipse.hudson.graph.GraphSeries;
 
 /**
  * Common base class for recording test result.

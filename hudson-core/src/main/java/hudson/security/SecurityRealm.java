@@ -39,6 +39,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.Stapler;

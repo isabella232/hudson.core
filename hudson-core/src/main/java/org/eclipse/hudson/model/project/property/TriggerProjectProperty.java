@@ -13,10 +13,10 @@
  *
  *******************************************************************************/
 
-package org.hudsonci.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.triggers.Trigger;
-import org.hudsonci.api.model.ICascadingJob;
+import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
  * Property for triggers in case of we should use child project trigger

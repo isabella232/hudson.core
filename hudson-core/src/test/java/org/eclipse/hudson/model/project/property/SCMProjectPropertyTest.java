@@ -12,7 +12,7 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
-package org.hudsonci.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.FilePath;
 import hudson.Launcher;
@@ -67,7 +67,7 @@ public class SCMProjectPropertyTest {
     }
 
     /**
-     * Verify {@link org.hudsonci.model.project.property.SCMProjectProperty#getDefaultValue()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.SCMProjectProperty#getDefaultValue()} method.
      */
     @Test
     public void testGetDefaultValue() {
@@ -75,7 +75,7 @@ public class SCMProjectPropertyTest {
     }
 
     /**
-     * Verify {@link org.hudsonci.model.project.property.SCMProjectProperty#returnOriginalValue()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.SCMProjectProperty#returnOriginalValue()} method.
      */
     @Test
     public void testReturnOriginalValue() {

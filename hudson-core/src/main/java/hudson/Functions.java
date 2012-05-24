@@ -120,6 +120,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
 import org.eclipse.hudson.script.ScriptSupport;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 
 /**
  * Utility functions used in views.

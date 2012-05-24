@@ -30,7 +30,6 @@ import hudson.lifecycle.WindowsSlaveInstaller;
 import hudson.Util;
 import hudson.AbortException;
 import hudson.remoting.Launcher;
-import hudson.security.HudsonSecurityManager;
 import static hudson.slaves.SlaveComputer.LogHolder.SLAVE_LOG_HANDLER;
 import hudson.slaves.OfflineCause.ChannelTermination;
 
@@ -59,6 +58,7 @@ import org.kohsuke.stapler.HttpRedirect;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 
 /**
  * {@link Computer} for {@link Slave}s.

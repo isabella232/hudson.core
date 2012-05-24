@@ -28,11 +28,11 @@ import hudson.model.Label;
 import hudson.model.Descriptor;
 import hudson.security.ACL;
 import hudson.security.AccessControlled;
-import hudson.security.HudsonSecurityEntitiesHolder;
 import hudson.security.Permission;
 import hudson.util.DescriptorList;
 
 import java.util.Collection;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
  * Creates {@link Node}s to dynamically expand/shrink the slaves attached to Hudson.
@@ -56,22 +56,27 @@ public abstract class Cloud extends AbstractModelObject implements ExtensionPoin
         this.name = name;
     }
 
+    @Override
     public String getDisplayName() {
         return name;
     }
 
+    @Override
     public String getSearchUrl() {
         return "cloud/"+name;
     }
 
+    @Override
     public ACL getACL() {
         return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy().getACL(this);
     }
 
+    @Override
     public final void checkPermission(Permission permission) {
         getACL().checkPermission(permission);
     }
 
+    @Override
     public final boolean hasPermission(Permission permission) {
         return getACL().hasPermission(permission);
     }

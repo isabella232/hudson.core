@@ -11,10 +11,9 @@
  *
  *    Kohsuke Kawaguchi, Winston Prakash
  *        
- *
  *******************************************************************************/ 
 
-package hudson.util.graph;
+package org.eclipse.hudson.graph;
 
 import hudson.model.Api;
 import hudson.model.Messages;

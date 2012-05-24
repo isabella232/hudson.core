@@ -38,7 +38,7 @@ import java.util.logging.Level;
 import java.lang.reflect.Method;
 
 import static hudson.model.queue.Executables.*;
-import hudson.security.HudsonSecurityManager;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 
 
 /**

@@ -21,7 +21,6 @@ import hudson.util.CascadingUtil;
 import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.MapUtils;
-import hudson.util.graph.GraphSeries;
 import hudson.widgets.Widget;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -45,19 +44,12 @@ import hudson.tasks.LogRotator;
 import hudson.util.ColorPalette;
 import hudson.util.CopyOnWriteList;
 
-import hudson.util.graph.DataSet;
-
 import hudson.util.IOException2;
 import hudson.util.RunList;
 import hudson.util.TextFile;
 
-import hudson.util.graph.ChartLabel;
-import hudson.util.graph.Graph;
-
-
 import hudson.widgets.HistoryWidget;
 import hudson.widgets.HistoryWidget.Adapter;
-
 
 import java.awt.Color;
 
@@ -81,11 +73,11 @@ import net.sf.json.JSONException;
  
 import net.sf.json.JSONObject;
 
-import org.hudsonci.api.model.ICascadingJob;
-import org.hudsonci.api.model.IJob;
-import org.hudsonci.api.model.IProjectProperty;
-import org.hudsonci.model.project.property.BaseProjectProperty;
-import org.hudsonci.model.project.property.ExternalProjectProperty;
+import org.eclipse.hudson.api.model.ICascadingJob;
+import org.eclipse.hudson.api.model.IJob;
+import org.eclipse.hudson.api.model.IProjectProperty;
+import org.eclipse.hudson.model.project.property.BaseProjectProperty;
+import org.eclipse.hudson.model.project.property.ExternalProjectProperty;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -96,6 +88,11 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
 
 import static javax.servlet.http.HttpServletResponse.*;
+import org.eclipse.hudson.graph.ChartLabel;
+import org.eclipse.hudson.graph.DataSet;
+import org.eclipse.hudson.graph.Graph;
+import org.eclipse.hudson.graph.GraphSeries;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
  * A job is an runnable entity under the monitoring of Hudson.
@@ -134,7 +131,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     /**
      * @deprecated as of 2.2.0
-     *             don't use this field directly, logic was moved to {@link org.hudsonci.api.model.IProjectProperty}.
+     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
     private volatile LogRotator logRotator;

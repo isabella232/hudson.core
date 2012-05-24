@@ -13,7 +13,7 @@
  *
  *******************************************************************************/
 
-package org.hudsonci.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.matrix.AxisList;
 import hudson.model.FreeStyleProjectMock;
@@ -58,7 +58,7 @@ public class AxisListProjectPropertyTest {
     }
 
     /**
-     * Verify {@link org.hudsonci.model.project.property.CopyOnWriteListProjectProperty#getDefaultValue()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty#getDefaultValue()} method.
      */
     @Test
     public void testAxisListProjectPropertyGetDefaultValue() {

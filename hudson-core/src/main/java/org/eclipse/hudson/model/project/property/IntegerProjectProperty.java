@@ -12,9 +12,9 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
-package org.hudsonci.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
-import org.hudsonci.api.model.ICascadingJob;
+import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
  * Represents integer property for project.

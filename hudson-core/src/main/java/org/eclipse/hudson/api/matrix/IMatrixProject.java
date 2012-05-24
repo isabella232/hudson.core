@@ -17,7 +17,7 @@ package org.eclipse.hudson.api.matrix;
 import hudson.matrix.AxisList;
 import hudson.model.Result;
 import java.io.IOException;
-import org.hudsonci.api.model.IBaseBuildableProject;
+import org.eclipse.hudson.api.model.IBaseBuildableProject;
 
 /**
  * Matrix Project Interface.

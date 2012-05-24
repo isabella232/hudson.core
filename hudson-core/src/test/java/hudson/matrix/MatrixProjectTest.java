@@ -17,9 +17,9 @@ package hudson.matrix;
 import hudson.model.Result;
 import hudson.security.Permission;
 import java.io.IOException;
-import org.hudsonci.api.model.IProjectProperty;
-import org.hudsonci.model.project.property.ResultProjectProperty;
-import org.hudsonci.model.project.property.StringProjectProperty;
+import org.eclipse.hudson.api.model.IProjectProperty;
+import org.eclipse.hudson.model.project.property.ResultProjectProperty;
+import org.eclipse.hudson.model.project.property.StringProjectProperty;
 import org.junit.Test;
 
 import static hudson.model.AbstractProject.PROPERTY_NAME_SEPARATOR;

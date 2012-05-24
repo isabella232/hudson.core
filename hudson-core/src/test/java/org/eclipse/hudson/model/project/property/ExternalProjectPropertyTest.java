@@ -13,7 +13,7 @@
  *
  *******************************************************************************/
 
-package org.hudsonci.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.model.FreeStyleProjectMock;
 import org.junit.Before;
@@ -56,7 +56,7 @@ public class ExternalProjectPropertyTest {
     }
 
     /**
-     * Verify {@link org.hudsonci.model.project.property.ExternalProjectProperty#updateOriginalValue(Object, Object)} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.ExternalProjectProperty#updateOriginalValue(Object, Object)} method.
      */
     @Test
     public void testUpdateOriginalValue() {
@@ -73,7 +73,7 @@ public class ExternalProjectPropertyTest {
     }
 
     /**
-     * Verify {@link org.hudsonci.model.project.property.ExternalProjectProperty#onCascadingProjectSet()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.ExternalProjectProperty#onCascadingProjectSet()} method.
      */
     @Test
     public void testOnCascadingProjectSet() {

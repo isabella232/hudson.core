@@ -17,9 +17,9 @@
 package hudson.model;
 
 import hudson.util.ColorPalette;
-import hudson.util.graph.MultiStageTimeSeries;
-import hudson.util.graph.MultiStageTimeSeries.TimeScale;
-import hudson.util.graph.MultiStageTimeSeries.TrendChart;
+import org.eclipse.hudson.graph.MultiStageTimeSeries;
+import org.eclipse.hudson.graph.MultiStageTimeSeries.TimeScale;
+import org.eclipse.hudson.graph.MultiStageTimeSeries.TrendChart;
 import org.kohsuke.stapler.export.Exported;
 
 /**

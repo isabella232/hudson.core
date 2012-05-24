@@ -29,7 +29,7 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.model.Descriptor.FormException;
 import hudson.Extension;
-import hudson.security.HudsonSecurityEntitiesHolder;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
  * {@link View} that only contains projects for which the current user has access to.

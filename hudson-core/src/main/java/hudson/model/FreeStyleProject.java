@@ -21,7 +21,7 @@ import hudson.Extension;
 import hudson.util.CascadingUtil;
 import java.io.IOException;
 
-import org.hudsonci.api.model.IFreeStyleProject;
+import org.eclipse.hudson.api.model.IFreeStyleProject;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -40,7 +40,7 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
      *
      * @since 1.216
      * @deprecated as of 2.2.0
-     *             don't use this field directly, logic was moved to {@link org.hudsonci.api.model.IProjectProperty}.
+     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
      *             Use getter/setter for accessing to this field.
      */
     @Deprecated

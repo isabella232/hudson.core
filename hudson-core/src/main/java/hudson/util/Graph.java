@@ -20,9 +20,9 @@ import java.util.Calendar;
  * Exists solely for backward compatibility
  * 
  * @author Winston Prakash
- * @see hudson.util.graph.Graph
+ * @see org.eclipse.hudson.graph.Graph
  */
-public class Graph extends hudson.util.graph.Graph {
+public class Graph extends org.eclipse.hudson.graph.Graph {
 
     public Graph(long timestamp, int defaultW, int defaultH) {
         super(timestamp, defaultW, defaultH);

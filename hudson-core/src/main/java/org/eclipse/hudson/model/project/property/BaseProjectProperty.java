@@ -13,12 +13,12 @@
  *
  *******************************************************************************/
 
-package org.hudsonci.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.util.DeepEquals;
 import org.apache.commons.lang3.ObjectUtils;
-import org.hudsonci.api.model.ICascadingJob;
-import org.hudsonci.api.model.IProjectProperty;
+import org.eclipse.hudson.api.model.ICascadingJob;
+import org.eclipse.hudson.api.model.IProjectProperty;
 
 /**
  * Base property implementation. Contains common methods for setting and getting cascading and overridden properties.

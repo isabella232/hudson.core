@@ -13,7 +13,7 @@
  *
  *******************************************************************************/
 
-package org.hudsonci.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.model.FreeStyleProjectMock;
 import hudson.tasks.LogRotator;

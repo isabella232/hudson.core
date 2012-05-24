@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;

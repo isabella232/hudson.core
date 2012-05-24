@@ -13,7 +13,7 @@
  *
  *******************************************************************************/
 
-package org.hudsonci.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.model.FreeStyleProjectMock;
 import hudson.util.CopyOnWriteList;
@@ -61,7 +61,7 @@ public class CopyOnWriteListProjectPropertyTest {
     }
 
     /**
-     * Verify {@link org.hudsonci.model.project.property.CopyOnWriteListProjectProperty#getDefaultValue()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty#getDefaultValue()} method.
      */
     @Test
     public void testGetDefaultValue() {
@@ -73,7 +73,7 @@ public class CopyOnWriteListProjectPropertyTest {
     }
 
     /**
-     * Verify {@link org.hudsonci.model.project.property.CopyOnWriteListProjectProperty#getOriginalValue()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty#getOriginalValue()} method.
      */
     @Test
     public void testGetOriginalValue() {
@@ -85,7 +85,7 @@ public class CopyOnWriteListProjectPropertyTest {
     }
 
     /**
-     * Verify {@link org.hudsonci.model.project.property.CopyOnWriteListProjectProperty#returnOriginalValue()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty#returnOriginalValue()} method.
      */
     @Test
     public void testReturnOriginalValue() {
@@ -104,7 +104,7 @@ public class CopyOnWriteListProjectPropertyTest {
     }
 
     /**
-     * Verify {@link org.hudsonci.model.project.property.CopyOnWriteListProjectProperty#clearOriginalValue(hudson.util.CopyOnWriteList)} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty#clearOriginalValue(hudson.util.CopyOnWriteList)} method.
      */
     @Test
     public void testClearOriginalValue() {

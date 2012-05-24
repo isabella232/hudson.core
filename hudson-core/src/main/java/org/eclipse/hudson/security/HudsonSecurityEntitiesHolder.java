@@ -14,7 +14,9 @@
  *
  ******************************************************************************
  */
-package hudson.security;
+package org.eclipse.hudson.security;
+
+import hudson.security.HudsonFilter;
 
 /**
  * This is a Container class to set and fetch the Security related entities such

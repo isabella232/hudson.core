@@ -19,7 +19,6 @@ import hudson.PluginWrapper;
 import hudson.PluginManager;
 import hudson.model.UpdateCenter.UpdateCenterJob;
 import hudson.lifecycle.Lifecycle;
-import hudson.security.HudsonSecurityManager;
 import hudson.util.IOUtils;
 import hudson.util.JSONCanonicalUtils;
 import hudson.util.TextFile;
@@ -59,6 +58,7 @@ import java.security.cert.TrustAnchor;
 
 import javax.servlet.ServletContext;
 import org.apache.commons.codec.binary.Base64;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 
 
 /**

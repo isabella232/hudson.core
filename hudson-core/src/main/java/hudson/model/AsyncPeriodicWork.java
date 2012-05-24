@@ -15,12 +15,12 @@
 
 package hudson.model;
 
-import hudson.security.HudsonSecurityManager;
 import hudson.util.StreamTaskListener;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 
 /**
  * {@link PeriodicWork} that takes a long time to run.

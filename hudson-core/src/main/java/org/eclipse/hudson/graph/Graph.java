@@ -11,9 +11,8 @@
  *
  *    Kohsuke Kawaguchi,  Winston.Prakash@Oracle.com
  *        
- *
  *******************************************************************************/
-package hudson.util.graph;
+package org.eclipse.hudson.graph;
 
 import hudson.model.Descriptor.FormException;
 import hudson.util.ColorPalette;

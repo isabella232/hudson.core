@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.List;
 import java.util.ArrayList;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
  * {@link Authentication} implementation for {@link Principal}

@@ -25,7 +25,6 @@ import hudson.model.Hudson.MasterComputer;
 import hudson.remoting.Callable;
 import hudson.remoting.Channel;
 import hudson.remoting.VirtualChannel;
-import hudson.security.HudsonSecurityEntitiesHolder;
 import hudson.util.Secret;
 import org.springframework.security.Authentication;
 import org.springframework.security.AuthenticationException;
@@ -39,6 +38,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Properties;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
  * Represents the authentication credential store of the CLI client.

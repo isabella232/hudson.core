@@ -12,7 +12,8 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
-package org.hudsonci.api.model;
+
+package org.eclipse.hudson.api.model;
 
 import hudson.FilePath;
 import hudson.model.AbstractBuild;

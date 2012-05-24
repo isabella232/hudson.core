@@ -25,7 +25,7 @@ import hudson.util.XStream2;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
-import hudson.security.HudsonSecurityManager;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 
 /**
  * Cause object base class.  This class hierarchy is used to keep track of why 

@@ -18,7 +18,7 @@ package hudson;
 
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
-import hudson.security.HudsonSecurityManager;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;

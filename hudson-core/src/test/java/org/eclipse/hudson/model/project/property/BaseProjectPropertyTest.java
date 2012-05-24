@@ -13,7 +13,7 @@
  *
  *******************************************************************************/
 
-package org.hudsonci.model.project.property;
+package org.eclipse.hudson.model.project.property;
 
 import hudson.matrix.Axis;
 import hudson.matrix.AxisList;
@@ -70,7 +70,7 @@ public class BaseProjectPropertyTest {
     }
 
     /**
-     * Verify {@link BaseProjectProperty#setJob(org.hudsonci.api.model.IJob)} method.
+     * Verify {@link BaseProjectProperty#setJob(org.eclipse.hudson.api.model.IJob)} method.
      */
     @Test
     public void testSetJob() {
@@ -358,7 +358,7 @@ public class BaseProjectPropertyTest {
     }
 
     /**
-     * Verify {@link org.hudsonci.model.project.property.BaseProjectProperty#onCascadingProjectRemoved()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.BaseProjectProperty#onCascadingProjectRemoved()} method.
      */
     @Test
     public void testOnCascadingProjectRemoved() {
@@ -369,7 +369,7 @@ public class BaseProjectPropertyTest {
     }
 
     /**
-     * Verify {@link org.hudsonci.model.project.property.BaseProjectProperty#onCascadingProjectRemoved()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.BaseProjectProperty#onCascadingProjectRemoved()} method.
      */
     @Test
     public void testOnCascadingProjectSet() {
@@ -389,7 +389,7 @@ public class BaseProjectPropertyTest {
     }
 
     /**
-     * Verify {@link org.hudsonci.model.project.property.BaseProjectProperty#onCascadingProjectChanged()} method.
+     * Verify {@link org.eclipse.hudson.model.project.property.BaseProjectProperty#onCascadingProjectChanged()} method.
      */
     @Test
     public void testOnCascadingProjectChanged() {

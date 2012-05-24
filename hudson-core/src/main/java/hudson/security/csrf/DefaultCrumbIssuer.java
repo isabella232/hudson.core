@@ -24,12 +24,12 @@ import java.util.logging.Logger;
 import hudson.Extension;
 import hudson.model.Hudson;
 import hudson.model.ModelObject;
-import hudson.security.HudsonSecurityManager;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import net.sf.json.JSONObject;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 
 import org.springframework.security.Authentication;
 import org.kohsuke.stapler.DataBoundConstructor;

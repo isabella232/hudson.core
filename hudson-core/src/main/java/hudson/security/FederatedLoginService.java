@@ -53,6 +53,7 @@ import org.kohsuke.stapler.StaplerResponse;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
  * Abstraction for a login mechanism through external authenticator/identity provider

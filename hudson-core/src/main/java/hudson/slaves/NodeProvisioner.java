@@ -23,8 +23,6 @@ import hudson.model.Label;
 import hudson.model.PeriodicWork;
 import static hudson.model.LoadStatistics.DECAY;
 import hudson.Extension;
-import hudson.util.graph.MultiStageTimeSeries;
-import hudson.util.graph.MultiStageTimeSeries.TimeScale;
 
 import java.awt.Color;
 import java.util.concurrent.Future;
@@ -36,6 +34,8 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.io.IOException;
+import org.eclipse.hudson.graph.MultiStageTimeSeries;
+import org.eclipse.hudson.graph.MultiStageTimeSeries.TimeScale;
 
 /**
  * Uses the {@link LoadStatistics} and determines when we need to allocate

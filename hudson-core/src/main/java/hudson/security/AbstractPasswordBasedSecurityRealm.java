@@ -24,6 +24,7 @@ import hudson.tasks.MailAddressResolver;
 import java.io.Console;
 import java.io.IOException;
 import java.util.Arrays;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.springframework.security.Authentication;
 import org.springframework.security.AuthenticationException;
 import org.springframework.security.BadCredentialsException;

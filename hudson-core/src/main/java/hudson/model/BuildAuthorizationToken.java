@@ -18,11 +18,11 @@ package hudson.model;
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 import hudson.Util;
 import hudson.security.ACL;
-import hudson.security.HudsonSecurityEntitiesHolder;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import java.io.IOException;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.springframework.security.AccessDeniedException;
 
 /**

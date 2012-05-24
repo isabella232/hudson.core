@@ -12,7 +12,8 @@
  *    Nikita Levyankov
  *
  *******************************************************************************/
-package org.hudsonci.api.model;
+
+package org.eclipse.hudson.api.model;
 
 import hudson.PermalinkList;
 import hudson.model.BallColor;
@@ -27,7 +28,7 @@ import hudson.model.Queue;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.tasks.LogRotator;
-import hudson.util.graph.Graph;
+import org.eclipse.hudson.graph.Graph;
 import hudson.util.RunList;
 import hudson.widgets.Widget;
 import java.io.IOException;

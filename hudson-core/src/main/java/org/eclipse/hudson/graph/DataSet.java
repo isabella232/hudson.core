@@ -13,7 +13,7 @@
  *     
  *
  *******************************************************************************/
-package hudson.util.graph;
+package org.eclipse.hudson.graph;
 
 import java.util.ArrayList;
 import java.util.List;

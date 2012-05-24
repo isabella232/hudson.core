@@ -19,8 +19,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-
-import hudson.security.HudsonSecurityManager;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 
 /**
  * {@link Timer} wrapper so that a fatal error in {@link TimerTask}

@@ -14,7 +14,7 @@
  *
  ******************************************************************************
  */
-package hudson.security;
+package org.eclipse.hudson.security;
 
 import com.thoughtworks.xstream.XStream;
 import hudson.BulkChange;
@@ -25,6 +25,7 @@ import hudson.markup.RawHtmlMarkupFormatter;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
+import hudson.security.*;
 import hudson.util.TextFile;
 import hudson.util.XStream2;
 import java.io.File;

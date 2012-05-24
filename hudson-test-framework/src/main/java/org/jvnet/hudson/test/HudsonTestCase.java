@@ -148,6 +148,8 @@ import hudson.util.SecurityFailedToInit;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.eclipse.hudson.HudsonServletContextListener;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 
 /**
  * Base class for all Hudson test cases.

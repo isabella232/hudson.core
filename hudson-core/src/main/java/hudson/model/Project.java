@@ -22,7 +22,7 @@ import hudson.tasks.Fingerprinter;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.ProjectWithMaven;
 import hudson.tasks.Maven.MavenInstallation;
-import org.hudsonci.api.model.IProject;
+import org.eclipse.hudson.api.model.IProject;
 import java.util.HashSet;
 import java.util.Set;
 

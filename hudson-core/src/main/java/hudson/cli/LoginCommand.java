@@ -17,7 +17,7 @@ package hudson.cli;
 
 import hudson.Extension;
 import hudson.model.Hudson;
-import hudson.security.HudsonSecurityManager;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.springframework.security.Authentication;
 import org.kohsuke.args4j.CmdLineException;
 

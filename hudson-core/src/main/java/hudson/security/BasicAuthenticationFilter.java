@@ -29,6 +29,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.springframework.security.context.SecurityContextHolder;
 
 /**
