@@ -56,7 +56,7 @@
         }
 
         ul.setup > li {
-            border: 1px solid #DDDDDD;
+            border: 1px solid #A583B7;
             border-radius: 4px 4px 4px 4px;
             list-style-type: none;
             margin: 0 0 10px;
@@ -67,12 +67,12 @@
         ul.setup h3 {
             font-size: 18px;
             margin: 0;
-            color: #4183C4;
+            color: #863566;
             white-space: nowrap;
         }
 
         ul.setup .body {
-            background: #EFEFEF;
+            background: #E2D7E7;
             border-bottom-left-radius: 4px;
             border-bottom-right-radius: 4px;
             border-top: 1px solid #EEEEEE;
@@ -174,7 +174,7 @@
         <div class="site clearfix">
             <div class="container">
                 <span style="width:100%; text-align:center">
-                    <h1 style="margin-top:4em; color:#678799">
+                    <h1 style="margin-top:4em; color:#5C3566">
                         Hudson CI Server Initial Setup
                     </h1>
                 </span>
@@ -586,7 +586,9 @@
             });
             return installables;
         }
-             
+        
+        
+        
         function showLoginDialog(){
             jQuery.blockUI({
               message: jQuery('#loginDialog'),
