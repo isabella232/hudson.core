@@ -351,7 +351,7 @@
                             ${%HTTP Proxy Configuration}
                         </h3>
                         <p class="description">
-                            For installing the plugins, Hudson server need to connect to the internet. Check your HTTP proxy settings. 
+                            For installing the plugins, Hudson server needs to connect to the internet. Check your HTTP proxy settings. 
                         </p>
                         <div class="body">
                             <div class="setup-items-container">
