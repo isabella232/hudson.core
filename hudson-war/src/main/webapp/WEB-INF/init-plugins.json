@@ -65,7 +65,7 @@
         },
         "maven-plugin" : {
             "name" : "maven-plugin",
-            "displayName" : "Hudson SSH Slaves plugin",
+            "displayName" : "Legacy Maven Plugin",
             "description" : "This Plugin is needed for building Legacy Maven 2/3 job.",
             "version" : "2.2.1",
             "dependencies" : [ ],
