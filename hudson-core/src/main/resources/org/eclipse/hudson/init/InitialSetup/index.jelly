@@ -207,7 +207,7 @@
                                                 </div>
                                             </td>
                                             <td class="column3" style="white-space:nowrap">
-                                                ${p.version} (Available)
+                                                ${p.version}
                                             </td>
                                         </tr>
                                     </j:forEach>
@@ -228,7 +228,7 @@
                                                 </div>
                                             </td>
                                             <td class="column3" style="white-space:nowrap">
-                                                ${p.version} (Available)
+                                                ${p.version}
                                             </td>
                                             <td class="column4" style="white-space:nowrap">
                                                 ${it.getInstalled(p).version} (Installed)
@@ -290,7 +290,7 @@
                                                 </div>
                                             </td>
                                             <td class="column3" style="white-space:nowrap">
-                                                ${p.version} (Available)
+                                                ${p.version}
                                             </td>
                                         </tr>
                                     </j:forEach>
@@ -311,7 +311,7 @@
                                                 </div>
                                             </td>
                                             <td class="column3" style="white-space:nowrap">
-                                                ${p.version} (Available)
+                                                ${p.version}
                                             </td>
                                             <td class="column4" style="white-space:nowrap">
                                                 ${it.getInstalled(p).version} (Installed)
