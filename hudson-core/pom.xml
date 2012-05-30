@@ -476,6 +476,10 @@
                     <artifactId>icu4j</artifactId>
                     <groupId>com.ibm.icu</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>xalan</artifactId>
+                    <groupId>xalan</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         
@@ -761,6 +765,11 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.6.1</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.7.1</version>
         </dependency>
     </dependencies>
 
