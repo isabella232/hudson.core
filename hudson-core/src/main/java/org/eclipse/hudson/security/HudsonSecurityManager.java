@@ -10,7 +10,7 @@
  *
  * Contributors:
  *
- * Winston Prakash
+ *   Winston Prakash
  *
  ******************************************************************************
  */
@@ -33,6 +33,12 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import javax.crypto.SecretKey;
 import javax.servlet.ServletException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -44,6 +50,11 @@ import org.springframework.security.GrantedAuthorityImpl;
 import org.springframework.security.SpringSecurityException;
 import org.springframework.security.context.SecurityContextHolder;
 import org.springframework.security.providers.anonymous.AnonymousAuthenticationToken;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Manager that manages Hudson Security. The configuration is written to the
@@ -53,6 +64,8 @@ import org.springframework.security.providers.anonymous.AnonymousAuthenticationT
  * @since 3.0.0
  */
 public class HudsonSecurityManager implements Saveable {
+    
+    private final String securityConfigFileName = "hudson-security.xml";
 
     /**
      * Used to load/save Security configuration.
@@ -332,7 +345,7 @@ public class HudsonSecurityManager implements Saveable {
      * The file where the Security settings are saved.
      */
     protected final XmlFile getConfigFile() {
-        return new XmlFile(XSTREAM, new File(hudsonHome, "/hudson-security.xml"));
+        return new XmlFile(XSTREAM, new File(hudsonHome, securityConfigFileName));
     }
 
     /**
@@ -355,6 +368,11 @@ public class HudsonSecurityManager implements Saveable {
         try {
             if (config.exists()) {
                 config.unmarshal(this);
+            }else{
+                // Compatibility. Hudson 2.x stores Security config in the Global Config file.
+                if (extractSecurityConfig()){
+                    config.unmarshal(this);
+                }
             }
         } catch (IOException e) {
             logger.error("Failed to load " + config, e);
@@ -412,5 +430,71 @@ public class HudsonSecurityManager implements Saveable {
             a = ANONYMOUS;
         }
         return a;
+    }
+    
+    private boolean extractSecurityConfig() {
+        try {
+
+            File globalConfigFile = new File(hudsonHome, "config.xml");
+
+            Document globalConfigDoc = parseXmlFile(globalConfigFile);
+
+            if (isSecuritySet(globalConfigDoc)) {
+                DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                Document securityConfigDoc = builder.newDocument();
+
+                Element root = securityConfigDoc.createElement("hudsonSecurityManager");
+                securityConfigDoc.appendChild(root);
+                moveElement(globalConfigDoc, securityConfigDoc, root, "useSecurity");
+                moveElement(globalConfigDoc, securityConfigDoc, root, "authorizationStrategy");
+                moveElement(globalConfigDoc, securityConfigDoc, root, "securityRealm");
+
+                File securityConfigFile = new File(hudsonHome, securityConfigFileName);
+                securityConfigFile.createNewFile();
+                writeXmlFile(securityConfigDoc, securityConfigFile);
+
+                writeXmlFile(globalConfigDoc, globalConfigFile);
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            return false;
+        }
+    }
+
+    private void moveElement(Document fromDoc, Document toDoc, Element root, String elementName) {
+        NodeList list = fromDoc.getElementsByTagName(elementName);
+        if ((list != null) && (list.getLength() > 0)) {
+            Element element = (Element) list.item(0);
+            Node node = toDoc.importNode(element, true);
+            root.appendChild(node);
+            element.getParentNode().removeChild(element);
+        }
+    }
+
+    private Document parseXmlFile(File xmlFile) throws ParserConfigurationException, SAXException, IOException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setValidating(false);
+
+        Document doc = factory.newDocumentBuilder().parse(xmlFile);
+        return doc;
+    }
+
+    private void writeXmlFile(Document doc, File file) throws TransformerConfigurationException, TransformerException {
+        Source source = new DOMSource(doc);
+        Result result = new StreamResult(file);
+
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+        transformer.transform(source, result);
+    }
+
+    private boolean isSecuritySet(Document globalConfigDoc) {
+        NodeList list = globalConfigDoc.getElementsByTagName("useSecurity");
+        return (list != null) && (list.getLength() > 0);
     }
 }
