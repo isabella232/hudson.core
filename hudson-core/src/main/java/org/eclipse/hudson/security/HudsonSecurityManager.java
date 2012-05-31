@@ -436,6 +436,10 @@ public class HudsonSecurityManager implements Saveable {
         try {
 
             File globalConfigFile = new File(hudsonHome, "config.xml");
+            
+            if (!globalConfigFile.exists()){
+                return false;
+            }
 
             Document globalConfigDoc = parseXmlFile(globalConfigFile);
 
