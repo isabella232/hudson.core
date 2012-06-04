@@ -262,18 +262,18 @@
                             </div>
                         </div>
                     </li>
-                    <li class="recommended">
+                    <li class="featured">
                         <h3>
-                            Recommended Plugins
+                            Featured Plugins
                         </h3>
                         <p class="description">
-                            Following plugins are recommended. They are tested and certified by Hudson QA team.
+                            Following are featured plugins. They are tested and certified by Hudson QA team.
                         </p>
                         <div class="body">
                             <div class="setup-items-container">
                                         
-                                <table width="100%" border="0" id="recommendedPlugins" cellpadding="10">
-                                    <j:forEach var="p" items="${it.installablePlugins}">
+                                <table width="100%" border="0" id="featuredPlugins" cellpadding="10">
+                                    <j:forEach var="p" items="${it.installableFeaturedPlugins}">
                                         <tr>
                                             <td class="column1">
                                                 <input type="checkbox" checked="true" value="${p.name}"/>
@@ -294,7 +294,7 @@
                                             </td>
                                         </tr>
                                     </j:forEach>
-                                    <j:forEach var="p" items="${it.updatablePlugins}">
+                                    <j:forEach var="p" items="${it.updatableFeaturedPlugins}">
                                         <tr>
                                             <td class="column1">
                                                 <input type="checkbox" checked="true"  value="${p.name}"/>
@@ -318,7 +318,91 @@
                                             </td>
                                         </tr>
                                     </j:forEach>
-                                    <j:forEach var="p" items="${it.installedPlugins}">
+                                    <j:forEach var="p" items="${it.installedFeaturedPlugins}">
+                                        <tr>
+                                            <td class="column1">
+                                                 <img src="${imagesURL}/green-check.jpg"/>
+                                            </td>
+                                            <td class="column2">
+                                                <div>
+                                                    <a href="${p.wikiUrl}" target="_blank" style="color:gray">
+                                                        ${p.displayName}
+                                                    </a>
+                                                </div>
+                                                <div class="excerpt" style="padding-top: 5px; color:gray">
+                                                    ${p.description}
+                                                </div>
+                                            </td>
+                                            <td class="column3" style="white-space:nowrap; color:gray">
+                                                No update available
+                                            </td>
+                                            <td class="column4" style="white-space:nowrap; color:gray">
+                                                ${it.getInstalled(p).version} (Installed)
+                                            </td>
+                                        </tr>
+                                    </j:forEach>
+                                </table>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <li class="recommended">
+                        <h3>
+                            Recommended Plugins
+                        </h3>
+                        <p class="description">
+                            Following plugins are recommended. They are maintained by Hudson community developers and widely used.
+                        </p>
+                        <div class="body">
+                            <div class="setup-items-container">
+                                        
+                                <table width="100%" border="0" id="recommendedPlugins" cellpadding="10">
+                                    <j:forEach var="p" items="${it.installableRecommendedPlugins}">
+                                        <tr>
+                                            <td class="column1">
+                                                <input type="checkbox" value="${p.name}"/>
+                                                <img id="${p.name}" style="display:none;"/>
+                                            </td>
+                                            <td class="column2">
+                                                <div>
+                                                    <a href="${p.wikiUrl}" target="_blank">
+                                                        ${p.displayName}
+                                                    </a>
+                                                </div>
+                                                <div class="excerpt" style="padding-top: 5px;">
+                                                    ${p.description}
+                                                </div>
+                                            </td>
+                                            <td class="column3" style="white-space:nowrap">
+                                                ${p.version}
+                                            </td>
+                                        </tr>
+                                    </j:forEach>
+                                    <j:forEach var="p" items="${it.updatableRecommendedPlugins}">
+                                        <tr>
+                                            <td class="column1">
+                                                <input type="checkbox"  value="${p.name}"/>
+                                                <img id="${p.name}" style="display:none;"/>
+                                            </td>
+                                            <td class="column2">
+                                                <div>
+                                                    <a href="${p.wikiUrl}" target="_blank">
+                                                        ${p.displayName}
+                                                    </a>
+                                                </div>
+                                                <div class="excerpt" style="padding-top: 5px;">
+                                                    ${p.description}
+                                                </div>
+                                            </td>
+                                            <td class="column3" style="white-space:nowrap">
+                                                ${p.version}
+                                            </td>
+                                            <td class="column4" style="white-space:nowrap">
+                                                ${it.getInstalled(p).version} (Installed)
+                                            </td>
+                                        </tr>
+                                    </j:forEach>
+                                    <j:forEach var="p" items="${it.installedRecommendedPlugins}">
                                         <tr>
                                             <td class="column1">
                                                  <img src="${imagesURL}/green-check.jpg"/>
@@ -434,15 +518,14 @@
                 <div>
                     <span id="mandatoryMsg">
                         The Mandatory Plugins are needed and cannot be deselected. 
-                        Select the recommended plugins and click install to install the 
-                        mandatory and selected recommended plugins or click Finish
-                        to start Hudson after installing the mandatory plugins and any selected recommended plugins.  
+                        Select the featured or recommended plugins and click install to download and install the plugins or Finish
+                        to start Hudson after installing the plugins.  
                     </span> 
                         
                     <span id="recommendedMsg">
                         All Mandatory Plugins are installed. 
-                        Select the recommended plugins and click Install to install the selected recommended plugins 
-                        or click Finish to start Hudson after installing any selected recommended plugins.
+                        Select the featured or recommended plugins and click install to download and install the plugins or Finish
+                        to start Hudson after installing the plugins.
                     </span>
                          
                      <div>
@@ -579,6 +662,9 @@
         function getInstallables(){
             var installables = [];
             jQuery('#mandatoryPlugins input[@type=checkbox]:checked').each(function(){
+               installables.push(this);
+            });
+            jQuery('#featuredPlugins input[@type=checkbox]:checked').each(function(){
                installables.push(this);
             });
             jQuery('#recommendedPlugins input[@type=checkbox]:checked').each(function(){

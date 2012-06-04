@@ -18,10 +18,7 @@ package org.eclipse.hudson.init;
 
 import java.io.*;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import net.sf.json.JSONObject;
 
 /**
@@ -32,7 +29,10 @@ import net.sf.json.JSONObject;
  */
 public final class AvailablePluginManager {
 
-    private final Map<String, AvailablePluginInfo> availablePluginInfos = new TreeMap<String, AvailablePluginInfo>(String.CASE_INSENSITIVE_ORDER);
+    public static final String MANDATORY = "mandatory";
+    public static final String FEATURED = "featured";
+    public static final String RECOMMENDED = "recommended";
+    private final Map<String, AvailablePluginManager.AvailablePluginInfo> availablePluginInfos = new TreeMap<String, AvailablePluginManager.AvailablePluginInfo>(String.CASE_INSENSITIVE_ORDER);
     private URL initPluginsJsonUrl;
 
     AvailablePluginManager(URL pluginsJsonUrl) throws IOException {
@@ -44,7 +44,17 @@ public final class AvailablePluginManager {
         return availablePluginInfos.keySet();
     }
 
-    public AvailablePluginInfo getAvailablePlugin(String name) {
+    public List<AvailablePluginManager.AvailablePluginInfo> getAvailablePlugins(String type) {
+        List<AvailablePluginManager.AvailablePluginInfo> availablePlugins = new ArrayList<AvailablePluginManager.AvailablePluginInfo>();
+        for (AvailablePluginManager.AvailablePluginInfo pluginInfo : availablePluginInfos.values()) {
+            if (pluginInfo.getType().equals(type)) {
+                availablePlugins.add(pluginInfo);
+            }
+        }
+        return availablePlugins;
+    }
+
+    public AvailablePluginManager.AvailablePluginInfo getAvailablePlugin(String name) {
         return availablePluginInfos.get(name);
     }
 
@@ -62,7 +72,7 @@ public final class AvailablePluginManager {
         }
         JSONObject jsonObject = JSONObject.fromObject(strWriter.toString());
         for (Map.Entry<String, JSONObject> e : (Set<Map.Entry<String, JSONObject>>) jsonObject.getJSONObject("plugins").entrySet()) {
-            availablePluginInfos.put(e.getKey(), new AvailablePluginInfo(e.getValue()));
+            availablePluginInfos.put(e.getKey(), new AvailablePluginManager.AvailablePluginInfo(e.getValue()));
         }
     }
 
@@ -74,8 +84,8 @@ public final class AvailablePluginManager {
         private String wikiUrl;
         private String displayName;
         private String description;
+        private String type;
         private String[] categories;
-        private boolean mandatory = false;
         private Map<String, String> dependencies = new HashMap<String, String>();
 
         public AvailablePluginInfo(JSONObject jsonObject) {
@@ -108,8 +118,8 @@ public final class AvailablePluginManager {
         public String getDownloadUrl() {
             return downloadUrl;
         }
-        
-         public String getWikiUrl() {
+
+        public String getWikiUrl() {
             return wikiUrl;
         }
 
@@ -117,15 +127,15 @@ public final class AvailablePluginManager {
             return version;
         }
 
-        public boolean isMandatory() {
-            return mandatory;
+        public String getType() {
+            return type;
         }
 
         @Override
         public String toString() {
             return "[Plugin Name:" + name + " Display Name:" + displayName + " Version:" + version + " Wiki Url:" + wikiUrl + "Download Url:" + downloadUrl + "]";
         }
-        
+
         private void parseJsonObject(JSONObject jsonObject) {
             name = jsonObject.getString("name");
             version = jsonObject.getString("version");
@@ -133,17 +143,12 @@ public final class AvailablePluginManager {
             wikiUrl = get(jsonObject, "wikiUrl");
             displayName = get(jsonObject, "displayName");
             description = get(jsonObject, "description");
-            if (jsonObject.has("mandatory")) {
-                mandatory = jsonObject.getBoolean("mandatory");
-            } else {
-                mandatory = false;
-            }
+            type = get(jsonObject, "type");
 
             categories = jsonObject.has("categories") ? (String[]) jsonObject.getJSONArray("categories").toArray(new String[0]) : null;
             for (Object jo : jsonObject.getJSONArray("dependencies")) {
                 JSONObject depObj = (JSONObject) jo;
                 if (get(depObj, "name") != null
-                        && !get(depObj, "name").equals("maven-plugin")
                         && get(depObj, "optional").equals("false")) {
                     dependencies.put(get(depObj, "name"), get(depObj, "version"));
                 }
