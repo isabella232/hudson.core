@@ -9,14 +9,13 @@
  *
  * Contributors: 
  *
- *   
- *        
+ *  Kohsuke Kawaguchi, Winston Prakash
  *
  *******************************************************************************/ 
 
 package hudson.util;
 
-import ch.ethz.ssh2.crypto.digest.MD5;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +24,10 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import hudson.util.Iterators.DuplicateFilterIterator;
+import java.nio.charset.Charset;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Consistent hash.
@@ -52,6 +55,8 @@ import hudson.util.Iterators.DuplicateFilterIterator;
  * @since 1.302
  */
 public class ConsistentHash<T> {
+    
+    private Logger logger = LoggerFactory.getLogger(ConsistentHash.class);
     /**
      * All the items in the hash, to their replication factors.
      */
@@ -262,15 +267,19 @@ public class ConsistentHash<T> {
      * Compresses a string into an integer with MD5.
      */
     private int md5(String s) {
-        MD5 md5 = new MD5();
-        md5.update(s.getBytes());
-        byte[] digest = new byte[16];
-        md5.digest(digest);
+        try {
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            md5.update(s.getBytes(Charset.forName("UTF8")));
+            byte[] digest = md5.digest();
 
-        // 16 bytes -> 4 bytes
-        for (int i=0; i<4; i++)
-            digest[i] ^= digest[i+4]+digest[i+8]+digest[i+12];
-        return (b2i(digest[0])<< 24)|(b2i(digest[1])<<16)|(b2i(digest[2])<< 8)|b2i(digest[3]);
+            // 16 bytes -> 4 bytes
+            for (int i=0; i<4; i++)
+                digest[i] ^= digest[i+4]+digest[i+8]+digest[i+12];
+            return (b2i(digest[0])<< 24)|(b2i(digest[1])<<16)|(b2i(digest[2])<< 8)|b2i(digest[3]);
+        } catch (Exception ex) {
+            logger.error("Error finding MD5 for the string " + s, ex); 
+            return -1;
+        }
     }
 
     /**
