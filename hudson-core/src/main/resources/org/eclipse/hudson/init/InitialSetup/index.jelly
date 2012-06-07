@@ -178,8 +178,8 @@
             <div class="container">
                 <span style="width:100%; text-align:center">
                     <h1 style="margin-top:4em; color:#5C3566">
-                        Hudson CI Server Initial Setup
-                         <a href="http://wiki.eclipse.org/Hudson-ci/features/Initial_Setup" target="_blank"> 
+                        Hudson CI Server Initial Setup 
+                        <a href="http://wiki.eclipse.org/Hudson-ci/features/Initial_Setup" target="_blank"> 
                             <img src="${imagesURL}/16x16/help.png"/>
                         </a>
                     </h1>
@@ -303,7 +303,13 @@
                                     <j:forEach var="p" items="${it.updatableFeaturedPlugins}">
                                         <tr>
                                             <td class="column1">
-                                                <input type="checkbox" checked="true"  value="${p.name}"/>
+                                                <j:if test="${it.getInstalled(p).isDisabled()}">
+                                                    <input type="checkbox"  value="${p.name}"/>
+                                                </j:if>
+                                                <j:if test="${!it.getInstalled(p).isDisabled()}">
+                                                    <input type="checkbox" checked="true"  value="${p.name}"/>
+                                                </j:if>
+                                                 
                                                 <img id="${p.name}" style="display:none;"/>
                                             </td>
                                             <td class="column2">
@@ -320,7 +326,12 @@
                                                 ${p.version}
                                             </td>
                                             <td class="column4" style="white-space:nowrap">
-                                                ${it.getInstalled(p).version} (Installed)
+                                                <j:if test="${it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Disabled)
+                                                </j:if>
+                                                <j:if test="${!it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Installed)
+                                                </j:if>
                                             </td>
                                         </tr>
                                     </j:forEach>
@@ -343,7 +354,12 @@
                                                 No update available
                                             </td>
                                             <td class="column4" style="white-space:nowrap; color:gray">
-                                                ${it.getInstalled(p).version} (Installed)
+                                                <j:if test="${it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Disabled)
+                                                </j:if>
+                                                <j:if test="${!it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Installed)
+                                                </j:if>
                                             </td>
                                         </tr>
                                     </j:forEach>
@@ -404,7 +420,12 @@
                                                 ${p.version}
                                             </td>
                                             <td class="column4" style="white-space:nowrap">
-                                                ${it.getInstalled(p).version} (Installed)
+                                                <j:if test="${it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Disabled)
+                                                </j:if>
+                                                <j:if test="${!it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Installed)
+                                                </j:if>
                                             </td>
                                         </tr>
                                     </j:forEach>
@@ -427,7 +448,12 @@
                                                 No update available
                                             </td>
                                             <td class="column4" style="white-space:nowrap; color:gray">
-                                                ${it.getInstalled(p).version} (Installed)
+                                                <j:if test="${it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Disabled)
+                                                </j:if>
+                                                <j:if test="${!it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Installed)
+                                                </j:if>
                                             </td>
                                         </tr>
                                     </j:forEach>
