@@ -28,10 +28,14 @@ import hudson.util.DaemonThreadFactory;
 import hudson.util.HudsonFailedToLoad;
 import hudson.util.HudsonIsLoading;
 import hudson.util.VersionNumber;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.*;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
@@ -120,11 +124,21 @@ final public class InitialSetup {
     }
     
     public boolean needsInitSetup(){
-        return !initSetupFile.exists();
+        if (!initSetupFile.exists()){
+            return (installableMandatoryPlugins.size() > 0) || (updatableMandatoryPlugins.size() > 0) ||
+                    (installableFeaturedPlugins.size() > 0) || (updatableFeaturedPlugins.size() > 0) ||
+                    (installableRecommendedPlugins.size() > 0) || (updatableRecommendedPlugins.size() > 0);
+        }else{
+            return !canFinish();
+        }
     }
     
-    public HudsonSecurityManager getHudsonSecurityManager() {
-        return hudsonSecurityManager;
+    public boolean needsAdminLogin() {
+        return !hudsonSecurityManager.hasPermission(Permission.HUDSON_ADMINISTER);
+    }
+    
+    public ServletContext getServletContext() {
+        return servletContext;
     }
 
     public ProxyConfiguration getProxyConfig() {
@@ -290,7 +304,7 @@ final public class InitialSetup {
             }.start();
     }
     
-    private boolean canFinish(){
+    public boolean canFinish(){
         reCheck();
         return (getInstallableMandatoryPlugins().size() == 0) && (getUpdatableMandatoryPlugins().size() == 0);
     }

@@ -44,6 +44,7 @@ import java.util.Locale;
 import java.security.Security;
 import org.eclipse.hudson.graph.ChartUtil;
 import org.eclipse.hudson.init.InitialSetup;
+import org.eclipse.hudson.init.InitialSetupLogin;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.slf4j.Logger;
@@ -206,7 +207,12 @@ public final class HudsonServletContextListener implements ServletContextListene
             
             InitialSetup initSetup = new InitialSetup(home, servletContext);
             if (initSetup.needsInitSetup()){
-                controller.install(initSetup);
+                logger.info("Initial setup required. Please go to the Hudson Dashboard and complete the setup");
+                if (HudsonSecurityEntitiesHolder.getHudsonSecurityManager().isUseSecurity()) {
+                    controller.install(new InitialSetupLogin(initSetup));
+                } else {
+                    controller.install(initSetup);
+                }
             }else{
                initSetup.invokeHudson(); 
             }

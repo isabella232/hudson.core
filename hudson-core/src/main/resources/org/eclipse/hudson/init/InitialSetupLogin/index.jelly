@@ -1,0 +1,365 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    
+    <j:set var="rootURL" value="${request.contextPath}" />
+    <j:set var="imagesURL"  value="${rootURL}/images" />
+    <j:set var="resURL"  value="${rootURL}" />
+  
+    <script src="${resURL}/scripts/jquery-1.6.4.min.js" type="text/javascript"></script>
+    <script src="${resURL}/scripts/jquery.blockUI-2.39.js" type="text/javascript"></script>
+    
+    <style type="text/css">
+        #wrapper {
+            height: auto !important;
+            margin: 0 0 -330px;
+            min-height: 100%;
+        }
+
+        .clearfix {
+            display: block;
+        }
+
+        .clearfix:after {
+            clear: both;
+            content: ".";
+            display: block;
+            height: 0;
+            visibility: hidden;
+        }
+
+        .site {
+            padding: 20px 0 0;
+            position: relative;
+            width: 100%;
+            z-index: 9;
+        }
+
+        .container {
+            margin: 0 auto;
+            width: 920px;
+        }
+
+        .first {
+            float: left;
+            width: 450px;
+        }
+
+        .last {
+            float: right;
+            width: 450px;
+        }
+
+        ul.setup {
+            margin: 0;
+            padding-left: 0px;
+        }
+
+        ul.setup > li {
+            border: 1px solid #A583B7;
+            border-radius: 4px 4px 4px 4px;
+            list-style-type: none;
+            margin: 0 0 10px;
+            overflow: hidden;
+            padding: 8px 10px 0;
+        }
+
+        ul.setup h3 {
+            font-size: 18px;
+            margin: 0;
+            color: #863566;
+            white-space: nowrap;
+        }
+
+        ul.setup .body {
+            background: #E2D7E7;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+            border-top: 1px solid #EEEEEE;
+            margin-left: -10px;
+            margin-top: 8px;
+            padding: 5px 10px;
+            width: 100%;
+        }
+
+        ul.setup p.description {
+            color: #444444;
+            margin: 0 0 3px;
+            padding-top: 5px;
+        }
+
+        .setup-items-container {
+            background: none repeat scroll 0 0 #FFFFFF;
+            border-color: #E5E5E5 #EEEEEE #EEEEEE #E5E5E5;
+            border-radius: 3px 3px 3px 3px;
+            border-style: solid;
+            border-width: 1px;
+            margin-left: -5px;
+            margin-top: 0px;
+            padding: 5px 4px;
+            width: 100%;
+        }
+        
+        .column1{
+           width:3%
+        }
+        .column2{
+           width:67%
+        }
+        .column3{
+           width:15%;
+           padding-left: 5px
+        }
+        .column4{
+           width:15%;
+           padding-left: 5px
+        }
+        
+        #buttonBar li {
+            display: inline;
+            list-style-type: none;
+            float: right;
+            padding-left: 5px
+        }
+        
+        #mandatoryMsg{
+          width:100%;
+          display: none;
+        }
+        
+        #recommendedMsg{
+          width:100%;
+          display: none;
+        }
+        
+        /* === Login Dialog ==== */
+
+        #loginError, #loginMsg {
+            text-align:center;
+            font-weight:bold;
+        }
+        #loginMsg {
+            color: black;
+            display: none;
+        }
+        
+        #loginError {
+            color: red;
+            display: none;
+        }
+        
+        #loginForm input {
+            width: 150px;
+        }
+        
+        #finishButton {
+            display: none;
+        }
+        
+    </style>
+   
+    
+    <div id="wrapper">
+        <div class="site clearfix">
+            <div class="container">
+                <span style="width:100%; text-align:center">
+                    <h1 style="margin-top:4em; color:#5C3566">
+                        Hudson CI Server Initial Setup
+                    </h1>
+                </span>
+                <ul id="installList" class="setup">
+                    <div>
+                        <span id="mandatoryMsg">
+                            For Hudson CI server to work properly few Mandatory Plugins need to be installed. 
+                            You will also get a chance to install other featured and recommended plugins. 
+                            Click continue to go to the install page. 
+                        </span> 
+                         
+                        <span id="recommendedMsg">
+                            All Mandatory Plugins required for Hudson CI server to work properly are installed. 
+                            To install the featured or recommended plugins click Continue. Click Finish to start Hudson.
+                        </span>
+                        
+                        <p id="loginNeededMsg">
+                            Note: You must <a id="loginLink" href="#" onClick="showLoginDialog(); return false;">login</a> as administrator to install the plugins.
+                        </p>
+                         
+                        <div>
+                            <ul id="buttonBar">
+                                <li>
+                                    <input type="button" id="finishButton" value="${%Finish}" />
+                                </li>
+                                <li>
+                                    <input type="button" id="continueButton" value="${%Continue}" />
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </ul>
+                 
+            </div>
+        </div>
+    </div>
+    
+    <div id="loginDialog" style="display:none; cursor: default">
+        <j:set var="submitFrom" value="${from}" />
+        <div style="margin: 2em;">
+        <!-- login form -->
+            <form id="loginForm"  style="text-size:smaller">
+                <table cellspacing="10">
+                    <tr>
+                        <td colspan="2">${%Admin access required to install the plugins. Login as admin.}</td>
+                    </tr>
+                    <tr>
+                        <td>${%User}:</td>
+                        <td>
+                            <input type="text" name="j_username" id="j_username" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >${%Password}:</td>
+                        <td>
+                            <input  type="password" name="j_password" id="j_password"/>
+                        </td>
+                    </tr>
+                    <j:if test="${app.security.name()=='SECURED'}">
+                        <!-- remember me service only available for Spring Security -->
+                        <tr>
+                            <td align="right">
+                                <input style="width:10px" id="remember_me" type="checkbox" name="remember_me" />
+                            </td>
+                            <td>
+                                <label for="remember_me">${%Remember me on this computer}</label>
+                            </td>
+                        </tr>
+                    </j:if>
+                </table>
+                <input type="hidden" name="from" value="${submitFrom}" />
+                <input style="width:75px" type="button" id="loginButton" value="${%Login}" />
+                <input style="margin-left:10px; width:75px" type="button" id="cancelButton" value="${%Cancel}" />
+
+            </form>
+
+            <div id="loginError">
+                ${%Invalid login information. Please try again.}
+            </div>
+
+            <div id="loginMsg">
+                ${%Logging in...}
+            </div>
+        
+        </div>
+    </div>
+    
+    <script type="text/javascript">
+        jQuery.noConflict();
+        
+        var securitySet = ${it.hudsonSecurityManager.isUseSecurity()};
+        
+        var canFinish = ${it.canFinish()};
+        
+        var loggedIn = false;
+        var canContinue = false;
+        
+        function showLoginDialog(){
+            jQuery.blockUI({
+              message: jQuery('#loginDialog'),
+              css: { 
+                width: '350px'
+              },
+              title:  'Confirmation'
+            });
+            jQuery('j_username').focus();
+        }
+
+        function submitLoginForm(){
+            jQuery('#loginMsg').show();
+            jQuery('#loginError').hide();
+            var dataString = jQuery("#loginForm").serialize();
+            jQuery.ajax({
+              type: 'POST',
+              url: "${rootURL}/${it.hudsonSecurityManager.securityRealm.authenticationGatewayUrl}",
+              data: dataString,
+              success: function(){
+                jQuery.unblockUI();
+                loggedIn = true;
+                if (canContinue == true){
+                  doContinue("continue");
+                }else{
+                  loginMsg
+                  jQuery('#loginNeededMsg').hide();
+                }
+              },
+              error: function(){
+                jQuery('#loginError').show();
+                jQuery('#loginMsg').hide();
+              },
+              dataType: "html"
+            }); 
+        }
+        
+        function doContinue(url){
+            jQuery.ajax({
+              type: 'GET',
+              url: url,
+              success: function(){
+                 window.location.href=".";
+              },
+              dataType: "html"
+            }); 
+        }
+
+        jQuery(document).ready(function() {
+        
+            jQuery('#j_username').keypress(function(e){
+              if(e.which == 13){
+                submitLoginForm();
+              }
+            });
+            
+            jQuery('#j_password').keypress(function(e){
+              if(e.which == 13){
+                submitLoginForm();
+              }
+            });
+
+            jQuery('#loginButton').click(function() {
+                 submitLoginForm();
+            });
+            
+
+            jQuery('#cancelButton').click(function() {
+                jQuery.unblockUI();
+                jQuery('#j_username').attr({value:""});
+                jQuery('#j_password').attr({value:""});
+                jQuery('#loginError').hide();
+                jQuery('#loginMsg').hide();
+                return false;
+            });
+            
+            jQuery('#continueButton').click(function() {
+               canContinue = true;
+               if (securitySet == true) {
+                  if (loggedIn == false){
+                    showLoginDialog();
+                  } else {
+                    doContinue("continue");
+                  }
+               }
+            });
+            
+
+            jQuery('#finishButton').click(function() {
+                doContinue("finish")
+            });
+            
+            if (canFinish == true){
+               jQuery('#finishButton').show();
+               jQuery('#recommendedMsg').show();
+            }else{
+               jQuery('#mandatoryMsg').show();
+            }
+
+        });
+    </script>
+       
+</j:jelly>
