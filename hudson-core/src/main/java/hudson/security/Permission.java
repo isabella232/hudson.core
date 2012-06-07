@@ -211,14 +211,24 @@ public final class Permission {
      */
     public static Permission fromId(String id) {
         int idx = id.lastIndexOf('.');
-        if(idx<0)   return null;
+        if (idx < 0) {
+            return null;
+        }
 
         try {
             // force the initialization so that it will put all its permissions into the list.
-            Class cl = Class.forName(id.substring(0,idx),true,Hudson.getInstance().getPluginManager().uberClassLoader);
+            Class cl;
+            if (Hudson.getInstance() != null){
+                cl = Class.forName(id.substring(0, idx), true, Hudson.getInstance().getPluginManager().uberClassLoader);
+            }else{
+                // Hudson may not be yet initialized - to support Initial Setup
+                cl = Class.forName(id.substring(0, idx));
+            }
             PermissionGroup g = PermissionGroup.get(cl);
-            if(g ==null)  return null;
-            return g.find(id.substring(idx+1));
+            if (g == null) {
+                return null;
+            }
+            return g.find(id.substring(idx + 1));
         } catch (ClassNotFoundException e) {
             return null;
         }

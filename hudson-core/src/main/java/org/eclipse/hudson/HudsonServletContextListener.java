@@ -138,13 +138,6 @@ public final class HudsonServletContextListener implements ServletContextListene
                 return;
             }
             
-            try {
-                // Create the Security Manager
-                HudsonSecurityEntitiesHolder.setHudsonSecurityManager(new HudsonSecurityManager(home));
-            } catch (IOException ex) {
-                controller.install(new SecurityFailedToInit(ex));
-                return;
-            }
         
             // make sure that we are using XStream in the "enhanced" (JVM-specific) mode
             if(jvm.bestReflectionProvider().getClass()==PureJavaReflectionProvider.class) {
@@ -205,16 +198,27 @@ public final class HudsonServletContextListener implements ServletContextListene
 
             installExpressionFactory(event);
             
+            // Do the initial setup (if needed) before actually starting Hudson
+            
+             try {
+                // Create the Security Manager temporarily. Since the plugins are not loaded yet
+                // all permissions may not be loaded. The Security manager will reload when Hudson
+                // fully starts later
+                HudsonSecurityEntitiesHolder.setHudsonSecurityManager(new HudsonSecurityManager(home));
+            } catch (IOException ex) {
+                controller.install(new SecurityFailedToInit(ex));
+                return;
+            }
             InitialSetup initSetup = new InitialSetup(home, servletContext);
-            if (initSetup.needsInitSetup()){
+            if (initSetup.needsInitSetup()) {
                 logger.info("Initial setup required. Please go to the Hudson Dashboard and complete the setup");
                 if (HudsonSecurityEntitiesHolder.getHudsonSecurityManager().isUseSecurity()) {
                     controller.install(new InitialSetupLogin(initSetup));
                 } else {
                     controller.install(initSetup);
                 }
-            }else{
-               initSetup.invokeHudson(); 
+            } else {
+                initSetup.invokeHudson();
             }
 
         }catch (Exception exc) {

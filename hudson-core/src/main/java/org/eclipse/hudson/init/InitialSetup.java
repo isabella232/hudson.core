@@ -280,6 +280,9 @@ final public class InitialSetup {
                     try {
                         // Creating of the god object performs most of the booting muck
                         Hudson hudson = new Hudson(hudsonHomeDir, servletContext);
+                        
+                        //Now Hudson is fully loaded, reload Hudson Security Manager
+                        HudsonSecurityEntitiesHolder.setHudsonSecurityManager(new HudsonSecurityManager(hudsonHomeDir));
 
                         // once its done, hook up to stapler and things should be ready to go
                         controller.install(hudson);
