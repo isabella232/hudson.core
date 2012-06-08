@@ -5,22 +5,22 @@
             "name" : "birt-charts",
             "displayName" : "BIRT Chart Support Plugin",
             "description" : "This plugin integrates Eclipse BIRT Charting Engine for Hudson Graph suport. This plugin is required for Hudson to work properly",
-            "version" : "3.0.0",
+            "version" : "3.0.1",
             "type": "mandatory",
             "dependencies" : [ ],
             "labels" : [ "utils" ],
-            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/birt-charts/3.0.0/birt-charts.hpi",
+            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/birt-charts/3.0.1/birt-charts.hpi",
             "wikiUrl" : "http://wiki.hudson-ci.org/display/HUDSON/BIRT+Chart+Plugin"
         },
         "jna-native-support-plugin" : {
             "name" : "jna-native-support-plugin",
             "displayName" : "JNA Native Support Plugin ",
             "description" : "This plugin integrates Java Native Access library Support to Hudson. This plugin is required for Hudson to work properly",
-            "version" : "3.0.0",
+            "version" : "3.0.1",
             "type": "mandatory",
             "dependencies" : [ ],
             "labels" : [ "utils" ],
-            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/jna-native-support-plugin/3.0.0/jna-native-support-plugin.hpi",
+            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/jna-native-support-plugin/3.0.1/jna-native-support-plugin.hpi",
             "wikiUrl" : "http://wiki.hudson-ci.org/display/HUDSON/JNA+Support+Plugin"
         },
         "subversion" : {
@@ -77,6 +77,17 @@
             "labels" : [ "builder" ],
             "downloadUrl" : "http://hudson-ci.org/downloads/plugins/maven-plugin/2.2.1/maven-plugin.hpi",
             "wikiUrl" : "http://wiki.hudson-ci.org/display/HUDSON/Maven+2+Project+Plugin"
+        },
+        "groovy-support-plugin" : {
+            "name" : "groovy-support-plugin",
+            "displayName" : "Groovy Support Plugin",
+            "description" : "This Plugin provides groovy shell scripting and CLI support in Hudson.",
+            "version" : "3.0.1",
+            "type": "recommended",
+            "dependencies" : [ ],
+            "labels" : [ "utils" ],
+            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/groovy-support-plugin/3.0.1/groovy-support-plugin.hpi",
+            "wikiUrl" : "http://wiki.hudson-ci.org/display/HUDSON/Groovy+Support+Plugin"
         }
     }
 }
