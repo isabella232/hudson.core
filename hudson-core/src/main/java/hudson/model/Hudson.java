@@ -1034,22 +1034,12 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         return systemMessage;
     }
 
-    /**
-     * Gets the markup formatter used in the system.
-     *
-     * @return
-     *      never null.
-     * @since 1.391
-     */
+    // Here for backward compatibility 2.x
     public MarkupFormatter getMarkupFormatter() {
         return getSecurityManager().getMarkupFormatter();
     }
 
-    /**
-     * Sets the markup formatter used in the system globally.
-     *
-     * @since 1.391
-     */
+    // Here for backward compatibility to 2.x
     public void setMarkupFormatter(MarkupFormatter markupFormatter) {
         getSecurityManager().setMarkupFormatter(markupFormatter);
     }

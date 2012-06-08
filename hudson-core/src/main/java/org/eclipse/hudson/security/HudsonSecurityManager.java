@@ -65,7 +65,7 @@ import org.xml.sax.SAXException;
  */
 public class HudsonSecurityManager implements Saveable {
     
-    private final String securityConfigFileName = "hudson-security.xml";
+    private transient final String securityConfigFileName = "hudson-security.xml";
 
     /**
      * Used to load/save Security configuration.
@@ -113,8 +113,8 @@ public class HudsonSecurityManager implements Saveable {
      * @see #securityRealm
      */
     private Boolean useSecurity;
-    private MarkupFormatter markupFormatter;
-    private File hudsonHome;
+    private MarkupFormatter markupFormatter = RawHtmlMarkupFormatter.INSTANCE;
+    private transient File hudsonHome;
 
     static {
         XSTREAM.alias("hudsonSecurityManager", HudsonSecurityManager.class);
@@ -159,7 +159,7 @@ public class HudsonSecurityManager implements Saveable {
      * @return never null.
      */
     public MarkupFormatter getMarkupFormatter() {
-        return markupFormatter != null ? markupFormatter : RawHtmlMarkupFormatter.INSTANCE;
+        return markupFormatter;
     }
 
     /**
@@ -312,14 +312,11 @@ public class HudsonSecurityManager implements Saveable {
 
                 if (security.has("markupFormatter")) {
                     markupFormatter = req.bindJSON(MarkupFormatter.class, security.getJSONObject("markupFormatter"));
-                } else {
-                    markupFormatter = null;
-                }
+                }  
             } else {
                 useSecurity = null;
                 setSecurityRealm(SecurityRealm.NO_AUTHENTICATION);
                 authorizationStrategy = AuthorizationStrategy.UNSECURED;
-                markupFormatter = null;
             }
 
             rsp.sendRedirect(req.getContextPath() + '/');  // go to the top page
@@ -450,6 +447,7 @@ public class HudsonSecurityManager implements Saveable {
                 Element root = securityConfigDoc.createElement("hudsonSecurityManager");
                 securityConfigDoc.appendChild(root);
                 moveElement(globalConfigDoc, securityConfigDoc, root, "useSecurity");
+                moveElement(globalConfigDoc, securityConfigDoc, root, "markupFormatter");
                 moveElement(globalConfigDoc, securityConfigDoc, root, "authorizationStrategy");
                 moveElement(globalConfigDoc, securityConfigDoc, root, "securityRealm");
 
