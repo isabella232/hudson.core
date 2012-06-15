@@ -23,9 +23,11 @@ import hudson.model.Hudson;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides the capability for starting/stopping/restarting/uninstalling Hudson.
@@ -39,6 +41,9 @@ import org.apache.commons.io.FileUtils;
  * @since 1.254
  */
 public abstract class Lifecycle implements ExtensionPoint {
+    
+    private transient Logger logger = LoggerFactory.getLogger(Lifecycle.class);
+    
     private static Lifecycle INSTANCE = null;
 
     /**
@@ -179,10 +184,12 @@ public abstract class Lifecycle implements ExtensionPoint {
         try {
             verifyRestartable();
             return true;
-        } catch (RestartNotSupportedException e) {
+        } catch (Throwable th) {
+            // This could happen if the native libraries are not loaded properly.
+            // Gracefully degrade rather than throwing exception
+            logger.info(th.getLocalizedMessage());
             return false;
         }
     }
 
-    private static final Logger LOGGER = Logger.getLogger(Lifecycle.class.getName());
 }
