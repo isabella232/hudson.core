@@ -14,10 +14,10 @@
  *******************************************************************************/
 package hudson.model;
 
-import antlr.ANTLRException;
 import hudson.model.labels.LabelAtom;
 import hudson.model.labels.LabelExpression;
 import java.io.Serializable;
+import org.antlr.runtime.RecognitionException;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -121,7 +121,7 @@ public class AppointedNode implements Serializable {
         try {
             LabelExpression.parseExpression(nodeName);
             return nodeName;
-        } catch (ANTLRException e) {
+        } catch (RecognitionException e) {
             // must be old label or host name that includes whitespace or other unsafe chars
             return LabelAtom.escape(nodeName);
         }

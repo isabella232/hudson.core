@@ -16,7 +16,6 @@
 
 package hudson.scheduler;
 
-import antlr.ANTLRException;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -24,12 +23,13 @@ import junit.framework.TestCase;
 import org.jvnet.hudson.test.Bug;
 
 import static java.util.Calendar.MONDAY;
+import org.antlr.runtime.RecognitionException;
 
 /**
  * @author Kohsuke Kawaguchi
  */
 public class CronTabTest extends TestCase {
-    public void test1() throws ANTLRException {
+    public void test1() throws RecognitionException {
         new CronTab("@yearly");
         new CronTab("@weekly");
         new CronTab("@midnight");

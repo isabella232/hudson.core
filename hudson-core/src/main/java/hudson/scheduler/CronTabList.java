@@ -16,11 +16,11 @@
 
 package hudson.scheduler;
 
-import antlr.ANTLRException;
-
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Vector;
+
+import org.antlr.runtime.RecognitionException;
 
 /**
  * {@link CronTab} list (logically OR-ed).
@@ -62,7 +62,7 @@ public final class CronTabList {
         return null;
     }
 
-    public static CronTabList create(String format) throws ANTLRException {
+    public static CronTabList create(String format) throws RecognitionException {
         Vector<CronTab> r = new Vector<CronTab>();
         int lineNumber = 0;
         for (String line : format.split("\\r?\\n")) {
@@ -72,8 +72,8 @@ public final class CronTabList {
                 continue;   // ignorable line
             try {
                 r.add(new CronTab(line,lineNumber));
-            } catch (ANTLRException e) {
-                throw new ANTLRException(Messages.CronTabList_InvalidInput(line,e.toString()),e);
+            } catch (RecognitionException e) {
+                throw new BaseParser.SemanticException(Messages.CronTabList_InvalidInput(line,e.toString()),e);
             }
         }
         return new CronTabList(r);

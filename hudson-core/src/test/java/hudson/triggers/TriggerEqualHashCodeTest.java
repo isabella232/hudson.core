@@ -14,9 +14,9 @@
  *******************************************************************************/
 package hudson.triggers;
 
-import antlr.ANTLRException;
 import java.util.Arrays;
 import java.util.Collection;
+import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -44,7 +44,7 @@ public class TriggerEqualHashCodeTest {
     }
 
     @Parameterized.Parameters
-    public static Collection generateData() throws ANTLRException {
+    public static Collection generateData() throws RecognitionException {
         return Arrays.asList(new Object[][] {
             {true, new TimerTrigger(""), new TimerTrigger("")},
             {true, new TimerTrigger("* * * * *"), new TimerTrigger("* * * * *")},
@@ -56,7 +56,7 @@ public class TriggerEqualHashCodeTest {
     }
 
     @Test
-    public void testEquals() throws ANTLRException {
+    public void testEquals() throws RecognitionException {
         assertEquals(expectedResult, trigger1.equals(trigger2));
     }
 

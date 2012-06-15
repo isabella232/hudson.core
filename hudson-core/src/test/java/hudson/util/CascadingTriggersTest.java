@@ -15,7 +15,6 @@
  *******************************************************************************/
 package hudson.util;
 
-import antlr.ANTLRException;
 import hudson.model.FreeStyleProjectMock;
 import hudson.model.Hudson;
 import hudson.triggers.TimerTrigger;

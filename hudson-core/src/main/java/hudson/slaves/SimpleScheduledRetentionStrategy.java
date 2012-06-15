@@ -16,7 +16,6 @@
 
 package hudson.slaves;
 
-import antlr.ANTLRException;
 import hudson.Extension;
 import static hudson.Util.fixNull;
 import hudson.model.Computer;
@@ -34,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static java.util.logging.Level.INFO;
+import org.antlr.runtime.RecognitionException;
 
 /**
  * {@link RetentionStrategy} that controls the slave based on a schedule. 
@@ -57,7 +57,7 @@ public class SimpleScheduledRetentionStrategy extends RetentionStrategy<SlaveCom
 
     @DataBoundConstructor
     public SimpleScheduledRetentionStrategy(String startTimeSpec, int upTimeMins, boolean keepUpWhenActive)
-            throws ANTLRException {
+            throws RecognitionException {
         this.startTimeSpec = startTimeSpec;
         this.keepUpWhenActive = keepUpWhenActive;
         this.tabs = CronTabList.create(startTimeSpec);
@@ -142,7 +142,7 @@ public class SimpleScheduledRetentionStrategy extends RetentionStrategy<SlaveCom
             nextStart = Long.MIN_VALUE;
             lastStop = Long.MAX_VALUE;
             lastStart = Long.MAX_VALUE;
-        } catch (ANTLRException e) {
+        } catch (RecognitionException e) {
             InvalidObjectException x = new InvalidObjectException(e.getMessage());
             x.initCause(e);
             throw x;
@@ -229,7 +229,7 @@ public class SimpleScheduledRetentionStrategy extends RetentionStrategy<SlaveCom
                 if (msg != null)
                     return FormValidation.warning(msg);
                 return FormValidation.ok();
-            } catch (ANTLRException e) {
+            } catch (RecognitionException e) {
                 return FormValidation.error(e.getMessage());
             }
         }
