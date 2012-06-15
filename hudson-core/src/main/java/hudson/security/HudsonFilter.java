@@ -109,7 +109,8 @@ public class HudsonFilter implements Filter {
      * Gets the {@link HudsonFilter} created for the given {@link ServletContext}.
      */
     public static HudsonFilter get(ServletContext context) {
-        return (HudsonFilter) context.getAttribute(HudsonFilter.class.getName());
+        // As of 3.0.0 we no longer set it to the context
+        return HudsonSecurityEntitiesHolder.getHudsonSecurityFilter();
     }
 
     /**
