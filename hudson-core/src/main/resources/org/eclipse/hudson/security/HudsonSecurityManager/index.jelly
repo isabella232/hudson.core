@@ -19,9 +19,10 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
     <l:layout norefresh="true" permission="${it.ADMINISTER}">
-        <!-- <st:include page="sidepanel.jelly" /> -->
+        <st:include it="${app.primaryView}" page="sidepanel.jelly" xmlns:st="jelly:stapler" />
         <l:main-panel>
             <div class="behavior-loading">${%LOADING}</div>
+            <div><h1>Configure Security</h1></div>
             <f:form method="post" name="config" action="configSubmit">
       
                 <f:optionalBlock name="use_security" title="${%Enable security}"

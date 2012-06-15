@@ -119,7 +119,11 @@ public final class InstalledPluginManager {
             if (version == null) {
                 version = manifest.getMainAttributes().getValue("Implementation-Version");
             }
-
+        }
+        
+        public boolean isDisabled() {
+            File disabledMarker = new File(hpiArchive.getPath() + ".disabled");
+            return disabledMarker.exists();
         }
 
         public VersionNumber getVersionNumber() {

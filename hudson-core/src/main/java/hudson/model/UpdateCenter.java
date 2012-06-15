@@ -627,7 +627,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
          *      Absolute URL that ends with '/'.
          */
         public String getUpdateCenterUrl() {
-            return updateServer + "update-center.json";
+            return updateServer + "update-center/update-center-M3.json";
         }
 
         /**

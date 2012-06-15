@@ -96,9 +96,15 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
     private void add(String shortForm) {
         int idx = shortForm.indexOf(':');
         Permission p = Permission.fromId(shortForm.substring(0, idx));
-        if (p==null)
-            throw new IllegalArgumentException("Failed to parse '"+shortForm+"' --- no such permission");
-        add(p,shortForm.substring(idx+1));
+        if (p != null) {
+            add(p, shortForm.substring(idx + 1));
+        }else{
+            // This should not happen if Hudson is fully initialized.
+            // But Initial Setup also loads Security setup before Hudson Initialization
+            if (Hudson.getInstance() != null) {
+                throw new IllegalArgumentException("Failed to parse '" + shortForm + "' --- no such permission");
+            }
+        }
     }
 
     @Override
@@ -117,6 +123,10 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
      */
     /*package*/ static boolean migrateHudson2324(Map<Permission,Set<String>> grantedPermissions) {
         boolean result = false;
+        // Hudson may not be initialized yet in case of Initial Setup
+        if (Hudson.getInstance() == null){
+            return false;
+        }
         if(Hudson.getInstance().isUpgradedFromBefore(new VersionNumber("1.300.*"))) {
             Set<String> f = grantedPermissions.get(Hudson.READ);
             if (f!=null) {

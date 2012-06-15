@@ -148,6 +148,10 @@
             display: none;
         }
         
+        #loginForm input {
+            width: 150px;
+        }
+        
         #proxyError {
             padding-top: 10px;
             padding-left: 10px;
@@ -166,7 +170,6 @@
             color: red;
             display: none;
         }
-        
     </style>
    
     
@@ -175,7 +178,10 @@
             <div class="container">
                 <span style="width:100%; text-align:center">
                     <h1 style="margin-top:4em; color:#5C3566">
-                        Hudson CI Server Initial Setup
+                        Hudson CI Server Initial Setup 
+                        <a href="http://wiki.eclipse.org/Hudson-ci/features/Initial_Setup" target="_blank"> 
+                            <img src="${imagesURL}/16x16/help.png"/>
+                        </a>
                     </h1>
                 </span>
                 <ul id="installList" class="setup">
@@ -262,18 +268,18 @@
                             </div>
                         </div>
                     </li>
-                    <li class="recommended">
+                    <li class="featured">
                         <h3>
-                            Recommended Plugins
+                            Featured Plugins
                         </h3>
                         <p class="description">
-                            Following plugins are recommended. They are tested and certified by Hudson QA team.
+                            Following are featured plugins. They are tested and certified by Hudson QA team.
                         </p>
                         <div class="body">
                             <div class="setup-items-container">
                                         
-                                <table width="100%" border="0" id="recommendedPlugins" cellpadding="10">
-                                    <j:forEach var="p" items="${it.installablePlugins}">
+                                <table width="100%" border="0" id="featuredPlugins" cellpadding="10">
+                                    <j:forEach var="p" items="${it.installableFeaturedPlugins}">
                                         <tr>
                                             <td class="column1">
                                                 <input type="checkbox" checked="true" value="${p.name}"/>
@@ -294,10 +300,16 @@
                                             </td>
                                         </tr>
                                     </j:forEach>
-                                    <j:forEach var="p" items="${it.updatablePlugins}">
+                                    <j:forEach var="p" items="${it.updatableFeaturedPlugins}">
                                         <tr>
                                             <td class="column1">
-                                                <input type="checkbox" checked="true"  value="${p.name}"/>
+                                                <j:if test="${it.getInstalled(p).isDisabled()}">
+                                                    <input type="checkbox"  value="${p.name}"/>
+                                                </j:if>
+                                                <j:if test="${!it.getInstalled(p).isDisabled()}">
+                                                    <input type="checkbox" checked="true"  value="${p.name}"/>
+                                                </j:if>
+                                                 
                                                 <img id="${p.name}" style="display:none;"/>
                                             </td>
                                             <td class="column2">
@@ -314,11 +326,16 @@
                                                 ${p.version}
                                             </td>
                                             <td class="column4" style="white-space:nowrap">
-                                                ${it.getInstalled(p).version} (Installed)
+                                                <j:if test="${it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Disabled)
+                                                </j:if>
+                                                <j:if test="${!it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Installed)
+                                                </j:if>
                                             </td>
                                         </tr>
                                     </j:forEach>
-                                    <j:forEach var="p" items="${it.installedPlugins}">
+                                    <j:forEach var="p" items="${it.installedFeaturedPlugins}">
                                         <tr>
                                             <td class="column1">
                                                  <img src="${imagesURL}/green-check.jpg"/>
@@ -337,7 +354,106 @@
                                                 No update available
                                             </td>
                                             <td class="column4" style="white-space:nowrap; color:gray">
-                                                ${it.getInstalled(p).version} (Installed)
+                                                <j:if test="${it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Disabled)
+                                                </j:if>
+                                                <j:if test="${!it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Installed)
+                                                </j:if>
+                                            </td>
+                                        </tr>
+                                    </j:forEach>
+                                </table>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <li class="recommended">
+                        <h3>
+                            Recommended Plugins
+                        </h3>
+                        <p class="description">
+                            Following plugins are recommended. They are maintained by Hudson community developers and widely used.
+                        </p>
+                        <div class="body">
+                            <div class="setup-items-container">
+                                        
+                                <table width="100%" border="0" id="recommendedPlugins" cellpadding="10">
+                                    <j:forEach var="p" items="${it.installableRecommendedPlugins}">
+                                        <tr>
+                                            <td class="column1">
+                                                <input type="checkbox" value="${p.name}"/>
+                                                <img id="${p.name}" style="display:none;"/>
+                                            </td>
+                                            <td class="column2">
+                                                <div>
+                                                    <a href="${p.wikiUrl}" target="_blank">
+                                                        ${p.displayName}
+                                                    </a>
+                                                </div>
+                                                <div class="excerpt" style="padding-top: 5px;">
+                                                    ${p.description}
+                                                </div>
+                                            </td>
+                                            <td class="column3" style="white-space:nowrap">
+                                                ${p.version}
+                                            </td>
+                                        </tr>
+                                    </j:forEach>
+                                    <j:forEach var="p" items="${it.updatableRecommendedPlugins}">
+                                        <tr>
+                                            <td class="column1">
+                                                <input type="checkbox"  value="${p.name}"/>
+                                                <img id="${p.name}" style="display:none;"/>
+                                            </td>
+                                            <td class="column2">
+                                                <div>
+                                                    <a href="${p.wikiUrl}" target="_blank">
+                                                        ${p.displayName}
+                                                    </a>
+                                                </div>
+                                                <div class="excerpt" style="padding-top: 5px;">
+                                                    ${p.description}
+                                                </div>
+                                            </td>
+                                            <td class="column3" style="white-space:nowrap">
+                                                ${p.version}
+                                            </td>
+                                            <td class="column4" style="white-space:nowrap">
+                                                <j:if test="${it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Disabled)
+                                                </j:if>
+                                                <j:if test="${!it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Installed)
+                                                </j:if>
+                                            </td>
+                                        </tr>
+                                    </j:forEach>
+                                    <j:forEach var="p" items="${it.installedRecommendedPlugins}">
+                                        <tr>
+                                            <td class="column1">
+                                                 <img src="${imagesURL}/green-check.jpg"/>
+                                            </td>
+                                            <td class="column2">
+                                                <div>
+                                                    <a href="${p.wikiUrl}" target="_blank" style="color:gray">
+                                                        ${p.displayName}
+                                                    </a>
+                                                </div>
+                                                <div class="excerpt" style="padding-top: 5px; color:gray">
+                                                    ${p.description}
+                                                </div>
+                                            </td>
+                                            <td class="column3" style="white-space:nowrap; color:gray">
+                                                No update available
+                                            </td>
+                                            <td class="column4" style="white-space:nowrap; color:gray">
+                                                <j:if test="${it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Disabled)
+                                                </j:if>
+                                                <j:if test="${!it.getInstalled(p).isDisabled()}">
+                                                    ${it.getInstalled(p).version} (Installed)
+                                                </j:if>
                                             </td>
                                         </tr>
                                     </j:forEach>
@@ -434,15 +550,14 @@
                 <div>
                     <span id="mandatoryMsg">
                         The Mandatory Plugins are needed and cannot be deselected. 
-                        Select the recommended plugins and click install to install the 
-                        mandatory and selected recommended plugins or click Finish
-                        to start Hudson after installing the mandatory plugins and any selected recommended plugins.  
+                        Select the featured or recommended plugins and click install to download and install the plugins or Finish
+                        to start Hudson after installing the plugins.  
                     </span> 
                         
                     <span id="recommendedMsg">
                         All Mandatory Plugins are installed. 
-                        Select the recommended plugins and click Install to install the selected recommended plugins 
-                        or click Finish to start Hudson after installing any selected recommended plugins.
+                        Select the featured or recommended plugins and click install to download and install the plugins or Finish
+                        to start Hudson after installing the plugins.
                     </span>
                          
                      <div>
@@ -467,7 +582,52 @@
     
     <div id="loginDialog" style="display:none; cursor: default">
         <j:set var="submitFrom" value="${from}" />
-        <st:include page="loginDialog.jelly" />
+        <div style="margin: 2em;">
+        <!-- login form -->
+            <form id="loginForm"  style="text-size:smaller">
+                <table cellspacing="10">
+                    <tr>
+                        <td colspan="2">${%Admin access required to install the plugins. Login as admin.}</td>
+                    </tr>
+                    <tr>
+                        <td>${%User}:</td>
+                        <td>
+                            <input type="text" name="j_username" id="j_username" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >${%Password}:</td>
+                        <td>
+                            <input  type="password" name="j_password" id="j_password"/>
+                        </td>
+                    </tr>
+                    <j:if test="${app.security.name()=='SECURED'}">
+                    <!-- remember me service only available for Spring Security -->
+                        <tr>
+                            <td align="right">
+                                <input style="width:10px" id="remember_me" type="checkbox" name="remember_me" />
+                            </td>
+                            <td>
+                                <label for="remember_me">${%Remember me on this computer}</label>
+                            </td>
+                        </tr>
+                    </j:if>
+                </table>
+                <input type="hidden" name="from" value="${submitFrom}" />
+                <input style="width:75px" type="button" id="loginButton" value="${%Login}" />
+                <input style="margin-left:10px; width:75px" type="button" id="cancelButton" value="${%Cancel}" />
+
+            </form>
+
+            <div id="loginError">
+                ${%Invalid login information. Please try again.}
+            </div>
+
+            <div id="loginMsg">
+                ${%Logging in...}
+            </div>
+        
+        </div>
     </div>
     
     <script type="text/javascript">
@@ -475,7 +635,7 @@
         jQuery.noConflict();
         
         var proxyNeeded = ${it.isProxyNeeded()};
-        var securitySet = ${it.hudsonSecurityManager.isUseSecurity()};
+        var needsAdminLogin = ${it.needsAdminLogin()};
         var loggedIn = false;
         
         var installableCount = 0;
@@ -549,10 +709,10 @@
             var installables = getInstallables();
             if (installables.length == 0){
                if (finish == true){
-                  securitySet == false; 
+                  needsAdminLogin == false; 
                }
             }
-            if (securitySet == true) {
+            if (needsAdminLogin == true) {
                 if (loggedIn == false){
                    showLoginDialog();
                 }else{
@@ -581,13 +741,14 @@
             jQuery('#mandatoryPlugins input[@type=checkbox]:checked').each(function(){
                installables.push(this);
             });
+            jQuery('#featuredPlugins input[@type=checkbox]:checked').each(function(){
+               installables.push(this);
+            });
             jQuery('#recommendedPlugins input[@type=checkbox]:checked').each(function(){
                installables.push(this);
             });
             return installables;
         }
-        
-        
         
         function showLoginDialog(){
             jQuery.blockUI({

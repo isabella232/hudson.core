@@ -43,7 +43,14 @@ public abstract class ToolDescriptor<T extends ToolInstallation> extends Descrip
      *      can be empty but never null.
      */
     public T[] getInstallations() {
-        return  installations != null ? installations.clone() : null;
+        
+        if (installations != null){
+            installations.clone();
+        }else{
+           Class<?> arrayType = installations.getClass().getComponentType();
+	   installations = (T[])Array.newInstance(arrayType, 0);
+        }
+        return  installations;
     }
 
     /**
