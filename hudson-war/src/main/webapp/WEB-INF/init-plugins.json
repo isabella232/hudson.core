@@ -71,7 +71,7 @@
             "name" : "maven3-plugin",
             "displayName" : "Hudson Maven3 plugin",
             "description" : "This plugin adds the Maven 3 build step to Hudson.",
-            "version" : "2.2.0",
+            "version" : "3.0.0",
             "type": "featured",
             "dependencies" : [ 
             {
@@ -81,7 +81,7 @@
             },
             ],
             "labels" : [ "builder" ],
-            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/maven3-plugin/2.2.0/maven3-plugin.hpi",
+            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/maven3-plugin/3.0.0/maven3-plugin.hpi",
             "wikiUrl" : "http://wiki.hudson-ci.org/display/HUDSON/Maven+3+Build+Plugin"
         },
         "rest-plugin" : {
@@ -99,11 +99,11 @@
             "name" : "maven3-snapshots",
             "displayName" : "Maven3 Snapshots Monitor plugin",
             "description" : "This plugin adds Maven 3 snapshot monitoring support to Hudson.",
-            "version" : "2.2.0",
+            "version" : "3.0.0",
             "type": "featured",
             "dependencies" : [ ],
             "labels" : [ "utils" ],
-            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/maven3-snapshots/2.2.0/maven3-snapshots.hpi",
+            "downloadUrl" : "http://hudson-ci.org/downloads/plugins/maven3-snapshots/3.0.0/maven3-snapshots.hpi",
             "wikiUrl" : "http://wiki.hudson-ci.org/display/HUDSON/Maven+3+Snapshots+Plugin"
         },
         "maven-plugin" : {
