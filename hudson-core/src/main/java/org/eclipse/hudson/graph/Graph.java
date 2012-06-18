@@ -170,7 +170,18 @@ public class Graph {
             rsp.sendRedirect2(req.getContextPath() + "/images/headless.png");
         }
     }
-
+    
+    /**
+     * Create a Image map with the given name, width and height
+     * @param mapName
+     * @param width
+     * @param height
+     * @return 
+     */
+    public String createImageMap(String mapName, int width, int height){
+        return graphSupport.getImageMap(mapName, width, height);
+    }
+    
     /**
      * Send the a clickable map data information.
      */
@@ -189,7 +200,7 @@ public class Graph {
                 height = Integer.parseInt(h);
             }
             rsp.setContentType("text/plain;charset=UTF-8");
-            String mapHtml = graphSupport.getImageMap("map", width, height);
+            String mapHtml = createImageMap("map", width, height);
             rsp.getWriter().println(mapHtml);
         }
     }
