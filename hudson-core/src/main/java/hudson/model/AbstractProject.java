@@ -19,7 +19,6 @@
  */
 package hudson.model;
 
-import antlr.ANTLRException;
 import hudson.AbortException;
 import hudson.CopyOnWrite;
 import hudson.FeedAdapter;
@@ -110,6 +109,7 @@ import org.kohsuke.stapler.export.Exported;
 import static hudson.scm.PollingResult.BUILD_NOW;
 import static hudson.scm.PollingResult.NO_CHANGES;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import org.antlr.runtime.RecognitionException;
 
 /**
  * Base implementation of {@link Job}s that build software.
@@ -2241,7 +2241,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
             }
             try {
                 Label.parseExpression(value);
-            } catch (ANTLRException e) {
+            } catch (RecognitionException e) {
                 return FormValidation.error(e,
                         Messages.AbstractProject_AssignedLabelString_InvalidBooleanExpression(e.getMessage()));
             }

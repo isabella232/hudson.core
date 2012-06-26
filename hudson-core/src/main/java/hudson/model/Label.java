@@ -16,7 +16,6 @@
 
 package hudson.model;
 
-import antlr.ANTLRException;
 import hudson.Util;
 import static hudson.Util.fixNull;
 
@@ -32,7 +31,6 @@ import hudson.util.VariableResolver;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -46,6 +44,9 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
 
 /**
  * Group of {@link Node}s.
@@ -472,8 +473,8 @@ public abstract class Label extends Actionable implements Comparable<Label>, Mod
      *
      * TODO: replace this with a real parser later
      */
-    public static Label parseExpression(String labelExpression) throws ANTLRException {
-        LabelExpressionLexer lexer = new LabelExpressionLexer(new StringReader(labelExpression));
-        return new LabelExpressionParser(lexer).expr();
+    public static Label parseExpression(String labelExpression) throws RecognitionException {
+        LabelExpressionLexer lexer = new LabelExpressionLexer(new ANTLRStringStream(labelExpression));
+        return new LabelExpressionParser(new CommonTokenStream(lexer)).expr();
     }
 }

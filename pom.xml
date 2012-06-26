@@ -120,7 +120,7 @@
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
         <build.number />
         
-        <maven-hpi-plugin.version>3.0.0-M2</maven-hpi-plugin.version>
+        <maven-hpi-plugin.version>3.0.0-SNAPSHOT</maven-hpi-plugin.version>
         <stapler.version>3.0.0-M2</stapler.version>
         <maven-stapler-plugin.version>3.0.1</maven-stapler-plugin.version>
 
@@ -215,7 +215,7 @@
         <json-lib.version>2.4</json-lib.version>
         <annotation-indexer.version>1.2</annotation-indexer.version>
         <task-reactor.version>1.2</task-reactor.version>
-        <antlr.version>2.7.7</antlr.version>
+        <antlr.version>3.4</antlr.version>
         <commons-digester.version>3.0</commons-digester.version>
         <commons-beanutils.version>1.8.0</commons-beanutils.version>
         <commons-jelly-tags-fmt.version>1.0</commons-jelly-tags-fmt.version>
@@ -243,7 +243,6 @@
 
         <!--Plugins-->
         <maven-encoding-plugin.version>1.1</maven-encoding-plugin.version>
-        <antlr-maven-plugin.version>2.1</antlr-maven-plugin.version>
         <apt-maven-plugin.version>1.0-alpha-2</apt-maven-plugin.version>
         <maven-project-info-reports-plugin.version>2.1</maven-project-info-reports-plugin.version>
     </properties>

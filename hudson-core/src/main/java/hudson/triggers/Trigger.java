@@ -16,7 +16,6 @@
 
 package hudson.triggers;
 
-import antlr.ANTLRException;
 import hudson.DependencyRunner;
 import hudson.DependencyRunner.ProjectRunnable;
 import hudson.ExtensionPoint;
@@ -52,6 +51,7 @@ import java.util.ArrayList;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.antlr.runtime.RecognitionException;
 
 /**
  * Triggers a {@link Build}.
@@ -136,7 +136,7 @@ public abstract class Trigger<J extends Item> implements Describable<Trigger<?>>
      * periodically. This is useful when your trigger does
      * some polling work.
      */
-    protected Trigger(String cronTabSpec) throws ANTLRException {
+    protected Trigger(String cronTabSpec) throws RecognitionException {
         this.spec = cronTabSpec;
         this.tabs = CronTabList.create(cronTabSpec);
     }
@@ -161,7 +161,7 @@ public abstract class Trigger<J extends Item> implements Describable<Trigger<?>>
     protected Object readResolve() throws ObjectStreamException {
         try {
             tabs = CronTabList.create(spec);
-        } catch (ANTLRException e) {
+        } catch (RecognitionException e) {
             InvalidObjectException x = new InvalidObjectException(e.getMessage());
             x.initCause(e);
             throw x;

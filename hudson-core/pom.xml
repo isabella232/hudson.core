@@ -93,31 +93,16 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>antlr-maven-plugin</artifactId>
-                <version>${antlr-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>cron</id>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirectory>${basedir}/src/main/grammar</sourceDirectory>
-                            <grammars>crontab.g</grammars>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>labelExpr</id>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirectory>${basedir}/src/main/grammar</sourceDirectory>
-                            <grammars>labelExpr.g</grammars>
-                        </configuration>
-                    </execution>
-                </executions>
+              <groupId>org.antlr</groupId>
+              <artifactId>antlr3-maven-plugin</artifactId>
+              <version>${antlr.version}</version>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>antlr</goal>
+                  </goals>
+                </execution>
+              </executions>
             </plugin>
             <!--TODO  Use the maven-dependency-plugin -->
             <plugin>
@@ -721,9 +706,15 @@
             <version>${jtidy.version}</version>
         </dependency>
         <dependency>
-            <groupId>antlr</groupId>
-            <artifactId>antlr</artifactId>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr-runtime</artifactId>
             <version>${antlr.version}</version>
+            <exclusions>
+              <exclusion>
+                <groupId>antlr</groupId>
+                <artifactId>antlr</artifactId>
+              </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse.hudson.stapler</groupId>

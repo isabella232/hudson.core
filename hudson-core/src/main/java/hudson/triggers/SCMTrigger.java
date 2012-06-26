@@ -16,7 +16,6 @@
 
 package hudson.triggers;
 
-import antlr.ANTLRException;
 import hudson.Util;
 import hudson.Extension;
 import hudson.console.AnnotatedLargeText;
@@ -59,6 +58,7 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerResponse;
 
 import static java.util.logging.Level.*;
+import org.antlr.runtime.RecognitionException;
 
 /**
  * {@link Trigger} that checks for SCM updates periodically.
@@ -67,7 +67,7 @@ import static java.util.logging.Level.*;
  */
 public class SCMTrigger extends Trigger<SCMedItem> {
     @DataBoundConstructor
-    public SCMTrigger(String scmpoll_spec) throws ANTLRException {
+    public SCMTrigger(String scmpoll_spec) throws RecognitionException {
         super(scmpoll_spec);
     }
 

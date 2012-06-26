@@ -16,14 +16,15 @@
 
 package hudson.scheduler;
 
-import antlr.ANTLRException;
-
-import java.io.StringReader;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import static java.util.Calendar.*;
+
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
 
 /**
  * Table for driving scheduled tasks.
@@ -48,18 +49,19 @@ public final class CronTab {
      */
     private String spec;
 
-    public CronTab(String format) throws ANTLRException {
+    public CronTab(String format) throws RecognitionException {
         this(format,1);
     }
 
-    public CronTab(String format, int line) throws ANTLRException {
+    public CronTab(String format, int line) throws RecognitionException {
         set(format, line);
     }
 
-    private void set(String format, int line) throws ANTLRException {
-        CrontabLexer lexer = new CrontabLexer(new StringReader(format));
-        lexer.setLine(line);
-        CrontabParser parser = new CrontabParser(lexer);
+    private void set(String format, int line) throws RecognitionException {
+        ANTLRStringStream stream = new ANTLRStringStream(format);
+        stream.setLine(line);
+        CrontabLexer lexer = new CrontabLexer(stream);
+        CrontabParser parser = new CrontabParser(new CommonTokenStream(lexer));
         spec = format;
 
         parser.startRule(this);
@@ -346,7 +348,7 @@ public final class CronTab {
         }
     }
 
-    void set(String format) throws ANTLRException {
+    void set(String format) throws RecognitionException {
         set(format,1);
     }
 

@@ -23,11 +23,11 @@ import hudson.model.Item;
 import hudson.scheduler.CronTabList;
 import hudson.util.FormValidation;
 import hudson.Extension;
+import org.antlr.runtime.RecognitionException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
-import antlr.ANTLRException;
 
 /**
  * {@link Trigger} that runs a job periodically.
@@ -37,7 +37,7 @@ import antlr.ANTLRException;
 public class TimerTrigger extends Trigger<BuildableItem> {
 
     @DataBoundConstructor
-    public TimerTrigger(String spec) throws ANTLRException {
+    public TimerTrigger(String spec) throws RecognitionException {
         super(spec);
     }
 
@@ -69,7 +69,7 @@ public class TimerTrigger extends Trigger<BuildableItem> {
                 String msg = CronTabList.create(fixNull(value)).checkSanity();
                 if(msg!=null)   return FormValidation.warning(msg);
                 return FormValidation.ok();
-            } catch (ANTLRException e) {
+            } catch (RecognitionException e) {
                 return FormValidation.error(e.getMessage());
             }
         }

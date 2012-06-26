@@ -14,7 +14,6 @@
  *******************************************************************************/
 package org.eclipse.hudson.model.project.property;
 
-import antlr.ANTLRException;
 import hudson.model.FreeStyleProjectMock;
 import hudson.triggers.TimerTrigger;
 import hudson.triggers.Trigger;
@@ -22,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.Assert.*;
+import org.antlr.runtime.RecognitionException;
 
 /**
  * Contains test-cases for {@link TriggerProjectProperty}.
@@ -55,10 +55,10 @@ public class TriggerProjectPropertyTest {
     /**
      * Verify {@link org.eclipse.hudson.model.project.property.TriggerProjectProperty#clearOriginalValue(hudson.triggers.Trigger)} method.
      *
-     * @throws antlr.ANTLRException if any
+     * @throws antlr.RecognitionException if any
      */
     @Test
-    public void testClearOriginalValue() throws ANTLRException {
+    public void testClearOriginalValue() throws RecognitionException {
         //Overridden flag should be cleared to false. Pre-set true value
         property.setOverridden(true);
         assertTrue(property.isOverridden());
@@ -73,10 +73,10 @@ public class TriggerProjectPropertyTest {
     /**
      * Test updateOriginalValue method for TriggerProjectProperty.
      *
-     * @throws antlr.ANTLRException if any
+     * @throws antlr.RecognitionException if any
      */
     @Test
-    public void testUpdateOriginalValue() throws ANTLRException {
+    public void testUpdateOriginalValue() throws RecognitionException {
         Trigger originalTrigger = new TimerTrigger("* * * * *");
         Trigger cascadingTrigger = new TimerTrigger("* * * * *");
         property.updateOriginalValue(originalTrigger, cascadingTrigger);
@@ -94,10 +94,10 @@ public class TriggerProjectPropertyTest {
     /**
      * Verify {@link org.eclipse.hudson.model.project.property.TriggerProjectProperty#onCascadingProjectRemoved()} method.
      *
-     * @throws antlr.ANTLRException if any
+     * @throws antlr.RecognitionException if any
      */
     @Test
-    public void testOnCascadingProjectRemoved() throws ANTLRException {
+    public void testOnCascadingProjectRemoved() throws RecognitionException {
         Trigger trigger = new TimerTrigger("* * * * *");
         property.setOriginalValue(trigger, false);
         assertTrue(trigger == property.getOriginalValue());

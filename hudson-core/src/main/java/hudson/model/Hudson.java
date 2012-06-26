@@ -16,7 +16,6 @@
 
 package hudson.model;
 
-import antlr.ANTLRException;
 import com.thoughtworks.xstream.XStream;
 import hudson.BulkChange;
 import hudson.DNSMultiCast;
@@ -200,6 +199,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.LogRecord;
 import java.util.regex.Pattern;
+import org.antlr.runtime.RecognitionException;
 import org.eclipse.hudson.script.ScriptSupport;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
@@ -1404,7 +1404,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     /**
      * @deprecated
-     *      UI method. Not meant to be used programatically.
+     *      UI method. Not meant to be used programmatically.
      */
     public ComputerSet getComputer() {
         return new ComputerSet();
@@ -1429,7 +1429,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             // non-existent
             try {
                 labels.putIfAbsent(expr, Label.parseExpression(expr));
-            } catch (ANTLRException e) {
+            } catch (RecognitionException e) {
                 // laxly accept it as a single label atom for backward compatibility
                 return getLabelAtom(expr);
             }
