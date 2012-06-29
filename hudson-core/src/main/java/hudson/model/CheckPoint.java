@@ -16,12 +16,6 @@
 
 package hudson.model;
 
-import hudson.tasks.BuildStep;
-import hudson.tasks.Recorder;
-import hudson.tasks.Builder;
-import hudson.tasks.junit.JUnitResultArchiver;
-import hudson.scm.SCM;
-
 /**
  * Provides a mechanism for synchronizing build executions in the face of concurrent builds.
  *

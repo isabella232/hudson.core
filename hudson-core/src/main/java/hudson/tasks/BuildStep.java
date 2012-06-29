@@ -17,25 +17,17 @@
 package hudson.tasks;
 
 import hudson.Launcher;
-import hudson.Extension;
-import hudson.ExtensionList;
-import hudson.util.DescriptorList;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
-import hudson.model.Build;
 import hudson.model.BuildListener;
 import hudson.model.Descriptor;
-import hudson.model.Project;
-import hudson.model.Hudson;
-import hudson.model.CheckPoint;
-import hudson.model.Run;
-
+import hudson.util.DescriptorList;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
 import java.util.AbstractList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.WeakHashMap;
 
 /**
