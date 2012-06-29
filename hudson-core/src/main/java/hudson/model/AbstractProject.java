@@ -1528,14 +1528,6 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     }
 
     /**
-     * For reasons I don't understand, if I inline this method,
-     * AbstractMethodError escapes try/catch block.
-     */
-    private SCMRevisionState safeCalcRevisionsFromBuild(AbstractBuild build, Launcher launcher, TaskListener listener) throws IOException, InterruptedException {
-        return getScm()._calcRevisionsFromBuild(build, launcher, listener);
-    }
-
-    /**
      * Checks if there's any update in SCM, and returns true if any is found.
      *
      * @deprecated as of 1.346 Use {@link #poll(TaskListener)} instead.
