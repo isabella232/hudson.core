@@ -215,8 +215,7 @@ public class MultiStageTimeSeries {
                     xSeries.add(timeStr); 
             }
                 
-            for (int i = 0; i < series.size(); i++){
-                MultiStageTimeSeries mstSeries = series.get(i);
+            for (MultiStageTimeSeries mstSeries : series) {
                 GraphSeries<Number> ySeries = new GraphSeries<Number>(GraphSeries.TYPE_LINE, mstSeries.title.toString(), mstSeries.color, false, false);
                 ySeries.setStacked(false);
                 ds.addYSeries(ySeries);
