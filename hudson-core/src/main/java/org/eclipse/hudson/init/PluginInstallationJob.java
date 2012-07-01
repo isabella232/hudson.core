@@ -18,6 +18,7 @@ package org.eclipse.hudson.init;
 
 import hudson.ProxyConfiguration;
 import hudson.Util;
+import hudson.util.IOUtils;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -116,10 +117,10 @@ public final class PluginInstallationJob implements Runnable {
             }
         } catch (IOException e) {
             throw new IOException("Failed to load " + src + " to " + tmp, e);
+        } finally {
+           IOUtils.closeQuietly(out); 
+           IOUtils.closeQuietly(in); 
         }
-
-        in.close();
-        out.close();
 
         if (total != -1 && total != tmp.length()) {
             throw new IOException("Inconsistent file length: expected " + total + " but only got " + tmp.length());

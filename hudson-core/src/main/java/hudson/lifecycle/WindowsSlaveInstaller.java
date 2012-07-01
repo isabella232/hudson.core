@@ -112,9 +112,14 @@ public class WindowsSlaveInstaller implements Callable<Void,RuntimeException>, A
             Logger.getLogger(WindowsSlaveInstaller.class.getName()).log(Level.SEVERE, null, ex);
             return -1;
         } finally {
-            FileInputStream fin = new FileInputStream(new File(pwd, "redirect.log"));
-            IOUtils.copy(fin, out.getLogger());
-            fin.close();
+            FileInputStream fin = null;
+            try {
+                fin = new FileInputStream(new File(pwd, "redirect.log"));
+                IOUtils.copy(fin, out.getLogger());
+            } finally {
+                IOUtils.closeQuietly(fin);
+            }
+            
         }
     }
 

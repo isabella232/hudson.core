@@ -28,15 +28,12 @@ import static hudson.util.Iterators.reverse;
 
 import hudson.cli.declarative.CLIMethod;
 import hudson.cli.declarative.CLIResolver;
-import hudson.model.queue.AbstractQueueTask;
-import hudson.model.queue.Executables;
 import hudson.model.queue.SubTask;
 import hudson.model.queue.FutureImpl;
 import hudson.model.queue.MappingWorksheet;
 import hudson.model.queue.MappingWorksheet.Mapping;
 import hudson.model.queue.QueueSorter;
 import hudson.model.queue.QueueTaskDispatcher;
-import hudson.model.queue.Tasks;
 import hudson.model.queue.WorkUnit;
 import hudson.model.Node.Mode;
 import hudson.model.listeners.SaveableListener;
@@ -49,6 +46,7 @@ import hudson.model.queue.CauseOfBlockage.BecauseNodeIsBusy;
 import hudson.model.queue.WorkUnitContext;
 import hudson.triggers.SafeTimerTask;
 import hudson.triggers.Trigger;
+import hudson.util.IOUtils;
 import hudson.util.OneShotEvent;
 import hudson.util.TimeUnit2;
 import hudson.util.XStream2;
@@ -90,6 +88,7 @@ import org.kohsuke.stapler.export.ExportedBean;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+
 import java.util.HashSet;
 
 /**
@@ -262,14 +261,18 @@ public class Queue extends ResourceController implements Saveable {
             // first try the old format
             File queueFile = getQueueFile();
             if (queueFile.exists()) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(queueFile)));
-                String line;
-                while ((line = in.readLine()) != null) {
-                    AbstractProject j = Hudson.getInstance().getItemByFullName(line, AbstractProject.class);
-                    if (j != null)
-                        j.scheduleBuild();
+                BufferedReader in = null;
+                try {
+                    in = new BufferedReader(new InputStreamReader(new FileInputStream(queueFile)));
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        AbstractProject j = Hudson.getInstance().getItemByFullName(line, AbstractProject.class);
+                        if (j != null)
+                            j.scheduleBuild();
+                    } 
+                } finally {
+                    IOUtils.closeQuietly(in);
                 }
-                in.close();
                 // discard the queue file now that we are done
                 queueFile.delete();
             } else {

@@ -1661,9 +1661,13 @@ public abstract class Run <JobT extends Job<JobT,RunT>,RunT extends Run<JobT,Run
     public void doConsoleText(StaplerRequest req, StaplerResponse rsp) throws IOException {
         rsp.setContentType("text/plain;charset=UTF-8");
         // Prevent jelly from flushing stream so Content-Length header can be added afterwards
-        FlushProofOutputStream out = new FlushProofOutputStream(rsp.getCompressedOutputStream(req));
-        getLogText().writeLogTo(0,out);
-        out.close();
+        FlushProofOutputStream out = null;
+        try {
+            out = new FlushProofOutputStream(rsp.getCompressedOutputStream(req));
+            getLogText().writeLogTo(0,out);
+        } finally {
+            IOUtils.closeQuietly(out);
+        }
     }
 
     /**

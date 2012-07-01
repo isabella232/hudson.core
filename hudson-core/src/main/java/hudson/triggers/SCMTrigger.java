@@ -28,11 +28,7 @@ import hudson.model.Item;
 import hudson.model.Project;
 import hudson.model.SCMedItem;
 import hudson.model.AdministrativeMonitor;
-import hudson.util.FlushProofOutputStream;
-import hudson.util.FormValidation;
-import hudson.util.StreamTaskListener;
-import hudson.util.TimeUnit2;
-import hudson.util.SequentialExecutionQueue;
+import hudson.util.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.jelly.XMLOutput;
 import org.kohsuke.stapler.StaplerRequest;
@@ -305,9 +301,13 @@ public class SCMTrigger extends Trigger<SCMedItem> {
         public void doPollingLog(StaplerRequest req, StaplerResponse rsp) throws IOException {
             rsp.setContentType("text/plain;charset=UTF-8");
             // Prevent jelly from flushing stream so Content-Length header can be added afterwards
-            FlushProofOutputStream out = new FlushProofOutputStream(rsp.getCompressedOutputStream(req));
-            getPollingLogText().writeLogTo(0, out);
-            out.close();
+            FlushProofOutputStream out = null; 
+            try {
+                out = new FlushProofOutputStream(rsp.getCompressedOutputStream(req));
+                getPollingLogText().writeLogTo(0, out);
+            } finally {
+                IOUtils.closeQuietly(out);
+            }
         }
 
         public AnnotatedLargeText getPollingLogText() {

@@ -40,19 +40,24 @@ final class ZipArchiver extends Archiver {
     }
 
     public void visit(File f, String relativePath) throws IOException {
-        if(f.isDirectory()) {
-            ZipEntry dirZipEntry = new ZipEntry(relativePath+'/');
+        if (f.isDirectory()) {
+            ZipEntry dirZipEntry = new ZipEntry(relativePath + '/');
             // Setting this bit explicitly is needed by some unzipping applications (see HUDSON-3294).
             dirZipEntry.setExternalAttributes(BITMASK_IS_DIRECTORY);
             zip.putNextEntry(dirZipEntry);
             zip.closeEntry();
         } else {
             zip.putNextEntry(new ZipEntry(relativePath));
-            FileInputStream in = new FileInputStream(f);
-            int len;
-            while((len=in.read(buf))>0)
-                zip.write(buf,0,len);
-            in.close();
+            FileInputStream in = null;
+            try {
+                in = new FileInputStream(f);
+                int len;
+                while((len = in.read(buf)) > 0) {
+                    zip.write(buf, 0, len);
+                }
+            } finally {
+                in.close();
+            }
             zip.closeEntry();
         }
         entriesWritten++;

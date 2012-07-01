@@ -20,6 +20,7 @@ import hudson.FilePath;
 import hudson.Launcher.LocalLauncher;
 import hudson.Util;
 import hudson.model.Hudson;
+import hudson.util.IOUtils;
 import hudson.util.StreamTaskListener;
 import org.eclipse.hudson.jna.NativeAccessException;
 import org.eclipse.hudson.jna.NativeUtils;
@@ -98,9 +99,13 @@ public class WindowsServiceLifecycle extends Lifecycle {
         File rootDir = Hudson.getInstance().getRootDir();
         File copyFiles = new File(rootDir,"hudson.copies");
 
-        FileWriter w = new FileWriter(copyFiles, true);
-        w.write(by.getAbsolutePath()+'>'+getHudsonWar().getAbsolutePath()+'\n');
-        w.close();
+        FileWriter w = null;
+        try {
+            w = new FileWriter(copyFiles, true);
+            w.write(by.getAbsolutePath()+'>'+getHudsonWar().getAbsolutePath()+'\n');
+        } finally {
+            IOUtils.closeQuietly(w);
+        }
     }
 
     @Override

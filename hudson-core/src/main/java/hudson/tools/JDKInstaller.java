@@ -338,13 +338,14 @@ public class JDKInstaller extends ToolInstaller {
         }
 
         url = new URL(form.attributeValue("action"));
+        PrintStream os = null;
         try {
             HttpURLConnection con = (HttpURLConnection) ProxyConfiguration.open(url);
             con.setRequestMethod("POST");
             con.setDoOutput(true);
             con.setRequestProperty("Cookie",cookie);
             con.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
-            PrintStream os = new PrintStream(con.getOutputStream());
+            os = new PrintStream(con.getOutputStream());
 
             // select platform
             String primary=null,secondary=null;
@@ -382,10 +383,11 @@ public class JDKInstaller extends ToolInstaller {
                 else
                     os.print(URLEncoder.encode(value,"UTF-8"));
             }
-            os.close();
             return con;
         } catch (IOException e) {
             throw new IOException2("Failed to access "+url,e);
+        } finally {
+            IOUtils.closeQuietly(os);
         }
     }
 

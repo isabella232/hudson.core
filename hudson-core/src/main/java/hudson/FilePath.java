@@ -950,10 +950,13 @@ public final class FilePath implements Serializable {
                     } catch (IOException e) {
                         throw new IOException2("Failed to create a temporary directory in "+dir,e);
                     }
-
-                    Writer w = new FileWriter(f);
-                    w.write(contents);
-                    w.close();
+                    Writer w = null;
+                    try {
+                        w = new FileWriter(f);
+                        w.write(contents);
+                    } finally {
+                        IOUtils.closeQuietly(w);
+                    }
 
                     return f.getAbsolutePath();
                 }

@@ -30,10 +30,7 @@ import hudson.lifecycle.Lifecycle;
 import hudson.model.UpdateSite.Data;
 import hudson.model.UpdateSite.Plugin;
 import hudson.model.listeners.SaveableListener;
-import hudson.util.DaemonThreadFactory;
-import hudson.util.IOException2;
-import hudson.util.PersistedList;
-import hudson.util.XStream2;
+import hudson.util.*;
 import org.springframework.security.Authentication;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.output.NullOutputStream;
@@ -531,26 +528,29 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
         public File download(DownloadJob job, URL src) throws IOException {
             URLConnection con = connect(job,src);
             int total = con.getContentLength();
-            CountingInputStream in = new CountingInputStream(con.getInputStream());
+            
             byte[] buf = new byte[8192];
             int len;
 
             File dst = job.getDestination();
             File tmp = new File(dst.getPath()+".tmp");
-            OutputStream out = new FileOutputStream(tmp);
-
+            OutputStream out = null;
+            CountingInputStream in = null;
+            
             LOGGER.info("Downloading "+job.getName());
             try {
+                in = new CountingInputStream(con.getInputStream());
+                out = new FileOutputStream(tmp);
                 while((len=in.read(buf))>=0) {
                     out.write(buf,0,len);
                     job.status = job.new Installing(total==-1 ? -1 : in.getCount()*100/total);
                 }
             } catch (IOException e) {
                 throw new IOException2("Failed to load "+src+" to "+tmp,e);
+            } finally {
+                IOUtils.closeQuietly(in);
+                IOUtils.closeQuietly(out);
             }
-
-            in.close();
-            out.close();
 
             if (total!=-1 && total!=tmp.length()) {
                 // don't know exactly how this happens, but report like

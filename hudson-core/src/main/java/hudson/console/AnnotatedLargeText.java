@@ -19,6 +19,7 @@ package hudson.console;
 import hudson.model.Hudson;
 import hudson.remoting.ObjectInputStreamEx;
 import hudson.util.IOException2;
+import hudson.util.IOUtils;
 import hudson.util.Secret;
 import hudson.util.TimeUnit2;
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -146,19 +147,21 @@ public class AnnotatedLargeText<T> extends LargeText {
                 w, createAnnotator(Stapler.getCurrentRequest()), context, charset);
         long r = super.writeLogTo(start,caw);
 
+        ObjectOutputStream oos = null;
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Cipher sym = Secret.getCipher("AES");
             sym.init(Cipher.ENCRYPT_MODE, Hudson.getInstance().getSecretKeyAsAES128());
-            ObjectOutputStream oos = new ObjectOutputStream(new GZIPOutputStream(new CipherOutputStream(baos,sym)));
+            oos = new ObjectOutputStream(new GZIPOutputStream(new CipherOutputStream(baos,sym)));
             oos.writeLong(System.currentTimeMillis()); // send timestamp to prevent a replay attack
-            oos.writeObject(caw.getConsoleAnnotator());
-            oos.close();
+            oos.writeObject(caw.getConsoleAnnotator());            
             StaplerResponse rsp = Stapler.getCurrentResponse();
             if (rsp!=null)
                 rsp.setHeader("X-ConsoleAnnotator", new String(Base64.encodeBase64(baos.toByteArray())));
         } catch (GeneralSecurityException e) {
             throw new IOException2(e);
+        } finally {
+            IOUtils.closeQuietly(oos);
         }
         return r;
     }

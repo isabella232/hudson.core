@@ -37,6 +37,7 @@ import hudson.model.Descriptor;
 import hudson.model.Api;
 import hudson.model.Action;
 import hudson.model.AbstractProject.AbstractProjectDescriptor;
+import hudson.util.IOUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -557,14 +558,17 @@ public abstract class SCM implements Describable<SCM>, ExtensionPoint {
 //
 
     protected final boolean createEmptyChangeLog(File changelogFile, BuildListener listener, String rootTag) {
+        FileWriter w = null;
         try {
-            FileWriter w = new FileWriter(changelogFile);
+            w = new FileWriter(changelogFile);
             w.write("<"+rootTag +"/>");
             w.close();
             return true;
         } catch (IOException e) {
             e.printStackTrace(listener.error(e.getMessage()));
             return false;
+        } finally {
+            IOUtils.closeQuietly(w);
         }
     }
 
