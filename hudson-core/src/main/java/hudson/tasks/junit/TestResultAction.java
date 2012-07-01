@@ -19,7 +19,6 @@ package hudson.tasks.junit;
 import com.thoughtworks.xstream.XStream;
 import hudson.XmlFile;
 import hudson.model.AbstractBuild;
-import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestObject;
@@ -46,6 +45,11 @@ import java.util.logging.Logger;
  * @author Kohsuke Kawaguchi
  */
 public class TestResultAction extends AbstractTestResultAction<TestResultAction> implements StaplerProxy {
+    
+    private static final Logger LOGGER = Logger.getLogger(TestResultAction.class.getName());
+
+    private static final XStream XSTREAM = new XStream2();    
+    
     private transient WeakReference<TestResult> result;
 
     // Hudson < 1.25 didn't set these fields, so use Integer
@@ -81,23 +85,23 @@ public class TestResultAction extends AbstractTestResultAction<TestResultAction>
     }
 
     private XmlFile getDataFile() {
-        return new XmlFile(XSTREAM,new File(owner.getRootDir(), "junitResult.xml"));
+        return new XmlFile(XSTREAM, new File(owner.getRootDir(), "junitResult.xml"));
     }
 
     public synchronized TestResult getResult() {
         TestResult r;
-        if(result==null) {
+        if (result == null) {
             r = load();
             result = new WeakReference<TestResult>(r);
         } else {
             r = result.get();
         }
 
-        if(r==null) {
+        if (r == null) {
             r = load();
             result = new WeakReference<TestResult>(r);
         }
-        if(totalCount==null) {
+        if (totalCount == null) {
             totalCount = r.getTotalCount();
             failCount = r.getFailCount();
             skipCount = r.getSkipCount();
@@ -106,22 +110,22 @@ public class TestResultAction extends AbstractTestResultAction<TestResultAction>
     }
 
     @Override
-    public int getFailCount() {
-        if(totalCount==null)
+    public synchronized int getFailCount() {
+        if (totalCount == null)
             getResult();    // this will compute the result
         return failCount;
     }
 
     @Override
-    public int getSkipCount() {
-        if(totalCount==null)
+    public synchronized int getSkipCount() {
+        if (totalCount == null)
             getResult();    // this will compute the result
         return skipCount;
     }
 
     @Override
-    public int getTotalCount() {
-        if(totalCount==null)
+    public synchronized int getTotalCount() {
+        if (totalCount == null)
             getResult();    // this will compute the result
         return totalCount;
     }
@@ -137,15 +141,16 @@ public class TestResultAction extends AbstractTestResultAction<TestResultAction>
     private TestResult load() {
         TestResult r;
         try {
-            r = (TestResult)getDataFile().read();
+            r = (TestResult) getDataFile().read();
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Failed to load "+getDataFile(),e);
+            LOGGER.log(Level.WARNING, "Failed to load " + getDataFile(), e);
             r = new TestResult();   // return a dummy
         }
         r.freeze(this);
         return r;
     }
-
+    
+    @Override
     public Object getTarget() {
         return getResult();
     }
@@ -153,7 +158,7 @@ public class TestResultAction extends AbstractTestResultAction<TestResultAction>
     public List<TestAction> getActions(TestObject object) {
     	List<TestAction> result = new ArrayList<TestAction>();
 	// Added check for null testData to avoid NPE from issue 4257.
-	if (testData!=null) {
+	if (testData != null) {
         for (Data data : testData) {
             result.addAll(data.getTestAction(object));
         }
@@ -192,15 +197,11 @@ public class TestResultAction extends AbstractTestResultAction<TestResultAction>
     	return this;
     }
     
-    private static final Logger logger = Logger.getLogger(TestResultAction.class.getName());
-
-    private static final XStream XSTREAM = new XStream2();
-
     static {
-        XSTREAM.alias("result",TestResult.class);
-        XSTREAM.alias("suite",SuiteResult.class);
-        XSTREAM.alias("case",CaseResult.class);
-        XSTREAM.registerConverter(new HeapSpaceStringConverter(),100);
+        XSTREAM.alias("result", TestResult.class);
+        XSTREAM.alias("suite", SuiteResult.class);
+        XSTREAM.alias("case", CaseResult.class);
+        XSTREAM.registerConverter(new HeapSpaceStringConverter(), 100);
     }
 
 }
