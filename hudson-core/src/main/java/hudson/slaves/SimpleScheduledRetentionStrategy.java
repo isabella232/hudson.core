@@ -151,7 +151,7 @@ public class SimpleScheduledRetentionStrategy extends RetentionStrategy<SlaveCom
     }
 
     @Override
-    public boolean isManualLaunchAllowed(final SlaveComputer c) {
+    public synchronized boolean isManualLaunchAllowed(final SlaveComputer c) {
         return isOnlineScheduled();
     }
 
