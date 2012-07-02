@@ -16,10 +16,10 @@
 
 package hudson.scheduler;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Vector;
-
+import java.util.List;
 import org.antlr.runtime.RecognitionException;
 
 /**
@@ -28,19 +28,20 @@ import org.antlr.runtime.RecognitionException;
  * @author Kohsuke Kawaguchi
  */
 public final class CronTabList {
-    private final Vector<CronTab> tabs;
+    private final List<CronTab> tabs;
 
     public CronTabList(Collection<CronTab> tabs) {
-        this.tabs = new Vector<CronTab>(tabs);
+        this.tabs = new ArrayList<CronTab>(tabs);
     }
 
     /**
-     * Returns true if the given calendar matches
+     * Returns true if the given calendar matches.
      */
-    public synchronized boolean check(Calendar cal) {
+    public boolean check(Calendar cal) {
         for (CronTab tab : tabs) {
-            if(tab.check(cal))
+            if (tab.check(cal)) {
                 return true;
+            }
         }
         return false;
     }
@@ -57,23 +58,25 @@ public final class CronTabList {
     public String checkSanity() {
         for (CronTab tab : tabs) {
             String s = tab.checkSanity();
-            if(s!=null)     return s;
+            if (s != null) {
+                return s;
+            }
         }
         return null;
     }
 
     public static CronTabList create(String format) throws RecognitionException {
-        Vector<CronTab> r = new Vector<CronTab>();
+        List<CronTab> r = new ArrayList<CronTab>();
         int lineNumber = 0;
         for (String line : format.split("\\r?\\n")) {
             lineNumber++;
             line = line.trim();
-            if(line.length()==0 || line.startsWith("#"))
+            if (line.length() == 0 || line.startsWith("#")) 
                 continue;   // ignorable line
             try {
-                r.add(new CronTab(line,lineNumber));
+                r.add(new CronTab(line, lineNumber));
             } catch (RecognitionException e) {
-                throw new BaseParser.SemanticException(Messages.CronTabList_InvalidInput(line,e.toString()),e);
+                throw new BaseParser.SemanticException(Messages.CronTabList_InvalidInput(line, e.toString()), e);
             }
         }
         return new CronTabList(r);
