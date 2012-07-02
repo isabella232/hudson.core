@@ -16,15 +16,9 @@
 
 package hudson.security;
 
-import hudson.cli.CLICommand;
-import hudson.model.Hudson;
+import java.io.IOException;
 import org.springframework.security.Authentication;
 import org.springframework.security.AuthenticationException;
-import org.kohsuke.args4j.Argument;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.Option;
-
-import java.io.IOException;
 
 /**
  * Handles authentication for CLI commands.
