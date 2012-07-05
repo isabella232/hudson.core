@@ -422,19 +422,23 @@ public abstract class AbstractBuild<P extends AbstractProject<P,R>,R extends Abs
                 Result result = doRun(listener);
 
                 Computer c = node.toComputer();
-                if (c==null || c.isOffline()) {
+                if (c == null || c.isOffline()) {
                     // As can be seen in HUDSON-5073, when a build fails because of the slave connectivity problem,
                     // error message doesn't point users to the slave. So let's do it here.
-                    listener.hyperlink("/computer/"+builtOn+"/log","Looks like the node went offline during the build. Check the slave log for the details.");
+                    listener.hyperlink("/computer/" + builtOn + "/log","Looks like the node went offline during the build. Check the slave log for the details.");
 
-                    // grab the end of the log file. This might not work very well if the slave already
-                    // starts reconnecting. Fixing this requires a ring buffer in slave logs.
-                    AnnotatedLargeText<Computer> log = c.getLogText();
-                    StringWriter w = new StringWriter();
-                    log.writeHtmlTo(Math.max(0,c.getLogFile().length()-10240),w);
+                    if (c != null) {
+                        // grab the end of the log file. This might not work very well if the slave already
+                        // starts reconnecting. Fixing this requires a ring buffer in slave logs.
+                        AnnotatedLargeText<Computer> log = c.getLogText();
+                        StringWriter w = new StringWriter();
+                        log.writeHtmlTo(Math.max(0, c.getLogFile().length() - 10240), w);
 
-                    listener.getLogger().print(ExpandableDetailsNote.encodeTo("details",w.toString()));
-                    listener.getLogger().println();
+                        listener.getLogger().print(ExpandableDetailsNote.encodeTo("details", w.toString()));
+                        listener.getLogger().println();
+                    } else {
+                        listener.getLogger().println("No slave log available");
+                    }
                 }
 
                 // kill run-away processes that are left by build
