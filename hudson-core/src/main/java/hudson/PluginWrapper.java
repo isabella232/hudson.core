@@ -64,6 +64,9 @@ import java.util.jar.JarFile;
  * @author Kohsuke Kawaguchi
  */
 public class PluginWrapper implements Comparable<PluginWrapper> {
+    
+    private static final Logger LOGGER = Logger.getLogger(PluginWrapper.class.getName());
+    
     /**
      * {@link PluginManager} to which this belongs to.
      */
@@ -136,10 +139,11 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
 
         public Dependency(String s) {
             int idx = s.indexOf(':');
-            if(idx==-1)
-                throw new IllegalArgumentException("Illegal dependency specifier "+s);
-            this.shortName = s.substring(0,idx);
-            this.version = s.substring(idx+1);
+            if (idx == -1) {
+                throw new IllegalArgumentException("Illegal dependency specifier " + s);
+            }
+            this.shortName = s.substring(0, idx);
+            this.version = s.substring(idx + 1);
             
             boolean isOptional = false;
             String[] osgiProperties = s.split(";");
@@ -174,13 +178,13 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
      * @param archive
      *      A .hpi archive file jar file, or a .hpl linked plugin.
      *  @param manifest
-     *  	The manifest for the plugin
+     *          The manifest for the plugin
      *  @param baseResourceURL
-     *  	A URL pointing to the resources for this plugin
+     *          A URL pointing to the resources for this plugin
      *  @param classLoader
-     *  	a classloader that loads classes from this plugin and its dependencies
+     *          a classloader that loads classes from this plugin and its dependencies
      *  @param disableFile
-     *  	if this file exists on startup, the plugin will not be activated
+     *          if this file exists on startup, the plugin will not be activated
      *  @param dependencies a list of mandatory dependencies
      *  @param optionalDependencies a list of optional dependencies
      */
@@ -220,9 +224,10 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
         URL idx = null;
         try {
             Enumeration<URL> en = classLoader.getResources("index.jelly");
-            while (en.hasMoreElements())
+            while (en.hasMoreElements()) {
                 idx = en.nextElement();
-        } catch (IOException ignore) { }
+            }
+        } catch (IOException ignore) {/*ignore*/ }
         // In case plugin has dependencies but is missing its own index.jelly,
         // check that result has this plugin's artifactId in it:
         return idx != null && idx.toString().contains(shortName) ? idx : null;
@@ -232,11 +237,15 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
         // use the name captured in the manifest, as often plugins
         // depend on the specific short name in its URLs.
         String n = manifest.getMainAttributes().getValue("Short-Name");
-        if(n!=null)     return n;
+        if (n != null) {
+            return n;
+        }
 
         // maven seems to put this automatically, so good fallback to check.
         n = manifest.getMainAttributes().getValue("Extension-Name");
-        if(n!=null)     return n;
+        if (n != null) {
+            return n;
+        }
 
         // otherwise infer from the file name, since older plugins don't have
         // this entry.
@@ -250,8 +259,9 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
     static String getBaseName(File archive) {
         String n = archive.getName();
         int idx = n.lastIndexOf('.');
-        if(idx>=0)
-            n = n.substring(0,idx);
+        if (idx >= 0) {
+            n = n.substring(0, idx);
+        }
         return n;
     }
 
@@ -287,11 +297,15 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
     public String getUrl() {
         // first look for the manifest entry. This is new in maven-hpi-plugin 1.30
         String url = manifest.getMainAttributes().getValue("Url");
-        if(url!=null)      return url;
+        if (url != null) {
+            return url;
+        }
 
         // fallback to update center metadata
         UpdateSite.Plugin ui = getInfo();
-        if(ui!=null)    return ui.wiki;
+        if (ui != null) {
+            return ui.wiki;
+        }
 
         return null;
     }
@@ -306,7 +320,9 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
      */
     public String getLongName() {
         String name = manifest.getMainAttributes().getValue("Long-Name");
-        if(name!=null)      return name;
+        if (name != null) {
+            return name;
+        }
         return shortName;
     }
 
@@ -315,11 +331,15 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
      */
     public String getVersion() {
         String v = manifest.getMainAttributes().getValue("Plugin-Version");
-        if(v!=null)      return v;
+        if (v != null) {
+            return v;
+        }
 
         // plugins generated before maven-hpi-plugin 1.3 should still have this attribute
         v = manifest.getMainAttributes().getValue("Implementation-Version");
-        if(v!=null)      return v;
+        if (v != null) {
+            return v;
+        }
 
         return "???";
     }
@@ -348,11 +368,11 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
      * Terminates the plugin.
      */
     public void stop() {
-        LOGGER.info("Stopping "+shortName);
+        LOGGER.info("Stopping " + shortName);
         try {
             getPlugin().stop();
-        } catch(Throwable t) {
-            LOGGER.log(WARNING, "Failed to shut down "+shortName, t);
+        } catch (Throwable t) {
+            LOGGER.log(WARNING, "Failed to shut down " + shortName, t);
         }
         // Work around a bug in commons-logging.
         // See http://www.szegedi.org/articles/memleak.html
@@ -360,20 +380,22 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
     }
 
     public void releaseClassLoader() {
-        if (classLoader instanceof Closeable)
+        if (classLoader instanceof Closeable) {
             try {
                 ((Closeable) classLoader).close();
             } catch (IOException e) {
                 LOGGER.log(WARNING, "Failed to shut down classloader",e);
             }
+        }
     }
 
     /**
      * Enables this plugin next time Hudson runs.
      */
     public void enable() throws IOException {
-        if(!disableFile.delete())
-            throw new IOException("Failed to delete "+disableFile);
+        if (!disableFile.delete()) {
+            throw new IOException("Failed to delete " + disableFile);
+        }
     }
 
     /**
@@ -409,7 +431,7 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
     }
 
     public void setPlugin(Plugin plugin) {
-        Hudson.lookup(PluginInstanceStore.class).store.put(this,plugin);
+        Hudson.lookup(PluginInstanceStore.class).store.put(this, plugin);
         plugin.wrapper = this;
     }
 
@@ -428,16 +450,18 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
         List<String> missingDependencies = new ArrayList<String>();
         // make sure dependencies exist
         for (Dependency d : dependencies) {
-            if (parent.getPlugin(d.shortName) == null)
+            if (parent.getPlugin(d.shortName) == null) {
                 missingDependencies.add(d.toString());
+            }
         }
-        if (!missingDependencies.isEmpty())
+        if (!missingDependencies.isEmpty()) {
             throw new IOException("Dependency "+Util.join(missingDependencies, ", ")+" doesn't exist");
-
+        }
         // add the optional dependencies that exists
         for (Dependency d : optionalDependencies) {
-            if (parent.getPlugin(d.shortName) != null)
+            if (parent.getPlugin(d.shortName) != null) {
                 dependencies.add(d);
+            }
         }
     }
 
@@ -452,7 +476,9 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
     public UpdateSite.Plugin getUpdateInfo() {
         UpdateCenter uc = Hudson.getInstance().getUpdateCenter();
         UpdateSite.Plugin p = uc.getPlugin(getShortName());
-        if(p!=null && p.isNewerThan(getVersion())) return p;
+        if (p != null && p.isNewerThan(getVersion())) {
+            return p;
+        }
         return null;
     }
     
@@ -472,7 +498,7 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
      * it always returns false.
      */
     public boolean hasUpdate() {
-        return getUpdateInfo()!=null;
+        return getUpdateInfo() != null;
     }
     
     public boolean isPinned() {
@@ -482,6 +508,7 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
     /**
      * Sort by short name.
      */
+    @Override
     public int compareTo(PluginWrapper pw) {
         return shortName.compareToIgnoreCase(pw.shortName);
     }
@@ -497,7 +524,7 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
      * Where is the backup file?
      */
     public File getBackupFile() {
-        return new File(Hudson.getInstance().getRootDir(),"plugins/"+getShortName() + ".bak");
+        return new File(Hudson.getInstance().getRootDir(), "plugins/" + getShortName() + ".bak");
     }
 
     /**
@@ -506,12 +533,21 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
      */
     public String getBackupVersion() {
         if (getBackupFile().exists()) {
+            JarFile backupPlugin = null;
             try {
-                JarFile backupPlugin = new JarFile(getBackupFile());
+                backupPlugin = new JarFile(getBackupFile());
                 return backupPlugin.getManifest().getMainAttributes().getValue("Plugin-Version");
             } catch (IOException e) {
                 LOGGER.log(WARNING, "Failed to get backup version ", e);
                 return null;
+            } finally {
+                if (backupPlugin != null) {
+                    try {
+                        backupPlugin.close();
+                    } catch (IOException ex) {
+                        /* ignore */
+                    }
+                }
             }
         } else {
             return null;
@@ -545,8 +581,5 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
         pinFile.delete();
         return HttpResponses.ok();
     }
-
-
-    private static final Logger LOGGER = Logger.getLogger(PluginWrapper.class.getName());
 
 }
