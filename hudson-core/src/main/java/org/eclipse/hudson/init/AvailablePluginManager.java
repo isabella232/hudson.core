@@ -19,6 +19,7 @@ package org.eclipse.hudson.init;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -144,8 +145,8 @@ public final class AvailablePluginManager {
             displayName = get(jsonObject, "displayName");
             description = get(jsonObject, "description");
             type = get(jsonObject, "type");
-
-            categories = jsonObject.has("categories") ? (String[]) jsonObject.getJSONArray("categories").toArray(new String[0]) : null;
+            JSONArray categoriesJsonArray = jsonObject.getJSONArray("categories");
+            categories = jsonObject.has("categories") ? (String[]) categoriesJsonArray.toArray(new String[categoriesJsonArray.size()]) : null;
             for (Object jo : jsonObject.getJSONArray("dependencies")) {
                 JSONObject depObj = (JSONObject) jo;
                 if (get(depObj, "name") != null

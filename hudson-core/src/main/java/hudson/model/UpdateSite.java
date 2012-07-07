@@ -57,6 +57,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.TrustAnchor;
 
 import javax.servlet.ServletContext;
+import net.sf.json.JSONArray;
 import org.apache.commons.codec.binary.Base64;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 
@@ -497,7 +498,8 @@ public class UpdateSite {
             this.excerpt = get(o,"excerpt");
             this.compatibleSinceVersion = get(o,"compatibleSinceVersion");
             this.requiredCore = get(o,"requiredCore");
-            this.categories = o.has("labels") ? (String[])o.getJSONArray("labels").toArray(new String[0]) : null;
+            JSONArray labelsJsonArray = o.getJSONArray("labels");
+            this.categories = o.has("labels") ? (String[]) labelsJsonArray.toArray(new String[labelsJsonArray.size()]) : null;
             for(Object jo : o.getJSONArray("dependencies")) {
                 JSONObject depObj = (JSONObject) jo;
                 // Make sure there's a name attribute, that that name isn't maven-plugin - we ignore that one -
