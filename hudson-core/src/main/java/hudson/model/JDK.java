@@ -136,7 +136,7 @@ public final class JDK extends ToolInstallation implements NodeSpecific<JDK>, En
 
         @Override
         public JDK[] getInstallations() {
-            return Hudson.getInstance().getJDKs().toArray(new JDK[0]);
+            return Hudson.getInstance().getJDKs().toArray(new JDK[Hudson.getInstance().getJDKs().size()]);
         }
 
         // this isn't really synchronized well since the list is Hudson.jdks :(

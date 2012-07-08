@@ -333,7 +333,8 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
      */
     public static void reload() {
         // iterate over an array to be concurrency-safe
-        for( User u : byName.values().toArray(new User[0]) )
+        Collection<User> values = byName.values();
+        for( User u : values.toArray(new User[values.size()]) )
             u.load();
     }
 

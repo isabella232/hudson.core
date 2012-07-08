@@ -18,6 +18,7 @@ package hudson.matrix;
 
 import hudson.model.Job;
 import hudson.tasks.LogRotator;
+import hudson.util.RunList;
 
 import java.io.IOException;
 
@@ -50,9 +51,9 @@ final class LinkedLogRotator extends LogRotator {
         // Let superclass handle clearing artifacts, if configured:
         super.perform(_job);
         MatrixConfiguration job = (MatrixConfiguration) _job;
-
         // copy it to the array because we'll be deleting builds as we go.
-        for( MatrixRun r : job.getBuilds().toArray(new MatrixRun[0]) ) {
+        RunList<MatrixRun> builds = job.getBuilds();
+        for( MatrixRun r : builds.toArray(new MatrixRun[builds.size()]) ) {
             if(job.getParent().getBuildByNumber(r.getNumber())==null)
                 r.delete();
         }
