@@ -1815,30 +1815,35 @@ public final class FilePath implements Serializable {
      *      Otherwise, the relative path is expected to be pointing to a directory.
      */
     public FormValidation validateRelativePath(String value, boolean errorIfNotExist, boolean expectingFile) throws IOException {
-        AbstractProject subject = Stapler.getCurrentRequest().findAncestorObject(AbstractProject.class);
-        subject.checkPermission(Item.CONFIGURE);
-
+        AbstractProject subject = Stapler.getCurrentRequest().findAncestorObject(AbstractProject.class);        
         value = fixEmpty(value);
 
         // none entered yet, or something is seriously wrong
-        if(value==null || (AbstractProject<?,?>)subject ==null) return FormValidation.ok();
+        if (value == null || (AbstractProject<?,?>) subject == null) {
+            return FormValidation.ok();
+        }
+        subject.checkPermission(Item.CONFIGURE);
 
         // a common mistake is to use wildcard
-        if(value.contains("*")) return FormValidation.error(Messages.FilePath_validateRelativePath_wildcardNotAllowed());
+        if (value.contains("*")) { 
+            return FormValidation.error(Messages.FilePath_validateRelativePath_wildcardNotAllowed());
+        }
 
         try {
-            if(!exists())    // no base directory. can't check
+            // no base directory. can't check
+            if (!exists()) {   
                 return FormValidation.ok();
-
+            }
+            
             FilePath path = child(value);
-            if(path.exists()) {
+            if (path.exists()) {
                 if (expectingFile) {
-                    if(!path.isDirectory())
+                    if (!path.isDirectory())
                         return FormValidation.ok();
                     else
                         return FormValidation.error(Messages.FilePath_validateRelativePath_notFile(value));
                 } else {
-                    if(path.isDirectory())
+                    if (path.isDirectory())
                         return FormValidation.ok();
                     else
                         return FormValidation.error(Messages.FilePath_validateRelativePath_notDirectory(value));
@@ -1847,7 +1852,7 @@ public final class FilePath implements Serializable {
 
             String msg = expectingFile ? Messages.FilePath_validateRelativePath_noSuchFile(value) : 
                 Messages.FilePath_validateRelativePath_noSuchDirectory(value);
-            if(errorIfNotExist)     return FormValidation.error(msg);
+            if (errorIfNotExist)     return FormValidation.error(msg);
             else                    return FormValidation.warning(msg);
         } catch (InterruptedException e) {
             return FormValidation.ok();
