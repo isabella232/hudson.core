@@ -16,7 +16,7 @@
 
 package hudson.util.io;
 
-import hudson.util.FileVisitor;
+import hudson.util.IOUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipOutputStream;
 
@@ -31,6 +31,10 @@ import java.io.OutputStream;
  * @see ArchiverFactory#ZIP
  */
 final class ZipArchiver extends Archiver {
+    
+    // Bitmask indicating directories in 'external attributes' of a ZIP archive entry.
+    private static final long BITMASK_IS_DIRECTORY = 1 << 4;    
+    
     private final byte[] buf = new byte[8192];
     private final ZipOutputStream zip;
 
@@ -39,6 +43,7 @@ final class ZipArchiver extends Archiver {
         zip.setEncoding(System.getProperty("file.encoding"));
     }
 
+    @Override
     public void visit(File f, String relativePath) throws IOException {
         if (f.isDirectory()) {
             ZipEntry dirZipEntry = new ZipEntry(relativePath + '/');
@@ -52,21 +57,19 @@ final class ZipArchiver extends Archiver {
             try {
                 in = new FileInputStream(f);
                 int len;
-                while((len = in.read(buf)) > 0) {
+                while ((len = in.read(buf)) > 0) {
                     zip.write(buf, 0, len);
                 }
             } finally {
-                in.close();
+                IOUtils.closeQuietly(in);
             }
             zip.closeEntry();
         }
         entriesWritten++;
     }
 
+    @Override
     public void close() throws IOException {
         zip.close();
     }
-
-    // Bitmask indicating directories in 'external attributes' of a ZIP archive entry.
-    private static final long BITMASK_IS_DIRECTORY = 1<<4;
 }
