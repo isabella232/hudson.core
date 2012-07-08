@@ -1320,7 +1320,7 @@ public abstract class Run <JobT extends Job<JobT,RunT>,RunT extends Run<JobT,Run
             // otherwise the queue state becomes inconsistent
 
             long start = System.currentTimeMillis();
-
+            OutputStream logger = null;
             try {
                 try {
                     Charset charset = Computer.currentComputer().getDefaultCharset();
@@ -1329,7 +1329,7 @@ public abstract class Run <JobT extends Job<JobT,RunT>,RunT extends Run<JobT,Run
                     // don't do buffering so that what's written to the listener
                     // gets reflected to the file immediately, which can then be
                     // served to the browser immediately
-                    OutputStream logger = new FileOutputStream(getLogFile());
+                    logger = new FileOutputStream(getLogFile());
                     RunT build = job.getBuild();
 
                     // Global log filters
@@ -1409,6 +1409,10 @@ public abstract class Run <JobT extends Job<JobT,RunT>,RunT extends Run<JobT,Run
                     listener.finished(result);
                 if(listener!=null)
                     listener.closeQuietly();
+                
+                if (logger != null) {
+                    IOUtils.closeQuietly(logger);
+                }
 
                 try {
                     save();
