@@ -53,6 +53,18 @@ import java.util.zip.GZIPOutputStream;
  * @author Kohsuke Kawaguchi
  */
 public class CompressedFile {
+    
+    /**
+     * Executor used for compression. Limited up to one thread since
+     * this should be a fairly low-priority task.
+     */
+    private static final ExecutorService COMPRESSION_THREAD = new ThreadPoolExecutor(
+        0, 1, 5L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
+        new ExceptionCatchingThreadFactory(new DaemonThreadFactory()));
+
+    private static final Logger LOGGER = Logger.getLogger(CompressedFile.class.getName());    
+    
+    
     /**
      * The name of the raw file.
      */
@@ -65,15 +77,16 @@ public class CompressedFile {
 
     public CompressedFile(File file) {
         this.file = file;
-        this.gz = new File(file.getParentFile(),file.getName()+".gz");
+        this.gz = new File(file.getParentFile(), file.getName() + ".gz");
     }
 
     /**
      * Gets the OutputStream to write to the file.
      */
     public OutputStream write() throws FileNotFoundException {
-        if(gz.exists())
+        if (gz.exists()) {
             gz.delete();
+        }
         return new FileOutputStream(file);
     }
 
@@ -81,13 +94,14 @@ public class CompressedFile {
      * Reads the contents of a file.
      */
     public InputStream read() throws IOException {
-        if(file.exists())
+        if (file.exists()) {
             return new FileInputStream(file);
-
+        }
+        
         // check if the compressed file exists
-        if(gz.exists())
+        if (gz.exists()) {
             return new GZIPInputStream(new FileInputStream(gz));
-
+        }
         // no such file
         throw new FileNotFoundException(file.getName());
     }
@@ -97,26 +111,26 @@ public class CompressedFile {
      */
     public String loadAsString() throws IOException {
         long sizeGuess;
-        if(file.exists())
+        if (file.exists()) {
             sizeGuess = file.length();
-        else
-        if(gz.exists())
-            sizeGuess = gz.length()*2;
-        else
+        } else if (gz.exists()) {
+            sizeGuess = gz.length() * 2;
+        } else {
             return "";
-
-        StringBuilder str = new StringBuilder((int)sizeGuess);
+        }
+        
+        StringBuilder str = new StringBuilder((int) sizeGuess);
 
         Reader r = null;
         try {
             r = new InputStreamReader(read());
             char[] buf = new char[8192];
             int len;
-            while((len=r.read(buf,0,buf.length))>0) {
-                str.append(buf,0,len);
+            while ((len = r.read(buf, 0, buf.length)) > 0) {
+                str.append(buf, 0, len);
             }
         } finally {
-            r.close();
+            IOUtils.closeQuietly(r);
         }
         return str.toString();
     }
@@ -129,13 +143,14 @@ public class CompressedFile {
      * the further reading will be done from the compressed stream.
      */
     public void compress() {
-        compressionThread.submit(new Runnable() {
+        COMPRESSION_THREAD.submit(new Runnable() {
+            @Override
             public void run() {
                 try {
                     InputStream in = read();
                     OutputStream out = new GZIPOutputStream(new FileOutputStream(gz));
                     try {
-                        Util.copyStream(in,out);
+                        Util.copyStream(in, out);
                     } finally {
                         in.close();
                         out.close();
@@ -143,20 +158,11 @@ public class CompressedFile {
                     // if the compressed file is created successfully, remove the original
                     file.delete();
                 } catch (IOException e) {
-                    LOGGER.log(Level.WARNING, "Failed to compress "+file,e);
-                    gz.delete(); // in case a processing is left in the middle
+                    LOGGER.log(Level.WARNING, "Failed to compress " + file, e);
+                    // in case a processing is left in the middle
+                    gz.delete(); 
                 }
             }
         });
     }
-
-    /**
-     * Executor used for compression. Limited up to one thread since
-     * this should be a fairly low-priority task.
-     */
-    private static final ExecutorService compressionThread = new ThreadPoolExecutor(
-        0, 1, 5L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
-        new ExceptionCatchingThreadFactory(new DaemonThreadFactory()));
-
-    private static final Logger LOGGER = Logger.getLogger(CompressedFile.class.getName());
 }
