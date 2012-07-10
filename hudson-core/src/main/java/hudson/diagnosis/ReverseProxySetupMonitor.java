@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -28,18 +28,21 @@ import org.kohsuke.stapler.WebMethod;
 import java.io.IOException;
 
 /**
- * Looks out for a broken reverse proxy setup that doesn't rewrite the location header correctly.
+ * Looks out for a broken reverse proxy setup that doesn't rewrite the location
+ * header correctly.
  *
- * <p>
- * Have the JavaScript make an AJAX call, to which we respond with 302 redirect. If the reverse proxy
- * is done correctly, this will be handled by {@link #doFoo()}, but otherwise we'll report that as an error.
- * Unfortunately, {@code XmlHttpRequest} doesn't expose properties that allow the client-side JavaScript
- * to learn the details of the failure, so we have to make do with limited information.
+ * <p> Have the JavaScript make an AJAX call, to which we respond with 302
+ * redirect. If the reverse proxy is done correctly, this will be handled by
+ * {@link #doFoo()}, but otherwise we'll report that as an error. Unfortunately,
+ * {@code XmlHttpRequest} doesn't expose properties that allow the client-side
+ * JavaScript to learn the details of the failure, so we have to make do with
+ * limited information.
  *
  * @author Kohsuke Kawaguchi
  */
 @Extension
 public class ReverseProxySetupMonitor extends AdministrativeMonitor {
+
     @Override
     public boolean isActivated() {
         // return true to always inject an HTML fragment to perform a test
@@ -50,16 +53,17 @@ public class ReverseProxySetupMonitor extends AdministrativeMonitor {
         return new HttpRedirect("test-for-reverse-proxy-setup");
     }
 
-    @WebMethod(name="test-for-reverse-proxy-setup")
+    @WebMethod(name = "test-for-reverse-proxy-setup")
     public FormValidation doFoo() {
         return FormValidation.ok();
     }
 
     /**
-     * Depending on whether the user said "yes" or "no", send him to the right place.
+     * Depending on whether the user said "yes" or "no", send him to the right
+     * place.
      */
     public HttpResponse doAct(@QueryParameter String no) throws IOException {
-        if(no!=null) { // dismiss
+        if (no != null) { // dismiss
             disable(true);
             // of course the irony is that this redirect won't work
             return HttpResponses.redirectViaContextPath("/manage");
@@ -68,4 +72,3 @@ public class ReverseProxySetupMonitor extends AdministrativeMonitor {
         }
     }
 }
-

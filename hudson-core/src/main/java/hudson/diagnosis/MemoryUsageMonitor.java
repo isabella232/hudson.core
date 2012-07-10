@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Winston Prakash
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.diagnosis;
@@ -40,26 +40,28 @@ import org.kohsuke.stapler.QueryParameter;
  */
 @Extension
 public final class MemoryUsageMonitor extends PeriodicWork {
+
     /**
-     * A memory group is conceptually a set of memory pools. 
+     * A memory group is conceptually a set of memory pools.
      */
     public final class MemoryGroup {
-        private final List<MemoryPoolMXBean> pools = new ArrayList<MemoryPoolMXBean>();
 
+        private final List<MemoryPoolMXBean> pools = new ArrayList<MemoryPoolMXBean>();
         /**
-         * Trend of the memory usage, after GCs.
-         * So this shows the accurate snapshot of the footprint of live objects.
+         * Trend of the memory usage, after GCs. So this shows the accurate
+         * snapshot of the footprint of live objects.
          */
-        public final MultiStageTimeSeries used = new MultiStageTimeSeries(Messages._MemoryUsageMonitor_USED(), ColorPalette.RED, 0,0);
+        public final MultiStageTimeSeries used = new MultiStageTimeSeries(Messages._MemoryUsageMonitor_USED(), ColorPalette.RED, 0, 0);
         /**
          * Trend of the maximum memory size, after GCs.
          */
-        public final MultiStageTimeSeries max = new MultiStageTimeSeries(Messages._MemoryUsageMonitor_TOTAL(), ColorPalette.BLUE, 0,0);
+        public final MultiStageTimeSeries max = new MultiStageTimeSeries(Messages._MemoryUsageMonitor_TOTAL(), ColorPalette.BLUE, 0, 0);
 
         private MemoryGroup(List<MemoryPoolMXBean> pools, MemoryType type) {
             for (MemoryPoolMXBean pool : pools) {
-                if (pool.getType() == type)
+                if (pool.getType() == type) {
                     this.pools.add(pool);
+                }
             }
         }
 
@@ -69,9 +71,11 @@ public final class MemoryUsageMonitor extends PeriodicWork {
 //            long cur = 0;
             for (MemoryPoolMXBean pool : pools) {
                 MemoryUsage usage = pool.getCollectionUsage();
-                if(usage==null) continue;   // not available
+                if (usage == null) {
+                    continue;   // not available
+                }
                 used += usage.getUsed();
-                max  += usage.getMax();
+                max += usage.getMax();
 
 //                usage = pool.getUsage();
 //                if(usage==null) continue;   // not available
@@ -93,10 +97,9 @@ public final class MemoryUsageMonitor extends PeriodicWork {
          * Generates the memory usage statistics graph.
          */
         public TrendChart doGraph(@QueryParameter String type) throws IOException {
-            return MultiStageTimeSeries.createTrendChart(TimeScale.parse(type),used,max);
+            return MultiStageTimeSeries.createTrendChart(TimeScale.parse(type), used, max);
         }
     }
-
     public final MemoryGroup heap;
     public final MemoryGroup nonHeap;
 
