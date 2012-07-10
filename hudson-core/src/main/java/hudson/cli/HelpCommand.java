@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -29,6 +29,7 @@ import java.util.TreeMap;
  */
 @Extension
 public class HelpCommand extends CLICommand {
+
     @Override
     public String getShortDescription() {
         return "Lists all the available commands";
@@ -41,15 +42,16 @@ public class HelpCommand extends CLICommand {
             return 0;
         }
 
-        Map<String,CLICommand> commands = new TreeMap<String,CLICommand>();
-        for (CLICommand c : CLICommand.all())
-            commands.put(c.getName(),c);
+        Map<String, CLICommand> commands = new TreeMap<String, CLICommand>();
+        for (CLICommand c : CLICommand.all()) {
+            commands.put(c.getName(), c);
+        }
 
         for (CLICommand c : commands.values()) {
-            stderr.println("  "+c.getName());
-            stderr.println("    "+c.getShortDescription());
+            stderr.println("  " + c.getName());
+            stderr.println("    " + c.getShortDescription());
         }
-        
+
         return 0;
     }
 }

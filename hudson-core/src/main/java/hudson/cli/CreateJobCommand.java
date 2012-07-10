@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -23,31 +23,29 @@ import org.kohsuke.args4j.Argument;
 
 /**
  * Creates a new job by reading stdin as a configuration XML file.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 @Extension
 public class CreateJobCommand extends CLICommand {
+
     @Override
     public String getShortDescription() {
         return "Creates a new job by reading stdin as a configuration XML file";
     }
-
-    @Argument(metaVar="NAME",usage="Name of the job to create")
+    @Argument(metaVar = "NAME", usage = "Name of the job to create")
     public String name;
 
     protected int run() throws Exception {
         Hudson h = Hudson.getInstance();
         h.checkPermission(Item.CREATE);
 
-        if (h.getItem(name)!=null) {
-            stderr.println("Job '"+name+"' already exists");
+        if (h.getItem(name) != null) {
+            stderr.println("Job '" + name + "' already exists");
             return -1;
         }
 
-        h.createProjectFromXML(name,stdin);
+        h.createProjectFromXML(name, stdin);
         return 0;
     }
 }
-
-

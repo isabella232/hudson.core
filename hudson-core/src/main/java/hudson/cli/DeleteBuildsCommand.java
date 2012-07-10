@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -31,6 +31,7 @@ import java.util.List;
  */
 @Extension
 public class DeleteBuildsCommand extends AbstractBuildRangeCommand {
+
     @Override
     public String getShortDescription() {
         return "Deletes build record(s)";
@@ -39,20 +40,19 @@ public class DeleteBuildsCommand extends AbstractBuildRangeCommand {
     @Override
     protected void printUsageSummary(PrintStream stderr) {
         stderr.println(
-            "Delete build records of a specified job, possibly in a bulk. "
-        );
+                "Delete build records of a specified job, possibly in a bulk. ");
     }
 
     @Override
     protected int act(List<AbstractBuild<?, ?>> builds) throws IOException {
         job.checkPermission(Run.DELETE);
 
-        for (AbstractBuild build : builds)
+        for (AbstractBuild build : builds) {
             build.delete();
+        }
 
-        stdout.println("Deleted "+builds.size()+" builds");
+        stdout.println("Deleted " + builds.size() + " builds");
 
         return 0;
     }
-
 }

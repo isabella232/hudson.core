@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -24,10 +24,11 @@ package hudson.cli;
  * @author Kohsuke Kawaguchi
  */
 public abstract class CloneableCLICommand extends CLICommand implements Cloneable {
+
     @Override
     protected CLICommand createClone() {
         try {
-            return (CLICommand)clone();
+            return (CLICommand) clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError(e);
         }

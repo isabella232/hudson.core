@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -45,19 +45,17 @@ import java.io.PrintStream;
  */
 @Extension
 public class BuildCommand extends CLICommand {
+
     @Override
     public String getShortDescription() {
         return "Builds a job, and optionally waits until its completion.";
     }
-
-    @Argument(metaVar="JOB",usage="Name of the job to build",required=true)
-    public AbstractProject<?,?> job;
-
-    @Option(name="-s",usage="Wait until the completion/abortion of the command")
+    @Argument(metaVar = "JOB", usage = "Name of the job to build", required = true)
+    public AbstractProject<?, ?> job;
+    @Option(name = "-s", usage = "Wait until the completion/abortion of the command")
     public boolean sync = false;
-
-    @Option(name="-p",usage="Specify the build parameters in the key=value format.")
-    public Map<String,String> parameters = new HashMap<String, String>();
+    @Option(name = "-p", usage = "Specify the build parameters in the key=value format.")
+    public Map<String, String> parameters = new HashMap<String, String>();
 
     protected int run() throws Exception {
         job.checkPermission(Item.BUILD);
@@ -65,18 +63,20 @@ public class BuildCommand extends CLICommand {
         ParametersAction a = null;
         if (!parameters.isEmpty()) {
             ParametersDefinitionProperty pdp = job.getProperty(ParametersDefinitionProperty.class);
-            if (pdp==null)
-                throw new AbortException(job.getFullDisplayName()+" is not parameterized but the -p option was specified");
+            if (pdp == null) {
+                throw new AbortException(job.getFullDisplayName() + " is not parameterized but the -p option was specified");
+            }
 
-            List<ParameterValue> values = new ArrayList<ParameterValue>(); 
+            List<ParameterValue> values = new ArrayList<ParameterValue>();
 
             for (Entry<String, String> e : parameters.entrySet()) {
                 String name = e.getKey();
                 ParameterDefinition pd = pdp.getParameterDefinition(name);
-                if (pd==null)
+                if (pd == null) {
                     throw new AbortException(String.format("\'%s\' is not a valid parameter. Did you mean %s?",
                             name, EditDistance.findNearest(name, pdp.getParameterDefinitionNames())));
-                values.add(pd.createValue(this,e.getValue()));
+                }
+                values.add(pd.createValue(this, e.getValue()));
             }
             for (ParameterDefinition pd : pdp.getParameterDefinitions()) {
                 if (parameters.get(pd.getName()) == null) {
@@ -87,26 +87,28 @@ public class BuildCommand extends CLICommand {
         }
 
         Future<? extends AbstractBuild> f = job.scheduleBuild2(0, new CLICause(), a);
-        if (!sync)  return 0;
+        if (!sync) {
+            return 0;
+        }
 
         AbstractBuild b = f.get();    // wait for the completion
-        stdout.println("Completed "+b.getFullDisplayName()+" : "+b.getResult());
+        stdout.println("Completed " + b.getFullDisplayName() + " : " + b.getResult());
         return b.getResult().ordinal;
     }
 
     @Override
     protected void printUsageSummary(PrintStream stderr) {
         stderr.println(
-            "Starts a build, and optionally waits for a completion.\n" +
-            "Aside from general scripting use, this command can be\n" +
-            "used to invoke another job from within a build of one job.\n" +
-            "With the -s option, this command changes the exit code based on\n" +
-            "the outcome of the build (exit code 0 indicates a success.)\n"
-        );
+                "Starts a build, and optionally waits for a completion.\n"
+                + "Aside from general scripting use, this command can be\n"
+                + "used to invoke another job from within a build of one job.\n"
+                + "With the -s option, this command changes the exit code based on\n"
+                + "the outcome of the build (exit code 0 indicates a success.)\n");
     }
 
     // TODO: CLI can authenticate as different users, so should record which user here..
     public static class CLICause extends Cause {
+
         public String getShortDescription() {
             return "Started by command line";
         }
@@ -122,4 +124,3 @@ public class BuildCommand extends CLICommand {
         }
     }
 }
-
