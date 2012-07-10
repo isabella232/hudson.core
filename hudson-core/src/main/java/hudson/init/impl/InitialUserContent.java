@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -27,15 +27,17 @@ import java.io.IOException;
 
 /**
  * Prepares userContent folder and put a readme if it doesn't exist.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class InitialUserContent {
-    @Initializer(after=JOB_LOADED)
+
+    @Initializer(after = JOB_LOADED)
     public static void init(Hudson h) throws IOException {
         File userContentDir = new File(h.getRootDir(), "userContent");
-        if(!userContentDir.exists()) {
+        if (!userContentDir.exists()) {
             userContentDir.mkdirs();
-            FileUtils.writeStringToFile(new File(userContentDir,"readme.txt"), Messages.Hudson_USER_CONTENT_README());
+            FileUtils.writeStringToFile(new File(userContentDir, "readme.txt"), Messages.Hudson_USER_CONTENT_README());
         }
     }
 }
