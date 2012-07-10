@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -26,11 +26,13 @@ import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
 
 /**
- * Refer to {@link AbstractProject} by its name. Registered at META-INF/services.
+ * Refer to {@link AbstractProject} by its name. Registered at
+ * META-INF/services.
  *
  * @author Kohsuke Kawaguchi
  */
 public class AbstractProjectOptionHandler extends OptionHandler<AbstractProject> {
+
     public AbstractProjectOptionHandler(CmdLineParser parser, OptionDef option, Setter<AbstractProject> setter) {
         super(parser, option, setter);
     }
@@ -40,9 +42,10 @@ public class AbstractProjectOptionHandler extends OptionHandler<AbstractProject>
         Hudson h = Hudson.getInstance();
         String src = params.getParameter(0);
 
-        AbstractProject s = h.getItemByFullName(src,AbstractProject.class);
-        if (s==null)
-            throw new CmdLineException(owner, "No such job '"+src+"' perhaps you meant "+ AbstractProject.findNearest(src)+"?");
+        AbstractProject s = h.getItemByFullName(src, AbstractProject.class);
+        if (s == null) {
+            throw new CmdLineException(owner, "No such job '" + src + "' perhaps you meant " + AbstractProject.findNearest(src) + "?");
+        }
         setter.addValue(s);
         return 1;
     }

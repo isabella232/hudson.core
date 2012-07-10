@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *   Kohsuke Kawaguchi, Winston Prakash
- *       
+ *
  *******************************************************************************/ 
 
 package hudson.cli.declarative;
@@ -50,17 +50,20 @@ import java.util.logging.Logger;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
- * Discover {@link CLIMethod}s and register them as {@link CLICommand} implementations.
+ * Discover {@link CLIMethod}s and register them as {@link CLICommand}
+ * implementations.
  *
  * @author Kohsuke Kawaguchi
  */
 @Extension
 public class CLIRegisterer extends ExtensionFinder {
+
     public <T> Collection<ExtensionComponent<T>> find(Class<T> type, Hudson hudson) {
-        if (type==CLICommand.class)
-            return (List)discover(hudson);
-        else
+        if (type == CLICommand.class) {
+            return (List) discover(hudson);
+        } else {
             return Collections.emptyList();
+        }
     }
 
     /**
@@ -68,10 +71,13 @@ public class CLIRegisterer extends ExtensionFinder {
      */
     private Method findResolver(Class type) throws IOException {
         List<Method> resolvers = Util.filter(Index.list(CLIResolver.class, Hudson.getInstance().getPluginManager().uberClassLoader), Method.class);
-        for ( ; type!=null; type=type.getSuperclass())
-            for (Method m : resolvers)
-                if (m.getReturnType()==type)
+        for (; type != null; type = type.getSuperclass()) {
+            for (Method m : resolvers) {
+                if (m.getReturnType() == type) {
                     return m;
+                }
+            }
+        }
         return null;
     }
 
@@ -80,13 +86,13 @@ public class CLIRegisterer extends ExtensionFinder {
         List<ExtensionComponent<CLICommand>> r = new ArrayList<ExtensionComponent<CLICommand>>();
 
         try {
-            for ( final Method m : Util.filter(Index.list(CLIMethod.class, hudson.getPluginManager().uberClassLoader),Method.class)) {
+            for (final Method m : Util.filter(Index.list(CLIMethod.class, hudson.getPluginManager().uberClassLoader), Method.class)) {
                 try {
                     // command name
                     final String name = m.getAnnotation(CLIMethod.class).name();
 
                     final ResourceBundleHolder res = loadMessageBundle(m);
-                    res.format("CLI."+name+".shortDescription");   // make sure we have the resource, to fail early
+                    res.format("CLI." + name + ".shortDescription");   // make sure we have the resource, to fail early
 
                     r.add(new ExtensionComponent<CLICommand>(new CloneableCLICommand() {
                         @Override
@@ -96,7 +102,7 @@ public class CLIRegisterer extends ExtensionFinder {
 
                         public String getShortDescription() {
                             // format by using the right locale
-                            return res.format("CLI."+name+".shortDescription");
+                            return res.format("CLI." + name + ".shortDescription");
                         }
 
                         @Override
@@ -117,56 +123,61 @@ public class CLIRegisterer extends ExtensionFinder {
                                     Method method = m;
                                     while (true) {
                                         chains.push(method);
-                                        if (Modifier.isStatic(method.getModifiers()))
+                                        if (Modifier.isStatic(method.getModifiers())) {
                                             break; // the chain is complete.
-
+                                        }
                                         // the method in question is an instance method, so we need to resolve the instance by using another resolver
                                         Class<?> type = method.getDeclaringClass();
                                         method = findResolver(type);
-                                        if (method==null) {
-                                            stderr.println("Unable to find the resolver method annotated with @CLIResolver for "+type);
+                                        if (method == null) {
+                                            stderr.println("Unable to find the resolver method annotated with @CLIResolver for " + type);
                                             return 1;
                                         }
                                     }
 
                                     List<MethodBinder> binders = new ArrayList<MethodBinder>();
 
-                                    while (!chains.isEmpty())
-                                        binders.add(new MethodBinder(chains.pop(),parser));
+                                    while (!chains.isEmpty()) {
+                                        binders.add(new MethodBinder(chains.pop(), parser));
+                                    }
 
                                     // authentication
                                     CliAuthenticator authenticator = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm().createCliAuthenticator(this);
-                                    new ClassParser().parse(authenticator,parser);
+                                    new ClassParser().parse(authenticator, parser);
 
                                     // fill up all the binders
                                     parser.parseArgument(args);
 
                                     Authentication auth = authenticator.authenticate();
-                                    if (auth==Hudson.ANONYMOUS)
+                                    if (auth == Hudson.ANONYMOUS) {
                                         auth = loadStoredAuthentication();
+                                    }
                                     sc.setAuthentication(auth); // run the CLI with the right credential
                                     hudson.checkPermission(Hudson.READ);
 
                                     // resolve them
                                     Object instance = null;
-                                    for (MethodBinder binder : binders)
+                                    for (MethodBinder binder : binders) {
                                         instance = binder.call(instance);
+                                    }
 
-                                    if (instance instanceof Integer)
+                                    if (instance instanceof Integer) {
                                         return (Integer) instance;
-                                    else
+                                    } else {
                                         return 0;
+                                    }
                                 } catch (InvocationTargetException e) {
                                     Throwable t = e.getTargetException();
-                                    if (t instanceof Exception)
+                                    if (t instanceof Exception) {
                                         throw (Exception) t;
+                                    }
                                     throw e;
                                 } finally {
                                     sc.setAuthentication(old); // restore
                                 }
                             } catch (CmdLineException e) {
                                 stderr.println(e.getMessage());
-                                printUsage(stderr,parser);
+                                printUsage(stderr, parser);
                                 return 1;
                             } catch (Exception e) {
                                 e.printStackTrace(stderr);
@@ -179,11 +190,11 @@ public class CLIRegisterer extends ExtensionFinder {
                         }
                     }));
                 } catch (ClassNotFoundException e) {
-                    LOGGER.log(SEVERE,"Failed to process @CLIMethod: "+m,e);
+                    LOGGER.log(SEVERE, "Failed to process @CLIMethod: " + m, e);
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(SEVERE, "Failed to discvoer @CLIMethod",e);
+            LOGGER.log(SEVERE, "Failed to discvoer @CLIMethod", e);
         }
 
         return r;
@@ -197,6 +208,5 @@ public class CLIRegisterer extends ExtensionFinder {
         Class<?> msg = c.getClassLoader().loadClass(c.getName().substring(0, c.getName().lastIndexOf(".")) + ".Messages");
         return ResourceBundleHolder.get(msg);
     }
-
     private static final Logger LOGGER = Logger.getLogger(CLIRegisterer.class.getName());
 }
