@@ -30,19 +30,17 @@ import javax.mail.internet.MimeMessage;
  * Base logic of sending out notification e-mail.
  */
 public abstract class BaseMailSender {
-    private static final String DEFAULT_TEXT = "Should be overridden";
 
+    private static final String DEFAULT_TEXT = "Should be overridden";
     protected static final String DEFAULT_CHARSET = "UTF-8";
     /**
      * Whitespace-separated list of e-mail addresses that represent recipients.
      */
     private String recipients;
-
     /**
      * The charset to use for the text and subject.
      */
     private String charset;
-
 
     public BaseMailSender(String recipients) {
         this(recipients, DEFAULT_CHARSET);
@@ -109,7 +107,7 @@ public abstract class BaseMailSender {
         }
         msg.setRecipients(Message.RecipientType.TO, rcp.toArray(new InternetAddress[rcp.size()]));
         msg.setSubject(new StringBuilder().append(getSubjectPrefix()).append(" ").append(getSubject()).toString(),
-            charset);
+                charset);
         msg.setText(new StringBuilder().append(getText()).append(getTextFooter()).toString(), charset);
         return msg;
     }
@@ -149,5 +147,4 @@ public abstract class BaseMailSender {
     protected String getSubjectPrefix() {
         return hudson.mail.Messages.hudson_email_subject_prefix();
     }
-
 }

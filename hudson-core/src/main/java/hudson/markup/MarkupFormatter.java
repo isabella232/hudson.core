@@ -7,7 +7,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:        
+ * Contributors:
  *
  *******************************************************************************/ 
 
@@ -34,7 +34,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package hudson.markup;
 
 import hudson.ExtensionPoint;
@@ -46,45 +45,46 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 /**
- * Generalization of a function that takes text with some markup and converts that to HTML.
- * Such markup is often associated with Wiki.
+ * Generalization of a function that takes text with some markup and converts
+ * that to HTML. Such markup is often associated with Wiki.
  *
- * <p>
- * Use of markup, as opposed to using raw HTML, ensures certain degree of security.
+ * <p> Use of markup, as opposed to using raw HTML, ensures certain degree of
+ * security.
  *
- * <p>
- * This is an extension point in Hudson, allowing plugins to implement different markup formatters.
+ * <p> This is an extension point in Hudson, allowing plugins to implement
+ * different markup formatters.
  *
- * <h2>Views</h2>
- * <p>
- * This extension point must have a valid <tt>config.jelly</tt> that feeds the constructor.
+ * <h2>Views</h2> <p> This extension point must have a valid
+ * <tt>config.jelly</tt> that feeds the constructor.
  *
- * TODO: allow {@link MarkupFormatter} to control the UI that the user uses to edit.
+ * TODO: allow {@link MarkupFormatter} to control the UI that the user uses to
+ * edit.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.391
  * @see Hudson#getMarkupFormatter()
  */
 public abstract class MarkupFormatter extends AbstractDescribableImpl<MarkupFormatter> implements ExtensionPoint {
+
     /**
-     * Given the text, converts that to HTML according to whatever markup rules implicit in the implementation class.
+     * Given the text, converts that to HTML according to whatever markup rules
+     * implicit in the implementation class.
      *
-     * <p>
-     * Multiple threads can call this method concurrently with different inputs.
+     * <p> Multiple threads can call this method concurrently with different
+     * inputs.
      *
-     * @param output
-     *      Formatted HTML should be sent to this output.
+     * @param output Formatted HTML should be sent to this output.
      */
     public abstract void translate(String markup, Writer output) throws IOException;
 
     public final String translate(String markup) throws IOException {
         StringWriter w = new StringWriter();
-        translate(markup,w);
+        translate(markup, w);
         return w.toString();
     }
 
     @Override
     public MarkupFormatterDescriptor getDescriptor() {
-        return (MarkupFormatterDescriptor)super.getDescriptor();
+        return (MarkupFormatterDescriptor) super.getDescriptor();
     }
 }

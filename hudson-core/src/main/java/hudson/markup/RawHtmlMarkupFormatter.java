@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -21,12 +21,13 @@ import java.io.IOException;
 import java.io.Writer;
 
 /**
- * {@link MarkupFormatter} that treats the input as the raw html.
- * This is the backward compatible behaviour.
+ * {@link MarkupFormatter} that treats the input as the raw html. This is the
+ * backward compatible behaviour.
  *
  * @author Kohsuke Kawaguchi
  */
 public class RawHtmlMarkupFormatter extends MarkupFormatter {
+
     @DataBoundConstructor
     public RawHtmlMarkupFormatter() {
     }
@@ -38,11 +39,11 @@ public class RawHtmlMarkupFormatter extends MarkupFormatter {
 
     @Extension
     public static class DescriptorImpl extends MarkupFormatterDescriptor {
+
         @Override
         public String getDisplayName() {
             return "Raw HTML";
         }
     }
-
     public static MarkupFormatter INSTANCE = new RawHtmlMarkupFormatter();
 }
