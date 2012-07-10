@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Inc., Kohsuke Kawaguchi, Winston Prakash
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -49,13 +49,13 @@ import static javax.swing.JOptionPane.*;
 /**
  * @author Kohsuke Kawaguchi
  */
-public class WindowsSlaveInstaller implements Callable<Void,RuntimeException>, ActionListener {
+public class WindowsSlaveInstaller implements Callable<Void, RuntimeException>, ActionListener {
+
     /**
-     * Root directory of this slave.
-     * String, not File because the platform can be different.
+     * Root directory of this slave. String, not File because the platform can
+     * be different.
      */
     private final String rootDir;
-
     private transient Engine engine;
     private transient MainDialog dialog;
 
@@ -64,13 +64,16 @@ public class WindowsSlaveInstaller implements Callable<Void,RuntimeException>, A
     }
 
     public Void call() {
-        if(File.separatorChar=='/') return null;    // not Windows
-        if(System.getProperty("hudson.showWindowsServiceInstallLink")==null)
+        if (File.separatorChar == '/') {
+            return null;    // not Windows
+        }
+        if (System.getProperty("hudson.showWindowsServiceInstallLink") == null) {
             return null;    // only show this when it makes sense, which is when we run from JNLP
-
+        }
         dialog = MainDialog.get();
-        if(dialog==null)     return null;    // can't find the main window. Maybe not running with GUI
-
+        if (dialog == null) {
+            return null;    // can't find the main window. Maybe not running with GUI
+        }
         // capture the engine
         engine = Engine.current();
 
@@ -91,8 +94,8 @@ public class WindowsSlaveInstaller implements Callable<Void,RuntimeException>, A
     /**
      * Invokes slave.exe with a SCM management command.
      *
-     * <p>
-     * If it fails in a way that indicates the presence of UAC, retry in an UAC compatible manner.
+     * <p> If it fails in a way that indicates the presence of UAC, retry in an
+     * UAC compatible manner.
      */
     static int runElevated(File slaveExe, String command, TaskListener out, File pwd) throws IOException, InterruptedException {
         try {
@@ -119,7 +122,7 @@ public class WindowsSlaveInstaller implements Callable<Void,RuntimeException>, A
             } finally {
                 IOUtils.closeQuietly(fin);
             }
-            
+
         }
     }
 
@@ -131,17 +134,19 @@ public class WindowsSlaveInstaller implements Callable<Void,RuntimeException>, A
             int r = JOptionPane.showConfirmDialog(dialog,
                     Messages.WindowsSlaveInstaller_ConfirmInstallation(),
                     Messages.WindowsInstallerLink_DisplayName(), OK_CANCEL_OPTION);
-            if(r!=JOptionPane.OK_OPTION)    return;
+            if (r != JOptionPane.OK_OPTION) {
+                return;
+            }
 
-            if(!NativeUtils.getInstance().isDotNetInstalled(2, 0)) {
-                JOptionPane.showMessageDialog(dialog,Messages.WindowsSlaveInstaller_DotNetRequired(),
+            if (!NativeUtils.getInstance().isDotNetInstalled(2, 0)) {
+                JOptionPane.showMessageDialog(dialog, Messages.WindowsSlaveInstaller_DotNetRequired(),
                         Messages.WindowsInstallerLink_DisplayName(), ERROR_MESSAGE);
                 return;
             }
 
             final File dir = new File(rootDir);
             if (!dir.exists()) {
-                JOptionPane.showMessageDialog(dialog,Messages.WindowsSlaveInstaller_RootFsDoesntExist(rootDir),
+                JOptionPane.showMessageDialog(dialog, Messages.WindowsSlaveInstaller_RootFsDoesntExist(rootDir),
                         Messages.WindowsInstallerLink_DisplayName(), ERROR_MESSAGE);
                 return;
             }
@@ -150,40 +155,44 @@ public class WindowsSlaveInstaller implements Callable<Void,RuntimeException>, A
             FileUtils.copyURLToFile(getClass().getResource("/windows-service/hudson.exe"), slaveExe);
 
             // write out the descriptor
-            URL jnlp = new URL(engine.getHudsonUrl(),"computer/"+Util.rawEncode(engine.slaveName)+"/slave-agent.jnlp");
+            URL jnlp = new URL(engine.getHudsonUrl(), "computer/" + Util.rawEncode(engine.slaveName) + "/slave-agent.jnlp");
             String xml = generateSlaveXml(
                     generateServiceId(rootDir),
-                    System.getProperty("java.home")+"\\bin\\java.exe", "-jnlpUrl "+jnlp.toExternalForm());
-            FileUtils.writeStringToFile(new File(dir, "hudson-slave.xml"),xml,"UTF-8");
+                    System.getProperty("java.home") + "\\bin\\java.exe", "-jnlpUrl " + jnlp.toExternalForm());
+            FileUtils.writeStringToFile(new File(dir, "hudson-slave.xml"), xml, "UTF-8");
 
             // copy slave.jar
-            URL slaveJar = new URL(engine.getHudsonUrl(),"jnlpJars/remoting.jar");
-            File dstSlaveJar = new File(dir,"slave.jar").getCanonicalFile();
-            if(!dstSlaveJar.exists()) // perhaps slave.jar is already there?
-                FileUtils.copyURLToFile(slaveJar,dstSlaveJar);
+            URL slaveJar = new URL(engine.getHudsonUrl(), "jnlpJars/remoting.jar");
+            File dstSlaveJar = new File(dir, "slave.jar").getCanonicalFile();
+            if (!dstSlaveJar.exists()) // perhaps slave.jar is already there?
+            {
+                FileUtils.copyURLToFile(slaveJar, dstSlaveJar);
+            }
 
             // install as a service
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             StreamTaskListener task = new StreamTaskListener(baos);
-            r = runElevated(slaveExe,"install",task,dir);
-            if(r!=0) {
+            r = runElevated(slaveExe, "install", task, dir);
+            if (r != 0) {
                 JOptionPane.showMessageDialog(
-                    dialog,baos.toString(),"Error", ERROR_MESSAGE);
+                        dialog, baos.toString(), "Error", ERROR_MESSAGE);
                 return;
             }
 
             r = JOptionPane.showConfirmDialog(dialog,
                     Messages.WindowsSlaveInstaller_InstallationSuccessful(),
                     Messages.WindowsInstallerLink_DisplayName(), OK_CANCEL_OPTION);
-            if(r!=JOptionPane.OK_OPTION)    return;
+            if (r != JOptionPane.OK_OPTION) {
+                return;
+            }
 
             // let the service start after we close our connection, to avoid conflicts
             Runtime.getRuntime().addShutdownHook(new Thread("service starter") {
                 public void run() {
                     try {
                         StreamTaskListener task = StreamTaskListener.fromStdout();
-                        int r = runElevated(slaveExe,"start",task,dir);
-                        task.getLogger().println(r==0?"Successfully started":"start service failed. Exit code="+r);
+                        int r = runElevated(slaveExe, "start", task, dir);
+                        task.getLogger().println(r == 0 ? "Successfully started" : "start service failed. Exit code=" + r);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
@@ -195,12 +204,12 @@ public class WindowsSlaveInstaller implements Callable<Void,RuntimeException>, A
         } catch (Exception t) {// this runs as a JNLP app, so if we let an exeption go, we'll never find out why it failed 
             StringWriter sw = new StringWriter();
             t.printStackTrace(new PrintWriter(sw));
-            JOptionPane.showMessageDialog(dialog,sw.toString(),"Error", ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(dialog, sw.toString(), "Error", ERROR_MESSAGE);
         }
     }
 
     public static String generateServiceId(String slaveRoot) throws IOException {
-        return "hudsonslave-"+slaveRoot.replace(':','_').replace('\\','_').replace('/','_');
+        return "hudsonslave-" + slaveRoot.replace(':', '_').replace('\\', '_').replace('/', '_');
     }
 
     public static String generateSlaveXml(String id, String java, String args) throws IOException {
@@ -210,6 +219,5 @@ public class WindowsSlaveInstaller implements Callable<Void,RuntimeException>, A
         xml = xml.replace("@ARGS@", args);
         return xml;
     }
-
     private static final long serialVersionUID = 1L;
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -22,11 +22,10 @@ import org.eclipse.hudson.jna.NativeUtils;
 import java.io.IOException;
 
 /**
- * {@link Lifecycle} implementation when Hudson runs on the embedded
- * servlet container on Unix.
+ * {@link Lifecycle} implementation when Hudson runs on the embedded servlet
+ * container on Unix.
  *
- * <p>
- * Restart by exec to self.
+ * <p> Restart by exec to self.
  *
  * @author Kohsuke Kawaguchi, Winston Prakash
  * @since 1.304

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Seiji Sogabe, CloudBees, Inc.
- *     
+ *
  *
  *******************************************************************************/
 package hudson.lifecycle;
@@ -50,12 +50,13 @@ import java.net.URL;
 public class WindowsInstallerLink extends ManagementLink {
 
     /**
-     * Location of the hudson.war.
-     * In general case, we can't determine this value, yet having this is a requirement for the installer.
+     * Location of the hudson.war. In general case, we can't determine this
+     * value, yet having this is a requirement for the installer.
      */
     private final File hudsonWar;
     /**
-     * If the installation is completed, this value holds the installation directory.
+     * If the installation is completed, this value holds the installation
+     * directory.
      */
     private volatile File installationDir;
 
@@ -148,7 +149,8 @@ public class WindowsInstallerLink extends ManagementLink {
     }
 
     /**
-     * Copies a single resource into the target folder, by the given name, and handle errors gracefully.
+     * Copies a single resource into the target folder, by the given name, and
+     * handle errors gracefully.
      */
     private void copy(StaplerRequest req, StaplerResponse rsp, File dir, URL src, String name) throws ServletException, IOException {
         try {
@@ -175,7 +177,6 @@ public class WindowsInstallerLink extends ManagementLink {
 
         // initiate an orderly shutdown after we finished serving this request
         new Thread("terminator") {
-
             @Override
             public void run() {
                 try {
@@ -183,7 +184,6 @@ public class WindowsInstallerLink extends ManagementLink {
 
                     // let the service start after we close our sockets, to avoid conflicts
                     Runtime.getRuntime().addShutdownHook(new Thread("service starter") {
-
                         @Override
                         public void run() {
                             try {
@@ -243,13 +243,14 @@ public class WindowsInstallerLink extends ManagementLink {
     }
 
     /**
-     * Decide if {@link WindowsInstallerLink} should show up in UI, and if so, register it.
+     * Decide if {@link WindowsInstallerLink} should show up in UI, and if so,
+     * register it.
      */
     @Extension
     public static ManagementLink registerIfApplicable() {
-        if(!Functions.isWindows())
+        if (!Functions.isWindows()) {
             return null; // this is a Windows only feature
-
+        }
         if (Lifecycle.get() instanceof WindowsServiceLifecycle) {
             return null; // already installed as Windows service
         }
