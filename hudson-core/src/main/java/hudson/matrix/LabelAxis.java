@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -28,6 +28,7 @@ import java.util.List;
  * @author Kohsuke Kawaguchi
  */
 public class LabelAxis extends Axis {
+
     @DataBoundConstructor
     public LabelAxis(String name, List<String> values) {
         super(name, values);
@@ -40,13 +41,15 @@ public class LabelAxis extends Axis {
 
     @Extension
     public static class DescriptorImpl extends AxisDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.LabelAxis_DisplayName();
         }
 
         /**
-         * If there's no distributed build set up, it's pointless to provide this axis.
+         * If there's no distributed build set up, it's pointless to provide
+         * this axis.
          */
         @Override
         public boolean isInstantiable() {

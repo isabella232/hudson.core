@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *  Kohsuke Kawaguchi, Winston Prakash
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.matrix;
@@ -32,31 +32,32 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import static java.lang.Boolean.TRUE;
 
-
 /**
  * A particular combination of {@link Axis} values.
  *
- * For example, when axes are "x={1,2},y={3,4}", then
- * [x=1,y=3] is a combination (out of 4 possible combinations)
+ * For example, when axes are "x={1,2},y={3,4}", then [x=1,y=3] is a combination
+ * (out of 4 possible combinations)
  *
  * @author Kohsuke Kawaguchi
  */
-public final class Combination extends TreeMap<String,String> implements Comparable<Combination> {
+public final class Combination extends TreeMap<String, String> implements Comparable<Combination> {
 
     protected static final String DELIM = ",";
 
     public Combination(AxisList axisList, List<String> values) {
-        for(int i=0; i<axisList.size(); i++)
-            super.put(axisList.get(i).getName(),values.get(i));
+        for (int i = 0; i < axisList.size(); i++) {
+            super.put(axisList.get(i).getName(), values.get(i));
+        }
     }
 
-    public Combination(AxisList axisList,String... values) {
-        this(axisList,Arrays.asList(values));
+    public Combination(AxisList axisList, String... values) {
+        this(axisList, Arrays.asList(values));
     }
 
-    public Combination(Map<String,String> keyValuePairs) {
-        for (Map.Entry<String, String> e : keyValuePairs.entrySet())
-            super.put(e.getKey(),e.getValue());
+    public Combination(Map<String, String> keyValuePairs) {
+        for (Map.Entry<String, String> e : keyValuePairs.entrySet()) {
+            super.put(e.getKey(), e.getValue());
+        }
     }
 
     public String get(Axis a) {
@@ -64,8 +65,8 @@ public final class Combination extends TreeMap<String,String> implements Compara
     }
 
     /**
-     * Obtains the continuous unique index number of this {@link Combination}
-     * in the given {@link AxisList}.
+     * Obtains the continuous unique index number of this {@link Combination} in
+     * the given {@link AxisList}.
      */
     public int toIndex(AxisList axis) {
         int r = 0;
@@ -77,15 +78,14 @@ public final class Combination extends TreeMap<String,String> implements Compara
     }
 
     /**
-     * Obtains a number N such that "N%M==0" would create
-     * a reasonable sparse matrix for integer M.
+     * Obtains a number N such that "N%M==0" would create a reasonable sparse
+     * matrix for integer M.
      *
-     * <p>
-     * This is bit like {@link #toIndex(AxisList)}, but instead
-     * of creating a continuous number (which often maps different
-     * values of the same axis to the same index in modulo N residue ring,
-     * we use a prime number P as the base. I think this guarantees the uniform
-     * distribution in any N smaller than 2P (but proof, anyone?)
+     * <p> This is bit like {@link #toIndex(AxisList)}, but instead of creating
+     * a continuous number (which often maps different values of the same axis
+     * to the same index in modulo N residue ring, we use a prime number P as
+     * the base. I think this guarantees the uniform distribution in any N
+     * smaller than 2P (but proof, anyone?)
      */
     private long toModuloIndex(AxisList axis) {
         long r = 0;
@@ -95,16 +95,16 @@ public final class Combination extends TreeMap<String,String> implements Compara
         }
         return r;
     }
-    
+
     /**
-     * Evaluates the given Dynamic Language Script Expression  with values bound from this combination.
-     * <p>
-     * For example, if this combination is a=X,b=Y, then expressions like <tt>a=="X"</tt> would evaluate to
-     * true.
+     * Evaluates the given Dynamic Language Script Expression with values bound
+     * from this combination. <p> For example, if this combination is a=X,b=Y,
+     * then expressions like <tt>a=="X"</tt> would evaluate to true.
+     *
      * @param axes
      * @param expression
      * @param scriptType
-     * @return 
+     * @return
      */
     public boolean evalScriptExpression(AxisList axes, String expression) {
         if (Util.fixEmptyAndTrim(expression) == null) {
@@ -132,19 +132,25 @@ public final class Combination extends TreeMap<String,String> implements Compara
     }
 
     public int compareTo(Combination that) {
-        int d = this.size()-that.size();
-        if(d!=0)    return d;
+        int d = this.size() - that.size();
+        if (d != 0) {
+            return d;
+        }
 
-        Iterator<Map.Entry<String,String>> itr = this.entrySet().iterator();
-        Iterator<Map.Entry<String,String>> jtr = that.entrySet().iterator();
-        while(itr.hasNext()) {
-            Map.Entry<String,String> i = itr.next();
-            Map.Entry<String,String> j = jtr.next();
+        Iterator<Map.Entry<String, String>> itr = this.entrySet().iterator();
+        Iterator<Map.Entry<String, String>> jtr = that.entrySet().iterator();
+        while (itr.hasNext()) {
+            Map.Entry<String, String> i = itr.next();
+            Map.Entry<String, String> j = jtr.next();
 
             d = i.getKey().compareTo(j.getKey());
-            if(d!=0)    return d;
+            if (d != 0) {
+                return d;
+            }
             d = i.getValue().compareTo(j.getValue());
-            if(d!=0)    return d;
+            if (d != 0) {
+                return d;
+            }
         }
         return 0;
     }
@@ -153,15 +159,20 @@ public final class Combination extends TreeMap<String,String> implements Compara
      * Works like {@link #toString()} but only include the given axes.
      */
     public String toString(Collection<Axis> subset) {
-        if(size()==1 && subset.size()==1)
+        if (size() == 1 && subset.size() == 1) {
             return values().iterator().next();
+        }
 
         StringBuilder buf = new StringBuilder();
         for (Axis a : subset) {
-            if(buf.length()>0) buf.append(',');
+            if (buf.length() > 0) {
+                buf.append(',');
+            }
             buf.append(a.getName()).append('=').append(get(a));
         }
-        if(buf.length()==0) buf.append("default"); // special case to avoid 0-length name.
+        if (buf.length() == 0) {
+            buf.append("default"); // special case to avoid 0-length name.
+        }
         return buf.toString();
     }
 
@@ -170,8 +181,9 @@ public final class Combination extends TreeMap<String,String> implements Compara
      */
     public List<String> values(Collection<? extends Axis> axes) {
         List<String> r = new ArrayList<String>(axes.size());
-        for (Axis a : axes)
+        for (Axis a : axes) {
             r.add(get(a));
+        }
         return r;
     }
 
@@ -179,10 +191,8 @@ public final class Combination extends TreeMap<String,String> implements Compara
      * Converts to the ID string representation:
      * <tt>axisName=value,axisName=value,...</tt>
      *
-     * @param sep1
-     *      The separator between multiple axes.
-     * @param sep2
-     *      The separator between axis name and value.
+     * @param sep1 The separator between multiple axes.
+     * @param sep2 The separator between axis name and value.
      */
     public String toString(char sep1, char sep2) {
         return toString(sep1, sep2, false);
@@ -222,7 +232,7 @@ public final class Combination extends TreeMap<String,String> implements Compara
 
     @Override
     public String toString() {
-        return toString(',','=');
+        return toString(',', '=');
     }
 
     /**
@@ -236,17 +246,19 @@ public final class Combination extends TreeMap<String,String> implements Compara
      * Reverse operation of {@link #toString()}.
      */
     public static Combination fromString(String id) {
-        if(id.equals("default"))
-            return new Combination(Collections.<String,String>emptyMap());
+        if (id.equals("default")) {
+            return new Combination(Collections.<String, String>emptyMap());
+        }
 
-        Map<String,String> m = new HashMap<String,String>();
+        Map<String, String> m = new HashMap<String, String>();
         StringTokenizer tokens = new StringTokenizer(id, DELIM);
-        while(tokens.hasMoreTokens()) {
+        while (tokens.hasMoreTokens()) {
             String token = tokens.nextToken();
             int idx = token.indexOf('=');
-            if(idx<0)
-                throw new IllegalArgumentException("Can't parse "+id);
-            m.put(token.substring(0,idx),token.substring(idx+1));
+            if (idx < 0) {
+                throw new IllegalArgumentException("Can't parse " + id);
+            }
+            m.put(token.substring(0, idx), token.substring(idx + 1));
         }
         return new Combination(m);
     }
@@ -254,18 +266,17 @@ public final class Combination extends TreeMap<String,String> implements Compara
     /**
      * Creates compact string representataion suitable for display purpose.
      *
-     * <p>
-     * The string is made compact by looking for {@link Axis} whose values
+     * <p> The string is made compact by looking for {@link Axis} whose values
      * are unique, and omit the axis name.
      */
     public String toCompactString(AxisList axes) {
         Set<String> nonUniqueAxes = new HashSet<String>();
-        Map<String,Axis> axisByValue = new HashMap<String,Axis>();
+        Map<String, Axis> axisByValue = new HashMap<String, Axis>();
 
         for (Axis a : axes) {
             for (String v : a.getValues()) {
-                Axis old = axisByValue.put(v,a);
-                if(old!=null) {
+                Axis old = axisByValue.put(v, a);
+                if (old != null) {
                     // these two axes have colliding values
                     nonUniqueAxes.add(old.getName());
                     nonUniqueAxes.add(a.getName());
@@ -274,13 +285,18 @@ public final class Combination extends TreeMap<String,String> implements Compara
         }
 
         StringBuilder buf = new StringBuilder();
-        for (Map.Entry<String,String> e : entrySet()) {
-            if(buf.length()>0) buf.append(',');
-            if(nonUniqueAxes.contains(e.getKey()))
+        for (Map.Entry<String, String> e : entrySet()) {
+            if (buf.length() > 0) {
+                buf.append(',');
+            }
+            if (nonUniqueAxes.contains(e.getKey())) {
                 buf.append(e.getKey()).append('=');
+            }
             buf.append(e.getValue());
         }
-        if(buf.length()==0) buf.append("default"); // special case to avoid 0-length name.
+        if (buf.length() == 0) {
+            buf.append("default"); // special case to avoid 0-length name.
+        }
         return buf.toString();
     }
 
@@ -311,6 +327,7 @@ public final class Combination extends TreeMap<String,String> implements Compara
      * @see Combination#evalScriptExpression(AxisList,String)
      */
     public static final class BooleanCategory {
+
         /**
          * x -> y
          */

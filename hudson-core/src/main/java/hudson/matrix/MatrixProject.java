@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Jorg Heymans, Red Hat, Inc., id:cactusman, Anton Kozak, Nikita Levyankov
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Jorg Heymans, Red Hat, Inc., id:cactusman, Anton Kozak, Nikita Levyankov
+ *
  *
  *******************************************************************************/ 
 
@@ -69,13 +69,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * {@link Job} that allows you to run multiple different configurations
- * from a single setting.
+ * {@link Job} that allows you to run multiple different configurations from a
+ * single setting.
  *
  * @author Kohsuke Kawaguchi
  */
 public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBuild> implements IMatrixProject, TopLevelItem,
-    SCMedItem, ItemGroup<MatrixConfiguration>, Saveable, FlyweightTask, BuildableItemWithBuildWrappers {
+        SCMedItem, ItemGroup<MatrixConfiguration>, Saveable, FlyweightTask, BuildableItemWithBuildWrappers {
 
     public static final String HAS_COMBINATION_FILTER_PARAM = "hasCombinationFilter";
     public static final String HAS_TOUCH_STONE_COMBINATION_FILTER_PARAM = "hasTouchStoneCombinationFilter";
@@ -89,60 +89,59 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
     public static final String TOUCH_STONE_RESULT_CONDITION_PROPERTY_NAME = "touchStoneResultCondition";
     public static final String AXES_PROPERTY_NAME = "axes";
     protected static final String AXIS_CONFIGURATIONS_DIR = "configurations";
-
     /**
      * Configuration axes.
+     *
      * @deprecated as of 2.2.0, use #getAxes() and #setAxes() instead
      */
     @Deprecated
     private volatile AxisList axes = new AxisList();
-
     /**
-     * The filter that is applied to combinations. It is a Dynamic Language Script if condition.
-     * This can be null, which means "true".
-     * Package visible for the tests only.
+     * The filter that is applied to combinations. It is a Dynamic Language
+     * Script if condition. This can be null, which means "true". Package
+     * visible for the tests only.
      *
-     * @deprecated as of 2.2.0, use #getCombinationFilter() and #setCombinationFilter() instead
+     * @deprecated as of 2.2.0, use #getCombinationFilter() and
+     * #setCombinationFilter() instead
      */
     @Deprecated
     private volatile String combinationFilter;
-
     /**
-     * All {@link MatrixConfiguration}s, keyed by their {@link MatrixConfiguration#getName() names}.
+     * All {@link MatrixConfiguration}s, keyed by their
+     * {@link MatrixConfiguration#getName() names}.
      */
-    private transient /*final*/ Map<Combination,MatrixConfiguration> configurations = new CopyOnWriteMap.Tree<Combination,MatrixConfiguration>();
-
+    private transient /*final*/ Map<Combination, MatrixConfiguration> configurations = new CopyOnWriteMap.Tree<Combination, MatrixConfiguration>();
     /**
      * @see #getActiveConfigurations()
      */
     @CopyOnWrite
     private transient /*final*/ Set<MatrixConfiguration> activeConfigurations = new LinkedHashSet<MatrixConfiguration>();
-
     /**
-     * @deprecated as of 2.2.0, use #isRunSequentially() and #setRunSequentially() instead
+     * @deprecated as of 2.2.0, use #isRunSequentially() and
+     * #setRunSequentially() instead
      */
     @Deprecated
     private boolean runSequentially;
-
     /**
      * Filter to select a number of combinations to build first
      *
-     * @deprecated as of 2.2.0, use #getTouchStoneCombinationFilter() and #setTouchStoneCombinationFilter() instead
+     * @deprecated as of 2.2.0, use #getTouchStoneCombinationFilter() and
+     * #setTouchStoneCombinationFilter() instead
      */
     @Deprecated
     private String touchStoneCombinationFilter;
-
     /**
-     * Required result on the touchstone combinations, in order to
-     * continue with the rest
+     * Required result on the touchstone combinations, in order to continue with
+     * the rest
      *
-     * @deprecated as of 2.2.0, use #getTouchStoneResultCondition() and #setTouchStoneResultCondition() instead
+     * @deprecated as of 2.2.0, use #getTouchStoneResultCondition() and
+     * #setTouchStoneResultCondition() instead
      */
     @Deprecated
     private Result touchStoneResultCondition;
-
     /**
-     * @deprecated as of 2.2.0, use #getCustomWorkspace() and #setCustomWorkspace() instead
+     * @deprecated as of 2.2.0, use #getCustomWorkspace() and
+     * #setCustomWorkspace() instead
      */
     @Deprecated
     private String customWorkspace;
@@ -214,7 +213,7 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
      */
     public void setTouchStoneCombinationFilter(String touchStoneCombinationFilter) {
         CascadingUtil.getStringProjectProperty(this, TOUCH_STONE_COMBINATION_FILTER_PROPERTY_NAME)
-            .setValue(touchStoneCombinationFilter);
+                .setValue(touchStoneCombinationFilter);
     }
 
     /**
@@ -229,7 +228,7 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
      */
     public void setTouchStoneResultCondition(Result touchStoneResultCondition) {
         CascadingUtil.getResultProjectProperty(this,
-            TOUCH_STONE_RESULT_CONDITION_PROPERTY_NAME).setValue(touchStoneResultCondition);
+                TOUCH_STONE_RESULT_CONDITION_PROPERTY_NAME).setValue(touchStoneResultCondition);
     }
 
     /**
@@ -258,7 +257,7 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
             setCombinationFilter(combinationFilter);
             combinationFilter = null;//Reset to null. No longer needed.
         }
-        if ( null == getProperty(RUN_SEQUENTIALLY_PROPERTY_NAME)) {
+        if (null == getProperty(RUN_SEQUENTIALLY_PROPERTY_NAME)) {
             setRunSequentially(runSequentially);
             runSequentially = false;
         }
@@ -281,14 +280,16 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
     /**
      * Gets the subset of {@link AxisList} that are not system axes.
      *
-     * @deprecated as of 1.373
-     *      System vs user difference are generalized into extension point.
+     * @deprecated as of 1.373 System vs user difference are generalized into
+     * extension point.
      */
     public List<Axis> getUserAxes() {
         List<Axis> r = new ArrayList<Axis>();
-        for (Axis a : getAxes())
-            if(!a.isSystem())
+        for (Axis a : getAxes()) {
+            if (!a.isSystem()) {
                 r.add(a);
+            }
+        }
         return r;
     }
 
@@ -317,35 +318,34 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
         // perform the log rotation of inactive configurations to make sure
         // their logs get eventually discarded
         for (MatrixConfiguration config : configurations.values()) {
-            if(!config.isActiveConfiguration())
+            if (!config.isActiveConfiguration()) {
                 config.logRotate();
+            }
         }
     }
 
     /**
      * Recursively search for configuration and put them to the map
      *
-     * <p>
-     * The directory structure would be <tt>axis-a/b/axis-c/d/axis-e/f</tt> for
-     * combination [a=b,c=d,e=f]. Note that two combinations [a=b,c=d] and [a=b,c=d,e=f]
-     * can both co-exist (where one is an archived record and the other is live, for example)
-     * so search needs to be thorough.
+     * <p> The directory structure would be <tt>axis-a/b/axis-c/d/axis-e/f</tt>
+     * for combination [a=b,c=d,e=f]. Note that two combinations [a=b,c=d] and
+     * [a=b,c=d,e=f] can both co-exist (where one is an archived record and the
+     * other is live, for example) so search needs to be thorough.
      *
-     * @param dir
-     *      Directory to be searched.
-     * @param result
-     *      Receives the loaded {@link MatrixConfiguration}s.
-     * @param combination
-     *      Combination of key/values discovered so far while traversing the directories.
-     *      Read-only.
+     * @param dir Directory to be searched.
+     * @param result Receives the loaded {@link MatrixConfiguration}s.
+     * @param combination Combination of key/values discovered so far while
+     * traversing the directories. Read-only.
      */
-    private void loadConfigurations( File dir, CopyOnWriteMap.Tree<Combination,MatrixConfiguration> result, Map<String,String> combination ) {
+    private void loadConfigurations(File dir, CopyOnWriteMap.Tree<Combination, MatrixConfiguration> result, Map<String, String> combination) {
         File[] axisDirs = dir.listFiles(new FileFilter() {
             public boolean accept(File child) {
                 return child.isDirectory() && child.getName().startsWith("axis-");
             }
         });
-        if(axisDirs==null)      return;
+        if (axisDirs == null) {
+            return;
+        }
 
         for (File subdir : axisDirs) {
             String axis = subdir.getName().substring(5);    // axis name
@@ -355,22 +355,24 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
                     return child.isDirectory();
                 }
             });
-            if(valuesDir==null) continue;   // no values here
-
+            if (valuesDir == null) {
+                continue;   // no values here
+            }
             for (File v : valuesDir) {
-                Map<String,String> c = new HashMap<String, String>(combination);
-                c.put(axis,TokenList.decode(v.getName()));
+                Map<String, String> c = new HashMap<String, String>(combination);
+                c.put(axis, TokenList.decode(v.getName()));
 
                 try {
                     XmlFile config = Items.getConfigFile(v);
-                    if(config.exists()) {
+                    if (config.exists()) {
                         Combination comb = new Combination(c);
                         // if we already have this in memory, just use it.
                         // otherwise load it
-                        MatrixConfiguration item=null;
-                        if(this.configurations!=null)
+                        MatrixConfiguration item = null;
+                        if (this.configurations != null) {
                             item = this.configurations.get(comb);
-                        if(item==null) {
+                        }
+                        if (item == null) {
                             item = (MatrixConfiguration) config.read();
                             item.setCombination(comb);
                             item.onLoad(this, v.getName());
@@ -378,15 +380,16 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
                         result.put(item.getCombination(), item);
                     }
                 } catch (IOException e) {
-                    LOGGER.log(Level.WARNING, "Failed to load matrix configuration "+v,e);
+                    LOGGER.log(Level.WARNING, "Failed to load matrix configuration " + v, e);
                 }
-                loadConfigurations(v,result,c);
+                loadConfigurations(v, result, c);
             }
         }
     }
 
     /**
-     * Rebuilds the {@link #configurations} list and {@link #activeConfigurations}.
+     * Rebuilds the {@link #configurations} list and
+     * {@link #activeConfigurations}.
      */
     void rebuildConfigurations() throws IOException {
         // backward compatibility check to see if there's any data in the old structure
@@ -409,9 +412,9 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
             }
         }
 
-        CopyOnWriteMap.Tree<Combination,MatrixConfiguration> configurations =
-            new CopyOnWriteMap.Tree<Combination,MatrixConfiguration>();
-        loadConfigurations(getConfigurationsDir(),configurations,Collections.<String,String>emptyMap());
+        CopyOnWriteMap.Tree<Combination, MatrixConfiguration> configurations =
+                new CopyOnWriteMap.Tree<Combination, MatrixConfiguration>();
+        loadConfigurations(getConfigurationsDir(), configurations, Collections.<String, String>emptyMap());
         this.configurations = configurations;
 
         // find all active configurations
@@ -440,10 +443,9 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
     }
 
     /**
-     * Gets all active configurations.
-     * <p>
-     * In contract, inactive configurations are those that are left for archival purpose
-     * and no longer built when a new {@link MatrixBuild} is executed.
+     * Gets all active configurations. <p> In contract, inactive configurations
+     * are those that are left for archival purpose and no longer built when a
+     * new {@link MatrixBuild} is executed.
      */
     public Collection<MatrixConfiguration> getActiveConfigurations() {
         return activeConfigurations;
@@ -486,8 +488,9 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
 
     public File getRootDirFor(Combination combination) {
         File f = getConfigurationsDir();
-        for (Entry<String, String> e : combination.entrySet())
-            f = new File(f,"axis-"+e.getKey()+'/'+Util.rawEncode(e.getValue()));
+        for (Entry<String, String> e : combination.entrySet()) {
+            f = new File(f, "axis-" + e.getKey() + '/' + Util.rawEncode(e.getValue()));
+        }
         f.getParentFile().mkdirs();
         return f;
     }
@@ -495,42 +498,50 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
     /**
      * @see #getJDKs()
      */
-    @Override @Deprecated
+    @Override
+    @Deprecated
     public JDK getJDK() {
         return super.getJDK();
     }
 
     /**
      * Gets the {@link JDK}s where the builds will be run.
+     *
      * @return never null but can be empty
      */
     public Set<JDK> getJDKs() {
         Axis a = getAxes().find("jdk");
-        if(a==null)  return Collections.emptySet();
+        if (a == null) {
+            return Collections.emptySet();
+        }
         Set<JDK> r = new HashSet<JDK>();
         for (String j : a) {
             JDK jdk = Hudson.getInstance().getJDK(j);
-            if(jdk!=null)
+            if (jdk != null) {
                 r.add(jdk);
+            }
         }
         return r;
     }
 
     /**
      * Gets the {@link Label}s where the builds will be run.
+     *
      * @return never null
      */
     public Set<Label> getLabels() {
         Set<Label> r = new HashSet<Label>();
-        for (Combination c : getAxes().subList(LabelAxis.class).list())
-            r.add(Hudson.getInstance().getLabel(Util.join(c.values(),"&&")));
+        for (Combination c : getAxes().subList(LabelAxis.class).list()) {
+            r.add(Hudson.getInstance().getLabel(Util.join(c.values(), "&&")));
+        }
         return r;
     }
 
     public Publisher getPublisher(Descriptor<Publisher> descriptor) {
         for (Publisher p : getPublishersList()) {
-            if(p.getDescriptor()==descriptor)
+            if (p.getDescriptor() == descriptor) {
                 return p;
+            }
         }
         return null;
     }
@@ -551,12 +562,13 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
     public Object getDynamic(String token, StaplerRequest req, StaplerResponse rsp) {
         try {
             MatrixConfiguration item = getItem(token);
-            if(item!=null)
-            return item;
+            if (item != null) {
+                return item;
+            }
         } catch (IllegalArgumentException _) {
             // failed to parse the token as Combination. Must be something else
         }
-        return super.getDynamic(token,req,rsp);
+        return super.getDynamic(token, req, rsp);
     }
 
     @Override
@@ -566,10 +578,10 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
         JSONObject json = req.getSubmittedForm();
 
         setCombinationFilter(
-            req.getParameter(HAS_COMBINATION_FILTER_PARAM) != null ? Util.nullify(req.getParameter(
+                req.getParameter(HAS_COMBINATION_FILTER_PARAM) != null ? Util.nullify(req.getParameter(
                 COMBINATION_FILTER_PROPERTY_NAME)) : null);
 
-        if (req.getParameter(HAS_TOUCH_STONE_COMBINATION_FILTER_PARAM)!=null) {
+        if (req.getParameter(HAS_TOUCH_STONE_COMBINATION_FILTER_PARAM) != null) {
             setTouchStoneCombinationFilter(Util.nullify(req.getParameter(TOUCH_STONE_COMBINATION_FILTER_PARAM)));
             setTouchStoneResultCondition(Result.fromString(req.getParameter(TOUCH_STONE_RESULT_CONDITION_PARAM)));
         } else {
@@ -577,11 +589,11 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
         }
 
         setCustomWorkspace(
-            req.hasParameter(CUSTOM_WORKSPACE_PARAM) ? req.getParameter(CUSTOM_WORKSPACE_DIRECTORY_PARAM) : null);
+                req.hasParameter(CUSTOM_WORKSPACE_PARAM) ? req.getParameter(CUSTOM_WORKSPACE_DIRECTORY_PARAM) : null);
 
         // parse system axes
         DescribableList<Axis, AxisDescriptor> newAxes = DescribableListUtil.buildFromHetero(this, req, json, "axis",
-            Axis.all());
+                Axis.all());
         checkAxisNames(newAxes);
         setAxes(new AxisList(newAxes.toList()));
 
@@ -597,11 +609,13 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
         HashSet<String> axisNames = new HashSet<String>();
         for (Axis a : newAxes) {
             FormValidation fv = a.getDescriptor().doCheckName(a.getName());
-            if (fv.kind!=Kind.OK)
-                throw new FormException(Messages.MatrixProject_DuplicateAxisName(),fv,"axis.name");
+            if (fv.kind != Kind.OK) {
+                throw new FormException(Messages.MatrixProject_DuplicateAxisName(), fv, "axis.name");
+            }
 
-            if (axisNames.contains(a.getName()))
-                throw new FormException(Messages.MatrixProject_DuplicateAxisName(),"axis.name");
+            if (axisNames.contains(a.getName())) {
+                throw new FormException(Messages.MatrixProject_DuplicateAxisName(), "axis.name");
+            }
             axisNames.add(a.getName());
         }
     }
@@ -612,26 +626,26 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
     @Override
     public HttpResponse doDoWipeOutWorkspace() throws IOException, ServletException, InterruptedException {
         HttpResponse rsp = super.doDoWipeOutWorkspace();
-        for (MatrixConfiguration c : configurations.values())
+        for (MatrixConfiguration c : configurations.values()) {
             c.doDoWipeOutWorkspace();
+        }
         return rsp;
     }
-
 
     public DescriptorImpl getDescriptor() {
         return DESCRIPTOR;
     }
-
     @Extension
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
     public static final class DescriptorImpl extends AbstractProjectDescriptor {
+
         public String getDisplayName() {
             return Messages.MatrixProject_DisplayName();
         }
 
         public MatrixProject newInstance(ItemGroup parent, String name) {
-            return new MatrixProject(parent,name);
+            return new MatrixProject(parent, name);
         }
 
         /**
@@ -640,8 +654,9 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
         public List<AxisDescriptor> getAxisDescriptors() {
             List<AxisDescriptor> r = new ArrayList<AxisDescriptor>();
             for (AxisDescriptor d : Axis.all()) {
-                if (d.isInstantiable())
+                if (d.isInstantiable()) {
                     r.add(d);
+                }
             }
             return r;
         }
@@ -665,6 +680,5 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
             LOGGER.log(Level.WARNING, "Failed to rebuild matrix configuration", e);
         }
     }
-
     private static final Logger LOGGER = Logger.getLogger(MatrixProject.class.getName());
 }

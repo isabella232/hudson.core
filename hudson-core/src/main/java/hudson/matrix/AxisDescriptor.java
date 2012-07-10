@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -29,6 +29,7 @@ import org.kohsuke.stapler.QueryParameter;
  * @author Kohsuke Kawaguchi
  */
 public abstract class AxisDescriptor extends Descriptor<Axis> {
+
     protected AxisDescriptor(Class<? extends Axis> clazz) {
         super(clazz);
     }
@@ -37,7 +38,8 @@ public abstract class AxisDescriptor extends Descriptor<Axis> {
     }
 
     /**
-     * Return false if the user shouldn't be able to create thie axis from the UI.
+     * Return false if the user shouldn't be able to create thie axis from the
+     * UI.
      */
     public boolean isInstantiable() {
         return true;
@@ -47,8 +49,9 @@ public abstract class AxisDescriptor extends Descriptor<Axis> {
      * Makes sure that the given name is good as a axis name.
      */
     public FormValidation doCheckName(@QueryParameter String value) {
-        if(Util.fixEmpty(value)==null)
+        if (Util.fixEmpty(value) == null) {
             return FormValidation.ok();
+        }
 
         try {
             Hudson.checkGoodName(value);

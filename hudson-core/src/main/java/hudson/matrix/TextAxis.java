@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -21,10 +21,11 @@ import java.util.List;
 
 /**
  * User-defined plain text axis.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public class TextAxis extends Axis {
+
     public TextAxis(String name, List<String> values) {
         super(name, values);
     }
@@ -40,6 +41,7 @@ public class TextAxis extends Axis {
 
     @Extension
     public static class DescriptorImpl extends AxisDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.TextArea_DisplayName();
