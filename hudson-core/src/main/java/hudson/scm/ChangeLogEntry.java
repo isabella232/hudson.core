@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Nikita Levyankov
- *      
+ *
  *
  *******************************************************************************/ 
 
@@ -20,16 +20,18 @@ import hudson.model.User;
 import java.util.Collection;
 
 /**
- * Interface that represents entry from change log.
- * Note: this interface is gonna be used in email-ext plugin and some other plugins.
- * So, changing methods signatures could broke existing logic.
+ * Interface that represents entry from change log. Note: this interface is
+ * gonna be used in email-ext plugin and some other plugins. So, changing
+ * methods signatures could broke existing logic.
  * <p/>
- * <p/>
+ * <
+ * p/>
  * Date: 5/23/11
  *
  * @author Nikita Levyankov
  */
 interface ChangeLogEntry {
+
     ChangeLogSet getParent();
 
     /**
@@ -49,11 +51,10 @@ interface ChangeLogEntry {
     String getMsg();
 
     /**
-     * Returns a set of paths in the workspace that was
-     * affected by this change.
+     * Returns a set of paths in the workspace that was affected by this change.
      * <p/>
-     * Contains string like 'foo/bar/zot'. No leading/trailing '/',
-     * and separator must be normalized to '/'.
+     * Contains string like 'foo/bar/zot'. No leading/trailing '/', and
+     * separator must be normalized to '/'.
      *
      * @return never null.
      */
@@ -74,21 +75,20 @@ interface ChangeLogEntry {
     String getUser();
 
     /**
-     * Returns revision version.
-     * Some VCS's use string representation of revision number, for ex. git or cvs;
-     * perforce, svn - use numeric values for revisions
+     * Returns revision version. Some VCS's use string representation of
+     * revision number, for ex. git or cvs; perforce, svn - use numeric values
+     * for revisions
      *
      * @return revision version.
      */
     String getCurrentRevision();
 
     /**
-     * Returns a set of paths in the workspace that was
-     * affected by this change.
+     * Returns a set of paths in the workspace that was affected by this change.
      * <p/>
      * Noted: since this is a new interface, some of the SCMs may not have
-     * implemented this interface. The default implementation for this
-     * interface is throw UnsupportedOperationException
+     * implemented this interface. The default implementation for this interface
+     * is throw UnsupportedOperationException
      *
      * @return AffectedFile never null.
      * @since 2.0.1

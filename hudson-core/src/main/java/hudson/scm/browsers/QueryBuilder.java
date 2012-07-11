@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -20,8 +20,9 @@ package hudson.scm.browsers;
  * Builds up a query string.
  *
  * @author Kohsuke Kawaguchi
-*/
+ */
 public final class QueryBuilder {
+
     private final StringBuilder buf = new StringBuilder();
 
     public QueryBuilder(String s) {
@@ -29,9 +30,14 @@ public final class QueryBuilder {
     }
 
     public QueryBuilder add(String s) {
-        if(s==null)     return this; // nothing to add
-        if(buf.length()==0) buf.append('?');
-        else                buf.append('&');
+        if (s == null) {
+            return this; // nothing to add
+        }
+        if (buf.length() == 0) {
+            buf.append('?');
+        } else {
+            buf.append('&');
+        }
         buf.append(s);
         return this;
     }

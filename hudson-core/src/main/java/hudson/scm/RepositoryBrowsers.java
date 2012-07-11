@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Daniel Dyer, Stephen Connolly
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Daniel Dyer, Stephen Connolly
+ *
  *
  *******************************************************************************/ 
 
@@ -33,39 +33,43 @@ import net.sf.json.JSONObject;
  * @author Kohsuke Kawaguchi
  */
 public class RepositoryBrowsers {
+
     /**
      * List of all installed {@link RepositoryBrowsers}.
      *
-     * @deprecated as of 1.286.
-     *      Use {@link RepositoryBrowser#all()} for read access and {@link Extension} for registration.
+     * @deprecated as of 1.286. Use {@link RepositoryBrowser#all()} for read
+     * access and {@link Extension} for registration.
      */
-    public static final List<Descriptor<RepositoryBrowser<?>>> LIST = new DescriptorList<RepositoryBrowser<?>>((Class)RepositoryBrowser.class);
+    public static final List<Descriptor<RepositoryBrowser<?>>> LIST = new DescriptorList<RepositoryBrowser<?>>((Class) RepositoryBrowser.class);
 
     /**
-     * Only returns those {@link RepositoryBrowser} descriptors that extend from the given type.
+     * Only returns those {@link RepositoryBrowser} descriptors that extend from
+     * the given type.
      */
     public static List<Descriptor<RepositoryBrowser<?>>> filter(Class<? extends RepositoryBrowser> t) {
         List<Descriptor<RepositoryBrowser<?>>> r = new ArrayList<Descriptor<RepositoryBrowser<?>>>();
-        for (Descriptor<RepositoryBrowser<?>> d : RepositoryBrowser.all())
-            if(d.isSubTypeOf(t))
+        for (Descriptor<RepositoryBrowser<?>> d : RepositoryBrowser.all()) {
+            if (d.isSubTypeOf(t)) {
                 r.add(d);
+            }
+        }
         return r;
     }
 
     /**
      * Creates an instance of {@link RepositoryBrowser} from a form submission.
      *
-     * @deprecated since 2008-06-19.
-     *      Use {@link #createInstance(Class, StaplerRequest, JSONObject, String)}.
+     * @deprecated since 2008-06-19. Use
+     * {@link #createInstance(Class, StaplerRequest, JSONObject, String)}.
      */
-    public static <T extends RepositoryBrowser>
-    T createInstance(Class<T> type, StaplerRequest req, String fieldName) throws FormException {
+    public static <T extends RepositoryBrowser> T createInstance(Class<T> type, StaplerRequest req, String fieldName) throws FormException {
         List<Descriptor<RepositoryBrowser<?>>> list = filter(type);
         String value = req.getParameter(fieldName);
-        if(value==null || value.equals("auto"))
+        if (value == null || value.equals("auto")) {
             return null;
+        }
 
-        return type.cast(list.get(Integer.parseInt(value)).newInstance(req,null/*TODO*/));
+        return type.cast(list.get(Integer.parseInt(value)).newInstance(req, null/*TODO*/));
     }
 
     /**
@@ -73,11 +77,12 @@ public class RepositoryBrowsers {
      *
      * @since 1.227
      */
-    public static <T extends RepositoryBrowser>
-    T createInstance(Class<T> type, StaplerRequest req, JSONObject parent, String fieldName) throws FormException {
-        JSONObject o = (JSONObject)parent.get(fieldName);
-        if(o==null) return null;
+    public static <T extends RepositoryBrowser> T createInstance(Class<T> type, StaplerRequest req, JSONObject parent, String fieldName) throws FormException {
+        JSONObject o = (JSONObject) parent.get(fieldName);
+        if (o == null) {
+            return null;
+        }
 
-        return req.bindJSON(type,o);
+        return req.bindJSON(type, o);
     }
 }

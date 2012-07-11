@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -24,9 +24,11 @@ import java.io.IOException;
 
 /**
  * {@link ChangeLogParser} for no SCM.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class NullChangeLogParser extends ChangeLogParser {
+
     public ChangeLogSet<? extends ChangeLogSet.Entry> parse(AbstractBuild build, File changelogFile) throws IOException, SAXException {
         return ChangeLogSet.createEmpty(build);
     }

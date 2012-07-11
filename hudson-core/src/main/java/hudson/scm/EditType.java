@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -28,6 +28,7 @@ import java.util.Arrays;
  * @author Kohsuke Kawaguchi
  */
 public final class EditType implements CustomExportedBean {
+
     private String name;
     private String description;
 
@@ -47,10 +48,8 @@ public final class EditType implements CustomExportedBean {
     public String toExportedObject() {
         return name;
     }
-
-    public static final EditType ADD = new EditType("add","The file was added");
-    public static final EditType EDIT = new EditType("edit","The file was modified");
-    public static final EditType DELETE = new EditType("delete","The file was removed");
-
-    public static final List<EditType> ALL = Collections.unmodifiableList(Arrays.asList(ADD,EDIT,DELETE));
+    public static final EditType ADD = new EditType("add", "The file was added");
+    public static final EditType EDIT = new EditType("edit", "The file was modified");
+    public static final EditType DELETE = new EditType("delete", "The file was removed");
+    public static final List<EditType> ALL = Collections.unmodifiableList(Arrays.asList(ADD, EDIT, DELETE));
 }

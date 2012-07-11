@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -29,26 +29,29 @@ import javax.servlet.ServletException;
 
 /**
  * List of all installed SCMs.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public class SCMS {
+
     /**
      * List of all installed SCMs.
-     * @deprecated as of 1.286
-     *      Use {@link SCM#all()} for read access and {@link Extension} for registration.
+     *
+     * @deprecated as of 1.286 Use {@link SCM#all()} for read access and
+     * {@link Extension} for registration.
      */
-    public static final List<SCMDescriptor<?>> SCMS = (List)new DescriptorList<SCM>(SCM.class);
+    public static final List<SCMDescriptor<?>> SCMS = (List) new DescriptorList<SCM>(SCM.class);
 
     /**
      * Parses {@link SCM} configuration from the submitted form.
      *
-     * @param target
-     *      The project for which this SCM is configured to.
+     * @param target The project for which this SCM is configured to.
      */
     public static SCM parseSCM(StaplerRequest req, AbstractProject target) throws FormException, ServletException {
         String scm = req.getParameter("scm");
-        if(scm==null)   return new NullSCM();
+        if (scm == null) {
+            return new NullSCM();
+        }
 
         int scmidx = Integer.parseInt(scm);
         SCMDescriptor<?> d = SCM._for(target).get(scmidx);
@@ -57,11 +60,11 @@ public class SCMS {
     }
 
     /**
-     * @deprecated as of 1.294
-     *      Use {@link #parseSCM(StaplerRequest, AbstractProject)} and pass in the caller's project type.
+     * @deprecated as of 1.294 Use
+     * {@link #parseSCM(StaplerRequest, AbstractProject)} and pass in the
+     * caller's project type.
      */
     public static SCM parseSCM(StaplerRequest req) throws FormException, ServletException {
-        return parseSCM(req,null);
+        return parseSCM(req, null);
     }
-
 }
