@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -28,20 +28,21 @@ import java.io.IOException;
 import java.text.ParseException;
 
 /**
- * Checks available disk space of the remote FS root.
- * Requires Mustang.
+ * Checks available disk space of the remote FS root. Requires Mustang.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.123
  */
 public class DiskSpaceMonitor extends AbstractDiskSpaceMonitor {
-    @DataBoundConstructor
-	public DiskSpaceMonitor(String freeSpaceThreshold) throws ParseException {
-        super(freeSpaceThreshold);
-	}
 
-    public DiskSpaceMonitor() {}
-    
+    @DataBoundConstructor
+    public DiskSpaceMonitor(String freeSpaceThreshold) throws ParseException {
+        super(freeSpaceThreshold);
+    }
+
+    public DiskSpaceMonitor() {
+    }
+
     public DiskSpace getFreeSpace(Computer c) {
         return DESCRIPTOR.get(c);
     }
@@ -51,7 +52,6 @@ public class DiskSpaceMonitor extends AbstractDiskSpaceMonitor {
         // Hide this column from non-admins
         return Hudson.getInstance().hasPermission(Hudson.ADMINISTER) ? super.getColumnCaption() : null;
     }
-
     public static final DiskSpaceMonitorDescriptor DESCRIPTOR = new DiskSpaceMonitorDescriptor() {
         public String getDisplayName() {
             return Messages.DiskSpaceMonitor_DisplayName();
@@ -59,7 +59,9 @@ public class DiskSpaceMonitor extends AbstractDiskSpaceMonitor {
 
         protected DiskSpace getFreeSpace(Computer c) throws IOException, InterruptedException {
             FilePath p = c.getNode().getRootPath();
-            if(p==null) return null;
+            if (p == null) {
+                return null;
+            }
 
             return p.act(new GetUsableSpace());
         }
@@ -67,7 +69,9 @@ public class DiskSpaceMonitor extends AbstractDiskSpaceMonitor {
 
     @Extension
     public static DiskSpaceMonitorDescriptor install() {
-        if(Functions.isMustangOrAbove())    return DESCRIPTOR;
+        if (Functions.isMustangOrAbove()) {
+            return DESCRIPTOR;
+        }
         return null;
     }
 }

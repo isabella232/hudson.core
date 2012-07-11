@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -25,9 +25,11 @@ import java.util.logging.Logger;
  * @author Kohsuke Kawaguchi
  */
 public abstract class AbstractDiskSpaceMonitor extends NodeMonitor {
+
     /**
      * The free space threshold, below which the node monitor will be triggered.
-     * This is a human readable string representation as entered by the user, so that we can retain the original notation.
+     * This is a human readable string representation as entered by the user, so
+     * that we can retain the original notation.
      */
     public final String freeSpaceThreshold;
 
@@ -42,8 +44,9 @@ public abstract class AbstractDiskSpaceMonitor extends NodeMonitor {
     }
 
     public long getThresholdBytes() {
-        if (freeSpaceThreshold==null)
+        if (freeSpaceThreshold == null) {
             return DEFAULT_THRESHOLD; // backward compatibility with the data format that didn't have 'freeSpaceThreshold'
+        }
         try {
             return DiskSpace.parse(freeSpaceThreshold).size;
         } catch (ParseException e) {
@@ -53,16 +56,15 @@ public abstract class AbstractDiskSpaceMonitor extends NodeMonitor {
 
     @Override
     public Object data(Computer c) {
-    	DiskSpace size = (DiskSpace) super.data(c);
-        if(size!=null && size.size < getThresholdBytes()) {
-        	size.setTriggered(true);
-        	if(getDescriptor().markOffline(c,size)) {
-        		LOGGER.warning(Messages.DiskSpaceMonitor_MarkedOffline(c.getName()));
-        	}
+        DiskSpace size = (DiskSpace) super.data(c);
+        if (size != null && size.size < getThresholdBytes()) {
+            size.setTriggered(true);
+            if (getDescriptor().markOffline(c, size)) {
+                LOGGER.warning(Messages.DiskSpaceMonitor_MarkedOffline(c.getName()));
+            }
         }
         return size;
     }
-
     private static final Logger LOGGER = Logger.getLogger(AbstractDiskSpaceMonitor.class.getName());
-    private static final long DEFAULT_THRESHOLD = 1024L*1024*1024;
+    private static final long DEFAULT_THRESHOLD = 1024L * 1024 * 1024;
 }
