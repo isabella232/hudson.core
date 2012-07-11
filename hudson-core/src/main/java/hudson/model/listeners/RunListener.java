@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -32,18 +32,18 @@ import java.lang.reflect.Type;
 /**
  * Receives notifications about builds.
  *
- * <p>
- * Listener is always Hudson-wide, so once registered it gets notifications for every build
- * that happens in this Hudson.
+ * <p> Listener is always Hudson-wide, so once registered it gets notifications
+ * for every build that happens in this Hudson.
  *
- * <p>
- * This is an abstract class so that methods added in the future won't break existing listeners.
- * 
+ * <p> This is an abstract class so that methods added in the future won't break
+ * existing listeners.
+ *
  * @author Kohsuke Kawaguchi
  * @since 1.145
  */
 public abstract class RunListener<R extends Run> implements ExtensionPoint {
     //TODO: review and check whether we can do it private
+
     public final Class<R> targetType;
 
     protected RunListener(Class<R> targetType) {
@@ -52,10 +52,11 @@ public abstract class RunListener<R extends Run> implements ExtensionPoint {
 
     protected RunListener() {
         Type type = Types.getBaseClass(getClass(), RunListener.class);
-        if (type instanceof ParameterizedType)
-            targetType = Types.erasure(Types.getTypeArgument(type,0));
-        else
-            throw new IllegalStateException(getClass()+" uses the raw type for extending RunListener");
+        if (type instanceof ParameterizedType) {
+            targetType = Types.erasure(Types.getTypeArgument(type, 0));
+        } else {
+            throw new IllegalStateException(getClass() + " uses the raw type for extending RunListener");
+        }
     }
 
     public Class<R> getTargetType() {
@@ -65,49 +66,51 @@ public abstract class RunListener<R extends Run> implements ExtensionPoint {
     /**
      * Called after a build is completed.
      *
-     * @param r
-     *      The completed build.
-     * @param listener
-     *      The listener for this build. This can be used to produce log messages, for example,
-     *      which becomes a part of the "console output" of this build. But when this method runs,
-     *      the build is considered completed, so its status cannot be changed anymore.
+     * @param r The completed build.
+     * @param listener The listener for this build. This can be used to produce
+     * log messages, for example, which becomes a part of the "console output"
+     * of this build. But when this method runs, the build is considered
+     * completed, so its status cannot be changed anymore.
      */
-    public void onCompleted(R r, TaskListener listener) {}
+    public void onCompleted(R r, TaskListener listener) {
+    }
 
     /**
      * Called after a build is moved to the {@link Run.State#COMPLETED} state.
      *
-     * <p>
-     * At this point, all the records related to a build is written down to the disk. As such,
-     * {@link TaskListener} is no longer available. This happens later than {@link #onCompleted(Run, TaskListener)}.
+     * <p> At this point, all the records related to a build is written down to
+     * the disk. As such, {@link TaskListener} is no longer available. This
+     * happens later than {@link #onCompleted(Run, TaskListener)}.
      */
-    public void onFinalized(R r) {}
+    public void onFinalized(R r) {
+    }
 
     /**
-     * Called when a build is started (i.e. it was in the queue, and will now start running
-     * on an executor)
+     * Called when a build is started (i.e. it was in the queue, and will now
+     * start running on an executor)
      *
-     * @param r
-     *      The started build.
-     * @param listener
-     *      The listener for this build. This can be used to produce log messages, for example,
-     *      which becomes a part of the "console output" of this build.
+     * @param r The started build.
+     * @param listener The listener for this build. This can be used to produce
+     * log messages, for example, which becomes a part of the "console output"
+     * of this build.
      */
-    public void onStarted(R r, TaskListener listener) {}
+    public void onStarted(R r, TaskListener listener) {
+    }
 
     /**
      * Called right before a build is going to be deleted.
      *
      * @param r The build.
      */
-    public void onDeleted(R r) {}
+    public void onDeleted(R r) {
+    }
 
     /**
      * Registers this object as an active listener so that it can start getting
      * callbacks invoked.
      *
-     * @deprecated as of 1.281
-     *      Put {@link Extension} on your class to get it auto-registered.
+     * @deprecated as of 1.281 Put {@link Extension} on your class to get it
+     * auto-registered.
      */
     public void register() {
         all().add(this);
@@ -119,11 +122,11 @@ public abstract class RunListener<R extends Run> implements ExtensionPoint {
     public void unregister() {
         all().remove(this);
     }
-
     /**
      * List of registered listeners.
-     * @deprecated as of 1.281
-     *      Use {@link #all()} for read access, and use {@link Extension} for registration.
+     *
+     * @deprecated as of 1.281 Use {@link #all()} for read access, and use
+     * {@link Extension} for registration.
      */
     public static final CopyOnWriteList<RunListener> LISTENERS = ExtensionListView.createCopyOnWriteList(RunListener.class);
 
@@ -132,8 +135,9 @@ public abstract class RunListener<R extends Run> implements ExtensionPoint {
      */
     public static void fireCompleted(Run r, TaskListener listener) {
         for (RunListener l : all()) {
-            if(l.targetType.isInstance(r))
-                l.onCompleted(r,listener);
+            if (l.targetType.isInstance(r)) {
+                l.onCompleted(r, listener);
+            }
         }
     }
 
@@ -142,8 +146,9 @@ public abstract class RunListener<R extends Run> implements ExtensionPoint {
      */
     public static void fireStarted(Run r, TaskListener listener) {
         for (RunListener l : all()) {
-            if(l.targetType.isInstance(r))
-                l.onStarted(r,listener);
+            if (l.targetType.isInstance(r)) {
+                l.onStarted(r, listener);
+            }
         }
     }
 
@@ -152,8 +157,9 @@ public abstract class RunListener<R extends Run> implements ExtensionPoint {
      */
     public static void fireFinalized(Run r) {
         for (RunListener l : all()) {
-            if(l.targetType.isInstance(r))
+            if (l.targetType.isInstance(r)) {
                 l.onFinalized(r);
+            }
         }
     }
 
@@ -162,8 +168,9 @@ public abstract class RunListener<R extends Run> implements ExtensionPoint {
      */
     public static void fireDeleted(Run r) {
         for (RunListener l : all()) {
-            if(l.targetType.isInstance(r))
+            if (l.targetType.isInstance(r)) {
                 l.onDeleted(r);
+            }
         }
     }
 

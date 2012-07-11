@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -21,16 +21,17 @@ import hudson.model.Label;
 import org.jvnet.localizer.Localizable;
 
 /**
- * If a {@link Task} execution is blocked in the queue, this object represents why.
+ * If a {@link Task} execution is blocked in the queue, this object represents
+ * why.
  *
- * <h2>View</h2>
- * <tt>summary.jelly</tt> should do one-line HTML rendering to be used while rendering
- * "build history" widget, next to the blocking build. By default it simply renders
- * {@link #getShortDescription()} text.
+ * <h2>View</h2> <tt>summary.jelly</tt> should do one-line HTML rendering to be
+ * used while rendering "build history" widget, next to the blocking build. By
+ * default it simply renders {@link #getShortDescription()} text.
  *
  * @since 1.330
  */
 public abstract class CauseOfBlockage {
+
     /**
      * Human readable description of why the build is blocked.
      */
@@ -52,6 +53,7 @@ public abstract class CauseOfBlockage {
      */
     public static final class BecauseNodeIsOffline extends CauseOfBlockage {
         //TODO: review and check whether we can do it private
+
         public final Node node;
 
         public Node getNode() {
@@ -68,10 +70,12 @@ public abstract class CauseOfBlockage {
     }
 
     /**
-     * Build is blocked because all the nodes that match a given label is offline.
+     * Build is blocked because all the nodes that match a given label is
+     * offline.
      */
     public static final class BecauseLabelIsOffline extends CauseOfBlockage {
         //TODO: review and check whether we can do it private
+
         public final Label label;
 
         public Label getLabel() {
@@ -92,6 +96,7 @@ public abstract class CauseOfBlockage {
      */
     public static final class BecauseNodeIsBusy extends CauseOfBlockage {
         //TODO: review and check whether we can do it private
+
         public final Node node;
 
         public Node getNode() {
@@ -108,10 +113,12 @@ public abstract class CauseOfBlockage {
     }
 
     /**
-     * Build is blocked because everyone that matches the specified label is fully busy
+     * Build is blocked because everyone that matches the specified label is
+     * fully busy
      */
     public static final class BecauseLabelIsBusy extends CauseOfBlockage {
         //TODO: review and check whether we can do it private
+
         public final Label label;
 
         public Label getLabel() {

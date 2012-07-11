@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -49,14 +49,14 @@ import java.util.logging.Logger;
 
 /**
  * Atomic single token label, like "foo" or "bar".
- * 
+ *
  * @author Kohsuke Kawaguchi
- * @since  1.372
+ * @since 1.372
  */
 public class LabelAtom extends Label implements Saveable {
-    private DescribableList<LabelAtomProperty,LabelAtomPropertyDescriptor> properties =
-            new DescribableList<LabelAtomProperty,LabelAtomPropertyDescriptor>(this);
 
+    private DescribableList<LabelAtomProperty, LabelAtomPropertyDescriptor> properties =
+            new DescribableList<LabelAtomProperty, LabelAtomPropertyDescriptor>(this);
     @CopyOnWrite
     protected transient volatile List<Action> transientActions = new Vector<Action>();
 
@@ -75,10 +75,9 @@ public class LabelAtom extends Label implements Saveable {
     /**
      * {@inheritDoc}
      *
-     * <p>
-     * Note that this method returns a read-only view of {@link Action}s.
-     * {@link LabelAtomProperty}s who want to add a project action
-     * should do so by implementing {@link LabelAtomProperty#getActions(LabelAtom)}.
+     * <p> Note that this method returns a read-only view of {@link Action}s.
+     * {@link LabelAtomProperty}s who want to add a project action should do so
+     * by implementing {@link LabelAtomProperty#getActions(LabelAtom)}.
      */
     @Override
     public synchronized List<Action> getActions() {
@@ -97,10 +96,11 @@ public class LabelAtom extends Label implements Saveable {
             // if there's no property descriptor, there's nothing interesting to configure.
             ta.add(new Action() {
                 public String getIconFileName() {
-                    if (Hudson.getInstance().hasPermission(Hudson.ADMINISTER))
+                    if (Hudson.getInstance().hasPermission(Hudson.ADMINISTER)) {
                         return "setting.png";
-                    else
+                    } else {
                         return null;
+                    }
                 }
 
                 public String getDisplayName() {
@@ -113,8 +113,9 @@ public class LabelAtom extends Label implements Saveable {
             });
         }
 
-        for (LabelAtomProperty p : properties)
+        for (LabelAtomProperty p : properties) {
             ta.addAll(p.getActions(this));
+        }
 
         transientActions = ta;
     }
@@ -142,26 +143,28 @@ public class LabelAtom extends Label implements Saveable {
     }
 
     /*package*/ XmlFile getConfigFile() {
-        return new XmlFile(XSTREAM, new File(Hudson.getInstance().root, "labels/"+name+".xml"));
+        return new XmlFile(XSTREAM, new File(Hudson.getInstance().root, "labels/" + name + ".xml"));
     }
 
     public void save() throws IOException {
-        if(BulkChange.contains(this))   return;
+        if (BulkChange.contains(this)) {
+            return;
+        }
         try {
             getConfigFile().write(this);
             SaveableListener.fireOnChange(this, getConfigFile());
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Failed to save "+getConfigFile(),e);
+            LOGGER.log(Level.WARNING, "Failed to save " + getConfigFile(), e);
         }
     }
 
     public void load() {
         XmlFile file = getConfigFile();
-        if(file.exists()) {
+        if (file.exists()) {
             try {
                 file.unmarshal(this);
             } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Failed to load "+file, e);
+                LOGGER.log(Level.WARNING, "Failed to load " + file, e);
             }
         }
         properties.setOwner(this);
@@ -169,8 +172,8 @@ public class LabelAtom extends Label implements Saveable {
     }
 
     /**
-     * Returns all the {@link LabelAtomPropertyDescriptor}s that can be potentially configured
-     * on this label.
+     * Returns all the {@link LabelAtomPropertyDescriptor}s that can be
+     * potentially configured on this label.
      */
     public List<LabelAtomPropertyDescriptor> getApplicablePropertyDescriptors() {
         return LabelAtomProperty.all();
@@ -179,7 +182,7 @@ public class LabelAtom extends Label implements Saveable {
     /**
      * Accepts the update to the node configuration.
      */
-    public void doConfigSubmit( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException, FormException {
+    public void doConfigSubmit(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, FormException {
         final Hudson app = Hudson.getInstance();
 
         app.checkPermission(Hudson.ADMINISTER);
@@ -203,10 +206,11 @@ public class LabelAtom extends Label implements Saveable {
         try {
             Hudson.checkGoodName(name);
             // additional restricted chars
-            for( int i=0; i<name.length(); i++ ) {
+            for (int i = 0; i < name.length(); i++) {
                 char ch = name.charAt(i);
-                if(" ()\t\n".indexOf(ch)!=-1)
+                if (" ()\t\n".indexOf(ch) != -1) {
                     return true;
+                }
             }
             return false;
         } catch (Failure failure) {
@@ -215,13 +219,12 @@ public class LabelAtom extends Label implements Saveable {
     }
 
     public static String escape(String name) {
-        if (needsEscape(name))
+        if (needsEscape(name)) {
             return QuotedStringTokenizer.quote(name);
+        }
         return name;
     }
-
     private static final Logger LOGGER = Logger.getLogger(LabelAtom.class.getName());
-
     private static final XStream2 XSTREAM = new XStream2();
 
     static {
@@ -231,6 +234,7 @@ public class LabelAtom extends Label implements Saveable {
 
     // class name is not ConverterImpl, to avoid getting picked up by AssociatedConverterImpl
     private static class LabelAtomConverter extends XStream2.PassthruConverter<LabelAtom> {
+
         private Label.ConverterImpl leafLabelConverter = new Label.ConverterImpl();
 
         private LabelAtomConverter() {
@@ -242,34 +246,35 @@ public class LabelAtom extends Label implements Saveable {
         }
 
         public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-            if (context.get(IN_NESTED)==null) {
-                context.put(IN_NESTED,true);
+            if (context.get(IN_NESTED) == null) {
+                context.put(IN_NESTED, true);
                 try {
-                    super.marshal(source,writer,context);
+                    super.marshal(source, writer, context);
                 } finally {
-                    context.put(IN_NESTED,false);
+                    context.put(IN_NESTED, false);
                 }
-            } else
-                leafLabelConverter.marshal(source,writer,context);
+            } else {
+                leafLabelConverter.marshal(source, writer, context);
+            }
         }
 
         public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-            if (context.get(IN_NESTED)==null) {
-                context.put(IN_NESTED,true);
+            if (context.get(IN_NESTED) == null) {
+                context.put(IN_NESTED, true);
                 try {
-                    return super.unmarshal(reader,context);
+                    return super.unmarshal(reader, context);
                 } finally {
-                    context.put(IN_NESTED,false);
+                    context.put(IN_NESTED, false);
                 }
-            } else
-                return leafLabelConverter.unmarshal(reader,context);
+            } else {
+                return leafLabelConverter.unmarshal(reader, context);
+            }
         }
 
         @Override
         protected void callback(LabelAtom obj, UnmarshallingContext context) {
             // noop
         }
-
         private static final Object IN_NESTED = "VisitingInnerLabelAtom";
     }
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -27,15 +27,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created when {@link Queue.Item} is created so that the caller can track the progress of the task.
+ * Created when {@link Queue.Item} is created so that the caller can track the
+ * progress of the task.
  *
  * @author Kohsuke Kawaguchi
  */
 public final class FutureImpl extends AsyncFutureImpl<Executable> {
-    private final Task task;
 
+    private final Task task;
     /**
-     * If the computation has started, set to {@link Executor}s that are running the build.
+     * If the computation has started, set to {@link Executor}s that are running
+     * the build.
      */
     private final Set<Executor> executors = new HashSet<Executor>();
 
@@ -48,10 +50,12 @@ public final class FutureImpl extends AsyncFutureImpl<Executable> {
         Queue q = Hudson.getInstance().getQueue();
         synchronized (q) {
             synchronized (this) {
-                if(!executors.isEmpty()) {
-                    if(mayInterruptIfRunning)
-                        for (Executor e : executors)
+                if (!executors.isEmpty()) {
+                    if (mayInterruptIfRunning) {
+                        for (Executor e : executors) {
                             e.interrupt();
+                        }
+                    }
                     return mayInterruptIfRunning;
                 }
                 return q.cancel(task);

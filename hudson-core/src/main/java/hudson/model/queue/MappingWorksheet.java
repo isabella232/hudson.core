@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -42,45 +42,44 @@ import static java.lang.Math.*;
 /**
  * Defines a mapping problem for answering "where do we execute this task?"
  *
- * <p>
- * The heart of the placement problem is a mapping problem. We are given a {@link Task},
- * (which in the general case consists of a set of {@link SubTask}s), and we are also given a number
- * of idle {@link Executor}s, and our goal is to find a mapping from the former to the latter,
- * which determines where each {@link SubTask} gets executed.
+ * <p> The heart of the placement problem is a mapping problem. We are given a
+ * {@link Task}, (which in the general case consists of a set of
+ * {@link SubTask}s), and we are also given a number of idle {@link Executor}s,
+ * and our goal is to find a mapping from the former to the latter, which
+ * determines where each {@link SubTask} gets executed.
  *
- * <p>
- * This mapping is done under two constraints:
+ * <p> This mapping is done under two constraints:
  *
- * <ul>
- * <li>
- * "Same node" constraint. Some of the subtasks need to be co-located on the same node.
- * See {@link SubTask#getSameNodeConstraint()}
- * <li>
- * Label constraint. {@link SubTask}s can specify that it can be only run on nodes that has the label.
- * </ul>
+ * <ul> <li> "Same node" constraint. Some of the subtasks need to be co-located
+ * on the same node. See {@link SubTask#getSameNodeConstraint()} <li> Label
+ * constraint. {@link SubTask}s can specify that it can be only run on nodes
+ * that has the label. </ul>
  *
- * <p>
- * We first fold the former constraint into the problem definition. That is, we now consider
- * a set of {@link SubTask}s that need to be co-located as a single {@link WorkChunk}. Similarly,
- * we consider a set of all {@link Executor}s from the same node as {@link ExecutorChunk}.
- * Now, the problem becomes the weighted matching problem from {@link WorkChunk} to {@link ExecutorChunk}.
+ * <p> We first fold the former constraint into the problem definition. That is,
+ * we now consider a set of {@link SubTask}s that need to be co-located as a
+ * single {@link WorkChunk}. Similarly, we consider a set of all
+ * {@link Executor}s from the same node as {@link ExecutorChunk}. Now, the
+ * problem becomes the weighted matching problem from {@link WorkChunk} to
+ * {@link ExecutorChunk}.
  *
- * <p>
- * An instance of {@link MappingWorksheet} captures a problem definition, plus which
- * {@link ExecutorChunk} and {@link WorkChunk} are compatible. The purpose of this class
- * (and {@link ExecutorChunk} and {@link WorkChunk}) are to expose a lot of convenience methods
- * to assist various algorithms that produce the solution of this mapping problem,
- * which is represented as {@link Mapping}.
+ * <p> An instance of {@link MappingWorksheet} captures a problem definition,
+ * plus which {@link ExecutorChunk} and {@link WorkChunk} are compatible. The
+ * purpose of this class (and {@link ExecutorChunk} and {@link WorkChunk}) are
+ * to expose a lot of convenience methods to assist various algorithms that
+ * produce the solution of this mapping problem, which is represented as
+ * {@link Mapping}.
  *
  * @see LoadBalancer#map(Task, MappingWorksheet)
  * @author Kohsuke Kawaguchi
  */
 public class MappingWorksheet {
     //TODO: review and check whether we can do it private
+
     public final List<ExecutorChunk> executors;
     public final List<WorkChunk> works;
     /**
-     * {@link BuildableItem} for which we are trying to figure out the execution plan. Never null.
+     * {@link BuildableItem} for which we are trying to figure out the execution
+     * plan. Never null.
      */
     public final BuildableItem item;
 
@@ -97,6 +96,7 @@ public class MappingWorksheet {
     }
 
     private static class ReadOnlyList<E> extends AbstractList<E> {
+
         protected final List<E> base;
 
         ReadOnlyList(List<E> base) {
@@ -114,6 +114,7 @@ public class MappingWorksheet {
 
     public final class ExecutorChunk extends ReadOnlyList<ExecutorSlot> {
         //TODO: review and check whether we can do it private
+
         public final int index;
         public final Computer computer;
         public final Node node;
@@ -139,11 +140,12 @@ public class MappingWorksheet {
         }
 
         /**
-         * Is this executor chunk and the given work chunk compatible? Can the latter be run on the former?
+         * Is this executor chunk and the given work chunk compatible? Can the
+         * latter be run on the former?
          */
         public boolean canAccept(WorkChunk c) {
             return this.size() >= c.size()
-                && (c.assignedLabel==null || c.assignedLabel.contains(node));
+                    && (c.assignedLabel == null || c.assignedLabel.contains(node));
         }
 
         /**
@@ -154,8 +156,7 @@ public class MappingWorksheet {
         }
 
         /**
-         * Number of executors in this chunk.
-         * Alias for size but more readable.
+         * Number of executors in this chunk. Alias for size but more readable.
          */
         public int capacity() {
             return size();
@@ -165,36 +166,33 @@ public class MappingWorksheet {
             assert capacity() >= wc.size();
             int e = 0;
             for (SubTask s : wc) {
-                while (!get(e).isAvailable())
+                while (!get(e).isAvailable()) {
                     e++;
+                }
                 get(e++).set(wuc.createWorkUnit(s));
             }
         }
     }
 
     public class WorkChunk extends ReadOnlyList<SubTask> {
-        public final int index;
 
+        public final int index;
         // the main should be always at position 0
 //        /**
 //         * This chunk includes {@linkplain WorkUnit#isMainWork() the main work unit}.
 //         */
 //        public final boolean isMain;
-
         /**
          * If this task needs to be run on a node with a particular label,
-         * return that {@link Label}. Otherwise null, indicating
-         * it can run on anywhere.
+         * return that {@link Label}. Otherwise null, indicating it can run on
+         * anywhere.
          */
         public final Label assignedLabel;
-
         /**
-         * If the previous execution of this task run on a certain node
-         * and this task prefers to run on the same node, return that.
-         * Otherwise null.
+         * If the previous execution of this task run on a certain node and this
+         * task prefers to run on the same node, return that. Otherwise null.
          */
         public final ExecutorChunk lastBuiltOn;
-
 
         private WorkChunk(List<SubTask> base, int index) {
             super(base);
@@ -204,7 +202,7 @@ public class MappingWorksheet {
 
             Node lbo = base.get(0).getLastBuiltOn();
             for (ExecutorChunk ec : executors) {
-                if (ec.node==lbo) {
+                if (ec.node == lbo) {
                     lastBuiltOn = ec;
                     return;
                 }
@@ -215,20 +213,22 @@ public class MappingWorksheet {
         public List<ExecutorChunk> applicableExecutorChunks() {
             List<ExecutorChunk> r = new ArrayList<ExecutorChunk>(executors.size());
             for (ExecutorChunk e : executors) {
-                if (e.canAccept(this))
+                if (e.canAccept(this)) {
                     r.add(e);
+                }
             }
             return r;
         }
     }
 
     /**
-     * Represents the solution to the mapping problem.
-     * It's a mapping from every {@link WorkChunk} to {@link ExecutorChunk}
-     * that satisfies the constraints.
+     * Represents the solution to the mapping problem. It's a mapping from every
+     * {@link WorkChunk} to {@link ExecutorChunk} that satisfies the
+     * constraints.
      */
     public final class Mapping {
         // for each WorkChunk, identify ExecutorChunk where it is assigned to.
+
         private final ExecutorChunk[] mapping = new ExecutorChunk[works.size()];
 
         /**
@@ -246,7 +246,8 @@ public class MappingWorksheet {
         }
 
         /**
-         * Update the mapping to execute n-th {@link WorkChunk} on the specified {@link ExecutorChunk}.
+         * Update the mapping to execute n-th {@link WorkChunk} on the specified
+         * {@link ExecutorChunk}.
          */
         public ExecutorChunk assign(int index, ExecutorChunk element) {
             ExecutorChunk o = mapping[index];
@@ -264,65 +265,78 @@ public class MappingWorksheet {
         /**
          * Returns the assignment as a map.
          */
-        public Map<WorkChunk,ExecutorChunk> toMap() {
-            Map<WorkChunk,ExecutorChunk> r = new HashMap<WorkChunk,ExecutorChunk>();
-            for (int i=0; i<size(); i++)
-                r.put(get(i),assigned(i));
+        public Map<WorkChunk, ExecutorChunk> toMap() {
+            Map<WorkChunk, ExecutorChunk> r = new HashMap<WorkChunk, ExecutorChunk>();
+            for (int i = 0; i < size(); i++) {
+                r.put(get(i), assigned(i));
+            }
             return r;
         }
 
         /**
-         * Checks if the assignments made thus far are valid an within the constraints.
+         * Checks if the assignments made thus far are valid an within the
+         * constraints.
          */
         public boolean isPartiallyValid() {
             int[] used = new int[executors.size()];
-            for (int i=0; i<mapping.length; i++) {
+            for (int i = 0; i < mapping.length; i++) {
                 ExecutorChunk ec = mapping[i];
-                if (ec==null)   continue;
-                if (!ec.canAccept(works(i)))
+                if (ec == null) {
+                    continue;
+                }
+                if (!ec.canAccept(works(i))) {
                     return false;   // invalid assignment
-                if ((used[ec.index] += works(i).size()) > ec.capacity())
+                }
+                if ((used[ec.index] += works(i).size()) > ec.capacity()) {
                     return false;
+                }
             }
             return true;
         }
 
         /**
-         * Makes sure that all the assignments are made and it is within the constraints.
+         * Makes sure that all the assignments are made and it is within the
+         * constraints.
          */
         public boolean isCompletelyValid() {
-            for (ExecutorChunk ec : mapping)
-                if (ec==null)   return false;   // unassigned
+            for (ExecutorChunk ec : mapping) {
+                if (ec == null) {
+                    return false;   // unassigned
+                }
+            }
             return isPartiallyValid();
         }
 
         /**
-         * Executes this mapping by handing over {@link Executable}s to {@link JobOffer}
-         * as defined by the mapping.
+         * Executes this mapping by handing over {@link Executable}s to
+         * {@link JobOffer} as defined by the mapping.
          */
         public void execute(WorkUnitContext wuc) {
-            if (!isCompletelyValid())
+            if (!isCompletelyValid()) {
                 throw new IllegalStateException();
+            }
 
-            for (int i=0; i<size(); i++)
-                assigned(i).execute(get(i),wuc);
+            for (int i = 0; i < size(); i++) {
+                assigned(i).execute(get(i), wuc);
+            }
         }
     }
 
     public MappingWorksheet(BuildableItem item, List<? extends ExecutorSlot> offers) {
-        this(item,offers,LoadPredictor.all());
+        this(item, offers, LoadPredictor.all());
     }
 
     public MappingWorksheet(BuildableItem item, List<? extends ExecutorSlot> offers, Collection<? extends LoadPredictor> loadPredictors) {
         this.item = item;
-        
+
         // group executors by their computers
-        Map<Computer,List<ExecutorSlot>> j = new HashMap<Computer, List<ExecutorSlot>>();
+        Map<Computer, List<ExecutorSlot>> j = new HashMap<Computer, List<ExecutorSlot>>();
         for (ExecutorSlot o : offers) {
             Computer c = o.getExecutor().getOwner();
             List<ExecutorSlot> l = j.get(c);
-            if (l==null)
-                j.put(c,l=new ArrayList<ExecutorSlot>());
+            if (l == null) {
+                j.put(c, l = new ArrayList<ExecutorSlot>());
+            }
             l.add(o);
         }
 
@@ -339,15 +353,18 @@ public class MappingWorksheet {
                     int peak = 0;
                     OUTER:
                     for (LoadPredictor lp : loadPredictors) {
-                        for (FutureLoad fl : Iterables.limit(lp.predict(this,e.getKey(), now, now + duration),100)) {
-                            peak = max(peak,timeline.insert(fl.startTime, fl.startTime+fl.duration, fl.numExecutors));
-                            if (peak>=max)  break OUTER;
+                        for (FutureLoad fl : Iterables.limit(lp.predict(this, e.getKey(), now, now + duration), 100)) {
+                            peak = max(peak, timeline.insert(fl.startTime, fl.startTime + fl.duration, fl.numExecutors));
+                            if (peak >= max) {
+                                break OUTER;
+                            }
                         }
                     }
 
-                    int minIdle = max-peak; // minimum number of idle nodes during this time period
-                    if (minIdle<list.size())
-                        e.setValue(list.subList(0,minIdle));
+                    int minIdle = max - peak; // minimum number of idle nodes during this time period
+                    if (minIdle < list.size()) {
+                        e.setValue(list.subList(0, minIdle));
+                    }
                 }
             }
         }
@@ -355,29 +372,36 @@ public class MappingWorksheet {
         // build into the final shape
         List<ExecutorChunk> executors = new ArrayList<ExecutorChunk>();
         for (List<ExecutorSlot> group : j.values()) {
-            if (group.isEmpty())    continue;   // evict empty group
+            if (group.isEmpty()) {
+                continue;   // evict empty group
+            }
             ExecutorChunk ec = new ExecutorChunk(group, executors.size());
-            if (ec.node==null)  continue;   // evict out of sync node
+            if (ec.node == null) {
+                continue;   // evict out of sync node
+            }
             executors.add(ec);
         }
         this.executors = ImmutableList.copyOf(executors);
 
         // group execution units into chunks. use of LinkedHashMap ensures that the main work comes at the top
-        Map<Object,List<SubTask>> m = new LinkedHashMap<Object,List<SubTask>>();
+        Map<Object, List<SubTask>> m = new LinkedHashMap<Object, List<SubTask>>();
         for (SubTask meu : Tasks.getSubTasksOf(item.task)) {
             Object c = Tasks.getSameNodeConstraintOf(meu);
-            if (c==null)    c = new Object();
+            if (c == null) {
+                c = new Object();
+            }
 
             List<SubTask> l = m.get(c);
-            if (l==null)
-                m.put(c,l= new ArrayList<SubTask>());
+            if (l == null) {
+                m.put(c, l = new ArrayList<SubTask>());
+            }
             l.add(meu);
         }
 
         // build into the final shape
         List<WorkChunk> works = new ArrayList<WorkChunk>();
         for (List<SubTask> group : m.values()) {
-            works.add(new WorkChunk(group,works.size()));
+            works.add(new WorkChunk(group, works.size()));
         }
         this.works = ImmutableList.copyOf(works);
     }
@@ -391,6 +415,7 @@ public class MappingWorksheet {
     }
 
     public static abstract class ExecutorSlot {
+
         public abstract Executor getExecutor();
 
         public abstract boolean isAvailable();

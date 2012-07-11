@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -27,8 +27,10 @@ import java.lang.reflect.Method;
  * @author Kohsuke Kawaguchi
  */
 public class Executables {
+
     /**
-     * Due to the return type change in {@link Executable}, the caller needs a special precaution now.
+     * Due to the return type change in {@link Executable}, the caller needs a
+     * special precaution now.
      */
     public static SubTask getParentOf(Executable e) {
         try {
@@ -39,30 +41,34 @@ public class Executables {
                 m.setAccessible(true);
                 return (SubTask) m.invoke(e);
             } catch (IllegalAccessException x) {
-                throw (Error)new IllegalAccessError().initCause(x);
+                throw (Error) new IllegalAccessError().initCause(x);
             } catch (NoSuchMethodException x) {
-                throw (Error)new NoSuchMethodError().initCause(x);
+                throw (Error) new NoSuchMethodError().initCause(x);
             } catch (InvocationTargetException x) {
                 Throwable y = x.getTargetException();
-                if (y instanceof Error)     throw (Error)y;
-                if (y instanceof RuntimeException)     throw (RuntimeException)y;
+                if (y instanceof Error) {
+                    throw (Error) y;
+                }
+                if (y instanceof RuntimeException) {
+                    throw (RuntimeException) y;
+                }
                 throw new Error(x);
             }
         }
     }
 
     /**
-     * A pointless function to work around what appears to be a HotSpot problem. See HUDSON-5756 and bug 6933067
-     * on BugParade for more details.
+     * A pointless function to work around what appears to be a HotSpot problem.
+     * See HUDSON-5756 and bug 6933067 on BugParade for more details.
      */
     private static SubTask _getParentOf(Executable e) {
         return e.getParent();
     }
 
     /**
-     * Returns the estimated duration for the executable.
-     * Protects against {@link AbstractMethodError}s if the {@link Executable} implementation
-     * was compiled against Hudson < 1.383
+     * Returns the estimated duration for the executable. Protects against
+     * {@link AbstractMethodError}s if the {@link Executable} implementation was
+     * compiled against Hudson < 1.383
      */
     public static long getEstimatedDurationFor(Executable e) {
         try {
@@ -73,8 +79,8 @@ public class Executables {
     }
 
     /**
-     * A pointless function to work around what appears to be a HotSpot problem. See HUDSON-5756 and bug 6933067
-     * on BugParade for more details.
+     * A pointless function to work around what appears to be a HotSpot problem.
+     * See HUDSON-5756 and bug 6933067 on BugParade for more details.
      */
     private static long _getEstimatedDuration(Executable e) {
         return e.getEstimatedDuration();

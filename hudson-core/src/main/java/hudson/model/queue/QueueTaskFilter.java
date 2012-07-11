@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -33,6 +33,7 @@ import java.util.Collection;
  * @since 1.360
  */
 public abstract class QueueTaskFilter implements Queue.Task {
+
     private final Queue.Task base;
 
     protected QueueTaskFilter(Task base) {

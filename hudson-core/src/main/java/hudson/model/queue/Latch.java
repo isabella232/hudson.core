@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -19,19 +19,19 @@ package hudson.model.queue;
 import hudson.AbortException;
 
 /**
- * A concurrency primitive that waits for N number of threads to synchronize.
- * If any of the threads are interrupted while waiting for the completion of the condition,
- * then all the involved threads get interrupted.
+ * A concurrency primitive that waits for N number of threads to synchronize. If
+ * any of the threads are interrupted while waiting for the completion of the
+ * condition, then all the involved threads get interrupted.
  *
  * @author Kohsuke Kawaguchi
  */
 class Latch {
+
     private final int n;
-    private int i=0;
+    private int i = 0;
     /**
-     * If the synchronization on the latch is aborted/interrupted,
-     * point to the stack trace where that happened. If null,
-     * no interruption happened.
+     * If the synchronization on the latch is aborted/interrupted, point to the
+     * stack trace where that happened. If null, no interruption happened.
      */
     private Exception interrupted;
 
@@ -41,11 +41,11 @@ class Latch {
 
     public synchronized void abort(Throwable cause) {
         interrupted = new AbortException();
-        if (cause!=null)
+        if (cause != null) {
             interrupted.initCause(cause);
+        }
         notifyAll();
     }
-
 
     public synchronized void synchronize() throws InterruptedException {
         check(n);
@@ -60,15 +60,15 @@ class Latch {
             throw e;
         }
 
-        check(n*2);
+        check(n * 2);
     }
 
     private void check(int threshold) throws InterruptedException {
         i++;
-        if (i==threshold) {
+        if (i == threshold) {
             notifyAll();
         } else {
-            while (i<threshold && interrupted==null) {
+            while (i < threshold && interrupted == null) {
                 try {
                     wait();
                 } catch (InterruptedException e) {
@@ -80,9 +80,11 @@ class Latch {
         }
 
         // all of us either leave normally or get interrupted
-        if (interrupted!=null)
-            throw (InterruptedException)new InterruptedException().initCause(interrupted);
+        if (interrupted != null) {
+            throw (InterruptedException) new InterruptedException().initCause(interrupted);
+        }
     }
 
-    protected void onCriteriaMet() throws InterruptedException {}
+    protected void onCriteriaMet() throws InterruptedException {
+    }
 }

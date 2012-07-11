@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -27,7 +27,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Holds the information shared between {@link WorkUnit}s created from the same {@link Task}.
+ * Holds the information shared between {@link WorkUnit}s created from the same
+ * {@link Task}.
  *
  * @author Kohsuke Kawaguchi
  */
@@ -35,37 +36,33 @@ public final class WorkUnitContext {
 
     //TODO: review and check whether we can do it private
     public final BuildableItem item;
-
     //TODO: review and check whether we can do it private
     public final Task task;
-
     /**
-     * Once the execution is complete, update this future object with the outcome.
+     * Once the execution is complete, update this future object with the
+     * outcome.
      */
     //TODO: review and check whether we can do it private
     public final FutureImpl future;
-
     /**
      * Associated parameters to the build.
      */
     //TODO: review and check whether we can do it private
     public final List<Action> actions;
-
     private final Latch startLatch, endLatch;
-
     private List<WorkUnit> workUnits = new ArrayList<WorkUnit>();
-
     /**
-     * If the execution is aborted, set to non-null that indicates where it was aborted.
+     * If the execution is aborted, set to non-null that indicates where it was
+     * aborted.
      */
     private volatile Throwable aborted;
 
     public WorkUnitContext(BuildableItem item) {
         this.item = item;
         this.task = item.task;
-        this.future = (FutureImpl)item.getFuture();
+        this.future = (FutureImpl) item.getFuture();
         this.actions = item.getActions();
-        
+
         // +1 for the main task
         int workUnitSize = Tasks.getSubTasksOf(task).size();
         startLatch = new Latch(workUnitSize) {
@@ -75,7 +72,7 @@ public final class WorkUnitContext {
                 // the one that executes the main thing will send notifications
                 Executor e = Executor.currentExecutor();
                 if (e.getCurrentWorkUnit().isMainWork()) {
-                    e.getOwner().taskAccepted(e,task);
+                    e.getOwner().taskAccepted(e, task);
                 }
             }
         };
@@ -100,8 +97,8 @@ public final class WorkUnitContext {
     }
 
     /**
-     * Called by the executor that executes a member {@link SubTask} that belongs to this task
-     * to create its {@link WorkUnit}.
+     * Called by the executor that executes a member {@link SubTask} that
+     * belongs to this task to create its {@link WorkUnit}.
      */
     public WorkUnit createWorkUnit(SubTask execUnit) {
         future.addExecutor(Executor.currentExecutor());
@@ -119,18 +116,20 @@ public final class WorkUnitContext {
     }
 
     /**
-     * All the {@link Executor}s that jointly execute a {@link Task} call this method to synchronize on the start.
+     * All the {@link Executor}s that jointly execute a {@link Task} call this
+     * method to synchronize on the start.
      */
     public void synchronizeStart() throws InterruptedException {
         startLatch.synchronize();
     }
 
     /**
-     * All the {@link Executor}s that jointly execute a {@link Task} call this method to synchronize on the end of the task.
+     * All the {@link Executor}s that jointly execute a {@link Task} call this
+     * method to synchronize on the end of the task.
      *
-     * @throws InterruptedException
-     *      If any of the member thread is interrupted while waiting for other threads to join, all
-     *      the member threads will report {@link InterruptedException}.
+     * @throws InterruptedException If any of the member thread is interrupted
+     * while waiting for other threads to join, all the member threads will
+     * report {@link InterruptedException}.
      */
     public void synchronizeEnd(Queue.Executable executable, Throwable problems, long duration) throws InterruptedException {
         endLatch.synchronize();
@@ -150,11 +149,16 @@ public final class WorkUnitContext {
     }
 
     /**
-     * When one of the work unit is aborted, call this method to abort all the other work units.
+     * When one of the work unit is aborted, call this method to abort all the
+     * other work units.
      */
     public synchronized void abort(Throwable cause) {
-        if (cause==null)        throw new IllegalArgumentException();
-        if (aborted!=null)      return; // already aborted    
+        if (cause == null) {
+            throw new IllegalArgumentException();
+        }
+        if (aborted != null) {
+            return; // already aborted    
+        }
         aborted = cause;
         startLatch.abort(cause);
         endLatch.abort(cause);
@@ -162,8 +166,9 @@ public final class WorkUnitContext {
         Thread c = Thread.currentThread();
         for (WorkUnit wu : workUnits) {
             Executor e = wu.getExecutor();
-            if (e!=null && e!=c)
+            if (e != null && e != c) {
                 e.interrupt();
+            }
         }
     }
 }
