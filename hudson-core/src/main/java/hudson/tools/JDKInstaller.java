@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -71,18 +71,20 @@ import net.sf.json.JSONObject;
  * @since 1.305
  */
 public class JDKInstaller extends ToolInstaller {
+
     /**
-     * The release ID that Sun assigns to each JDK, such as "jdk-6u13-oth-JPR@CDS-CDS_Developer"
+     * The release ID that Sun assigns to each JDK, such as
+     * "jdk-6u13-oth-JPR@CDS-CDS_Developer"
      *
-     * <p>
-     * This ID can be seen in the "ProductRef" query parameter of the download page, like
+     * <p> This ID can be seen in the "ProductRef" query parameter of the
+     * download page, like
      * https://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/ViewProductDetail-Start?ProductRef=jdk-6u13-oth-JPR@CDS-CDS_Developer
      */
     public final String id;
-
     /**
-     * We require that the user accepts the license by clicking a checkbox, to make up for the part
-     * that we auto-accept cds.sun.com license click through.
+     * We require that the user accepts the license by clicking a checkbox, to
+     * make up for the part that we auto-accept cds.sun.com license click
+     * through.
      */
     public final boolean acceptLicense;
 
@@ -93,11 +95,12 @@ public class JDKInstaller extends ToolInstaller {
         this.acceptLicense = acceptLicense;
     }
 
+    @Override
     public FilePath performInstallation(ToolInstallation tool, Node node, TaskListener log) throws IOException, InterruptedException {
         FilePath expectedLocation = preferredLocation(tool, node);
         PrintStream out = log.getLogger();
         try {
-            if(!acceptLicense) {
+            if (!acceptLicense) {
                 out.println(Messages.JDKInstaller_UnableToInstallUntilLicenseAccepted());
                 return expectedLocation;
             }
@@ -112,7 +115,7 @@ public class JDKInstaller extends ToolInstaller {
             Platform p = Platform.of(node);
             URL url = locate(log, p, CPU.of(node));
 
-            out.println("Downloading "+url);
+            out.println("Downloading " + url);
             FilePath file = expectedLocation.child(p.bundleFileName);
             file.copyFrom(url);
 
@@ -124,146 +127,162 @@ public class JDKInstaller extends ToolInstaller {
             marker.write(id, null);
 
         } catch (DetectionFailedException e) {
-            out.println("JDK installation skipped: "+e.getMessage());
+            out.println("JDK installation skipped: " + e.getMessage());
         }
 
         return expectedLocation;
     }
 
     /**
-     * Performs the JDK installation to a system, provided that the bundle was already downloaded.
+     * Performs the JDK installation to a system, provided that the bundle was
+     * already downloaded.
      *
-     * @param launcher
-     *      Used to launch processes on the system.
-     * @param p
-     *      Platform of the system. This determines how the bundle is installed.
-     * @param fs
-     *      Abstraction of the file system manipulation on this system.
-     * @param log
-     *      Where the output from the installation will be written.
-     * @param expectedLocation
-     *      Path to install JDK to. Must be absolute and in the native file system notation.
-     * @param jdkBundle
-     *      Path to the installed JDK bundle. (The bundle to download can be determined by {@link #locate(TaskListener, Platform, CPU)} call.)
+     * @param launcher Used to launch processes on the system.
+     * @param p Platform of the system. This determines how the bundle is
+     * installed.
+     * @param fs Abstraction of the file system manipulation on this system.
+     * @param log Where the output from the installation will be written.
+     * @param expectedLocation Path to install JDK to. Must be absolute and in
+     * the native file system notation.
+     * @param jdkBundle Path to the installed JDK bundle. (The bundle to
+     * download can be determined by
+     * {@link #locate(TaskListener, Platform, CPU)} call.)
      */
     public void install(Launcher launcher, Platform p, FileSystem fs, TaskListener log, String expectedLocation, String jdkBundle) throws IOException, InterruptedException {
         PrintStream out = log.getLogger();
 
-        out.println("Installing "+ jdkBundle);
+        out.println("Installing " + jdkBundle);
         switch (p) {
-        case LINUX:
-        case SOLARIS:
-            fs.chmod(jdkBundle,0755);
-            int exit = launcher.launch().cmds(jdkBundle, "-noregister")
-                    .stdin(new ByteArrayInputStream("yes".getBytes())).stdout(out)
-                    .pwd(new FilePath(launcher.getChannel(), expectedLocation)).join();
-            if (exit != 0)
-                throw new AbortException(Messages.JDKInstaller_FailedToInstallJDK(exit));
-
-            // JDK creates its own sub-directory, so pull them up
-            List<String> paths = fs.listSubDirectories(expectedLocation);
-            for (Iterator<String> itr = paths.iterator(); itr.hasNext();) {
-                String s =  itr.next();
-                if (!s.matches("j(2s)?dk.*"))
-                    itr.remove();
-            }
-            if(paths.size()!=1)
-                throw new AbortException("Failed to find the extracted JDKs: "+paths);
-
-            // remove the intermediate directory
-            fs.pullUp(expectedLocation+'/'+paths.get(0),expectedLocation);
-            break;
-        case WINDOWS:
-            /*
-                Windows silent installation is full of bad know-how.
-
-                On Windows, command line argument to a process at the OS level is a single string,
-                not a string array like POSIX. When we pass arguments as string array, JRE eventually
-                turn it into a single string with adding quotes to "the right place". Unfortunately,
-                with the strange argument layout of InstallShield (like /v/qn" INSTALLDIR=foobar"),
-                it appears that the escaping done by JRE gets in the way, and prevents the installation.
-                Presumably because of this, my attempt to use /q/vn" INSTALLDIR=foo" didn't work with JDK5.
-
-                I tried to locate exactly how InstallShield parses the arguments (and why it uses
-                awkward option like /qn, but couldn't find any. Instead, experiments revealed that
-                "/q/vn ARG ARG ARG" works just as well. This is presumably due to the Visual C++ runtime library
-                (which does single string -> string array conversion to invoke the main method in most Win32 process),
-                and this consistently worked on JDK5 and JDK4.
-
-                Some of the official documentations are available at
-                - http://java.sun.com/j2se/1.5.0/sdksilent.html
-                - http://java.sun.com/j2se/1.4.2/docs/guide/plugin/developer_guide/silent.html
-             */
-            String logFile = jdkBundle+".install.log";
-
-            ArgumentListBuilder args = new ArgumentListBuilder();
-            args.add(jdkBundle);
-            args.add("/s");
-            // according to http://community.acresso.com/showthread.php?t=83301, \" is the trick to quote values with whitespaces.
-            // Oh Windows, oh windows, why do you have to be so difficult?
-            args.add("/v/qn REBOOT=Suppress INSTALLDIR=\\\""+ expectedLocation +"\\\" /L \\\""+logFile+"\\\"");
-
-            int r = launcher.launch().cmds(args).stdout(out)
-                    .pwd(new FilePath(launcher.getChannel(), expectedLocation)).join();
-            if (r != 0) {
-                out.println(Messages.JDKInstaller_FailedToInstallJDK(r));
-                // log file is in UTF-16
-                InputStreamReader in = new InputStreamReader(fs.read(logFile), "UTF-16");
-                try {
-                    IOUtils.copy(in,new OutputStreamWriter(out));
-                } finally {
-                    in.close();
+            case LINUX:
+            case SOLARIS:
+                fs.chmod(jdkBundle, 0755);
+                int exit = launcher.launch().cmds(jdkBundle, "-noregister")
+                        .stdin(new ByteArrayInputStream("yes".getBytes())).stdout(out)
+                        .pwd(new FilePath(launcher.getChannel(), expectedLocation)).join();
+                if (exit != 0) {
+                    throw new AbortException(Messages.JDKInstaller_FailedToInstallJDK(exit));
                 }
-                throw new AbortException();
-            }
 
-            fs.delete(logFile);
+                // JDK creates its own sub-directory, so pull them up
+                List<String> paths = fs.listSubDirectories(expectedLocation);
+                for (Iterator<String> itr = paths.iterator(); itr.hasNext();) {
+                    String s = itr.next();
+                    if (!s.matches("j(2s)?dk.*")) {
+                        itr.remove();
+                    }
+                }
+                if (paths.size() != 1) {
+                    throw new AbortException("Failed to find the extracted JDKs: " + paths);
+                }
 
-            break;
+                // remove the intermediate directory
+                fs.pullUp(expectedLocation + '/' + paths.get(0), expectedLocation);
+                break;
+            case WINDOWS:
+                /*
+                 Windows silent installation is full of bad know-how.
+
+                 On Windows, command line argument to a process at the OS level is a single string,
+                 not a string array like POSIX. When we pass arguments as string array, JRE eventually
+                 turn it into a single string with adding quotes to "the right place". Unfortunately,
+                 with the strange argument layout of InstallShield (like /v/qn" INSTALLDIR=foobar"),
+                 it appears that the escaping done by JRE gets in the way, and prevents the installation.
+                 Presumably because of this, my attempt to use /q/vn" INSTALLDIR=foo" didn't work with JDK5.
+
+                 I tried to locate exactly how InstallShield parses the arguments (and why it uses
+                 awkward option like /qn, but couldn't find any. Instead, experiments revealed that
+                 "/q/vn ARG ARG ARG" works just as well. This is presumably due to the Visual C++ runtime library
+                 (which does single string -> string array conversion to invoke the main method in most Win32 process),
+                 and this consistently worked on JDK5 and JDK4.
+
+                 Some of the official documentations are available at
+                 - http://java.sun.com/j2se/1.5.0/sdksilent.html
+                 - http://java.sun.com/j2se/1.4.2/docs/guide/plugin/developer_guide/silent.html
+                 */
+                String logFile = jdkBundle + ".install.log";
+
+                ArgumentListBuilder args = new ArgumentListBuilder();
+                args.add(jdkBundle);
+                args.add("/s");
+                // according to http://community.acresso.com/showthread.php?t=83301, \" is the trick to quote values with whitespaces.
+                // Oh Windows, oh windows, why do you have to be so difficult?
+                args.add("/v/qn REBOOT=Suppress INSTALLDIR=\\\"" + expectedLocation + "\\\" /L \\\"" + logFile + "\\\"");
+
+                int r = launcher.launch().cmds(args).stdout(out)
+                        .pwd(new FilePath(launcher.getChannel(), expectedLocation)).join();
+                if (r != 0) {
+                    out.println(Messages.JDKInstaller_FailedToInstallJDK(r));
+                    // log file is in UTF-16
+                    InputStreamReader in = new InputStreamReader(fs.read(logFile), "UTF-16");
+                    try {
+                        IOUtils.copy(in, new OutputStreamWriter(out));
+                    } finally {
+                        in.close();
+                    }
+                    throw new AbortException();
+                }
+
+                fs.delete(logFile);
+
+                break;
         }
     }
 
     /**
-     * Abstraction of the file system to perform JDK installation.
-     * Consider {@link FilePathFileSystem} as the canonical documentation of the contract.
+     * Abstraction of the file system to perform JDK installation. Consider
+     * {@link FilePathFileSystem} as the canonical documentation of the
+     * contract.
      */
     public interface FileSystem {
+
         void delete(String file) throws IOException, InterruptedException;
-        void chmod(String file,int mode) throws IOException, InterruptedException;
+
+        void chmod(String file, int mode) throws IOException, InterruptedException;
+
         InputStream read(String file) throws IOException;
+
         /**
-         * List sub-directories of the given directory and just return the file name portion.
+         * List sub-directories of the given directory and just return the file
+         * name portion.
          */
         List<String> listSubDirectories(String dir) throws IOException, InterruptedException;
+
         void pullUp(String from, String to) throws IOException, InterruptedException;
     }
 
     /*package*/ static final class FilePathFileSystem implements FileSystem {
+
         private final Node node;
 
         FilePathFileSystem(Node node) {
             this.node = node;
         }
 
+        @Override
         public void delete(String file) throws IOException, InterruptedException {
             $(file).delete();
         }
 
+        @Override
         public void chmod(String file, int mode) throws IOException, InterruptedException {
             $(file).chmod(mode);
         }
 
+        @Override
         public InputStream read(String file) throws IOException {
             return $(file).read();
         }
 
+        @Override
         public List<String> listSubDirectories(String dir) throws IOException, InterruptedException {
             List<String> r = new ArrayList<String>();
-            for( FilePath f : $(dir).listDirectories())
+            for (FilePath f : $(dir).listDirectories()) {
                 r.add(f.getName());
+            }
             return r;
         }
 
+        @Override
         public void pullUp(String from, String to) throws IOException, InterruptedException {
             $(from).moveAllChildrenTo($(to));
         }
@@ -277,22 +296,25 @@ public class JDKInstaller extends ToolInstaller {
      * This is where we locally cache this JDK.
      */
     private File getLocalCacheFile(Platform platform, CPU cpu) {
-        return new File(Hudson.getInstance().getRootDir(),"cache/jdks/"+platform+"/"+cpu+"/"+id);
+        return new File(Hudson.getInstance().getRootDir(), "cache/jdks/" + platform + "/" + cpu + "/" + id);
     }
 
     /**
-     * Performs a license click through and obtains the one-time URL for downloading bits.
+     * Performs a license click through and obtains the one-time URL for
+     * downloading bits.
      */
     public URL locate(TaskListener log, Platform platform, CPU cpu) throws IOException {
         File cache = getLocalCacheFile(platform, cpu);
-        if (cache.exists()) return cache.toURL();
+        if (cache.exists()) {
+            return cache.toURL();
+        }
 
         HttpURLConnection con = locateStage1(platform, cpu);
         String page = IOUtils.toString(con.getInputStream());
         URL src = locateStage2(log, page);
 
         // download to a temporary file and rename it in to handle concurrency and failure correctly,
-        File tmp = new File(cache.getPath()+".tmp");
+        File tmp = new File(cache.getPath() + ".tmp");
         tmp.getParentFile().mkdirs();
         try {
             FileOutputStream out = new FileOutputStream(tmp);
@@ -311,13 +333,13 @@ public class JDKInstaller extends ToolInstaller {
 
     @SuppressWarnings("unchecked") // dom4j doesn't do generics, apparently... should probably switch to XOM
     private HttpURLConnection locateStage1(Platform platform, CPU cpu) throws IOException {
-        URL url = new URL("https://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/ViewProductDetail-Start?ProductRef="+id);
+        URL url = new URL("https://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/ViewProductDetail-Start?ProductRef=" + id);
         String cookie;
         Element form;
         try {
             HttpURLConnection con = (HttpURLConnection) ProxyConfiguration.open(url);
             cookie = con.getHeaderField("Set-Cookie");
-            LOGGER.fine("Cookie="+cookie);
+            LOGGER.fine("Cookie=" + cookie);
 
             Tidy tidy = new Tidy();
             tidy.setErrout(new PrintWriter(new NullWriter()));
@@ -325,16 +347,16 @@ public class JDKInstaller extends ToolInstaller {
             Document dom = domReader.read(tidy.parseDOM(con.getInputStream(), null));
 
             form = null;
-            for (Element e : (List<Element>)dom.selectNodes("//form")) {
+            for (Element e : (List<Element>) dom.selectNodes("//form")) {
                 String action = e.attributeValue("action");
-                LOGGER.fine("Found form:"+action);
-                if(action.contains("ViewFilteredProducts")) {
+                LOGGER.fine("Found form:" + action);
+                if (action.contains("ViewFilteredProducts")) {
                     form = e;
                     break;
                 }
             }
         } catch (IOException e) {
-            throw new IOException2("Failed to access "+url,e);
+            throw new IOException2("Failed to access " + url, e);
         }
 
         url = new URL(form.attributeValue("action"));
@@ -343,49 +365,60 @@ public class JDKInstaller extends ToolInstaller {
             HttpURLConnection con = (HttpURLConnection) ProxyConfiguration.open(url);
             con.setRequestMethod("POST");
             con.setDoOutput(true);
-            con.setRequestProperty("Cookie",cookie);
-            con.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+            con.setRequestProperty("Cookie", cookie);
+            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             os = new PrintStream(con.getOutputStream());
 
             // select platform
-            String primary=null,secondary=null;
-            Element p = (Element)form.selectSingleNode(".//select[@id='dnld_platform']");
-            for (Element opt : (List<Element>)p.elements("option")) {
+            String primary = null, secondary = null;
+            Element p = (Element) form.selectSingleNode(".//select[@id='dnld_platform']");
+            for (Element opt : (List<Element>) p.elements("option")) {
                 String value = opt.attributeValue("value");
                 String vcap = value.toUpperCase(Locale.ENGLISH);
-                if(!platform.is(vcap))  continue;
+                if (!platform.is(vcap)) {
+                    continue;
+                }
                 switch (cpu.accept(vcap)) {
-                case PRIMARY:   primary = value;break;
-                case SECONDARY: secondary=value;break;
-                case UNACCEPTABLE:  break;
+                    case PRIMARY:
+                        primary = value;
+                        break;
+                    case SECONDARY:
+                        secondary = value;
+                        break;
+                    case UNACCEPTABLE:
+                        break;
                 }
             }
-            if(primary==null)   primary=secondary;
-            if(primary==null)
-            throw new AbortException("Couldn't find the right download for "+platform+" and "+ cpu +" combination");
-            os.print(p.attributeValue("name")+'='+primary);
-            LOGGER.fine("Platform choice:"+primary);
+            if (primary == null) {
+                primary = secondary;
+            }
+            if (primary == null) {
+                throw new AbortException("Couldn't find the right download for " + platform + " and " + cpu + " combination");
+            }
+            os.print(p.attributeValue("name") + '=' + primary);
+            LOGGER.fine("Platform choice:" + primary);
 
             // select language
-            Element l = (Element)form.selectSingleNode(".//select[@id='dnld_language']");
+            Element l = (Element) form.selectSingleNode(".//select[@id='dnld_language']");
             if (l != null) {
-                os.print("&"+l.attributeValue("name")+"="+l.element("option").attributeValue("value"));
+                os.print("&" + l.attributeValue("name") + "=" + l.element("option").attributeValue("value"));
             }
 
             // the rest
-            for (Element e : (List<Element>)form.selectNodes(".//input")) {
+            for (Element e : (List<Element>) form.selectNodes(".//input")) {
                 os.print('&');
                 os.print(e.attributeValue("name"));
                 os.print('=');
                 String value = e.attributeValue("value");
-                if(value==null)
+                if (value == null) {
                     os.print("on"); // assume this is a checkbox
-                else
-                    os.print(URLEncoder.encode(value,"UTF-8"));
+                } else {
+                    os.print(URLEncoder.encode(value, "UTF-8"));
+                }
             }
             return con;
         } catch (IOException e) {
-            throw new IOException2("Failed to access "+url,e);
+            throw new IOException2("Failed to access " + url, e);
         } finally {
             IOUtils.closeQuietly(os);
         }
@@ -399,19 +432,25 @@ public class JDKInstaller extends ToolInstaller {
         log.getLogger().println("Choosing the download bundle");
         List<String> urls = new ArrayList<String>();
 
-        while(m.find()) {
+        while (m.find()) {
             String url = m.group(1);
-            LOGGER.fine("Considering a download link:"+ url);
+            LOGGER.fine("Considering a download link:" + url);
 
             // still more options to choose from.
             // avoid rpm bundles, and avoid tar.Z bundle
-            if(url.contains("rpm"))  continue;
-            if(url.contains("tar.Z"))  continue;
+            if (url.contains("rpm")) {
+                continue;
+            }
+            if (url.contains("tar.Z")) {
+                continue;
+            }
             // sparcv9 bundle is add-on to the sparc bundle, so just download 32bit sparc bundle, even on 64bit system
-            if(url.contains("sparcv9"))  continue;
+            if (url.contains("sparcv9")) {
+                continue;
+            }
 
             urls.add(url);
-            LOGGER.fine("Found a download candidate: "+ url);
+            LOGGER.fine("Found a download candidate: " + url);
         }
 
         if (urls.isEmpty()) {
@@ -423,6 +462,7 @@ public class JDKInstaller extends ToolInstaller {
     }
 
     public enum Preference {
+
         PRIMARY, SECONDARY, UNACCEPTABLE
     }
 
@@ -430,8 +470,8 @@ public class JDKInstaller extends ToolInstaller {
      * Supported platform.
      */
     public enum Platform {
-        LINUX("jdk.sh"), SOLARIS("jdk.sh"), WINDOWS("jdk.exe");
 
+        LINUX("jdk.sh"), SOLARIS("jdk.sh"), WINDOWS("jdk.exe");
         /**
          * Choose the file name suitable for the downloaded JDK bundle.
          */
@@ -448,8 +488,9 @@ public class JDKInstaller extends ToolInstaller {
         /**
          * Determines the platform of the given node.
          */
-        public static Platform of(Node n) throws IOException,InterruptedException,DetectionFailedException {
-            return n.getChannel().call(new Callable<Platform,DetectionFailedException>() {
+        public static Platform of(Node n) throws IOException, InterruptedException, DetectionFailedException {
+            return n.getChannel().call(new Callable<Platform, DetectionFailedException>() {
+                @Override
                 public Platform call() throws DetectionFailedException {
                     return current();
                 }
@@ -458,10 +499,16 @@ public class JDKInstaller extends ToolInstaller {
 
         public static Platform current() throws DetectionFailedException {
             String arch = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
-            if(arch.contains("linux"))  return LINUX;
-            if(arch.contains("windows"))   return WINDOWS;
-            if(arch.contains("sun") || arch.contains("solaris"))    return SOLARIS;
-            throw new DetectionFailedException("Unknown CPU name: "+arch);
+            if (arch.contains("linux")) {
+                return LINUX;
+            }
+            if (arch.contains("windows")) {
+                return WINDOWS;
+            }
+            if (arch.contains("sun") || arch.contains("solaris")) {
+                return SOLARIS;
+            }
+            throw new DetectionFailedException("Unknown CPU name: " + arch);
         }
     }
 
@@ -469,39 +516,49 @@ public class JDKInstaller extends ToolInstaller {
      * CPU type.
      */
     public enum CPU {
+
         i386, amd64, Sparc, Itanium;
 
         /**
-         * In JDK5u3, I see platform like "Linux AMD64", while JDK6u3 refers to "Linux x64", so
-         * just use "64" for locating bits.
+         * In JDK5u3, I see platform like "Linux AMD64", while JDK6u3 refers to
+         * "Linux x64", so just use "64" for locating bits.
          */
         public Preference accept(String line) {
             switch (this) {
-            // these two guys are totally incompatible with everything else, so no fallback
-            case Sparc:     return must(line.contains("SPARC"));
-            case Itanium:   return must(line.contains("ITANIUM"));
+                // these two guys are totally incompatible with everything else, so no fallback
+                case Sparc:
+                    return must(line.contains("SPARC"));
+                case Itanium:
+                    return must(line.contains("ITANIUM"));
 
-            // 64bit Solaris, Linux, and Windows can all run 32bit executable, so fall back to 32bit if 64bit bundle is not found
-            case amd64:
-                if(line.contains("64"))     return PRIMARY;
-                if(line.contains("SPARC") || line.contains("ITANIUM"))  return UNACCEPTABLE;
-                return SECONDARY;
-            case i386:
-                if(line.contains("64") || line.contains("SPARC") || line.contains("ITANIUM"))     return UNACCEPTABLE;
-                return PRIMARY;
+                // 64bit Solaris, Linux, and Windows can all run 32bit executable, so fall back to 32bit if 64bit bundle is not found
+                case amd64:
+                    if (line.contains("64")) {
+                        return PRIMARY;
+                    }
+                    if (line.contains("SPARC") || line.contains("ITANIUM")) {
+                        return UNACCEPTABLE;
+                    }
+                    return SECONDARY;
+                case i386:
+                    if (line.contains("64") || line.contains("SPARC") || line.contains("ITANIUM")) {
+                        return UNACCEPTABLE;
+                    }
+                    return PRIMARY;
             }
             return UNACCEPTABLE;
         }
 
         private static Preference must(boolean b) {
-             return b ? PRIMARY : UNACCEPTABLE;
+            return b ? PRIMARY : UNACCEPTABLE;
         }
 
         /**
          * Determines the CPU of the given node.
          */
-        public static CPU of(Node n) throws IOException,InterruptedException, DetectionFailedException {
-            return n.getChannel().call(new Callable<CPU,DetectionFailedException>() {
+        public static CPU of(Node n) throws IOException, InterruptedException, DetectionFailedException {
+            return n.getChannel().call(new Callable<CPU, DetectionFailedException>() {
+                @Override
                 public CPU call() throws DetectionFailedException {
                     return current();
                 }
@@ -513,11 +570,19 @@ public class JDKInstaller extends ToolInstaller {
          */
         public static CPU current() throws DetectionFailedException {
             String arch = System.getProperty("os.arch").toLowerCase(Locale.ENGLISH);
-            if(arch.contains("sparc"))  return Sparc;
-            if(arch.contains("ia64"))   return Itanium;
-            if(arch.contains("amd64") || arch.contains("86_64"))    return amd64;
-            if(arch.contains("86"))    return i386;
-            throw new DetectionFailedException("Unknown CPU architecture: "+arch);
+            if (arch.contains("sparc")) {
+                return Sparc;
+            }
+            if (arch.contains("ia64")) {
+                return Itanium;
+            }
+            if (arch.contains("amd64") || arch.contains("86_64")) {
+                return amd64;
+            }
+            if (arch.contains("86")) {
+                return i386;
+            }
+            throw new DetectionFailedException("Unknown CPU architecture: " + arch);
         }
     }
 
@@ -525,21 +590,25 @@ public class JDKInstaller extends ToolInstaller {
      * Indicates the failure to detect the OS or CPU.
      */
     private static final class DetectionFailedException extends Exception {
+
         private DetectionFailedException(String message) {
             super(message);
         }
     }
 
     public static final class JDKFamilyList {
+
         public JDKFamily[] jdks = new JDKFamily[0];
     }
 
     public static final class JDKFamily {
+
         public String name;
         public InstallableJDK[] list;
     }
 
     public static final class InstallableJDK {
+
         public String name;
         /**
          * Product code.
@@ -549,13 +618,15 @@ public class JDKInstaller extends ToolInstaller {
 
     @Extension
     public static final class DescriptorImpl extends ToolInstallerDescriptor<JDKInstaller> {
+
+        @Override
         public String getDisplayName() {
             return Messages.JDKInstaller_DescriptorImpl_displayName();
         }
 
         @Override
         public boolean isApplicable(Class<? extends ToolInstallation> toolType) {
-            return toolType==JDK.class;
+            return toolType == JDK.class;
         }
 
         public FormValidation doCheckId(@QueryParameter String value) {
@@ -569,6 +640,7 @@ public class JDKInstaller extends ToolInstaller {
 
         /**
          * List of installable JDKs.
+         *
          * @return never null.
          */
         public List<JDKFamily> getInstallableJDKs() throws IOException {
@@ -579,7 +651,7 @@ public class JDKInstaller extends ToolInstaller {
             if (value) {
                 return FormValidation.ok();
             } else {
-                return FormValidation.error(Messages.JDKInstaller_DescriptorImpl_doCheckAcceptLicense()); 
+                return FormValidation.error(Messages.JDKInstaller_DescriptorImpl_doCheckAcceptLicense());
             }
         }
     }
@@ -589,16 +661,18 @@ public class JDKInstaller extends ToolInstaller {
      */
     @Extension
     public static final class JDKList extends Downloadable {
+
         public JDKList() {
             super(JDKInstaller.class);
         }
 
         public JDKFamilyList toList() throws IOException {
             JSONObject d = getData();
-            if(d==null) return new JDKFamilyList();
-            return (JDKFamilyList)JSONObject.toBean(d,JDKFamilyList.class);
+            if (d == null) {
+                return new JDKFamilyList();
+            }
+            return (JDKFamilyList) JSONObject.toBean(d, JDKFamilyList.class);
         }
     }
-
     private static final Logger LOGGER = Logger.getLogger(JDKInstaller.class.getName());
 }
