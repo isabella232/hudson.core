@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
+ * Contributors:
+ * 
 *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -32,18 +32,16 @@ import org.slf4j.LoggerFactory;
 /**
  * Provides the capability for starting/stopping/restarting/uninstalling Hudson.
  *
- * <p>
- * The steps to perform these operations depend on how Hudson is launched,
- * so the concrete instance of this method (which is VM-wide singleton) is discovered
- * by looking up a FQCN from the system property "hudson.lifecycle".
+ * <p> The steps to perform these operations depend on how Hudson is launched,
+ * so the concrete instance of this method (which is VM-wide singleton) is
+ * discovered by looking up a FQCN from the system property "hudson.lifecycle".
  *
  * @author Kohsuke Kawaguchi
  * @since 1.254
  */
 public abstract class Lifecycle implements ExtensionPoint {
-    
+
     private transient Logger logger = LoggerFactory.getLogger(Lifecycle.class);
-    
     private static Lifecycle INSTANCE = null;
 
     /**
@@ -52,13 +50,13 @@ public abstract class Lifecycle implements ExtensionPoint {
      * @return never null
      */
     public synchronized static Lifecycle get() {
-        if(INSTANCE==null) {
+        if (INSTANCE == null) {
             Lifecycle instance;
             String p = System.getProperty("hudson.lifecycle");
-            if(p!=null) {
+            if (p != null) {
                 try {
                     ClassLoader cl = Hudson.getInstance().getPluginManager().uberClassLoader;
-                    instance = (Lifecycle)cl.loadClass(p).newInstance();
+                    instance = (Lifecycle) cl.loadClass(p).newInstance();
                 } catch (InstantiationException e) {
                     InstantiationError x = new InstantiationError(e.getMessage());
                     x.initCause(e);
@@ -73,7 +71,7 @@ public abstract class Lifecycle implements ExtensionPoint {
                     throw x;
                 }
             } else {
-                if(Functions.isWindows()) {
+                if (Functions.isWindows()) {
                     instance = new Lifecycle() {
                         @Override
                         public void verifyRestartable() throws RestartNotSupportedException {
@@ -81,7 +79,7 @@ public abstract class Lifecycle implements ExtensionPoint {
                                     "Default Windows lifecycle does not support restart.");
                         }
                     };
-                } else if (System.getenv("SMF_FMRI")!=null && System.getenv("SMF_RESTARTER")!=null) {
+                } else if (System.getenv("SMF_FMRI") != null && System.getenv("SMF_RESTARTER") != null) {
                     // when we are run by Solaris SMF, these environment variables are set.
                     instance = new SolarisSMFLifecycle();
                 } else {
@@ -99,42 +97,45 @@ public abstract class Lifecycle implements ExtensionPoint {
      * If the location of <tt>hudson.war</tt> is known in this life cycle,
      * return it location. Otherwise return null to indicate that it is unknown.
      *
-     * <p>
-     * When a non-null value is returned, Hudson will offer an upgrade UI
-     * to a newer version.
+     * <p> When a non-null value is returned, Hudson will offer an upgrade UI to
+     * a newer version.
      */
     public File getHudsonWar() {
         String war = System.getProperty("executable-war");
-        if(war!=null && new File(war).exists())
+        if (war != null && new File(war).exists()) {
             return new File(war);
+        }
         return null;
     }
 
     /**
      * Replaces hudson.war by the given file.
      *
-     * <p>
-     * On some system, most notably Windows, a file being in use cannot be changed,
-     * so rewriting <tt>hudson.war</tt> requires some special trick. Override this method
-     * to do so.
+     * <p> On some system, most notably Windows, a file being in use cannot be
+     * changed, so rewriting <tt>hudson.war</tt> requires some special trick.
+     * Override this method to do so.
      */
     public void rewriteHudsonWar(File by) throws IOException {
         File dest = getHudsonWar();
         // this should be impossible given the canRewriteHudsonWar method,
         // but let's be defensive
-        if(dest==null)  throw new IOException("hudson.war location is not known.");
+        if (dest == null) {
+            throw new IOException("hudson.war location is not known.");
+        }
 
         // backing up the old hudson.war before it gets lost due to upgrading
         // (newly downloaded hudson.war and 'backup' (hudson.war.tmp) are the same files
         // unless we are trying to rewrite hudson.war by a backup itself
         File bak = new File(dest.getPath() + ".bak");
-        if (!by.equals(bak))
+        if (!by.equals(bak)) {
             FileUtils.copyFile(dest, bak);
-       
+        }
+
         FileUtils.copyFile(by, dest);
         // we don't want to keep backup if we are downgrading
-        if (by.equals(bak)&&bak.exists())
+        if (by.equals(bak) && bak.exists()) {
             bak.delete();
+        }
     }
 
     /**
@@ -143,21 +144,19 @@ public abstract class Lifecycle implements ExtensionPoint {
     public boolean canRewriteHudsonWar() {
         // if we don't know where hudson.war is, it's impossible to replace.
         File f = getHudsonWar();
-        return f!=null && f.canWrite();
+        return f != null && f.canWrite();
     }
 
     /**
-     * If this life cycle supports a restart of Hudson, do so.
-     * Otherwise, throw {@link UnsupportedOperationException},
-     * which is what the default implementation does.
+     * If this life cycle supports a restart of Hudson, do so. Otherwise, throw
+     * {@link UnsupportedOperationException}, which is what the default
+     * implementation does.
      *
-     * <p>
-     * The restart operation may happen synchronously (in which case
-     * this method will never return), or asynchronously (in which
-     * case this method will successfully return.)
+     * <p> The restart operation may happen synchronously (in which case this
+     * method will never return), or asynchronously (in which case this method
+     * will successfully return.)
      *
-     * <p>
-     * Throw an exception if the operation fails unexpectedly.
+     * <p> Throw an exception if the operation fails unexpectedly.
      */
     public void restart() throws IOException, InterruptedException {
         throw new UnsupportedOperationException();
@@ -166,19 +165,20 @@ public abstract class Lifecycle implements ExtensionPoint {
     /**
      * Can the {@link #restart()} method restart Hudson?
      *
-     * @throws RestartNotSupportedException
-     *      If the restart is not supported, throw this exception and explain the cause.
+     * @throws RestartNotSupportedException If the restart is not supported,
+     * throw this exception and explain the cause.
      */
     public void verifyRestartable() throws RestartNotSupportedException {
         // the rewriteHudsonWar method isn't overridden.
-        if (!Util.isOverridden(Lifecycle.class,getClass(), "restart"))
-            throw new RestartNotSupportedException("Restart is not supported in this running mode (" +
-                    getClass().getName() + ").");
+        if (!Util.isOverridden(Lifecycle.class, getClass(), "restart")) {
+            throw new RestartNotSupportedException("Restart is not supported in this running mode ("
+                    + getClass().getName() + ").");
+        }
     }
 
     /**
-     * The same as {@link #verifyRestartable()} except the status is indicated by the return value,
-     * not by an exception.
+     * The same as {@link #verifyRestartable()} except the status is indicated
+     * by the return value, not by an exception.
      */
     public boolean canRestart() {
         try {
@@ -191,5 +191,4 @@ public abstract class Lifecycle implements ExtensionPoint {
             return false;
         }
     }
-
 }

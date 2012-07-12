@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -52,10 +52,11 @@ import java.util.logging.Logger;
  * @author Kohsuke Kawaguchi
  */
 public class LogRecorderManager extends AbstractModelObject {
+
     /**
      * {@link LogRecorder}s.
      */
-    public transient final Map<String,LogRecorder> logRecorders = new CopyOnWriteMap.Tree<String,LogRecorder>();
+    public transient final Map<String, LogRecorder> logRecorders = new CopyOnWriteMap.Tree<String, LogRecorder>();
 
     public String getDisplayName() {
         return Messages.LogRecorderManager_DisplayName();
@@ -79,14 +80,16 @@ public class LogRecorderManager extends AbstractModelObject {
     public void load() throws IOException {
         logRecorders.clear();
         File dir = new File(Hudson.getInstance().getRootDir(), "log");
-        File[] files = dir.listFiles((FileFilter)new WildcardFileFilter("*.xml"));
-        if(files==null)     return;
+        File[] files = dir.listFiles((FileFilter) new WildcardFileFilter("*.xml"));
+        if (files == null) {
+            return;
+        }
         for (File child : files) {
             String name = child.getName();
-            name = name.substring(0,name.length()-4);   // cut off ".xml"
+            name = name.substring(0, name.length() - 4);   // cut off ".xml"
             LogRecorder lr = new LogRecorder(name);
             lr.load();
-            logRecorders.put(name,lr);
+            logRecorders.put(name, lr);
         }
     }
 
@@ -95,11 +98,11 @@ public class LogRecorderManager extends AbstractModelObject {
      */
     public HttpResponse doNewLogRecorder(@QueryParameter String name) {
         Hudson.checkGoodName(name);
-        
-        logRecorders.put(name,new LogRecorder(name));
+
+        logRecorders.put(name, new LogRecorder(name));
 
         // redirect to the config screen
-        return new HttpRedirect(name+"/configure");
+        return new HttpRedirect(name + "/configure");
     }
 
     /**
@@ -108,10 +111,11 @@ public class LogRecorderManager extends AbstractModelObject {
     public HttpResponse doConfigLogger(@QueryParameter String name, @QueryParameter String level) {
         Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
         Level lv;
-        if(level.equals("inherit"))
+        if (level.equals("inherit")) {
             lv = null;
-        else
+        } else {
             lv = Level.parse(level.toUpperCase(Locale.ENGLISH));
+        }
         Logger.getLogger(name).setLevel(lv);
         return new HttpRedirect("levels");
     }
@@ -119,7 +123,7 @@ public class LogRecorderManager extends AbstractModelObject {
     /**
      * RSS feed for log entries.
      */
-    public void doRss( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
+    public void doRss(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         doRss(req, rsp, getDisplayName(), Hudson.logRecords);
     }
 
@@ -129,17 +133,18 @@ public class LogRecorderManager extends AbstractModelObject {
     /*package*/ static void doRss(StaplerRequest req, StaplerResponse rsp, String recorderName, List<LogRecord> logs) throws IOException, ServletException {
         // filter log records based on the log level
         String level = req.getParameter("level");
-        if(level!=null) {
+        if (level != null) {
             Level threshold = Level.parse(level);
             List<LogRecord> filtered = new ArrayList<LogRecord>();
             for (LogRecord r : logs) {
-                if(r.getLevel().intValue() >= threshold.intValue())
+                if (r.getLevel().intValue() >= threshold.intValue()) {
                     filtered.add(r);
+                }
             }
             logs = filtered;
         }
 
-        RSS.forwardToRss("Hudson " + recorderName + " log","", logs, new FeedAdapter<LogRecord>() {
+        RSS.forwardToRss("Hudson " + recorderName + " log", "", logs, new FeedAdapter<LogRecord>() {
             public String getEntryTitle(LogRecord entry) {
                 return entry.getMessage();
             }
@@ -165,10 +170,10 @@ public class LogRecorderManager extends AbstractModelObject {
             public String getEntryAuthor(LogRecord entry) {
                 return Mailer.descriptor().getAdminAddress();
             }
-        },req,rsp);
+        }, req, rsp);
     }
 
-    @Initializer(before=PLUGINS_PREPARED)
+    @Initializer(before = PLUGINS_PREPARED)
     public static void init(Hudson h) throws IOException {
         h.getLog().load();
     }

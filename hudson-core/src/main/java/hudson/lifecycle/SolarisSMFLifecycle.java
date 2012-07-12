@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -25,14 +25,17 @@ import java.io.IOException;
  * @author Kohsuke Kawaguchi
  */
 public class SolarisSMFLifecycle extends Lifecycle {
+
     /**
-     * In SMF managed environment, just commit a suicide and the service will be restarted by SMF.
+     * In SMF managed environment, just commit a suicide and the service will be
+     * restarted by SMF.
      */
     @Override
     public void restart() throws IOException, InterruptedException {
         Hudson h = Hudson.getInstance();
-        if (h != null)
+        if (h != null) {
             h.cleanUp();
+        }
         System.exit(0);
     }
 }
