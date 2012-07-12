@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -23,6 +23,7 @@ package hudson.model.queue;
  * @see LoadPredictor
  */
 public final class FutureLoad {
+
     /**
      * When is this load expected to start?
      */
@@ -43,6 +44,6 @@ public final class FutureLoad {
     }
 
     public String toString() {
-        return "startTime="+startTime+",#executors="+numExecutors+",duration="+duration;
+        return "startTime=" + startTime + ",#executors=" + numExecutors + ",duration=" + duration;
     }
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -21,11 +21,12 @@ import hudson.util.VariableResolver;
 
 /**
  * Boolean expression of labels.
- * 
+ *
  * @author Kohsuke Kawaguchi
- * @since  1.372
+ * @since 1.372
  */
 public abstract class LabelExpression extends Label {
+
     protected LabelExpression(String name) {
         super(name);
     }
@@ -36,10 +37,11 @@ public abstract class LabelExpression extends Label {
     }
 
     public static class Not extends LabelExpression {
+
         private final Label base;
 
         public Not(Label base) {
-            super('!'+paren(LabelOperatorPrecedence.NOT,base));
+            super('!' + paren(LabelOperatorPrecedence.NOT, base));
             this.base = base;
         }
 
@@ -58,10 +60,11 @@ public abstract class LabelExpression extends Label {
      * No-op but useful for preserving the parenthesis in the user input.
      */
     public static class Paren extends LabelExpression {
+
         private final Label base;
 
         public Paren(Label base) {
-            super('('+base.getExpression()+')');
+            super('(' + base.getExpression() + ')');
             this.base = base;
         }
 
@@ -77,16 +80,19 @@ public abstract class LabelExpression extends Label {
     }
 
     /**
-     * Puts the label name into a parenthesis if the given operator will have a higher precedence.
+     * Puts the label name into a parenthesis if the given operator will have a
+     * higher precedence.
      */
     static String paren(LabelOperatorPrecedence op, Label l) {
-        if (op.compareTo(l.precedence())<0)
-            return '('+l.getExpression()+')';
+        if (op.compareTo(l.precedence()) < 0) {
+            return '(' + l.getExpression() + ')';
+        }
         return l.getExpression();
     }
 
     public static abstract class Binary extends LabelExpression {
-        private final Label lhs,rhs;
+
+        private final Label lhs, rhs;
 
         public Binary(Label lhs, Label rhs, LabelOperatorPrecedence op) {
             super(combine(lhs, rhs, op));
@@ -95,7 +101,7 @@ public abstract class LabelExpression extends Label {
         }
 
         private static String combine(Label lhs, Label rhs, LabelOperatorPrecedence op) {
-            return paren(op,lhs)+op.str+paren(op,rhs);
+            return paren(op, lhs) + op.str + paren(op, rhs);
         }
 
         /**
@@ -104,13 +110,14 @@ public abstract class LabelExpression extends Label {
          */
         @Override
         public boolean matches(VariableResolver<Boolean> resolver) {
-            return op(lhs.matches(resolver),rhs.matches(resolver));
+            return op(lhs.matches(resolver), rhs.matches(resolver));
         }
 
         protected abstract boolean op(boolean a, boolean b);
     }
 
     public static final class And extends Binary {
+
         public And(Label lhs, Label rhs) {
             super(lhs, rhs, LabelOperatorPrecedence.AND);
         }
@@ -127,6 +134,7 @@ public abstract class LabelExpression extends Label {
     }
 
     public static final class Or extends Binary {
+
         public Or(Label lhs, Label rhs) {
             super(lhs, rhs, LabelOperatorPrecedence.OR);
         }
@@ -143,6 +151,7 @@ public abstract class LabelExpression extends Label {
     }
 
     public static final class Iff extends Binary {
+
         public Iff(Label lhs, Label rhs) {
             super(lhs, rhs, LabelOperatorPrecedence.IFF);
         }
@@ -159,6 +168,7 @@ public abstract class LabelExpression extends Label {
     }
 
     public static final class Implies extends Binary {
+
         public Implies(Label lhs, Label rhs) {
             super(lhs, rhs, LabelOperatorPrecedence.IMPLIES);
         }

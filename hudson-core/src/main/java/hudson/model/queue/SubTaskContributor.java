@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -26,16 +26,19 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Externally contributes {@link SubTask}s to {@link AbstractProject#getSubTasks()}.
+ * Externally contributes {@link SubTask}s to
+ * {@link AbstractProject#getSubTasks()}.
  *
- * <p>
- * Put @{@link Extension} on your implementation classes to register them.
+ * <p> Put
+ *
+ * @{@link Extension} on your implementation classes to register them.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.377
  */
 public abstract class SubTaskContributor implements ExtensionPoint {
-    public Collection<? extends SubTask> forProject(AbstractProject<?,?> p) {
+
+    public Collection<? extends SubTask> forProject(AbstractProject<?, ?> p) {
         return Collections.emptyList();
     }
 

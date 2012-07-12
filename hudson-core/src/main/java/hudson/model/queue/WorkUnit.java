@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -30,18 +30,17 @@ import org.kohsuke.stapler.export.ExportedBean;
  */
 @ExportedBean
 public final class WorkUnit {
+
     /**
      * Task to be executed.
      */
     //TODO: review and check whether we can do it private
     public final SubTask work;
-
     /**
      * Shared context among {@link WorkUnit}s.
      */
     //TODO: review and check whether we can do it private
     public final WorkUnitContext context;
-
     private volatile Executor executor;
 
     WorkUnit(WorkUnitContext context, SubTask work) {
@@ -58,8 +57,7 @@ public final class WorkUnit {
     }
 
     /**
-     * {@link Executor} running this work unit.
-     * <p>
+     * {@link Executor} running this work unit. <p>
      * {@link Executor#getCurrentWorkUnit()} and {@link WorkUnit#getExecutor()}
      * form a bi-directional reachability between them.
      */
@@ -75,7 +73,7 @@ public final class WorkUnit {
      * If the execution has already started, return the current executable.
      */
     public Executable getExecutable() {
-        return executor!=null ? executor.getCurrentExecutable() : null;
+        return executor != null ? executor.getCurrentExecutable() : null;
     }
 
     /**
@@ -83,6 +81,6 @@ public final class WorkUnit {
      * represented by {@link Task} itself.
      */
     public boolean isMainWork() {
-        return context.task==work;
+        return context.task == work;
     }
 }

@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -32,18 +32,18 @@ import static hudson.init.InitMilestone.JOB_LOADED;
  * @since 1.343
  */
 public abstract class QueueSorter implements ExtensionPoint {
+
     /**
-     * Sorts the buildable items list. The items at the beginning will be executed
-     * before the items at the end of the list.
+     * Sorts the buildable items list. The items at the beginning will be
+     * executed before the items at the end of the list.
      *
-     * @param buildables
-     *      List of buildable items in the queue. Never null.
+     * @param buildables List of buildable items in the queue. Never null.
      */
     public abstract void sortBuildableItems(List<BuildableItem> buildables);
 
     /**
-     * All registered {@link QueueSorter}s. Only the first one will be picked up,
-     * unless explicitly overridden by {@link Queue#setSorter(QueueSorter)}.
+     * All registered {@link QueueSorter}s. Only the first one will be picked
+     * up, unless explicitly overridden by {@link Queue#setSorter(QueueSorter)}.
      */
     public static ExtensionList<QueueSorter> all() {
         return Hudson.getInstance().getExtensionList(QueueSorter.class);
@@ -54,18 +54,21 @@ public abstract class QueueSorter implements ExtensionPoint {
      *
      * {@link Queue#Queue(hudson.model.LoadBalancer)} is too early to do this
      */
-    @Initializer(after=JOB_LOADED)
+    @Initializer(after = JOB_LOADED)
     public static void installDefaultQueueSorter() {
         ExtensionList<QueueSorter> all = all();
-        if (all.isEmpty())  return;
+        if (all.isEmpty()) {
+            return;
+        }
 
         Queue q = Hudson.getInstance().getQueue();
-        if (q.getSorter()!=null)        return; // someone has already installed something. leave that alone.
-
+        if (q.getSorter() != null) {
+            return; // someone has already installed something. leave that alone.
+        }
         q.setSorter(all.get(0));
-        if (all.size()>1)
-            LOGGER.warning("Multiple QueueSorters are registered. Only the first one is used and the rest are ignored: "+all);
+        if (all.size() > 1) {
+            LOGGER.warning("Multiple QueueSorters are registered. Only the first one is used and the rest are ignored: " + all);
+        }
     }
-
     private static final Logger LOGGER = Logger.getLogger(QueueSorter.class.getName());
 }

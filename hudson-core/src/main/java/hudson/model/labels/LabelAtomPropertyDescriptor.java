@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -22,12 +22,11 @@ import hudson.model.Descriptor;
 /**
  * {@link Descriptor} for {@link LabelAtom}.
  *
- * <p>
- * Put {@link Extension} on your descriptor implementation to have it auto-registered.
+ * <p> Put {@link Extension} on your descriptor implementation to have it
+ * auto-registered.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.373
  */
 public abstract class LabelAtomPropertyDescriptor extends Descriptor<LabelAtomProperty> {
-
 }

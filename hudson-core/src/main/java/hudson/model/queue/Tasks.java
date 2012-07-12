@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -30,8 +30,8 @@ import java.util.Collections;
 public class Tasks {
 
     /**
-     * A pointless function to work around what appears to be a HotSpot problem. See HUDSON-5756 and bug 6933067
-     * on BugParade for more details.
+     * A pointless function to work around what appears to be a HotSpot problem.
+     * See HUDSON-5756 and bug 6933067 on BugParade for more details.
      */
     private static Collection<? extends SubTask> _getSubTasksOf(Task task) {
         return task.getSubTasks();
@@ -46,8 +46,8 @@ public class Tasks {
     }
 
     /**
-     * A pointless function to work around what appears to be a HotSpot problem. See HUDSON-5756 and bug 6933067
-     * on BugParade for more details.
+     * A pointless function to work around what appears to be a HotSpot problem.
+     * See HUDSON-5756 and bug 6933067 on BugParade for more details.
      */
     private static Object _getSameNodeConstraintOf(SubTask t) {
         return t.getSameNodeConstraint();
@@ -62,8 +62,8 @@ public class Tasks {
     }
 
     /**
-     * A pointless function to work around what appears to be a HotSpot problem. See HUDSON-5756 and bug 6933067
-     * on BugParade for more details.
+     * A pointless function to work around what appears to be a HotSpot problem.
+     * See HUDSON-5756 and bug 6933067 on BugParade for more details.
      */
     public static Task _getOwnerTaskOf(SubTask t) {
         return t.getOwnerTask();
@@ -73,7 +73,7 @@ public class Tasks {
         try {
             return _getOwnerTaskOf(t);
         } catch (AbstractMethodError e) {
-            return (Task)t;
+            return (Task) t;
         }
     }
 }

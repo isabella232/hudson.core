@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -23,8 +23,8 @@ package hudson.model.labels;
  * @since 1.372
  */
 public enum LabelOperatorPrecedence {
-    ATOM(null), NOT("!"), AND("&&"), OR("||"), IMPLIES("->"), IFF("<->");
 
+    ATOM(null), NOT("!"), AND("&&"), OR("||"), IMPLIES("->"), IFF("<->");
     /**
      * String representation of this operator.
      */
