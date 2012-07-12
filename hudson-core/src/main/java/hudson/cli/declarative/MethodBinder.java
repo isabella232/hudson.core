@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -31,9 +31,9 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * Binds method parameters to CLI arguments and parameters via args4j.
- * Once the parser fills in the instance state, {@link #call(Object)}
- * can be used to invoke a method.
+ * Binds method parameters to CLI arguments and parameters via args4j. Once the
+ * parser fills in the instance state, {@link #call(Object)} can be used to
+ * invoke a method.
  *
  * @author Kohsuke Kawaguchi
  */
@@ -72,27 +72,31 @@ class MethodBinder {
                 }
             };
             Option option = p.annotation(Option.class);
-            if (option!=null) {
-                parser.addOption(setter,option);
+            if (option != null) {
+                parser.addOption(setter, option);
             }
             Argument arg = p.annotation(Argument.class);
-            if (arg!=null) {
-                if (bias>0) arg = new ArgumentImpl(arg,bias);
-                parser.addArgument(setter,arg);
+            if (arg != null) {
+                if (bias > 0) {
+                    arg = new ArgumentImpl(arg, bias);
+                }
+                parser.addArgument(setter, arg);
             }
 
-            if (p.type().isPrimitive())
+            if (p.type().isPrimitive()) {
                 arguments[index] = ReflectionUtils.getVmDefaultValueForPrimitiveType(p.type());
+            }
         }
     }
 
     public Object call(Object instance) throws Exception {
         try {
-            return method.invoke(instance,arguments);
+            return method.invoke(instance, arguments);
         } catch (InvocationTargetException e) {
             Throwable t = e.getTargetException();
-            if (t instanceof Exception)
+            if (t instanceof Exception) {
                 throw (Exception) t;
+            }
             throw e;
         }
     }
@@ -102,6 +106,7 @@ class MethodBinder {
      */
     @SuppressWarnings({"ClassExplicitlyAnnotation"})
     private static final class ArgumentImpl implements Argument {
+
         private final Argument base;
         private final int bias;
 
@@ -127,7 +132,7 @@ class MethodBinder {
         }
 
         public int index() {
-            return base.index()+bias;
+            return base.index() + bias;
         }
 
         public boolean multiValued() {

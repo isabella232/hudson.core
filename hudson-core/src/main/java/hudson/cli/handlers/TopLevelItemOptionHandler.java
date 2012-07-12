@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -30,6 +30,7 @@ import org.kohsuke.args4j.spi.Setter;
  * @author Kohsuke Kawaguchi
  */
 public class TopLevelItemOptionHandler extends OptionHandler<TopLevelItem> {
+
     public TopLevelItemOptionHandler(CmdLineParser parser, OptionDef option, Setter<TopLevelItem> setter) {
         super(parser, option, setter);
     }
@@ -40,8 +41,9 @@ public class TopLevelItemOptionHandler extends OptionHandler<TopLevelItem> {
         String src = params.getParameter(0);
 
         TopLevelItem s = h.getItem(src);
-        if (s==null)
-            throw new CmdLineException(owner, "No such job '"+src+"' perhaps you meant "+ AbstractProject.findNearest(src)+"?");
+        if (s == null) {
+            throw new CmdLineException(owner, "No such job '" + src + "' perhaps you meant " + AbstractProject.findNearest(src) + "?");
+        }
         setter.addValue(s);
         return 1;
     }
