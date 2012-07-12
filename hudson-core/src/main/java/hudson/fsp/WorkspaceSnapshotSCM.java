@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -39,18 +39,21 @@ import java.io.File;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
- * {@link SCM} that inherits the workspace from another build through {@link WorkspaceSnapshot}
+ * {@link SCM} that inherits the workspace from another build through
+ * {@link WorkspaceSnapshot}
  *
  * @author Kohsuke Kawaguchi
  */
 public class WorkspaceSnapshotSCM extends SCM {
+
     /**
      * The job name from which we inherit the workspace.
      */
     //TODO: review and check whether we can do it private
     public String jobName;
     /**
-     * The permalink name indicating the build from which to inherit the workspace.
+     * The permalink name indicating the build from which to inherit the
+     * workspace.
      */
     public String permalink;
 
@@ -69,57 +72,66 @@ public class WorkspaceSnapshotSCM extends SCM {
     }
 
     /**
-     * {@link Exception} indicating that the resolution of the job/permalink failed.
+     * {@link Exception} indicating that the resolution of the job/permalink
+     * failed.
      */
     private final class ResolvedFailedException extends Exception {
+
         private ResolvedFailedException(String message) {
             super(message);
         }
     }
 
     private static class Snapshot {
+
         final WorkspaceSnapshot snapshot;
-        final AbstractBuild<?,?> owner;
-        private Snapshot(WorkspaceSnapshot snapshot, AbstractBuild<?,?> owner) {
+        final AbstractBuild<?, ?> owner;
+
+        private Snapshot(WorkspaceSnapshot snapshot, AbstractBuild<?, ?> owner) {
             this.snapshot = snapshot;
             this.owner = owner;
         }
 
-        void restoreTo(FilePath dst,TaskListener listener) throws IOException, InterruptedException {
-            snapshot.restoreTo(owner,dst,listener);
+        void restoreTo(FilePath dst, TaskListener listener) throws IOException, InterruptedException {
+            snapshot.restoreTo(owner, dst, listener);
         }
     }
+
     /**
-     * Obtains the {@link WorkspaceSnapshot} object that this {@link SCM} points to,
-     * or throws {@link ResolvedFailedException} upon failing.
+     * Obtains the {@link WorkspaceSnapshot} object that this {@link SCM} points
+     * to, or throws {@link ResolvedFailedException} upon failing.
      *
      * @return never null.
      */
     public Snapshot resolve() throws ResolvedFailedException {
         Hudson h = Hudson.getInstance();
-        AbstractProject<?,?> job = h.getItemByFullName(jobName, AbstractProject.class);
-        if(job==null) {
-            if(h.getItemByFullName(jobName)==null) {
+        AbstractProject<?, ?> job = h.getItemByFullName(jobName, AbstractProject.class);
+        if (job == null) {
+            if (h.getItemByFullName(jobName) == null) {
                 AbstractProject nearest = AbstractProject.findNearest(jobName);
-                throw new ResolvedFailedException(Messages.WorkspaceSnapshotSCM_NoSuchJob(jobName,nearest.getFullName()));
-            } else
+                throw new ResolvedFailedException(Messages.WorkspaceSnapshotSCM_NoSuchJob(jobName, nearest.getFullName()));
+            } else {
                 throw new ResolvedFailedException(Messages.WorkspaceSnapshotSCM_IncorrectJobType(jobName));
+            }
         }
 
         PermalinkList permalinks = job.getPermalinks();
         Permalink p = permalinks.get(permalink);
-        if(p==null)
-            throw new ResolvedFailedException(Messages.WorkspaceSnapshotSCM_NoSuchPermalink(permalink,jobName));
+        if (p == null) {
+            throw new ResolvedFailedException(Messages.WorkspaceSnapshotSCM_NoSuchPermalink(permalink, jobName));
+        }
 
-        AbstractBuild<?,?> b = (AbstractBuild<?,?>)p.resolve(job);
-        if(b==null)
-            throw new ResolvedFailedException(Messages.WorkspaceSnapshotSCM_NoBuild(permalink,jobName));
+        AbstractBuild<?, ?> b = (AbstractBuild<?, ?>) p.resolve(job);
+        if (b == null) {
+            throw new ResolvedFailedException(Messages.WorkspaceSnapshotSCM_NoBuild(permalink, jobName));
+        }
 
         WorkspaceSnapshot snapshot = b.getAction(WorkspaceSnapshot.class);
-        if(snapshot==null)
-            throw new ResolvedFailedException(Messages.WorkspaceSnapshotSCM_NoWorkspace(jobName,permalink));
+        if (snapshot == null) {
+            throw new ResolvedFailedException(Messages.WorkspaceSnapshotSCM_NoWorkspace(jobName, permalink));
+        }
 
-        return new Snapshot(snapshot,b);
+        return new Snapshot(snapshot, b);
     }
 
     public SCMRevisionState calcRevisionsFromBuild(AbstractBuild<?, ?> build, Launcher launcher, TaskListener listener) throws IOException, InterruptedException {
@@ -132,7 +144,7 @@ public class WorkspaceSnapshotSCM extends SCM {
 
     public boolean checkout(AbstractBuild build, Launcher launcher, FilePath workspace, BuildListener listener, File changelogFile) throws IOException, InterruptedException {
         try {
-            resolve().restoreTo(workspace,listener);
+            resolve().restoreTo(workspace, listener);
             return true;
         } catch (ResolvedFailedException e) {
             listener.error(e.getMessage()); // stack trace is meaningless
