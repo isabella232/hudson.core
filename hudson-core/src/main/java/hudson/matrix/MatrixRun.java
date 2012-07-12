@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -37,7 +37,8 @@ import java.util.Map;
  *
  * @author Kohsuke Kawaguchi
  */
-public class MatrixRun extends Build<MatrixConfiguration,MatrixRun> {
+public class MatrixRun extends Build<MatrixConfiguration, MatrixRun> {
+
     public MatrixRun(MatrixConfiguration job) throws IOException {
         super(job);
     }
@@ -53,13 +54,13 @@ public class MatrixRun extends Build<MatrixConfiguration,MatrixRun> {
     @Override
     public String getUpUrl() {
         StaplerRequest req = Stapler.getCurrentRequest();
-        if(req!=null) {
+        if (req != null) {
             List<Ancestor> ancs = req.getAncestors();
-            for( int i=1; i<ancs.size(); i++) {
-                if(ancs.get(i).getObject()==this) {
-                    Object parentObj = ancs.get(i-1).getObject();
-                    if(parentObj instanceof MatrixBuild || parentObj instanceof MatrixConfiguration) {
-                        return ancs.get(i-1).getUrl()+'/';
+            for (int i = 1; i < ancs.size(); i++) {
+                if (ancs.get(i).getObject() == this) {
+                    Object parentObj = ancs.get(i - 1).getObject();
+                    if (parentObj instanceof MatrixBuild || parentObj instanceof MatrixConfiguration) {
+                        return ancs.get(i - 1).getUrl() + '/';
                     }
                 }
             }
@@ -70,30 +71,31 @@ public class MatrixRun extends Build<MatrixConfiguration,MatrixRun> {
     /**
      * Gets the {@link MatrixBuild} that has the same build number.
      *
-     * @return
-     *      null if no such build exists, which happens when the module build
-     *      is manually triggered.
+     * @return null if no such build exists, which happens when the module build
+     * is manually triggered.
      */
     public MatrixBuild getParentBuild() {
         return getParent().getParent().getBuildByNumber(getNumber());
     }
-    
+
     @Override
     public void checkPermission(hudson.security.Permission p) {
         MatrixBuild parentBuild = getParentBuild();
-        if(parentBuild != null) {
+        if (parentBuild != null) {
             parentBuild.checkPermission(p);
         }
-    };
+    }
+
+    ;
 
     @Override
     public String getDisplayName() {
         StaplerRequest req = Stapler.getCurrentRequest();
-        if(req!=null) {
+        if (req != null) {
             List<Ancestor> ancs = req.getAncestors();
-            for( int i=1; i<ancs.size(); i++) {
-                if(ancs.get(i).getObject()==this) {
-                    if(ancs.get(i-1).getObject() instanceof MatrixBuild) {
+            for (int i = 1; i < ancs.size(); i++) {
+                if (ancs.get(i).getObject() == this) {
+                    if (ancs.get(i - 1).getObject() instanceof MatrixBuild) {
                         return getParent().getCombination().toCompactString(getParent().getParent().getAxes());
                     }
                 }
@@ -108,11 +110,11 @@ public class MatrixRun extends Build<MatrixConfiguration,MatrixRun> {
     @Override
     protected void customizeBuildVariables(final Map<String, String> vars) {
         AxisList axes = getParent().getParent().getAxes();
-        for (Map.Entry<String,String> e : getParent().getCombination().entrySet()) {
+        for (Map.Entry<String, String> e : getParent().getCombination().entrySet()) {
             Axis a = axes.find(e.getKey());
-            if (a!=null) {
-                a.addBuildVariable(e.getValue(),vars);
-            }else {
+            if (a != null) {
+                a.addBuildVariable(e.getValue(), vars);
+            } else {
                 vars.put(e.getKey(), e.getValue());
             }
         }
@@ -124,8 +126,9 @@ public class MatrixRun extends Build<MatrixConfiguration,MatrixRun> {
     @Override
     public String getWhyKeepLog() {
         MatrixBuild pb = getParentBuild();
-        if(pb!=null && pb.getWhyKeepLog()!=null)
+        if (pb != null && pb.getWhyKeepLog() != null) {
             return Messages.MatrixRun_KeptBecauseOfParent(pb);
+        }
         return super.getWhyKeepLog();
     }
 
@@ -139,24 +142,25 @@ public class MatrixRun extends Build<MatrixConfiguration,MatrixRun> {
         run(new RunnerImpl());
     }
 
-    protected class RunnerImpl extends Build<MatrixConfiguration,MatrixRun>.RunnerImpl {
+    protected class RunnerImpl extends Build<MatrixConfiguration, MatrixRun>.RunnerImpl {
+
         @Override
         protected Lease decideWorkspace(Node n, WorkspaceList wsl) throws InterruptedException, IOException {
             // Map current combination to a directory subtree, e.g. 'axis1=a,axis2=b' to 'axis1/a/axis2/b'.
             String subtree;
-            if(useShortWorkspaceName) {
-                subtree = getParent().getDigestName(); 
+            if (useShortWorkspaceName) {
+                subtree = getParent().getDigestName();
             } else {
-                subtree = getParent().getCombination().toString('/','/', true);
+                subtree = getParent().getCombination().toString('/', '/', true);
             }
-            
+
             String customWorkspace = getParent().getParent().getCustomWorkspace();
             if (customWorkspace != null) {
                 // Use custom workspace as defined in the matrix project settings.
                 FilePath ws = n.getRootPath().child(getEnvironment(listener).expand(customWorkspace));
                 // We allow custom workspaces to be used concurrently between jobs.
                 return Lease.createDummyLease(ws.child(subtree));
-            } else {   
+            } else {
                 // Use default workspace as assigned by Hudson.
                 Node node = getBuiltOn();
                 FilePath ws = node.getWorkspaceFor(getParent().getParent());

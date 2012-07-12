@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -37,29 +37,25 @@ import java.util.Map;
 /**
  * Configuration axis.
  *
- * <p>
- * This class represents a single dimension of the configuration matrix.
- * For example, the JAX-WS RI test configuration might include
- * one axis "container={glassfish,tomcat,jetty}" and another axis
+ * <p> This class represents a single dimension of the configuration matrix. For
+ * example, the JAX-WS RI test configuration might include one axis
+ * "container={glassfish,tomcat,jetty}" and another axis
  * "stax={sjsxp,woodstox}", and so on.
  *
  * @author Kohsuke Kawaguchi
  */
 public class Axis extends AbstractDescribableImpl<Axis> implements Comparable<Axis>, Iterable<String>, ExtensionPoint {
+
     /**
-     * Name of this axis.
-     * Used as a variable name.
+     * Name of this axis. Used as a variable name.
      *
-     * @deprecated as of 1.373
-     *      Use {@link #getName()}
+     * @deprecated as of 1.373 Use {@link #getName()}
      */
     public final String name;
-
     /**
      * Possible values for this axis.
      *
-     * @deprecated as of 1.373
-     *      Use {@link #getValues()}
+     * @deprecated as of 1.373 Use {@link #getValues()}
      */
     //TODO: review and check whether we can do it private
     public final List<String> values;
@@ -67,12 +63,13 @@ public class Axis extends AbstractDescribableImpl<Axis> implements Comparable<Ax
     public Axis(String name, List<String> values) {
         this.name = name;
         this.values = new ArrayList<String>(values);
-        if(values.isEmpty())
+        if (values.isEmpty()) {
             throw new IllegalArgumentException(); // bug in the code
+        }
     }
 
     public Axis(String name, String... values) {
-        this(name,Arrays.asList(values));        
+        this(name, Arrays.asList(values));
     }
 
     /**
@@ -87,11 +84,11 @@ public class Axis extends AbstractDescribableImpl<Axis> implements Comparable<Ax
     }
 
     /**
-     * Returns true if this axis is a system-reserved axis
-     * that <strike>has</strike> used to have af special treatment.
+     * Returns true if this axis is a system-reserved axis that
+     * <strike>has</strike> used to have af special treatment.
      *
-     * @deprecated as of 1.373
-     *      System vs user difference are generalized into extension point.
+     * @deprecated as of 1.373 System vs user difference are generalized into
+     * extension point.
      */
     public boolean isSystem() {
         return false;
@@ -117,16 +114,15 @@ public class Axis extends AbstractDescribableImpl<Axis> implements Comparable<Ax
     }
 
     /**
-     * Axis is fully ordered so that we can convert between a list of axis
-     * and a string unambiguously.
+     * Axis is fully ordered so that we can convert between a list of axis and a
+     * string unambiguously.
      */
     public int compareTo(Axis that) {
         return this.name.compareTo(that.name);
     }
 
     /**
-     * Name of this axis.
-     * Used as a variable name.
+     * Name of this axis. Used as a variable name.
      */
     public String getName() {
         return name;
@@ -141,77 +137,84 @@ public class Axis extends AbstractDescribableImpl<Axis> implements Comparable<Ax
 
     @Override
     public AxisDescriptor getDescriptor() {
-        return (AxisDescriptor)super.getDescriptor();
+        return (AxisDescriptor) super.getDescriptor();
     }
 
     @Override
     public String toString() {
-        return new StringBuilder().append(name).append("={").append(Util.join(values,",")).append('}').toString();
+        return new StringBuilder().append(name).append("={").append(Util.join(values, ",")).append('}').toString();
     }
 
     /**
-     * Used for generating the config UI.
-     * If the axis is big and occupies a lot of space, use newline for separator
-     * to display multi-line text.
+     * Used for generating the config UI. If the axis is big and occupies a lot
+     * of space, use newline for separator to display multi-line text.
      */
     public String getValueString() {
-        int len=0;
-        for (String value : values)
+        int len = 0;
+        for (String value : values) {
             len += value.length();
-        char delim = len>30 ? '\n' : ' ';
+        }
+        char delim = len > 30 ? '\n' : ' ';
         // Build string connected with delimiter, quoting as needed
-        StringBuilder buf = new StringBuilder(len+values.size()*3);
-        for (String value : values)
-            buf.append(delim).append(QuotedStringTokenizer.quote(value,""));
+        StringBuilder buf = new StringBuilder(len + values.size() * 3);
+        for (String value : values) {
+            buf.append(delim).append(QuotedStringTokenizer.quote(value, ""));
+        }
         return buf.substring(1);
     }
 
     /**
-     * Parses the submitted form (where possible values are
-     * presented as a list of checkboxes) and creates an axis
+     * Parses the submitted form (where possible values are presented as a list
+     * of checkboxes) and creates an axis
      */
     public static Axis parsePrefixed(StaplerRequest req, String name) {
         List<String> values = new ArrayList<String>();
-        String prefix = name+'.';
+        String prefix = name + '.';
 
         Enumeration e = req.getParameterNames();
         while (e.hasMoreElements()) {
             String paramName = (String) e.nextElement();
-            if(paramName.startsWith(prefix))
+            if (paramName.startsWith(prefix)) {
                 values.add(paramName.substring(prefix.length()));
+            }
         }
-        if(values.isEmpty())
+        if (values.isEmpty()) {
             return null;
-        return new Axis(name,values);
+        }
+        return new Axis(name, values);
     }
 
     /**
-     * Previously we used to persist {@link Axis}, but now those are divided into subtypes.
-     * So upon deserialization, resolve to the proper type.
+     * Previously we used to persist {@link Axis}, but now those are divided
+     * into subtypes. So upon deserialization, resolve to the proper type.
      */
     public Object readResolve() {
-        if (getClass()!=Axis.class) return this;
+        if (getClass() != Axis.class) {
+            return this;
+        }
 
-        if (getName().equals("jdk"))
+        if (getName().equals("jdk")) {
             return new JDKAxis(getValues());
-        if (getName().equals("label"))
-            return new LabelAxis(getName(),getValues());
-        return new TextAxis(getName(),getValues());
+        }
+        if (getName().equals("label")) {
+            return new LabelAxis(getName(), getValues());
+        }
+        return new TextAxis(getName(), getValues());
     }
 
     /**
      * Returns all the registered {@link AxisDescriptor}s.
      */
-    public static DescriptorExtensionList<Axis,AxisDescriptor> all() {
-        return Hudson.getInstance().<Axis,AxisDescriptor>getDescriptorList(Axis.class);
+    public static DescriptorExtensionList<Axis, AxisDescriptor> all() {
+        return Hudson.getInstance().<Axis, AxisDescriptor>getDescriptorList(Axis.class);
     }
 
     /**
-     * Converts the selected value (which is among {@link #values}) and adds that to the given map,
-     * which serves as the build variables.
+     * Converts the selected value (which is among {@link #values}) and adds
+     * that to the given map, which serves as the build variables.
      */
-    public void addBuildVariable(String value, Map<String,String> map) {
-        map.put(name,value);
+    public void addBuildVariable(String value, Map<String, String> map) {
+        map.put(name, value);
     }
 
     @Override
@@ -243,4 +246,3 @@ public class Axis extends AbstractDescribableImpl<Axis> implements Comparable<Ax
         return result;
     }
 }
-

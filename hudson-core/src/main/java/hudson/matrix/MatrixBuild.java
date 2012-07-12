@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Red Hat, Inc., Tom Huybrechts, Anton Kozak, Nikita Levyankov
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Red Hat, Inc., Tom Huybrechts, Anton Kozak, Nikita Levyankov
+ *
  *
  *******************************************************************************/ 
 
@@ -51,6 +51,7 @@ import org.kohsuke.stapler.StaplerResponse;
  * @author Kohsuke Kawaguchi
  */
 public class MatrixBuild extends AbstractBuild<MatrixProject, MatrixBuild> {
+
     private AxisList axes;
 
     public MatrixBuild(MatrixProject job) throws IOException {
@@ -78,6 +79,7 @@ public class MatrixBuild extends AbstractBuild<MatrixProject, MatrixBuild> {
      */
     public final class RunPtr {
         //TODO: review and check whether we can do it private
+
         public final Combination combination;
 
         private RunPtr(Combination c) {
@@ -119,8 +121,8 @@ public class MatrixBuild extends AbstractBuild<MatrixProject, MatrixBuild> {
     }
 
     /**
-     * Gets the {@link MatrixRun} in this build that corresponds
-     * to the given combination.
+     * Gets the {@link MatrixRun} in this build that corresponds to the given
+     * combination.
      */
     public MatrixRun getRun(Combination c) {
         MatrixConfiguration config = getParent().getItem(c);
@@ -172,6 +174,7 @@ public class MatrixBuild extends AbstractBuild<MatrixProject, MatrixBuild> {
     }
 
     private class RunnerImpl extends AbstractRunner {
+
         private final List<MatrixAggregator> aggregators = new ArrayList<MatrixAggregator>();
 
         protected Result doRun(BuildListener listener) throws Exception {
@@ -211,7 +214,7 @@ public class MatrixBuild extends AbstractBuild<MatrixProject, MatrixBuild> {
                 AxisList axes = p.getAxes();
                 String touchStoneCombinationFilter = p.getTouchStoneCombinationFilter();
                 if (touchStoneFilter != null && c.getCombination()
-                    .evalScriptExpression(axes, touchStoneCombinationFilter)) {
+                        .evalScriptExpression(axes, touchStoneCombinationFilter)) {
                     touchStoneConfigurations.add(c);
                 } else {
                     delayedConfigurations.add(c);
@@ -287,7 +290,7 @@ public class MatrixBuild extends AbstractBuild<MatrixProject, MatrixBuild> {
         }
 
         private Result waitForCompletion(BuildListener listener, MatrixConfiguration c)
-            throws InterruptedException, IOException, AggregatorFailureException {
+                throws InterruptedException, IOException, AggregatorFailureException {
             String whyInQueue = "";
             long startTime = System.currentTimeMillis();
 
@@ -363,13 +366,12 @@ public class MatrixBuild extends AbstractBuild<MatrixProject, MatrixBuild> {
             }
             return super.decideWorkspace(n, wsl);
         }
-
     }
 
     /**
-     * A private exception to help maintain the correct control flow after extracting the 'waitForCompletion' method
+     * A private exception to help maintain the correct control flow after
+     * extracting the 'waitForCompletion' method
      */
     private static class AggregatorFailureException extends Exception {
     }
-
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Anton Kozak
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -30,10 +30,11 @@ import org.apache.commons.collections.ListUtils;
 
 /**
  * List of {@link Axis}.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public class AxisList extends ArrayList<Axis> {
+
     public AxisList() {
     }
 
@@ -47,22 +48,24 @@ public class AxisList extends ArrayList<Axis> {
 
     public Axis find(String name) {
         for (Axis a : this) {
-            if(a.name.equals(name))
+            if (a.name.equals(name)) {
                 return a;
+            }
         }
         return null;
     }
 
     /**
-     * Creates a subset of the list that only contains the type assignable to the specified type.
+     * Creates a subset of the list that only contains the type assignable to
+     * the specified type.
      */
     public AxisList subList(Class<? extends Axis> subType) {
-        return new AxisList(Util.filter(this,subType));
+        return new AxisList(Util.filter(this, subType));
     }
 
     @Override
     public boolean add(Axis axis) {
-        return axis!=null && super.add(axis);
+        return axis != null && super.add(axis);
     }
 
     @Override
@@ -91,10 +94,12 @@ public class AxisList extends ArrayList<Axis> {
      */
     public Iterable<Combination> list() {
         final int[] base = new int[size()];
-        if (base.length==0) return Collections.<Combination>emptyList();
+        if (base.length == 0) {
+            return Collections.<Combination>emptyList();
+        }
 
         int b = 1;
-        for( int i=size()-1; i>=0; i-- ) {
+        for (int i = size() - 1; i >= 0; i--) {
             base[i] = b;
             b *= get(i).size();
         }
@@ -107,18 +112,18 @@ public class AxisList extends ArrayList<Axis> {
                     private int counter = 0;
 
                     public boolean hasNext() {
-                        return counter<total;
+                        return counter < total;
                     }
 
                     public Combination next() {
                         String[] data = new String[size()];
                         int x = counter++;
-                        for( int i=0; i<data.length; i++) {
-                            data[i] = get(i).value(x/base[i]);
+                        for (int i = 0; i < data.length; i++) {
+                            data[i] = get(i).value(x / base[i]);
                             x %= base[i];
                         }
-                        assert x==0;
-                        return new Combination(AxisList.this,data);
+                        assert x == 0;
+                        return new Combination(AxisList.this, data);
                     }
 
                     public void remove() {
@@ -133,13 +138,14 @@ public class AxisList extends ArrayList<Axis> {
      * {@link Converter} implementation for XStream.
      */
     public static final class ConverterImpl extends RobustCollectionConverter {
+
         public ConverterImpl(XStream xs) {
             super(xs);
         }
 
         @Override
         public boolean canConvert(Class type) {
-            return type==AxisList.class;
+            return type == AxisList.class;
         }
 
         @Override

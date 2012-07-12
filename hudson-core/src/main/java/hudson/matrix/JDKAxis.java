@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -29,9 +29,10 @@ import java.util.List;
  * @author Kohsuke Kawaguchi
  */
 public class JDKAxis extends Axis {
+
     /**
-     * JDK axis was used to be stored as a plain "Axis" with the name "jdk",
-     * so it cannot be configured by any other name.
+     * JDK axis was used to be stored as a plain "Axis" with the name "jdk", so
+     * it cannot be configured by any other name.
      */
     public JDKAxis(List<String> values) {
         super("jdk", values);
@@ -49,6 +50,7 @@ public class JDKAxis extends Axis {
 
     @Extension
     public static class DescriptorImpl extends AxisDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.JDKAxis_DisplayName();

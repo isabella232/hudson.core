@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -23,24 +23,22 @@ import hudson.util.RunList;
 import java.io.IOException;
 
 /**
- * {@link LogRotator} for {@link MatrixConfiguration},
- * which discards the builds if and only if it's discarded
- * in the parent.
+ * {@link LogRotator} for {@link MatrixConfiguration}, which discards the builds
+ * if and only if it's discarded in the parent.
  *
- * <p>
- * Because of the serialization compatibility, we can't easily
- * refactor {@link LogRotator} into a contract and an implementation. 
+ * <p> Because of the serialization compatibility, we can't easily refactor
+ * {@link LogRotator} into a contract and an implementation.
  *
  * @author Kohsuke Kawaguchi
  */
 final class LinkedLogRotator extends LogRotator {
+
     LinkedLogRotator(int artifactDaysToKeep, int artifactNumToKeep) {
         super(-1, -1, artifactDaysToKeep, artifactNumToKeep);
     }
 
     /**
-     * @deprecated since 1.369
-     *     Use {@link #LinkedLogRotator(int, int)}
+     * @deprecated since 1.369 Use {@link #LinkedLogRotator(int, int)}
      */
     LinkedLogRotator() {
         super(-1, -1, -1, -1);
@@ -53,12 +51,14 @@ final class LinkedLogRotator extends LogRotator {
         MatrixConfiguration job = (MatrixConfiguration) _job;
         // copy it to the array because we'll be deleting builds as we go.
         RunList<MatrixRun> builds = job.getBuilds();
-        for( MatrixRun r : builds.toArray(new MatrixRun[builds.size()]) ) {
-            if(job.getParent().getBuildByNumber(r.getNumber())==null)
+        for (MatrixRun r : builds.toArray(new MatrixRun[builds.size()])) {
+            if (job.getParent().getBuildByNumber(r.getNumber()) == null) {
                 r.delete();
+            }
         }
 
-        if(!job.isActiveConfiguration() && job.getLastBuild()==null)
+        if (!job.isActiveConfiguration() && job.getLastBuild() == null) {
             job.delete();
+        }
     }
 }
