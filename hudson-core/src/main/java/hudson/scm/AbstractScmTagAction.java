@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
+ * Contributors:
+ * 
 *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -30,14 +30,14 @@ import java.io.IOException;
 /**
  * Common part of {@link CVSSCM.TagAction} and {@link SubversionTagAction}.
  *
- * <p>
- * This class implements the action that tags the modules. Derived classes
- * need to provide <tt>tagForm.jelly</tt> view that displays a form for
- * letting user start tagging.
+ * <p> This class implements the action that tags the modules. Derived classes
+ * need to provide <tt>tagForm.jelly</tt> view that displays a form for letting
+ * user start tagging.
  *
  * @author Kohsuke Kawaguchi
  */
 public abstract class AbstractScmTagAction extends TaskAction implements BuildBadgeAction {
+
     protected final AbstractBuild build;
 
     protected AbstractScmTagAction(AbstractBuild build) {
@@ -77,13 +77,13 @@ public abstract class AbstractScmTagAction extends TaskAction implements BuildBa
     }
 
     public void doIndex(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
-        req.getView(this,chooseAction()).forward(req,rsp);
+        req.getView(this, chooseAction()).forward(req, rsp);
     }
 
     protected synchronized String chooseAction() {
-        if(workerThread!=null)
+        if (workerThread != null) {
             return "inProgress.jelly";
+        }
         return "tagForm.jelly";
     }
-
 }

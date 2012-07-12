@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Nikita Levyankov
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -31,12 +31,14 @@ import org.kohsuke.stapler.export.ExportedBean;
 /**
  * Represents SCM change list.
  * <p/>
+ * <
+ * p/>
+ * Use the "index" view of this object to render the changeset detail page, and
+ * use the "digest" view of this object to render the summary page. For the
+ * change list at project level, see {@link SCM}.
  * <p/>
- * Use the "index" view of this object to render the changeset detail page,
- * and use the "digest" view of this object to render the summary page.
- * For the change list at project level, see {@link SCM}.
- * <p/>
- * <p/>
+ * <
+ * p/>
  * {@link Iterator} is expected to return recent changes first.
  *
  * @author Kohsuke Kawaguchi
@@ -62,7 +64,7 @@ public abstract class ChangeLogSet<T extends ChangeLogSet.Entry> implements Iter
     /**
      * Returns true if there's no change.
      *
-     * @return if {@link #getLogs()}  returns empty or null list
+     * @return if {@link #getLogs()} returns empty or null list
      */
     public boolean isEmptySet() {
         return CollectionUtils.isEmpty(getLogs());
@@ -73,7 +75,7 @@ public abstract class ChangeLogSet<T extends ChangeLogSet.Entry> implements Iter
      */
     @SuppressWarnings("unchecked")
     public Iterator<T> iterator() {
-        return isEmptySet()? Iterators.<T>emptyIterator(): getLogs().iterator();
+        return isEmptySet() ? Iterators.<T>emptyIterator() : getLogs().iterator();
     }
 
     /**
@@ -83,13 +85,15 @@ public abstract class ChangeLogSet<T extends ChangeLogSet.Entry> implements Iter
     @Exported
     public final Object[] getItems() {
         List<T> r = new ArrayList<T>();
-        for (T t : this)
+        for (T t : this) {
             r.add(t);
+        }
         return r.toArray();
     }
 
     /**
      * Optional identification of the kind of SCM being used.
+     *
      * @return a short token, such as the SCM's main CLI executable name
      * @since 1.284
      */
@@ -114,6 +118,7 @@ public abstract class ChangeLogSet<T extends ChangeLogSet.Entry> implements Iter
 
     @ExportedBean(defaultVisibility = 999)
     public static abstract class Entry implements ChangeLogEntry {
+
         private ChangeLogSet parent;
 
         public ChangeLogSet getParent() {
@@ -128,14 +133,11 @@ public abstract class ChangeLogSet<T extends ChangeLogSet.Entry> implements Iter
         }
 
         /**
-         * Returns a set of paths in the workspace that was
-         * affected by this change.
-         * <p>
-         * Noted: since this is a new interface, some of the SCMs may not have
-         * implemented this interface. The default implementation for this
-         * interface is throw UnsupportedOperationException
-         * <p>
-         * It doesn't throw NoSuchMethodException because I rather to throw a
+         * Returns a set of paths in the workspace that was affected by this
+         * change. <p> Noted: since this is a new interface, some of the SCMs
+         * may not have implemented this interface. The default implementation
+         * for this interface is throw UnsupportedOperationException <p> It
+         * doesn't throw NoSuchMethodException because I rather to throw a
          * runtime exception
          *
          * @return AffectedFile never null.
@@ -143,7 +145,7 @@ public abstract class ChangeLogSet<T extends ChangeLogSet.Entry> implements Iter
          */
         public Collection<? extends AffectedFile> getAffectedFiles() {
             String scm = getScmKind();
-	        throw new UnsupportedOperationException("getAffectedFiles() is not implemented by " + scm);
+            throw new UnsupportedOperationException("getAffectedFiles() is not implemented by " + scm);
         }
 
         /**
@@ -151,8 +153,9 @@ public abstract class ChangeLogSet<T extends ChangeLogSet.Entry> implements Iter
          */
         public String getMsgAnnotated() {
             MarkupText markup = new MarkupText(getMsg());
-            for (ChangeLogAnnotator a : ChangeLogAnnotator.all())
-                a.annotate(parent.build,this,markup);
+            for (ChangeLogAnnotator a : ChangeLogAnnotator.all()) {
+                a.annotate(parent.build, this, markup);
+            }
 
             return markup.toString(false);
         }
@@ -173,8 +176,8 @@ public abstract class ChangeLogSet<T extends ChangeLogSet.Entry> implements Iter
         }
 
         /**
-         * Returns scm name.
-         * Help method used for throwing exception while executing unimplemented method.
+         * Returns scm name. Help method used for throwing exception while
+         * executing unimplemented method.
          *
          * @return name.
          */
@@ -194,17 +197,17 @@ public abstract class ChangeLogSet<T extends ChangeLogSet.Entry> implements Iter
     /**
      * Represents a file change. Contains filename, edit type, etc.
      *
-     * I checked the API names against some some major SCMs and most SCMs
-     * can adapt to this interface with very little changes
+     * I checked the API names against some some major SCMs and most SCMs can
+     * adapt to this interface with very little changes
      *
      * @see ChangeLogSet.Entry#getAffectedFiles()
      */
     public interface AffectedFile {
+
         /**
-         * The path in the workspace that was affected
-         * <p>
-         * Contains string like 'foo/bar/zot'. No leading/trailing '/',
-         * and separator must be normalized to '/'.
+         * The path in the workspace that was affected <p> Contains string like
+         * 'foo/bar/zot'. No leading/trailing '/', and separator must be
+         * normalized to '/'.
          *
          * @return never null.
          */

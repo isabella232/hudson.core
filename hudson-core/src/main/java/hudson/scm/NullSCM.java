@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -35,6 +35,7 @@ import java.io.IOException;
  * @author Kohsuke Kawaguchi
  */
 public class NullSCM extends SCM {
+
     public SCMRevisionState calcRevisionsFromBuild(AbstractBuild<?, ?> build, Launcher launcher, TaskListener listener) throws IOException, InterruptedException {
         return null;
     }
@@ -43,7 +44,7 @@ public class NullSCM extends SCM {
         return PollingResult.NO_CHANGES;
     }
 
-    public boolean checkout(AbstractBuild<?,?> build, Launcher launcher, FilePath remoteDir, BuildListener listener, File changeLogFile) throws IOException, InterruptedException {
+    public boolean checkout(AbstractBuild<?, ?> build, Launcher launcher, FilePath remoteDir, BuildListener listener, File changeLogFile) throws IOException, InterruptedException {
         return createEmptyChangeLog(changeLogFile, listener, "log");
     }
 
@@ -53,6 +54,7 @@ public class NullSCM extends SCM {
 
     @Extension
     public static class DescriptorImpl extends SCMDescriptor<NullSCM> {
+
         public DescriptorImpl() {
             super(null);
         }

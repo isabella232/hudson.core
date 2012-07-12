@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -28,23 +28,23 @@ import java.lang.reflect.Field;
 /**
  * {@link Descriptor} for {@link SCM}.
  *
- * @param <T>
- *      The 'self' type that represents the type of {@link SCM} that
- *      this descriptor describes.
+ * @param <T> The 'self' type that represents the type of {@link SCM} that this
+ * descriptor describes.
  * @author Kohsuke Kawaguchi
  */
 public abstract class SCMDescriptor<T extends SCM> extends Descriptor<SCM> {
-    /**
-     * If this SCM has corresponding {@link RepositoryBrowser},
-     * that type. Otherwise this SCM will not have any repository browser.
-     */
-    public transient final Class<? extends RepositoryBrowser> repositoryBrowser;
 
     /**
-     * Incremented every time a new {@link SCM} instance is created from this descriptor. 
-     * This is used to invalidate cache. Due to the lack of synchronization and serialization,
-     * this field doesn't really count the # of instances created to date,
-     * but it's good enough for the cache invalidation.
+     * If this SCM has corresponding {@link RepositoryBrowser}, that type.
+     * Otherwise this SCM will not have any repository browser.
+     */
+    public transient final Class<? extends RepositoryBrowser> repositoryBrowser;
+    /**
+     * Incremented every time a new {@link SCM} instance is created from this
+     * descriptor. This is used to invalidate cache. Due to the lack of
+     * synchronization and serialization, this field doesn't really count the #
+     * of instances created to date, but it's good enough for the cache
+     * invalidation.
      */
     //TODO: review and check whether we can do it private
     public volatile int generation = 1;
@@ -56,8 +56,9 @@ public abstract class SCMDescriptor<T extends SCM> extends Descriptor<SCM> {
 
     /**
      * Infers the type of the corresponding {@link SCM} from the outer class.
-     * This version works when you follow the common convention, where a descriptor
-     * is written as the static nested class of the describable class.
+     * This version works when you follow the common convention, where a
+     * descriptor is written as the static nested class of the describable
+     * class.
      *
      * @since 1.278
      */
@@ -76,15 +77,15 @@ public abstract class SCMDescriptor<T extends SCM> extends Descriptor<SCM> {
     public void load() {
         Class<? extends RepositoryBrowser> rb = repositoryBrowser;
         super.load();
-        if (repositoryBrowser!=rb) { // XStream may overwrite even the final field.
+        if (repositoryBrowser != rb) { // XStream may overwrite even the final field.
             try {
                 Field f = SCMDescriptor.class.getDeclaredField("repositoryBrowser");
                 f.setAccessible(true);
-                f.set(this,rb);
+                f.set(this, rb);
             } catch (NoSuchFieldException e) {
-                LOGGER.log(WARNING, "Failed to overwrite the repositoryBrowser field",e);
+                LOGGER.log(WARNING, "Failed to overwrite the repositoryBrowser field", e);
             } catch (IllegalAccessException e) {
-                LOGGER.log(WARNING, "Failed to overwrite the repositoryBrowser field",e);
+                LOGGER.log(WARNING, "Failed to overwrite the repositoryBrowser field", e);
             }
         }
     }
@@ -92,24 +93,24 @@ public abstract class SCMDescriptor<T extends SCM> extends Descriptor<SCM> {
     /**
      * Optional method used by the automatic SCM browser inference.
      *
-     * <p>
-     * Implementing this method allows Hudson to reuse {@link RepositoryBrowser}
-     * configured for one project to be used for other "compatible" projects.
-     * 
-     * @return
-     *      true if the two given SCM configurations are similar enough
-     *      that they can reuse {@link RepositoryBrowser} between them.
+     * <p> Implementing this method allows Hudson to reuse
+     * {@link RepositoryBrowser} configured for one project to be used for other
+     * "compatible" projects.
+     *
+     * @return true if the two given SCM configurations are similar enough that
+     * they can reuse {@link RepositoryBrowser} between them.
      */
     public boolean isBrowserReusable(T x, T y) {
         return false;
     }
 
     /**
-     * Allows {@link SCMDescriptor}s to choose which projects it wants to be configurable against.
+     * Allows {@link SCMDescriptor}s to choose which projects it wants to be
+     * configurable against.
      *
-     * <p>
-     * When this method returns false, this {@link SCM} will not appear in the configuration screen
-     * for the given project. The default method always return true.
+     * <p> When this method returns false, this {@link SCM} will not appear in
+     * the configuration screen for the given project. The default method always
+     * return true.
      *
      * @since 1.294
      */
@@ -118,16 +119,16 @@ public abstract class SCMDescriptor<T extends SCM> extends Descriptor<SCM> {
     }
 
     /**
-     * Returns the list of {@link RepositoryBrowser} {@link Descriptor}
-     * that can be used with this SCM.
+     * Returns the list of {@link RepositoryBrowser} {@link Descriptor} that can
+     * be used with this SCM.
      *
-     * @return
-     *      can be empty but never null.
+     * @return can be empty but never null.
      */
     public List<Descriptor<RepositoryBrowser<?>>> getBrowserDescriptors() {
-        if(repositoryBrowser==null)     return Collections.emptyList();
+        if (repositoryBrowser == null) {
+            return Collections.emptyList();
+        }
         return RepositoryBrowsers.filter(repositoryBrowser);
     }
-
     private static final Logger LOGGER = Logger.getLogger(SCMDescriptor.class.getName());
 }
