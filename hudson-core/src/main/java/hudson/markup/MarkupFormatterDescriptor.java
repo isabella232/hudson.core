@@ -7,7 +7,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:       
+ * Contributors:
  *
  *******************************************************************************/
 
@@ -34,7 +34,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package hudson.markup;
 
 import hudson.DescriptorExtensionList;
@@ -48,10 +47,11 @@ import hudson.model.Hudson;
  * @since 1.391
  */
 public abstract class MarkupFormatterDescriptor extends Descriptor<MarkupFormatter> {
+
     /**
      * Returns all the registered {@link MarkupFormatterDescriptor}s.
      */
-    public static DescriptorExtensionList<MarkupFormatter,MarkupFormatterDescriptor> all() {
+    public static DescriptorExtensionList<MarkupFormatter, MarkupFormatterDescriptor> all() {
         return Hudson.getInstance().getDescriptorList(MarkupFormatter.class);
     }
 }
