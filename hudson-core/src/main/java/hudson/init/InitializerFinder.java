@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -45,8 +45,8 @@ import static java.util.logging.Level.FINEST;
  * @author Kohsuke Kawaguchi
  */
 public class InitializerFinder extends TaskBuilder {
-    private final ClassLoader cl;
 
+    private final ClassLoader cl;
     private final Set<Method> discovered = new HashSet<Method>();
 
     public InitializerFinder(ClassLoader cl) {
@@ -59,16 +59,18 @@ public class InitializerFinder extends TaskBuilder {
 
     public Collection<Task> discoverTasks(Reactor session) throws IOException {
         List<Task> result = new ArrayList<Task>();
-        for (Method e : Index.list(Initializer.class,cl,Method.class)) {
-            if (!discovered.add(e))
+        for (Method e : Index.list(Initializer.class, cl, Method.class)) {
+            if (!discovered.add(e)) {
                 continue;   // already reported once
-
-            if (!Modifier.isStatic(e.getModifiers()))
-                throw new IOException(e+" is not a static method");
+            }
+            if (!Modifier.isStatic(e.getModifiers())) {
+                throw new IOException(e + " is not a static method");
+            }
 
             Initializer i = e.getAnnotation(Initializer.class);
-            if (i==null)        continue; // stale index
-
+            if (i == null) {
+                continue; // stale index
+            }
             result.add(new TaskImpl(i, e));
         }
         return result;
@@ -83,11 +85,13 @@ public class InitializerFinder extends TaskBuilder {
             ResourceBundleHolder rb = ResourceBundleHolder.get(c.getClassLoader().loadClass(c.getPackage().getName() + ".Messages"));
 
             String key = i.displayName();
-            if (key.length()==0)  return c.getSimpleName()+"."+e.getName();
+            if (key.length() == 0) {
+                return c.getSimpleName() + "." + e.getName();
+            }
             return rb.format(key);
         } catch (ClassNotFoundException x) {
-            LOGGER.log(FINEST, "Failed to load "+x.getMessage()+" for "+e.toString(),x);
-            return c.getSimpleName()+"."+e.getName();
+            LOGGER.log(FINEST, "Failed to load " + x.getMessage() + " for " + e.toString(), x);
+            return c.getSimpleName() + "." + e.getName();
         }
     }
 
@@ -98,11 +102,12 @@ public class InitializerFinder extends TaskBuilder {
         try {
             Class<?>[] pt = e.getParameterTypes();
             Object[] args = new Object[pt.length];
-            for (int i=0; i<args.length; i++)
+            for (int i = 0; i < args.length; i++) {
                 args[i] = lookUp(pt[i]);
-            e.invoke(null,args);
+            }
+            e.invoke(null, args);
         } catch (IllegalAccessException x) {
-            throw (Error)new IllegalAccessError().initCause(x);
+            throw (Error) new IllegalAccessError().initCause(x);
         } catch (InvocationTargetException x) {
             throw new Error(x);
         }
@@ -112,15 +117,17 @@ public class InitializerFinder extends TaskBuilder {
      * Determines the parameter injection of the initialization method.
      */
     private Object lookUp(Class<?> type) {
-        if (type== Hudson.class)
+        if (type == Hudson.class) {
             return Hudson.getInstance();
-        throw new IllegalArgumentException("Unable to inject "+type);
+        }
+        throw new IllegalArgumentException("Unable to inject " + type);
     }
 
     /**
      * Task implementation.
      */
     public class TaskImpl implements Task {
+
         final Collection<Milestone> requires;
         final Collection<Milestone> attains;
         private final Initializer i;
@@ -184,6 +191,5 @@ public class InitializerFinder extends TaskBuilder {
             return r;
         }
     }
-
     private static final Logger LOGGER = Logger.getLogger(InitializerFinder.class.getName());
 }

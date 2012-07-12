@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -29,17 +29,17 @@ import static hudson.init.InitMilestone.STARTED;
 import static hudson.init.InitMilestone.COMPLETED;
 
 /**
- * Placed on static methods to indicate that this method is to be run during the Hudson start up to perform
- * some sort of initialization tasks.
+ * Placed on static methods to indicate that this method is to be run during the
+ * Hudson start up to perform some sort of initialization tasks.
  *
  * <h3>Example</h3>
  * <pre>
-   &#64;Initializer(after=JOB_LOADED)
-   public static void init() throws IOException {
-       ....
-   }
+ * &#64;Initializer(after=JOB_LOADED)
+ * public static void init() throws IOException {
+ * ....
+ * }
  * </pre>
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 @Indexed
@@ -47,21 +47,23 @@ import static hudson.init.InitMilestone.COMPLETED;
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface Initializer {
+
     /**
-     * Indicates that the specified milestone is necessary before executing this initializer.
+     * Indicates that the specified milestone is necessary before executing this
+     * initializer.
      *
-     * <p>
-     * This has the identical purpose as {@link #requires()}, but it's separated to allow better type-safety
-     * when using {@link InitMilestone} as a requirement (since enum member definitions need to be constant.)
+     * <p> This has the identical purpose as {@link #requires()}, but it's
+     * separated to allow better type-safety when using {@link InitMilestone} as
+     * a requirement (since enum member definitions need to be constant.)
      */
     InitMilestone after() default STARTED;
 
     /**
-     * Indicates that this initializer is a necessary step before achieving the specified milestone.
+     * Indicates that this initializer is a necessary step before achieving the
+     * specified milestone.
      *
-     * <p>
-     * This has the identical purpose as {@link #attains()}. See {@link #after()} for why there are two things
-     * to achieve the same goal.
+     * <p> This has the identical purpose as {@link #attains()}. See
+     * {@link #after()} for why there are two things to achieve the same goal.
      */
     InitMilestone before() default COMPLETED;
 
@@ -73,21 +75,22 @@ public @interface Initializer {
     /**
      * Indicates the milestones that this initializer contributes to.
      *
-     * A milestone is considered attained if all the initializers that attains the given milestone
-     * completes. So it works as a kind of join.
+     * A milestone is considered attained if all the initializers that attains
+     * the given milestone completes. So it works as a kind of join.
      */
     String[] attains() default {};
 
     /**
-     * Key in <tt>Messages.properties</tt> that represents what this task is about. Used for rendering the progress.
-     * Defaults to "${short class name}.${method Name}".
+     * Key in <tt>Messages.properties</tt> that represents what this task is
+     * about. Used for rendering the progress. Defaults to "${short class
+     * name}.${method Name}".
      */
     String displayName() default "";
 
     /**
      * Should the failure in this task prevent Hudson from starting up?
      *
-     * @see Task#failureIsFatal() 
+     * @see Task#failureIsFatal()
      */
     boolean fatal() default true;
 }
