@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -23,13 +23,14 @@ import static hudson.util.TimeUnit2.*;
 import static java.util.logging.Level.*;
 
 /**
- * {@link RetentionStrategy} implementation for {@link AbstractCloudComputer} that terminates
- * it if it remains idle for X minutes.
+ * {@link RetentionStrategy} implementation for {@link AbstractCloudComputer}
+ * that terminates it if it remains idle for X minutes.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.382
  */
 public class CloudRetentionStrategy extends RetentionStrategy<AbstractCloudComputer> {
+
     private int idleMinutes;
 
     public CloudRetentionStrategy(int idleMinutes) {
@@ -40,13 +41,13 @@ public class CloudRetentionStrategy extends RetentionStrategy<AbstractCloudCompu
         if (c.isIdle() && !disabled) {
             final long idleMilliseconds = System.currentTimeMillis() - c.getIdleStartMilliseconds();
             if (idleMilliseconds > MINUTES.toMillis(idleMinutes)) {
-                LOGGER.info("Disconnecting "+c.getName());
+                LOGGER.info("Disconnecting " + c.getName());
                 try {
                     c.getNode().terminate();
                 } catch (InterruptedException e) {
-                    LOGGER.log(WARNING,"Failed to terminate "+c.getName(),e);
+                    LOGGER.log(WARNING, "Failed to terminate " + c.getName(), e);
                 } catch (IOException e) {
-                    LOGGER.log(WARNING,"Failed to terminate "+c.getName(),e);
+                    LOGGER.log(WARNING, "Failed to terminate " + c.getName(), e);
                 }
             }
         }
@@ -60,8 +61,6 @@ public class CloudRetentionStrategy extends RetentionStrategy<AbstractCloudCompu
     public void start(AbstractCloudComputer c) {
         c.connect(false);
     }
-
     private static final Logger LOGGER = Logger.getLogger(CloudRetentionStrategy.class.getName());
-
-    public static boolean disabled = Boolean.getBoolean(CloudRetentionStrategy.class.getName()+".disabled");
+    public static boolean disabled = Boolean.getBoolean(CloudRetentionStrategy.class.getName() + ".disabled");
 }

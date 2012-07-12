@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -25,7 +25,8 @@ import hudson.model.Hudson;
  * @since 1.383
  */
 public abstract class ComputerConnectorDescriptor extends Descriptor<ComputerConnector> {
-    public static DescriptorExtensionList<ComputerConnector,ComputerConnectorDescriptor> all() {
+
+    public static DescriptorExtensionList<ComputerConnector, ComputerConnectorDescriptor> all() {
         return Hudson.getInstance().getDescriptorList(ComputerConnector.class);
     }
 }

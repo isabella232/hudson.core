@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Stephen Connolly
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Stephen Connolly
+ *
  *
  *******************************************************************************/ 
 
@@ -66,44 +66,39 @@ import org.eclipse.hudson.security.HudsonSecurityManager;
  * @author Kohsuke Kawaguchi
  */
 public class SlaveComputer extends Computer {
+
     private volatile Channel channel;
     private volatile transient boolean acceptingTasks = true;
     private Charset defaultCharset;
     private Boolean isUnix;
     /**
-     * Effective {@link ComputerLauncher} that hides the details of
-     * how we launch a slave agent on this computer.
+     * Effective {@link ComputerLauncher} that hides the details of how we
+     * launch a slave agent on this computer.
      *
-     * <p>
-     * This is normally the same as {@link Slave#getLauncher()} but
-     * can be different. See {@link #grabLauncher(Node)}. 
+     * <p> This is normally the same as {@link Slave#getLauncher()} but can be
+     * different. See {@link #grabLauncher(Node)}.
      */
     private ComputerLauncher launcher;
-
     /**
      * Perpetually writable log file.
      */
     private final ReopenableFileOutputStream log;
-
     /**
-     * {@link StreamTaskListener} that wraps {@link #log}, hence perpetually writable.
+     * {@link StreamTaskListener} that wraps {@link #log}, hence perpetually
+     * writable.
      */
     private final TaskListener taskListener;
-
-
     /**
-     * Number of failed attempts to reconnect to this node
-     * (so that if we keep failing to reconnect, we can stop
-     * trying.)
+     * Number of failed attempts to reconnect to this node (so that if we keep
+     * failing to reconnect, we can stop trying.)
      */
     private transient int numRetryAttempt;
-
     /**
-     * Tracks the status of the last launch operation, which is always asynchronous.
-     * This can be used to wait for the completion, or cancel the launch activity.
+     * Tracks the status of the last launch operation, which is always
+     * asynchronous. This can be used to wait for the completion, or cancel the
+     * launch activity.
      */
     private volatile Future<?> lastConnectActivity = null;
-
     private Object constructed = new Object();
 
     public SlaveComputer(Slave slave) {
@@ -121,8 +116,9 @@ public class SlaveComputer extends Computer {
     }
 
     /**
-     * Allows a {@linkplain hudson.slaves.ComputerLauncher} or a {@linkplain hudson.slaves.RetentionStrategy} to
-     * suspend tasks being accepted by the slave computer.
+     * Allows a {@linkplain hudson.slaves.ComputerLauncher} or a
+     * {@linkplain hudson.slaves.RetentionStrategy} to suspend tasks being
+     * accepted by the slave computer.
      *
      * @param acceptingTasks {@code true} if the slave can accept tasks.
      */
@@ -133,8 +129,8 @@ public class SlaveComputer extends Computer {
     /**
      * True if this computer is a Unix machine (as opposed to Windows machine).
      *
-     * @return
-     *      null if the computer is disconnected and therefore we don't know whether it is Unix or not.
+     * @return null if the computer is disconnected and therefore we don't know
+     * whether it is Unix or not.
      */
     public Boolean isUnix() {
         return isUnix;
@@ -142,21 +138,23 @@ public class SlaveComputer extends Computer {
 
     @Override
     public Slave getNode() {
-        return (Slave)super.getNode();
+        return (Slave) super.getNode();
     }
 
     @Override
     public String getIcon() {
         Future<?> l = lastConnectActivity;
-        if(l!=null && !l.isDone())
+        if (l != null && !l.isDone()) {
             return "computer-flash.gif";
+        }
         return super.getIcon();
     }
 
     /**
      * @deprecated since 2008-05-20.
      */
-    @Deprecated @Override
+    @Deprecated
+    @Override
     public boolean isJnlpAgent() {
         return launcher instanceof JNLPLauncher;
     }
@@ -171,11 +169,15 @@ public class SlaveComputer extends Computer {
     }
 
     protected Future<?> _connect(boolean forceReconnect) {
-        if(channel!=null)   return Futures.precomputed(null);
-        if(!forceReconnect && isConnecting())
+        if (channel != null) {
+            return Futures.precomputed(null);
+        }
+        if (!forceReconnect && isConnecting()) {
             return lastConnectActivity;
-        if(forceReconnect && isConnecting())
-            logger.fine("Forcing a reconnect on "+getName());
+        }
+        if (forceReconnect && isConnecting()) {
+            logger.fine("Forcing a reconnect on " + getName());
+        }
 
         closeChannel();
         return lastConnectActivity = Computer.threadPoolForRemoting.submit(new java.util.concurrent.Callable<Object>() {
@@ -191,7 +193,7 @@ public class SlaveComputer extends Computer {
                         taskListener.error(e.getMessage());
                         throw e;
                     } catch (IOException e) {
-                        Util.displayIOException(e,taskListener);
+                        Util.displayIOException(e, taskListener);
                         e.printStackTrace(taskListener.error(Messages.ComputerLauncher_unexpectedError()));
                         throw e;
                     } catch (InterruptedException e) {
@@ -199,8 +201,9 @@ public class SlaveComputer extends Computer {
                         throw e;
                     }
                 } finally {
-                    if (channel==null)
+                    if (channel == null) {
                         offlineCause = new OfflineCause.LaunchFailed();
+                    }
                 }
             }
         });
@@ -213,10 +216,10 @@ public class SlaveComputer extends Computer {
     public void taskAccepted(Executor executor, Queue.Task task) {
         super.taskAccepted(executor, task);
         if (launcher instanceof ExecutorListener) {
-            ((ExecutorListener)launcher).taskAccepted(executor, task);
+            ((ExecutorListener) launcher).taskAccepted(executor, task);
         }
         if (getNode().getRetentionStrategy() instanceof ExecutorListener) {
-            ((ExecutorListener)getNode().getRetentionStrategy()).taskAccepted(executor, task);
+            ((ExecutorListener) getNode().getRetentionStrategy()).taskAccepted(executor, task);
         }
     }
 
@@ -227,7 +230,7 @@ public class SlaveComputer extends Computer {
     public void taskCompleted(Executor executor, Queue.Task task, long durationMS) {
         super.taskCompleted(executor, task, durationMS);
         if (launcher instanceof ExecutorListener) {
-            ((ExecutorListener)launcher).taskCompleted(executor, task, durationMS);
+            ((ExecutorListener) launcher).taskCompleted(executor, task, durationMS);
         }
         RetentionStrategy r = getRetentionStrategy();
         if (r instanceof ExecutorListener) {
@@ -242,7 +245,7 @@ public class SlaveComputer extends Computer {
     public void taskCompletedWithProblems(Executor executor, Queue.Task task, long durationMS, Throwable problems) {
         super.taskCompletedWithProblems(executor, task, durationMS, problems);
         if (launcher instanceof ExecutorListener) {
-            ((ExecutorListener)launcher).taskCompletedWithProblems(executor, task, durationMS, problems);
+            ((ExecutorListener) launcher).taskCompletedWithProblems(executor, task, durationMS, problems);
         }
         RetentionStrategy r = getRetentionStrategy();
         if (r instanceof ExecutorListener) {
@@ -253,7 +256,7 @@ public class SlaveComputer extends Computer {
     @Override
     public boolean isConnecting() {
         Future<?> l = lastConnectActivity;
-        return isOffline() && l!=null && !l.isDone();
+        return isOffline() && l != null && !l.isDone();
     }
 
     public OutputStream openLogFile() {
@@ -261,85 +264,86 @@ public class SlaveComputer extends Computer {
             log.rewind();
             return log;
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to create log file "+getLogFile(),e);
+            logger.log(Level.SEVERE, "Failed to create log file " + getLogFile(), e);
             return new NullStream();
         }
     }
-
     private final Object channelLock = new Object();
 
     public void setChannel(InputStream in, OutputStream out, TaskListener taskListener, Channel.Listener listener) throws IOException, InterruptedException {
-        setChannel(in,out,taskListener.getLogger(),listener);
+        setChannel(in, out, taskListener.getLogger(), listener);
     }
 
     /**
-     * Creates a {@link Channel} from the given stream and sets that to this slave.
+     * Creates a {@link Channel} from the given stream and sets that to this
+     * slave.
      *
-     * @param in
-     *      Stream connected to the remote "slave.jar". It's the caller's responsibility to do
-     *      buffering on this stream, if that's necessary.
-     * @param out
-     *      Stream connected to the remote peer. It's the caller's responsibility to do
-     *      buffering on this stream, if that's necessary.
-     * @param launchLog
-     *      If non-null, receive the portion of data in <tt>is</tt> before
-     *      the data goes into the "binary mode". This is useful
-     *      when the established communication channel might include some data that might
-     *      be useful for debugging/trouble-shooting.
-     * @param listener
-     *      Gets a notification when the channel closes, to perform clean up. Can be null.
-     *      By the time this method is called, the cause of the termination is reported to the user,
-     *      so the implementation of the listener doesn't need to do that again.
+     * @param in Stream connected to the remote "slave.jar". It's the caller's
+     * responsibility to do buffering on this stream, if that's necessary.
+     * @param out Stream connected to the remote peer. It's the caller's
+     * responsibility to do buffering on this stream, if that's necessary.
+     * @param launchLog If non-null, receive the portion of data in <tt>is</tt>
+     * before the data goes into the "binary mode". This is useful when the
+     * established communication channel might include some data that might be
+     * useful for debugging/trouble-shooting.
+     * @param listener Gets a notification when the channel closes, to perform
+     * clean up. Can be null. By the time this method is called, the cause of
+     * the termination is reported to the user, so the implementation of the
+     * listener doesn't need to do that again.
      */
     public void setChannel(InputStream in, OutputStream out, OutputStream launchLog, Channel.Listener listener) throws IOException, InterruptedException {
-        if(this.channel!=null)
+        if (this.channel != null) {
             throw new IllegalStateException("Already connected");
+        }
 
         final TaskListener taskListener = new StreamTaskListener(launchLog);
         PrintStream log = taskListener.getLogger();
 
-        Channel channel = new Channel(nodeName,threadPoolForRemoting, Channel.Mode.NEGOTIATE,
-            in,out, launchLog);
+        Channel channel = new Channel(nodeName, threadPoolForRemoting, Channel.Mode.NEGOTIATE,
+                in, out, launchLog);
         channel.addListener(new Channel.Listener() {
             @Override
             public void onClosed(Channel c, IOException cause) {
                 SlaveComputer.this.channel = null;
                 // Orderly shutdown will have null exception
-                if (cause!=null) {
+                if (cause != null) {
                     offlineCause = new ChannelTermination(cause);
-                     cause.printStackTrace(taskListener.error("Connection terminated"));
+                    cause.printStackTrace(taskListener.error("Connection terminated"));
                 } else {
                     taskListener.getLogger().println("Connection terminated");
                 }
                 launcher.afterDisconnect(SlaveComputer.this, taskListener);
             }
         });
-        if(listener!=null)
+        if (listener != null) {
             channel.addListener(listener);
+        }
 
         String slaveVersion = channel.call(new SlaveVersion());
         log.println("Slave.jar version: " + slaveVersion);
 
         boolean _isUnix = channel.call(new DetectOS());
-        log.println(_isUnix? hudson.model.Messages.Slave_UnixSlave():hudson.model.Messages.Slave_WindowsSlave());
+        log.println(_isUnix ? hudson.model.Messages.Slave_UnixSlave() : hudson.model.Messages.Slave_WindowsSlave());
 
         String defaultCharsetName = channel.call(new DetectDefaultCharset());
 
         String remoteFs = getNode().getRemoteFS();
-        if(_isUnix && !remoteFs.contains("/") && remoteFs.contains("\\"))
-            log.println("WARNING: "+remoteFs+" looks suspiciously like Windows path. Maybe you meant "+remoteFs.replace('\\','/')+"?");
-        FilePath root = new FilePath(channel,getNode().getRemoteFS());
+        if (_isUnix && !remoteFs.contains("/") && remoteFs.contains("\\")) {
+            log.println("WARNING: " + remoteFs + " looks suspiciously like Windows path. Maybe you meant " + remoteFs.replace('\\', '/') + "?");
+        }
+        FilePath root = new FilePath(channel, getNode().getRemoteFS());
 
         channel.call(new SlaveInitializer());
         channel.call(new WindowsSlaveInstaller(remoteFs));
-        for (ComputerListener cl : ComputerListener.all())
-            cl.preOnline(this,channel,root,taskListener);
+        for (ComputerListener cl : ComputerListener.all()) {
+            cl.preOnline(this, channel, root, taskListener);
+        }
 
         offlineCause = null;
 
         // update the data structure atomically to prevent others from seeing a channel that's not properly initialized yet
-        synchronized(channelLock) {
-            if(this.channel!=null) {
+        synchronized (channelLock) {
+            if (this.channel != null) {
                 // check again. we used to have this entire method in a big sycnhronization block,
                 // but Channel constructor blocks for an external process to do the connection
                 // if CommandLauncher is used, and that cannot be interrupted because it blocks at InputStream.
@@ -354,8 +358,9 @@ public class SlaveComputer extends Computer {
             this.channel = channel;
             defaultCharset = Charset.forName(defaultCharsetName);
         }
-        for (ComputerListener cl : ComputerListener.all())
-            cl.onOnline(this,taskListener);
+        for (ComputerListener cl : ComputerListener.all()) {
+            cl.onOnline(this, taskListener);
+        }
         log.println("Slave successfully connected and online");
         Hudson.getInstance().getQueue().scheduleMaintenance();
     }
@@ -370,25 +375,25 @@ public class SlaveComputer extends Computer {
     }
 
     public List<LogRecord> getLogRecords() throws IOException, InterruptedException {
-        if(channel==null)
+        if (channel == null) {
             return Collections.emptyList();
-        else
-            return channel.call(new Callable<List<LogRecord>,RuntimeException>() {
+        } else {
+            return channel.call(new Callable<List<LogRecord>, RuntimeException>() {
                 public List<LogRecord> call() {
                     return new ArrayList<LogRecord>(SLAVE_LOG_HANDLER.getView());
                 }
             });
+        }
     }
 
     public HttpResponse doDoDisconnect(@QueryParameter String offlineMessage) throws IOException, ServletException {
-        if (channel!=null) {
+        if (channel != null) {
             //does nothing in case computer is already disconnected
             checkPermission(Hudson.ADMINISTER);
             offlineMessage = Util.fixEmptyAndTrim(offlineMessage);
             disconnect(OfflineCause.create(Messages._SlaveComputer_DisconnectedBy(
                     HudsonSecurityManager.getAuthentication().getName(),
-                    offlineMessage!=null ? " : " + offlineMessage : "")
-            ));
+                    offlineMessage != null ? " : " + offlineMessage : "")));
         }
         return new HttpRedirect(".");
     }
@@ -408,7 +413,7 @@ public class SlaveComputer extends Computer {
     }
 
     public void doLaunchSlaveAgent(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
-        if(channel!=null) {
+        if (channel != null) {
             rsp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -422,9 +427,9 @@ public class SlaveComputer extends Computer {
 
     public void tryReconnect() {
         numRetryAttempt++;
-        if(numRetryAttempt<6 || (numRetryAttempt%12)==0) {
+        if (numRetryAttempt < 6 || (numRetryAttempt % 12) == 0) {
             // initially retry several times quickly, and after that, do it infrequently.
-            logger.info("Attempting to reconnect "+nodeName);
+            logger.info("Attempting to reconnect " + nodeName);
             connect(true);
         }
     }
@@ -432,9 +437,9 @@ public class SlaveComputer extends Computer {
     /**
      * Serves jar files for JNLP slave agents.
      *
-     * @deprecated since 2008-08-18.
-     *      This URL binding is no longer used and moved up directly under to {@link Hudson},
-     *      but it's left here for now just in case some old JNLP slave agents request it.
+     * @deprecated since 2008-08-18. This URL binding is no longer used and
+     * moved up directly under to {@link Hudson}, but it's left here for now
+     * just in case some old JNLP slave agents request it.
      */
     public Slave.JnlpJar getJnlpJars(String fileName) {
         return new Slave.JnlpJar(fileName);
@@ -448,7 +453,7 @@ public class SlaveComputer extends Computer {
 
     public RetentionStrategy getRetentionStrategy() {
         Slave n = getNode();
-        return n==null ? RetentionStrategy.INSTANCE : n.getRetentionStrategy();
+        return n == null ? RetentionStrategy.INSTANCE : n.getRetentionStrategy();
     }
 
     /**
@@ -466,8 +471,9 @@ public class SlaveComputer extends Computer {
                 logger.log(Level.SEVERE, "Failed to terminate channel to " + getDisplayName(), e);
             }
         }
-        for (ComputerListener cl : ComputerListener.all())
+        for (ComputerListener cl : ComputerListener.all()) {
             cl.onOffline(this);
+        }
     }
 
     @Override
@@ -478,70 +484,82 @@ public class SlaveComputer extends Computer {
         // maybe the configuration was changed to relaunch the slave, so try to re-launch now.
         // "constructed==null" test is an ugly work around to avoid launching before the object is fully
         // constructed.
-        if(constructed!=null) {
-            if (node instanceof Slave)
-                ((Slave)node).getRetentionStrategy().check(this);
-            else
+        if (constructed != null) {
+            if (node instanceof Slave) {
+                ((Slave) node).getRetentionStrategy().check(this);
+            } else {
                 connect(false);
+            }
         }
     }
 
     /**
-     * Grabs a {@link ComputerLauncher} out of {@link Node} to keep it in this {@link Computer}.
-     * The returned launcher will be set to {@link #launcher} and used to carry out the actual launch operation.
+     * Grabs a {@link ComputerLauncher} out of {@link Node} to keep it in this
+     * {@link Computer}. The returned launcher will be set to {@link #launcher}
+     * and used to carry out the actual launch operation.
      *
-     * <p>
-     * Subtypes that needs to decorate {@link ComputerLauncher} can do so by overriding this method.
-     * This is useful for {@link SlaveComputer}s for clouds for example, where one normally needs
-     * additional pre-launch step (such as waiting for the provisioned node to become available)
-     * before the user specified launch step (like SSH connection) kicks in.
+     * <p> Subtypes that needs to decorate {@link ComputerLauncher} can do so by
+     * overriding this method. This is useful for {@link SlaveComputer}s for
+     * clouds for example, where one normally needs additional pre-launch step
+     * (such as waiting for the provisioned node to become available) before the
+     * user specified launch step (like SSH connection) kicks in.
      *
      * @see ComputerLauncherFilter
      */
     protected ComputerLauncher grabLauncher(Node node) {
-        return ((Slave)node).getLauncher();
+        return ((Slave) node).getLauncher();
     }
-
     private static final Logger logger = Logger.getLogger(SlaveComputer.class.getName());
 
-    private static final class SlaveVersion implements Callable<String,IOException> {
+    private static final class SlaveVersion implements Callable<String, IOException> {
+
         public String call() throws IOException {
-            try { return Launcher.VERSION; }
-            catch (Throwable ex) { return "< 1.335"; } // Older slave.jar won't have VERSION
-        }
-    }
-    private static final class DetectOS implements Callable<Boolean,IOException> {
-        public Boolean call() throws IOException {
-            return File.pathSeparatorChar==':';
+            try {
+                return Launcher.VERSION;
+            } catch (Throwable ex) {
+                return "< 1.335";
+            } // Older slave.jar won't have VERSION
         }
     }
 
-    private static final class DetectDefaultCharset implements Callable<String,IOException> {
+    private static final class DetectOS implements Callable<Boolean, IOException> {
+
+        public Boolean call() throws IOException {
+            return File.pathSeparatorChar == ':';
+        }
+    }
+
+    private static final class DetectDefaultCharset implements Callable<String, IOException> {
+
         public String call() throws IOException {
             return Charset.defaultCharset().name();
         }
     }
 
     /**
-     * Puts the {@link #SLAVE_LOG_HANDLER} into a separate class so that loading this class
-     * in JVM doesn't end up loading tons of additional classes.
+     * Puts the {@link #SLAVE_LOG_HANDLER} into a separate class so that loading
+     * this class in JVM doesn't end up loading tons of additional classes.
      */
     static final class LogHolder {
+
         /**
-         * This field is used on each slave node to record log records on the slave.
+         * This field is used on each slave node to record log records on the
+         * slave.
          */
         static final RingBufferLogHandler SLAVE_LOG_HANDLER = new RingBufferLogHandler();
     }
 
-    private static class SlaveInitializer implements Callable<Void,RuntimeException> {
+    private static class SlaveInitializer implements Callable<Void, RuntimeException> {
+
         public Void call() {
             // avoid double installation of the handler. JNLP slaves can reconnect to the master multiple times
             // and each connection gets a different RemoteClassLoader, so we need to evict them by class name,
             // not by their identity.
             Logger logger = Logger.getLogger("hudson");
             for (Handler h : logger.getHandlers()) {
-                if (h.getClass().getName().equals(SLAVE_LOG_HANDLER.getClass().getName()))
+                if (h.getClass().getName().equals(SLAVE_LOG_HANDLER.getClass().getName())) {
                     logger.removeHandler(h);
+                }
             }
             logger.addHandler(SLAVE_LOG_HANDLER);
 
@@ -552,30 +570,34 @@ public class SlaveComputer extends Computer {
                 // ignore this error.
             }
 
-            Channel.current().setProperty("slave",Boolean.TRUE); // indicate that this side of the channel is the slave side.
-            
+            Channel.current().setProperty("slave", Boolean.TRUE); // indicate that this side of the channel is the slave side.
+
             return null;
         }
         private static final long serialVersionUID = 1L;
     }
 
     /**
-     * Obtains a {@link VirtualChannel} that allows some computation to be performed on the master.
-     * This method can be called from any thread on the master, or from slave (more precisely,
-     * it only works from the remoting request-handling thread in slaves, which means if you've started
-     * separate thread on slaves, that'll fail.)
+     * Obtains a {@link VirtualChannel} that allows some computation to be
+     * performed on the master. This method can be called from any thread on the
+     * master, or from slave (more precisely, it only works from the remoting
+     * request-handling thread in slaves, which means if you've started separate
+     * thread on slaves, that'll fail.)
      *
-     * @return null if the calling thread doesn't have any trace of where its master is.
+     * @return null if the calling thread doesn't have any trace of where its
+     * master is.
      * @since 1.362
      */
     public static VirtualChannel getChannelToMaster() {
-        if (Hudson.getInstance()!=null)
+        if (Hudson.getInstance() != null) {
             return MasterComputer.localChannel;
+        }
 
         // if this method is called from within the slave computation thread, this should work
         Channel c = Channel.current();
-        if (c!=null && c.getProperty("slave")==Boolean.TRUE)
+        if (c != null && c.getProperty("slave") == Boolean.TRUE) {
             return c;
+        }
 
         return null;
     }

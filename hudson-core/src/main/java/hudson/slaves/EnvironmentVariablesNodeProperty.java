@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -42,7 +42,7 @@ public class EnvironmentVariablesNodeProperty extends NodeProperty<Node> {
      * Slave-specific environment variables
      */
     private final EnvVars envVars;
-    
+
     @DataBoundConstructor
     public EnvironmentVariablesNodeProperty(List<Entry> env) {
         this.envVars = toMap(env);
@@ -51,24 +51,24 @@ public class EnvironmentVariablesNodeProperty extends NodeProperty<Node> {
     public EnvironmentVariablesNodeProperty(Entry... env) {
         this(Arrays.asList(env));
     }
-	
+
     public EnvVars getEnvVars() {
-    	return envVars;
+        return envVars;
     }
 
     @Override
     public Environment setUp(AbstractBuild build, Launcher launcher,
-			BuildListener listener) throws IOException, InterruptedException {
-    	return Environment.create(envVars);
+            BuildListener listener) throws IOException, InterruptedException {
+        return Environment.create(envVars);
     }
 
     @Extension
     public static class DescriptorImpl extends NodePropertyDescriptor {
 
         @Override
-		public String getDisplayName() {
-			return Messages.EnvironmentVariablesNodeProperty_displayName();
-		}
+        public String getDisplayName() {
+            return Messages.EnvironmentVariablesNodeProperty_displayName();
+        }
 
         public String getHelpPage() {
             // yes, I know this is a work around.
@@ -82,16 +82,17 @@ public class EnvironmentVariablesNodeProperty extends NodeProperty<Node> {
             }
         }
     }
-	
-	public static class Entry {
-        //TODO: review and check whether we can do it private
-		public String key, value;
 
-		@DataBoundConstructor
-		public Entry(String key, String value) {
-			this.key = key;
-			this.value = value;
-		}
+    public static class Entry {
+        //TODO: review and check whether we can do it private
+
+        public String key, value;
+
+        @DataBoundConstructor
+        public Entry(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
 
         public String getKey() {
             return key;
@@ -101,13 +102,14 @@ public class EnvironmentVariablesNodeProperty extends NodeProperty<Node> {
             return value;
         }
     }
-	
-	private static EnvVars toMap(List<Entry> entries) {
-		EnvVars map = new EnvVars();
-        if (entries!=null)
-            for (Entry entry: entries)
-                map.put(entry.key,entry.value);
-		return map;
-	}
 
+    private static EnvVars toMap(List<Entry> entries) {
+        EnvVars map = new EnvVars();
+        if (entries != null) {
+            for (Entry entry : entries) {
+                map.put(entry.key, entry.value);
+            }
+        }
+        return map;
+    }
 }

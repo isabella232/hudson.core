@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -26,14 +26,15 @@ import java.util.List;
 
 /**
  * Convenient base implementation of {@link ComputerLauncher} that allows
- * subtypes to perform some initialization (typically something cloud/v12n related
- * to power up the machine), then to delegate to another {@link ComputerLauncher}
- * to connect.
+ * subtypes to perform some initialization (typically something cloud/v12n
+ * related to power up the machine), then to delegate to another
+ * {@link ComputerLauncher} to connect.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.382
  */
 public abstract class DelegatingComputerLauncher extends ComputerLauncher {
+
     protected ComputerLauncher launcher;
 
     protected DelegatingComputerLauncher(ComputerLauncher launcher) {
@@ -60,18 +61,21 @@ public abstract class DelegatingComputerLauncher extends ComputerLauncher {
     }
 
     public static abstract class DescriptorImpl extends Descriptor<ComputerLauncher> {
+
         /**
-         * Returns the applicable nested computer launcher types.
-         * The default implementation avoids all delegating descriptors, as that creates infinite recursion.
+         * Returns the applicable nested computer launcher types. The default
+         * implementation avoids all delegating descriptors, as that creates
+         * infinite recursion.
          */
         public List<Descriptor<ComputerLauncher>> getApplicableDescriptors() {
             List<Descriptor<ComputerLauncher>> r = new ArrayList<Descriptor<ComputerLauncher>>();
             for (Descriptor<ComputerLauncher> d : Functions.getComputerLauncherDescriptors()) {
-                if (DelegatingComputerLauncher.class.isInstance(d))  continue;
+                if (DelegatingComputerLauncher.class.isInstance(d)) {
+                    continue;
+                }
                 r.add(d);
             }
             return r;
         }
     }
-
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Stephen Connolly
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Stephen Connolly
+ *
  *
  *******************************************************************************/ 
 
@@ -27,23 +27,22 @@ import org.kohsuke.stapler.DataBoundConstructor;
  *
  * @author Stephen Connolly
  * @author Kohsuke Kawaguchi
-*/
+ */
 public class JNLPLauncher extends ComputerLauncher {
+
     /**
-     * If the slave needs to tunnel the connection to the master,
-     * specify the "host:port" here. This can include the special
-     * syntax "host:" and ":port" to indicate the default host/port
-     * shall be used.
+     * If the slave needs to tunnel the connection to the master, specify the
+     * "host:port" here. This can include the special syntax "host:" and ":port"
+     * to indicate the default host/port shall be used.
      *
-     * <p>
-     * Null if no tunneling is necessary.
+     * <p> Null if no tunneling is necessary.
      *
      * @since 1.250
      */
     public final String tunnel;
-
     /**
      * Additional JVM arguments. Can be null.
+     *
      * @since 1.297
      */
     public final String vmargs;
@@ -55,7 +54,7 @@ public class JNLPLauncher extends ComputerLauncher {
     }
 
     public JNLPLauncher() {
-        this(null,null);
+        this(null, null);
     }
 
     @Override
@@ -67,12 +66,10 @@ public class JNLPLauncher extends ComputerLauncher {
     public void launch(SlaveComputer computer, TaskListener listener) {
         // do nothing as we cannot self start
     }
-
     @Extension
     public static final Descriptor<ComputerLauncher> DESCRIPTOR = new Descriptor<ComputerLauncher>() {
         public String getDisplayName() {
             return Messages.JNLPLauncher_displayName();
         }
     };
-
 }

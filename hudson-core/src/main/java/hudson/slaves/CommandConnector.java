@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -29,6 +29,7 @@ import java.io.IOException;
  * @author Kohsuke Kawaguchi
  */
 public class CommandConnector extends ComputerConnector {
+
     public final String command;
 
     @DataBoundConstructor
@@ -38,11 +39,12 @@ public class CommandConnector extends ComputerConnector {
 
     @Override
     public CommandLauncher launch(String host, TaskListener listener) throws IOException, InterruptedException {
-        return new CommandLauncher(command,new EnvVars("SLAVE",host));
+        return new CommandLauncher(command, new EnvVars("SLAVE", host));
     }
 
     @Extension
     public static class DescriptorImpl extends ComputerConnectorDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.CommandLauncher_displayName();

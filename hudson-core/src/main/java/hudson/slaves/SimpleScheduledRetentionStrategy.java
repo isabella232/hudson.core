@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Stephen Connolly
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Stephen Connolly
+ *
  *
  *******************************************************************************/ 
 
@@ -36,7 +36,7 @@ import static java.util.logging.Level.INFO;
 import org.antlr.runtime.RecognitionException;
 
 /**
- * {@link RetentionStrategy} that controls the slave based on a schedule. 
+ * {@link RetentionStrategy} that controls the slave based on a schedule.
  *
  * @author Stephen Connolly
  * @since 1.275
@@ -44,7 +44,6 @@ import org.antlr.runtime.RecognitionException;
 public class SimpleScheduledRetentionStrategy extends RetentionStrategy<SlaveComputer> {
 
     private static final Logger LOGGER = Logger.getLogger(SimpleScheduledRetentionStrategy.class.getName());
-
     private final String startTimeSpec;
     private transient CronTabList tabs;
     private transient Calendar lastChecked;
@@ -216,6 +215,7 @@ public class SimpleScheduledRetentionStrategy extends RetentionStrategy<SlaveCom
 
     @Extension
     public static class DescriptorImpl extends Descriptor<RetentionStrategy<?>> {
+
         public String getDisplayName() {
             return Messages.SimpleScheduledRetentionStrategy_displayName();
         }
@@ -226,8 +226,9 @@ public class SimpleScheduledRetentionStrategy extends RetentionStrategy<SlaveCom
         public FormValidation doCheck(@QueryParameter String value) {
             try {
                 String msg = CronTabList.create(fixNull(value)).checkSanity();
-                if (msg != null)
+                if (msg != null) {
                     return FormValidation.warning(msg);
+                }
                 return FormValidation.ok();
             } catch (RecognitionException e) {
                 return FormValidation.error(e.getMessage());
