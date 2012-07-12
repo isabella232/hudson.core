@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -20,8 +20,9 @@ package hudson.search;
  * @author Kohsuke Kawaguchi
  */
 public class SearchItems {
+
     public static SearchItem create(String searchName, String url) {
-        return create(searchName,url, SearchIndex.EMPTY);
+        return create(searchName, url, SearchIndex.EMPTY);
     }
 
     public static SearchItem create(final String searchName, final String url, final SearchIndex children) {
