@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -46,10 +46,10 @@ import org.kohsuke.args4j.Argument;
  */
 @Extension
 public class InstallToolCommand extends CLICommand {
-    @Argument(index=0,metaVar="KIND",usage="The type of the tool to install, such as 'Ant'")
-    public String toolType;
 
-    @Argument(index=1,metaVar="NAME",usage="The name of the tool to install, as you've entered in the Hudson system configuration")
+    @Argument(index = 0, metaVar = "KIND", usage = "The type of the tool to install, such as 'Ant'")
+    public String toolType;
+    @Argument(index = 1, metaVar = "NAME", usage = "The name of the tool to install, as you've entered in the Hudson system configuration")
     public String toolName;
 
     public String getShortDescription() {
@@ -63,12 +63,14 @@ public class InstallToolCommand extends CLICommand {
         // where is this build running?
         BuildIDs id = channel.call(new BuildIDs());
 
-        if (!id.isComplete())
+        if (!id.isComplete()) {
             throw new AbortException("This command can be only invoked from a build executing inside Hudson");
+        }
 
         AbstractProject p = Hudson.getInstance().getItemByFullName(id.job, AbstractProject.class);
-        if (p==null)
-            throw new AbortException("No such job found: "+id.job);
+        if (p == null) {
+            throw new AbortException("No such job found: " + id.job);
+        }
         p.checkPermission(Item.CONFIGURE);
 
         List<String> toolTypes = new ArrayList<String>();
@@ -78,8 +80,9 @@ public class InstallToolCommand extends CLICommand {
                 List<String> toolNames = new ArrayList<String>();
                 for (ToolInstallation t : d.getInstallations()) {
                     toolNames.add(t.getName());
-                    if (t.getName().equals(toolName))
+                    if (t.getName().equals(toolName)) {
                         return install(t, id, p);
+                    }
                 }
 
                 // didn't find the right tool name
@@ -95,10 +98,11 @@ public class InstallToolCommand extends CLICommand {
     }
 
     private int error(List<String> candidates, String given, String noun) throws AbortException {
-        if (given ==null)
-            throw new AbortException("No tool "+ noun +" was specified. Valid values are "+candidates.toString());
-        else
-            throw new AbortException("Unrecognized tool "+noun+". Perhaps you meant '"+ EditDistance.findNearest(given,candidates)+"'?");
+        if (given == null) {
+            throw new AbortException("No tool " + noun + " was specified. Valid values are " + candidates.toString());
+        } else {
+            throw new AbortException("Unrecognized tool " + noun + ". Perhaps you meant '" + EditDistance.findNearest(given, candidates) + "'?");
+        }
     }
 
     /**
@@ -107,29 +111,32 @@ public class InstallToolCommand extends CLICommand {
     private int install(ToolInstallation t, BuildIDs id, AbstractProject p) throws IOException, InterruptedException {
 
         Run b = p.getBuildByNumber(Integer.parseInt(id.number));
-        if (b==null)
-            throw new AbortException("No such build: "+id.number);
+        if (b == null) {
+            throw new AbortException("No such build: " + id.number);
+        }
 
         Executor exec = b.getExecutor();
-        if (exec==null)
-            throw new AbortException(b.getFullDisplayName()+" is not building");
+        if (exec == null) {
+            throw new AbortException(b.getFullDisplayName() + " is not building");
+        }
 
         Node node = exec.getOwner().getNode();
 
         if (t instanceof NodeSpecific) {
             NodeSpecific n = (NodeSpecific) t;
-            t = (ToolInstallation)n.forNode(node,new StreamTaskListener(stderr));
+            t = (ToolInstallation) n.forNode(node, new StreamTaskListener(stderr));
         }
         if (t instanceof EnvironmentSpecific) {
             EnvironmentSpecific e = (EnvironmentSpecific) t;
-            t = (ToolInstallation)e.forEnvironment(EnvVars.getRemote(channel));
+            t = (ToolInstallation) e.forEnvironment(EnvVars.getRemote(channel));
         }
         stdout.println(t.getHome());
         return 0;
     }
 
     private static final class BuildIDs implements Callable<BuildIDs, IOException> {
-        String job,number,id;
+
+        String job, number, id;
 
         public BuildIDs call() throws IOException {
             job = System.getenv("JOB_NAME");
@@ -139,9 +146,8 @@ public class InstallToolCommand extends CLICommand {
         }
 
         boolean isComplete() {
-            return job!=null && number!=null && id!=null;
+            return job != null && number != null && id != null;
         }
-
         private static final long serialVersionUID = 1L;
     }
 }

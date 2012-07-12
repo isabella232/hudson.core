@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -35,26 +35,24 @@ import java.util.Set;
 
 /**
  * Installs a plugin either from a file, an URL, or from update center.
- * 
+ *
  * @author Kohsuke Kawaguchi
  * @since 1.331
  */
 @Extension
 public class InstallPluginCommand extends CLICommand {
+
     public String getShortDescription() {
         return "Installs a plugin either from a file, an URL, or from update center";
     }
-
-    @Argument(metaVar="SOURCE",required=true,usage="If this points to a local file, that file will be installed. " +
-            "If this is an URL, Hudson downloads the URL and installs that as a plugin." +
-            "Otherwise the name is assumed to be the short name of the plugin in the existing update center (like \"findbugs\")," +
-            "and the plugin will be installed from the update center")
+    @Argument(metaVar = "SOURCE", required = true, usage = "If this points to a local file, that file will be installed. "
+    + "If this is an URL, Hudson downloads the URL and installs that as a plugin."
+    + "Otherwise the name is assumed to be the short name of the plugin in the existing update center (like \"findbugs\"),"
+    + "and the plugin will be installed from the update center")
     public List<String> sources = new ArrayList<String>();
-
-    @Option(name="-name",usage="If specified, the plugin will be installed as this short name (whereas normally the name is inferred from the source name automatically.)")
+    @Option(name = "-name", usage = "If specified, the plugin will be installed as this short name (whereas normally the name is inferred from the source name automatically.)")
     public String name;
-
-    @Option(name="-restart",usage="Restart Hudson upon successful installation")
+    @Option(name = "-restart", usage = "Restart Hudson upon successful installation")
     public boolean restart;
 
     protected int run() throws Exception {
@@ -66,8 +64,9 @@ public class InstallPluginCommand extends CLICommand {
             FilePath f = new FilePath(channel, source);
             if (f.exists()) {
                 stdout.println(Messages.InstallPluginCommand_InstallingPluginFromLocalFile(f));
-                if (name==null)
+                if (name == null) {
                     name = f.getBaseName();
+                }
                 f.copyTo(getTargetFile());
                 continue;
             }
@@ -76,12 +75,14 @@ public class InstallPluginCommand extends CLICommand {
             try {
                 URL u = new URL(source);
                 stdout.println(Messages.InstallPluginCommand_InstallingPluginFromUrl(u));
-                if (name==null) {
+                if (name == null) {
                     name = u.getPath();
-                    name = name.substring(name.indexOf('/')+1);
-                    name = name.substring(name.indexOf('\\')+1);
+                    name = name.substring(name.indexOf('/') + 1);
+                    name = name.substring(name.indexOf('\\') + 1);
                     int idx = name.lastIndexOf('.');
-                    if (idx>0)  name = name.substring(0,idx);
+                    if (idx > 0) {
+                        name = name.substring(0, idx);
+                    }
                 }
                 getTargetFile().copyFrom(u);
                 continue;
@@ -91,7 +92,7 @@ public class InstallPluginCommand extends CLICommand {
 
             // is this a plugin the update center?
             UpdateSite.Plugin p = h.getUpdateCenter().getPlugin(source);
-            if (p!=null) {
+            if (p != null) {
                 stdout.println(Messages.InstallPluginCommand_InstallingFromUpdateCenter(source));
                 p.deploy().get();
                 continue;
@@ -107,25 +108,26 @@ public class InstallPluginCommand extends CLICommand {
                     Set<String> candidates = new HashSet<String>();
                     for (UpdateSite s : h.getUpdateCenter().getSites()) {
                         Data dt = s.getData();
-                        if (dt==null) {
+                        if (dt == null) {
                             stdout.println(Messages.InstallPluginCommand_NoUpdateDataRetrieved(s.getUrl()));
                         } else {
                             candidates.addAll(dt.plugins.keySet());
                         }
                     }
-                    stdout.println(Messages.InstallPluginCommand_DidYouMean(source,EditDistance.findNearest(source,candidates)));
+                    stdout.println(Messages.InstallPluginCommand_DidYouMean(source, EditDistance.findNearest(source, candidates)));
                 }
             }
 
             return 1;
         }
 
-        if (restart)
+        if (restart) {
             h.restart();
+        }
         return 0; // all success
     }
 
     private FilePath getTargetFile() {
-        return new FilePath(new File(Hudson.getInstance().getPluginManager().rootDir,name+".hpi"));
+        return new FilePath(new File(Hudson.getInstance().getPluginManager().rootDir, name + ".hpi"));
     }
 }

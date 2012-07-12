@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -24,6 +24,7 @@ import hudson.Extension;
  */
 @Extension
 public class LogoutCommand extends CLICommand {
+
     @Override
     public String getShortDescription() {
         return "Deletes the credential stored with the login command";

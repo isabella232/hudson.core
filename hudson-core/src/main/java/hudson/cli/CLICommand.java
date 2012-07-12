@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *   Kohsuke Kawaguchi, Winston Prakash
- *       
+ *
  *******************************************************************************/ 
 
 package hudson.cli;
@@ -51,36 +51,34 @@ import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 /**
  * Base class for Hudson CLI.
  *
- * <h2>How does a CLI command work</h2>
- * <p>
- * The users starts {@linkplain CLI the "CLI agent"} on a remote system, by specifying arguments, like
- * <tt>"java -jar hudson-cli.jar command arg1 arg2 arg3"</tt>. The CLI agent creates
- * a remoting channel with the server, and it sends the entire arguments to the server, along with
- * the remoted stdin/out/err.
+ * <h2>How does a CLI command work</h2> <p> The users starts
+ * {@linkplain CLI the "CLI agent"} on a remote system, by specifying arguments,
+ * like <tt>"java -jar hudson-cli.jar command arg1 arg2 arg3"</tt>. The CLI
+ * agent creates a remoting channel with the server, and it sends the entire
+ * arguments to the server, along with the remoted stdin/out/err.
  *
- * <p>
- * The Hudson master then picks the right {@link CLICommand} to execute, clone it, and
- * calls {@link #main(List, Locale, InputStream, PrintStream, PrintStream)} method.
+ * <p> The Hudson master then picks the right {@link CLICommand} to execute,
+ * clone it, and calls
+ * {@link #main(List, Locale, InputStream, PrintStream, PrintStream)} method.
  *
- * <h2>Note for CLI command implementor</h2>
- * Start with <a href="http://wiki.hudson-ci.org/display/HUDSON/Writing+CLI+commands">this document</a>
- * to get the general idea of CLI.
+ * <h2>Note for CLI command implementor</h2> Start with <a
+ * href="http://wiki.hudson-ci.org/display/HUDSON/Writing+CLI+commands">this
+ * document</a> to get the general idea of CLI.
  *
- * <ul>
- * <li>
- * Put {@link Extension} on your implementation to have it discovered by Hudson.
+ * <ul> <li> Put {@link Extension} on your implementation to have it discovered
+ * by Hudson.
  *
- * <li>
- * Use <a href="http://java.net/projects/args4j/">args4j</a> annotation on your implementation to define
- * options and arguments (however, if you don't like that, you could override
- * the {@link #main(List, Locale, InputStream, PrintStream, PrintStream)} method directly.
+ * <li> Use <a href="http://java.net/projects/args4j/">args4j</a> annotation on
+ * your implementation to define options and arguments (however, if you don't
+ * like that, you could override the
+ * {@link #main(List, Locale, InputStream, PrintStream, PrintStream)} method
+ * directly.
  *
- * <li>
- * stdin, stdout, stderr are remoted, so proper buffering is necessary for good user experience.
+ * <li> stdin, stdout, stderr are remoted, so proper buffering is necessary for
+ * good user experience.
  *
- * <li>
- * Send {@link Callable} to a CLI agent by using {@link #channel} to get local interaction,
- * such as uploading a file, asking for a password, etc.
+ * <li> Send {@link Callable} to a CLI agent by using {@link #channel} to get
+ * local interaction, such as uploading a file, asking for a password, etc.
  *
  * </ul>
  *
@@ -90,63 +88,58 @@ import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
  */
 @LegacyInstancesAreScopedToHudson
 public abstract class CLICommand implements ExtensionPoint, Cloneable {
+
     /**
-     * Connected to stdout and stderr of the CLI agent that initiated the session.
-     * IOW, if you write to these streams, the person who launched the CLI command
-     * will see the messages in his terminal.
+     * Connected to stdout and stderr of the CLI agent that initiated the
+     * session. IOW, if you write to these streams, the person who launched the
+     * CLI command will see the messages in his terminal.
      *
-     * <p>
-     * (In contrast, calling {@code System.out.println(...)} would print out
+     * <p> (In contrast, calling {@code System.out.println(...)} would print out
      * the message to the server log file, which is probably not what you want.
      */
-    public transient PrintStream stdout,stderr;
-
+    public transient PrintStream stdout, stderr;
     /**
      * Connected to stdin of the CLI agent.
      *
-     * <p>
-     * This input stream is buffered to hide the latency in the remoting.
+     * <p> This input stream is buffered to hide the latency in the remoting.
      */
     public transient InputStream stdin;
-
     /**
-     * {@link Channel} that represents the CLI JVM. You can use this to
-     * execute {@link Callable} on the CLI JVM, among other things.
+     * {@link Channel} that represents the CLI JVM. You can use this to execute
+     * {@link Callable} on the CLI JVM, among other things.
      */
     public transient Channel channel;
-
     /**
-     * The locale of the client. Messages should be formatted with this resource.
+     * The locale of the client. Messages should be formatted with this
+     * resource.
      */
     public transient Locale locale;
-
 
     /**
      * Gets the command name.
      *
-     * <p>
-     * For example, if the CLI is invoked as <tt>java -jar cli.jar foo arg1 arg2 arg4</tt>,
-     * on the server side {@link CLICommand} that returns "foo" from {@link #getName()}
-     * will be invoked.
+     * <p> For example, if the CLI is invoked as <tt>java -jar cli.jar foo arg1
+     * arg2 arg4</tt>, on the server side {@link CLICommand} that returns "foo"
+     * from {@link #getName()} will be invoked.
      *
-     * <p>
-     * By default, this method creates "foo-bar-zot" from "FooBarZotCommand".
+     * <p> By default, this method creates "foo-bar-zot" from
+     * "FooBarZotCommand".
      */
     public String getName() {
         String name = getClass().getName();
-        name = name.substring(name.lastIndexOf('.')+1); // short name
-        name = name.substring(name.lastIndexOf('$')+1);
-        if(name.endsWith("Command"))
-            name = name.substring(0,name.length()-7); // trim off the command
-
+        name = name.substring(name.lastIndexOf('.') + 1); // short name
+        name = name.substring(name.lastIndexOf('$') + 1);
+        if (name.endsWith("Command")) {
+            name = name.substring(0, name.length() - 7); // trim off the command
+        }
         // convert "FooBarZot" into "foo-bar-zot"
         // Locale is fixed so that "CreateInstance" always become "create-instance" no matter where this is run.
-        return name.replaceAll("([a-z0-9])([A-Z])","$1-$2").toLowerCase(Locale.ENGLISH);
+        return name.replaceAll("([a-z0-9])([A-Z])", "$1-$2").toLowerCase(Locale.ENGLISH);
     }
 
     /**
-     * Gets the quick summary of what this command does.
-     * Used by the help command to generate the list of commands.
+     * Gets the quick summary of what this command does. Used by the help
+     * command to generate the list of commands.
      */
     public abstract String getShortDescription();
 
@@ -164,16 +157,18 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
         Authentication old = sc.getAuthentication();
 
         CliAuthenticator authenticator = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm().createCliAuthenticator(this);
-        new ClassParser().parse(authenticator,p);
+        new ClassParser().parse(authenticator, p);
 
         try {
             p.parseArgument(args.toArray(new String[args.size()]));
             Authentication auth = authenticator.authenticate();
-            if (auth==Hudson.ANONYMOUS)
+            if (auth == Hudson.ANONYMOUS) {
                 auth = loadStoredAuthentication();
+            }
             sc.setAuthentication(auth); // run the CLI with the right credential
-            if (!(this instanceof LoginCommand || this instanceof HelpCommand))
+            if (!(this instanceof LoginCommand || this instanceof HelpCommand)) {
                 Hudson.getInstance().checkPermission(Hudson.READ);
+            }
             return run();
         } catch (CmdLineException e) {
             stderr.println(e.getMessage());
@@ -192,7 +187,8 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
     }
 
     /**
-     * Loads the persisted authentication information from {@link ClientAuthenticationCache}.
+     * Loads the persisted authentication information from
+     * {@link ClientAuthenticationCache}.
      */
     protected Authentication loadStoredAuthentication() throws InterruptedException {
         try {
@@ -205,84 +201,88 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
     }
 
     /**
-     * Determines if the user authentication is attempted through CLI before running this command.
+     * Determines if the user authentication is attempted through CLI before
+     * running this command.
      *
-     * <p>
-     * If your command doesn't require any authentication whatsoever, and if you don't even want to let the user
-     * authenticate, then override this method to always return false &mdash; doing so will result in all the commands
-     * running as anonymous user credential.
+     * <p> If your command doesn't require any authentication whatsoever, and if
+     * you don't even want to let the user authenticate, then override this
+     * method to always return false &mdash; doing so will result in all the
+     * commands running as anonymous user credential.
      *
-     * <p>
-     * Note that even if this method returns true, the user can still skip aut 
+     * <p> Note that even if this method returns true, the user can still skip
+     * aut
      *
-     * @param auth
-     *      Always non-null.
-     *      If the underlying transport had already performed authentication, this object is something other than
-     *      {@link Hudson#ANONYMOUS}.
+     * @param auth Always non-null. If the underlying transport had already
+     * performed authentication, this object is something other than
+     * {@link Hudson#ANONYMOUS}.
      */
     protected boolean shouldPerformAuthentication(Authentication auth) {
-        return auth==Hudson.ANONYMOUS;
+        return auth == Hudson.ANONYMOUS;
     }
 
     /**
-     * Returns the identity of the client as determined at the CLI transport level.
+     * Returns the identity of the client as determined at the CLI transport
+     * level.
      *
-     * <p>
-     * When the CLI connection to the server is tunneled over HTTP, that HTTP connection
-     * can authenticate the client, just like any other HTTP connections to the server
-     * can authenticate the client. This method returns that information, if one is available.
-     * By generalizing it, this method returns the identity obtained at the transport-level authentication.
+     * <p> When the CLI connection to the server is tunneled over HTTP, that
+     * HTTP connection can authenticate the client, just like any other HTTP
+     * connections to the server can authenticate the client. This method
+     * returns that information, if one is available. By generalizing it, this
+     * method returns the identity obtained at the transport-level
+     * authentication.
      *
-     * <p>
-     * For example, imagine if the current {@link SecurityRealm} is doing Kerberos authentication,
-     * then this method can return a valid identity of the client.
+     * <p> For example, imagine if the current {@link SecurityRealm} is doing
+     * Kerberos authentication, then this method can return a valid identity of
+     * the client.
      *
-     * <p>
-     * If the transport doesn't do authentication, this method returns {@link Hudson#ANONYMOUS}.
+     * <p> If the transport doesn't do authentication, this method returns
+     * {@link Hudson#ANONYMOUS}.
      */
     public Authentication getTransportAuthentication() {
         Authentication a = channel.getProperty(TRANSPORT_AUTHENTICATION);
-        if (a==null)    a = Hudson.ANONYMOUS;
+        if (a == null) {
+            a = Hudson.ANONYMOUS;
+        }
         return a;
     }
 
     /**
      * Executes the command, and return the exit code.
      *
-     * @return
-     *      0 to indicate a success, otherwise an error code.
-     * @throws AbortException
-     *      If the processing should be aborted. Hudson will report the error message
-     *      without stack trace, and then exits this command.
-     * @throws Exception
-     *      All the other exceptions cause the stack trace to be dumped, and then
-     *      the command exits with an error code.
+     * @return 0 to indicate a success, otherwise an error code.
+     * @throws AbortException If the processing should be aborted. Hudson will
+     * report the error message without stack trace, and then exits this
+     * command.
+     * @throws Exception All the other exceptions cause the stack trace to be
+     * dumped, and then the command exits with an error code.
      */
     protected abstract int run() throws Exception;
 
     protected void printUsage(PrintStream stderr, CmdLineParser p) {
-        stderr.println("java -jar hudson-cli.jar "+getName()+" args...");
+        stderr.println("java -jar hudson-cli.jar " + getName() + " args...");
         printUsageSummary(stderr);
         p.printUsage(stderr);
     }
 
     /**
-     * Called while producing usage. This is a good method to override
-     * to render the general description of the command that goes beyond
-     * a single-line summary. 
+     * Called while producing usage. This is a good method to override to render
+     * the general description of the command that goes beyond a single-line
+     * summary.
      */
     protected void printUsageSummary(PrintStream stderr) {
         stderr.println(getShortDescription());
     }
 
     /**
-     * Convenience method for subtypes to obtain the system property of the client.
+     * Convenience method for subtypes to obtain the system property of the
+     * client.
      */
     protected String getClientSystemProperty(String name) throws IOException, InterruptedException {
         return channel.call(new GetSystemProperty(name));
     }
 
     private static final class GetSystemProperty implements Callable<String, IOException> {
+
         private final String name;
 
         private GetSystemProperty(String name) {
@@ -292,18 +292,19 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
         public String call() throws IOException {
             return System.getProperty(name);
         }
-
         private static final long serialVersionUID = 1L;
     }
 
     /**
-     * Convenience method for subtypes to obtain environment variables of the client.
+     * Convenience method for subtypes to obtain environment variables of the
+     * client.
      */
     protected String getClientEnvironmentVariable(String name) throws IOException, InterruptedException {
         return channel.call(new GetEnvironmentVariable(name));
     }
 
     private static final class GetEnvironmentVariable implements Callable<String, IOException> {
+
         private final String name;
 
         private GetEnvironmentVariable(String name) {
@@ -313,7 +314,6 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
         public String call() throws IOException {
             return System.getenv(name);
         }
-
         private static final long serialVersionUID = 1L;
     }
 
@@ -331,13 +331,14 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
     }
 
     /**
-     * Auto-discovers {@link OptionHandler}s and add them to the given command line parser.
+     * Auto-discovers {@link OptionHandler}s and add them to the given command
+     * line parser.
      */
     protected void registerOptionHandlers() {
         try {
-            for (Class c : Index.list(OptionHandlerExtension.class,Hudson.getInstance().pluginManager.uberClassLoader,Class.class)) {
+            for (Class c : Index.list(OptionHandlerExtension.class, Hudson.getInstance().pluginManager.uberClassLoader, Class.class)) {
                 Type t = Types.getBaseClass(c, OptionHandler.class);
-                CmdLineParser.registerHandler(Types.erasure(Types.getTypeArgument(t,0)), c);
+                CmdLineParser.registerHandler(Types.erasure(Types.getTypeArgument(t, 0)), c);
             }
         } catch (IOException e) {
             throw new Error(e);
@@ -355,20 +356,20 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
      * Obtains a copy of the command for invocation.
      */
     public static CLICommand clone(String name) {
-        for (CLICommand cmd : all())
-            if(name.equals(cmd.getName()))
+        for (CLICommand cmd : all()) {
+            if (name.equals(cmd.getName())) {
                 return cmd.createClone();
+            }
+        }
         return null;
     }
-
     private static final Logger LOGGER = Logger.getLogger(CLICommand.class.getName());
-
     /**
-     * Key for {@link Channel#getProperty(Object)} that links to the {@link Authentication} object
-     * which captures the identity of the client given by the transport layer.
+     * Key for {@link Channel#getProperty(Object)} that links to the
+     * {@link Authentication} object which captures the identity of the client
+     * given by the transport layer.
      */
-    public static final ChannelProperty<Authentication> TRANSPORT_AUTHENTICATION = new ChannelProperty<Authentication>(Authentication.class,"transportAuthentication");
-
+    public static final ChannelProperty<Authentication> TRANSPORT_AUTHENTICATION = new ChannelProperty<Authentication>(Authentication.class, "transportAuthentication");
     private static final ThreadLocal<CLICommand> CURRENT_COMMAND = new ThreadLocal<CLICommand>();
 
     /*package*/ static CLICommand setCurrent(CLICommand cmd) {
@@ -378,7 +379,8 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
     }
 
     /**
-     * If the calling thread is in the middle of executing a CLI command, return it. Otherwise null.
+     * If the calling thread is in the middle of executing a CLI command, return
+     * it. Otherwise null.
      */
     public static CLICommand getCurrent() {
         return CURRENT_COMMAND.get();

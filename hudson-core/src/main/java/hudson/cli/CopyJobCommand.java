@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -24,25 +24,22 @@ import hudson.model.Item;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
-
 /**
  * Copies a job from CLI.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 @Extension
 public class CopyJobCommand extends CLICommand {
+
     @Override
     public String getShortDescription() {
         return "Copies a job";
     }
-
-    @Argument(metaVar="SRC",usage="Name of the job to copy",required=true)
+    @Argument(metaVar = "SRC", usage = "Name of the job to copy", required = true)
     public TopLevelItem src;
-
-    @Argument(metaVar="DST",usage="Name of the new job to be created.",index=1,required=true)
+    @Argument(metaVar = "DST", usage = "Name of the new job to be created.", index = 1, required = true)
     public String dst;
-
     @Option(name = "-fs", aliases = {"--force-save"}, usage = "Force saving the destination job in order to enable build functionality.")
     public boolean forceSave;
 
@@ -50,17 +47,16 @@ public class CopyJobCommand extends CLICommand {
         Hudson h = Hudson.getInstance();
         h.checkPermission(Item.CREATE);
 
-        if (h.getItem(dst)!=null) {
-            stderr.println("Job '"+dst+"' already exists");
+        if (h.getItem(dst) != null) {
+            stderr.println("Job '" + dst + "' already exists");
             return -1;
         }
-        
-        h.copy(src,dst);
-        Job newJob = (Job)Hudson.getInstance().getItem(dst);
+
+        h.copy(src, dst);
+        Job newJob = (Job) Hudson.getInstance().getItem(dst);
         if (forceSave && null != newJob) {
             newJob.save();
         }
         return 0;
     }
 }
-

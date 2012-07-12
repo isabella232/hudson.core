@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -25,13 +25,14 @@ import hudson.tasks.Mailer;
 /**
  * Sends e-mail through Hudson.
  *
- * <p>
- * Various platforms have different commands to do this, so on heterogenous platform, doing this via Hudson is easier.
+ * <p> Various platforms have different commands to do this, so on heterogenous
+ * platform, doing this via Hudson is easier.
  *
  * @author Kohsuke Kawaguchi
  */
 @Extension
 public class MailCommand extends CLICommand {
+
     public String getShortDescription() {
         return "Reads stdin and sends that out as an e-mail.";
     }

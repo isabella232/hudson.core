@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -32,31 +32,27 @@ public class SetBuildDescriptionCommand extends CLICommand implements Serializab
     public String getShortDescription() {
         return "Sets the description of a build";
     }
-
-    @Argument(metaVar="JOB",usage="Name of the job to build",required=true,index=0)
-    public transient AbstractProject<?,?> job;
-
-    @Argument(metaVar="BUILD#",usage="Number of the build",required=true,index=1)
+    @Argument(metaVar = "JOB", usage = "Name of the job to build", required = true, index = 0)
+    public transient AbstractProject<?, ?> job;
+    @Argument(metaVar = "BUILD#", usage = "Number of the build", required = true, index = 1)
     public int number;
-    
-    @Argument(metaVar="DESCRIPTION",required=true,usage="Description to be set. '=' to read from stdin.", index=2)
+    @Argument(metaVar = "DESCRIPTION", required = true, usage = "Description to be set. '=' to read from stdin.", index = 2)
     public String description;
 
     protected int run() throws Exception {
-    	Run run = job.getBuildByNumber(number);
+        Run run = job.getBuildByNumber(number);
         run.checkPermission(Run.UPDATE);
 
         if ("=".equals(description)) {
-        	description = channel.call(new Callable<String,IOException>() {
-				public String call() throws IOException {
-					return IOUtils.toString(System.in);
-				}
-        	});
+            description = channel.call(new Callable<String, IOException>() {
+                public String call() throws IOException {
+                    return IOUtils.toString(System.in);
+                }
+            });
         }
-        
+
         run.setDescription(description);
-        
+
         return 0;
     }
-    
 }

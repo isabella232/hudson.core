@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -41,6 +41,7 @@ import java.io.Serializable;
  * @author Kohsuke Kawaguchi
  */
 public class CliManagerImpl implements CliEntryPoint, Serializable {
+
     public CliManagerImpl() {
     }
 
@@ -55,22 +56,22 @@ public class CliManagerImpl implements CliEntryPoint, Serializable {
 
         String subCmd = args.get(0);
         CLICommand cmd = CLICommand.clone(subCmd);
-        if(cmd!=null) {
+        if (cmd != null) {
             final CLICommand old = CLICommand.setCurrent(cmd);
             try {
-                return cmd.main(args.subList(1,args.size()),locale, stdin, out, err);
+                return cmd.main(args.subList(1, args.size()), locale, stdin, out, err);
             } finally {
                 CLICommand.setCurrent(old);
             }
         }
 
-        err.println("No such command: "+subCmd);
+        err.println("No such command: " + subCmd);
         new HelpCommand().main(Collections.<String>emptyList(), locale, stdin, out, err);
         return -1;
     }
 
     public boolean hasCommand(String name) {
-        return CLICommand.clone(name)!=null;
+        return CLICommand.clone(name) != null;
     }
 
     public int protocolVersion() {
@@ -78,7 +79,7 @@ public class CliManagerImpl implements CliEntryPoint, Serializable {
     }
 
     private Object writeReplace() {
-        return Channel.current().export(CliEntryPoint.class,this);
+        return Channel.current().export(CliEntryPoint.class, this);
     }
 
     static {
@@ -87,14 +88,14 @@ public class CliManagerImpl implements CliEntryPoint, Serializable {
         cls.put(Hudson.getInstance().getPluginManager().uberClassLoader);
 
         ResourceNameIterator servicesIter =
-            new DiscoverServiceNames(cls).findResourceNames(OptionHandler.class.getName());
+                new DiscoverServiceNames(cls).findResourceNames(OptionHandler.class.getName());
         final ResourceClassIterator itr =
-            new DiscoverClasses(cls).findResourceClasses(servicesIter);
+                new DiscoverClasses(cls).findResourceClasses(servicesIter);
 
-        while(itr.hasNext()) {
+        while (itr.hasNext()) {
             Class h = itr.nextResourceClass().loadClass();
             Class c = Types.erasure(Types.getTypeArgument(Types.getBaseClass(h, OptionHandler.class), 0));
-            CmdLineParser.registerHandler(c,h);
+            CmdLineParser.registerHandler(c, h);
         }
     }
 }

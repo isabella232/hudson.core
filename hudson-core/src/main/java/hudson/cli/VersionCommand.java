@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -26,6 +26,7 @@ import hudson.model.Hudson;
  */
 @Extension
 public class VersionCommand extends CLICommand {
+
     @Override
     public String getShortDescription() {
         return "Shows the Hudson version";
