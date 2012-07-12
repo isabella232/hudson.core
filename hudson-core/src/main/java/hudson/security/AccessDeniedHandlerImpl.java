@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -39,12 +39,13 @@ import java.util.Vector;
  * @author Kohsuke Kawaguchi
  */
 public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
+
     public void handle(ServletRequest request, ServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse rsp = (HttpServletResponse) response;
 
         rsp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        req.setAttribute("exception",accessDeniedException);
+        req.setAttribute("exception", accessDeniedException);
         Stapler stapler = new Stapler();
         stapler.init(new ServletConfig() {
             public String getServletName() {
@@ -64,6 +65,6 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
             }
         });
 
-        stapler.invoke(req,rsp, Hudson.getInstance(),"/accessDenied");
+        stapler.invoke(req, rsp, Hudson.getInstance(), "/accessDenied");
     }
 }

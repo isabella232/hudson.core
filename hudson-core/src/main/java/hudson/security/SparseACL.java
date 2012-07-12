@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -30,9 +30,11 @@ import static java.util.logging.Level.FINE;
  * @author Kohsuke Kawaguchi
  */
 public class SparseACL extends SidACL {
+
     public static final class Entry {
         // Sid has value-equality semantics
         //TODO: review and check whether we can do it private
+
         public final Sid sid;
         public final Permission permission;
         public final boolean allowed;
@@ -55,7 +57,6 @@ public class SparseACL extends SidACL {
             return allowed;
         }
     }
-
     private final List<Entry> entries = new ArrayList<Entry>();
     private ACL parent;
 
@@ -68,19 +69,24 @@ public class SparseACL extends SidACL {
     }
 
     public void add(Sid sid, Permission permission, boolean allowed) {
-        add(new Entry(sid,permission,allowed));
+        add(new Entry(sid, permission, allowed));
     }
 
     @Override
     public boolean hasPermission(Authentication a, Permission permission) {
-        if(a==SYSTEM)   return true;
-        Boolean b = _hasPermission(a,permission);
-        if(b!=null) return b;
+        if (a == SYSTEM) {
+            return true;
+        }
+        Boolean b = _hasPermission(a, permission);
+        if (b != null) {
+            return b;
+        }
 
-        if(parent!=null) {
-            if(LOGGER.isLoggable(FINE))
-                LOGGER.fine("hasPermission("+a+","+permission+") is delegating to parent ACL: "+parent);
-            return parent.hasPermission(a,permission);
+        if (parent != null) {
+            if (LOGGER.isLoggable(FINE)) {
+                LOGGER.fine("hasPermission(" + a + "," + permission + ") is delegating to parent ACL: " + parent);
+            }
+            return parent.hasPermission(a, permission);
         }
 
         // the ultimate default is to reject everything
@@ -89,14 +95,14 @@ public class SparseACL extends SidACL {
 
     @Override
     protected Boolean hasPermission(Sid p, Permission permission) {
-        for( ; permission!=null; permission=permission.impliedBy ) {
+        for (; permission != null; permission = permission.impliedBy) {
             for (Entry e : entries) {
-                if(e.permission==permission && e.sid.equals(p))
+                if (e.permission == permission && e.sid.equals(p)) {
                     return e.allowed;
+                }
             }
         }
         return null;
     }
-
     private static final Logger LOGGER = Logger.getLogger(SparseACL.class.getName());
 }

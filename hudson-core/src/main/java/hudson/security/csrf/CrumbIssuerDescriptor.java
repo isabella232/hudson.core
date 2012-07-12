@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *      
+ *
  *
  *******************************************************************************/ 
 
@@ -18,9 +18,9 @@ import hudson.Util;
 import hudson.model.Descriptor;
 
 /**
- * Describes global configuration for crumb issuers. Create subclasses to specify
- * additional global configuration for custom crumb issuers.
- * 
+ * Describes global configuration for crumb issuers. Create subclasses to
+ * specify additional global configuration for custom crumb issuers.
+ *
  * @author dty
  */
 public abstract class CrumbIssuerDescriptor<T extends CrumbIssuer> extends Descriptor<CrumbIssuer> {
@@ -32,7 +32,8 @@ public abstract class CrumbIssuerDescriptor<T extends CrumbIssuer> extends Descr
      * Crumb issuers always take a salt and a request field name.
      *
      * @param salt Salt value
-     * @param crumbRequestField Request parameter name containing crumb from previous response
+     * @param crumbRequestField Request parameter name containing crumb from
+     * previous response
      */
     protected CrumbIssuerDescriptor(String salt, String crumbRequestField) {
         setCrumbSalt(salt);
@@ -41,6 +42,7 @@ public abstract class CrumbIssuerDescriptor<T extends CrumbIssuer> extends Descr
 
     /**
      * Get the salt value.
+     *
      * @return
      */
     public String getCrumbSalt() {
@@ -49,6 +51,7 @@ public abstract class CrumbIssuerDescriptor<T extends CrumbIssuer> extends Descr
 
     /**
      * Set the salt value. Must not be null.
+     *
      * @param salt
      */
     public void setCrumbSalt(String salt) {

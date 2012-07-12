@@ -7,8 +7,8 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:  
- *       
+ * Contributors:
+ *
  *
  *******************************************************************************/ 
 
@@ -35,7 +35,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package hudson.security;
 
 import hudson.model.UserProperty;
@@ -53,6 +52,7 @@ import java.util.Set;
  * @see FederatedLoginService
  */
 public class FederatedLoginServiceUserProperty extends UserProperty {
+
     protected final Set<String> identifiers;
 
     protected FederatedLoginServiceUserProperty(Collection<String> identifiers) {

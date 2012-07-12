@@ -9,7 +9,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * 
+ *
  * Kohsuke Kawaguchi, Winston Prakash
  *
  ******************************************************************************
@@ -39,7 +39,8 @@ import org.springframework.security.userdetails.UserDetailsService;
  * {@link Filter} that Hudson uses to implement security support.
  *
  * <p> This is the instance the servlet container creates, but internally this
- * just acts as a proxy to the real {@link Filter}, created by {@link SecurityRealm#createFilter(FilterConfig)}.
+ * just acts as a proxy to the real {@link Filter}, created by
+ * {@link SecurityRealm#createFilter(FilterConfig)}.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.160
@@ -61,7 +62,8 @@ public class HudsonFilter implements Filter {
      * {@link AuthenticationManager} proxy so that the Spring Security filter
      * chain can stay the same even when security setting is reconfigured.
      *
-     * @deprecated in 1.271. This proxy always delegate to {@code Hudson.getInstance().getSecurityRealm().getSecurityComponents().manager},
+     * @deprecated in 1.271. This proxy always delegate to
+     * {@code Hudson.getInstance().getSecurityRealm().getSecurityComponents().manager},
      * so use that instead.
      */
     public static final AuthenticationManagerProxy AUTHENTICATION_MANAGER = new AuthenticationManagerProxy();
@@ -69,7 +71,8 @@ public class HudsonFilter implements Filter {
      * {@link UserDetailsService} proxy so that the Spring Security filter chain
      * can stay the same even when security setting is reconfigured.
      *
-     * @deprecated in 1.271. This proxy always delegate to {@code Hudson.getInstance().getSecurityRealm().getSecurityComponents().userDetails},
+     * @deprecated in 1.271. This proxy always delegate to
+     * {@code Hudson.getInstance().getSecurityRealm().getSecurityComponents().userDetails},
      * so use that instead.
      */
     public static final UserDetailsServiceProxy USER_DETAILS_SERVICE_PROXY = new UserDetailsServiceProxy();
@@ -77,7 +80,8 @@ public class HudsonFilter implements Filter {
      * {@link RememberMeServices} proxy so that the Spring Security filter chain
      * can stay the same even when security setting is reconfigured.
      *
-     * @deprecated in 1.271. This proxy always delegate to {@code Hudson.getInstance().getSecurityRealm().getSecurityComponents().rememberMe},
+     * @deprecated in 1.271. This proxy always delegate to
+     * {@code Hudson.getInstance().getSecurityRealm().getSecurityComponents().rememberMe},
      * so use that instead.
      */
     public static final RememberMeServicesProxy REMEMBER_ME_SERVICES_PROXY = new RememberMeServicesProxy();
@@ -106,7 +110,8 @@ public class HudsonFilter implements Filter {
     }
 
     /**
-     * Gets the {@link HudsonFilter} created for the given {@link ServletContext}.
+     * Gets the {@link HudsonFilter} created for the given
+     * {@link ServletContext}.
      */
     public static HudsonFilter get(ServletContext context) {
         // As of 3.0.0 we no longer set it to the context

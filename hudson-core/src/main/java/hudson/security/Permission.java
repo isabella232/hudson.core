@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Yahoo! Inc.
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Yahoo! Inc.
+ *
  *
  *******************************************************************************/ 
 
@@ -29,11 +29,12 @@ import org.jvnet.localizer.Localizable;
 /**
  * Permission, which represents activity that requires a security privilege.
  *
- * <p>
- * Each permission is represented by a specific instance of {@link Permission}.
+ * <p> Each permission is represented by a specific instance of
+ * {@link Permission}.
  *
  * @author Kohsuke Kawaguchi
- * @see http://wiki.hudson-ci.org/display/HUDSON/Making+your+plugin+behave+in+secured+Hudson
+ * @see
+ * http://wiki.hudson-ci.org/display/HUDSON/Making+your+plugin+behave+in+secured+Hudson
  */
 public final class Permission {
 
@@ -41,7 +42,6 @@ public final class Permission {
      * Comparator that orders {@link Permission} objects based on their ID.
      */
     public static final Comparator<Permission> ID_COMPARATOR = new Comparator<Permission>() {
-
         /**
          * {@inheritDoc}
          */
@@ -51,57 +51,45 @@ public final class Permission {
             return one.getId().compareTo(two.getId());
         }
     };
-
     //TODO: review and check whether we can do it private
     public final Class owner;
-
     //TODO: review and check whether we can do it private
     public final PermissionGroup group;
-
     /**
      * Human readable ID of the permission.
      *
-     * <p>
-     * This name should uniquely determine a permission among
-     * its owner class. The name must be a valid Java identifier.
-     * <p>
-     * The expected naming convention is something like "BrowseWorkspace".
+     * <p> This name should uniquely determine a permission among its owner
+     * class. The name must be a valid Java identifier. <p> The expected naming
+     * convention is something like "BrowseWorkspace".
      */
     //TODO: review and check whether we can do it private
     public final String name;
-
     /**
-     * Human-readable description of this permission.
-     * Used as a tooltip to explain this permission, so this message
-     * should be a couple of sentences long.
+     * Human-readable description of this permission. Used as a tooltip to
+     * explain this permission, so this message should be a couple of sentences
+     * long.
      *
-     * <p>
-     * If null, there will be no description text.
+     * <p> If null, there will be no description text.
      */
     //TODO: review and check whether we can do it private
     public final Localizable description;
-
     /**
      * Bundled {@link Permission} that also implies this permission.
      *
-     * <p>
-     * This allows us to organize permissions in a hierarchy, so that
-     * for example we can say "view workspace" permission is implied by
-     * the (broader) "read" permission.
+     * <p> This allows us to organize permissions in a hierarchy, so that for
+     * example we can say "view workspace" permission is implied by the
+     * (broader) "read" permission.
      *
-     * <p>
-     * The idea here is that for most people, access control based on
-     * such broad permission bundle is good enough, and those few
-     * that need finer control can do so.
+     * <p> The idea here is that for most people, access control based on such
+     * broad permission bundle is good enough, and those few that need finer
+     * control can do so.
      */
     //TODO: review and check whether we can do it private
     public final Permission impliedBy;
-
     /**
      * Whether this permission is available for use.
      *
-     * <p>
-     * This allows us to dynamically enable or disable the visibility of
+     * <p> This allows us to dynamically enable or disable the visibility of
      * permissions, so administrators can control the complexity of their
      * permission matrix.
      *
@@ -109,13 +97,12 @@ public final class Permission {
      */
     //TODO: review and check whether we can do it private
     public boolean enabled;
-    
+
     /**
      * Defines a new permission.
      *
-     * @param group
-     *      Permissions are grouped per classes that own them. Specify the permission group
-     *      created for that class. The idiom is:
+     * @param group Permissions are grouped per classes that own them. Specify
+     * the permission group created for that class. The idiom is:
      *
      * <pre>
      * class Foo {
@@ -124,19 +111,18 @@ public final class Permission {
      * }
      * </pre>
      *
-     *      Because of the classloading problems and the difficulty for Hudson to enumerate them,
-     *      the permission constants really need to be static field of the owner class.
+     * Because of the classloading problems and the difficulty for Hudson to
+     * enumerate them, the permission constants really need to be static field
+     * of the owner class.
      *
-     * @param name
-     *      See {@link #name}.
-     * @param description
-     *      See {@link #description}.
-     * @param impliedBy
-     *      See {@link #impliedBy}.
+     * @param name See {@link #name}.
+     * @param description See {@link #description}.
+     * @param impliedBy See {@link #impliedBy}.
      */
     public Permission(PermissionGroup group, String name, Localizable description, Permission impliedBy, boolean enable) {
-        if(!JSONUtils.isJavaIdentifier(name))
-            throw new IllegalArgumentException(name+" is not a Java identifier");
+        if (!JSONUtils.isJavaIdentifier(name)) {
+            throw new IllegalArgumentException(name + " is not a Java identifier");
+        }
         this.owner = group.owner;
         this.group = group;
         this.name = name;
@@ -151,31 +137,30 @@ public final class Permission {
     public Permission(PermissionGroup group, String name, Localizable description, Permission impliedBy) {
         this(group, name, description, impliedBy, true);
     }
-    
+
     /**
-     * @deprecated since 1.257.
-     *      Use {@link #Permission(PermissionGroup, String, Localizable, Permission)} 
+     * @deprecated since 1.257. Use
+     * {@link #Permission(PermissionGroup, String, Localizable, Permission)}
      */
     public Permission(PermissionGroup group, String name, Permission impliedBy) {
-        this(group,name,null,impliedBy);
+        this(group, name, null, impliedBy);
     }
 
     private Permission(PermissionGroup group, String name) {
-        this(group,name,null,null);
+        this(group, name, null, null);
     }
 
     /**
-     * Returns the string representation of this {@link Permission},
-     * which can be converted back to {@link Permission} via the
-     * {@link #fromId(String)} method.
+     * Returns the string representation of this {@link Permission}, which can
+     * be converted back to {@link Permission} via the {@link #fromId(String)}
+     * method.
      *
-     * <p>
-     * This string representation is suitable for persistence.
+     * <p> This string representation is suitable for persistence.
      *
      * @see #fromId(String)
      */
     public String getId() {
-        return owner.getName()+'.'+name;
+        return owner.getName() + '.' + name;
     }
 
     public Class getOwner() {
@@ -205,8 +190,7 @@ public final class Permission {
     /**
      * Convert the ID representation into {@link Permission} object.
      *
-     * @return
-     *      null if the conversion failed.
+     * @return null if the conversion failed.
      * @see #getId()
      */
     public static Permission fromId(String id) {
@@ -218,9 +202,9 @@ public final class Permission {
         try {
             // force the initialization so that it will put all its permissions into the list.
             Class cl;
-            if (Hudson.getInstance() != null){
+            if (Hudson.getInstance() != null) {
                 cl = Class.forName(id.substring(0, idx), true, Hudson.getInstance().getPluginManager().uberClassLoader);
-            }else{
+            } else {
                 // Hudson may not be yet initialized - to support Initial Setup
                 cl = Class.forName(id.substring(0, idx));
             }
@@ -236,7 +220,7 @@ public final class Permission {
 
     @Override
     public String toString() {
-        return "Permission["+owner+','+name+']';
+        return "Permission[" + owner + ',' + name + ']';
     }
 
     public void setEnabled(boolean enable) {
@@ -246,47 +230,41 @@ public final class Permission {
     public boolean getEnabled() {
         return enabled;
     }
-    
+
     /**
      * Returns all the {@link Permission}s available in the system.
-     * @return
-     *      always non-null. Read-only.
+     *
+     * @return always non-null. Read-only.
      */
     public static List<Permission> getAll() {
         return ALL_VIEW;
     }
-
     /**
      * All permissions in the system but in a single list.
      */
     private static final List<Permission> ALL = new CopyOnWriteArrayList<Permission>();
-
     private static final List<Permission> ALL_VIEW = Collections.unmodifiableList(ALL);
-
 //
 //
 // Because of the initialization order issue, these two fields need to be defined here,
 // even though they logically belong to Hudson.
 //
-
     /**
      * {@link PermissionGroup} for {@link Hudson}.
      *
-     * @deprecated since 2009-01-23.
-     *      Access {@link Hudson#PERMISSIONS} instead.
+     * @deprecated since 2009-01-23. Access {@link Hudson#PERMISSIONS} instead.
      */
     public static final PermissionGroup HUDSON_PERMISSIONS = new PermissionGroup(Hudson.class, hudson.model.Messages._Hudson_Permissions_Title());
     /**
-     * {@link Permission} that represents the God-like access. Equivalent of Unix root.
+     * {@link Permission} that represents the God-like access. Equivalent of
+     * Unix root.
      *
-     * <p>
-     * All permissions are eventually {@linkplain Permission#impliedBy implied by} this permission.
+     * <p> All permissions are eventually
+     * {@linkplain Permission#impliedBy implied by} this permission.
      *
-     * @deprecated since 2009-01-23.
-     *      Access {@link Hudson#ADMINISTER} instead.
+     * @deprecated since 2009-01-23. Access {@link Hudson#ADMINISTER} instead.
      */
-    public static final Permission HUDSON_ADMINISTER = new Permission(HUDSON_PERMISSIONS,"Administer", hudson.model.Messages._Hudson_AdministerPermission_Description(),null);
-
+    public static final Permission HUDSON_ADMINISTER = new Permission(HUDSON_PERMISSIONS, "Administer", hudson.model.Messages._Hudson_AdministerPermission_Description(), null);
 //
 //
 // Root Permissions.
@@ -294,45 +272,36 @@ public final class Permission {
 // These permisisons are meant to be used as the 'impliedBy' permission for other more specific permissions.
 // The intention is to allow a simplified AuthorizationStrategy implementation agnostic to
 // specific permissions.
-
-    public static final PermissionGroup GROUP = new PermissionGroup(Permission.class,Messages._Permission_Permissions_Title());
-
+    public static final PermissionGroup GROUP = new PermissionGroup(Permission.class, Messages._Permission_Permissions_Title());
     /**
-     * Historically this was separate from {@link #HUDSON_ADMINISTER} but such a distinction doesn't make sense
-     * any more, so deprecated.
+     * Historically this was separate from {@link #HUDSON_ADMINISTER} but such a
+     * distinction doesn't make sense any more, so deprecated.
      *
-     * @deprecated since 2009-01-23.
-     *      Use {@link Hudson#ADMINISTER}.
+     * @deprecated since 2009-01-23. Use {@link Hudson#ADMINISTER}.
      */
-    public static final Permission FULL_CONTROL = new Permission(GROUP,"FullControl",HUDSON_ADMINISTER);
-
+    public static final Permission FULL_CONTROL = new Permission(GROUP, "FullControl", HUDSON_ADMINISTER);
     /**
      * Generic read access.
      */
-    public static final Permission READ = new Permission(GROUP,"GenericRead",null,HUDSON_ADMINISTER);
-
+    public static final Permission READ = new Permission(GROUP, "GenericRead", null, HUDSON_ADMINISTER);
     /**
      * Generic write access.
      */
-    public static final Permission WRITE = new Permission(GROUP,"GenericWrite",null,HUDSON_ADMINISTER);
-
+    public static final Permission WRITE = new Permission(GROUP, "GenericWrite", null, HUDSON_ADMINISTER);
     /**
      * Generic create access.
      */
-    public static final Permission CREATE = new Permission(GROUP,"GenericCreate",null,WRITE);
-
+    public static final Permission CREATE = new Permission(GROUP, "GenericCreate", null, WRITE);
     /**
      * Generic update access.
      */
-    public static final Permission UPDATE = new Permission(GROUP,"GenericUpdate",null,WRITE);
-
+    public static final Permission UPDATE = new Permission(GROUP, "GenericUpdate", null, WRITE);
     /**
      * Generic delete access.
      */
-    public static final Permission DELETE = new Permission(GROUP,"GenericDelete",null,WRITE);
-
+    public static final Permission DELETE = new Permission(GROUP, "GenericDelete", null, WRITE);
     /**
      * Generic configuration access.
      */
-    public static final Permission CONFIGURE = new Permission(GROUP,"GenericConfigure",null,UPDATE);
+    public static final Permission CONFIGURE = new Permission(GROUP, "GenericConfigure", null, UPDATE);
 }

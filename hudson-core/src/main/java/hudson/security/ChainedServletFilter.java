@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -36,6 +36,7 @@ import javax.servlet.ServletResponse;
  */
 public class ChainedServletFilter implements Filter {
     // array is assumed to be immutable once set
+
     protected volatile Filter[] filters;
 
     public ChainedServletFilter() {
@@ -55,38 +56,41 @@ public class ChainedServletFilter implements Filter {
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {
-        if (LOGGER.isLoggable(Level.FINEST))
-            for (Filter f : filters)
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            for (Filter f : filters) {
                 LOGGER.finest("ChainedServletFilter contains: " + f);
+            }
+        }
 
-        for (Filter f : filters)
+        for (Filter f : filters) {
             f.init(filterConfig);
+        }
     }
 
     public void doFilter(ServletRequest request, ServletResponse response, final FilterChain chain) throws IOException, ServletException {
         LOGGER.entering(ChainedServletFilter.class.getName(), "doFilter");
 
         new FilterChain() {
-            private int position=0;
+            private int position = 0;
             // capture the array for thread-safety
             private final Filter[] filters = ChainedServletFilter.this.filters;
 
             public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException {
-                if(position==filters.length) {
+                if (position == filters.length) {
                     // reached to the end
-                    chain.doFilter(request,response);
+                    chain.doFilter(request, response);
                 } else {
                     // call next
-                    filters[position++].doFilter(request,response,this);
+                    filters[position++].doFilter(request, response, this);
                 }
             }
-        }.doFilter(request,response);
+        }.doFilter(request, response);
     }
 
     public void destroy() {
-        for (Filter f : filters)
+        for (Filter f : filters) {
             f.destroy();
+        }
     }
-
     private static final Logger LOGGER = Logger.getLogger(ChainedServletFilter.class.getName());
 }

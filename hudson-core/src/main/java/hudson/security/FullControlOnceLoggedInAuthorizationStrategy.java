@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
+ * Contributors:
+ * 
 *    Kohsuke Kawaguchi, Seiji Sogabe
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -34,6 +34,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Kohsuke Kawaguchi
  */
 public class FullControlOnceLoggedInAuthorizationStrategy extends AuthorizationStrategy {
+
     @Override
     public ACL getRootACL() {
         return THE_ACL;
@@ -42,15 +43,13 @@ public class FullControlOnceLoggedInAuthorizationStrategy extends AuthorizationS
     public List<String> getGroups() {
         return Collections.emptyList();
     }
-
     private static final SparseACL THE_ACL = new SparseACL(null);
 
     static {
-        THE_ACL.add(ACL.EVERYONE,Hudson.ADMINISTER,true);
-        THE_ACL.add(ACL.ANONYMOUS,Hudson.ADMINISTER,false);
-        THE_ACL.add(ACL.ANONYMOUS,Permission.READ,true);
+        THE_ACL.add(ACL.EVERYONE, Hudson.ADMINISTER, true);
+        THE_ACL.add(ACL.ANONYMOUS, Hudson.ADMINISTER, false);
+        THE_ACL.add(ACL.ANONYMOUS, Permission.READ, true);
     }
-
     @Extension
     public static final Descriptor<AuthorizationStrategy> DESCRIPTOR = new Descriptor<AuthorizationStrategy>() {
         public String getDisplayName() {

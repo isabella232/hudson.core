@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -33,28 +33,27 @@ import java.net.URLEncoder;
 import java.text.MessageFormat;
 
 /**
- * For anonymous requests to pages that require authentication,
- * first respond with {@link HttpServletResponse#SC_FORBIDDEN},
- * then redirect browsers automatically to the login page.
+ * For anonymous requests to pages that require authentication, first respond
+ * with {@link HttpServletResponse#SC_FORBIDDEN}, then redirect browsers
+ * automatically to the login page.
  *
- * <p>
- * This is a compromise to handle programmatic access and
- * real browsers equally well.
+ * <p> This is a compromise to handle programmatic access and real browsers
+ * equally well.
  *
- * <p>
- * The page that programs see is entirely white, and it auto-redirects,
- * so humans wouldn't notice it. 
+ * <p> The page that programs see is entirely white, and it auto-redirects, so
+ * humans wouldn't notice it.
  *
  * @author Kohsuke Kawaguchi
  */
 public class HudsonAuthenticationEntryPoint extends AuthenticationProcessingFilterEntryPoint {
+
     @Override
     public void commence(ServletRequest request, ServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse rsp = (HttpServletResponse) response;
 
         String requestedWith = req.getHeader("X-Requested-With");
-        if("XMLHttpRequest".equals(requestedWith)) {
+        if ("XMLHttpRequest".equals(requestedWith)) {
             // container authentication normally relies on session attribute to
             // remember where the user came from, so concurrent AJAX requests
             // often ends up sending users back to AJAX pages after successful login.
@@ -63,8 +62,8 @@ public class HudsonAuthenticationEntryPoint extends AuthenticationProcessingFilt
             rsp.sendError(SC_FORBIDDEN);
         } else {
             // give the opportunity to include the target URL
-            String loginForm = req.getContextPath()+getLoginFormUrl();
-            loginForm = MessageFormat.format(loginForm, URLEncoder.encode(req.getRequestURI(),"UTF-8"));
+            String loginForm = req.getContextPath() + getLoginFormUrl();
+            loginForm = MessageFormat.format(loginForm, URLEncoder.encode(req.getRequestURI(), "UTF-8"));
             req.setAttribute("loginForm", loginForm);
 
             rsp.setStatus(SC_FORBIDDEN);
@@ -77,17 +76,17 @@ public class HudsonAuthenticationEntryPoint extends AuthenticationProcessingFilt
                 out = rsp.getWriter();
             }
             out.printf(
-                "<html><head>" +
-                "<meta http-equiv='refresh' content='1;url=%1$s'/>" +
-                "<script>window.location.replace('%1$s');</script>" +
-                "</head>" +
-                "<body style='background-color:white; color:white;'>" +
-                "Authentication required</body></html>", loginForm
-            );
+                    "<html><head>"
+                    + "<meta http-equiv='refresh' content='1;url=%1$s'/>"
+                    + "<script>window.location.replace('%1$s');</script>"
+                    + "</head>"
+                    + "<body style='background-color:white; color:white;'>"
+                    + "Authentication required</body></html>", loginForm);
             // Turn Off "Show Friendly HTTP Error Messages" Feature on the Server Side.
             // See http://support.microsoft.com/kb/294807
-            for (int i=0; i < 10; i++)
+            for (int i = 0; i < 10; i++) {
                 out.print("                              ");
+            }
             out.flush();
         }
     }
