@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Red Hat, Inc.
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Red Hat, Inc.
+ *
  *
  *******************************************************************************/ 
 
@@ -42,6 +42,7 @@ import org.kohsuke.stapler.export.ExportedBean;
  * @author Kohsuke Kawaguchi
  */
 public class ResponseTimeMonitor extends NodeMonitor {
+
     @Extension
     public static final AbstractNodeMonitorDescriptor<Data> DESCRIPTOR = new AbstractNodeMonitorDescriptor<Data>() {
         protected Data monitor(Computer c) throws IOException, InterruptedException {
@@ -53,15 +54,15 @@ public class ResponseTimeMonitor extends NodeMonitor {
             try {
                 f.get(TIMEOUT, TimeUnit.MILLISECONDS);
                 long end = System.nanoTime();
-                d = new Data(old,TimeUnit2.NANOSECONDS.toMillis(end-start));
+                d = new Data(old, TimeUnit2.NANOSECONDS.toMillis(end - start));
             } catch (ExecutionException e) {
                 throw new IOException2(e.getCause());    // I don't think this is possible
             } catch (TimeoutException e) {
                 // special constant to indicate that the processing timed out.
-                d = new Data(old,-1L);
+                d = new Data(old, -1L);
             }
 
-            if(d.hasTooManyTimeouts() && !isIgnored()) {
+            if (d.hasTooManyTimeouts() && !isIgnored()) {
                 // unlike other monitors whose failure still allow us to communicate with the slave,
                 // the failure in this monitor indicates that we are just unable to make any requests
                 // to this slave. So we should severe the connection, as opposed to marking it temporarily
@@ -87,20 +88,21 @@ public class ResponseTimeMonitor extends NodeMonitor {
      */
     @ExportedBean
     public static final class Data extends OfflineCause {
+
         /**
-         * Record of the past 5 times. -1 if time out. Otherwise in milliseconds.
-         * Old ones first.
+         * Record of the past 5 times. -1 if time out. Otherwise in
+         * milliseconds. Old ones first.
          */
         private final long[] past5;
 
         private Data(Data old, long newDataPoint) {
-            if(old==null)
-                past5 = new long[] {newDataPoint};
-            else {
-                past5 = new long[Math.min(5,old.past5.length+1)];
+            if (old == null) {
+                past5 = new long[]{newDataPoint};
+            } else {
+                past5 = new long[Math.min(5, old.past5.length + 1)];
                 int copyLen = past5.length - 1;
-                System.arraycopy(old.past5, old.past5.length-copyLen, this.past5, 0, copyLen);
-                past5[past5.length-1] = newDataPoint;
+                System.arraycopy(old.past5, old.past5.length - copyLen, this.past5, 0, copyLen);
+                past5[past5.length - 1] = newDataPoint;
             }
         }
 
@@ -108,27 +110,31 @@ public class ResponseTimeMonitor extends NodeMonitor {
          * Computes the recurrence of the time out
          */
         private int failureCount() {
-            int cnt=0;
-            for(int i=past5.length-1; i>=0 && past5[i]<0; i--, cnt++)
+            int cnt = 0;
+            for (int i = past5.length - 1; i >= 0 && past5[i] < 0; i--, cnt++)
                 ;
             return cnt;
         }
 
         /**
-         * Computes the average response time, by taking the time out into account.
+         * Computes the average response time, by taking the time out into
+         * account.
          */
         @Exported
         public long getAverage() {
-            long total=0;
+            long total = 0;
             for (long l : past5) {
-                if(l<0)     total += TIMEOUT;
-                else        total += l;
+                if (l < 0) {
+                    total += TIMEOUT;
+                } else {
+                    total += l;
+                }
             }
-            return total/past5.length;
+            return total / past5.length;
         }
 
         public boolean hasTooManyTimeouts() {
-            return failureCount()>=5;
+            return failureCount() >= 5;
         }
 
         /**
@@ -143,24 +149,23 @@ public class ResponseTimeMonitor extends NodeMonitor {
 //            }
 //            return buf.toString();
             int fc = failureCount();
-            if(fc>0)
+            if (fc > 0) {
                 return Util.wrapToErrorSpan(Messages.ResponseTimeMonitor_TimeOut(fc));
-            return getAverage()+"ms";
+            }
+            return getAverage() + "ms";
         }
     }
 
-    private static class NoopTask implements Callable<String,RuntimeException> {
+    private static class NoopTask implements Callable<String, RuntimeException> {
+
         public String call() {
             return null;
         }
-
         private static final long serialVersionUID = 1L;
     }
-
     /**
      * Time out interval in milliseconds.
      */
     private static final long TIMEOUT = 5000;
-
     private static final Logger LOGGER = Logger.getLogger(ResponseTimeMonitor.class.getName());
 }

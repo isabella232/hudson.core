@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Inc., Kohsuke Kawaguchi, Seiji Sogabe, Winston Prakash
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -39,30 +39,33 @@ import java.io.IOException;
  * @sine 1.233
  */
 public class SwapSpaceMonitor extends NodeMonitor {
+
     /**
      * Returns the HTML representation of the space.
      */
     public String toHtml(NativeSystemMemory usage) {
-        if(usage.getAvailableSwapSpace() == -1)
+        if (usage.getAvailableSwapSpace() == -1) {
             return "N/A";
+        }
 
         long free = usage.getAvailableSwapSpace();
-        free/=1024L;   // convert to KB
-        free/=1024L;   // convert to MB
-        if(free>256 || usage.getTotalSwapSpace() < usage.getAvailableSwapSpace() * 5)
-            return free+"MB"; // if we have more than 256MB free or less than 80% filled up, it's OK
-
+        free /= 1024L;   // convert to KB
+        free /= 1024L;   // convert to MB
+        if (free > 256 || usage.getTotalSwapSpace() < usage.getAvailableSwapSpace() * 5) {
+            return free + "MB"; // if we have more than 256MB free or less than 80% filled up, it's OK
+        }
         // Otherwise considered dangerously low.
-        return Util.wrapToErrorSpan(free+"MB");
+        return Util.wrapToErrorSpan(free + "MB");
     }
 
     public long toMB(NativeSystemMemory usage) {
-        if(usage.getAvailableSwapSpace() == -1)
+        if (usage.getAvailableSwapSpace() == -1) {
             return -1;
+        }
 
         long free = usage.getAvailableSwapSpace();
-        free/=1024L;   // convert to KB
-        free/=1024L;   // convert to MB
+        free /= 1024L;   // convert to KB
+        free /= 1024L;   // convert to MB
         return free;
     }
 
@@ -71,7 +74,6 @@ public class SwapSpaceMonitor extends NodeMonitor {
         // Hide this column from non-admins
         return Hudson.getInstance().hasPermission(Hudson.ADMINISTER) ? super.getColumnCaption() : null;
     }
-
     @Extension
     public static final AbstractNodeMonitorDescriptor<NativeSystemMemory> DESCRIPTOR = new AbstractNodeMonitorDescriptor<NativeSystemMemory>() {
         protected NativeSystemMemory monitor(Computer c) throws IOException, InterruptedException {
@@ -121,16 +123,15 @@ public class SwapSpaceMonitor extends NodeMonitor {
     /**
      * Memory Usage.
      *
-     * <p>
-     * {@link MemoryUsage} + stapler annotations.
+     * <p> {@link MemoryUsage} + stapler annotations.
      */
     @ExportedBean
-    public static class MemoryUsage implements NativeSystemMemory{
-        
+    public static class MemoryUsage implements NativeSystemMemory {
+
         NativeSystemMemory systemMemory;
-        
+
         public MemoryUsage(NativeSystemMemory mem) {
-            systemMemory = mem; 
+            systemMemory = mem;
         }
 
         /**

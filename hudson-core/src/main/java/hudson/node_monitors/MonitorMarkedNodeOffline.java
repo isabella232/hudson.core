@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -20,16 +20,17 @@ import hudson.model.AdministrativeMonitor;
 import hudson.Extension;
 
 /**
- * If {@link NodeMonitor} marks the node as offline, we'll show this to the admin to get their attention.
+ * If {@link NodeMonitor} marks the node as offline, we'll show this to the
+ * admin to get their attention.
  *
- * <p>
- * This also allows them to disable the monitoring if they don't like it.
+ * <p> This also allows them to disable the monitoring if they don't like it.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.301
  */
 @Extension
 public class MonitorMarkedNodeOffline extends AdministrativeMonitor {
+
     public boolean active = false;
 
     public boolean isActivated() {

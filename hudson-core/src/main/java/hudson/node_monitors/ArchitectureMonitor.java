@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -31,8 +31,10 @@ import java.io.IOException;
  * @author Kohsuke Kawaguchi
  */
 public class ArchitectureMonitor extends NodeMonitor {
+
     @Extension
     public static final class DescriptorImpl extends AbstractNodeMonitorDescriptor<String> {
+
         protected String monitor(Computer c) throws IOException, InterruptedException {
             return c.getChannel().call(new GetArchTask());
         }
@@ -49,13 +51,13 @@ public class ArchitectureMonitor extends NodeMonitor {
     /**
      * Obtains the string that represents the architecture.
      */
-    private static class GetArchTask implements Callable<String,RuntimeException> {
+    private static class GetArchTask implements Callable<String, RuntimeException> {
+
         public String call() {
             String os = System.getProperty("os.name");
             String arch = System.getProperty("os.arch");
-            return os+" ("+arch+')';
+            return os + " (" + arch + ')';
         }
-
         private static final long serialVersionUID = 1L;
     }
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -36,12 +36,14 @@ import java.text.ParseException;
  * @author Kohsuke Kawaguchi
  */
 public class TemporarySpaceMonitor extends AbstractDiskSpaceMonitor {
-    @DataBoundConstructor
-	public TemporarySpaceMonitor(String freeSpaceThreshold) throws ParseException {
-        super(freeSpaceThreshold);
-	}
 
-    public TemporarySpaceMonitor() {}
+    @DataBoundConstructor
+    public TemporarySpaceMonitor(String freeSpaceThreshold) throws ParseException {
+        super(freeSpaceThreshold);
+    }
+
+    public TemporarySpaceMonitor() {
+    }
 
     public DiskSpace getFreeSpace(Computer c) {
         return DESCRIPTOR.get(c);
@@ -52,7 +54,6 @@ public class TemporarySpaceMonitor extends AbstractDiskSpaceMonitor {
         // Hide this column from non-admins
         return Hudson.getInstance().hasPermission(Hudson.ADMINISTER) ? super.getColumnCaption() : null;
     }
-
     public static final DiskSpaceMonitorDescriptor DESCRIPTOR = new DiskSpaceMonitorDescriptor() {
         public String getDisplayName() {
             return Messages.TemporarySpaceMonitor_DisplayName();
@@ -60,7 +61,9 @@ public class TemporarySpaceMonitor extends AbstractDiskSpaceMonitor {
 
         protected DiskSpace getFreeSpace(Computer c) throws IOException, InterruptedException {
             FilePath p = c.getNode().getRootPath();
-            if(p==null) return null;
+            if (p == null) {
+                return null;
+            }
 
             return p.act(new GetTempSpace());
         }
@@ -68,18 +71,23 @@ public class TemporarySpaceMonitor extends AbstractDiskSpaceMonitor {
 
     @Extension
     public static DiskSpaceMonitorDescriptor install() {
-        if(Functions.isMustangOrAbove())    return DESCRIPTOR;
+        if (Functions.isMustangOrAbove()) {
+            return DESCRIPTOR;
+        }
         return null;
     }
-    
+
     protected static final class GetTempSpace implements FileCallable<DiskSpace> {
+
         public DiskSpace invoke(File f, VirtualChannel channel) throws IOException {
             try {
                 // if the disk is really filled up we can't even create a single file,
                 // so calling File.createTempFile and figuring out the directory won't reliably work.
                 f = new File(System.getProperty("java.io.tmpdir"));
                 long s = f.getUsableSpace();
-                if(s<=0)    return null;
+                if (s <= 0) {
+                    return null;
+                }
                 return new DiskSpace(s);
             } catch (LinkageError e) {
                 // pre-mustang
