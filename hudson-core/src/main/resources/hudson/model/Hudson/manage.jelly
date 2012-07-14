@@ -74,12 +74,15 @@
                     ${%Useful when you modified config files directly on disk.}
                 </local:feature>
                 
-                <local:feature icon="plugin.png" href="pluginManager/" title="${%Manage Plugins}">
+                
+                <local:feature icon="plugin.png" href="pluginCenter/" title="${%Manage Plugins}">
                     ${%Add, remove, disable or enable plugins that can extend the functionality of Hudson.}
                     <j:if test="${it.updateCenter.hasUpdates()}">
                         <span style="color:red; font-weight:bold">(${%updates available})</span>
                     </j:if>
                 </local:feature>
+                
+                <local:feature icon="plugin.png" href="pluginManager/" title="${%Manage Plugins using Classic Plugin Manager}"/>
                 
                 <local:feature icon="computer.png" href="systemInfo" title="${%System Information}">
                     ${%Displays various environmental information to assist trouble-shooting.}
