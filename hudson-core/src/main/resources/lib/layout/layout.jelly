@@ -61,6 +61,9 @@
     -->
     <j:set var="resURL"  value="${rootURL}${h.resourcePath}" />
     <j:set var="imagesURL"  value="${rootURL}${h.resourcePath}/images" />
+    <j:set var="cssURL"  value="${rootURL}${h.resourcePath}/css" />
+    <j:set var="scriptsURL"  value="${rootURL}${h.resourcePath}/scripts" />
+    
     <html>
         <head>
             ${h.checkPermission(it,permission)}
