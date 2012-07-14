@@ -200,6 +200,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.LogRecord;
 import java.util.regex.Pattern;
 import org.antlr.runtime.RecognitionException;
+import org.eclipse.hudson.plugins.PluginCenter;
 import org.eclipse.hudson.script.ScriptSupport;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
@@ -380,6 +381,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Loaded plugins.
      */
     public transient final PluginManager pluginManager;
+    
+    private transient PluginCenter pluginCenter;
+    
     public transient volatile TcpSlaveAgentListener tcpSlaveAgentListener;
     private transient UDPBroadcastThread udpBroadcastThread;
     private transient DNSMultiCast dnsMultiCast;
@@ -553,6 +557,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             }
             this.pluginManager = pluginManager;
             
+            pluginCenter = new PluginCenter(root);
+                    
             // JSON binding needs to be able to see all the classes from all the plugins
             WebApp.get(servletContext).setClassLoader(pluginManager.uberClassLoader);
 
@@ -748,6 +754,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     public PluginManager getPluginManager() {
         return pluginManager;
+    }
+    
+    public PluginCenter getPluginCenter() {
+        return pluginCenter;
     }
     
     public HudsonSecurityManager getSecurityManager() {

@@ -40,8 +40,11 @@ import java.util.concurrent.*;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 import org.eclipse.hudson.WebAppController;
-import org.eclipse.hudson.init.AvailablePluginManager.AvailablePluginInfo;
-import org.eclipse.hudson.init.InstalledPluginManager.InstalledPluginInfo;
+import org.eclipse.hudson.plugins.InstalledPluginManager;
+import org.eclipse.hudson.plugins.InstalledPluginManager.InstalledPluginInfo;
+import org.eclipse.hudson.plugins.PluginInstallationJob;
+import org.eclipse.hudson.plugins.UpdateSiteManager;
+import org.eclipse.hudson.plugins.UpdateSiteManager.AvailablePluginInfo;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.kohsuke.stapler.HttpResponse;
@@ -67,7 +70,7 @@ final public class InitialSetup {
     private File pluginsDir;
     private URL initPluginsJsonUrl;
     private ServletContext servletContext;
-    private AvailablePluginManager availablePluginManager;
+    private UpdateSiteManager updateSiteManager;
     private InstalledPluginManager installedPluginManager;
     
     private List<AvailablePluginInfo> installedRecommendedPlugins = new ArrayList<AvailablePluginInfo>();
@@ -107,21 +110,21 @@ final public class InitialSetup {
         hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
         proxyConfig = new ProxyConfiguration(homeDir);
         initPluginsJsonUrl = servletContext.getResource("/WEB-INF/init-plugins.json");
-        availablePluginManager = new AvailablePluginManager(initPluginsJsonUrl);
+        updateSiteManager = new UpdateSiteManager("default", hudsonHomeDir, proxyConfig);
         installedPluginManager = new InstalledPluginManager(pluginsDir);
         initSetupFile = new XmlFile(new File(homeDir, "initSetup.xml"));
         check();
     }
 
     // For testing
-    InitialSetup(File dir, URL pluginsJsonUrl) throws MalformedURLException, IOException {
-        pluginsDir = dir;
-        initPluginsJsonUrl = pluginsJsonUrl;
-        proxyConfig = new ProxyConfiguration(dir);
-        availablePluginManager = new AvailablePluginManager(initPluginsJsonUrl);
-        installedPluginManager = new InstalledPluginManager(pluginsDir);
-        check();
-    }
+//    InitialSetup(File dir, URL pluginsJsonUrl) throws MalformedURLException, IOException {
+//        pluginsDir = dir;
+//        initPluginsJsonUrl = pluginsJsonUrl;
+//        proxyConfig = new ProxyConfiguration(dir);
+//        updateSiteManager = new UpdateSiteManager(initPluginsJsonUrl);
+//        installedPluginManager = new InstalledPluginManager(pluginsDir);
+//        check();
+//    }
     
     public boolean needsInitSetup(){
         if (!initSetupFile.exists()){
@@ -212,7 +215,7 @@ final public class InitialSetup {
         if (!hudsonSecurityManager.hasPermission(Permission.HUDSON_ADMINISTER)) {
             return HttpResponses.forbidden();
         }
-        AvailablePluginInfo plugin = availablePluginManager.getAvailablePlugin(pluginName);
+        AvailablePluginInfo plugin = updateSiteManager.getAvailablePlugin(pluginName);
         Future<PluginInstallationJob> installJob = install(plugin, false);
         try {
             PluginInstallationJob job = installJob.get();
@@ -373,13 +376,13 @@ final public class InitialSetup {
             pluginsDir.mkdirs();
         }
         Set<String> installedPluginNames = installedPluginManager.getInstalledPluginNames();
-        Set<String> availablePluginNames = availablePluginManager.getAvailablePluginNames();
+        Set<String> availablePluginNames = updateSiteManager.getAvailablePluginNames();
         for (String pluginName : availablePluginNames) {
-            AvailablePluginInfo availablePlugin = availablePluginManager.getAvailablePlugin(pluginName);
+            AvailablePluginInfo availablePlugin = updateSiteManager.getAvailablePlugin(pluginName);
             if (installedPluginNames.contains(pluginName)) {
                 //Installed
                 InstalledPluginInfo installedPlugin = installedPluginManager.getInstalledPlugin(pluginName);
-                if (availablePlugin.getType().equals(AvailablePluginManager.MANDATORY)) {
+                if (availablePlugin.getType().equals(UpdateSiteManager.MANDATORY)) {
                     //Installed Mandatory Plugin
                     if (isNewerThan(availablePlugin.getVersion(), installedPlugin.getVersion())) {
                         //Updatabale Mandatory Plugin update needed
@@ -388,7 +391,7 @@ final public class InitialSetup {
                         //Installed Mandatory Plugin. No updates available
                         installedMandatoryPlugins.add(availablePlugin);
                     }
-                } else  if (availablePlugin.getType().equals(AvailablePluginManager.FEATURED)) {
+                } else  if (availablePlugin.getType().equals(UpdateSiteManager.FEATURED)) {
                     if (isNewerThan(availablePlugin.getVersion(), installedPlugin.getVersion())) {
                         //Updatabale featured Plugin update needed
                         updatableFeaturedPlugins.add(availablePlugin);
@@ -396,7 +399,7 @@ final public class InitialSetup {
                         //Installed featured Plugin. No updates available
                         installedFeaturedPlugins.add(availablePlugin);
                     }
-                }else  if (availablePlugin.getType().equals(AvailablePluginManager.RECOMMENDED)) {
+                }else  if (availablePlugin.getType().equals(UpdateSiteManager.RECOMMENDED)) {
                     if (isNewerThan(availablePlugin.getVersion(), installedPlugin.getVersion())) {
                         //Updatabale recommended Plugin update needed
                         updatableRecommendedPlugins.add(availablePlugin);
@@ -408,13 +411,13 @@ final public class InitialSetup {
 
             } else {
                 //Not installed
-                if (availablePlugin.getType().equals(AvailablePluginManager.MANDATORY)) {
+                if (availablePlugin.getType().equals(UpdateSiteManager.MANDATORY)) {
                     //Mandatory Plugin. Need to be installed
                     installableMandatoryPlugins.add(availablePlugin);
-                } if (availablePlugin.getType().equals(AvailablePluginManager.FEATURED)) {
+                } if (availablePlugin.getType().equals(UpdateSiteManager.FEATURED)) {
                     //Featured Plugin. Available for installation
                     installableFeaturedPlugins.add(availablePlugin);
-                }if (availablePlugin.getType().equals(AvailablePluginManager.RECOMMENDED)) {
+                }if (availablePlugin.getType().equals(UpdateSiteManager.RECOMMENDED)) {
                     //Recommended Plugin. Available for installation
                     installableRecommendedPlugins.add(availablePlugin);
                 }
@@ -427,7 +430,7 @@ final public class InitialSetup {
         
         if ((pluginInfo != null) && (pluginInfo.getDependencies().size() > 0)) {
             for (Map.Entry<String, String> e : pluginInfo.getDependencies().entrySet()) {
-                AvailablePluginInfo depPlugin = availablePluginManager.getAvailablePlugin(e.getKey());
+                AvailablePluginInfo depPlugin = updateSiteManager.getAvailablePlugin(e.getKey());
                 if (depPlugin != null) {
                     VersionNumber requiredVersion = new VersionNumber(e.getValue());
 

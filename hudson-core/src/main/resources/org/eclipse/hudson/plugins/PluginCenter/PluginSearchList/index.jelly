@@ -1,0 +1,46 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <st:header name="Expires" value="0" />
+    <st:contentType value="text/html;charset=UTF-8" /> 
+    
+    <j:set var="rootURL" value="${request.contextPath}" />
+    <j:set var="imagesURL"  value="${rootURL}/images" />
+    <div class="tabBody">
+        <div class="items-container">    
+            <j:if test="${it.plugins.size() == 0}">
+                <p style="margin-left: 10px;"> 
+                    Your search did not return any results.
+                </p>
+            </j:if>
+            <table width="100%" border="0" id="searchedPlugins" cellpadding="5">
+                <j:forEach var="p" items="${it.plugins}">
+                    <tr>
+                        <td class="column1">
+                            <j:if test="${!it.pluginCenter.isInstalled(p)}">
+                                <input class="install_cb_${p.name}" type="checkbox" value="${p.name}"/>
+                                <img class="install_img_${p.name}" style="display:none;"/>
+                            </j:if>
+                            <j:if test="${it.pluginCenter.isInstalled(p)}">
+                                <img src="${imagesURL}/green-check.jpg" alt=""/>
+                            </j:if>
+                        </td>
+                        <td class="column2">
+                            <div>
+                                <a href="${p.wikiUrl}" target="_blank">
+                                    ${p.displayName}
+                                </a>
+                            </div>
+                            <div class="excerpt" style="padding-top: 5px;">
+                                <j:out value="${it.pluginCenter.markupFormatter.translate(p.description)}" />
+                            </div>
+                        </td>
+                        <td class="column3" style="white-space:nowrap">
+                            ${p.version}
+                        </td>
+                    </tr>
+                </j:forEach>
+            </table>
+        </div>
+    </div>  
+    
+</j:jelly>
