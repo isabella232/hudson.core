@@ -63,7 +63,7 @@ import org.eclipse.hudson.security.HudsonSecurityManager;
 
 
 /**
- * Source of the update center information, like "http://hudson-ci.org/update-center.json"
+ * Source of the update center information, like "http://hudson-ci.org/update-center3/update-center.json"
  *
  * <p>
  * Hudson can have multiple {@link UpdateSite}s registered in the system, so that it can pick up plugins
@@ -95,7 +95,7 @@ public class UpdateSite {
     private final String id;
 
     /**
-     * Path to <tt>update-center.json</tt>, like <tt>http://hudson-ci.org/update-center.json</tt>.
+     * Path to <tt>update-center.json</tt>, like <tt>http://hudson-ci.org/update-center3/update-center.json</tt>.
      */
     private final String url;
 
@@ -371,7 +371,10 @@ public class UpdateSite {
                 core = null;
             }
             for(Map.Entry<String,JSONObject> e : (Set<Map.Entry<String,JSONObject>>)o.getJSONObject("plugins").entrySet()) {
-                plugins.put(e.getKey(),new Plugin(sourceId, e.getValue()));
+                Plugin  plugin = new Plugin(sourceId, e.getValue());
+                if (!"disabled".equals(plugin.type)) {
+                    plugins.put(e.getKey(), plugin);
+                }
             }
 
             connectionCheckUrl = (String)o.get("connectionCheckUrl");
@@ -484,6 +487,8 @@ public class UpdateSite {
          * Can be null.
          */
         public final String[] categories;
+        
+        public String type;
 
         /**
          * Dependencies of this plugin.
@@ -493,6 +498,13 @@ public class UpdateSite {
         @DataBoundConstructor
         public Plugin(String sourceId, JSONObject o) {
             super(sourceId, o);
+            
+            this.type = get(o,"type");
+           
+            if ((type == null) || "".equals(type)) {
+                type = "others";
+            }
+            
             this.wiki = get(o,"wiki");
             this.title = get(o,"title");
             this.excerpt = get(o,"excerpt");

@@ -42,7 +42,7 @@ public final class UpdateSiteManager {
     public static final String FEATURED = "featured";
     public static final String RECOMMENDED = "recommended";
     private Map<String, AvailablePluginInfo> availablePluginInfos = new TreeMap<String, AvailablePluginInfo>(String.CASE_INSENSITIVE_ORDER);
-    private String updateSiteUrl = "http://hudson-ci.org/update-center/update-center-M3.json";
+    private String updateSiteUrl = "http://hudson-ci.org/update-center3/update-center.json";
     private ProxyConfiguration proxyConfig;
     private final String id = "default";
     private File hudsonHomeDir;
@@ -188,18 +188,20 @@ public final class UpdateSiteManager {
     }
 
     private Map<String, AvailablePluginInfo> parseJson(String jsonString) throws IOException {
-        Map<String, AvailablePluginInfo> tmpPluginInfos = new TreeMap<String, AvailablePluginInfo>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, AvailablePluginInfo> pluginInfos = new TreeMap<String, AvailablePluginInfo>(String.CASE_INSENSITIVE_ORDER);
         try {
-
             JSONObject jsonObject = JSONObject.fromObject(jsonString);
             for (Map.Entry<String, JSONObject> e : (Set<Map.Entry<String, JSONObject>>) jsonObject.getJSONObject("plugins").entrySet()) {
-                tmpPluginInfos.put(e.getKey(), new AvailablePluginInfo(e.getValue()));
+                AvailablePluginInfo pluginInfo = new AvailablePluginInfo(e.getValue());
+                if (!"disabled".equals(pluginInfo.getType())) {
+                    pluginInfos.put(e.getKey(), pluginInfo);
+                }
             }
         } catch (Exception exc) {
             System.out.println(jsonString);
             throw new IOException("Incorrect Update Center JSON. " + exc.getLocalizedMessage());
         }
-        return tmpPluginInfos;
+        return pluginInfos;
 
     }
 
