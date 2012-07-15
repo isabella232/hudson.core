@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -39,41 +39,42 @@ public abstract class ToolDescriptor<T extends ToolInstallation> extends Descrip
     /**
      * Configured instances of {@link ToolInstallation}s.
      *
-     * @return read-only list of installations;
-     *      can be empty but never null.
+     * @return read-only list of installations; can be empty but never null.
      */
     public T[] getInstallations() {
-        
-        if (installations != null){
+
+        if (installations != null) {
             installations.clone();
-        }else{
-           Class<?> arrayType = installations.getClass().getComponentType();
-	   installations = (T[])Array.newInstance(arrayType, 0);
+        } else {
+            Class<?> arrayType = installations.getClass().getComponentType();
+            installations = (T[]) Array.newInstance(arrayType, 0);
         }
-        return  installations;
+        return installations;
     }
 
     /**
      * Overwrites {@link ToolInstallation}s.
      *
-     * @param installations list of installations;
-     *      can be empty but never null.
+     * @param installations list of installations; can be empty but never null.
      */
     public void setInstallations(T... installations) {
         this.installations = installations.clone();
     }
 
     /**
-     * Lists up {@link ToolPropertyDescriptor}s that are applicable to this {@link ToolInstallation}.
+     * Lists up {@link ToolPropertyDescriptor}s that are applicable to this
+     * {@link ToolInstallation}.
      */
     public List<ToolPropertyDescriptor> getPropertyDescriptors() {
-        return PropertyDescriptor.for_(ToolProperty.all(),clazz);
+        return PropertyDescriptor.for_(ToolProperty.all(), clazz);
     }
 
     /**
-     * Optional list of installers to be configured by default for new tools of this type.
-     * If there are popular versions of the tool available using generic installation techniques,
-     * they can be returned here for the user's convenience.
+     * Optional list of installers to be configured by default for new tools of
+     * this type. If there are popular versions of the tool available using
+     * generic installation techniques, they can be returned here for the user's
+     * convenience.
+     *
      * @since 1.305
      */
     public List<? extends ToolInstaller> getDefaultInstallers() {
@@ -81,16 +82,18 @@ public abstract class ToolDescriptor<T extends ToolInstallation> extends Descrip
     }
 
     /**
-     * Default value for {@link ToolInstallation#getProperties()} used in the form binding.
+     * Default value for {@link ToolInstallation#getProperties()} used in the
+     * form binding.
+     *
      * @since 1.305
      */
-    public DescribableList<ToolProperty<?>,ToolPropertyDescriptor> getDefaultProperties() throws IOException {
-        DescribableList<ToolProperty<?>,ToolPropertyDescriptor> r
-                = new DescribableList<ToolProperty<?>, ToolPropertyDescriptor>(NOOP);
+    public DescribableList<ToolProperty<?>, ToolPropertyDescriptor> getDefaultProperties() throws IOException {
+        DescribableList<ToolProperty<?>, ToolPropertyDescriptor> r = new DescribableList<ToolProperty<?>, ToolPropertyDescriptor>(NOOP);
 
         List<? extends ToolInstaller> installers = getDefaultInstallers();
-        if(!installers.isEmpty())
+        if (!installers.isEmpty()) {
             r.add(new InstallSourceProperty(installers));
+        }
 
         return r;
     }
@@ -101,5 +104,4 @@ public abstract class ToolDescriptor<T extends ToolInstallation> extends Descrip
         setInstallations(req.bindJSONToList(clazz, json.get("tool")).toArray((T[]) Array.newInstance(clazz, 0)));
         return true;
     }
-
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *      
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -37,7 +37,9 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 /**
- * Installs a tool into the Hudson working area by downloading and unpacking a ZIP file.
+ * Installs a tool into the Hudson working area by downloading and unpacking a
+ * ZIP file.
+ *
  * @since 1.305
  */
 public class ZipExtractionInstaller extends ToolInstaller {
@@ -98,10 +100,9 @@ public class ZipExtractionInstaller extends ToolInstaller {
             } catch (MalformedURLException x) {
                 return FormValidation.error(Messages.ZipExtractionInstaller_malformed_url());
             } catch (IOException x) {
-                return FormValidation.error(x,Messages.ZipExtractionInstaller_could_not_connect());
+                return FormValidation.error(x, Messages.ZipExtractionInstaller_could_not_connect());
             }
         }
-
     }
 
     /**
@@ -109,12 +110,16 @@ public class ZipExtractionInstaller extends ToolInstaller {
      * Work around, is there a better way?
      */
     static class ChmodRecAPlusX implements FileCallable<Void> {
+
         private static final long serialVersionUID = 1L;
+
         public Void invoke(File d, VirtualChannel channel) throws IOException {
-            if(!Functions.isWindows())
+            if (!Functions.isWindows()) {
                 process(d);
+            }
             return null;
         }
+
         private void process(File f) {
             if (f.isFile()) {
                 if (Functions.isMustangOrAbove()) {
@@ -132,5 +137,4 @@ public class ZipExtractionInstaller extends ToolInstaller {
             }
         }
     }
-
 }
