@@ -192,24 +192,28 @@
                     </execution>
                 </executions>
             </plugin>
+            
             <plugin>
-                <groupId>com.googlecode.maven-download-plugin</groupId>
-                <artifactId>maven-download-plugin</artifactId>
-                <version>1.0.0</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>wagon-maven-plugin</artifactId>
+                <version>1.0-beta-4</version>
                 <executions>
                     <execution>
                         <id>download-update-center</id>
                         <phase>generate-resources</phase>
                         <goals>
-                            <goal>wget</goal>
+                            <goal>download-single</goal>
                         </goals>
                         <configuration>
-                            <url>http://hudson-ci.org/update-center3/update-center.json</url>
-                            <outputDirectory>target/generated-resources/WEB-INF</outputDirectory>
+                            <url>http://hudson-ci.org</url>
+                            <fromFile>update-center3/update-center.json</fromFile>
+                            <toDir>target/generated-resources/WEB-INF</toDir>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
