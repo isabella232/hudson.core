@@ -7,11 +7,11 @@
 # which accompanies this distribution, and is available at
 # http://www.eclipse.org/legal/epl-v10.html
 #
-# Contributors: 
+# Contributors:
 #
 #    Kohsuke Kawaguchi, Winston Prakash
 #        
-#************************************************************************** --> 
+#************************************************************************** -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -215,10 +215,9 @@
         <antlr.version>3.4</antlr.version>
         <commons-digester.version>3.0</commons-digester.version>
         <commons-beanutils.version>1.8.0</commons-beanutils.version>
-        <commons-jelly.version>1.1-hudson-20120704</commons-jelly.version>
         <commons-jelly-tags-fmt.version>1.0</commons-jelly-tags-fmt.version>
-        <commons-jelly-tags-xml.version>1.1-hudson-20120704</commons-jelly-tags-xml.version>
-        <commons-jelly-tags-define.version>1.0.1-hudson-20120704</commons-jelly-tags-define.version>
+        <commons-jelly-tags-xml.version>1.1</commons-jelly-tags-xml.version>
+        <commons-jelly-tags-define.version>1.0.1-hudson-20071021</commons-jelly-tags-define.version>
         <commons-jexl.version>2.0.1</commons-jexl.version>
         <commons-logging.version>1.1.1</commons-logging.version>
         <commons-collections.version>3.2</commons-collections.version>
@@ -257,7 +256,7 @@
         <module>hudson-test-framework</module>
         <module>hudson-plugin-parent</module>
     </modules>
-  
+ 
     <build>
         
         <defaultGoal>install</defaultGoal>
@@ -801,7 +800,7 @@
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>${commons-codec.version}</version>
-            </dependency> 
+            </dependency>
 
             <!--unit tests -->
             <dependency>
