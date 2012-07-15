@@ -42,6 +42,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Locale;
 import java.security.Security;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.hudson.graph.ChartUtil;
 import org.eclipse.hudson.init.InitialSetup;
 import org.eclipse.hudson.init.InitialSetupLogin;
@@ -209,6 +210,10 @@ public final class HudsonServletContextListener implements ServletContextListene
                 controller.install(new SecurityFailedToInit(ex));
                 return;
             }
+             
+            // Copy the bundled update-center.jso file to the local cached file
+            copyUpdateCenterJson(servletContext, home);
+                    
             InitialSetup initSetup = new InitialSetup(home, servletContext);
             if (initSetup.needsInitSetup()) {
                 logger.info("Initial setup required. Please go to the Hudson Dashboard and complete the setup");
@@ -225,6 +230,25 @@ public final class HudsonServletContextListener implements ServletContextListene
             logger.error( "Failed to initialize Hudson", exc);
         }catch (Error e) {
             logger.error( "Failed to initialize Hudson",e);
+        }
+    }
+    
+    protected void copyUpdateCenterJson(ServletContext servletContext, File hudsonHomeDir) throws IOException {
+        URL updateCenterJsonUrl = servletContext.getResource("/WEB-INF/update-center.json");
+        long lastModified = updateCenterJsonUrl.openConnection().getLastModified();
+        File localCacheFile = new File(hudsonHomeDir, "updates/default.json");
+
+        if (!localCacheFile.exists() || (localCacheFile.lastModified() < lastModified)) {
+            String jsonStr = org.apache.commons.io.IOUtils.toString(updateCenterJsonUrl.openStream());
+            jsonStr = jsonStr.trim();
+            if (jsonStr.startsWith("updateCenter.post(")) {
+                jsonStr = jsonStr.substring("updateCenter.post(".length());
+            }
+            if (jsonStr.endsWith(");")) {
+                jsonStr = jsonStr.substring(0, jsonStr.lastIndexOf(");"));
+            }
+            FileUtils.writeStringToFile(localCacheFile, jsonStr);
+            localCacheFile.setLastModified(lastModified);
         }
     }
 
