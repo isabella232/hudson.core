@@ -10,7 +10,7 @@
  *
  * Contributors:
  *
- *   Winston Prakash
+ * Winston Prakash
  *
  *****************************************************************************
  */
@@ -37,11 +37,10 @@ import org.apache.commons.io.IOUtils;
  * @author Winston Prakash
  */
 public final class UpdateSiteManager {
-    
+
     public static final String MANDATORY = "mandatory";
     public static final String FEATURED = "featured";
     public static final String RECOMMENDED = "recommended";
-
     private Map<String, AvailablePluginInfo> availablePluginInfos = new TreeMap<String, AvailablePluginInfo>(String.CASE_INSENSITIVE_ORDER);
     private String updateSiteUrl = "http://hudson-ci.org/update-center/update-center-M3.json";
     private ProxyConfiguration proxyConfig;
@@ -52,13 +51,15 @@ public final class UpdateSiteManager {
     public UpdateSiteManager(String id, File homeDir, ProxyConfiguration proxyConfig) throws IOException {
         hudsonHomeDir = homeDir;
         this.proxyConfig = proxyConfig;
-        availablePluginInfos = parseJson(getLocalCacheFile().readTrim());
+        if (getLocalCacheFile().exists()) {
+            availablePluginInfos = parseJson(getLocalCacheFile().readTrim());
+        }
     }
 
     public String getId() {
         return id;
     }
-    
+
     public Set<AvailablePluginInfo> searchPlugins(String patternStr, boolean searchDescription) {
         Set<AvailablePluginInfo> availablePlugins = new TreeSet<AvailablePluginInfo>();
 
@@ -87,7 +88,7 @@ public final class UpdateSiteManager {
         }
         return availablePlugins;
     }
-    
+
     public List<AvailablePluginInfo> getAvailablePlugins(String pluginType) {
         List<AvailablePluginInfo> availablePlugins = new ArrayList<AvailablePluginInfo>();
         Set<String> availablePluginNames = getAvailablePluginNames();
@@ -100,7 +101,7 @@ public final class UpdateSiteManager {
         }
         return availablePlugins;
     }
-    
+
     public List<AvailablePluginInfo> getCategorizedAvailablePlugins(String pluginType, String category) {
         List<AvailablePluginInfo> availablePlugins = new ArrayList<AvailablePluginInfo>();
         for (AvailablePluginInfo plugin : getAvailablePlugins(pluginType)) {
@@ -202,7 +203,7 @@ public final class UpdateSiteManager {
 
     }
 
-    public final class AvailablePluginInfo implements Comparable<AvailablePluginInfo>{
+    public final class AvailablePluginInfo implements Comparable<AvailablePluginInfo> {
 
         private String name;
         private String version;
@@ -294,10 +295,10 @@ public final class UpdateSiteManager {
                     if (!pluginCategories.contains(category)) {
                         pluginCategories.add(category);
                     }
-                    categories.add(category); 
+                    categories.add(category);
                 }
-            }else{
-               categories.add("Uncategorized");  
+            } else {
+                categories.add("Uncategorized");
             }
 
             for (String category : categories) {
@@ -337,7 +338,7 @@ public final class UpdateSiteManager {
 
         @Override
         public int compareTo(AvailablePluginInfo t) {
-             return this.getName().compareToIgnoreCase(t.getName());
+            return this.getName().compareToIgnoreCase(t.getName());
         }
     }
 
