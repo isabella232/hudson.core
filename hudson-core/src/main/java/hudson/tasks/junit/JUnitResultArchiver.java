@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Martin Eigenbrodt,   Tom Huybrechts, Yahoo!, Inc., Richard Hierlmeier
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Martin Eigenbrodt,   Tom Huybrechts, Yahoo!, Inc., Richard Hierlmeier
+ *
  *
  *******************************************************************************/ 
 
@@ -57,54 +57,56 @@ import java.util.List;
 
 /**
  * Generates HTML report from JUnit test result XML files.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public class JUnitResultArchiver extends Recorder implements Serializable,
-		MatrixAggregatable {
+        MatrixAggregatable {
 
     /**
      * {@link FileSet} "includes" string, like "foo/bar/*.xml"
      */
     private final String testResults;
-
     /**
-     * If true, retain a suite's complete stdout/stderr even if this is huge and the suite passed.
+     * If true, retain a suite's complete stdout/stderr even if this is huge and
+     * the suite passed.
+     *
      * @since 1.358
      */
     private final boolean keepLongStdio;
-
     /**
-     * {@link TestDataPublisher}s configured for this archiver, to process the recorded data.
-     * For compatibility reasons, can be null.
+     * {@link TestDataPublisher}s configured for this archiver, to process the
+     * recorded data. For compatibility reasons, can be null.
+     *
      * @since 1.320
      */
     private final DescribableList<TestDataPublisher, Descriptor<TestDataPublisher>> testDataPublishers;
 
-	/**
-	 * left for backwards compatibility
-         * @deprecated since 2009-08-09.
-	 */
-	@Deprecated
-	public JUnitResultArchiver(String testResults) {
-		this(testResults, false, null);
-	}
+    /**
+     * left for backwards compatibility
+     *
+     * @deprecated since 2009-08-09.
+     */
+    @Deprecated
+    public JUnitResultArchiver(String testResults) {
+        this(testResults, false, null);
+    }
 
     @Deprecated
     public JUnitResultArchiver(String testResults,
             DescribableList<TestDataPublisher, Descriptor<TestDataPublisher>> testDataPublishers) {
         this(testResults, false, testDataPublishers);
     }
-	
-	@DataBoundConstructor
-	public JUnitResultArchiver(
-			String testResults,
+
+    @DataBoundConstructor
+    public JUnitResultArchiver(
+            String testResults,
             boolean keepLongStdio,
-			DescribableList<TestDataPublisher, Descriptor<TestDataPublisher>> testDataPublishers) {
-		this.testResults = testResults;
+            DescribableList<TestDataPublisher, Descriptor<TestDataPublisher>> testDataPublishers) {
+        this.testResults = testResults;
         this.keepLongStdio = keepLongStdio;
-		this.testDataPublishers = testDataPublishers;
-	}
+        this.testDataPublishers = testDataPublishers;
+    }
 
     /**
      * @inheritDoc
@@ -119,157 +121,158 @@ public class JUnitResultArchiver extends Recorder implements Serializable,
      * In progress. Working on delegating the actual parsing to the JUnitParser.
      */
     protected TestResult parse(String expandedTestResults, AbstractBuild build, Launcher launcher, BuildListener listener)
-            throws IOException, InterruptedException
-    {
+            throws IOException, InterruptedException {
         return new JUnitParser(isKeepLongStdio()).parse(expandedTestResults, build, launcher, listener);
     }
 
     @Override
-	public boolean perform(AbstractBuild build, Launcher launcher,
-			BuildListener listener) throws InterruptedException, IOException {
-		listener.getLogger().println(Messages.JUnitResultArchiver_Recording());
-		TestResultAction action;
-		
-		final String testResults = build.getEnvironment(listener).expand(this.testResults);
+    public boolean perform(AbstractBuild build, Launcher launcher,
+            BuildListener listener) throws InterruptedException, IOException {
+        listener.getLogger().println(Messages.JUnitResultArchiver_Recording());
+        TestResultAction action;
 
-		try {
-			TestResult result = parse(testResults, build, launcher, listener);
+        final String testResults = build.getEnvironment(listener).expand(this.testResults);
 
-			try {
-				action = new TestResultAction(build, result, listener);
-			} catch (NullPointerException npe) {
-				throw new AbortException(Messages.JUnitResultArchiver_BadXML(testResults));
-			}
+        try {
+            TestResult result = parse(testResults, build, launcher, listener);
+
+            try {
+                action = new TestResultAction(build, result, listener);
+            } catch (NullPointerException npe) {
+                throw new AbortException(Messages.JUnitResultArchiver_BadXML(testResults));
+            }
             result.freeze(action);
-			if (result.getPassCount() == 0 && result.getFailCount() == 0)
-				throw new AbortException(Messages.JUnitResultArchiver_ResultIsEmpty());
+            if (result.getPassCount() == 0 && result.getFailCount() == 0) {
+                throw new AbortException(Messages.JUnitResultArchiver_ResultIsEmpty());
+            }
 
             // TODO: Move into JUnitParser [BUG 3123310]
-			List<Data> data = new ArrayList<Data>();
-			if (testDataPublishers != null) {
-				for (TestDataPublisher tdp : testDataPublishers) {
-					Data d = tdp.getTestData(build, launcher, listener, result);
-					if (d != null) {
-						data.add(d);
-					}
-				}
-			}
+            List<Data> data = new ArrayList<Data>();
+            if (testDataPublishers != null) {
+                for (TestDataPublisher tdp : testDataPublishers) {
+                    Data d = tdp.getTestData(build, launcher, listener, result);
+                    if (d != null) {
+                        data.add(d);
+                    }
+                }
+            }
 
-			action.setData(data);
+            action.setData(data);
 
-			CHECKPOINT.block();
+            CHECKPOINT.block();
 
-		} catch (AbortException e) {
-			if (build.getResult() == Result.FAILURE)
-				// most likely a build failed before it gets to the test phase.
-				// don't report confusing error message.
-				return true;
+        } catch (AbortException e) {
+            if (build.getResult() == Result.FAILURE) // most likely a build failed before it gets to the test phase.
+            // don't report confusing error message.
+            {
+                return true;
+            }
 
-			listener.getLogger().println(e.getMessage());
-			build.setResult(Result.FAILURE);
-			return true;
-		} catch (IOException e) {
-			e.printStackTrace(listener.error("Failed to archive test reports"));
-			build.setResult(Result.FAILURE);
-			return true;
-		}
+            listener.getLogger().println(e.getMessage());
+            build.setResult(Result.FAILURE);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace(listener.error("Failed to archive test reports"));
+            build.setResult(Result.FAILURE);
+            return true;
+        }
 
-		build.getActions().add(action);
-		CHECKPOINT.report();
+        build.getActions().add(action);
+        CHECKPOINT.report();
 
-		if (action.getResult().getFailCount() > 0)
-			build.setResult(Result.UNSTABLE);
+        if (action.getResult().getFailCount() > 0) {
+            build.setResult(Result.UNSTABLE);
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * Not actually used, but left for backward compatibility
-	 * 
-	 * @deprecated since 2009-08-10.
-	 */
-	protected TestResult parseResult(DirectoryScanner ds, long buildTime)
-			throws IOException {
-		return new TestResult(buildTime, ds);
-	}
+    /**
+     * Not actually used, but left for backward compatibility
+     *
+     * @deprecated since 2009-08-10.
+     */
+    protected TestResult parseResult(DirectoryScanner ds, long buildTime)
+            throws IOException {
+        return new TestResult(buildTime, ds);
+    }
 
-	/**
-	 * This class does explicit checkpointing.
-	 */
-	public BuildStepMonitor getRequiredMonitorService() {
-		return BuildStepMonitor.NONE;
-	}
+    /**
+     * This class does explicit checkpointing.
+     */
+    public BuildStepMonitor getRequiredMonitorService() {
+        return BuildStepMonitor.NONE;
+    }
 
-	public String getTestResults() {
-		return testResults;
-	}
+    public String getTestResults() {
+        return testResults;
+    }
 
-	public DescribableList<TestDataPublisher, Descriptor<TestDataPublisher>> getTestDataPublishers() {
-		return testDataPublishers;
-	}
+    public DescribableList<TestDataPublisher, Descriptor<TestDataPublisher>> getTestDataPublishers() {
+        return testDataPublishers;
+    }
 
-	@Override
-	public Collection<Action> getProjectActions(AbstractProject<?, ?> project) {
-		return Collections.<Action>singleton(new TestResultProjectAction(project));
-	}
+    @Override
+    public Collection<Action> getProjectActions(AbstractProject<?, ?> project) {
+        return Collections.<Action>singleton(new TestResultProjectAction(project));
+    }
 
-	public MatrixAggregator createAggregator(MatrixBuild build,
-			Launcher launcher, BuildListener listener) {
-		return new TestResultAggregator(build, launcher, listener);
-	}
+    public MatrixAggregator createAggregator(MatrixBuild build,
+            Launcher launcher, BuildListener listener) {
+        return new TestResultAggregator(build, launcher, listener);
+    }
 
-	/**
-	 * @return the keepLongStdio
-	 */
-	public boolean isKeepLongStdio() {
-		return keepLongStdio;
-	}
-
-	/**
-	 * Test result tracks the diff from the previous run, hence the checkpoint.
-	 */
-	private static final CheckPoint CHECKPOINT = new CheckPoint(
-			"JUnit result archiving");
-
-	private static final long serialVersionUID = 1L;
+    /**
+     * @return the keepLongStdio
+     */
+    public boolean isKeepLongStdio() {
+        return keepLongStdio;
+    }
+    /**
+     * Test result tracks the diff from the previous run, hence the checkpoint.
+     */
+    private static final CheckPoint CHECKPOINT = new CheckPoint(
+            "JUnit result archiving");
+    private static final long serialVersionUID = 1L;
 
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
-		public String getDisplayName() {
-			return Messages.JUnitResultArchiver_DisplayName();
-		}
+
+        public String getDisplayName() {
+            return Messages.JUnitResultArchiver_DisplayName();
+        }
 
         @Override
         public String getHelpFile() {
             return "/help/tasks/junit/report.html";
         }
 
-		@Override
-		public Publisher newInstance(StaplerRequest req, JSONObject formData)
-				throws hudson.model.Descriptor.FormException {
-			String testResults = formData.getString("testResults");
+        @Override
+        public Publisher newInstance(StaplerRequest req, JSONObject formData)
+                throws hudson.model.Descriptor.FormException {
+            String testResults = formData.getString("testResults");
             boolean keepLongStdio = formData.getBoolean("keepLongStdio");
-			DescribableList<TestDataPublisher, Descriptor<TestDataPublisher>> testDataPublishers = new DescribableList<TestDataPublisher, Descriptor<TestDataPublisher>>(Saveable.NOOP);
+            DescribableList<TestDataPublisher, Descriptor<TestDataPublisher>> testDataPublishers = new DescribableList<TestDataPublisher, Descriptor<TestDataPublisher>>(Saveable.NOOP);
             try {
                 testDataPublishers.rebuild(req, formData, TestDataPublisher.all());
             } catch (IOException e) {
-                throw new FormException(e,null);
+                throw new FormException(e, null);
             }
 
             return new JUnitResultArchiver(testResults, keepLongStdio, testDataPublishers);
-		}
+        }
 
-		/**
-		 * Performs on-the-fly validation on the file mask wildcard.
-		 */
-		public FormValidation doCheckTestResults(
-				@AncestorInPath AbstractProject project,
-				@QueryParameter String value) throws IOException {
-			return FilePath.validateFileMask(project.getSomeWorkspace(), value);
-		}
+        /**
+         * Performs on-the-fly validation on the file mask wildcard.
+         */
+        public FormValidation doCheckTestResults(
+                @AncestorInPath AbstractProject project,
+                @QueryParameter String value) throws IOException {
+            return FilePath.validateFileMask(project.getSomeWorkspace(), value);
+        }
 
-		public boolean isApplicable(Class<? extends AbstractProject> jobType) {
-			return true;
-		}
+        public boolean isApplicable(Class<? extends AbstractProject> jobType) {
+            return true;
+        }
     }
 }

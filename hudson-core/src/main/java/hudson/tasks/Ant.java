@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Tom Huybrechts, Yahoo! Inc., Nikita Levyankov
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -65,35 +65,33 @@ import java.util.Set;
  * @author Kohsuke Kawaguchi
  */
 public class Ant extends Builder {
+
     /**
-     * The targets, properties, and other Ant options.
-     * Either separated by whitespace or newline.
+     * The targets, properties, and other Ant options. Either separated by
+     * whitespace or newline.
      */
     private final String targets;
-
     /**
      * Identifies {@link AntInstallation} to be used.
      */
     private final String antName;
-
     /**
      * ANT_OPTS if not null.
      */
     private final String antOpts;
-
     /**
-     * Optional build script path relative to the workspace.
-     * Used for the Ant '-f' option.
+     * Optional build script path relative to the workspace. Used for the Ant
+     * '-f' option.
      */
     private final String buildFile;
-
     /**
-     * Optional properties to be passed to Ant. Follows {@link Properties} syntax.
+     * Optional properties to be passed to Ant. Follows {@link Properties}
+     * syntax.
      */
     private final String properties;
-    
+
     @DataBoundConstructor
-    public Ant(String targets,String antName, String antOpts, String buildFile, String properties) {
+    public Ant(String targets, String antName, String antOpts, String buildFile, String properties) {
         this.targets = targets;
         this.antName = antName;
         this.antOpts = StringUtils.trimToNull(antOpts);
@@ -101,26 +99,26 @@ public class Ant extends Builder {
         this.properties = StringUtils.trimToNull(properties);
     }
 
-	public String getBuildFile() {
-		return buildFile;
-	}
+    public String getBuildFile() {
+        return buildFile;
+    }
 
-	public String getProperties() {
-		return properties;
-	}
+    public String getProperties() {
+        return properties;
+    }
 
     public String getTargets() {
         return targets;
     }
 
     /**
-     * Gets the Ant to invoke,
-     * or null to invoke the default one.
+     * Gets the Ant to invoke, or null to invoke the default one.
      */
     public AntInstallation getAnt() {
-        for( AntInstallation i : getDescriptor().getInstallations() ) {
-            if(antName!=null && antName.equals(i.getName()))
+        for (AntInstallation i : getDescriptor().getInstallations()) {
+            if (antName != null && antName.equals(i.getName())) {
                 return i;
+            }
         }
         return null;
     }
@@ -133,19 +131,19 @@ public class Ant extends Builder {
     }
 
     @Override
-    public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         ArgumentListBuilder args = new ArgumentListBuilder();
 
         EnvVars env = build.getEnvironment(listener);
-        
+
         AntInstallation ai = getAnt();
-        if(ai==null) {
+        if (ai == null) {
             args.add(launcher.isUnix() ? "ant" : "ant.bat");
         } else {
             ai = ai.forNode(Computer.currentComputer().getNode(), listener);
             ai = ai.forEnvironment(env);
             String exe = ai.getExecutable(launcher);
-            if (exe==null) {
+            if (exe == null) {
                 listener.fatalError(Messages.Ant_ExecutableNotFound(ai.getName()));
                 return false;
             }
@@ -156,10 +154,10 @@ public class Ant extends Builder {
 
         String buildFile = env.expand(this.buildFile);
         String targets = Util.replaceMacro(env.expand(this.targets), vr);
-        
+
         FilePath buildFilePath = buildFilePath(build.getModuleRoot(), buildFile, targets);
 
-        if(!buildFilePath.exists()) {
+        if (!buildFilePath.exists()) {
             // because of the poor choice of getModuleRoot() with CVS/Subversion, people often get confused
             // with where the build file path is relative to. Now it's too late to change this behavior
             // due to compatibility issue, but at least we can make this less painful by looking for errors
@@ -167,34 +165,36 @@ public class Ant extends Builder {
 
             // first check if this appears to be a valid relative path from workspace root
             FilePath buildFilePath2 = buildFilePath(build.getWorkspace(), buildFile, targets);
-            if(buildFilePath2.exists()) {
+            if (buildFilePath2.exists()) {
                 // This must be what the user meant. Let it continue.
                 buildFilePath = buildFilePath2;
             } else {
                 // neither file exists. So this now really does look like an error.
-                listener.fatalError("Unable to find build script at "+buildFilePath);
+                listener.fatalError("Unable to find build script at " + buildFilePath);
                 return false;
             }
         }
 
-        if(buildFile!=null) {
+        if (buildFile != null) {
             args.add("-file", buildFilePath.getName());
         }
 
         Set<String> sensitiveVars = build.getSensitiveBuildVariables();
 
-        args.addKeyValuePairs("-D",build.getBuildVariables(),sensitiveVars);
+        args.addKeyValuePairs("-D", build.getBuildVariables(), sensitiveVars);
 
-        args.addKeyValuePairsFromPropertyString("-D",properties,vr,sensitiveVars);
+        args.addKeyValuePairsFromPropertyString("-D", properties, vr, sensitiveVars);
 
-        args.addTokenized(targets.replaceAll("[\t\r\n]+"," "));
+        args.addTokenized(targets.replaceAll("[\t\r\n]+", " "));
 
-        if(ai!=null)
-            env.put("ANT_HOME",ai.getHome());
-        if(antOpts!=null)
-            env.put("ANT_OPTS",env.expand(antOpts));
+        if (ai != null) {
+            env.put("ANT_HOME", ai.getHome());
+        }
+        if (antOpts != null) {
+            env.put("ANT_OPTS", env.expand(antOpts));
+        }
 
-        if(!launcher.isUnix()) {
+        if (!launcher.isUnix()) {
             args = args.toWindowsCommand();
             // For some reason, ant on windows rejects empty parameters but unix does not.
             // Add quotes for any empty parameter values:
@@ -206,51 +206,56 @@ public class Ant extends Builder {
 
         long startTime = System.currentTimeMillis();
         try {
-            AntConsoleAnnotator aca = new AntConsoleAnnotator(listener.getLogger(),build.getCharset());
+            AntConsoleAnnotator aca = new AntConsoleAnnotator(listener.getLogger(), build.getCharset());
             int r;
             try {
                 r = launcher.launch().cmds(args).envs(env).stdout(aca).pwd(buildFilePath.getParent()).join();
             } finally {
                 aca.forceEol();
             }
-            return r==0;
+            return r == 0;
         } catch (IOException e) {
-            Util.displayIOException(e,listener);
+            Util.displayIOException(e, listener);
 
             String errorMessage = Messages.Ant_ExecFailed();
-            if(ai==null && (System.currentTimeMillis()-startTime)<1000) {
-                if(getDescriptor().getInstallations()==null)
-                    // looks like the user didn't configure any Ant installation
+            if (ai == null && (System.currentTimeMillis() - startTime) < 1000) {
+                if (getDescriptor().getInstallations() == null) // looks like the user didn't configure any Ant installation
+                {
                     errorMessage += Messages.Ant_GlobalConfigNeeded();
-                else
-                    // There are Ant installations configured but the project didn't pick it
+                } else // There are Ant installations configured but the project didn't pick it
+                {
                     errorMessage += Messages.Ant_ProjectConfigNeeded();
+                }
             }
-            e.printStackTrace( listener.fatalError(errorMessage) );
+            e.printStackTrace(listener.fatalError(errorMessage));
             return false;
         }
     }
 
     private static FilePath buildFilePath(FilePath base, String buildFile, String targets) {
-        if(buildFile!=null)     return base.child(buildFile);
+        if (buildFile != null) {
+            return base.child(buildFile);
+        }
         // some users specify the -f option in the targets field, so take that into account as well.
         // see 
         String[] tokens = Util.tokenize(targets);
-        for (int i = 0; i<tokens.length-1; i++) {
+        for (int i = 0; i < tokens.length - 1; i++) {
             String a = tokens[i];
-            if(a.equals("-f") || a.equals("-file") || a.equals("-buildfile"))
-                return base.child(tokens[i+1]);
+            if (a.equals("-f") || a.equals("-file") || a.equals("-buildfile")) {
+                return base.child(tokens[i + 1]);
+            }
         }
         return base.child("build.xml");
     }
 
     @Override
     public DescriptorImpl getDescriptor() {
-        return (DescriptorImpl)super.getDescriptor();
+        return (DescriptorImpl) super.getDescriptor();
     }
 
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
+
         @CopyOnWrite
         private volatile AntInstallation[] installations = new AntInstallation[0];
 
@@ -288,7 +293,7 @@ public class Ant extends Builder {
 
         @Override
         public Ant newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-            return (Ant)req.bindJSON(clazz,formData);
+            return (Ant) req.bindJSON(clazz, formData);
         }
 
         public void setInstallations(AntInstallation... antInstallations) {
@@ -303,6 +308,7 @@ public class Ant extends Builder {
     public static final class AntInstallation extends ToolInstallation implements
             EnvironmentSpecific<AntInstallation>, NodeSpecific<AntInstallation> {
         // to remain backward compatible with earlier Hudson that stored this field here.
+
         @Deprecated
         private transient String antHome;
 
@@ -312,18 +318,18 @@ public class Ant extends Builder {
         }
 
         /**
-         * @deprecated as of 1.308
-         *      Use {@link #AntInstallation(String, String, List)}
+         * @deprecated as of 1.308 Use
+         * {@link #AntInstallation(String, String, List)}
          */
         public AntInstallation(String name, String home) {
-            this(name,home,Collections.<ToolProperty<?>>emptyList());
+            this(name, home, Collections.<ToolProperty<?>>emptyList());
         }
 
         private static String launderHome(String home) {
-            if(home.endsWith("/") || home.endsWith("\\")) {
+            if (home.endsWith("/") || home.endsWith("\\")) {
                 // see https://issues.apache.org/bugzilla/show_bug.cgi?id=26947
                 // Ant doesn't like the trailing slash, especially on Windows
-                return home.substring(0,home.length()-1);
+                return home.substring(0, home.length() - 1);
             } else {
                 return home;
             }
@@ -342,11 +348,12 @@ public class Ant extends Builder {
          * Gets the executable path of this Ant on the given target system.
          */
         public String getExecutable(Launcher launcher) throws IOException, InterruptedException {
-            return launcher.getChannel().call(new Callable<String,IOException>() {
+            return launcher.getChannel().call(new Callable<String, IOException>() {
                 public String call() throws IOException {
                     File exe = getExeFile();
-                    if(exe.exists())
+                    if (exe.exists()) {
                         return exe.getPath();
+                    }
                     return null;
                 }
             });
@@ -356,16 +363,15 @@ public class Ant extends Builder {
             String execName = Functions.isWindows() ? "ant.bat" : "ant";
             String home = Util.replaceMacro(getHome(), EnvVars.masterEnvVars);
 
-            return new File(home,"bin/"+execName);
+            return new File(home, "bin/" + execName);
         }
 
         /**
          * Returns true if the executable exists.
          */
         public boolean getExists() throws IOException, InterruptedException {
-            return getExecutable(new Launcher.LocalLauncher(TaskListener.NULL))!=null;
+            return getExecutable(new Launcher.LocalLauncher(TaskListener.NULL)) != null;
         }
-
         private static final long serialVersionUID = 1L;
 
         public AntInstallation forEnvironment(EnvVars environment) {
@@ -405,18 +411,22 @@ public class Ant extends Builder {
              */
             public FormValidation doCheckHome(@QueryParameter File value) {
                 // this can be used to check the existence of a file on the server, so needs to be protected
-                if(!Hudson.getInstance().hasPermission(Hudson.ADMINISTER))
+                if (!Hudson.getInstance().hasPermission(Hudson.ADMINISTER)) {
                     return FormValidation.ok();
+                }
 
-                if(value.getPath().equals(""))
+                if (value.getPath().equals("")) {
                     return FormValidation.ok();
+                }
 
-                if(!value.isDirectory())
+                if (!value.isDirectory()) {
                     return FormValidation.error(Messages.Ant_NotADirectory(value));
+                }
 
-                File antJar = new File(value,"lib/ant.jar");
-                if(!antJar.exists())
+                File antJar = new File(value, "lib/ant.jar");
+                if (!antJar.exists()) {
                     return FormValidation.error(Messages.Ant_NotAntDirectory(value));
+                }
 
                 return FormValidation.ok();
             }
@@ -427,9 +437,14 @@ public class Ant extends Builder {
         }
 
         public static class ConverterImpl extends ToolConverter {
-            public ConverterImpl(XStream2 xstream) { super(xstream); }
-            @Override protected String oldHomeField(ToolInstallation obj) {
-                return ((AntInstallation)obj).antHome;
+
+            public ConverterImpl(XStream2 xstream) {
+                super(xstream);
+            }
+
+            @Override
+            protected String oldHomeField(ToolInstallation obj) {
+                return ((AntInstallation) obj).antHome;
             }
         }
     }
@@ -438,6 +453,7 @@ public class Ant extends Builder {
      * Automatic Ant installer from apache.org.
      */
     public static class AntInstaller extends DownloadFromUrlInstaller {
+
         @DataBoundConstructor
         public AntInstaller(String id) {
             super(id);
@@ -445,13 +461,14 @@ public class Ant extends Builder {
 
         @Extension
         public static final class DescriptorImpl extends DownloadFromUrlInstaller.DescriptorImpl<AntInstaller> {
+
             public String getDisplayName() {
                 return Messages.InstallFromApache();
             }
 
             @Override
             public boolean isApplicable(Class<? extends ToolInstallation> toolType) {
-                return toolType==AntInstallation.class;
+                return toolType == AntInstallation.class;
             }
         }
     }
@@ -466,22 +483,22 @@ public class Ant extends Builder {
         }
         Ant that = (Ant) o;
         return new EqualsBuilder()
-            .append(antName, that.antName)
-            .append(antOpts, that.antOpts)
-            .append(buildFile, that.buildFile)
-            .append(properties, that.properties)
-            .append(targets, that.targets)
-            .isEquals();
+                .append(antName, that.antName)
+                .append(antOpts, that.antOpts)
+                .append(buildFile, that.buildFile)
+                .append(properties, that.properties)
+                .append(targets, that.targets)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-            .append(targets)
-            .append(antName)
-            .append(antOpts)
-            .append(buildFile)
-            .append(properties)
-            .toHashCode();
+                .append(targets)
+                .append(antName)
+                .append(antOpts)
+                .append(buildFile)
+                .append(properties)
+                .toHashCode();
     }
 }

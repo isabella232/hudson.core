@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -28,9 +28,9 @@ import java.util.List;
 /**
  * Finds full name off the user when none is specified.
  *
- * <p>
- * This is an extension point of Hudson. Plugins tha contribute new implementation
- * of this class should use {@link Extension} to register the instance into Hudson, like this:
+ * <p> This is an extension point of Hudson. Plugins tha contribute new
+ * implementation of this class should use {@link Extension} to register the
+ * instance into Hudson, like this:
  *
  * <pre>
  * &#64;Extension
@@ -47,26 +47,25 @@ public abstract class UserNameResolver implements ExtensionPoint {
     /**
      * Finds full name of the given user.
      *
-     * <p>
-     * This method is called when a {@link User} without explicitly name is used.
+     * <p> This method is called when a {@link User} without explicitly name is
+     * used.
      *
-     * <p>
-     * When multiple resolvers are installed, they are consulted in order and
-     * the search will be over when a name is found by someoene.
+     * <p> When multiple resolvers are installed, they are consulted in order
+     * and the search will be over when a name is found by someoene.
      *
-     * <p>
-     * Since {@link UserNameResolver} is singleton, this method can be invoked concurrently
-     * from multiple threads.
+     * <p> Since {@link UserNameResolver} is singleton, this method can be
+     * invoked concurrently from multiple threads.
      *
-     * @return
-     *      null if the inference failed.
+     * @return null if the inference failed.
      */
     public abstract String findNameFor(User u);
-    
+
     public static String resolve(User u) {
         for (UserNameResolver r : all()) {
             String name = r.findNameFor(u);
-            if(name!=null) return name;
+            if (name != null) {
+                return name;
+            }
         }
 
         return null;
@@ -78,12 +77,11 @@ public abstract class UserNameResolver implements ExtensionPoint {
     public static ExtensionList<UserNameResolver> all() {
         return Hudson.getInstance().getExtensionList(UserNameResolver.class);
     }
-
     /**
      * All registered {@link UserNameResolver} implementations.
      *
-     * @deprecated since 2009-02-24.
-     *      Use {@link #all()} for read access, and use {@link Extension} for registration.
+     * @deprecated since 2009-02-24. Use {@link #all()} for read access, and use
+     * {@link Extension} for registration.
      */
     public static final List<UserNameResolver> LIST = ExtensionListView.createList(UserNameResolver.class);
 }

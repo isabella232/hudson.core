@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Michael B. Donohue, Yahoo!, Inc.
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Michael B. Donohue, Yahoo!, Inc.
+ *
  *
  *******************************************************************************/ 
 
@@ -48,16 +48,16 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Aggregates downstream test reports into a single consolidated report,
- * so that people can see the overall test results in one page
- * when tests are scattered across many different jobs.
+ * Aggregates downstream test reports into a single consolidated report, so that
+ * people can see the overall test results in one page when tests are scattered
+ * across many different jobs.
  *
  * @author Kohsuke Kawaguchi
  */
 public class AggregatedTestResultPublisher extends Recorder {
+
     /**
-     * Jobs to aggregate. Comma separated.
-     * Null if triggering downstreams.
+     * Jobs to aggregate. Comma separated. Null if triggering downstreams.
      */
     public final String jobs;
 
@@ -65,9 +65,9 @@ public class AggregatedTestResultPublisher extends Recorder {
         this.jobs = Util.fixEmptyAndTrim(jobs);
     }
 
-    public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         // add a TestResult just so that it can show up later.
-        build.addAction(new TestResultAction(jobs,build));
+        build.addAction(new TestResultAction(jobs, build));
         return true;
     }
 
@@ -82,12 +82,11 @@ public class AggregatedTestResultPublisher extends Recorder {
      * are gone, we can still retain some useful information.
      */
     public static final class TestResultAction extends AbstractTestResultAction {
+
         /**
-         * Jobs to aggregate. Comma separated.
-         * Never null.
+         * Jobs to aggregate. Comma separated. Never null.
          */
         private final String jobs;
-
         /**
          * The last time the fields of this object is computed from the rest.
          */
@@ -96,7 +95,6 @@ public class AggregatedTestResultPublisher extends Recorder {
          * When was the last time any build completed?
          */
         private static long lastChanged = 0;
-
         private transient int failCount;
         private transient int totalCount;
         private transient List<AbstractTestResultAction> individuals;
@@ -106,13 +104,15 @@ public class AggregatedTestResultPublisher extends Recorder {
         private transient List<AbstractProject> didntRun;
         private transient List<AbstractProject> noFingerprints;
 
-        public TestResultAction(String jobs, AbstractBuild<?,?> owner) {
+        public TestResultAction(String jobs, AbstractBuild<?, ?> owner) {
             super(owner);
-            if(jobs==null) {
+            if (jobs == null) {
                 // resolve null as the transitive downstream jobs
                 StringBuilder buf = new StringBuilder();
                 for (AbstractProject p : getProject().getTransitiveDownstreamProjects()) {
-                    if(buf.length()>0)  buf.append(',');
+                    if (buf.length() > 0) {
+                        buf.append(',');
+                    }
                     buf.append(p.getFullName());
                 }
                 jobs = buf.toString();
@@ -125,15 +125,16 @@ public class AggregatedTestResultPublisher extends Recorder {
          */
         public Collection<AbstractProject> getJobs() {
             List<AbstractProject> r = new ArrayList<AbstractProject>();
-            for (String job : Util.tokenize(jobs,",")) {
+            for (String job : Util.tokenize(jobs, ",")) {
                 AbstractProject j = Hudson.getInstance().getItemByFullName(job.trim(), AbstractProject.class);
-                if(j!=null)
+                if (j != null) {
                     r.add(j);
+                }
             }
             return r;
         }
 
-        private AbstractProject<?,?> getProject() {
+        private AbstractProject<?, ?> getProject() {
             return owner.getProject();
         }
 
@@ -154,11 +155,10 @@ public class AggregatedTestResultPublisher extends Recorder {
 
         /**
          * Since there's no TestObject that points this action as the owner
-         * (aggregated {@link TestObject}s point to their respective real owners, not 'this'),
-         * so this method should be never invoked.
+         * (aggregated {@link TestObject}s point to their respective real
+         * owners, not 'this'), so this method should be never invoked.
          *
-         * @deprecated
-         *      so that IDE warns you if you accidentally try to call it.
+         * @deprecated so that IDE warns you if you accidentally try to call it.
          */
         @Override
         protected String getDescription(TestObject object) {
@@ -168,8 +168,7 @@ public class AggregatedTestResultPublisher extends Recorder {
         /**
          * See {@link #getDescription(TestObject)}
          *
-         * @deprecated
-         *      so that IDE warns you if you accidentally try to call it.
+         * @deprecated so that IDE warns you if you accidentally try to call it.
          */
         @Override
         protected void setDescription(TestObject object, String description) {
@@ -185,16 +184,16 @@ public class AggregatedTestResultPublisher extends Recorder {
         }
 
         /**
-         * Gets the downstream projects that haven't run yet, but
-         * expected to produce test results.
+         * Gets the downstream projects that haven't run yet, but expected to
+         * produce test results.
          */
         public List<AbstractProject> getDidntRun() {
             return Collections.unmodifiableList(didntRun);
         }
 
-        /** 
-         * Gets the downstream projects that have available test results, but 
-         * do not appear to have fingerprinting enabled.
+        /**
+         * Gets the downstream projects that have available test results, but do
+         * not appear to have fingerprinting enabled.
          */
         public List<AbstractProject> getNoFingerprints() {
             return Collections.unmodifiableList(noFingerprints);
@@ -205,8 +204,10 @@ public class AggregatedTestResultPublisher extends Recorder {
          */
         private synchronized void upToDateCheck() {
             // up to date check
-            if(lastUpdated>lastChanged)     return;
-            lastUpdated = lastChanged+1;
+            if (lastUpdated > lastChanged) {
+                return;
+            }
+            lastUpdated = lastChanged + 1;
 
             int failCount = 0;
             int totalCount = 0;
@@ -215,11 +216,11 @@ public class AggregatedTestResultPublisher extends Recorder {
             List<AbstractProject> noFingerprints = new ArrayList<AbstractProject>();
             for (AbstractProject job : getJobs()) {
                 RangeSet rs = owner.getDownstreamRelationship(job);
-                if(rs.isEmpty()) {
+                if (rs.isEmpty()) {
                     // is this job expected to produce a test result?
                     Run b = job.getLastSuccessfulBuild();
-                    if(b!=null && b.getAction(AbstractTestResultAction.class)!=null) {
-                        if(b.getAction(FingerprintAction.class)!=null) {
+                    if (b != null && b.getAction(AbstractTestResultAction.class) != null) {
+                        if (b.getAction(FingerprintAction.class) != null) {
                             didntRun.add(job);
                         } else {
                             noFingerprints.add(job);
@@ -228,11 +229,13 @@ public class AggregatedTestResultPublisher extends Recorder {
                 } else {
                     for (int n : rs.listNumbersReverse()) {
                         Run b = job.getBuildByNumber(n);
-                        if(b==null) continue;
-                        if(b.isBuilding() || b.getResult().isWorseThan(Result.UNSTABLE))
+                        if (b == null) {
+                            continue;
+                        }
+                        if (b.isBuilding() || b.getResult().isWorseThan(Result.UNSTABLE)) {
                             continue;   // don't count them
-
-                        for( AbstractTestResultAction ta : b.getActions(AbstractTestResultAction.class)) {
+                        }
+                        for (AbstractTestResultAction ta : b.getActions(AbstractTestResultAction.class)) {
                             failCount += ta.getFailCount();
                             totalCount += ta.getTotalCount();
                             individuals.add(ta);
@@ -250,7 +253,7 @@ public class AggregatedTestResultPublisher extends Recorder {
         }
 
         public boolean getHasFingerprintAction() {
-            return this.owner.getAction(FingerprintAction.class)!=null;
+            return this.owner.getAction(FingerprintAction.class) != null;
         }
 
         @Override
@@ -265,6 +268,7 @@ public class AggregatedTestResultPublisher extends Recorder {
 
         @Extension
         public static class RunListenerImpl extends RunListener<Run> {
+
             @Override
             public void onCompleted(Run run, TaskListener listener) {
                 lastChanged = System.currentTimeMillis();
@@ -274,6 +278,7 @@ public class AggregatedTestResultPublisher extends Recorder {
 
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {
             return true;    // for all types
         }
@@ -289,25 +294,28 @@ public class AggregatedTestResultPublisher extends Recorder {
 
         public FormValidation doCheck(@AncestorInPath AbstractProject project, @QueryParameter String value) {
             // Require CONFIGURE permission on this project
-            if(!project.hasPermission(Item.CONFIGURE))  return FormValidation.ok();
+            if (!project.hasPermission(Item.CONFIGURE)) {
+                return FormValidation.ok();
+            }
 
             for (String name : Util.tokenize(fixNull(value), ",")) {
                 name = name.trim();
-                if(Hudson.getInstance().getItemByFullName(name)==null)
-                    return FormValidation.error(hudson.tasks.Messages.BuildTrigger_NoSuchProject(name,AbstractProject.findNearest(name).getName()));
+                if (Hudson.getInstance().getItemByFullName(name) == null) {
+                    return FormValidation.error(hudson.tasks.Messages.BuildTrigger_NoSuchProject(name, AbstractProject.findNearest(name).getName()));
+                }
             }
-            
+
             return FormValidation.ok();
         }
 
         @Override
         public AggregatedTestResultPublisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             JSONObject s = formData.getJSONObject("specify");
-            if(s.isNullObject())
+            if (s.isNullObject()) {
                 return new AggregatedTestResultPublisher(null);
-            else
+            } else {
                 return new AggregatedTestResultPublisher(s.getString("jobs"));
+            }
         }
     }
-
 }

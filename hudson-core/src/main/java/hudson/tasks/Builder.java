@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
+ * Contributors:
+ * 
 *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -25,18 +25,15 @@ import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 
-
 /**
  * {@link BuildStep}s that perform the actual build.
  *
- * <p>
- * To register a custom {@link Builder} from a plugin,
- * put {@link Extension} on your descriptor.
+ * <p> To register a custom {@link Builder} from a plugin, put {@link Extension}
+ * on your descriptor.
  *
  * @author Kohsuke Kawaguchi
  */
 public abstract class Builder extends BuildStepCompatibilityLayer implements BuildStep, Describable<Builder>, ExtensionPoint {
-    
 
 //
 // these two methods need to remain to keep binary compatibility with plugins built with Hudson < 1.150
@@ -49,8 +46,8 @@ public abstract class Builder extends BuildStepCompatibilityLayer implements Bui
     }
 
     /**
-     * Returns {@link BuildStepMonitor#NONE} by default, as {@link Builder}s normally don't depend
-     * on its previous result.
+     * Returns {@link BuildStepMonitor#NONE} by default, as {@link Builder}s
+     * normally don't depend on its previous result.
      */
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
@@ -64,7 +61,7 @@ public abstract class Builder extends BuildStepCompatibilityLayer implements Bui
      * Returns all the registered {@link Builder} descriptors.
      */
     // for backward compatibility, the signature is not BuildStepDescriptor
-    public static DescriptorExtensionList<Builder,Descriptor<Builder>> all() {
-        return Hudson.getInstance().<Builder,Descriptor<Builder>>getDescriptorList(Builder.class);
+    public static DescriptorExtensionList<Builder, Descriptor<Builder>> all() {
+        return Hudson.getInstance().<Builder, Descriptor<Builder>>getDescriptorList(Builder.class);
     }
 }

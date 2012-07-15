@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Jene Jasper, Yahoo! Inc., Nikita Levyankov
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -37,6 +37,7 @@ import java.util.Arrays;
  * @author Kohsuke Kawaguchi
  */
 public class Shell extends CommandInterpreter {
+
     @DataBoundConstructor
     public Shell(String command) {
         super(fixCrLf(command));
@@ -57,13 +58,13 @@ public class Shell extends CommandInterpreter {
     }
 
     /**
-     * Older versions of bash have a bug where non-ASCII on the first line
-     * makes the shell think the file is a binary file and not a script. Adding
-     * a leading line feed works around this problem.
+     * Older versions of bash have a bug where non-ASCII on the first line makes
+     * the shell think the file is a binary file and not a script. Adding a
+     * leading line feed works around this problem.
      */
     private static String addCrForNonASCII(String s) {
-        if(!s.startsWith("#!")) {
-            if (s.indexOf('\n')!=0) {
+        if (!s.startsWith("#!")) {
+            if (s.indexOf('\n') != 0) {
                 return "\n" + s;
             }
         }
@@ -72,17 +73,20 @@ public class Shell extends CommandInterpreter {
     }
 
     public String[] buildCommandLine(FilePath script) {
-        if(command.startsWith("#!")) {
+        if (command.startsWith("#!")) {
             // interpreter override
             int end = command.indexOf('\n');
-            if(end<0)   end=command.length();
+            if (end < 0) {
+                end = command.length();
+            }
             List<String> args = new ArrayList<String>();
-            args.addAll(Arrays.asList(Util.tokenize(command.substring(0,end).trim())));
+            args.addAll(Arrays.asList(Util.tokenize(command.substring(0, end).trim())));
             args.add(script.getRemote());
-            args.set(0,args.get(0).substring(2));   // trim off "#!"
+            args.set(0, args.get(0).substring(2));   // trim off "#!"
             return args.toArray(new String[args.size()]);
-        } else
-            return new String[] { getDescriptor().getShellOrDefault(),"-xe",script.getRemote()};
+        } else {
+            return new String[]{getDescriptor().getShellOrDefault(), "-xe", script.getRemote()};
+        }
     }
 
     protected String getContents() {
@@ -95,11 +99,12 @@ public class Shell extends CommandInterpreter {
 
     @Override
     public DescriptorImpl getDescriptor() {
-        return (DescriptorImpl)super.getDescriptor();
+        return (DescriptorImpl) super.getDescriptor();
     }
 
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
+
         /**
          * Shell executable, or null to default.
          */
@@ -118,8 +123,9 @@ public class Shell extends CommandInterpreter {
         }
 
         public String getShellOrDefault() {
-            if(shell==null)
-                return Functions.isWindows() ?"sh":"/bin/sh";
+            if (shell == null) {
+                return Functions.isWindows() ? "sh" : "/bin/sh";
+            }
             return shell;
         }
 
@@ -148,7 +154,7 @@ public class Shell extends CommandInterpreter {
          */
         public FormValidation doCheck(@QueryParameter String value) {
             // Executable requires admin permission
-            return FormValidation.validateExecutable(value); 
+            return FormValidation.validateExecutable(value);
         }
     }
 }

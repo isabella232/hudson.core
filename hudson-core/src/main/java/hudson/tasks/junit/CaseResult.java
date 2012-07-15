@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Daniel Dyer, Seiji Sogabe, Tom Huybrechts, Yahoo!, Inc.
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Daniel Dyer, Seiji Sogabe, Tom Huybrechts, Yahoo!, Inc.
+ *
  *
  *******************************************************************************/ 
 
@@ -36,11 +36,12 @@ import static java.util.Collections.emptyList;
  * @author Kohsuke Kawaguchi
  */
 public final class CaseResult extends TestResult implements Comparable<CaseResult> {
+
     private static final Logger LOGGER = Logger.getLogger(CaseResult.class.getName());
     private final float duration;
     /**
-     * In JUnit, a test is a method of a class. This field holds the fully qualified class name
-     * that the test was in.
+     * In JUnit, a test is a method of a class. This field holds the fully
+     * qualified class name that the test was in.
      */
     private final String className;
     /**
@@ -51,18 +52,16 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
     private final String errorStackTrace;
     private final String errorDetails;
     private transient SuiteResult parent;
-
     private transient ClassResult classResult;
-
     /**
-     * Some tools report stdout and stderr at testcase level (such as Maven surefire plugin), others do so at
-     * the suite level (such as Ant JUnit task.)
+     * Some tools report stdout and stderr at testcase level (such as Maven
+     * surefire plugin), others do so at the suite level (such as Ant JUnit
+     * task.)
      *
-     * If these information are reported at the test case level, these fields are set,
-     * otherwise null, in which case {@link SuiteResult#stdout}.
+     * If these information are reported at the test case level, these fields
+     * are set, otherwise null, in which case {@link SuiteResult#stdout}.
      */
-    private final String stdout,stderr;
-
+    private final String stdout, stderr;
     /**
      * This test has been failing since this build number (not id.)
      *
@@ -72,8 +71,8 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
 
     private static float parseTime(Element testCase) {
         String time = testCase.attributeValue("time");
-        if(time!=null) {
-            time = time.replace(",","");
+        if (time != null) {
+            time = time.replace(",", "");
             try {
                 return Float.parseFloat(time);
             } catch (NumberFormatException e) {
@@ -100,14 +99,14 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
 
 
         /*
-            According to http://www.nabble.com/NPE-(Fatal%3A-Null)-in-recording-junit-test-results-td23562964.html
-            there's some odd-ball cases where testClassName is null but
-            @name contains fully qualified name.
+         According to http://www.nabble.com/NPE-(Fatal%3A-Null)-in-recording-junit-test-results-td23562964.html
+         there's some odd-ball cases where testClassName is null but
+         @name contains fully qualified name.
          */
         String nameAttr = testCase.attributeValue("name");
-        if(testClassName==null && nameAttr.contains(".")) {
-            testClassName = nameAttr.substring(0,nameAttr.lastIndexOf('.'));
-            nameAttr = nameAttr.substring(nameAttr.lastIndexOf('.')+1);
+        if (testClassName == null && nameAttr.contains(".")) {
+            testClassName = nameAttr.substring(0, nameAttr.lastIndexOf('.'));
+            nameAttr = nameAttr.substring(nameAttr.lastIndexOf('.') + 1);
         }
 
         className = testClassName;
@@ -122,8 +121,8 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
         stdout = possiblyTrimStdio(_this, keepLongStdio, testCase.elementText("system-out"));
         stderr = possiblyTrimStdio(_this, keepLongStdio, testCase.elementText("system-err"));
     }
-
     private static final int HALF_MAX_SIZE = 500;
+
     static String possiblyTrimStdio(Collection<CaseResult> results, boolean keepLongStdio, String stdio) { // HUDSON-6516
         if (stdio == null) {
             return null;
@@ -145,7 +144,8 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
     }
 
     /**
-     * Used to create a fake failure, when Hudson fails to load data from XML files.
+     * Used to create a fake failure, when Hudson fails to load data from XML
+     * files.
      */
     CaseResult(SuiteResult parent, String testName, String errorStackTrace) {
         this.className = parent == null ? "unnamed" : parent.getName();
@@ -158,15 +158,16 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
         this.duration = 0.0f;
         this.skipped = false;
     }
-    
+
     public ClassResult getParent() {
-    	return classResult;
+        return classResult;
     }
 
     private static String getError(Element testCase) {
         String msg = testCase.elementText("error");
-        if(msg!=null)
+        if (msg != null) {
             return msg;
+        }
         return testCase.elementText("failure");
     }
 
@@ -184,8 +185,8 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
     }
 
     /**
-     * If the testCase element includes the skipped element (as output by TestNG), then
-     * the test has neither passed nor failed, it was never run.
+     * If the testCase element includes the skipped element (as output by
+     * TestNG), then the test has neither passed nor failed, it was never run.
      */
     private static boolean isMarkedAsSkipped(Element testCase) {
         return testCase.element("skipped") != null;
@@ -196,13 +197,14 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
     }
 
     /**
-     * Gets the name of the test, which is returned from {@code TestCase.getName()}
+     * Gets the name of the test, which is returned from
+     * {@code TestCase.getName()}
      *
-     * <p>
-     * Note that this may contain any URL-unfriendly character.
+     * <p> Note that this may contain any URL-unfriendly character.
      */
-    @Exported(visibility=999)
-    public @Override String getName() {
+    @Exported(visibility = 999)
+    public @Override
+    String getName() {
         return testName;
     }
 
@@ -217,7 +219,7 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
     /**
      * Gets the duration of the test, in seconds
      */
-    @Exported(visibility=9)
+    @Exported(visibility = 9)
     public float getDuration() {
         return duration;
     }
@@ -225,21 +227,23 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
     /**
      * Gets the version of {@link #getName()} that's URL-safe.
      */
-    public @Override String getSafeName() {
+    public @Override
+    String getSafeName() {
         StringBuilder buf = new StringBuilder(testName);
-        for( int i=0; i<buf.length(); i++ ) {
+        for (int i = 0; i < buf.length(); i++) {
             char ch = buf.charAt(i);
-            if(!Character.isJavaIdentifierPart(ch))
-                buf.setCharAt(i,'_');
+            if (!Character.isJavaIdentifierPart(ch)) {
+                buf.setCharAt(i, '_');
+            }
         }
-        Collection<CaseResult> siblings = (classResult ==null ? Collections.<CaseResult>emptyList(): classResult.getChildren());
+        Collection<CaseResult> siblings = (classResult == null ? Collections.<CaseResult>emptyList() : classResult.getChildren());
         return uniquifyName(siblings, buf.toString());
     }
 
     /**
      * Gets the class name of a test class.
      */
-    @Exported(visibility=9)
+    @Exported(visibility = 9)
     public String getClassName() {
         return className;
     }
@@ -249,7 +253,7 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
      */
     public String getSimpleName() {
         int idx = className.lastIndexOf('.');
-        return className.substring(idx+1);
+        return className.substring(idx + 1);
     }
 
     /**
@@ -257,23 +261,33 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
      */
     public String getPackageName() {
         int idx = className.lastIndexOf('.');
-        if(idx<0)       return "(root)";
-        else            return className.substring(0,idx);
+        if (idx < 0) {
+            return "(root)";
+        } else {
+            return className.substring(0, idx);
+        }
     }
 
     public String getFullName() {
-        return className+'.'+getName();
+        return className + '.' + getName();
     }
-
 
     @Override
     public int getFailCount() {
-        if (!isPassed() && !isSkipped()) return 1; else return 0;
+        if (!isPassed() && !isSkipped()) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 
     @Override
     public int getSkipCount() {
-        if (isSkipped()) return 1; else return 0;
+        if (isSkipped()) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 
     @Override
@@ -282,18 +296,18 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
     }
 
     /**
-     * If this test failed, then return the build number
-     * when this test started failing.
+     * If this test failed, then return the build number when this test started
+     * failing.
      */
-    @Exported(visibility=9)
+    @Exported(visibility = 9)
     public int getFailedSince() {
         // If we haven't calculated failedSince yet, and we should,
         // do it now.
-        if (failedSince==0 && getFailCount()==1) {
+        if (failedSince == 0 && getFailCount() == 1) {
             CaseResult prev = getPreviousResult();
-            if(prev!=null && !prev.isPassed())
+            if (prev != null && !prev.isPassed()) {
                 this.failedSince = prev.failedSince;
-            else if (getOwner() != null) {
+            } else if (getOwner() != null) {
                 this.failedSince = getOwner().getNumber();
             } else {
                 LOGGER.warning("trouble calculating getFailedSince. We've got prev, but no owner.");
@@ -302,45 +316,50 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
         }
         return failedSince;
     }
-    
-    public Run<?,?> getFailedSinceRun() {
-    	return getOwner().getParent().getBuildByNumber(getFailedSince());
+
+    public Run<?, ?> getFailedSinceRun() {
+        return getOwner().getParent().getBuildByNumber(getFailedSince());
     }
 
     /**
-     * Gets the number of consecutive builds (including this)
-     * that this test case has been failing.
+     * Gets the number of consecutive builds (including this) that this test
+     * case has been failing.
      */
-    @Exported(visibility=9)
+    @Exported(visibility = 9)
     public int getAge() {
-        if(isPassed())
+        if (isPassed()) {
             return 0;
-        else if (getOwner() != null) {
-            return getOwner().getNumber()-getFailedSince()+1;
+        } else if (getOwner() != null) {
+            return getOwner().getNumber() - getFailedSince() + 1;
         } else {
             LOGGER.fine("Trying to get age of a CaseResult without an owner");
-            return 0; 
-    }
+            return 0;
+        }
     }
 
     /**
      * The stdout of this test.
      *
-     * <p>
-     * Depending on the tool that produced the XML report, this method works somewhat inconsistently.
-     * With some tools (such as Maven surefire plugin), you get the accurate information, that is
-     * the stdout from this test case. With some other tools (such as the JUnit task in Ant), this
-     * method returns the stdout produced by the entire test suite.
+     * <p> Depending on the tool that produced the XML report, this method works
+     * somewhat inconsistently. With some tools (such as Maven surefire plugin),
+     * you get the accurate information, that is the stdout from this test case.
+     * With some other tools (such as the JUnit task in Ant), this method
+     * returns the stdout produced by the entire test suite.
      *
-     * <p>
-     * If you need to know which is the case, compare this output from {@link SuiteResult#getStdout()}.
+     * <p> If you need to know which is the case, compare this output from
+     * {@link SuiteResult#getStdout()}.
+     *
      * @since 1.294
      */
     @Exported
     public String getStdout() {
-        if(stdout!=null)    return stdout;
+        if (stdout != null) {
+            return stdout;
+        }
         SuiteResult sr = getSuiteResult();
-        if (sr==null) return "";         
+        if (sr == null) {
+            return "";
+        }
         return getSuiteResult().getStdout();
     }
 
@@ -352,29 +371,38 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
      */
     @Exported
     public String getStderr() {
-        if(stderr!=null)    return stderr;
+        if (stderr != null) {
+            return stderr;
+        }
         SuiteResult sr = getSuiteResult();
-        if (sr==null) return "";
+        if (sr == null) {
+            return "";
+        }
         return getSuiteResult().getStderr();
     }
 
     @Override
     public CaseResult getPreviousResult() {
-        if (parent == null) return null;
+        if (parent == null) {
+            return null;
+        }
         SuiteResult pr = parent.getPreviousResult();
-        if(pr==null)    return null;
+        if (pr == null) {
+            return null;
+        }
         return pr.getCase(getName());
     }
-    
+
     /**
      * Case results have no children
+     *
      * @return null
      */
     @Override
     public TestResult findCorrespondingResult(String id) {
         if (id.equals(safe(getName()))) {
             return this;
-    }
+        }
         return null;
     }
 
@@ -409,14 +437,16 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
     }
 
     private Collection<? extends hudson.tasks.test.TestResult> singletonListOrEmpty(boolean f) {
-        if (f)
+        if (f) {
             return Collections.singletonList(this);
-        else
+        } else {
             return emptyList();
+        }
     }
 
     /**
-     * If there was an error or a failure, this is the stack trace, or otherwise null.
+     * If there was an error or a failure, this is the stack trace, or otherwise
+     * null.
      */
     @Exported
     public String getErrorStackTrace() {
@@ -432,19 +462,21 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
     }
 
     /**
-     * @return true if the test was not skipped and did not fail, false otherwise.
+     * @return true if the test was not skipped and did not fail, false
+     * otherwise.
      */
     public boolean isPassed() {
-        return !skipped && errorStackTrace==null;
+        return !skipped && errorStackTrace == null;
     }
 
     /**
-     * Tests whether the test was skipped or not.  TestNG allows tests to be
+     * Tests whether the test was skipped or not. TestNG allows tests to be
      * skipped if their dependencies fail or they are part of a group that has
      * been configured to be skipped.
+     *
      * @return true if the test was not executed, false otherwise.
      */
-    @Exported(visibility=9)
+    @Exported(visibility = 9)
     public boolean isSkipped() {
         return skipped;
     }
@@ -452,31 +484,36 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
     public SuiteResult getSuiteResult() {
         return parent;
     }
-    
+
     @Override
-    public AbstractBuild<?,?> getOwner() {
+    public AbstractBuild<?, ?> getOwner() {
         SuiteResult sr = getSuiteResult();
-        if (sr==null) {
-            LOGGER.warning("In getOwner(), getSuiteResult is null"); return null; }
+        if (sr == null) {
+            LOGGER.warning("In getOwner(), getSuiteResult is null");
+            return null;
+        }
         hudson.tasks.junit.TestResult tr = sr.getParent();
-        if (tr==null) {
-            LOGGER.warning("In getOwner(), suiteResult.getParent() is null."); return null; }
-        return tr.getOwner(); 
+        if (tr == null) {
+            LOGGER.warning("In getOwner(), suiteResult.getParent() is null.");
+            return null;
+        }
+        return tr.getOwner();
     }
 
     public void setParentSuiteResult(SuiteResult parent) {
         this.parent = parent;
-            }
+    }
 
     public void freeze(SuiteResult parent) {
         this.parent = parent;
         // some old test data doesn't have failedSince value set, so for those compute them.
-        if(!isPassed() && failedSince==0) {
+        if (!isPassed() && failedSince == 0) {
             CaseResult prev = getPreviousResult();
-            if(prev!=null && !prev.isPassed())
+            if (prev != null && !prev.isPassed()) {
                 this.failedSince = prev.failedSince;
-            else
+            } else {
                 this.failedSince = getOwner().getNumber();
+            }
         }
     }
 
@@ -484,17 +521,17 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
         return this.getFullName().compareTo(that.getFullName());
     }
 
-    @Exported(name="status",visibility=9) // because stapler notices suffix 's' and remove it
+    @Exported(name = "status", visibility = 9) // because stapler notices suffix 's' and remove it
     public Status getStatus() {
         if (skipped) {
             return Status.SKIPPED;
         }
         CaseResult pr = getPreviousResult();
-        if(pr==null) {
+        if (pr == null) {
             return isPassed() ? Status.PASSED : Status.FAILED;
         }
 
-        if(pr.isPassed()) {
+        if (pr.isPassed()) {
             return isPassed() ? Status.PASSED : Status.REGRESSION;
         } else {
             return isPassed() ? Status.FIXED : Status.FAILED;
@@ -509,37 +546,37 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
      * Constants that represent the status of this test.
      */
     public enum Status {
+
         /**
          * This test runs OK, just like its previous run.
          */
-        PASSED("result-passed",Messages._CaseResult_Status_Passed(),true),
+        PASSED("result-passed", Messages._CaseResult_Status_Passed(), true),
         /**
-         * This test was skipped due to configuration or the
-         * failure or skipping of a method that it depends on.
+         * This test was skipped due to configuration or the failure or skipping
+         * of a method that it depends on.
          */
-        SKIPPED("result-skipped",Messages._CaseResult_Status_Skipped(),false),
+        SKIPPED("result-skipped", Messages._CaseResult_Status_Skipped(), false),
         /**
          * This test failed, just like its previous run.
          */
-        FAILED("result-failed",Messages._CaseResult_Status_Failed(),false),
+        FAILED("result-failed", Messages._CaseResult_Status_Failed(), false),
         /**
          * This test has been failing, but now it runs OK.
          */
-        FIXED("result-fixed",Messages._CaseResult_Status_Fixed(),true),
+        FIXED("result-fixed", Messages._CaseResult_Status_Fixed(), true),
         /**
          * This test has been running OK, but now it failed.
          */
-        REGRESSION("result-regression",Messages._CaseResult_Status_Regression(),false);
-
+        REGRESSION("result-regression", Messages._CaseResult_Status_Regression(), false);
         private final String cssClass;
         private final Localizable message;
         public final boolean isOK;
 
         Status(String cssClass, Localizable message, boolean OK) {
-           this.cssClass = cssClass;
-           this.message = message;
-           isOK = OK;
-       }
+            this.cssClass = cssClass;
+            this.message = message;
+            isOK = OK;
+        }
 
         public String getCssClass() {
             return cssClass;
@@ -550,18 +587,16 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
         }
 
         public boolean isRegression() {
-            return this==REGRESSION;
+            return this == REGRESSION;
         }
     }
-
     /**
      * For sorting errors by age.
      */
     /*package*/ static final Comparator<CaseResult> BY_AGE = new Comparator<CaseResult>() {
         public int compare(CaseResult lhs, CaseResult rhs) {
-            return lhs.getAge()-rhs.getAge();
+            return lhs.getAge() - rhs.getAge();
         }
     };
-
     private static final long serialVersionUID = 1L;
 }

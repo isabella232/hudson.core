@@ -33,7 +33,7 @@ public class BackToNormalBuildMail extends BaseBuildResultMail {
     private String currentState;
 
     public BackToNormalBuildMail(String recipients, boolean sendToIndividuals,
-                                 List<AbstractProject> upstreamProjects, String charset, String currentState) {
+            List<AbstractProject> upstreamProjects, String charset, String currentState) {
         super(recipients, sendToIndividuals, upstreamProjects, charset);
         this.currentState = currentState;
     }
@@ -42,7 +42,7 @@ public class BackToNormalBuildMail extends BaseBuildResultMail {
      * @inheritDoc
      */
     public MimeMessage getMail(AbstractBuild<?, ?> build, BuildListener listener)
-        throws MessagingException, InterruptedException {
+            throws MessagingException, InterruptedException {
         MimeMessage msg = createEmptyMail(build, listener);
         msg.setSubject(getSubject(build, Messages.MailSender_BackToNormalMail_Subject(currentState)), getCharset());
         StringBuilder buf = new StringBuilder();
