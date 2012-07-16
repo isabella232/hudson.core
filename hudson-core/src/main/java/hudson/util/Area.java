@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
  * @since 1.213
  */
 public final class Area {
+
     public final int width;
     public final int height;
 
@@ -39,19 +40,19 @@ public final class Area {
      */
     public static Area parse(String s) {
         Matcher m = PATTERN.matcher(s);
-        if(m.matches())
-            return new Area(Integer.parseInt(m.group(1)),Integer.parseInt(m.group(2)));
+        if (m.matches()) {
+            return new Area(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)));
+        }
         return null;
     }
 
     public int area() {
-        return width*height;
+        return width * height;
     }
 
     @Override
     public String toString() {
-        return width+"x"+height;
+        return width + "x" + height;
     }
-
     private static final Pattern PATTERN = Pattern.compile("(\\d+)x(\\d+)");
 }

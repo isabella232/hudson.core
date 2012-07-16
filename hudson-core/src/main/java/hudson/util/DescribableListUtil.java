@@ -50,23 +50,24 @@ public final class DescribableListUtil {
     /**
      * Builds the list by creating a fresh instances from the submitted form.
      * <p/>
-     * This method is almost always used by the owner.
-     * This method does not invoke the save method.
+     * This method is almost always used by the owner. This method does not
+     * invoke the save method.
      *
      * @param owner represents owner of {@link DescribableList}
      * @param req {@link StaplerRequest}
-     * @param json Structured form data that includes the data for nested descriptor list.
+     * @param json Structured form data that includes the data for nested
+     * descriptor list.
      * @param descriptors list of descriptors to create instances from.
      * @return list.
-     * @throws IOException              if any.
+     * @throws IOException if any.
      * @throws Descriptor.FormException if any.
      */
     public static <T extends Describable<T>, D extends Descriptor<T>> DescribableList<T, D> buildFromJson(
-        Saveable owner,
-        StaplerRequest req,
-        JSONObject json,
-        List<D> descriptors)
-        throws Descriptor.FormException, IOException {
+            Saveable owner,
+            StaplerRequest req,
+            JSONObject json,
+            List<D> descriptors)
+            throws Descriptor.FormException, IOException {
         List<T> newList = new ArrayList<T>();
 
         for (Descriptor<T> d : descriptors) {
@@ -82,31 +83,36 @@ public final class DescribableListUtil {
      * Rebuilds the list by creating a fresh instances from the submitted form.
      * <p/>
      * This version works with the the &lt;f:hetero-list> UI tag, where the user
-     * is allowed to create multiple instances of the same descriptor. Order is also
-     * significant.
+     * is allowed to create multiple instances of the same descriptor. Order is
+     * also significant.
      *
      * @param owner represents owner of {@link DescribableList}
      * @param req {@link StaplerRequest}
      * @param formData {@link JSONObject} populated based on form data,
-     * @param key the JSON property name for 'formData' that represents the data for the list of {@link Describable}
+     * @param key the JSON property name for 'formData' that represents the data
+     * for the list of {@link Describable}
      * @param descriptors list of descriptors to create instances from.
      * @return list.
-     * @throws IOException              if any.
+     * @throws IOException if any.
      * @throws Descriptor.FormException if any.
-     * @see Descriptor#newInstancesFromHeteroList(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject, String, java.util.Collection)
+     * @see
+     * Descriptor#newInstancesFromHeteroList(org.kohsuke.stapler.StaplerRequest,
+     * net.sf.json.JSONObject, String, java.util.Collection)
      */
     public static <T extends Describable<T>, D extends Descriptor<T>> DescribableList<T, D> buildFromHetero(
-        Saveable owner,
-        StaplerRequest req, JSONObject formData,
-        String key,
-        Collection<D> descriptors)
-        throws Descriptor.FormException, IOException {
+            Saveable owner,
+            StaplerRequest req, JSONObject formData,
+            String key,
+            Collection<D> descriptors)
+            throws Descriptor.FormException, IOException {
         return new DescribableList<T, D>(owner, Descriptor.newInstancesFromHeteroList(req, formData, key, descriptors));
     }
 
     /**
-     * Converts describableList data to project properties map. {@link hudson.model.Descriptor#getJsonSafeClassName()}
-     * is used as key, value - {@link org.eclipse.hudson.model.project.property.BaseProjectProperty}.
+     * Converts describableList data to project properties map.
+     * {@link hudson.model.Descriptor#getJsonSafeClassName()} is used as key,
+     * value -
+     * {@link org.eclipse.hudson.model.project.property.BaseProjectProperty}.
      *
      * @param describableList source.
      * @param owner new owner for properties.
@@ -114,8 +120,7 @@ public final class DescribableListUtil {
      * @param <D> Descriptor
      * @return map of converted properties.
      */
-    public static <T extends Describable<T>, D extends Descriptor<T>> Map<String, ExternalProjectProperty<T>>
-    convertToProjectProperties(DescribableList<T, D> describableList, Job owner) {
+    public static <T extends Describable<T>, D extends Descriptor<T>> Map<String, ExternalProjectProperty<T>> convertToProjectProperties(DescribableList<T, D> describableList, Job owner) {
         Map<String, ExternalProjectProperty<T>> result = Maps.newConcurrentMap();
         if (null != describableList) {
             for (Map.Entry<D, T> entry : describableList.toMap().entrySet()) {
@@ -128,20 +133,23 @@ public final class DescribableListUtil {
         }
         return result;
     }
+
     /**
-     * Converts collection of {@link ExternalProjectProperty} descriptors to {@link DescribableList}
+     * Converts collection of {@link ExternalProjectProperty} descriptors to
+     * {@link DescribableList}
      *
      * @param descriptors .
      * @param owner new owner for properties.
      * @return {@link DescribableList}
      */
     public static <T extends Describable<T>> DescribableList<T, Descriptor<T>> convertToDescribableList(
-        List<Descriptor<T>> descriptors, Job owner) {
+            List<Descriptor<T>> descriptors, Job owner) {
         return convertToDescribableList(descriptors, owner, ExternalProjectProperty.class);
     }
 
     /**
-     * Converts collection of propertyClass descriptors to {@link DescribableList}
+     * Converts collection of propertyClass descriptors to
+     * {@link DescribableList}
      *
      * @param descriptors .
      * @param owner new owner for properties.
@@ -149,13 +157,12 @@ public final class DescribableListUtil {
      * @return {@link DescribableList}
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Describable<T>, D extends Descriptor<T>, P extends IProjectProperty> DescribableList<T, D>
-    convertToDescribableList(List<D> descriptors, Job owner, Class<P> propertyClass) {
+    public static <T extends Describable<T>, D extends Descriptor<T>, P extends IProjectProperty> DescribableList<T, D> convertToDescribableList(List<D> descriptors, Job owner, Class<P> propertyClass) {
         List<T> describableList = new CopyOnWriteArrayList<T>();
         DescribableList<T, D> result = new DescribableList<T, D>(owner);
         for (Descriptor<T> descriptor : descriptors) {
             IProjectProperty<T> property =
-                CascadingUtil.getProjectProperty(owner, descriptor.getJsonSafeClassName(), propertyClass);
+                    CascadingUtil.getProjectProperty(owner, descriptor.getJsonSafeClassName(), propertyClass);
             if (null != property.getValue()) {
                 describableList.add(property.getValue());
             }
@@ -169,5 +176,4 @@ public final class DescribableListUtil {
         }
         return result;
     }
-
 }

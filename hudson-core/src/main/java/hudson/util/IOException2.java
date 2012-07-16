@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -23,7 +23,8 @@ import java.io.IOException;
  *
  * @author Kohsuke Kawaguchi
  */
-public class IOException2 extends IOException  {
+public class IOException2 extends IOException {
+
     private final Throwable cause;
 
     public IOException2(Throwable cause) {

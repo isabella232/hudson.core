@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -21,6 +21,7 @@ package hudson.util;
  */
 public class AWTProblem extends ErrorObject {
     //TODO: review and check whether we can do it private
+
     public final Throwable cause;
 
     public Throwable getCause() {
@@ -31,4 +32,3 @@ public class AWTProblem extends ErrorObject {
         this.cause = cause;
     }
 }
-

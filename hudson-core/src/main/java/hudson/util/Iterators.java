@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -33,6 +33,7 @@ import java.util.HashSet;
  * @see AdaptedIterator
  */
 public class Iterators {
+
     /**
      * Returns the empty iterator.
      */
@@ -43,7 +44,8 @@ public class Iterators {
     /**
      * Produces {A,B,C,D,E,F} from {{A,B},{C},{},{D,E,F}}.
      */
-    public static abstract class FlattenIterator<U,T> implements Iterator<U> {
+    public static abstract class FlattenIterator<U, T> implements Iterator<U> {
+
         private final Iterator<? extends T> core;
         private Iterator<U> cur;
 
@@ -59,16 +61,19 @@ public class Iterators {
         protected abstract Iterator<U> expand(T t);
 
         public boolean hasNext() {
-            while(!cur.hasNext()) {
-                if(!core.hasNext())
+            while (!cur.hasNext()) {
+                if (!core.hasNext()) {
                     return false;
+                }
                 cur = expand(core.next());
             }
             return true;
         }
 
         public U next() {
-            if(!hasNext())  throw new NoSuchElementException();
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
             return cur.next();
         }
 
@@ -83,6 +88,7 @@ public class Iterators {
      * @since 1.150
      */
     public static abstract class FilterIterator<T> implements Iterator<T> {
+
         private final Iterator<? extends T> core;
         private T next;
         private boolean fetched;
@@ -96,9 +102,9 @@ public class Iterators {
         }
 
         private void fetch() {
-            while(!fetched && core.hasNext()) {
+            while (!fetched && core.hasNext()) {
                 T n = core.next();
-                if(filter(n)) {
+                if (filter(n)) {
                     next = n;
                     fetched = true;
                 }
@@ -108,9 +114,8 @@ public class Iterators {
         /**
          * Filter out items in the original collection.
          *
-         * @return
-         *      true to leave this item and return this item from this iterator.
-         *      false to hide this item.
+         * @return true to leave this item and return this item from this
+         * iterator. false to hide this item.
          */
         protected abstract boolean filter(T t);
 
@@ -121,7 +126,9 @@ public class Iterators {
 
         public T next() {
             fetch();
-            if(!fetched)  throw new NoSuchElementException();
+            if (!fetched) {
+                throw new NoSuchElementException();
+            }
             fetched = false;
             return next;
         }
@@ -135,6 +142,7 @@ public class Iterators {
      * Remove duplicates from another iterator.
      */
     public static final class DuplicateFilterIterator<T> extends FilterIterator<T> {
+
         private final Set<T> seen = new HashSet<T>();
 
         public DuplicateFilterIterator(Iterator<? extends T> core) {
@@ -185,14 +193,17 @@ public class Iterators {
      */
     public static List<Integer> sequence(final int start, int end, final int step) {
 
-        final int size = (end-start)/step;
-        if(size<0)  throw new IllegalArgumentException("List size is negative");
+        final int size = (end - start) / step;
+        if (size < 0) {
+            throw new IllegalArgumentException("List size is negative");
+        }
 
         return new AbstractList<Integer>() {
             public Integer get(int index) {
-                if(index<0 || index>=size)
+                if (index < 0 || index >= size) {
                     throw new IndexOutOfBoundsException();
-                return start+index*step;
+                }
+                return start + index * step;
             }
 
             public int size() {
@@ -202,7 +213,7 @@ public class Iterators {
     }
 
     public static List<Integer> sequence(int start, int end) {
-        return sequence(start,end,1);
+        return sequence(start, end, 1);
     }
 
     /**
@@ -211,11 +222,11 @@ public class Iterators {
      * @since 1.150
      */
     public static List<Integer> reverseSequence(int start, int end, int step) {
-        return sequence(end-1,start-1,-step);
+        return sequence(end - 1, start - 1, -step);
     }
 
     public static List<Integer> reverseSequence(int start, int end) {
-        return reverseSequence(start,end,1);
+        return reverseSequence(start, end, 1);
     }
 
     /**
@@ -223,7 +234,7 @@ public class Iterators {
      */
     @SuppressWarnings({"unchecked"})
     public static <T> Iterator<T> cast(Iterator<? extends T> itr) {
-        return (Iterator)itr;
+        return (Iterator) itr;
     }
 
     /**
@@ -231,15 +242,15 @@ public class Iterators {
      */
     @SuppressWarnings({"unchecked"})
     public static <T> Iterable<T> cast(Iterable<? extends T> itr) {
-        return (Iterable)itr;
+        return (Iterable) itr;
     }
 
     /**
      * Returns an {@link Iterator} that only returns items of the given subtype.
      */
     @SuppressWarnings({"unchecked"})
-    public static <U,T extends U> Iterator<T> subType(Iterator<U> itr, final Class<T> type) {
-        return (Iterator)new FilterIterator<U>(itr) {
+    public static <U, T extends U> Iterator<T> subType(Iterator<U> itr, final Class<T> type) {
+        return (Iterator) new FilterIterator<U>(itr) {
             protected boolean filter(U u) {
                 return type.isInstance(u);
             }
@@ -272,21 +283,21 @@ public class Iterators {
         return new FilterIterator<T>(itr) {
             @Override
             protected boolean filter(T t) {
-                return t!=null;
+                return t != null;
             }
         };
     }
 
     /**
-     * Returns an {@link Iterable} that iterates over all the given {@link Iterable}s.
+     * Returns an {@link Iterable} that iterates over all the given
+     * {@link Iterable}s.
      *
-     * <p>
-     * That is, this creates {A,B,C,D} from {A,B},{C,D}.
+     * <p> That is, this creates {A,B,C,D} from {A,B},{C,D}.
      */
-    public static <T> Iterable<T> sequence( final Iterable<? extends T>... iterables ) {
+    public static <T> Iterable<T> sequence(final Iterable<? extends T>... iterables) {
         return new Iterable<T>() {
             public Iterator<T> iterator() {
-                return new FlattenIterator<T,Iterable<? extends T>>(Arrays.asList(iterables)) {
+                return new FlattenIterator<T, Iterable<? extends T>>(Arrays.asList(iterables)) {
                     protected Iterator<T> expand(Iterable<? extends T> iterable) {
                         return cast(iterable).iterator();
                     }

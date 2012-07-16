@@ -168,7 +168,6 @@ public final class RemotingDiagnostics {
      */
     public static FilePath getHeapDump(VirtualChannel channel) throws IOException, InterruptedException {
         return channel.call(new Callable<FilePath, IOException>() {
-
             public FilePath call() throws IOException {
                 final File hprof = File.createTempFile("hudson-heapdump", "hprof");
                 hprof.delete();

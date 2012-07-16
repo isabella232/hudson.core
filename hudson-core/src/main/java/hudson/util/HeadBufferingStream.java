@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -23,15 +23,16 @@ import java.io.InputStream;
 import java.io.IOException;
 
 /**
- * {@link FilterInputStream} that buffers the first N bytes to a byte array on the side.
- * This byte array can be then accessed later.
+ * {@link FilterInputStream} that buffers the first N bytes to a byte array on
+ * the side. This byte array can be then accessed later.
  *
- * <p>
- * Useful for sniffing the content of the stream after the error is discovered.
+ * <p> Useful for sniffing the content of the stream after the error is
+ * discovered.
  *
  * @author Kohsuke Kawaguchi
  */
 public class HeadBufferingStream extends FilterInputStream {
+
     private final ByteArrayOutputStream side;
     private final int sideBufferSize;
 
@@ -44,18 +45,20 @@ public class HeadBufferingStream extends FilterInputStream {
     @Override
     public int read() throws IOException {
         int i = in.read();
-        if(i>=0 && space()>0)
+        if (i >= 0 && space() > 0) {
             side.write(i);
+        }
         return i;
     }
 
     @Override
     public int read(byte b[], int off, int len) throws IOException {
         int r = in.read(b, off, len);
-        if(r>0) {
+        if (r > 0) {
             int sp = space();
-            if(sp>0)
-                side.write(b,off,Math.min(r, sp));
+            if (sp > 0) {
+                side.write(b, off, Math.min(r, sp));
+            }
         }
         return r;
     }
@@ -64,7 +67,7 @@ public class HeadBufferingStream extends FilterInputStream {
      * Available space in the {@link #side} buffer.
      */
     private int space() {
-        return sideBufferSize-side.size();
+        return sideBufferSize - side.size();
     }
 
     /**
@@ -72,9 +75,10 @@ public class HeadBufferingStream extends FilterInputStream {
      */
     public void fillSide() throws IOException {
         byte[] buf = new byte[space()];
-        while(space()>0) {
-            if(read(buf)<0)
+        while (space() > 0) {
+            if (read(buf) < 0) {
                 return;
+            }
         }
     }
 

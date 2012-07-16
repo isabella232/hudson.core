@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  * Kohsuke Kawaguchi, Nikita Levyankov
- *        
+ *
  *
  *******************************************************************************/ 
 
@@ -41,6 +41,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @since 1.MULTISOURCE
  */
 public class PersistedList<T> implements Iterable<T> {
+
     protected final CopyOnWriteList<T> data = new CopyOnWriteList<T>();
     protected Saveable owner = Saveable.NOOP;
 
@@ -79,9 +80,11 @@ public class PersistedList<T> implements Iterable<T> {
     }
 
     public <U extends T> U get(Class<U> type) {
-        for (T t : data)
-            if(type.isInstance(t))
+        for (T t : data) {
+            if (type.isInstance(t)) {
                 return type.cast(t);
+            }
+        }
         return null;
     }
 
@@ -90,9 +93,11 @@ public class PersistedList<T> implements Iterable<T> {
      */
     public <U extends T> List<U> getAll(Class<U> type) {
         List<U> r = new ArrayList<U>();
-        for (T t : data)
-            if(type.isInstance(t))
+        for (T t : data) {
+            if (type.isInstance(t)) {
                 r.add(type.cast(t));
+            }
+        }
         return r;
     }
 
@@ -105,7 +110,7 @@ public class PersistedList<T> implements Iterable<T> {
      */
     public void remove(Class<? extends T> type) throws IOException {
         for (T t : data) {
-            if(t.getClass()==type) {
+            if (t.getClass() == type) {
                 data.remove(t);
                 onModified();
                 return;
@@ -115,22 +120,24 @@ public class PersistedList<T> implements Iterable<T> {
 
     public boolean remove(T o) throws IOException {
         boolean b = data.remove(o);
-        if (b)  onModified();
+        if (b) {
+            onModified();
+        }
         return b;
     }
 
     public void removeAll(Class<? extends T> type) throws IOException {
-        boolean modified=false;
+        boolean modified = false;
         for (T t : data) {
-            if(t.getClass()==type) {
+            if (t.getClass() == type) {
                 data.remove(t);
-                modified=true;
+                modified = true;
             }
         }
-        if(modified)
+        if (modified) {
             onModified();
+        }
     }
-
 
     public void clear() {
         data.clear();
@@ -175,6 +182,7 @@ public class PersistedList<T> implements Iterable<T> {
      * Serializaion form is compatible with plain {@link List}.
      */
     public static class ConverterImpl extends AbstractCollectionConverter {
+
         CopyOnWriteList.ConverterImpl copyOnWriteListConverter;
 
         public ConverterImpl(Mapper mapper) {
@@ -188,15 +196,16 @@ public class PersistedList<T> implements Iterable<T> {
         }
 
         public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-            for (Object o : (PersistedList) source)
+            for (Object o : (PersistedList) source) {
                 writeItem(o, context, writer);
+            }
         }
 
         public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
             CopyOnWriteList core = copyOnWriteListConverter.unmarshal(reader, context);
 
             try {
-                PersistedList r = (PersistedList)context.getRequiredType().newInstance();
+                PersistedList r = (PersistedList) context.getRequiredType().newInstance();
                 r.data.replaceBy(core);
                 return r;
             } catch (InstantiationException e) {
@@ -222,18 +231,16 @@ public class PersistedList<T> implements Iterable<T> {
 
         PersistedList that = (PersistedList) o;
         return new EqualsBuilder()
-            .append(data, that.data)
-            .append(owner, that.owner)
-            .isEquals();
+                .append(data, that.data)
+                .append(owner, that.owner)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-            .append(data)
-            .append(owner)
-            .toHashCode();
+                .append(data)
+                .append(owner)
+                .toHashCode();
     }
 }
-
-

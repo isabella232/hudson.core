@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Seiji Sogabe, Thomas J. Black
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Seiji Sogabe, Thomas J. Black
+ *
  *
  *******************************************************************************/ 
 
@@ -31,11 +31,12 @@ import org.kohsuke.stapler.export.Exported;
  */
 @ExportedBean
 public final class ClockDifference {
+
     /**
      * The difference in milliseconds.
      *
-     * Positive value means the slave is behind the master,
-     * negative value means the slave is ahead of the master.
+     * Positive value means the slave is behind the master, negative value means
+     * the slave is ahead of the master.
      */
     @Exported
     public final long diff;
@@ -48,7 +49,7 @@ public final class ClockDifference {
      * Returns true if the difference is big enough to be considered dangerous.
      */
     public boolean isDangerous() {
-        return Math.abs(diff)>5000;
+        return Math.abs(diff) > 5000;
     }
 
     /**
@@ -63,30 +64,34 @@ public final class ClockDifference {
      */
     @Override
     public String toString() {
-        if(-1000<diff && diff <1000)
+        if (-1000 < diff && diff < 1000) {
             return Messages.ClockDifference_InSync();  // clock is in sync
-
+        }
         long abs = Math.abs(diff);
 
         String s = Util.getTimeSpanString(abs);
-        if(diff<0)
+        if (diff < 0) {
             s += Messages.ClockDifference_Ahead();
-        else
+        } else {
             s += Messages.ClockDifference_Behind();
+        }
 
         return s;
     }
-    
+
     public String toHtml() {
         String s = toString();
-        if(isDangerous())
+        if (isDangerous()) {
             s = Util.wrapToErrorSpan(s);
+        }
         return s;
     }
 
     public static String toHtml(Node d) {
         try {
-            if(d==null) return FAILED_HTML;
+            if (d == null) {
+                return FAILED_HTML;
+            }
             return d.getClockDifference().toHtml();
         } catch (IOException e) {
             return FAILED_HTML;
@@ -96,16 +101,16 @@ public final class ClockDifference {
     }
 
     /**
-     * Gets the clock difference in HTML string.
-     * This version handles null {@link ClockDifference}.
+     * Gets the clock difference in HTML string. This version handles null
+     * {@link ClockDifference}.
      */
     public static String toHtml(ClockDifference d) {
-        if(d==null)     return FAILED_HTML;
+        if (d == null) {
+            return FAILED_HTML;
+        }
         return d.toHtml();
     }
-
     public static final ClockDifference ZERO = new ClockDifference(0);
-
     private static final String FAILED_HTML =
             "<span class='error'>" + Messages.ClockDifference_Failed() + "</span>";
 }

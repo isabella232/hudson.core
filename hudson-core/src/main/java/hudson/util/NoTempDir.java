@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -21,15 +21,15 @@ import hudson.Functions;
 import java.io.IOException;
 
 /**
- * Model object used to display the error top page if
- * there appears to be no temporary directory.
+ * Model object used to display the error top page if there appears to be no
+ * temporary directory.
  *
- * <p>
- * <tt>index.jelly</tt> would display a nice friendly error page.
+ * <p> <tt>index.jelly</tt> would display a nice friendly error page.
  *
  * @author Kohsuke Kawaguchi
  */
 public class NoTempDir extends ErrorObject {
+
     public final IOException exception;
 
     public NoTempDir(IOException exception) {

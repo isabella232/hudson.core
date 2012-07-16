@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -18,7 +18,7 @@ import java.util.Calendar;
 
 /**
  * Exists solely for backward compatibility
- * 
+ *
  * @author Winston Prakash
  * @see org.eclipse.hudson.graph.Graph
  */

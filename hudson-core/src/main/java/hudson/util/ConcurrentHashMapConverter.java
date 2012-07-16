@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -27,25 +27,27 @@ import com.thoughtworks.xstream.mapper.Mapper;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * {@link ConcurrentHashMap} should convert like a map, instead of via serialization.
+ * {@link ConcurrentHashMap} should convert like a map, instead of via
+ * serialization.
  *
  * @author Kohsuke Kawaguchi
  */
 public class ConcurrentHashMapConverter extends MapConverter {
+
     private final SerializableConverter sc;
 
     public ConcurrentHashMapConverter(XStream xs) {
-        this(xs.getMapper(),xs.getReflectionProvider());
+        this(xs.getMapper(), xs.getReflectionProvider());
     }
 
     public ConcurrentHashMapConverter(Mapper mapper, ReflectionProvider reflectionProvider) {
         super(mapper);
-        sc = new SerializableConverter(mapper,reflectionProvider);
+        sc = new SerializableConverter(mapper, reflectionProvider);
     }
 
     @Override
     public boolean canConvert(Class type) {
-        return type==ConcurrentHashMap.class;
+        return type == ConcurrentHashMap.class;
     }
 
     @Override
@@ -53,8 +55,8 @@ public class ConcurrentHashMapConverter extends MapConverter {
         // ConcurrentHashMap used to serialize as custom serialization,
         // so read it in a compatible fashion.
         String s = reader.getAttribute("serialization");
-        if(s!=null && s.equals("custom")) {
-            return sc.unmarshal(reader,context);
+        if (s != null && s.equals("custom")) {
+            return sc.unmarshal(reader, context);
         } else {
             return super.unmarshal(reader, context);
         }

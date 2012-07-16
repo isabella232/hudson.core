@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -25,6 +25,7 @@ import java.util.concurrent.ThreadFactory;
  * @author Kohsuke Kawaguchi
  */
 public class DaemonThreadFactory implements ThreadFactory {
+
     private final ThreadFactory core;
 
     public DaemonThreadFactory() {

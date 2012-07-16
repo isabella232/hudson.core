@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -27,31 +27,28 @@ import java.io.Serializable;
  *
  * @author Kohsuke Kawaguchi
  * @since 1.359
-*/
+ */
 public abstract class ArchiverFactory implements Serializable {
+
     /**
      * Creates an archiver on top of the given stream.
      */
     public abstract Archiver create(OutputStream out) throws IOException;
-
     /**
      * Uncompressed tar format.
      */
     public static ArchiverFactory TAR = new TarArchiverFactory(TarCompression.NONE);
-
     /**
      * tar+gz
      */
     public static ArchiverFactory TARGZ = new TarArchiverFactory(TarCompression.GZIP);
-
     /**
      * Zip format.
      */
     public static ArchiverFactory ZIP = new ZipArchiverFactory();
 
-
-
     private static final class TarArchiverFactory extends ArchiverFactory {
+
         private final TarCompression method;
 
         private TarArchiverFactory(TarCompression method) {
@@ -61,17 +58,15 @@ public abstract class ArchiverFactory implements Serializable {
         public Archiver create(OutputStream out) throws IOException {
             return new TarArchiver(method.compress(out));
         }
-
         private static final long serialVersionUID = 1L;
     }
 
     private static final class ZipArchiverFactory extends ArchiverFactory {
+
         public Archiver create(OutputStream out) {
             return new ZipArchiver(out);
         }
-
         private static final long serialVersionUID = 1L;
     }
-
     private static final long serialVersionUID = 1L;
 }

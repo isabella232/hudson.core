@@ -10,7 +10,7 @@
  *
  * Contributors:
  * 
-* Kohsuke Kawaguchi
+ * Kohsuke Kawaguchi
  *
  *
  ******************************************************************************
@@ -46,7 +46,7 @@ public class Service {
 
         final Enumeration<URL> e = classLoader.getResources("META-INF/services/" + type.getName());
         BufferedReader configFile = null;
-        try {            
+        try {
             while (e.hasMoreElements()) {
                 URL url = e.nextElement();
                 configFile = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));

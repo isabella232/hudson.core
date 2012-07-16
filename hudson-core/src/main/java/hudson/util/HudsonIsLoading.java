@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *  Kohsuke Kawaguchi
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.util;
@@ -26,14 +26,15 @@ import java.io.IOException;
 /**
  * Model object used to display "Hudson is loading data".
  *
- * Set this object to {@link ServletContext#setAttribute(String, Object)} "app" while
- * the loading activity is taking place.
- * 
+ * Set this object to {@link ServletContext#setAttribute(String, Object)} "app"
+ * while the loading activity is taking place.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class HudsonIsLoading {
+
     public void doDynamic(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, InterruptedException {
         rsp.setStatus(SC_SERVICE_UNAVAILABLE);
-        req.getView(this,"index.jelly").forward(req,rsp);
+        req.getView(this, "index.jelly").forward(req, rsp);
     }
 }

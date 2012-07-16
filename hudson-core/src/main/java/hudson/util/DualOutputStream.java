@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -23,7 +23,8 @@ import java.io.OutputStream;
  * @author Kohsuke Kawaguchi
  */
 public class DualOutputStream extends OutputStream {
-    private final OutputStream lhs,rhs;
+
+    private final OutputStream lhs, rhs;
 
     public DualOutputStream(OutputStream lhs, OutputStream rhs) {
         this.lhs = lhs;
@@ -43,8 +44,8 @@ public class DualOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        lhs.write(b,off,len);
-        rhs.write(b,off,len);
+        lhs.write(b, off, len);
+        rhs.write(b, off, len);
     }
 
     @Override

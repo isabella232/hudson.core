@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi,   Alan Harder, Yahoo! Inc.
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -36,9 +36,11 @@ import java.util.Set;
  * @author Kohsuke Kawaguchi
  */
 public class ArgumentListBuilder implements Serializable {
+
     private final List<String> args = new ArrayList<String>();
     /**
-     * Bit mask indicating arguments that shouldn't be echoed-back (e.g., password)
+     * Bit mask indicating arguments that shouldn't be echoed-back (e.g.,
+     * password)
      */
     private BitSet mask = new BitSet();
 
@@ -65,27 +67,28 @@ public class ArgumentListBuilder implements Serializable {
     }
 
     public ArgumentListBuilder add(String a) {
-        return add(a,false);
+        return add(a, false);
     }
 
     /**
      * @since 1.378
      */
     public ArgumentListBuilder add(String a, boolean mask) {
-        if(a!=null) {
-            if(mask) {
+        if (a != null) {
+            if (mask) {
                 this.mask.set(args.size());
             }
             args.add(a);
         }
         return this;
     }
-    
+
     public ArgumentListBuilder prepend(String... args) {
         // left-shift the mask
-        BitSet nm = new BitSet(this.args.size()+args.length);
-        for(int i=0; i<this.args.size(); i++)
-            nm.set(i+args.length, mask.get(i));
+        BitSet nm = new BitSet(this.args.size() + args.length);
+        for (int i = 0; i < this.args.size(); i++) {
+            nm.set(i + args.length, mask.get(i));
+        }
         mask = nm;
 
         this.args.addAll(0, Arrays.asList(args));
@@ -93,22 +96,21 @@ public class ArgumentListBuilder implements Serializable {
     }
 
     /**
-     * Adds an argument by quoting it.
-     * This is necessary only in a rare circumstance,
-     * such as when adding argument for ssh and rsh.
+     * Adds an argument by quoting it. This is necessary only in a rare
+     * circumstance, such as when adding argument for ssh and rsh.
      *
-     * Normal process invocations don't need it, because each
-     * argument is treated as its own string and never merged into one. 
+     * Normal process invocations don't need it, because each argument is
+     * treated as its own string and never merged into one.
      */
     public ArgumentListBuilder addQuoted(String a) {
-        return add('"'+a+'"', false);
+        return add('"' + a + '"', false);
     }
 
     /**
      * @since 1.378
      */
     public ArgumentListBuilder addQuoted(String a, boolean mask) {
-        return add('"'+a+'"', mask);
+        return add('"' + a + '"', mask);
     }
 
     public ArgumentListBuilder add(String... args) {
@@ -119,10 +121,13 @@ public class ArgumentListBuilder implements Serializable {
     }
 
     /**
-     * Decomposes the given token into multiple arguments by splitting via whitespace.
+     * Decomposes the given token into multiple arguments by splitting via
+     * whitespace.
      */
     public ArgumentListBuilder addTokenized(String s) {
-        if(s==null) return this;
+        if (s == null) {
+            return this;
+        }
         add(Util.tokenize(s));
         return this;
     }
@@ -131,8 +136,10 @@ public class ArgumentListBuilder implements Serializable {
      * @since 1.378
      */
     public ArgumentListBuilder addKeyValuePair(String prefix, String key, String value, boolean mask) {
-        if(key==null) return this;
-        add(((prefix==null)?"-D":prefix)+key+'='+value, mask);
+        if (key == null) {
+            return this;
+        }
+        add(((prefix == null) ? "-D" : prefix) + key + '=' + value, mask);
         return this;
     }
 
@@ -140,74 +147,75 @@ public class ArgumentListBuilder implements Serializable {
      * Adds key value pairs as "-Dkey=value -Dkey=value ..."
      *
      * <tt>-D</tt> portion is configurable as the 'prefix' parameter.
+     *
      * @since 1.114
      */
-    public ArgumentListBuilder addKeyValuePairs(String prefix, Map<String,String> props) {
-        for (Entry<String,String> e : props.entrySet())
+    public ArgumentListBuilder addKeyValuePairs(String prefix, Map<String, String> props) {
+        for (Entry<String, String> e : props.entrySet()) {
             addKeyValuePair(prefix, e.getKey(), e.getValue(), false);
+        }
         return this;
     }
 
     /**
      * Adds key value pairs as "-Dkey=value -Dkey=value ..." with masking.
      *
-     * @param prefix
-     *      Configures the -D portion of the example. Defaults to -D if null.
-     * @param props
-     *      The map of key/value pairs to add
-     * @param propsToMask
-     *      Set containing key names to mark as masked in the argument list. Key
-     *      names that do not exist in the set will be added unmasked.
+     * @param prefix Configures the -D portion of the example. Defaults to -D if
+     * null.
+     * @param props The map of key/value pairs to add
+     * @param propsToMask Set containing key names to mark as masked in the
+     * argument list. Key names that do not exist in the set will be added
+     * unmasked.
      * @since 1.378
      */
-    public ArgumentListBuilder addKeyValuePairs(String prefix, Map<String,String> props, Set<String> propsToMask) {
-        for (Entry<String,String> e : props.entrySet()) {
+    public ArgumentListBuilder addKeyValuePairs(String prefix, Map<String, String> props, Set<String> propsToMask) {
+        for (Entry<String, String> e : props.entrySet()) {
             addKeyValuePair(prefix, e.getKey(), e.getValue(), (propsToMask == null) ? false : propsToMask.contains(e.getKey()));
         }
         return this;
     }
 
     /**
-     * Adds key value pairs as "-Dkey=value -Dkey=value ..." by parsing a given string using {@link Properties}.
+     * Adds key value pairs as "-Dkey=value -Dkey=value ..." by parsing a given
+     * string using {@link Properties}.
      *
-     * @param prefix
-     *      The '-D' portion of the example. Defaults to -D if null.
-     * @param properties
-     *      The persisted form of {@link Properties}. For example, "abc=def\nghi=jkl". Can be null, in which
-     *      case this method becomes no-op.
-     * @param vr
-     *      {@link VariableResolver} to be performed on the values.
+     * @param prefix The '-D' portion of the example. Defaults to -D if null.
+     * @param properties The persisted form of {@link Properties}. For example,
+     * "abc=def\nghi=jkl". Can be null, in which case this method becomes no-op.
+     * @param vr {@link VariableResolver} to be performed on the values.
      * @since 1.262
      */
     public ArgumentListBuilder addKeyValuePairsFromPropertyString(String prefix, String properties, VariableResolver vr) throws IOException {
-        if(properties==null)    return this;
+        if (properties == null) {
+            return this;
+        }
 
-        for (Entry<Object,Object> entry : Util.loadProperties(properties).entrySet()) {
-            addKeyValuePair(prefix, (String)entry.getKey(), Util.replaceMacro(entry.getValue().toString(),vr), false);
+        for (Entry<Object, Object> entry : Util.loadProperties(properties).entrySet()) {
+            addKeyValuePair(prefix, (String) entry.getKey(), Util.replaceMacro(entry.getValue().toString(), vr), false);
         }
         return this;
     }
 
     /**
-     * Adds key value pairs as "-Dkey=value -Dkey=value ..." by parsing a given string using {@link Properties} with masking.
+     * Adds key value pairs as "-Dkey=value -Dkey=value ..." by parsing a given
+     * string using {@link Properties} with masking.
      *
-     * @param prefix
-     *      The '-D' portion of the example. Defaults to -D if null.
-     * @param properties
-     *      The persisted form of {@link Properties}. For example, "abc=def\nghi=jkl". Can be null, in which
-     *      case this method becomes no-op.
-     * @param vr
-     *      {@link VariableResolver} to be performed on the values.
-     * @param propsToMask
-     *      Set containing key names to mark as masked in the argument list. Key
-     *      names that do not exist in the set will be added unmasked.
+     * @param prefix The '-D' portion of the example. Defaults to -D if null.
+     * @param properties The persisted form of {@link Properties}. For example,
+     * "abc=def\nghi=jkl". Can be null, in which case this method becomes no-op.
+     * @param vr {@link VariableResolver} to be performed on the values.
+     * @param propsToMask Set containing key names to mark as masked in the
+     * argument list. Key names that do not exist in the set will be added
+     * unmasked.
      * @since 1.378
      */
     public ArgumentListBuilder addKeyValuePairsFromPropertyString(String prefix, String properties, VariableResolver vr, Set<String> propsToMask) throws IOException {
-        if(properties==null)    return this;
+        if (properties == null) {
+            return this;
+        }
 
-        for (Entry<Object,Object> entry : Util.loadProperties(properties).entrySet()) {
-            addKeyValuePair(prefix, (String)entry.getKey(), Util.replaceMacro(entry.getValue().toString(),vr), (propsToMask == null) ? false : propsToMask.contains((String)entry.getKey()));
+        for (Entry<Object, Object> entry : Util.loadProperties(properties).entrySet()) {
+            addKeyValuePair(prefix, (String) entry.getKey(), Util.replaceMacro(entry.getValue().toString(), vr), (propsToMask == null) ? false : propsToMask.contains((String) entry.getKey()));
         }
         return this;
     }
@@ -220,7 +228,7 @@ public class ArgumentListBuilder implements Serializable {
     public String[] toCommandArray() {
         return args.toArray(new String[args.size()]);
     }
-    
+
     @Override
     public ArgumentListBuilder clone() {
         ArgumentListBuilder r = new ArgumentListBuilder();
@@ -242,41 +250,45 @@ public class ArgumentListBuilder implements Serializable {
     }
 
     /**
-     * Just adds quotes around args containing spaces, but no other special characters,
-     * so this method should generally be used only for informational/logging purposes.
+     * Just adds quotes around args containing spaces, but no other special
+     * characters, so this method should generally be used only for
+     * informational/logging purposes.
      */
     public String toStringWithQuote() {
         StringBuilder buf = new StringBuilder();
         for (String arg : args) {
-            if(buf.length()>0)  buf.append(' ');
+            if (buf.length() > 0) {
+                buf.append(' ');
+            }
 
-            if(arg.indexOf(' ')>=0 || arg.length()==0)
+            if (arg.indexOf(' ') >= 0 || arg.length() == 0) {
                 buf.append('"').append(arg).append('"');
-            else
+            } else {
                 buf.append(arg);
+            }
         }
         return buf.toString();
     }
 
     /**
-     * Wrap command in a CMD.EXE call so we can return the exit code (ERRORLEVEL).
-     * This method takes care of escaping special characters in the command, which
-     * is needed since the command is now passed as a string to the CMD.EXE shell.
-     * This is done as follows:
-     * Wrap arguments in double quotes if they contain any of:
-     *   space *?,;^&<>|" or % followed by a letter.
-     * <br/> When testing from command prompt, these characters also need to be
-     * prepended with a ^ character: ^&<>|  -- however, invoking cmd.exe from
-     * Hudson does not seem to require this extra escaping so it is not added by
-     * this method.
-     * <br/> A " is prepended with another " character.  Note: Windows has issues
-     * escaping some combinations of quotes and spaces.  Quotes should be avoided.
-     * <br/> A % followed by a letter has that letter wrapped in double quotes,
-     * to avoid possible variable expansion.  ie, %foo% becomes "%"f"oo%".
-     * The second % does not need special handling because it is not followed
-     * by a letter. <br/>
-     * Example: "-Dfoo=*abc?def;ghi^jkl&mno<pqr>stu|vwx""yz%"e"nd"
-     * @return new ArgumentListBuilder that runs given command through cmd.exe /C
+     * Wrap command in a CMD.EXE call so we can return the exit code
+     * (ERRORLEVEL). This method takes care of escaping special characters in
+     * the command, which is needed since the command is now passed as a string
+     * to the CMD.EXE shell. This is done as follows: Wrap arguments in double
+     * quotes if they contain any of: space *?,;^&<>|" or % followed by a
+     * letter. <br/> When testing from command prompt, these characters also
+     * need to be prepended with a ^ character: ^&<>| -- however, invoking
+     * cmd.exe from Hudson does not seem to require this extra escaping so it is
+     * not added by this method. <br/> A " is prepended with another "
+     * character. Note: Windows has issues escaping some combinations of quotes
+     * and spaces. Quotes should be avoided. <br/> A % followed by a letter has
+     * that letter wrapped in double quotes, to avoid possible variable
+     * expansion. ie, %foo% becomes "%"f"oo%". The second % does not need
+     * special handling because it is not followed by a letter. <br/> Example:
+     * "-Dfoo=*abc?def;ghi^jkl&mno<pqr>stu|vwx""yz%"e"nd"
+     *
+     * @return new ArgumentListBuilder that runs given command through cmd.exe
+     * /C
      * @since 1.386
      */
     public ArgumentListBuilder toWindowsCommand() {
@@ -288,24 +300,33 @@ public class ArgumentListBuilder implements Serializable {
                 char c = arg.charAt(i);
                 if (!quoted && (c == ' ' || c == '*' || c == '?' || c == ',' || c == ';')) {
                     quoted = startQuoting(quotedArgs, arg, i);
-                }
-                else if (c == '^' || c == '&' || c == '<' || c == '>' || c == '|') {
-                    if (!quoted) quoted = startQuoting(quotedArgs, arg, i);
+                } else if (c == '^' || c == '&' || c == '<' || c == '>' || c == '|') {
+                    if (!quoted) {
+                        quoted = startQuoting(quotedArgs, arg, i);
+                    }
                     // quotedArgs.append('^'); See note in javadoc above
-                }
-                else if (c == '"') {
-                    if (!quoted) quoted = startQuoting(quotedArgs, arg, i);
+                } else if (c == '"') {
+                    if (!quoted) {
+                        quoted = startQuoting(quotedArgs, arg, i);
+                    }
                     quotedArgs.append('"');
-                }
-                else if (percent && ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))) {
-                    if (!quoted) quoted = startQuoting(quotedArgs, arg, i);
+                } else if (percent && ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))) {
+                    if (!quoted) {
+                        quoted = startQuoting(quotedArgs, arg, i);
+                    }
                     quotedArgs.append('"').append(c);
                     c = '"';
                 }
                 percent = (c == '%');
-                if (quoted) quotedArgs.append(c);
+                if (quoted) {
+                    quotedArgs.append(c);
+                }
             }
-            if (quoted) quotedArgs.append('"'); else quotedArgs.append(arg);
+            if (quoted) {
+                quotedArgs.append('"');
+            } else {
+                quotedArgs.append(arg);
+            }
             quotedArgs.append(' ');
         }
         // (comment copied from old code in hudson.tasks.Ant)
@@ -324,30 +345,34 @@ public class ArgumentListBuilder implements Serializable {
 
     /**
      * Returns true if there are any masked arguments.
+     *
      * @return true if there are any masked arguments; false otherwise
      */
     public boolean hasMaskedArguments() {
-        return mask.length()>0;
+        return mask.length() > 0;
     }
 
     /**
-     * Returns an array of booleans where the masked arguments are marked as true
+     * Returns an array of booleans where the masked arguments are marked as
+     * true
+     *
      * @return an array of booleans.
      */
     public boolean[] toMaskArray() {
         boolean[] mask = new boolean[args.size()];
-        for( int i=0; i<mask.length; i++)
+        for (int i = 0; i < mask.length; i++) {
             mask[i] = this.mask.get(i);
+        }
         return mask;
     }
 
     /**
      * Add a masked argument
+     *
      * @param string the argument
      */
     public void addMasked(String string) {
         add(string, true);
     }
-
     private static final long serialVersionUID = 1L;
 }

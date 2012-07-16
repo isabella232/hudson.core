@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -26,6 +26,7 @@ import java.io.IOException;
  * @author Kohsuke Kawaguchi
  */
 public abstract class DelegatingOutputStream extends OutputStream {
+
     protected OutputStream out;
 
     protected DelegatingOutputStream(OutputStream out) {

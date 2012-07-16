@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -37,6 +37,7 @@ import static org.apache.tools.tar.TarConstants.LF_SYMLINK;
  * @see ArchiverFactory#TAR
  */
 final class TarArchiver extends Archiver {
+
     private final byte[] buf = new byte[8192];
     private final TarOutputStream tar;
 
@@ -75,15 +76,18 @@ final class TarArchiver extends Archiver {
     }
 
     public void visit(File file, String relativePath) throws IOException {
-        if(Functions.isWindows())
-            relativePath = relativePath.replace('\\','/');
+        if (Functions.isWindows()) {
+            relativePath = relativePath.replace('\\', '/');
+        }
 
-        if(file.isDirectory())
-            relativePath+='/';
+        if (file.isDirectory()) {
+            relativePath += '/';
+        }
         TarEntry te = new TarEntry(relativePath);
         te.setModTime(file.lastModified());
-        if(!file.isDirectory())
+        if (!file.isDirectory()) {
             te.setSize(file.length());
+        }
 
         tar.putNextEntry(te);
 
@@ -91,8 +95,9 @@ final class TarArchiver extends Archiver {
             FileInputStream in = new FileInputStream(file);
             try {
                 int len;
-                while((len=in.read(buf))>=0)
-                    tar.write(buf,0,len);
+                while ((len = in.read(buf)) >= 0) {
+                    tar.write(buf, 0, len);
+                }
             } finally {
                 in.close();
             }
@@ -105,7 +110,6 @@ final class TarArchiver extends Archiver {
     public void close() throws IOException {
         tar.close();
     }
-
     private static final Field LINKNAME_FIELD = getTarEntryLinkNameField();
 
     private static Field getTarEntryLinkNameField() {

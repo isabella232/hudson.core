@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Seiji Sogabe
- *      
+ *
  *
  *******************************************************************************/ 
 
@@ -28,8 +28,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Filter that sets the character encoding to be used in parsing the request
- * to avoid Non-ASCII characters garbled.
+ * Filter that sets the character encoding to be used in parsing the request to
+ * avoid Non-ASCII characters garbled.
  *
  * @author Seiji Sogabe
  */
@@ -39,15 +39,11 @@ public class CharacterEncodingFilter implements Filter {
      * The default character encoding.
      */
     private static final String ENCODING = "UTF-8";
-
-    private static final Boolean DISABLE_FILTER
-            = Boolean.getBoolean(CharacterEncodingFilter.class.getName() + ".disableFilter");
-
+    private static final Boolean DISABLE_FILTER = Boolean.getBoolean(CharacterEncodingFilter.class.getName() + ".disableFilter");
     /**
      * The character encoding sets forcibly?
      */
-    private static final Boolean FORCE_ENCODING
-            = Boolean.getBoolean(CharacterEncodingFilter.class.getName() + ".forceEncoding");
+    private static final Boolean FORCE_ENCODING = Boolean.getBoolean(CharacterEncodingFilter.class.getName() + ".forceEncoding");
 
     public void init(FilterConfig filterConfig) throws ServletException {
         LOGGER.log(Level.INFO,
@@ -95,9 +91,8 @@ public class CharacterEncodingFilter implements Filter {
         if (FORCE_ENCODING || req.getCharacterEncoding() == null) {
             return true;
         }
-        
+
         return false;
     }
-
     private static final Logger LOGGER = Logger.getLogger(CharacterEncodingFilter.class.getName());
 }

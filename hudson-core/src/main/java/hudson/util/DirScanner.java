@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -29,12 +29,14 @@ import static hudson.Util.fixEmpty;
 /**
  * Visits a directory and its contents and pass them to the {@link FileVisitor}.
  *
- * A {@link DirScanner} encapsulates the logic of how it filters files in the directory. It is also remotable.
+ * A {@link DirScanner} encapsulates the logic of how it filters files in the
+ * directory. It is also remotable.
  *
  * @since 1.343
  * @see FileVisitor
  */
 public abstract class DirScanner implements Serializable {
+
     /**
      * Scans the given directory and pass files onto the given visitor.
      */
@@ -44,6 +46,7 @@ public abstract class DirScanner implements Serializable {
      * Scans everything recursively.
      */
     public static class Full extends DirScanner {
+
         private void scan(File f, String path, FileVisitor visitor) throws IOException {
             if (f.canRead()) {
                 if (visitor.understandsSymlink()) {
@@ -51,20 +54,20 @@ public abstract class DirScanner implements Serializable {
                     if (target != null) {
                         visitor.visitSymlink(f, target, path + f.getName());
                         return;
-                    } 
+                    }
                 }
-                visitor.visit(f,path+f.getName());
-                if(f.isDirectory()) {
-                    for( File child : f.listFiles() )
-                        scan(child,path+f.getName()+'/',visitor);
+                visitor.visit(f, path + f.getName());
+                if (f.isDirectory()) {
+                    for (File child : f.listFiles()) {
+                        scan(child, path + f.getName() + '/', visitor);
+                    }
                 }
             }
         }
 
         public void scan(File dir, FileVisitor visitor) throws IOException {
-            scan(dir,"",visitor);
+            scan(dir, "", visitor);
         }
-
         private static final long serialVersionUID = 1L;
     }
 
@@ -72,6 +75,7 @@ public abstract class DirScanner implements Serializable {
      * Scans by filtering things out from {@link FileFilter}
      */
     public static class Filter extends Full {
+
         private final FileFilter filter;
 
         public Filter(FileFilter filter) {
@@ -80,9 +84,8 @@ public abstract class DirScanner implements Serializable {
 
         @Override
         public void scan(File dir, FileVisitor visitor) throws IOException {
-            super.scan(dir,visitor.with(filter));
+            super.scan(dir, visitor.with(filter));
         }
-
         private static final long serialVersionUID = 1L;
     }
 
@@ -90,6 +93,7 @@ public abstract class DirScanner implements Serializable {
      * Scans by using Ant GLOB syntax.
      */
     public static class Glob extends DirScanner {
+
         private final String includes, excludes;
 
         public Glob(String includes, String excludes) {
@@ -98,25 +102,23 @@ public abstract class DirScanner implements Serializable {
         }
 
         public void scan(File dir, FileVisitor visitor) throws IOException {
-            if(fixEmpty(includes)==null && excludes==null) {
+            if (fixEmpty(includes) == null && excludes == null) {
                 // optimization
-                new Full().scan(dir,visitor);
+                new Full().scan(dir, visitor);
                 return;
             }
 
-            FileSet fs = Util.createFileSet(dir,includes,excludes);
+            FileSet fs = Util.createFileSet(dir, includes, excludes);
 
-            if(dir.exists()) {
+            if (dir.exists()) {
                 DirectoryScanner ds = fs.getDirectoryScanner(new org.apache.tools.ant.Project());
-                for( String f : ds.getIncludedFiles()) {
+                for (String f : ds.getIncludedFiles()) {
                     File file = new File(dir, f);
-                    visitor.visit(file,f);
+                    visitor.visit(file, f);
                 }
             }
         }
-
         private static final long serialVersionUID = 1L;
     }
-
     private static final long serialVersionUID = 1L;
 }

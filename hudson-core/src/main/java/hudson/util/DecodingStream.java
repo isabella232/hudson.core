@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -27,6 +27,7 @@ import java.io.OutputStream;
  * @see EncodingStream
  */
 public class DecodingStream extends FilterOutputStream {
+
     private int last = -1;
 
     public DecodingStream(OutputStream out) {
@@ -35,12 +36,12 @@ public class DecodingStream extends FilterOutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        if(last==-1) {
+        if (last == -1) {
             last = b;
             return;
         }
 
-        out.write( Character.getNumericValue(last)*16 + Character.getNumericValue(b) );
+        out.write(Character.getNumericValue(last) * 16 + Character.getNumericValue(b));
         last = -1;
     }
 }
