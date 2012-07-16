@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
+ * Contributors:
+ * 
 *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -23,19 +23,17 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 import java.lang.annotation.Target;
 
 /**
- * Represents fields that are protected for concurrency by the copy-on-write semantics.
+ * Represents fields that are protected for concurrency by the copy-on-write
+ * semantics.
  *
- * <p>
- * Fields marked by this annotation always holds on to an immutable collection.
- * A change to the collection must be done by first creating a new collection
- * object, making changes, then replacing the reference atomically.
+ * <p> Fields marked by this annotation always holds on to an immutable
+ * collection. A change to the collection must be done by first creating a new
+ * collection object, making changes, then replacing the reference atomically.
  *
- * <p>
- * This allows code to access the field without synchronization, and
- * greatly reduces the risk of dead-lock bugs.
+ * <p> This allows code to access the field without synchronization, and greatly
+ * reduces the risk of dead-lock bugs.
  *
- * <p>
- * The field marked with this annotation usually needs to be marked as
+ * <p> The field marked with this annotation usually needs to be marked as
  * <tt>volatile</tt>.
  *
  * @author Kohsuke Kawaguchi

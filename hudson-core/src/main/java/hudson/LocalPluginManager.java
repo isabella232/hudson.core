@@ -7,9 +7,9 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
+ *
  *       Kohsuke Kawaguchi
  *
  *******************************************************************************/ 
@@ -34,17 +34,20 @@ import java.util.logging.Logger;
  * @author Kohsuke Kawaguchi
  */
 public class LocalPluginManager extends PluginManager {
+
     private final Hudson hudson;
+
     public LocalPluginManager(Hudson hudson) {
-        super(hudson.servletContext, new File(hudson.getRootDir(),"plugins"));
+        super(hudson.servletContext, new File(hudson.getRootDir(), "plugins"));
         this.hudson = hudson;
     }
 
     /**
-     * If the war file has any "/WEB-INF/plugins/*.hpi", extract them into the plugin directory.
+     * If the war file has any "/WEB-INF/plugins/*.hpi", extract them into the
+     * plugin directory.
      *
-     * @return
-     *      File names of the bundled plugins. Like {"ssh-slaves.hpi","subvesrion.hpi"}
+     * @return File names of the bundled plugins. Like
+     * {"ssh-slaves.hpi","subvesrion.hpi"}
      */
     @Override
     protected Collection<String> loadBundledPlugins() {
@@ -55,9 +58,9 @@ public class LocalPluginManager extends PluginManager {
 
         Set<String> names = new HashSet<String>();
 
-        for( String path : Util.fixNull((Set<String>)hudson.servletContext.getResourcePaths("/WEB-INF/plugins"))) {
-            String fileName = path.substring(path.lastIndexOf('/')+1);
-            if(fileName.length()==0) {
+        for (String path : Util.fixNull((Set<String>) hudson.servletContext.getResourcePaths("/WEB-INF/plugins"))) {
+            String fileName = path.substring(path.lastIndexOf('/') + 1);
+            if (fileName.length() == 0) {
                 // see http://www.nabble.com/404-Not-Found-error-when-clicking-on-help-td24508544.html
                 // I suspect some containers are returning directory names.
                 continue;
@@ -68,12 +71,11 @@ public class LocalPluginManager extends PluginManager {
                 URL url = hudson.servletContext.getResource(path);
                 copyBundledPlugin(url, fileName);
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Failed to extract the bundled plugin "+fileName,e);
+                LOGGER.log(Level.SEVERE, "Failed to extract the bundled plugin " + fileName, e);
             }
         }
 
         return names;
     }
-
     private static final Logger LOGGER = Logger.getLogger(LocalPluginManager.class.getName());
 }

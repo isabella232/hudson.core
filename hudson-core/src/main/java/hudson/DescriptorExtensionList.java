@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -41,75 +41,75 @@ import org.kohsuke.stapler.Stapler;
 import net.sf.json.JSONObject;
 
 /**
- * {@link ExtensionList} for holding a set of {@link Descriptor}s, which is a group of descriptors for
- * the same extension point.
+ * {@link ExtensionList} for holding a set of {@link Descriptor}s, which is a
+ * group of descriptors for the same extension point.
  *
  * Use {@link Hudson#getDescriptorList(Class)} to obtain instances.
  *
- * @param <D>
- *      Represents the descriptor type. This is {@code Descriptor<T>} normally but often there are subtypes
- *      of descriptors, like {@link ViewDescriptor}, {@link NodeDescriptor}, etc, and this parameter points
- *      to those for better type safety of users.
+ * @param <D> Represents the descriptor type. This is {@code Descriptor<T>}
+ * normally but often there are subtypes of descriptors, like
+ * {@link ViewDescriptor}, {@link NodeDescriptor}, etc, and this parameter
+ * points to those for better type safety of users.
  *
- *      The actual value of 'D' is not necessary for the operation of this code, so it's purely for convenience
- *      of the users of this class.
+ * The actual value of 'D' is not necessary for the operation of this code, so
+ * it's purely for convenience of the users of this class.
  *
  * @since 1.286
  */
 public class DescriptorExtensionList<T extends Describable<T>, D extends Descriptor<T>> extends ExtensionList<D> {
+
     /**
      * Creates a new instance.
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static <T extends Describable<T>,D extends Descriptor<T>>
-    DescriptorExtensionList<T,D> createDescriptorList(Hudson hudson, Class<T> describableType) {
+    public static <T extends Describable<T>, D extends Descriptor<T>> DescriptorExtensionList<T, D> createDescriptorList(Hudson hudson, Class<T> describableType) {
         if (describableType == (Class) Publisher.class) {
             return (DescriptorExtensionList) new DescriptorExtensionListImpl(hudson);
         }
-        return new DescriptorExtensionList<T,D>(hudson,describableType);
+        return new DescriptorExtensionList<T, D>(hudson, describableType);
     }
-
     /**
      * Type of the {@link Describable} that this extension list retains.
      */
     private final Class<T> describableType;
 
     protected DescriptorExtensionList(Hudson hudson, Class<T> describableType) {
-        super(hudson, (Class)Descriptor.class, (CopyOnWriteArrayList)getLegacyDescriptors(describableType));
+        super(hudson, (Class) Descriptor.class, (CopyOnWriteArrayList) getLegacyDescriptors(describableType));
         this.describableType = describableType;
     }
 
     /**
      * Finds the descriptor that has the matching fully-qualified class name.
      *
-     * @param fqcn
-     *      Fully qualified name of the descriptor, not the describable.
+     * @param fqcn Fully qualified name of the descriptor, not the describable.
      */
     public D find(String fqcn) {
-        return Descriptor.find(this,fqcn);
+        return Descriptor.find(this, fqcn);
     }
 
     /**
-     * Finds the descriptor that describes the given type.
-     * That is, if this method returns d, {@code d.clazz==type}
+     * Finds the descriptor that describes the given type. That is, if this
+     * method returns d, {@code d.clazz==type}
      */
     public D find(Class<? extends T> type) {
-        for (D d : this)
-            if (d.clazz==type)
+        for (D d : this) {
+            if (d.clazz == type) {
                 return d;
+            }
+        }
         return null;
     }
 
     /**
-     * Creates a new instance of a {@link Describable}
-     * from the structured form submission data posted
-     * by a radio button group.
+     * Creates a new instance of a {@link Describable} from the structured form
+     * submission data posted by a radio button group.
      */
     public T newInstanceFromRadioList(JSONObject config) throws FormException {
-        if(config.isNullObject())
+        if (config.isNullObject()) {
             return null;    // none was selected
+        }
         int idx = config.getInt("value");
-        return get(idx).newInstance(Stapler.getCurrentRequest(),config);
+        return get(idx).newInstance(Stapler.getCurrentRequest(), config);
     }
 
     public T newInstanceFromRadioList(JSONObject parent, String name) throws FormException {
@@ -122,14 +122,17 @@ public class DescriptorExtensionList<T extends Describable<T>, D extends Descrip
      * If none is found, null is returned.
      */
     public Descriptor<T> findByName(String id) {
-        for (Descriptor<T> d : this)
-            if(d.getId().equals(id))
+        for (Descriptor<T> d : this) {
+            if (d.getId().equals(id)) {
                 return d;
+            }
+        }
         return null;
     }
 
     /**
-     * {@link #load()} in the descriptor is not a real load activity, so locking against "this" is enough.
+     * {@link #load()} in the descriptor is not a real load activity, so locking
+     * against "this" is enough.
      */
     @Override
     protected Object getLoadLock() {
@@ -137,35 +140,37 @@ public class DescriptorExtensionList<T extends Describable<T>, D extends Descrip
     }
 
     /**
-     * Loading the descriptors in this case means filtering the descriptor from the master {@link ExtensionList}.
+     * Loading the descriptors in this case means filtering the descriptor from
+     * the master {@link ExtensionList}.
      */
     @Override
     protected List<ExtensionComponent<D>> load() {
         List<ExtensionComponent<D>> r = new ArrayList<ExtensionComponent<D>>();
-        for( ExtensionComponent<Descriptor> c : hudson.getExtensionList(Descriptor.class).getComponents() ) {
+        for (ExtensionComponent<Descriptor> c : hudson.getExtensionList(Descriptor.class).getComponents()) {
             Descriptor d = c.getInstance();
             Type subTyping = Types.getBaseClass(d.getClass(), Descriptor.class);
             if (!(subTyping instanceof ParameterizedType)) {
-                LOGGER.severe(d.getClass()+" doesn't extend Descriptor with a type parameter");
+                LOGGER.severe(d.getClass() + " doesn't extend Descriptor with a type parameter");
                 continue;   // skip this one
             }
-            if(Types.erasure(Types.getTypeArgument(subTyping,0))==(Class)describableType)
-                r.add((ExtensionComponent)c);
+            if (Types.erasure(Types.getTypeArgument(subTyping, 0)) == (Class) describableType) {
+                r.add((ExtensionComponent) c);
+            }
         }
         return r;
     }
-
     /**
-     * Stores manually registered Descriptor instances. Keyed by the {@link Describable} type.
+     * Stores manually registered Descriptor instances. Keyed by the
+     * {@link Describable} type.
      */
-    private static final Memoizer<Class,CopyOnWriteArrayList<ExtensionComponent<Descriptor>>> legacyDescriptors = new Memoizer<Class,CopyOnWriteArrayList<ExtensionComponent<Descriptor>>>() {
+    private static final Memoizer<Class, CopyOnWriteArrayList<ExtensionComponent<Descriptor>>> legacyDescriptors = new Memoizer<Class, CopyOnWriteArrayList<ExtensionComponent<Descriptor>>>() {
         public CopyOnWriteArrayList compute(Class key) {
             return new CopyOnWriteArrayList();
         }
     };
 
     private static <T extends Describable<T>> CopyOnWriteArrayList<ExtensionComponent<Descriptor<T>>> getLegacyDescriptors(Class<T> type) {
-        return (CopyOnWriteArrayList)legacyDescriptors.get(type);
+        return (CopyOnWriteArrayList) legacyDescriptors.get(type);
     }
 
     /**
@@ -174,13 +179,12 @@ public class DescriptorExtensionList<T extends Describable<T>, D extends Descrip
     public static Iterable<Descriptor> listLegacyInstances() {
         return new Iterable<Descriptor>() {
             public Iterator<Descriptor> iterator() {
-                return new AdaptedIterator<ExtensionComponent<Descriptor>,Descriptor>(
-                    new FlattenIterator<ExtensionComponent<Descriptor>,CopyOnWriteArrayList<ExtensionComponent<Descriptor>>>(legacyDescriptors.values()) {
-                        protected Iterator<ExtensionComponent<Descriptor>> expand(CopyOnWriteArrayList<ExtensionComponent<Descriptor>> v) {
-                            return v.iterator();
-                        }
-                    }) {
-
+                return new AdaptedIterator<ExtensionComponent<Descriptor>, Descriptor>(
+                        new FlattenIterator<ExtensionComponent<Descriptor>, CopyOnWriteArrayList<ExtensionComponent<Descriptor>>>(legacyDescriptors.values()) {
+                            protected Iterator<ExtensionComponent<Descriptor>> expand(CopyOnWriteArrayList<ExtensionComponent<Descriptor>> v) {
+                                return v.iterator();
+                            }
+                        }) {
                     protected Descriptor adapt(ExtensionComponent<Descriptor> item) {
                         return item.getInstance();
                     }
@@ -195,6 +199,5 @@ public class DescriptorExtensionList<T extends Describable<T>, D extends Descrip
     public static void clearLegacyInstances() {
         legacyDescriptors.clear();
     }
-
     private static final Logger LOGGER = Logger.getLogger(DescriptorExtensionList.class.getName());
 }

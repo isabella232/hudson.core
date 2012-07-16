@@ -7,24 +7,25 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
 package hudson;
 
 import hudson.util.DelegatingOutputStream;
-
 import java.io.OutputStream;
 
 /**
  * {@link OutputStream} that blocks {@link #close()} method.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class CloseProofOutputStream extends DelegatingOutputStream {
+
     public CloseProofOutputStream(OutputStream out) {
         super(out);
     }

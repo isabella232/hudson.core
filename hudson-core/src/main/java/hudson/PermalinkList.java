@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -30,6 +30,7 @@ import java.util.List;
  * @since 1.255
  */
 public final class PermalinkList extends ArrayList<Permalink> {
+
     public PermalinkList(Collection<? extends Permalink> c) {
         super(c);
     }
@@ -43,9 +44,11 @@ public final class PermalinkList extends ArrayList<Permalink> {
      * @return null if not found
      */
     public Permalink get(String id) {
-        for (Permalink p : this)
-            if(p.getId().equals(id))
+        for (Permalink p : this) {
+            if (p.getId().equals(id)) {
                 return p;
+            }
+        }
         return null;
     }
 
@@ -54,10 +57,13 @@ public final class PermalinkList extends ArrayList<Permalink> {
      */
     public Permalink findNearest(String id) {
         List<String> ids = new ArrayList<String>();
-        for (Permalink p : this)
+        for (Permalink p : this) {
             ids.add(p.getId());
+        }
         String nearest = EditDistance.findNearest(id, ids);
-        if(nearest==null)   return null;
+        if (nearest == null) {
+            return null;
+        }
         return get(nearest);
     }
 }
