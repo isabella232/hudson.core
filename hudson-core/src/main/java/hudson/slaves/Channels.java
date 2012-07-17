@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -44,21 +44,22 @@ import java.util.logging.Logger;
 
 /**
  * Various convenient subtype of {@link Channel}s.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public class Channels {
+
     /**
-     * @deprecated since 2009-04-13.
-     *      Use {@link #forProcess(String, ExecutorService, InputStream, OutputStream, OutputStream, Proc)}
+     * @deprecated since 2009-04-13. Use
+     * {@link #forProcess(String, ExecutorService, InputStream, OutputStream, OutputStream, Proc)}
      */
     public static Channel forProcess(String name, ExecutorService execService, InputStream in, OutputStream out, Proc proc) throws IOException {
-        return forProcess(name,execService,in,out,null,proc);
+        return forProcess(name, execService, in, out, null, proc);
     }
 
     /**
-     * Creates a channel that wraps a remote process, so that when we shut down the connection
-     * we kill the process.
+     * Creates a channel that wraps a remote process, so that when we shut down
+     * the connection we kill the process.
      */
     public static Channel forProcess(String name, ExecutorService execService, InputStream in, OutputStream out, OutputStream header, final Proc proc) throws IOException {
         return new Channel(name, execService, in, out, header) {
@@ -72,7 +73,7 @@ public class Channels {
                     proc.kill();
                 } catch (IOException x) {
                     // we are already in the error recovery mode, so just record it and move on
-                    LOGGER.log(Level.INFO, "Failed to terminate the severed connection",x);
+                    LOGGER.log(Level.INFO, "Failed to terminate the severed connection", x);
                 } catch (InterruptedException x) {
                     // process the interrupt later
                     Thread.currentThread().interrupt();
@@ -124,84 +125,85 @@ public class Channels {
     }
 
     /**
-     * Launches a new JVM with the given classpath and system properties, establish a communication channel,
-     * and return a {@link Channel} to it.
+     * Launches a new JVM with the given classpath and system properties,
+     * establish a communication channel, and return a {@link Channel} to it.
      *
-     * @param displayName
-     *      Human readable name of what this JVM represents. For example "Selenium grid" or "Hadoop".
-     *      This token is used for messages to {@code listener}.
-     * @param listener
-     *      The progress of the launcher and the failure information will be sent here. Must not be null.
-     * @param workDir
-     *      If non-null, the new JVM will have this directory as the working directory. This must be a local path.
-     * @param classpath
-     *      The classpath of the new JVM. Can be null if you just need {@code slave.jar} (and everything else
-     *      can be sent over the channel.) But if you have jars that are known to be necessary by the new JVM,
-     *      setting it here will improve the classloading performance (by avoiding remote class file transfer.)
-     *      Classes in this classpath will also take precedence over any other classes that's sent via the channel
-     *      later, so it's also useful for making sure you get the version of the classes you want.
-     * @param systemProperties
-     *      If the new JVM should have a certain system properties set. Can be null.
+     * @param displayName Human readable name of what this JVM represents. For
+     * example "Selenium grid" or "Hadoop". This token is used for messages to
+     * {@code listener}.
+     * @param listener The progress of the launcher and the failure information
+     * will be sent here. Must not be null.
+     * @param workDir If non-null, the new JVM will have this directory as the
+     * working directory. This must be a local path.
+     * @param classpath The classpath of the new JVM. Can be null if you just
+     * need {@code slave.jar} (and everything else can be sent over the
+     * channel.) But if you have jars that are known to be necessary by the new
+     * JVM, setting it here will improve the classloading performance (by
+     * avoiding remote class file transfer.) Classes in this classpath will also
+     * take precedence over any other classes that's sent via the channel later,
+     * so it's also useful for making sure you get the version of the classes
+     * you want.
+     * @param systemProperties If the new JVM should have a certain system
+     * properties set. Can be null.
      *
-     * @return
-     *      never null
+     * @return never null
      * @since 1.300
      */
-    public static Channel newJVM(String displayName, TaskListener listener, FilePath workDir, ClasspathBuilder classpath, Map<String,String> systemProperties) throws IOException {
+    public static Channel newJVM(String displayName, TaskListener listener, FilePath workDir, ClasspathBuilder classpath, Map<String, String> systemProperties) throws IOException {
         JVMBuilder vmb = new JVMBuilder();
         vmb.systemProperties(systemProperties);
 
-        return newJVM(displayName,listener,vmb,workDir,classpath);
+        return newJVM(displayName, listener, vmb, workDir, classpath);
     }
 
     /**
-     * Launches a new JVM with the given classpath, establish a communication channel,
-     * and return a {@link Channel} to it.
+     * Launches a new JVM with the given classpath, establish a communication
+     * channel, and return a {@link Channel} to it.
      *
-     * @param displayName
-     *      Human readable name of what this JVM represents. For example "Selenium grid" or "Hadoop".
-     *      This token is used for messages to {@code listener}.
-     * @param listener
-     *      The progress of the launcher and the failure information will be sent here. Must not be null.
-     * @param workDir
-     *      If non-null, the new JVM will have this directory as the working directory. This must be a local path.
-     * @param classpath
-     *      The classpath of the new JVM. Can be null if you just need {@code slave.jar} (and everything else
-     *      can be sent over the channel.) But if you have jars that are known to be necessary by the new JVM,
-     *      setting it here will improve the classloading performance (by avoiding remote class file transfer.)
-     *      Classes in this classpath will also take precedence over any other classes that's sent via the channel
-     *      later, so it's also useful for making sure you get the version of the classes you want.
-     * @param vmb
-     *      A partially configured {@link JVMBuilder} that allows the caller to fine-tune the launch parameter.
+     * @param displayName Human readable name of what this JVM represents. For
+     * example "Selenium grid" or "Hadoop". This token is used for messages to
+     * {@code listener}.
+     * @param listener The progress of the launcher and the failure information
+     * will be sent here. Must not be null.
+     * @param workDir If non-null, the new JVM will have this directory as the
+     * working directory. This must be a local path.
+     * @param classpath The classpath of the new JVM. Can be null if you just
+     * need {@code slave.jar} (and everything else can be sent over the
+     * channel.) But if you have jars that are known to be necessary by the new
+     * JVM, setting it here will improve the classloading performance (by
+     * avoiding remote class file transfer.) Classes in this classpath will also
+     * take precedence over any other classes that's sent via the channel later,
+     * so it's also useful for making sure you get the version of the classes
+     * you want.
+     * @param vmb A partially configured {@link JVMBuilder} that allows the
+     * caller to fine-tune the launch parameter.
      *
-     * @return
-     *      never null
+     * @return never null
      * @since 1.361
      */
     public static Channel newJVM(String displayName, TaskListener listener, JVMBuilder vmb, FilePath workDir, ClasspathBuilder classpath) throws IOException {
         ServerSocket serverSocket = new ServerSocket();
-        serverSocket.bind(new InetSocketAddress("localhost",0));
-        serverSocket.setSoTimeout(10*1000);
+        serverSocket.bind(new InetSocketAddress("localhost", 0));
+        serverSocket.setSoTimeout(10 * 1000);
 
         // use -cp + FQCN instead of -jar since remoting.jar can be rebundled (like in the case of the swarm plugin.)
         vmb.classpath().addJarOf(Channel.class);
         vmb.mainClass(Launcher.class);
 
-        if(classpath!=null)
+        if (classpath != null) {
             vmb.args().add("-cp").add(classpath);
-        vmb.args().add("-connectTo","localhost:"+serverSocket.getLocalPort());
+        }
+        vmb.args().add("-connectTo", "localhost:" + serverSocket.getLocalPort());
 
-        listener.getLogger().println("Starting "+displayName);
+        listener.getLogger().println("Starting " + displayName);
         Proc p = vmb.launch(new LocalLauncher(listener)).stdout(listener).pwd(workDir).start();
 
         Socket s = serverSocket.accept();
         serverSocket.close();
 
-        return forProcess("Channel to "+displayName, Computer.threadPoolForRemoting,
+        return forProcess("Channel to " + displayName, Computer.threadPoolForRemoting,
                 new BufferedInputStream(new SocketInputStream(s)),
-                new BufferedOutputStream(new SocketOutputStream(s)),null,p);
+                new BufferedOutputStream(new SocketOutputStream(s)), null, p);
     }
-
-
     private static final Logger LOGGER = Logger.getLogger(Channels.class.getName());
 }

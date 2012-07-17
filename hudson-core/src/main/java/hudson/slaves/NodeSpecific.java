@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -29,10 +29,10 @@ import java.io.IOException;
  * @author huybrechts
  * @since 1.286
  * @see EnvironmentSpecific
- * @param <T>
- *      Concrete type that represents the thing that can be adapted.
+ * @param <T> Concrete type that represents the thing that can be adapted.
  */
 public interface NodeSpecific<T extends NodeSpecific<T>> {
+
     /**
      * Returns a specialized copy of T for functioning in the given node.
      */

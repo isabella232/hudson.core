@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Stephen Connolly
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Stephen Connolly
+ *
  *
  *******************************************************************************/ 
 
@@ -40,17 +40,17 @@ import org.kohsuke.stapler.QueryParameter;
  *
  * @author Stephen Connolly
  * @author Kohsuke Kawaguchi
-*/
+ */
 public class CommandLauncher extends ComputerLauncher {
 
     /**
-     * Command line to launch the agent, like
-     * "ssh myslave java -jar /path/to/hudson-remoting.jar"
+     * Command line to launch the agent, like "ssh myslave java -jar
+     * /path/to/hudson-remoting.jar"
      */
     private final String agentCommand;
-    
     /**
-     * Optional environment variables to add to the current environment. Can be null.
+     * Optional environment variables to add to the current environment. Can be
+     * null.
      */
     private final EnvVars env;
 
@@ -58,10 +58,10 @@ public class CommandLauncher extends ComputerLauncher {
     public CommandLauncher(String command) {
         this(command, null);
     }
-    
+
     public CommandLauncher(String command, EnvVars env) {
-    	this.agentCommand = command;
-    	this.env = env;
+        this.agentCommand = command;
+        this.env = env;
     }
 
     public String getCommand() {
@@ -81,7 +81,7 @@ public class CommandLauncher extends ComputerLauncher {
         Process _proc = null;
         try {
             listener.getLogger().println(hudson.model.Messages.Slave_Launching(getTimestamp()));
-            if(getCommand().trim().length()==0) {
+            if (getCommand().trim().length() == 0) {
                 listener.getLogger().println(Messages.CommandLauncher_NoLaunchCommand());
                 return;
             }
@@ -93,16 +93,16 @@ public class CommandLauncher extends ComputerLauncher {
 
             {// system defined variables
                 String rootUrl = Hudson.getInstance().getRootUrl();
-                if (rootUrl!=null) {
+                if (rootUrl != null) {
                     pb.environment().put("HUDSON_URL", rootUrl);
-                    pb.environment().put("SLAVEJAR_URL", rootUrl+"/jnlpJars/slave.jar");
+                    pb.environment().put("SLAVEJAR_URL", rootUrl + "/jnlpJars/slave.jar");
                 }
             }
 
             if (env != null) {
-            	pb.environment().putAll(env);
+                pb.environment().putAll(env);
             }
-            
+
             final Process proc = _proc = pb.start();
 
             // capture error information from stderr. this will terminate itself
@@ -115,8 +115,8 @@ public class CommandLauncher extends ComputerLauncher {
                 public void onClosed(Channel channel, IOException cause) {
                     try {
                         int exitCode = proc.exitValue();
-                        if (exitCode!=0) {
-                            listener.error("Process terminated with exit code "+exitCode);
+                        if (exitCode != 0) {
+                            listener.error("Process terminated with exit code " + exitCode);
                         }
                     } catch (IllegalThreadStateException e) {
                         // hasn't terminated yet
@@ -150,28 +150,30 @@ public class CommandLauncher extends ComputerLauncher {
             LOGGER.log(Level.SEVERE, msg, e);
             e.printStackTrace(listener.error(msg));
 
-            if(_proc!=null)
+            if (_proc != null) {
                 try {
                     ProcessTree.get().killAll(_proc, _cookie);
                 } catch (InterruptedException x) {
                     x.printStackTrace(listener.error(Messages.ComputerLauncher_abortedLaunch()));
                 }
+            }
         }
     }
-
     private static final Logger LOGGER = Logger.getLogger(CommandLauncher.class.getName());
 
     @Extension
     public static class DescriptorImpl extends Descriptor<ComputerLauncher> {
+
         public String getDisplayName() {
             return Messages.CommandLauncher_displayName();
         }
 
         public FormValidation doCheckCommand(@QueryParameter String value) {
-            if(Util.fixEmptyAndTrim(value)==null)
+            if (Util.fixEmptyAndTrim(value) == null) {
                 return FormValidation.error("Command is empty");
-            else
+            } else {
                 return FormValidation.ok();
+            }
         }
     }
 }

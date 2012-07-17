@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -22,16 +22,17 @@ import hudson.model.TaskListener;
 import java.io.IOException;
 
 /**
- * {@link ComputerLauncher} filter that can be used as a base class for decorators.
+ * {@link ComputerLauncher} filter that can be used as a base class for
+ * decorators.
  *
- * <p>
- * Using this class also protects you from method additions in {@link ComputerLauncher},
- * since these two classes are updated in sync.
+ * <p> Using this class also protects you from method additions in
+ * {@link ComputerLauncher}, since these two classes are updated in sync.
  *
  * @author Kohsuke Kawaguchi
  * @see SlaveComputer#grabLauncher(Node)
  */
 public abstract class ComputerLauncherFilter extends ComputerLauncher {
+
     protected volatile ComputerLauncher core;
 
     public ComputerLauncherFilter(ComputerLauncher core) {

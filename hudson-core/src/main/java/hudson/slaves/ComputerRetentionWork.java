@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Stephen Connolly
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Stephen Connolly
+ *
  *
  *******************************************************************************/ 
 
@@ -51,13 +51,14 @@ public class ComputerRetentionWork extends PeriodicWork {
         final long startRun = System.currentTimeMillis();
         for (Computer c : Hudson.getInstance().getComputers()) {
             Node n = c.getNode();
-            if (n!=null && n.isHoldOffLaunchUntilSave())
+            if (n != null && n.isHoldOffLaunchUntilSave()) {
                 continue;
+            }
             if (!nextCheck.containsKey(c) || startRun > nextCheck.get(c)) {
                 // at the moment I don't trust strategies to wait more than 60 minutes
                 // strategies need to wait at least one minute
                 final long waitInMins = Math.min(1, Math.max(60, c.getRetentionStrategy().check(c)));
-                nextCheck.put(c, startRun + waitInMins*1000*60 /*MINS->MILLIS*/);
+                nextCheck.put(c, startRun + waitInMins * 1000 * 60 /*MINS->MILLIS*/);
             }
         }
     }
