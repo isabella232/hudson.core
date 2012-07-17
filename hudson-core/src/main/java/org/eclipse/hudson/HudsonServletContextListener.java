@@ -235,20 +235,22 @@ public final class HudsonServletContextListener implements ServletContextListene
     
     protected void copyUpdateCenterJson(ServletContext servletContext, File hudsonHomeDir) throws IOException {
         URL updateCenterJsonUrl = servletContext.getResource("/WEB-INF/update-center.json");
-        long lastModified = updateCenterJsonUrl.openConnection().getLastModified();
-        File localCacheFile = new File(hudsonHomeDir, "updates/default.json");
+        if (updateCenterJsonUrl != null) {
+            long lastModified = updateCenterJsonUrl.openConnection().getLastModified();
+            File localCacheFile = new File(hudsonHomeDir, "updates/default.json");
 
-        if (!localCacheFile.exists() || (localCacheFile.lastModified() < lastModified)) {
-            String jsonStr = org.apache.commons.io.IOUtils.toString(updateCenterJsonUrl.openStream());
-            jsonStr = jsonStr.trim();
-            if (jsonStr.startsWith("updateCenter.post(")) {
-                jsonStr = jsonStr.substring("updateCenter.post(".length());
+            if (!localCacheFile.exists() || (localCacheFile.lastModified() < lastModified)) {
+                String jsonStr = org.apache.commons.io.IOUtils.toString(updateCenterJsonUrl.openStream());
+                jsonStr = jsonStr.trim();
+                if (jsonStr.startsWith("updateCenter.post(")) {
+                    jsonStr = jsonStr.substring("updateCenter.post(".length());
+                }
+                if (jsonStr.endsWith(");")) {
+                    jsonStr = jsonStr.substring(0, jsonStr.lastIndexOf(");"));
+                }
+                FileUtils.writeStringToFile(localCacheFile, jsonStr);
+                localCacheFile.setLastModified(lastModified);
             }
-            if (jsonStr.endsWith(");")) {
-                jsonStr = jsonStr.substring(0, jsonStr.lastIndexOf(");"));
-            }
-            FileUtils.writeStringToFile(localCacheFile, jsonStr);
-            localCacheFile.setLastModified(lastModified);
         }
     }
 

@@ -109,7 +109,6 @@ final public class InitialSetup {
         servletContext = context;
         hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
         proxyConfig = new ProxyConfiguration(homeDir);
-        initPluginsJsonUrl = servletContext.getResource("/WEB-INF/init-plugins.json");
         updateSiteManager = new UpdateSiteManager("default", hudsonHomeDir, proxyConfig);
         installedPluginManager = new InstalledPluginManager(pluginsDir);
         initSetupFile = new XmlFile(new File(homeDir, "initSetup.xml"));
