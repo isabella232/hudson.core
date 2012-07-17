@@ -59,7 +59,6 @@ final public class PluginCenter {
     private ProxyConfiguration proxyConfig;
     private ExecutorService installerService = Executors.newSingleThreadExecutor(
             new DaemonThreadFactory(new ThreadFactory() {
-
         @Override
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r);
@@ -95,7 +94,7 @@ final public class PluginCenter {
     }
 
     public List<AvailablePluginInfo> getAvailablePlugins(String pluginType) {
-       return updateSiteManager.getAvailablePlugins(pluginType);
+        return updateSiteManager.getAvailablePlugins(pluginType);
     }
 
     public List<AvailablePluginInfo> getCategorizedAvailablePlugins(String pluginType, String category) {
@@ -184,7 +183,7 @@ final public class PluginCenter {
     public HttpResponse doupdatePlugin(@QueryParameter String pluginName) {
         return doinstallPlugin(pluginName);
     }
-    
+
     public HttpResponse doinstallPlugin(@QueryParameter String pluginName) {
         if (!hudsonSecurityManager.hasPermission(Permission.HUDSON_ADMINISTER)) {
             return HttpResponses.forbidden();

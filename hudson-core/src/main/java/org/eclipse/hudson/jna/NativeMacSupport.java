@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Winston Prakash
- *      
+ *
  *******************************************************************************/ 
 
 package org.eclipse.hudson.jna;
@@ -26,17 +26,16 @@ import java.util.List;
 /**
  * Extension point for adding Native Mac Support to Hudson
  *
- * <p>
- * This object can have an optional <tt>config.jelly</tt> to configure the Native Access Support
- * <p>
- * A default constructor is needed to create NativeAccessSupport in the default configuration.
+ * <p> This object can have an optional <tt>config.jelly</tt> to configure the
+ * Native Access Support <p> A default constructor is needed to create
+ * NativeAccessSupport in the default configuration.
  *
  * @author Winston Prakash
  * @since 3.0.0
  * @see NativeAccessSupportDescriptor
  */
 public abstract class NativeMacSupport extends AbstractDescribableImpl<NativeMacSupport> implements ExtensionPoint,
-    Serializable {
+        Serializable {
 
     /**
      * Returns all the registered {@link NativeAccessSupport} descriptors.
@@ -52,6 +51,7 @@ public abstract class NativeMacSupport extends AbstractDescribableImpl<NativeMac
 
     /**
      * Check if this Extension has Support for specific native Operation
+     *
      * @param nativeFunc Native Operation
      * @return true if supported
      */
@@ -59,14 +59,16 @@ public abstract class NativeMacSupport extends AbstractDescribableImpl<NativeMac
 
     /**
      * Get the error associated with the last Operation
+     *
      * @return String error message
      */
     abstract public String getLastError();
 
     /**
      * Get the Native processes of a Mac System
+     *
      * @return
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     abstract public List<NativeProcess> getMacProcesses() throws NativeAccessException;
 }

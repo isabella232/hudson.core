@@ -42,16 +42,19 @@ public interface IMatrixProject extends IBaseBuildableProject {
     public void setAxes(AxisList axes) throws IOException;
 
     /**
-     * Whether Hudson should run {@link hudson.matrix.MatrixRun}s are run sequentially.
+     * Whether Hudson should run {@link hudson.matrix.MatrixRun}s are run
+     * sequentially.
      *
-     * @return If true, {@link hudson.matrix.MatrixRun}s are run sequentially, instead of running in parallel.
+     * @return If true, {@link hudson.matrix.MatrixRun}s are run sequentially,
+     * instead of running in parallel.
      */
     boolean isRunSequentially();
 
     /**
      * Sets the mode of the running.
      *
-     * @param runSequentially If true, {@link hudson.matrix.MatrixRun}s are run sequentially, instead of running in parallel.
+     * @param runSequentially If true, {@link hudson.matrix.MatrixRun}s are run
+     * sequentially, instead of running in parallel.
      * @throws IOException exception.
      */
     void setRunSequentially(boolean runSequentially) throws IOException;
@@ -67,13 +70,16 @@ public interface IMatrixProject extends IBaseBuildableProject {
     /**
      * Obtains the combination filter, used to trim down the size of the matrix.
      * <p/>
+     * <
+     * p/> By default, a {@link hudson.matrix.MatrixConfiguration} is created
+     * for every possible combination of axes exhaustively. But by specifying a
+     * Dynamic Language Script expression as a combination filter, one can trim
+     * down the # of combinations built.
      * <p/>
-     * By default, a {@link hudson.matrix.MatrixConfiguration} is created for every possible combination of axes exhaustively.
-     * But by specifying a Dynamic Language Script expression as a combination filter, one can trim down the # of combinations built.
-     * <p/>
-     * <p/>
-     * Namely, this expression is evaluated for each axis value combination, and only when it evaluates to true,
-     * a corresponding {@link hudson.matrix.MatrixConfiguration} will be created and built.
+     * <
+     * p/> Namely, this expression is evaluated for each axis value combination,
+     * and only when it evaluates to true, a corresponding
+     * {@link hudson.matrix.MatrixConfiguration} will be created and built.
      *
      * @return can be null.
      * @since 1.279
@@ -118,20 +124,22 @@ public interface IMatrixProject extends IBaseBuildableProject {
     /**
      * Sets User-specified workspace directory, or null if it's up to Hudson.
      * <p/>
+     * <
+     * p/> Normally a matrix project uses the workspace location assigned by its
+     * parent container, but sometimes people have builds that have hard-coded
+     * paths.
      * <p/>
-     * Normally a matrix project uses the workspace location assigned by its parent container,
-     * but sometimes people have builds that have hard-coded paths.
+     * <
+     * p/> This is not {@link java.io.File} because it may have to hold a path
+     * representation on another OS.
      * <p/>
-     * <p/>
-     * This is not {@link java.io.File} because it may have to hold a path representation on another OS.
-     * <p/>
-     * <p/>
-     * If this path is relative, it's resolved against {@link hudson.model.Node#getRootPath()} on the node where this workspace
+     * <
+     * p/> If this path is relative, it's resolved against
+     * {@link hudson.model.Node#getRootPath()} on the node where this workspace
      * is prepared.
      *
      * @param customWorkspace custom workspace.
      * @throws java.io.IOException exception.
      */
     void setCustomWorkspace(String customWorkspace) throws IOException;
-
 }

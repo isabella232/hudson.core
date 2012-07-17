@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi,  Winston.Prakash@Oracle.com
- *        
+ *
  *******************************************************************************/
 package org.eclipse.hudson.graph;
 
@@ -30,19 +30,14 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
- * A Graph interface for graphing support. Actual graph generation is delegated to GraphSupport object.
- * Plugin can provide their own graphing support via GraphSupport Extension Point.
+ * A Graph interface for graphing support. Actual graph generation is delegated
+ * to GraphSupport object. Plugin can provide their own graphing support via
+ * GraphSupport Extension Point.
  *
- * <p>
- * This object exposes two URLs:
- * <dl>
- * <dt>/png
- * <dd>PNG image of a graph
+ * <p> This object exposes two URLs: <dl> <dt>/png <dd>PNG image of a graph
  *
- * <dt>/map
- * <dd>Clickable map
- * </dl>
- * 
+ * <dt>/map <dd>Clickable map </dl>
+ *
  * @since 2.3.0
  */
 public class Graph {
@@ -56,9 +51,8 @@ public class Graph {
     private volatile GraphSupport graphSupport;
 
     /**
-     * @param timestamp
-     *      Timestamp of this graph. Used for HTTP cache related headers.
-     *      If the graph doesn't have any timestamp to tie it to, pass -1.
+     * @param timestamp Timestamp of this graph. Used for HTTP cache related
+     * headers. If the graph doesn't have any timestamp to tie it to, pass -1.
      */
     public Graph(long timestamp, int defaultW, int defaultH) {
         this.timestamp = timestamp;
@@ -155,10 +149,10 @@ public class Graph {
             os.close();
         } catch (Error e) {
             /* OpenJDK on ARM produces an error like this in case of headless error
-            Caused by: java.lang.Error: Probable fatal error:No fonts found.
-            at sun.font.FontManager.getDefaultPhysicalFont(FontManager.java:1088)
-            at sun.font.FontManager.initialiseDeferredFont(FontManager.java:967)
-            ..
+             Caused by: java.lang.Error: Probable fatal error:No fonts found.
+             at sun.font.FontManager.getDefaultPhysicalFont(FontManager.java:1088)
+             at sun.font.FontManager.initialiseDeferredFont(FontManager.java:967)
+             ..
              */
             if (e.getMessage().contains("Probable fatal error:No fonts found")) {
                 rsp.sendRedirect2(req.getContextPath() + "/images/headless.png");
@@ -170,18 +164,19 @@ public class Graph {
             rsp.sendRedirect2(req.getContextPath() + "/images/headless.png");
         }
     }
-    
+
     /**
      * Create a Image map with the given name, width and height
+     *
      * @param mapName
      * @param width
      * @param height
-     * @return 
+     * @return
      */
-    public String createImageMap(String mapName, int width, int height){
+    public String createImageMap(String mapName, int width, int height) {
         return graphSupport.getImageMap(mapName, width, height);
     }
-    
+
     /**
      * Send the a clickable map data information.
      */

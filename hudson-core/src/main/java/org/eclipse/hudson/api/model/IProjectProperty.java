@@ -46,10 +46,10 @@ public interface IProjectProperty<T> extends Serializable {
     void setJob(ICascadingJob job);
 
     /**
-     * Sets property value.
-     * If property has cascading value and properties' {@link #allowOverrideValue(Object, Object)} method returns true,
-     * than value will be set to current property.<br/>
-     * If property doesn't have cascading value, than value will be set directly.
+     * Sets property value. If property has cascading value and properties'
+     * {@link #allowOverrideValue(Object, Object)} method returns true, than
+     * value will be set to current property.<br/> If property doesn't have
+     * cascading value, than value will be set directly.
      *
      * @param value value to set.
      */
@@ -70,27 +70,31 @@ public interface IProjectProperty<T> extends Serializable {
     T getCascadingValue();
 
     /**
-     * @return true if value inherited from cascading project, false - otherwise,
+     * @return true if value inherited from cascading project, false -
+     * otherwise,
      */
     boolean isOverridden();
 
     /**
-     * Returns property value. If originalValue is not null or value was overridden for this
-     * property - call {@link #getOriginalValue()}, otherwise call {@link #getCascadingValue()}.
+     * Returns property value. If originalValue is not null or value was
+     * overridden for this property - call {@link #getOriginalValue()},
+     * otherwise call {@link #getCascadingValue()}.
      *
      * @return string.
      */
     T getValue();
 
     /**
-     * This value will be taken if both cascading project and current project don't have values. Null by default.
+     * This value will be taken if both cascading project and current project
+     * don't have values. Null by default.
      *
      * @return value
      */
     T getDefaultValue();
 
     /**
-     * Resets value for given job. Default implementation sets Null value and resets propertyOverridden flag to false.
+     * Resets value for given job. Default implementation sets Null value and
+     * resets propertyOverridden flag to false.
      */
     void resetValue();
 
@@ -111,7 +115,8 @@ public interface IProjectProperty<T> extends Serializable {
     void setOverridden(boolean overridden);
 
     /**
-     * Method that is called while changing cascading parent. Update property internal states.l
+     * Method that is called while changing cascading parent. Update property
+     * internal states.l
      */
     void onCascadingProjectChanged();
 }

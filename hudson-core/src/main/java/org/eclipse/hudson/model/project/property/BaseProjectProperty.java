@@ -21,16 +21,17 @@ import org.eclipse.hudson.api.model.ICascadingJob;
 import org.eclipse.hudson.api.model.IProjectProperty;
 
 /**
- * Base property implementation. Contains common methods for setting and getting cascading and overridden properties.
+ * Base property implementation. Contains common methods for setting and getting
+ * cascading and overridden properties.
  * <p/>
  * Date: 9/22/11
  *
  * @author Nikita Levyankov
  */
 public class BaseProjectProperty<T> implements IProjectProperty<T> {
+
     static final String INVALID_JOB_EXCEPTION = "Project property should have not null job";
     static final String INVALID_PROPERTY_KEY_EXCEPTION = "Project property should have not null propertyKey";
-
     private transient String propertyKey;
     private transient ICascadingJob job;
     private T originalValue;
@@ -91,8 +92,8 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
         if (null == getKey()) {
             throw new IllegalArgumentException(INVALID_PROPERTY_KEY_EXCEPTION);
         }
-        return getJob().hasCascadingProject() ?
-            (T) getJob().getCascadingProject().getProperty(propertyKey, this.getClass()).getValue() : getDefaultValue();
+        return getJob().hasCascadingProject()
+                ? (T) getJob().getCascadingProject().getProperty(propertyKey, this.getClass()).getValue() : getDefaultValue();
     }
 
     /**
@@ -145,13 +146,15 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
     }
 
     /**
-     * Update value for cascading property. Before setting new value it will be checked for equality with cascading
-     * value. If two values are equals - current value will be cleared via {@link #clearOriginalValue(Object)}
-     * and will retrieved from parent. If not - value will be set directly.
+     * Update value for cascading property. Before setting new value it will be
+     * checked for equality with cascading value. If two values are equals -
+     * current value will be cleared via {@link #clearOriginalValue(Object)} and
+     * will retrieved from parent. If not - value will be set directly.
      *
      * @param value new value to be set.
      * @param cascadingValue current cascading value.
-     * @return true - if property was updated, false - otherwise if value was cleared.
+     * @return true - if property was updated, false - otherwise if value was
+     * cleared.
      */
     protected boolean updateOriginalValue(T value, T cascadingValue) {
         T candidateValue = null == value ? getDefaultValue() : value;
@@ -165,8 +168,8 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
     }
 
     /**
-     * Method that sets original value and mark it as overridden if needed. It was created to provide better flexibility
-     * in subclasses.
+     * Method that sets original value and mark it as overridden if needed. It
+     * was created to provide better flexibility in subclasses.
      *
      * @param originalValue value to set
      * @param overridden true - to mark as overridden.
@@ -178,7 +181,8 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
 
     /**
      * Method that clears original value and marks it as overridden if needed.
-     * Default implementation uses {@link #resetValue()}. Subclasses can override this method.
+     * Default implementation uses {@link #resetValue()}. Subclasses can
+     * override this method.
      *
      * @param originalValue value to set.
      */
@@ -198,7 +202,7 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
      */
     public boolean allowOverrideValue(T cascadingValue, T candidateValue) {
         return ObjectUtils.notEqual(cascadingValue, candidateValue)
-            && !DeepEquals.deepEquals(cascadingValue, candidateValue);
+                && !DeepEquals.deepEquals(cascadingValue, candidateValue);
     }
 
     /**
@@ -230,18 +234,19 @@ public class BaseProjectProperty<T> implements IProjectProperty<T> {
     }
 
     /**
-     * Executes when cascading parent is cleared. Default implementation marks property as not overridden.
+     * Executes when cascading parent is cleared. Default implementation marks
+     * property as not overridden.
      */
     protected void onCascadingProjectRemoved() {
         setOverridden(false);
     }
 
     /**
-     * Executes when cascading project is set. Default implementation compares cascading and current value.
-     * If values are not equal - mark property as overridden.
+     * Executes when cascading project is set. Default implementation compares
+     * cascading and current value. If values are not equal - mark property as
+     * overridden.
      */
     protected void onCascadingProjectSet() {
         setOverridden(allowOverrideValue(getCascadingValue(), getValue()));
     }
 }
-

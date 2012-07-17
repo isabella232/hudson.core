@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Winston Prakash
- *      
+ *
  *******************************************************************************/ 
 
 package org.eclipse.hudson.jna;
@@ -28,17 +28,16 @@ import java.util.Set;
 /**
  * Extension point for adding Native Unix Support to Hudson
  *
- * <p>
- * This object can have an optional <tt>config.jelly</tt> to configure the Native Access Support
- * <p>
- * A default constructor is needed to create NativeAccessSupport in the default configuration.
+ * <p> This object can have an optional <tt>config.jelly</tt> to configure the
+ * Native Access Support <p> A default constructor is needed to create
+ * NativeAccessSupport in the default configuration.
  *
  * @author Winston Prakash
  * @since 3.00
  * @see NativeAccessSupportDescriptor
  */
 public abstract class NativeUnixSupport extends AbstractDescribableImpl<NativeUnixSupport> implements ExtensionPoint,
-    Serializable {
+        Serializable {
 
     /**
      * Returns all the registered {@link NativeAccessSupport} descriptors.
@@ -54,6 +53,7 @@ public abstract class NativeUnixSupport extends AbstractDescribableImpl<NativeUn
 
     /**
      * Check if this Extension has Support for specific native Operation
+     *
      * @param nativeFunc Native Operation
      * @return true if supported
      */
@@ -61,12 +61,14 @@ public abstract class NativeUnixSupport extends AbstractDescribableImpl<NativeUn
 
     /**
      * Get the error associated with the last Operation
+     *
      * @return String error message
      */
     abstract public String getLastError();
 
     /**
      * Do the Unix style chmod (change file permission) on a File
+     *
      * @param file
      * @param mask
      * @return true if the operation is successful
@@ -74,14 +76,16 @@ public abstract class NativeUnixSupport extends AbstractDescribableImpl<NativeUn
     abstract public boolean chmod(File file, int mask) throws NativeAccessException;
 
     /**
-     * Make the file writable with native operation 
+     * Make the file writable with native operation
+     *
      * @param file
      * @return true if the operation is successful
      */
     abstract public boolean makeFileWritable(File file) throws NativeAccessException;
 
     /**
-     * Create unix style symlink 
+     * Create unix style symlink
+     *
      * @param targetPath
      * @param file
      * @return true if the operation is successful
@@ -90,13 +94,16 @@ public abstract class NativeUnixSupport extends AbstractDescribableImpl<NativeUn
 
     /**
      * Get the unix style mode (file permission) of a file
+     *
      * @param file
      * @return true if the operation is successful
      */
     abstract public int mode(File file);
 
     /**
-     * Resolves symlink, if the given file is a symlink on a Unix System. Otherwise return null.
+     * Resolves symlink, if the given file is a symlink on a Unix System.
+     * Otherwise return null.
+     *
      * @param targetPath
      * @param file
      * @return
@@ -105,79 +112,92 @@ public abstract class NativeUnixSupport extends AbstractDescribableImpl<NativeUn
 
     /**
      * Get the information about the System Memory
+     *
      * @return SystemMemory
-     * @throws hudson.util.jna.Native.ExecutionError 
+     * @throws hudson.util.jna.Native.ExecutionError
      */
     abstract public NativeSystemMemory getSystemMemory() throws NativeAccessException;
 
     /**
      * Get the effective User ID on a Unix System
+     *
      * @return int
-     * @throws hudson.util.jna.Native.ExecutionError 
+     * @throws hudson.util.jna.Native.ExecutionError
      */
     abstract public int getEuid() throws NativeAccessException;
 
     /**
      * Get the effective Group ID on a Unix System
-     * @return int 
-     * @throws hudson.util.jna.Native.ExecutionError 
+     *
+     * @return int
+     * @throws hudson.util.jna.Native.ExecutionError
      */
     abstract public int getEgid() throws NativeAccessException;
 
-
     /**
      * Restart current Java process (JVM in which this application is running)
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     *
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
-    abstract public void restartJavaProcess(Map<String,String> properties, boolean asDaemon) throws NativeAccessException;
+    abstract public void restartJavaProcess(Map<String, String> properties, boolean asDaemon) throws NativeAccessException;
 
     /**
      * Check if this Java process can be restarted
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     *
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     abstract public boolean canRestartJavaProcess() throws NativeAccessException;
 
     /**
      * Check if the Unix user exists on the machine where this program runs
+     *
      * @param userName
      * @return
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     abstract public boolean checkUnixUser(String userName) throws NativeAccessException;
-    
+
     /**
      * Check if the Unix group exists on the machine where this program runs
+     *
      * @param groupName
      * @return
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     abstract public boolean checkUnixGroup(String groupName) throws NativeAccessException;
 
     /**
      * Authenticate using Using Unix Pluggable Authentication Modules (PAM)
+     *
      * @param serviceName, sshd is the default
      * @param userName
      * @param password
      * @return Set<String> list of groups to which this user belongs
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     abstract public Set<String> pamAuthenticate(String serviceName, String userName, String password) throws NativeAccessException;
 
     /**
-     * Check if PAM Authentication available in the machine where this program runs
+     * Check if PAM Authentication available in the machine where this program
+     * runs
+     *
      * @return Message corresponding to the availability of PAM
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     abstract public String checkPamAuthentication() throws NativeAccessException;
 
     /**
      * Do the Unix style chown (change Owner permission) on a File
+     *
      * @param file
      * @param mask
      * @return true if the function executed successfully
-     * @throws hudson.util.jna.Native.ExecutionError 
+     * @throws hudson.util.jna.Native.ExecutionError
      */
-    abstract public boolean chown(File file, int uid, int gid) throws NativeAccessException;;
+    abstract public boolean chown(File file, int uid, int gid) throws NativeAccessException;
 
-    abstract public String getProcessUser() throws NativeAccessException;;
+    ;
+
+    abstract public String getProcessUser() throws NativeAccessException;
+;
 }

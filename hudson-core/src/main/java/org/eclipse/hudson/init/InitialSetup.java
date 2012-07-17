@@ -56,40 +56,32 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides support for initial setup during first run. Gives opportunity to
- * Hudson Admin to 
- *  - Install mandatory, featured and recommended plugins 
- *  - Update mandatory, featured and recommended plugins suitable for current Hudson 
- *  - Provide Authentication if needed 
- *  - Setup proxy if required
+ * Hudson Admin to - Install mandatory, featured and recommended plugins -
+ * Update mandatory, featured and recommended plugins suitable for current
+ * Hudson - Provide Authentication if needed - Setup proxy if required
  *
  * @author Winston Prakash
  */
 final public class InitialSetup {
-    
-    private Logger logger = LoggerFactory.getLogger(InitialSetup.class);
 
+    private Logger logger = LoggerFactory.getLogger(InitialSetup.class);
     private File pluginsDir;
     private URL initPluginsJsonUrl;
     private ServletContext servletContext;
     private UpdateSiteManager updateSiteManager;
     private InstalledPluginManager installedPluginManager;
-    
     private List<AvailablePluginInfo> installedRecommendedPlugins = new ArrayList<AvailablePluginInfo>();
     private List<AvailablePluginInfo> installableRecommendedPlugins = new ArrayList<AvailablePluginInfo>();
     private List<AvailablePluginInfo> updatableRecommendedPlugins = new ArrayList<AvailablePluginInfo>();
-    
     private List<AvailablePluginInfo> installedFeaturedPlugins = new ArrayList<AvailablePluginInfo>();
     private List<AvailablePluginInfo> installableFeaturedPlugins = new ArrayList<AvailablePluginInfo>();
     private List<AvailablePluginInfo> updatableFeaturedPlugins = new ArrayList<AvailablePluginInfo>();
-    
     private List<AvailablePluginInfo> installedMandatoryPlugins = new ArrayList<AvailablePluginInfo>();
     private List<AvailablePluginInfo> installableMandatoryPlugins = new ArrayList<AvailablePluginInfo>();
     private List<AvailablePluginInfo> updatableMandatoryPlugins = new ArrayList<AvailablePluginInfo>();
-    
     private ProxyConfiguration proxyConfig;
     private ExecutorService installerService = Executors.newSingleThreadExecutor(
             new DaemonThreadFactory(new ThreadFactory() {
-
         @Override
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r);
@@ -97,11 +89,8 @@ final public class InitialSetup {
             return t;
         }
     }));
-    
     private HudsonSecurityManager hudsonSecurityManager;
-    
     private XmlFile initSetupFile;
-
     private File hudsonHomeDir;
 
     public InitialSetup(File homeDir, ServletContext context) throws MalformedURLException, IOException {
@@ -125,21 +114,20 @@ final public class InitialSetup {
 //        installedPluginManager = new InstalledPluginManager(pluginsDir);
 //        check();
 //    }
-    
-    public boolean needsInitSetup(){
-        if (!initSetupFile.exists()){
-            return (installableMandatoryPlugins.size() > 0) || (updatableMandatoryPlugins.size() > 0) ||
-                    (installableFeaturedPlugins.size() > 0) || (updatableFeaturedPlugins.size() > 0) ||
-                    (installableRecommendedPlugins.size() > 0) || (updatableRecommendedPlugins.size() > 0);
-        }else{
+    public boolean needsInitSetup() {
+        if (!initSetupFile.exists()) {
+            return (installableMandatoryPlugins.size() > 0) || (updatableMandatoryPlugins.size() > 0)
+                    || (installableFeaturedPlugins.size() > 0) || (updatableFeaturedPlugins.size() > 0)
+                    || (installableRecommendedPlugins.size() > 0) || (updatableRecommendedPlugins.size() > 0);
+        } else {
             return !canFinish();
         }
     }
-    
+
     public boolean needsAdminLogin() {
         return !hudsonSecurityManager.hasPermission(Permission.HUDSON_ADMINISTER);
     }
-    
+
     public ServletContext getServletContext() {
         return servletContext;
     }
@@ -163,7 +151,7 @@ final public class InitialSetup {
     public List<AvailablePluginInfo> getUpdatableRecommendedPlugins() {
         return updatableRecommendedPlugins;
     }
-    
+
     public List<AvailablePluginInfo> getInstalledFeaturedPlugins() {
         return installedFeaturedPlugins;
     }
@@ -210,7 +198,7 @@ final public class InitialSetup {
             proxyConfig.openUrl(new URL("http://www.google.com"));
         } catch (IOException ex) {
             logger.debug(ex.getLocalizedMessage());
-            return true; 
+            return true;
         }
         return false;
     }
@@ -249,7 +237,7 @@ final public class InitialSetup {
 
         try {
             boolean proxySet = setProxy(server, port, noProxyFor, userName, password, authNeeded);
-            if (proxySet){
+            if (proxySet) {
                 proxyConfig.save();
             }
             // Try opening a URL and see if the proxy works fine
@@ -260,7 +248,7 @@ final public class InitialSetup {
         }
         return HttpResponses.ok();
     }
-    
+
     public HttpResponse doCheckFinish() {
         if (!canFinish()) {
             return HttpResponses.error(HttpServletResponse.SC_BAD_REQUEST, "Mandatory Plugins need to be installed first");
@@ -268,53 +256,53 @@ final public class InitialSetup {
             try {
                 initSetupFile.write("Hudson 3.0 Initial Setup Done");
             } catch (IOException ex) {
-                 logger.error(ex.getLocalizedMessage());
+                logger.error(ex.getLocalizedMessage());
             }
             invokeHudson();
-           
+
             return HttpResponses.ok();
         }
     }
-    
-    public void invokeHudson(){
+
+    public void invokeHudson() {
         final WebAppController controller = WebAppController.get();
-        
+
         controller.install(new HudsonIsLoading());
 
-            new Thread("hudson initialization thread") {
-                @Override
-                public void run() {
-                    try {
-                        // Creating of the god object performs most of the booting muck
-                        Hudson hudson = new Hudson(hudsonHomeDir, servletContext);
-                        
-                        //Now Hudson is fully loaded, reload Hudson Security Manager
-                        HudsonSecurityEntitiesHolder.setHudsonSecurityManager(new HudsonSecurityManager(hudsonHomeDir));
+        new Thread("hudson initialization thread") {
+            @Override
+            public void run() {
+                try {
+                    // Creating of the god object performs most of the booting muck
+                    Hudson hudson = new Hudson(hudsonHomeDir, servletContext);
 
-                        // once its done, hook up to stapler and things should be ready to go
-                        controller.install(hudson);
+                    //Now Hudson is fully loaded, reload Hudson Security Manager
+                    HudsonSecurityEntitiesHolder.setHudsonSecurityManager(new HudsonSecurityManager(hudsonHomeDir));
 
-                        // trigger the loading of changelogs in the background,
-                        // but give the system 10 seconds so that the first page
-                        // can be served quickly
-                        Trigger.timer.schedule(new SafeTimerTask() {
-                            public void doRun() {
-                                User.getUnknown().getBuilds();
-    }
-                        }, 1000*10);
-                    } catch (Error e) {
-                        logger.error("Failed to initialize Hudson", e);
-                        controller.install(new HudsonFailedToLoad(e));
-                        throw e;
-                    } catch (Exception e) {
-                        logger.error("Failed to initialize Hudson", e);
-                        controller.install(new HudsonFailedToLoad(e));
-                    }
+                    // once its done, hook up to stapler and things should be ready to go
+                    controller.install(hudson);
+
+                    // trigger the loading of changelogs in the background,
+                    // but give the system 10 seconds so that the first page
+                    // can be served quickly
+                    Trigger.timer.schedule(new SafeTimerTask() {
+                        public void doRun() {
+                            User.getUnknown().getBuilds();
+                        }
+                    }, 1000 * 10);
+                } catch (Error e) {
+                    logger.error("Failed to initialize Hudson", e);
+                    controller.install(new HudsonFailedToLoad(e));
+                    throw e;
+                } catch (Exception e) {
+                    logger.error("Failed to initialize Hudson", e);
+                    controller.install(new HudsonFailedToLoad(e));
                 }
-            }.start();
+            }
+        }.start();
     }
-    
-    public boolean canFinish(){
+
+    public boolean canFinish() {
         reCheck();
         return (getInstallableMandatoryPlugins().size() == 0) && (getUpdatableMandatoryPlugins().size() == 0);
     }
@@ -340,10 +328,10 @@ final public class InitialSetup {
                     Util.fixEmptyAndTrim(userName), Util.fixEmptyAndTrim(password), "on".equals(Util.fixNull(authNeeded)));
             return true;
 
-        }else{
-           proxyConfig.getXmlFile().delete();
-           proxyConfig.name = null;
-           return true;
+        } else {
+            proxyConfig.getXmlFile().delete();
+            proxyConfig.name = null;
+            return true;
         }
     }
 
@@ -376,7 +364,7 @@ final public class InitialSetup {
     }
 
     private void check() {
-        if (!pluginsDir.exists()){
+        if (!pluginsDir.exists()) {
             pluginsDir.mkdirs();
         }
         Set<String> installedPluginNames = installedPluginManager.getInstalledPluginNames();
@@ -395,7 +383,7 @@ final public class InitialSetup {
                         //Installed Mandatory Plugin. No updates available
                         installedMandatoryPlugins.add(availablePlugin);
                     }
-                } else  if (availablePlugin.getType().equals(UpdateSiteManager.FEATURED)) {
+                } else if (availablePlugin.getType().equals(UpdateSiteManager.FEATURED)) {
                     if (isNewerThan(availablePlugin.getVersion(), installedPlugin.getVersion())) {
                         //Updatabale featured Plugin update needed
                         updatableFeaturedPlugins.add(availablePlugin);
@@ -403,7 +391,7 @@ final public class InitialSetup {
                         //Installed featured Plugin. No updates available
                         installedFeaturedPlugins.add(availablePlugin);
                     }
-                }else  if (availablePlugin.getType().equals(UpdateSiteManager.RECOMMENDED)) {
+                } else if (availablePlugin.getType().equals(UpdateSiteManager.RECOMMENDED)) {
                     if (isNewerThan(availablePlugin.getVersion(), installedPlugin.getVersion())) {
                         //Updatabale recommended Plugin update needed
                         updatableRecommendedPlugins.add(availablePlugin);
@@ -418,10 +406,12 @@ final public class InitialSetup {
                 if (availablePlugin.getType().equals(UpdateSiteManager.MANDATORY)) {
                     //Mandatory Plugin. Need to be installed
                     installableMandatoryPlugins.add(availablePlugin);
-                } if (availablePlugin.getType().equals(UpdateSiteManager.FEATURED)) {
+                }
+                if (availablePlugin.getType().equals(UpdateSiteManager.FEATURED)) {
                     //Featured Plugin. Available for installation
                     installableFeaturedPlugins.add(availablePlugin);
-                }if (availablePlugin.getType().equals(UpdateSiteManager.RECOMMENDED)) {
+                }
+                if (availablePlugin.getType().equals(UpdateSiteManager.RECOMMENDED)) {
                     //Recommended Plugin. Available for installation
                     installableRecommendedPlugins.add(availablePlugin);
                 }
@@ -431,7 +421,7 @@ final public class InitialSetup {
 
     private List<AvailablePluginInfo> getNeededDependencies(AvailablePluginInfo pluginInfo) {
         List<AvailablePluginInfo> deps = new ArrayList<AvailablePluginInfo>();
-        
+
         if ((pluginInfo != null) && (pluginInfo.getDependencies().size() > 0)) {
             for (Map.Entry<String, String> e : pluginInfo.getDependencies().entrySet()) {
                 AvailablePluginInfo depPlugin = updateSiteManager.getAvailablePlugin(e.getKey());
@@ -446,8 +436,8 @@ final public class InitialSetup {
                     } else if (current.isOlderThan(requiredVersion)) {
                         deps.add(depPlugin);
                     }
-                }else{
-                    logger.error("Could not find " + e.getKey() + " which is required by " + pluginInfo.getDisplayName()); 
+                } else {
+                    logger.error("Could not find " + e.getKey() + " which is required by " + pluginInfo.getDisplayName());
                 }
             }
         }

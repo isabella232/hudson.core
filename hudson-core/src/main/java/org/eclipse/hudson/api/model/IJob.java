@@ -97,7 +97,8 @@ public interface IJob<JobT extends Job> extends Item {
     boolean isBuilding();
 
     /**
-     * @return flag, which shows whether all the build logs of dependency components will be kept.
+     * @return flag, which shows whether all the build logs of dependency
+     * components will be kept.
      */
     boolean isKeepDependencies();
 
@@ -117,9 +118,9 @@ public interface IJob<JobT extends Job> extends Item {
     /**
      * Programatically updates the next build number.
      * <p/>
-     * <p/>
-     * Much of Hudson assumes that the build number is unique and monotonic, so
-     * this method can only accept a new value that's bigger than
+     * <
+     * p/> Much of Hudson assumes that the build number is unique and monotonic,
+     * so this method can only accept a new value that's bigger than
      * {@link #getLastBuild()} returns. Otherwise it'll be no-op.
      *
      * @param next build number to set.
@@ -131,7 +132,7 @@ public interface IJob<JobT extends Job> extends Item {
     /**
      * Perform log rotation.
      *
-     * @throws IOException          if any.
+     * @throws IOException if any.
      * @throws InterruptedException if any.
      */
     void logRotate() throws IOException, InterruptedException;
@@ -147,7 +148,8 @@ public interface IJob<JobT extends Job> extends Item {
     boolean isBuildable();
 
     /**
-     * Gets all the {@link hudson.model.PermalinkProjectAction.Permalink}s defined for this job.
+     * Gets all the {@link hudson.model.PermalinkProjectAction.Permalink}s
+     * defined for this job.
      *
      * @return never null
      */
@@ -162,7 +164,8 @@ public interface IJob<JobT extends Job> extends Item {
 
     /**
      * @param rs target rangeSet.
-     * @return all the {@link Run}s whose build numbers matches the given {@link Fingerprint.RangeSet}.
+     * @return all the {@link Run}s whose build numbers matches the given
+     * {@link Fingerprint.RangeSet}.
      */
     <RunT extends Run> List<RunT> getBuilds(Fingerprint.RangeSet rs);
 
@@ -211,14 +214,16 @@ public interface IJob<JobT extends Job> extends Item {
     <RunT extends Run> RunT getFirstBuild();
 
     /**
-     * @return the last successful build, if any. Otherwise null. A successful build
-     *         would include either {@link Result#SUCCESS} or {@link Result#UNSTABLE}.
+     * @return the last successful build, if any. Otherwise null. A successful
+     * build would include either {@link Result#SUCCESS} or
+     * {@link Result#UNSTABLE}.
      * @see #getLastStableBuild()
      */
     <RunT extends Run> RunT getLastSuccessfulBuild();
 
     /**
-     * @return the last build that was anything but stable, if any. Otherwise null.
+     * @return the last build that was anything but stable, if any. Otherwise
+     * null.
      * @see #getLastSuccessfulBuild
      */
     <RunT extends Run> RunT getLastUnsuccessfulBuild();
@@ -246,17 +251,20 @@ public interface IJob<JobT extends Job> extends Item {
     <RunT extends Run> RunT getLastCompletedBuild();
 
     /**
-     * Returns the last 'numberOfBuilds' builds with a build result >= 'threshold'
+     * Returns the last 'numberOfBuilds' builds with a build result >=
+     * 'threshold'
      *
      * @param numberOfBuilds build count to return.
      * @param threshold required {@link Result} of the build.
-     * @return a list with the builds. May be smaller than 'numberOfBuilds' or even empty
-     *         if not enough builds satisfying the threshold have been found. Never null.
+     * @return a list with the builds. May be smaller than 'numberOfBuilds' or
+     * even empty if not enough builds satisfying the threshold have been found.
+     * Never null.
      */
     <RunT extends Run> List<RunT> getLastBuildsOverThreshold(int numberOfBuilds, Result threshold);
 
     /**
-     * @return build status image link. Info is taken from {@link BallColor#getImage()}.
+     * @return build status image link. Info is taken from
+     * {@link BallColor#getImage()}.
      * @see #getIconColor()
      * @see BallColor#getImage()
      */

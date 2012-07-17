@@ -25,6 +25,7 @@ import org.eclipse.hudson.api.model.ICascadingJob;
  * @author Nikita Levyankov
  */
 public class LogRotatorProjectProperty extends BaseProjectProperty<LogRotator> {
+
     public LogRotatorProjectProperty(ICascadingJob job) {
         super(job);
     }

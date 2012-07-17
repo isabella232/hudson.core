@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Winston Prakash
- *        
+ *
  *******************************************************************************/ 
 
 package org.eclipse.hudson.graph;
@@ -39,8 +39,9 @@ import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
 /**
- * Maintains several {@link TimeSeries} with different update frequencies to satisfy three goals;
- * (1) retain data over long timespan, (2) save memory, and (3) retain accurate data for the recent past.
+ * Maintains several {@link TimeSeries} with different update frequencies to
+ * satisfy three goals; (1) retain data over long timespan, (2) save memory, and
+ * (3) retain accurate data for the recent past.
  *
  * All in all, one instance uses about 8KB space.
  *
@@ -83,8 +84,8 @@ public class MultiStageTimeSeries {
     }
 
     /**
-     * @deprecated since 2009-04-05.
-     *      Use {@link #MultiStageTimeSeries(Localizable, Color, float, float)}
+     * @deprecated since 2009-04-05. Use
+     * {@link #MultiStageTimeSeries(Localizable, Color, float, float)}
      */
     public MultiStageTimeSeries(float initialValue, float decay) {
         this(Messages._MultiStageTimeSeries_EMPTY_STRING(), Color.WHITE, initialValue, decay);
@@ -135,13 +136,13 @@ public class MultiStageTimeSeries {
      * Choose which datapoint to use.
      */
     public enum TimeScale {
-     
+
         SEC10(TimeUnit2.SECONDS.toMillis(10)),
         MIN(TimeUnit2.MINUTES.toMillis(1)),
         HOUR(TimeUnit2.HOURS.toMillis(1));
         /**
-         * Number of milliseconds (10 secs, 1 min, and 1 hour)
-         * that this constant represents.
+         * Number of milliseconds (10 secs, 1 min, and 1 hour) that this
+         * constant represents.
          */
         public final long tick;
 
@@ -150,8 +151,8 @@ public class MultiStageTimeSeries {
         }
 
         /**
-         * Creates a new {@link DateFormat} suitable for processing
-         * this {@link TimeScale}.
+         * Creates a new {@link DateFormat} suitable for processing this
+         * {@link TimeScale}.
          */
         public DateFormat createDateFormat() {
             switch (this) {
@@ -178,10 +179,10 @@ public class MultiStageTimeSeries {
     }
 
     /**
-     * Represents the trend chart that consists of several {@link MultiStageTimeSeries}.
+     * Represents the trend chart that consists of several
+     * {@link MultiStageTimeSeries}.
      *
-     * <p>
-     * This object is renderable as HTTP response.
+     * <p> This object is renderable as HTTP response.
      */
     public static final class TrendChart implements HttpResponse {
 
@@ -196,36 +197,37 @@ public class MultiStageTimeSeries {
         }
 
         /**
-         * Creates a {@link DefaultCategoryDataset} for rendering a graph from a set of {@link MultiStageTimeSeries}.
+         * Creates a {@link DefaultCategoryDataset} for rendering a graph from a
+         * set of {@link MultiStageTimeSeries}.
          */
         private DataSet createDataset() {
-            
+
             DataSet<String, String> ds = new DataSet<String, String>();
-            
+
             DateFormat format = timeScale.createDateFormat();
 
             GraphSeries<String> xSeries = new GraphSeries<String>("Time");
             ds.setXSeries(xSeries);
-            
+
             float[] data = series.get(0).pick(timeScale).getHistory();
             Date date = new Date(System.currentTimeMillis() - timeScale.tick * data.length);
             for (int j = data.length - 1; j >= 0; j--) {
-                    date = new Date(date.getTime() + timeScale.tick);
-                    String timeStr = format.format(date);
-                    xSeries.add(timeStr); 
+                date = new Date(date.getTime() + timeScale.tick);
+                String timeStr = format.format(date);
+                xSeries.add(timeStr);
             }
-                
+
             for (MultiStageTimeSeries mstSeries : series) {
                 GraphSeries<Number> ySeries = new GraphSeries<Number>(GraphSeries.TYPE_LINE, mstSeries.title.toString(), mstSeries.color, false, false);
                 ySeries.setStacked(false);
                 ds.addYSeries(ySeries);
                 data = mstSeries.pick(timeScale).getHistory();
-                 
+
                 for (int j = data.length - 1; j >= 0; j--) {
                     ySeries.add(data[j]);
                 }
             }
-            
+
             // For backward compatibility with JFreechart
             float[][] dataPoints = new float[series.size()][];
             for (int i = 0; i < series.size(); i++) {
@@ -239,18 +241,18 @@ public class MultiStageTimeSeries {
                 date = new Date(date.getTime() + timeScale.tick);
                 String timeStr = format.format(date);
                 for (int j = 0; j < dataPoints.length; j++) {
-                   ds.add((double)dataPoints[j][i], series.get(j).title.toString(), timeStr);
+                    ds.add((double) dataPoints[j][i], series.get(j).title.toString(), timeStr);
                 }
             }
-            
+
             return ds;
         }
-        
-        public Graph createGraph(){
+
+        public Graph createGraph() {
             Graph graph = new Graph(-1, 500, 400);
             graph.setYAxisLabel("");
             graph.setData(createDataset());
-            graph.setChartType(Graph.TYPE_LINE); 
+            graph.setChartType(Graph.TYPE_LINE);
             graph.setMultiStageTimeSeries(series);
             return graph;
         }
@@ -259,11 +261,11 @@ public class MultiStageTimeSeries {
          * Renders this object as an image.
          */
         public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
-            createGraph().doPng(req, rsp); 
+            createGraph().doPng(req, rsp);
         }
     }
 
     public static TrendChart createTrendChart(TimeScale scale, MultiStageTimeSeries... data) {
-        return new TrendChart(scale,data);
+        return new TrendChart(scale, data);
     }
 }

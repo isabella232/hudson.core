@@ -7,33 +7,30 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Winston Prakash
- *      
+ *
  *******************************************************************************/ 
 
 package org.eclipse.hudson.jna;
 
-
 /**
- * Exception to be thrown when a native function is not supported
- * or when the function failed to execute
- * 
+ * Exception to be thrown when a native function is not supported or when the
+ * function failed to execute
+ *
  * @author Winston Prakash
  * @since 3.0.0
  */
 public class NativeAccessException extends RuntimeException {
-    
+
     public static int PERMISSION = 1;
-    
     private int code;
-    
 
     public NativeAccessException(String errorMsg) {
         super(errorMsg);
     }
-    
+
     public NativeAccessException(String errorMsg, int code) {
         super(errorMsg);
         this.code = code;
@@ -42,7 +39,7 @@ public class NativeAccessException extends RuntimeException {
     public NativeAccessException(Throwable exc) {
         super(exc);
     }
-    
+
     public int getCode() {
         return code;
     }

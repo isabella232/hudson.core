@@ -76,7 +76,8 @@ public interface IAbstractProject extends IJob {
     DescribableList<Trigger<?>, TriggerDescriptor> getTriggerDescribableList();
 
     /**
-     * Gets the specific trigger, should be null if the property is not configured for this job.
+     * Gets the specific trigger, should be null if the property is not
+     * configured for this job.
      *
      * @param clazz class of trigger
      * @return T
@@ -91,7 +92,8 @@ public interface IAbstractProject extends IJob {
     void setTriggers(List<Trigger<?>> triggerList);
 
     /**
-     * Adds a new {@link Trigger} to this {@link hudson.model.Project} if not active yet.
+     * Adds a new {@link Trigger} to this {@link hudson.model.Project} if not
+     * active yet.
      *
      * @param trigger new trigger.
      * @throws IOException if any.
@@ -99,7 +101,8 @@ public interface IAbstractProject extends IJob {
     void addTrigger(Trigger<?> trigger) throws IOException;
 
     /**
-     * Removes {@link Trigger} frin this {@link hudson.model.Project} by {@link TriggerDescriptor}.
+     * Removes {@link Trigger} frin this {@link hudson.model.Project} by
+     * {@link TriggerDescriptor}.
      *
      * @param trigger descriptor of trigger.
      * @throws IOException if any.
@@ -121,7 +124,8 @@ public interface IAbstractProject extends IJob {
     void setCleanWorkspaceRequired(boolean cleanWorkspaceRequired);
 
     /**
-     * Indicates whether build should be blocked while downstream project is building.
+     * Indicates whether build should be blocked while downstream project is
+     * building.
      *
      * @return true if yes, false - otherwise.
      */
@@ -136,7 +140,8 @@ public interface IAbstractProject extends IJob {
     void setBlockBuildWhenDownstreamBuilding(boolean b) throws IOException;
 
     /**
-     * Indicates whether build should be blocked while upstream project is building.
+     * Indicates whether build should be blocked while upstream project is
+     * building.
      *
      * @return true if yes, false - otherwise.
      */
@@ -165,7 +170,8 @@ public interface IAbstractProject extends IJob {
     int getQuietPeriod();
 
     /**
-     * Sets the custom quiet period of this project, or revert to the global default if null is given.
+     * Sets the custom quiet period of this project, or revert to the global
+     * default if null is given.
      *
      * @param seconds quiet period
      * @throws IOException if any.
@@ -173,15 +179,16 @@ public interface IAbstractProject extends IJob {
     void setQuietPeriod(Integer seconds) throws IOException;
 
     /**
-     * If this project is configured to be always built on this node,
-     * return that {@link hudson.model.Node}. Otherwise null.
+     * If this project is configured to be always built on this node, return
+     * that {@link hudson.model.Node}. Otherwise null.
      *
      * @return {@link hudson.model.Label} instance.
      */
     Label getAssignedLabel();
 
     /**
-     * Gets the textual representation of the assigned label as it was entered by the user.
+     * Gets the textual representation of the assigned label as it was entered
+     * by the user.
      *
      * @return string
      */
@@ -196,7 +203,8 @@ public interface IAbstractProject extends IJob {
     void setAssignedLabel(Label label) throws IOException;
 
     /**
-     * Assigns this job to the given node. A convenience method over {@link #setAssignedLabel(Label)}.
+     * Assigns this job to the given node. A convenience method over
+     * {@link #setAssignedLabel(Label)}.
      *
      * @param node node.
      * @throws java.io.IOException exception
@@ -242,10 +250,11 @@ public interface IAbstractProject extends IJob {
     /**
      * Gets a workspace for some build of this project.
      * <p/>
-     * <p/>
-     * This is useful for obtaining a workspace for the purpose of form field validation, where exactly
-     * which build the workspace belonged is less important. The implementation makes a cursory effort
-     * to find some workspace.
+     * <
+     * p/> This is useful for obtaining a workspace for the purpose of form
+     * field validation, where exactly which build the workspace belonged is
+     * less important. The implementation makes a cursory effort to find some
+     * workspace.
      *
      * @return null if there's no available workspace.
      * @since 1.319
@@ -260,8 +269,8 @@ public interface IAbstractProject extends IJob {
     <R extends AbstractBuild> R getSomeBuildWithWorkspace();
 
     /**
-     * Used in <tt>sidepanel.jelly</tt> to decide whether to display
-     * the config/delete/build links.
+     * Used in <tt>sidepanel.jelly</tt> to decide whether to display the
+     * config/delete/build links.
      *
      * @return true - if configurable, false - otherwise.
      */
@@ -294,7 +303,7 @@ public interface IAbstractProject extends IJob {
      * Cleans project workspace.
      *
      * @return true if success, false otherwise.
-     * @throws IOException          if any.
+     * @throws IOException if any.
      * @throws InterruptedException if any.
      */
     boolean cleanWorkspace() throws IOException, InterruptedException;
@@ -325,20 +334,24 @@ public interface IAbstractProject extends IJob {
     void setJDK(JDK jdk) throws IOException;
 
     /**
-     * @return the other {@link AbstractProject}s that should be built when a build of this project is completed.
+     * @return the other {@link AbstractProject}s that should be built when a
+     * build of this project is completed.
      */
     List<AbstractProject> getDownstreamProjects();
 
     /**
-     * @return the other {@link AbstractProject}s that should be built before a build of this project is started.
+     * @return the other {@link AbstractProject}s that should be built before a
+     * build of this project is started.
      */
     List<AbstractProject> getUpstreamProjects();
 
     /**
-     * Returns only those upstream projects that defines {@link hudson.tasks.BuildTrigger} to this project.
-     * This is a subset of {@link #getUpstreamProjects()}
+     * Returns only those upstream projects that defines
+     * {@link hudson.tasks.BuildTrigger} to this project. This is a subset of
+     * {@link #getUpstreamProjects()}
      *
-     * @return A List of upstream projects that has a {@link hudson.tasks.BuildTrigger} to this project.
+     * @return A List of upstream projects that has a
+     * {@link hudson.tasks.BuildTrigger} to this project.
      */
     List<AbstractProject> getBuildTriggerUpstreamProjects();
 
@@ -349,7 +362,8 @@ public interface IAbstractProject extends IJob {
     Set<AbstractProject> getTransitiveUpstreamProjects();
 
     /**
-     * @return all the downstream projects including transitive downstream projects.
+     * @return all the downstream projects including transitive downstream
+     * projects.
      * @since 1.138
      */
     Set<AbstractProject> getTransitiveDownstreamProjects();
@@ -359,8 +373,8 @@ public interface IAbstractProject extends IJob {
      * and that project (as the sink.)
      *
      * @param that {@link AbstractProject} to find relations.
-     * @return can be empty but not null. build number of this project to the build
-     *         numbers of that project.
+     * @return can be empty but not null. build number of this project to the
+     * build numbers of that project.
      */
     SortedMap<Integer, Fingerprint.RangeSet> getRelationship(AbstractProject that);
 }

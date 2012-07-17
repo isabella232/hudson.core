@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Winston Prakash
- *      
+ *
  *
  *******************************************************************************/ 
 
@@ -20,11 +20,15 @@ import java.awt.Color;
 
 /**
  * Information about Chart Label
+ *
  * @author Winston Prakash
  * @since 3.0.0
  */
-abstract public class ChartLabel implements Comparable<ChartLabel>{
+abstract public class ChartLabel implements Comparable<ChartLabel> {
+
     abstract public Color getColor(int row, int column);
+
     abstract public String getLink(int row, int column);
+
     abstract public String getToolTip(int row, int column);
 }

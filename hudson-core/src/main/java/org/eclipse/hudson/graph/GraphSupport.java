@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Winston Prakash
- *      
+ *
  *
  *******************************************************************************/ 
 
@@ -27,10 +27,9 @@ import java.util.List;
 /**
  * Extension point for adding Graph Support to Hudson
  *
- * <p>
- * This object can have an optional <tt>config.jelly</tt> to configure the Graph Support
- * <p>
- * A default constructor is needed to create GraphSupport in the default configuration.
+ * <p> This object can have an optional <tt>config.jelly</tt> to configure the
+ * Graph Support <p> A default constructor is needed to create GraphSupport in
+ * the default configuration.
  *
  * @author Winston Prakash
  * @since 3.0.0
@@ -46,14 +45,20 @@ public abstract class GraphSupport extends AbstractDescribableImpl<GraphSupport>
     }
 
     abstract public void setChartType(int chartType);
-    abstract public void setTitle(String title);
-    abstract public void setXAxisLabel(String xLabel);
-    abstract public void setYAxisLabel(String yLabel);
-    abstract public void setData(DataSet data);
-    abstract public void setMultiStageTimeSeries(List<MultiStageTimeSeries> multiStageTimeSeries);
-    abstract public BufferedImage render(int width, int height);
-    abstract public String getImageMap(String id, int width, int height);
 
+    abstract public void setTitle(String title);
+
+    abstract public void setXAxisLabel(String xLabel);
+
+    abstract public void setYAxisLabel(String yLabel);
+
+    abstract public void setData(DataSet data);
+
+    abstract public void setMultiStageTimeSeries(List<MultiStageTimeSeries> multiStageTimeSeries);
+
+    abstract public BufferedImage render(int width, int height);
+
+    abstract public String getImageMap(String id, int width, int height);
 
     @Override
     public GraphSupportDescriptor getDescriptor() {

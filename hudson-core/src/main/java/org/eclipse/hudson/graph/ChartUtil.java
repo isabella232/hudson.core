@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Winston Prakash
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -18,7 +18,6 @@ package org.eclipse.hudson.graph;
 
 import hudson.model.AbstractBuild;
 import java.awt.Font;
-
 
 /**
  * Chart generation utility code around JFreeChart.
@@ -29,32 +28,30 @@ import java.awt.Font;
  * @author Kohsuke Kawaguchi
  */
 public class ChartUtil {
-    
+
     /**
-     * @deprecated
-     *      Use {@code awtProblemCause!=null} instead. As of 1.267.
+     * @deprecated Use {@code awtProblemCause!=null} instead. As of 1.267.
      */
     public static boolean awtProblem = false;
-
     /**
      * See issue 93. Detect an error in X11 and handle it gracefully.
      */
     public static Throwable awtProblemCause = null;
-    
+
     static {
         try {
-            new Font("SansSerif",Font.BOLD,18).toString();
+            new Font("SansSerif", Font.BOLD, 18).toString();
         } catch (Throwable t) {
             awtProblemCause = t;
             awtProblem = true;
         }
     }
-    
-    
+
     /**
      * Can be used as a graph label. Only displays numbers.
      */
     public static abstract class NumberOnlyBuildLabel extends ChartLabel {
+
         public final AbstractBuild build;
 
         public NumberOnlyBuildLabel(AbstractBuild build) {
@@ -62,14 +59,16 @@ public class ChartUtil {
         }
 
         public int compareTo(NumberOnlyBuildLabel that) {
-            return this.build.number-that.build.number;
+            return this.build.number - that.build.number;
         }
 
         @Override
         public boolean equals(Object o) {
-            if(!(o instanceof NumberOnlyBuildLabel))    return false;
+            if (!(o instanceof NumberOnlyBuildLabel)) {
+                return false;
+            }
             NumberOnlyBuildLabel that = (NumberOnlyBuildLabel) o;
-            return build==that.build;
+            return build == that.build;
         }
 
         @Override

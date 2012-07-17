@@ -19,10 +19,11 @@ import hudson.triggers.Trigger;
 import org.eclipse.hudson.api.model.ICascadingJob;
 
 /**
- * Property for triggers in case of we should use child project trigger
- * instead of parent project if they are equals.
+ * Property for triggers in case of we should use child project trigger instead
+ * of parent project if they are equals.
  */
 public class TriggerProjectProperty extends BaseProjectProperty<Trigger> {
+
     public TriggerProjectProperty(ICascadingJob job) {
         super(job);
     }
