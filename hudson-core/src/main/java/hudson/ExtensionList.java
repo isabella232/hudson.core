@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -38,18 +38,18 @@ import java.util.logging.Logger;
 /**
  * Retains the known extension instances for the given type 'T'.
  *
- * <p>
- * Extensions are loaded lazily on demand and automatically by using {@link ExtensionFinder}, but this
- * class also provides a mechanism to provide compatibility with the older {@link DescriptorList}-based
- * manual registration,
+ * <p> Extensions are loaded lazily on demand and automatically by using
+ * {@link ExtensionFinder}, but this class also provides a mechanism to provide
+ * compatibility with the older {@link DescriptorList}-based manual
+ * registration,
  *
- * <p>
- * All {@link ExtensionList} instances should be owned by {@link Hudson}, even though
- * extension points can be defined by anyone on any type. Use {@link Hudson#getExtensionList(Class)}
- * and {@link Hudson#getDescriptorList(Class)} to obtain the instances.
+ * <p> All {@link ExtensionList} instances should be owned by {@link Hudson},
+ * even though extension points can be defined by anyone on any type. Use
+ * {@link Hudson#getExtensionList(Class)} and
+ * {@link Hudson#getDescriptorList(Class)} to obtain the instances.
  *
- * @param <T>
- *      Type of the extension point. This class holds instances of the subtypes of 'T'. 
+ * @param <T> Type of the extension point. This class holds instances of the
+ * subtypes of 'T'.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.286
@@ -58,31 +58,32 @@ import java.util.logging.Logger;
  */
 public class ExtensionList<T> extends AbstractList<T> {
     //TODO: review and check whether we can do it private
+
     public final Hudson hudson;
     public final Class<T> extensionType;
-
     /**
      * Once discovered, extensions are retained here.
      */
     @CopyOnWrite
     private volatile List<ExtensionComponent<T>> extensions;
-
     /**
      * Place to store manually registered instances with the per-Hudson scope.
-     * {@link CopyOnWriteArrayList} is used here to support concurrent iterations and mutation.
+     * {@link CopyOnWriteArrayList} is used here to support concurrent
+     * iterations and mutation.
      */
     private final CopyOnWriteArrayList<ExtensionComponent<T>> legacyInstances;
 
     protected ExtensionList(Hudson hudson, Class<T> extensionType) {
-        this(hudson,extensionType,new CopyOnWriteArrayList<ExtensionComponent<T>>());
+        this(hudson, extensionType, new CopyOnWriteArrayList<ExtensionComponent<T>>());
     }
 
     /**
      *
-     * @param legacyStore
-     *      Place to store manually registered instances. The version of the constructor that
-     *      omits this uses a new {@link Vector}, making the storage lifespan tied to the life of  {@link ExtensionList}.
-     *      If the manually registered instances are scoped to VM level, the caller should pass in a static list.
+     * @param legacyStore Place to store manually registered instances. The
+     * version of the constructor that omits this uses a new {@link Vector},
+     * making the storage lifespan tied to the life of {@link ExtensionList}. If
+     * the manually registered instances are scoped to VM level, the caller
+     * should pass in a static list.
      */
     protected ExtensionList(Hudson hudson, Class<T> extensionType, CopyOnWriteArrayList<ExtensionComponent<T>> legacyStore) {
         this.hudson = hudson;
@@ -95,16 +96,18 @@ public class ExtensionList<T> extends AbstractList<T> {
      * or return null.
      */
     public <U extends T> U get(Class<U> type) {
-        for (T ext : this)
-            if(ext.getClass()==type)
+        for (T ext : this) {
+            if (ext.getClass() == type) {
                 return type.cast(ext);
+            }
+        }
         return null;
     }
 
     @Override
     public Iterator<T> iterator() {
         // we need to intercept mutation, so for now don't allow Iterator.remove
-        return new AdaptedIterator<ExtensionComponent<T>,T>(Iterators.readOnly(ensureLoaded().iterator())) {
+        return new AdaptedIterator<ExtensionComponent<T>, T>(Iterators.readOnly(ensureLoaded().iterator())) {
             protected T adapt(ExtensionComponent<T> item) {
                 return item.getInstance();
             }
@@ -112,7 +115,8 @@ public class ExtensionList<T> extends AbstractList<T> {
     }
 
     /**
-     * Gets the same thing as the 'this' list represents, except as {@link ExtensionComponent}s.
+     * Gets the same thing as the 'this' list represents, except as
+     * {@link ExtensionComponent}s.
      */
     public List<ExtensionComponent<T>> getComponents() {
         return Collections.unmodifiableList(ensureLoaded());
@@ -128,10 +132,10 @@ public class ExtensionList<T> extends AbstractList<T> {
 
     @Override
     public synchronized boolean remove(Object o) {
-        removeComponent(legacyInstances,o);
-        if(extensions!=null) {
+        removeComponent(legacyInstances, o);
+        if (extensions != null) {
             List<ExtensionComponent<T>> r = new ArrayList<ExtensionComponent<T>>(extensions);
-            removeComponent(r,o);
+            removeComponent(r, o);
             extensions = sort(r);
         }
         return true;
@@ -139,7 +143,7 @@ public class ExtensionList<T> extends AbstractList<T> {
 
     private <T> void removeComponent(Collection<ExtensionComponent<T>> collection, Object t) {
         for (Iterator<ExtensionComponent<T>> itr = collection.iterator(); itr.hasNext();) {
-            ExtensionComponent<T> c =  itr.next();
+            ExtensionComponent<T> c = itr.next();
             if (c.getInstance().equals(t)) {
                 collection.remove(c);
                 return;
@@ -157,14 +161,13 @@ public class ExtensionList<T> extends AbstractList<T> {
     /**
      * Write access will put the instance into a legacy store.
      *
-     * @deprecated since 2009-02-23.
-     *      Prefer automatic registration.
+     * @deprecated since 2009-02-23. Prefer automatic registration.
      */
     @Override
     public synchronized boolean add(T t) {
         legacyInstances.add(new ExtensionComponent<T>(t));
         // if we've already filled extensions, add it
-        if(extensions!=null) {
+        if (extensions != null) {
             List<ExtensionComponent<T>> r = new ArrayList<ExtensionComponent<T>>(extensions);
             r.add(new ExtensionComponent<T>(t));
             extensions = sort(r);
@@ -183,9 +186,11 @@ public class ExtensionList<T> extends AbstractList<T> {
      * @since 1.349
      */
     public T getDynamic(String className) {
-        for (T t : this)
-            if (t.getClass().getName().equals(className))
+        for (T t : this) {
+            if (t.getClass().getName().equals(className)) {
                 return t;
+            }
+        }
         return null;
     }
 
@@ -198,13 +203,14 @@ public class ExtensionList<T> extends AbstractList<T> {
     }
 
     private List<ExtensionComponent<T>> ensureLoaded() {
-        if(extensions!=null)
+        if (extensions != null) {
             return extensions; // already loaded
-        if(Hudson.getInstance().getInitLevel().compareTo(InitMilestone.PLUGINS_PREPARED)<0)
+        }
+        if (Hudson.getInstance().getInitLevel().compareTo(InitMilestone.PLUGINS_PREPARED) < 0) {
             return legacyInstances; // can't perform the auto discovery until all plugins are loaded, so just make the legacy instances visible
-
+        }
         synchronized (getLoadLock()) {
-            if(extensions==null) {
+            if (extensions == null) {
                 List<ExtensionComponent<T>> r = load();
                 r.addAll(legacyInstances);
                 extensions = sort(r);
@@ -217,22 +223,25 @@ public class ExtensionList<T> extends AbstractList<T> {
      * Chooses the object that locks the loading of the extension instances.
      */
     protected Object getLoadLock() {
-        return hudson.lookup.setIfNull(Lock.class,new Lock());
+        return hudson.lookup.setIfNull(Lock.class, new Lock());
     }
 
     /**
-     * Loading an {@link ExtensionList} can result in a nested loading of another {@link ExtensionList}.
-     * What that means is that we need a single lock that spans across all the {@link ExtensionList}s,
-     * or else we can end up in a dead lock.
+     * Loading an {@link ExtensionList} can result in a nested loading of
+     * another {@link ExtensionList}. What that means is that we need a single
+     * lock that spans across all the {@link ExtensionList}s, or else we can end
+     * up in a dead lock.
      */
-    private static final class Lock {}
+    private static final class Lock {
+    }
 
     /**
      * Loads all the extensions.
      */
     protected List<ExtensionComponent<T>> load() {
-        if (LOGGER.isLoggable(Level.FINE))
-            LOGGER.log(Level.FINE,"Loading ExtensionList: "+extensionType);
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.log(Level.FINE, "Loading ExtensionList: " + extensionType);
+        }
 
         return hudson.getPluginManager().getPluginStrategy().findComponents(extensionType, hudson);
     }
@@ -241,8 +250,8 @@ public class ExtensionList<T> extends AbstractList<T> {
      * If the {@link ExtensionList} implementation requires sorting extensions,
      * override this method to do so.
      *
-     * <p>
-     * The implementation should copy a list, do a sort, and return the new instance.
+     * <p> The implementation should copy a list, do a sort, and return the new
+     * instance.
      */
     protected List<ExtensionComponent<T>> sort(List<ExtensionComponent<T>> r) {
         r = new ArrayList<ExtensionComponent<T>>(r);
@@ -251,17 +260,16 @@ public class ExtensionList<T> extends AbstractList<T> {
     }
 
     public static <T> ExtensionList<T> create(Hudson hudson, Class<T> type) {
-        if(type.getAnnotation(LegacyInstancesAreScopedToHudson.class)!=null)
-            return new ExtensionList<T>(hudson,type);
-        else {
-            return new ExtensionList<T>(hudson,type,staticLegacyInstances.get(type));
+        if (type.getAnnotation(LegacyInstancesAreScopedToHudson.class) != null) {
+            return new ExtensionList<T>(hudson, type);
+        } else {
+            return new ExtensionList<T>(hudson, type, staticLegacyInstances.get(type));
         }
     }
-
     /**
      * Places to store static-scope legacy instances.
      */
-    private static final Memoizer<Class,CopyOnWriteArrayList> staticLegacyInstances = new Memoizer<Class,CopyOnWriteArrayList>() {
+    private static final Memoizer<Class, CopyOnWriteArrayList> staticLegacyInstances = new Memoizer<Class, CopyOnWriteArrayList>() {
         public CopyOnWriteArrayList compute(Class key) {
             return new CopyOnWriteArrayList();
         }
@@ -273,6 +281,5 @@ public class ExtensionList<T> extends AbstractList<T> {
     public static void clearLegacyInstances() {
         staticLegacyInstances.clear();
     }
-
     private static final Logger LOGGER = Logger.getLogger(ExtensionList.class.getName());
 }

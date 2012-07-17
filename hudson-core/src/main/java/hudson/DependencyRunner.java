@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *   Kohsuke Kawaguchi, Winston Prakash, Brian Westrich, Jean-Baptiste Quenot
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -29,17 +29,13 @@ import java.util.logging.Logger;
 import org.springframework.security.Authentication;
 import org.springframework.security.context.SecurityContextHolder;
 
-
-
 /**
  * Runs a job on all projects in the order of dependencies
  */
 public class DependencyRunner implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(DependencyRunner.class.getName());
-	
     ProjectRunnable runnable;
-
     List<AbstractProject> polledProjects = new ArrayList<AbstractProject>();
 
     public DependencyRunner(ProjectRunnable runnable) {
@@ -54,16 +50,17 @@ public class DependencyRunner implements Runnable {
             Set<AbstractProject> topLevelProjects = new HashSet<AbstractProject>();
             // Get all top-level projects
             LOGGER.fine("assembling top level projects");
-            for (AbstractProject p : Hudson.getInstance().getAllItems(AbstractProject.class))
+            for (AbstractProject p : Hudson.getInstance().getAllItems(AbstractProject.class)) {
                 if (p.getUpstreamProjects().size() == 0) {
                     LOGGER.fine("adding top level project " + p.getName());
                     topLevelProjects.add(p);
                 } else {
                     LOGGER.fine("skipping project since not a top level project: " + p.getName());
                 }
+            }
             populate(topLevelProjects);
             for (AbstractProject p : polledProjects) {
-                    LOGGER.fine("running project in correct dependency order: " + p.getName());
+                LOGGER.fine("running project in correct dependency order: " + p.getName());
                 runnable.run(p);
             }
         } finally {
@@ -72,11 +69,11 @@ public class DependencyRunner implements Runnable {
     }
 
     private void populate(Collection<? extends AbstractProject> projectList) {
-        for (AbstractProject<?,?> p : projectList) {
+        for (AbstractProject<?, ?> p : projectList) {
             if (polledProjects.contains(p)) {
                 // Project will be readded at the queue, so that we always use
                 // the longest path
-            	LOGGER.fine("removing project " + p.getName() + " for re-add");
+                LOGGER.fine("removing project " + p.getName() + " for re-add");
                 polledProjects.remove(p);
             }
 
@@ -89,6 +86,7 @@ public class DependencyRunner implements Runnable {
     }
 
     public interface ProjectRunnable {
+
         void run(AbstractProject p);
     }
 }

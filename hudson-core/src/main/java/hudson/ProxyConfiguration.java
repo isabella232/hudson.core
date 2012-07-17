@@ -10,7 +10,7 @@
  *
  * Contributors:
  * 
-* Kohsuke Kawaguchi, Winston Prakash
+ * Kohsuke Kawaguchi, Winston Prakash
  *
  *
  ******************************************************************************
@@ -57,7 +57,6 @@ public final class ProxyConfiguration implements Saveable {
     public String noProxyFor;
     private int TIME_OUT_RETRY_COUNT = 5;
     private int CONNECTION_TIME_OUT_MS = 2000;
-    
     private transient Logger logger = LoggerFactory.getLogger(ProxyConfiguration.class);
     /**
      * Possibly null proxy user name and password. Password is base64 scrambled
@@ -66,18 +65,17 @@ public final class ProxyConfiguration implements Saveable {
     private String userName;
     private String password;
     private boolean authNeeded = false;
-    
     private File rootDir;
-    
-    public ProxyConfiguration(File dir) throws IOException{
+
+    public ProxyConfiguration(File dir) throws IOException {
         rootDir = dir;
         load();
     }
-    
+
     public ProxyConfiguration(String name, int port) {
         this(name, port, null, null, null, false);
     }
-    
+
     public ProxyConfiguration(String name, int port, String noProxyFor, String userName, String password, boolean authNeeded) {
         configure(name, port, noProxyFor, userName, password, authNeeded);
     }
@@ -99,7 +97,7 @@ public final class ProxyConfiguration implements Saveable {
     public int getPort() {
         return port;
     }
-    
+
     public String getNoProxyFor() {
         return noProxyFor;
     }
@@ -148,8 +146,8 @@ public final class ProxyConfiguration implements Saveable {
     }
 
     public URLConnection openUrl(URL url) throws IOException {
-        
-        if (name == null){
+
+        if (name == null) {
             URLConnection urlConnection = url.openConnection();
             connect(urlConnection);
             return urlConnection;
@@ -179,8 +177,8 @@ public final class ProxyConfiguration implements Saveable {
         connect(urlConnection);
         return urlConnection;
     }
-    
-    private void connect(URLConnection urlConnection) throws IOException{
+
+    private void connect(URLConnection urlConnection) throws IOException {
         boolean connected = false;
         int count = 0;
         urlConnection.setConnectTimeout(CONNECTION_TIME_OUT_MS);
@@ -207,8 +205,8 @@ public final class ProxyConfiguration implements Saveable {
         }
 
     }
-    
-     /**
+
+    /**
      * This method should be used wherever {@link URL#openConnection()} to
      * internet URLs is invoked directly.
      */
@@ -224,7 +222,6 @@ public final class ProxyConfiguration implements Saveable {
         }
 
     }
-    
     private static final XStream XSTREAM = new XStream2();
 
     static {

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -24,7 +24,6 @@ import hudson.model.Hudson;
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
  * @since 2.1.0
  */
- 
 @Extension(ordinal = Integer.MAX_VALUE)
 public class SystemQuietingDownGlobalMessage
         extends GlobalMessage {

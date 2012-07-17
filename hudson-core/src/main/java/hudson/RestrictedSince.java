@@ -7,26 +7,27 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
+ *
  *       Kohsuke Kawaguchi
  *
  *******************************************************************************/ 
 
 package hudson;
 
-
 import java.lang.annotation.Documented;
 
 /**
- * Accompanies {@link Depricated} annotation to indicate when the access restriction was placed.
+ * Accompanies {@link Depricated} annotation to indicate when the access
+ * restriction was placed.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.355
  */
 @Documented
 public @interface RestrictedSince {
+
     /**
      * Hudson version number that this deprecation has started.
      */
