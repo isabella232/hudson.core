@@ -97,9 +97,15 @@
                                 </div>
                             </li>
                         </ul> 
-                        <div class="buttonBar">
-                            <input type="button" id="updateButton" value="${%Update}" />
-                        </div>
+                        <j:if test="${!it.updatablePlugins.size() == 0}">
+                            <div class="buttonBar">
+                                <input type="button" id="updateButton" value="${%Update}" />
+                                <div id="updateProgress">
+                                    <span>Updating .. </span>
+                                    <img src="${imagesURL}/progressbar.gif" style="margin-bottom: -10px; margin-left: 5px;"/>
+                                </div>
+                            </div>
+                        </j:if>
                         <br/>
                         <span id="pluginUpdateMsg">
                               <!-- Plugin update operation message injected -->
@@ -314,6 +320,10 @@
                             
                         </div>
                         <div class="buttonBar">
+                            <div id="installProgress"> 
+                                <span>Installing .. </span>
+                                <img src="${imagesURL}/progressbar.gif" style="margin-bottom: -10px; margin-left: 5px;"/>
+                            </div>
                             <input type="button" style="margin-right: 15px;" id="installButton" value="${%Install}" />
                         </div>
                         <br/>

@@ -8,6 +8,8 @@
 jQuery.noConflict();
 
 var filesToUpload;
+var updateCount;
+var installCount;
 
 jQuery(document).ready(function() {
     
@@ -36,8 +38,11 @@ jQuery(document).ready(function() {
     var installButton = jQuery('#installButton');
     installButton.button();
     installButton.click(function() {
-        jQuery("#pluginInstallMsg").hide()
+        jQuery(this).hide();
+        jQuery('#installProgress').show();
+        jQuery("#pluginInstallMsg").hide();
         var pluginsToInstall = getPluginsToInstall();
+        installCount = pluginsToInstall.length;
         jQuery(pluginsToInstall).each(function(){
             installPlugin(this);
         });
@@ -46,8 +51,11 @@ jQuery(document).ready(function() {
     var updateButton = jQuery('#updateButton');
     updateButton.button();
     updateButton.click(function() {
+        jQuery(this).hide();
+        jQuery('#updateProgress').show();
         jQuery("#pluginUpdateMsg").hide();
         var pluginsToUpdate = getPluginsToUpdate();
+        updateCount = pluginsToUpdate.length;
         jQuery(pluginsToUpdate).each(function(){
             installPlugin(this);
         });
@@ -215,6 +223,11 @@ function installPlugin(selected){
             });
             jQuery(selected).attr("checked", false);
             jQuery('#restart-message').show();
+            installCount--;
+            if (installCount == 0){
+                jQuery('#installProgress').hide();
+                jQuery('#installButton').show();
+            }
         },
         error: function(){
             jQuery(".install_img_" + jQuery(selected).val()).each(function(){
@@ -222,6 +235,11 @@ function installPlugin(selected){
                 jQuery(this).attr('src', imageRoot + '/error.png');
             });
             showMessage(jQuery("#pluginInstallMsg"), msg.responseText, true);
+            installCount--;
+            if (installCount == 0){
+                jQuery('#installProgress').hide();
+                jQuery('#installButton').show();
+            }
         },
         statusCode: {
             403: function() {
@@ -253,6 +271,11 @@ function updatePlugin(selected){
             });
             jQuery(selected).attr("checked", false);
             jQuery('#restart-message').show();
+            updateCount--;
+            if (updateCount == 0){
+                jQuery('#updateProgress').hide();
+                jQuery('#updateButton').show();
+            }
         },
         error: function(){
             jQuery(".update_img_" + jQuery(selected).val()).each(function(){
@@ -260,6 +283,11 @@ function updatePlugin(selected){
                 jQuery(this).attr('src', imageRoot + '/error.png');
             });
             showMessage(jQuery("#pluginUpdateMsg"), msg.responseText, true);
+            updateCount--;
+            if (updateCount == 0){
+                jQuery('#updateProgress').hide();
+                jQuery('#updateButton').show();
+            }
         },
         statusCode: {
             403: function() {
@@ -438,10 +466,3 @@ function refreshUpdateCenter(){
         }
     }); 
 }
-
-
-
- 
-
-
-

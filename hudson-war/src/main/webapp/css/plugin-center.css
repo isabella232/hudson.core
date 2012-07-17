@@ -72,6 +72,16 @@ p {
     margin-top: 10px;
 }
 
+#installProgress{
+    float: right;
+    display: none;
+}
+
+#updateProgress{
+    float: right;
+    display: none;
+}
+
 #outerTabs {
     padding: 0px;
     background: none;
