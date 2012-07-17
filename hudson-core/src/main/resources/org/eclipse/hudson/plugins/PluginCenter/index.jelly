@@ -97,7 +97,7 @@
                                 </div>
                             </li>
                         </ul> 
-                        <j:if test="${!it.updatablePlugins.size() == 0}">
+                        <j:if test="${!(it.updatablePlugins.size() == 0)}">
                             <div class="buttonBar">
                                 <input type="button" id="updateButton" value="${%Update}" />
                                 <div id="updateProgress">

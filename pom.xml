@@ -207,7 +207,7 @@
         
         <!--Libraries-->
         <crypto-util.version>1.0</crypto-util.version>
-        <jtidy.version>r938</jtidy.version>
+        <jtidy.version>4aug2000r7-dev</jtidy.version>
         <jna-posix.version>1.0.3</jna-posix.version>
         <json-lib.version>2.4</json-lib.version>
         <annotation-indexer.version>1.2</annotation-indexer.version>
