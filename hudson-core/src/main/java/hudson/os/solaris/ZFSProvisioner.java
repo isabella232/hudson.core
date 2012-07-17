@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  * @author Kohsuke Kawaguchi
  */
 public class ZFSProvisioner extends FileSystemProvisioner implements Serializable {
-    
+
     private NativeUtils nativeUtils = NativeUtils.getInstance();
     private final Node node;
     private final String rootDataset;
@@ -54,22 +54,23 @@ public class ZFSProvisioner extends FileSystemProvisioner implements Serializabl
             public String invoke(File f, VirtualChannel channel) throws IOException {
                 try {
                     NativeZfsFileSystem fs = nativeUtils.getZfsByMountPoint(f);
-                    if(fs != null)    return fs.getName();
+                    if (fs != null) {
+                        return fs.getName();
+                    }
                 } catch (NativeAccessException ex) {
                     Logger.getLogger(ZFSProvisioner.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                 
+
                 // TODO: for now, only support slaves that are already on ZFS.
                 throw new IOException("Not on ZFS");
             }
         });
     }
 
-    public void prepareWorkspace(AbstractBuild<?,?> build, FilePath ws, final TaskListener listener) throws IOException, InterruptedException {
+    public void prepareWorkspace(AbstractBuild<?, ?> build, FilePath ws, final TaskListener listener) throws IOException, InterruptedException {
         final String name = build.getProject().getFullName();
-        
-        ws.act(new FileCallable<Void>() {
 
+        ws.act(new FileCallable<Void>() {
             public Void invoke(File f, VirtualChannel channel) throws IOException {
                 try {
                     NativeZfsFileSystem fs = nativeUtils.getZfsByMountPoint(f);
@@ -96,13 +97,13 @@ public class ZFSProvisioner extends FileSystemProvisioner implements Serializabl
             public Void invoke(File f, VirtualChannel channel) throws IOException {
                 try {
                     NativeZfsFileSystem fs = nativeUtils.getZfsByMountPoint(f);
-                    if(fs != null){
-                       fs.destory(true);
+                    if (fs != null) {
+                        fs.destory(true);
                     }
                 } catch (NativeAccessException ex) {
                     Logger.getLogger(ZFSProvisioner.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                 
+
                 return null;
             }
         });
@@ -121,6 +122,7 @@ public class ZFSProvisioner extends FileSystemProvisioner implements Serializabl
 
     @Extension
     public static final class DescriptorImpl extends FileSystemProvisionerDescriptor {
+
         public boolean discard(FilePath ws, TaskListener listener) throws IOException, InterruptedException {
             // TODO
             return false;
@@ -130,6 +132,5 @@ public class ZFSProvisioner extends FileSystemProvisioner implements Serializabl
             return "ZFS";
         }
     }
-
     private static final long serialVersionUID = 1L;
 }

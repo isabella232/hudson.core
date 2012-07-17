@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
+ * Contributors:
+ * 
 *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -28,6 +28,7 @@ import org.antlr.runtime.RecognitionException;
  * @author Kohsuke Kawaguchi
  */
 public final class CronTabList {
+
     private final List<CronTab> tabs;
 
     public CronTabList(Collection<CronTab> tabs) {
@@ -47,13 +48,11 @@ public final class CronTabList {
     }
 
     /**
-     * Checks if this crontab entry looks reasonable,
-     * and if not, return an warning message.
+     * Checks if this crontab entry looks reasonable, and if not, return an
+     * warning message.
      *
-     * <p>
-     * The point of this method is to catch syntactically correct
-     * but semantically suspicious combinations, like
-     * "* 0 * * *"
+     * <p> The point of this method is to catch syntactically correct but
+     * semantically suspicious combinations, like "* 0 * * *"
      */
     public String checkSanity() {
         for (CronTab tab : tabs) {
@@ -71,8 +70,9 @@ public final class CronTabList {
         for (String line : format.split("\\r?\\n")) {
             lineNumber++;
             line = line.trim();
-            if (line.length() == 0 || line.startsWith("#")) 
+            if (line.length() == 0 || line.startsWith("#")) {
                 continue;   // ignorable line
+            }
             try {
                 r.add(new CronTab(line, lineNumber));
             } catch (RecognitionException e) {
