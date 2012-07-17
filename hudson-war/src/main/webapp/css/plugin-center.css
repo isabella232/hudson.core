@@ -256,12 +256,28 @@ ul.setup .tabBody {
 }
 
 .category-head{
-    cursor: pointer;
+    background-color: #F6F6F6;
+    border: 1px solid #CCCCCC;
+    border-radius: 4px 4px 4px 4px;
     color: #863566;
-    background-color: #EDEDED;;
-    padding-right: 4px;
-    padding-left: 4px;
-    padding-bottom: 4px;
-    padding-top: 4px;
+    cursor: pointer;
     margin-bottom: 1px;
+    padding: 4px;
+    font-size: 12px;
+    margin-left: 5px;
 }
+
+.ui-icon-collapsed{
+    background-image: url("images/toggle-expand.png");
+    height: 16px;
+    width: 16px;
+    float: left;
+}
+
+.ui-icon-expanded{
+    background-image: url("images/toggle-collapse.png");
+    height: 16px;
+    width: 16px;
+    float: left;
+}
+

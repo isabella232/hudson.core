@@ -140,8 +140,16 @@ jQuery(document).ready(function() {
      
     jQuery('.category-head').click(function() {
         jQuery(this).next().toggle();
+        var child = jQuery(this).children(":eq(0)");
+        if (jQuery(child).hasClass("ui-icon-collapsed")){
+           jQuery(child).removeClass("ui-icon-collapsed");
+           jQuery(child).addClass("ui-icon-expanded");
+        }else{
+            jQuery(child).addClass("ui-icon-collapsed");
+           jQuery(child).removeClass("ui-icon-expanded");
+        }
         return false;
-    }).not(':first').next().hide();
+    });
     
     
     var pluginSearchButton = jQuery('#pluginSearchButton');

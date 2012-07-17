@@ -136,9 +136,12 @@
                                                     <j:set var="pluginsList" value="${it.getCategorizedAvailablePlugins('featured', category)}" />
                                                     <j:if test="${!empty(pluginsList)}">   
                                                         <div class="category-head">
-                                                            ${category}
+                                                            <div class="ui-icon-expanded"/> 
+                                                            <span style="margin-left: 5px;"> 
+                                                                ${category}
+                                                            </span>
                                                         </div>
-                                                        <table width="100%" border="0" id="featuredPlugins" cellpadding="5">
+                                                        <table width="98%" border="0" id="featuredPlugins" cellpadding="5" style="margin-left:10px">
                                                             <j:forEach var="p" items="${pluginsList}">
                                                                 <tr>
                                                                     <td class="column1">
@@ -188,9 +191,12 @@
                                                     <j:set var="pluginsList" value="${it.getCategorizedAvailablePlugins('recommended', category)}" />
                                                     <j:if test="${!empty(pluginsList)}">
                                                         <div class="category-head">
-                                                            ${category}
+                                                            <div class="ui-icon-expanded"/> 
+                                                            <span style="margin-left: 5px;"> 
+                                                                ${category}
+                                                            </span>
                                                         </div>
-                                                        <table width="100%" border="0" id="recommendedPlugins" cellpadding="5">
+                                                        <table width="98%" border="0" id="featuredPlugins" cellpadding="5" style="margin-left:10px">
                                                             <j:forEach var="p" items="${pluginsList}">
                                                                 <tr>
                                                                     <td class="column1">
@@ -240,9 +246,12 @@
                                                     <j:set var="pluginsList" value="${it.getCategorizedAvailablePlugins('others', category)}" />
                                                     <j:if test="${!empty(pluginsList)}">
                                                         <div class="category-head">
-                                                            ${category}
-                                                        </div>   
-                                                        <table width="100%" border="0" id="otherPlugins" cellpadding="5">
+                                                            <div class="ui-icon-expanded"/> 
+                                                            <span style="margin-left: 5px;"> 
+                                                                ${category}
+                                                            </span>
+                                                        </div>
+                                                        <table width="98%" border="0" id="featuredPlugins" cellpadding="5" style="margin-left:10px">
                                                             <j:forEach var="p" items="${pluginsList}">
                                                                 <tr>
                                                                     <td class="column1">
