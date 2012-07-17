@@ -27,12 +27,14 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @author Nikita Levyankov
  */
 public class ConsoleColumn extends ListViewColumn {
+
     @DataBoundConstructor
     public ConsoleColumn() {
     }
 
     @Extension
     public static class DescriptorImpl extends ListViewColumnDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.ConsoleColumn_DisplayName();
