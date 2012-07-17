@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *      
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -30,21 +30,25 @@ import org.apache.tools.ant.DirectoryScanner;
 
 /**
  * Parse some JUnit xml files and generate a TestResult containing all the
- * results parsed. 
+ * results parsed.
  */
 @Extension
 public class JUnitParser extends TestResultParser {
 
     private final boolean keepLongStdio;
 
-    /** XXX TestResultParser.all does not seem to ever be called so why must this be an Extension? */
+    /**
+     * XXX TestResultParser.all does not seem to ever be called so why must this
+     * be an Extension?
+     */
     @Deprecated
     public JUnitParser() {
         this(false);
     }
 
     /**
-     * @param keepLongStdio if true, retain a suite's complete stdout/stderr even if this is huge and the suite passed
+     * @param keepLongStdio if true, retain a suite's complete stdout/stderr
+     * even if this is huge and the suite passed
      * @since 1.358
      */
     public JUnitParser(boolean keepLongStdio) {
@@ -63,22 +67,22 @@ public class JUnitParser extends TestResultParser {
 
     @Override
     public TestResult parse(String testResultLocations,
-                                       AbstractBuild build, Launcher launcher,
-                                       TaskListener listener)
-            throws InterruptedException, IOException
-    {
+            AbstractBuild build, Launcher launcher,
+            TaskListener listener)
+            throws InterruptedException, IOException {
         final long buildTime = build.getTimestamp().getTimeInMillis();
         final long timeOnMaster = System.currentTimeMillis();
 
         // [BUG 3123310] TODO - Test Result Refactor: review and fix TestDataPublisher/TestAction subsystem]
         // also get code that deals with testDataPublishers from JUnitResultArchiver.perform
-        
-        TestResult testResult = build.getWorkspace().act( new ParseResultCallable(testResultLocations, buildTime, timeOnMaster, keepLongStdio));
-        return testResult;        
+
+        TestResult testResult = build.getWorkspace().act(new ParseResultCallable(testResultLocations, buildTime, timeOnMaster, keepLongStdio));
+        return testResult;
     }
 
     private static final class ParseResultCallable implements
             FilePath.FileCallable<TestResult> {
+
         private final long buildTime;
         private final String testResults;
         private final long nowMaster;
@@ -106,8 +110,7 @@ public class JUnitParser extends TestResultParser {
 
             TestResult result = new TestResult(buildTime + (nowSlave - nowMaster), ds, keepLongStdio);
             result.tally();
-            return result; 
+            return result;
         }
     }
-
 }

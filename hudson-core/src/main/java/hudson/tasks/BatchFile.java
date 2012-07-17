@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -29,17 +29,18 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Kohsuke Kawaguchi
  */
 public class BatchFile extends CommandInterpreter {
+
     @DataBoundConstructor
     public BatchFile(String command) {
         super(command);
     }
 
     public String[] buildCommandLine(FilePath script) {
-        return new String[] {"cmd","/c","call",script.getRemote()};
+        return new String[]{"cmd", "/c", "call", script.getRemote()};
     }
 
     protected String getContents() {
-        return command+"\r\nexit %ERRORLEVEL%";
+        return command + "\r\nexit %ERRORLEVEL%";
     }
 
     protected String getFileExtension() {
@@ -48,6 +49,7 @@ public class BatchFile extends CommandInterpreter {
 
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
+
         @Override
         public String getHelpFile() {
             return "/help/project-config/batch.html";

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi,   Tom Huybrechts, Yahoo!, Inc.
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -33,11 +33,11 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * Base class for all test result objects.
- * For compatibility with code that expects this class to be in hudson.tasks.junit,
- * we've created a pure-abstract class, hudson.tasks.junit.TestObject. That
- * stub class is deprecated; instead, people should use this class.  
- * 
+ * Base class for all test result objects. For compatibility with code that
+ * expects this class to be in hudson.tasks.junit, we've created a pure-abstract
+ * class, hudson.tasks.junit.TestObject. That stub class is deprecated; instead,
+ * people should use this class.
+ *
  * @author Kohsuke Kawaguchi
  */
 @ExportedBean
@@ -96,17 +96,18 @@ public abstract class TestObject extends hudson.tasks.junit.TestObject {
 
     /**
      * Returns the top level test result data.
-     * 
+     *
      * @return
-     */    
+     */
     public TestResult getTopLevelTestResult() {
         TestObject parent = getParent();
 
         return (parent == null ? null : getParent().getTopLevelTestResult());
     }
-    
+
     /**
-     * Computes the relative path to get to this test object from <code>it</code>. If
+     * Computes the relative path to get to this test object from
+     * <code>it</code>. If
      * <code>it</code> does not appear in the parent chain for this object, a
      * relative path from the server root will be returned.
      *
@@ -121,47 +122,47 @@ public abstract class TestObject extends hudson.tasks.junit.TestObject {
         // } else {
         //    return a complete path starting with "/"
         // }
-       if (it==this) {
+        if (it == this) {
             return ".";
         }
 
         StringBuilder buf = new StringBuilder();
         TestObject next = this;
-        TestObject cur = this;  
+        TestObject cur = this;
         // Walk up my ancesotors from leaf to root, looking for "it"
         // and accumulating a relative url as I go
-        while (next!=null && it!=next) {
+        while (next != null && it != next) {
             cur = next;
-            buf.insert(0,'/');
-            buf.insert(0,cur.getSafeName());
+            buf.insert(0, '/');
+            buf.insert(0, cur.getSafeName());
             next = cur.getParent();
         }
-        if (it==next) {
+        if (it == next) {
             return buf.toString();
         } else {
             // Keep adding on to the string we've built so far
 
             // Start with the test result action
             AbstractTestResultAction action = getTestResultAction();
-            if (action==null) {
+            if (action == null) {
                 LOGGER.warning("trying to get relative path, but we can't determine the action that owns this result.");
                 return ""; // this won't take us to the right place, but it also won't 404.
             }
-            buf.insert(0,'/');
-            buf.insert(0,action.getUrlName());
+            buf.insert(0, '/');
+            buf.insert(0, action.getUrlName());
 
             // Now the build
-            AbstractBuild<?,?> myBuild = cur.getOwner();
-            if (myBuild ==null) {
+            AbstractBuild<?, ?> myBuild = cur.getOwner();
+            if (myBuild == null) {
                 LOGGER.warning("trying to get relative path, but we can't determine the build that owns this result.");
                 return ""; // this won't take us to the right place, but it also won't 404. 
             }
-            buf.insert(0,'/');
-            buf.insert(0,myBuild.getUrl());
+            buf.insert(0, '/');
+            buf.insert(0, myBuild.getUrl());
 
             // If we're inside a stapler request, just delegate to Hudson.Functions to get the relative path!
             StaplerRequest req = Stapler.getCurrentRequest();
-            if (req!=null && myBuild instanceof Item) {
+            if (req != null && myBuild instanceof Item) {
                 buf.insert(0, '/');
                 // Ugly but I don't see how else to convince the compiler that myBuild is an Item
                 Item myBuildAsItem = (Item) myBuild;
@@ -170,8 +171,8 @@ public abstract class TestObject extends hudson.tasks.junit.TestObject {
                 // We're not in a stapler request. Okay, give up.
                 LOGGER.info("trying to get relative path, but it is not my ancestor, and we're not in a stapler request. Trying absolute hudson url...");
                 String hudsonRootUrl = Hudson.getInstance().getRootUrl();
-                if (hudsonRootUrl==null||hudsonRootUrl.length()==0) {
-                    LOGGER.warning("Can't find anything like a decent hudson url. Punting, returning empty string."); 
+                if (hudsonRootUrl == null || hudsonRootUrl.length() == 0) {
+                    LOGGER.warning("Can't find anything like a decent hudson url. Punting, returning empty string.");
                     return "";
 
                 }
@@ -179,18 +180,18 @@ public abstract class TestObject extends hudson.tasks.junit.TestObject {
                 buf.insert(0, hudsonRootUrl);
             }
 
-            LOGGER.info("Here's our relative path: " + buf.toString()); 
-            return buf.toString(); 
+            LOGGER.info("Here's our relative path: " + buf.toString());
+            return buf.toString();
         }
 
     }
 
     /**
-     * Subclasses may override this method if they are
-     * associated with a particular subclass of
-     * AbstractTestResultAction. 
+     * Subclasses may override this method if they are associated with a
+     * particular subclass of AbstractTestResultAction.
      *
-     * @return  the test result action that connects this test result to a particular build
+     * @return the test result action that connects this test result to a
+     * particular build
      */
     @Override
     public AbstractTestResultAction getTestResultAction() {
@@ -204,7 +205,8 @@ public abstract class TestObject extends hudson.tasks.junit.TestObject {
     }
 
     /**
-     * Get a list of all TestActions associated with this TestObject. 
+     * Get a list of all TestActions associated with this TestObject.
+     *
      * @return
      */
     @Override
@@ -219,7 +221,8 @@ public abstract class TestObject extends hudson.tasks.junit.TestObject {
     }
 
     /**
-     * Gets a test action of the class passed in. 
+     * Gets a test action of the class passed in.
+     *
      * @param klazz
      * @param <T> an instance of the class passed in
      * @return
@@ -249,8 +252,8 @@ public abstract class TestObject extends hudson.tasks.junit.TestObject {
     public abstract TestResult getResultInBuild(AbstractBuild<?, ?> build);
 
     /**
-     * Find the test result corresponding to the one identified by <code>id></code>
-     * withint this test result.
+     * Find the test result corresponding to the one identified by
+     * <code>id></code> withint this test result.
      *
      * @param id The path to the original test result
      * @return A corresponding test result, or null if there is no corresponding

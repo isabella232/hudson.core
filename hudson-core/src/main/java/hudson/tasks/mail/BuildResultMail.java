@@ -35,6 +35,5 @@ public interface BuildResultMail {
      * @throws InterruptedException exception if any.
      */
     MimeMessage getMail(AbstractBuild<?, ?> build, BuildListener listener)
-        throws MessagingException, InterruptedException;
-
+            throws MessagingException, InterruptedException;
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *      
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -28,26 +28,28 @@ import java.util.logging.Logger;
 import static java.util.Collections.emptyList;
 
 /**
- * The simplest possible case result, with no language ties.
- * Acts as if it passed, has no children, and has no failed or skipped tests.
+ * The simplest possible case result, with no language ties. Acts as if it
+ * passed, has no children, and has no failed or skipped tests.
  */
 public class SimpleCaseResult extends TestResult {
+
     protected AbstractTestResultAction parentAction;
     protected final List<SimpleCaseResult> listOnlyContainingThisObject = new ArrayList<SimpleCaseResult>(1);
     protected float duration = 1.0f;
     private static final Logger LOGGER = Logger.getLogger(SimpleCaseResult.class.getName());
 
     public SimpleCaseResult(float duration) {
-        listOnlyContainingThisObject.add(this); 
+        listOnlyContainingThisObject.add(this);
     }
-        
+
     public SimpleCaseResult() {
         this(1.0f);
     }
 
     /**
-     * Sets the parent action, which means the action that binds
-     * this particular case result to a build. Should not be null. 
+     * Sets the parent action, which means the action that binds this particular
+     * case result to a build. Should not be null.
+     *
      * @param parentAction
      */
     @Override
@@ -64,7 +66,7 @@ public class SimpleCaseResult extends TestResult {
     public TestObject getParent() {
         return null;
     }
-    
+
     @Override
     public TestResult findCorrespondingResult(String id) {
         if (id.equals(getId())) {
@@ -73,7 +75,7 @@ public class SimpleCaseResult extends TestResult {
 
         return null;
     }
-    
+
     /**
      * Gets the "children" of this test result that failed
      *
@@ -106,6 +108,7 @@ public class SimpleCaseResult extends TestResult {
 
     /**
      * Let's pretend that our trivial test result always passes.
+     *
      * @return always true
      */
     @Override
@@ -126,11 +129,11 @@ public class SimpleCaseResult extends TestResult {
      * Returns true iff this test failed.
      */
     public boolean isFailed() {
-        return false; 
+        return false;
     }
 
     /**
-     * Time took to run this test. In seconds. 
+     * Time took to run this test. In seconds.
      */
     @Override
     public float getDuration() {
@@ -182,10 +185,10 @@ public class SimpleCaseResult extends TestResult {
     }
 
     @Override
-    public AbstractBuild<?,?> getOwner() {
+    public AbstractBuild<?, ?> getOwner() {
         if (parentAction == null) {
             LOGGER.warning("in Trivial Test Result, parentAction is null, but getOwner() called");
-            return null; 
+            return null;
         }
         return parentAction.owner;
     }
@@ -194,14 +197,8 @@ public class SimpleCaseResult extends TestResult {
     public List<TestAction> getTestActions() {
         return SimpleCaseResult.EMPTY_ACTION_LIST;
     }
-
-
     /**
      * An empty list of actions, useful for tests
      */
     public static final List<TestAction> EMPTY_ACTION_LIST = Collections.unmodifiableList(new ArrayList<TestAction>());
-
-
-
-
 }

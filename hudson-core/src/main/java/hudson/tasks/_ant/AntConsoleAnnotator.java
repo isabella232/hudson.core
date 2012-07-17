@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -24,15 +24,16 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
- * Filter {@link OutputStream} that places an annotation that marks Ant target execution.
- * 
+ * Filter {@link OutputStream} that places an annotation that marks Ant target
+ * execution.
+ *
  * @author Kohsuke Kawaguchi
  * @sine 1.349
  */
 public class AntConsoleAnnotator extends LineTransformationOutputStream {
+
     private final OutputStream out;
     private final Charset charset;
-
     private boolean seenEmptyLine;
 
     public AntConsoleAnnotator(OutputStream out, Charset charset) {
@@ -47,20 +48,22 @@ public class AntConsoleAnnotator extends LineTransformationOutputStream {
         // trim off CR/LF from the end
         line = trimEOL(line);
 
-        if (seenEmptyLine && endsWith(line,':') && line.indexOf(' ')<0)
-            // put the annotation
+        if (seenEmptyLine && endsWith(line, ':') && line.indexOf(' ') < 0) // put the annotation
+        {
             new AntTargetNote().encodeTo(out);
+        }
 
-        if (line.equals("BUILD SUCCESSFUL") || line.equals("BUILD FAILED"))
+        if (line.equals("BUILD SUCCESSFUL") || line.equals("BUILD FAILED")) {
             new AntOutcomeNote().encodeTo(out);
+        }
 
-        seenEmptyLine = line.length()==0;
-        out.write(b,0,len);
+        seenEmptyLine = line.length() == 0;
+        out.write(b, 0, len);
     }
 
     private boolean endsWith(String line, char c) {
         int len = line.length();
-        return len>0 && line.charAt(len-1)==c;
+        return len > 0 && line.charAt(len - 1) == c;
     }
 
     @Override
@@ -68,5 +71,4 @@ public class AntConsoleAnnotator extends LineTransformationOutputStream {
         super.close();
         out.close();
     }
-
 }

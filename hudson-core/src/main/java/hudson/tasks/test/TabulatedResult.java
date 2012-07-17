@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Daniel Dyer, Tom Huybrechts, Yahoo!, Inc.
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Daniel Dyer, Tom Huybrechts, Yahoo!, Inc.
+ *
  *
  *******************************************************************************/ 
 
@@ -21,9 +21,8 @@ import java.util.Collection;
 /**
  * Cumulated result of multiple tests.
  *
- * <p>
- * On top of {@link TestResult}, this class introduces a tree structure
- * of {@link TestResult}s.
+ * <p> On top of {@link TestResult}, this class introduces a tree structure of
+ * {@link TestResult}s.
  *
  * @author Kohsuke Kawaguchi
  */

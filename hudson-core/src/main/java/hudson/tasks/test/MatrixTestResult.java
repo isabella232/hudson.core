@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Yahoo!, Inc.
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Yahoo!, Inc.
+ *
  *
  *******************************************************************************/ 
 
@@ -25,12 +25,12 @@ import hudson.model.Action;
 /**
  * {@link Action} that aggregates all the test results from {@link MatrixRun}s.
  *
- * <p>
- * This object is attached to {@link MatrixBuild}.
+ * <p> This object is attached to {@link MatrixBuild}.
  *
  * @author Kohsuke Kawaguchi
  */
 public class MatrixTestResult extends AggregatedTestResultAction {
+
     public MatrixTestResult(MatrixBuild owner) {
         super(owner);
     }
@@ -44,8 +44,8 @@ public class MatrixTestResult extends AggregatedTestResultAction {
     }
 
     @Override
-    public AbstractBuild<?,?> resolveChild(Child child) {
-        MatrixBuild b = (MatrixBuild)owner;
+    public AbstractBuild<?, ?> resolveChild(Child child) {
+        MatrixBuild b = (MatrixBuild) owner;
         return b.getRun(Combination.fromString(child.name));
     }
 

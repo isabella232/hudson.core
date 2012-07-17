@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Inc., Kohsuke Kawaguchi, Brian Westrich,   Jean-Baptiste Quenot, Anton Kozak
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -42,29 +42,26 @@ import org.kohsuke.stapler.StaplerRequest;
 public class ArtifactArchiver extends Recorder {
 
     /**
-     * Comma- or space-separated list of patterns of files/directories to be archived.
+     * Comma- or space-separated list of patterns of files/directories to be
+     * archived.
      */
     private final String artifacts;
-
     /**
      * Possibly null 'excludes' pattern as in Ant.
      */
     private final String excludes;
-
     /**
-     * Type of compression with will be applied to artifacts before master<->slave transfer.
+     * Type of compression with will be applied to artifacts before
+     * master<->slave transfer.
      */
     private FilePath.TarCompression compressionType;
-
     /**
      * Just keep the last successful artifact set, no more.
      */
     private final boolean latestOnly;
-
     private final boolean autoValidateFileMask;
-    
-    private static final Boolean allowEmptyArchive = 
-    	Boolean.getBoolean(ArtifactArchiver.class.getName()+".warnOnEmpty");
+    private static final Boolean allowEmptyArchive =
+            Boolean.getBoolean(ArtifactArchiver.class.getName() + ".warnOnEmpty");
 
     /**
      * @deprecated as of 2.0.1
@@ -73,6 +70,7 @@ public class ArtifactArchiver extends Recorder {
     public ArtifactArchiver(String artifacts, String excludes, boolean latestOnly) {
         this(artifacts, excludes, latestOnly, FilePath.TarCompression.GZIP.name());
     }
+
     /**
      * @deprecated as of 2.0.2
      */
@@ -83,7 +81,7 @@ public class ArtifactArchiver extends Recorder {
 
     @DataBoundConstructor
     public ArtifactArchiver(String artifacts, String excludes, boolean latestOnly, String compressionType,
-                            boolean autoValidateFileMask) {
+            boolean autoValidateFileMask) {
         this.artifacts = Util.fixEmptyAndTrim(artifacts);
         this.excludes = Util.fixEmptyAndTrim(excludes);
         this.latestOnly = latestOnly;
@@ -132,8 +130,8 @@ public class ArtifactArchiver extends Recorder {
      */
     public void setCompressionType(String compression) {
         try {
-            compressionType = (compression != null ? FilePath.TarCompression.valueOf( compression) :
-                FilePath.TarCompression.GZIP);
+            compressionType = (compression != null ? FilePath.TarCompression.valueOf(compression)
+                    : FilePath.TarCompression.GZIP);
         } catch (IllegalArgumentException e) {
             compressionType = FilePath.TarCompression.GZIP;
         }
@@ -149,7 +147,7 @@ public class ArtifactArchiver extends Recorder {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
-        throws InterruptedException {
+            throws InterruptedException {
         if (artifacts.length() == 0) {
             listener.error(Messages.ArtifactArchiver_NoIncludes());
             build.setResult(Result.FAILURE);
@@ -199,16 +197,16 @@ public class ArtifactArchiver extends Recorder {
 
     @Override
     public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
-        if(latestOnly) {
-            AbstractBuild<?,?> b = build.getProject().getLastCompletedBuild();
+        if (latestOnly) {
+            AbstractBuild<?, ?> b = build.getProject().getLastCompletedBuild();
             Result bestResultSoFar = Result.NOT_BUILT;
-            while(b!=null) {
+            while (b != null) {
                 if (b.getResult().isBetterThan(bestResultSoFar)) {
                     bestResultSoFar = b.getResult();
                 } else {
                     // remove old artifacts
                     File ad = b.getArtifactsDir();
-                    if(ad.exists()) {
+                    if (ad.exists()) {
                         listener.getLogger().println(Messages.ArtifactArchiver_DeletingOld(b.getDisplayName()));
                         try {
                             Util.deleteRecursive(ad);
@@ -226,16 +224,16 @@ public class ArtifactArchiver extends Recorder {
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
     }
-    
     /**
-     * @deprecated as of 1.286
-     *      Some plugin depends on this, so this field is left here and points to the last created instance.
-     *      Use {@link Hudson#getDescriptorByType(Class)} instead.
+     * @deprecated as of 1.286 Some plugin depends on this, so this field is
+     * left here and points to the last created instance. Use
+     * {@link Hudson#getDescriptorByType(Class)} instead.
      */
     public static volatile DescriptorImpl DESCRIPTOR;
 
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+
         public DescriptorImpl() {
             DESCRIPTOR = this; // backward compatibility
         }
@@ -248,8 +246,8 @@ public class ArtifactArchiver extends Recorder {
          * Performs on-the-fly validation on the file mask wildcard.
          */
         public FormValidation doCheckArtifacts(@AncestorInPath AbstractProject project,
-                                               @QueryParameter String artifacts,
-                                               @QueryParameter boolean force) throws IOException {
+                @QueryParameter String artifacts,
+                @QueryParameter boolean force) throws IOException {
             if (!force) {
                 return FormValidation.ok();
             }
@@ -258,7 +256,7 @@ public class ArtifactArchiver extends Recorder {
 
         @Override
         public ArtifactArchiver newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-            return req.bindJSON(ArtifactArchiver.class,formData);
+            return req.bindJSON(ArtifactArchiver.class, formData);
         }
 
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {

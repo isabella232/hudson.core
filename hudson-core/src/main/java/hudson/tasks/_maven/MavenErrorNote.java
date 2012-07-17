@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -28,22 +28,22 @@ import java.util.regex.Pattern;
  * @author Kohsuke Kawaguchi
  */
 public class MavenErrorNote extends ConsoleNote {
+
     public MavenErrorNote() {
     }
 
     @Override
     public ConsoleAnnotator annotate(Object context, MarkupText text, int charPos) {
-        text.addMarkup(0,text.length(),"<span class=error-inline>","</span>");
+        text.addMarkup(0, text.length(), "<span class=error-inline>", "</span>");
         return null;
     }
 
     @Extension
     public static final class DescriptorImpl extends ConsoleAnnotationDescriptor {
+
         public String getDisplayName() {
             return "Maven Errors";
         }
     }
-
     public static Pattern PATTERN = Pattern.compile("^\\[ERROR\\]");
 }
-

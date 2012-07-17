@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -22,15 +22,14 @@ import hudson.ExtensionPoint;
 /**
  * {@link BuildStep}s that run after the build is completed.
  *
- * <p>
- * {@link Recorder} is a kind of {@link Publisher} that collects statistics from the build,
- * and can mark builds as unstable/failure. This marking ensures that builds are marked accordingly
- * before notifications are sent via {@link Notifier}s. Otherwise, if the build is marked failed
- * after some notifications are sent, inconsistency ensues.
+ * <p> {@link Recorder} is a kind of {@link Publisher} that collects statistics
+ * from the build, and can mark builds as unstable/failure. This marking ensures
+ * that builds are marked accordingly before notifications are sent via
+ * {@link Notifier}s. Otherwise, if the build is marked failed after some
+ * notifications are sent, inconsistency ensues.
  *
- * <p>
- * To register a custom {@link Publisher} from a plugin,
- * put {@link Extension} on your descriptor.
+ * <p> To register a custom {@link Publisher} from a plugin, put
+ * {@link Extension} on your descriptor.
  *
  *
  * @author Kohsuke Kawaguchi
@@ -38,9 +37,12 @@ import hudson.ExtensionPoint;
  * @see Notifier
  */
 public abstract class Recorder extends Publisher implements ExtensionPoint {
+
     @SuppressWarnings("deprecation") // super only @Deprecated to discourage other subclasses
-    protected Recorder() {}
+    protected Recorder() {
+    }
+
     public BuildStepDescriptor getDescriptor() {
-        return (BuildStepDescriptor)super.getDescriptor();
+        return (BuildStepDescriptor) super.getDescriptor();
     }
 }

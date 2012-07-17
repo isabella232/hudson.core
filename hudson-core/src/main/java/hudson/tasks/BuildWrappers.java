@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -32,31 +32,34 @@ import java.util.List;
  * @author Kohsuke Kawaguchi
  */
 public class BuildWrappers {
+
     /**
-     * @deprecated
-     *      as of 1.281. Use {@link Extension} for registration, and use {@link BuildWrapper#all()}
-     *      for listing them.
+     * @deprecated as of 1.281. Use {@link Extension} for registration, and use
+     * {@link BuildWrapper#all()} for listing them.
      */
     public static final List<Descriptor<BuildWrapper>> WRAPPERS = new DescriptorList<BuildWrapper>(BuildWrapper.class);
 
     /**
-     * List up all {@link BuildWrapperDescriptor}s that are applicable for the given project.
+     * List up all {@link BuildWrapperDescriptor}s that are applicable for the
+     * given project.
      *
-     * @return
-     *      The signature doesn't use {@link BuildWrapperDescriptor} to maintain compatibility
-     *      with {@link BuildWrapper} implementations before 1.150.
+     * @return The signature doesn't use {@link BuildWrapperDescriptor} to
+     * maintain compatibility with {@link BuildWrapper} implementations before
+     * 1.150.
      */
     public static List<Descriptor<BuildWrapper>> getFor(AbstractProject<?, ?> project) {
         List<Descriptor<BuildWrapper>> result = new ArrayList<Descriptor<BuildWrapper>>();
-        Descriptor pd = Hudson.getInstance().getDescriptor((Class)project.getClass());
+        Descriptor pd = Hudson.getInstance().getDescriptor((Class) project.getClass());
 
         for (Descriptor<BuildWrapper> w : BuildWrapper.all()) {
-            if (pd instanceof AbstractProjectDescriptor && !((AbstractProjectDescriptor)pd).isApplicable(w))
+            if (pd instanceof AbstractProjectDescriptor && !((AbstractProjectDescriptor) pd).isApplicable(w)) {
                 continue;
+            }
             if (w instanceof BuildWrapperDescriptor) {
                 BuildWrapperDescriptor bwd = (BuildWrapperDescriptor) w;
-                if(bwd.isApplicable(project))
+                if (bwd.isApplicable(project)) {
                     result.add(bwd);
+                }
             } else {
                 // old BuildWrapper that doesn't implement BuildWrapperDescriptor
                 result.add(w);

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Jorg Heymans
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Jorg Heymans
+ *
  *
  *******************************************************************************/ 
 
@@ -27,8 +27,7 @@ import java.util.logging.Logger;
 /**
  * As the name suggest: a resolver for XML entities.
  *
- * <p>
- * Basically, it provides the possibility to intercept online DTD lookups
+ * <p> Basically, it provides the possibility to intercept online DTD lookups
  * and instead do offline lookup by redirecting to a local directory where
  * .dtd's are stored
  *
@@ -52,13 +51,13 @@ class XMLEntityResolver implements EntityResolver {
                 String dtdFileName = systemId.substring(TESTNG_NAMESPACE.length());
 
                 URL url = getClass().getClassLoader().getResource(dtdFileName);
-                if (url != null)
+                if (url != null) {
                     return new InputSource(url.toString());
+                }
             }
         }
         // Default fallback
         return null;
     }
-
     private static final Logger LOGGER = Logger.getLogger(XMLEntityResolver.class.getName());
 }

@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -28,17 +28,18 @@ import java.io.IOException;
  * @since 1.319
  */
 public enum BuildStepMonitor {
+
     NONE {
         public boolean perform(BuildStep bs, AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-            return bs.perform(build,launcher,listener);
+            return bs.perform(build, launcher, listener);
         }
     },
     STEP {
         public boolean perform(BuildStep bs, AbstractBuild build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-            CheckPoint cp = new CheckPoint(bs.getClass().getName(),bs.getClass());
+            CheckPoint cp = new CheckPoint(bs.getClass().getName(), bs.getClass());
             cp.block();
             try {
-                return bs.perform(build,launcher,listener);
+                return bs.perform(build, launcher, listener);
             } finally {
                 cp.report();
             }
@@ -47,12 +48,13 @@ public enum BuildStepMonitor {
     BUILD {
         public boolean perform(BuildStep bs, AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
             CheckPoint.COMPLETED.block();
-            return bs.perform(build,launcher,listener);
+            return bs.perform(build, launcher, listener);
         }
     };
 
     /**
-     * Calls {@link BuildStep#perform(AbstractBuild, Launcher, BuildListener)} with the proper synchronization.
+     * Calls {@link BuildStep#perform(AbstractBuild, Launcher, BuildListener)}
+     * with the proper synchronization.
      */
     public abstract boolean perform(BuildStep bs, AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException;
 }

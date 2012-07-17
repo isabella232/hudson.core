@@ -39,7 +39,7 @@ import org.apache.tools.ant.types.selectors.SelectorUtils;
 public class FailureBuildMail extends BaseBuildResultMail {
 
     public FailureBuildMail(String recipients, boolean sendToIndividuals,
-                            List<AbstractProject> upstreamProjects, String charset) {
+            List<AbstractProject> upstreamProjects, String charset) {
         super(recipients, sendToIndividuals, upstreamProjects, charset);
     }
 
@@ -47,7 +47,7 @@ public class FailureBuildMail extends BaseBuildResultMail {
      * @inheritDoc
      */
     public MimeMessage getMail(AbstractBuild<?, ?> build, BuildListener listener)
-        throws MessagingException, InterruptedException {
+            throws MessagingException, InterruptedException {
         MimeMessage msg = createEmptyMail(build, listener);
 
         msg.setSubject(getSubject(build, Messages.MailSender_FailureMail_Subject()), getCharset());
@@ -100,13 +100,13 @@ public class FailureBuildMail extends BaseBuildResultMail {
                 // Careful with path separator between $1 and $2:
                 // workspaceDir will not normally end with one;
                 // workspaceDir.toURI() will end with '/' if and only if workspaceDir.exists() at time of call
-                wsPattern = Pattern.compile("(" +
-                    Pattern.quote(ws.getRemote()) + "|" + Pattern.quote(ws.toURI().toString())
-                    + ")[/\\\\]?([^:#\\s]*)");
+                wsPattern = Pattern.compile("("
+                        + Pattern.quote(ws.getRemote()) + "|" + Pattern.quote(ws.toURI().toString())
+                        + ")[/\\\\]?([^:#\\s]*)");
             }
             for (String line : lines) {
                 line = line.replace('\0',
-                    ' '); // shall we replace other control code? This one is motivated by http://www.nabble.com/Problems-with-NULL-characters-in-generated-output-td25005177.html
+                        ' '); // shall we replace other control code? This one is motivated by http://www.nabble.com/Problems-with-NULL-characters-in-generated-output-td25005177.html
                 if (wsPattern != null) {
                     // Perl: $line =~ s{$rx}{$path = $2; $path =~ s!\\\\!/!g; $workspaceUrl . $path}eg;
                     Matcher m = wsPattern.matcher(line);
@@ -127,7 +127,7 @@ public class FailureBuildMail extends BaseBuildResultMail {
         } catch (IOException e) {
             // somehow failed to read the contents of the log
             buf.append(Messages.MailSender_FailureMail_FailedToAccessBuildLog()).append("\n\n").append(
-                Functions.printThrowable(e));
+                    Functions.printThrowable(e));
         }
         appendFooter(buf);
         msg.setText(buf.toString(), getCharset());
@@ -160,5 +160,4 @@ public class FailureBuildMail extends BaseBuildResultMail {
         //    new Object[]{path, artifacts});
         return false;
     }
-
 }

@@ -44,34 +44,28 @@ import org.apache.commons.collections.CollectionUtils;
  */
 public abstract class BaseBuildResultMail implements BuildResultMail {
 
-    protected static final int MAX_LOG_LINES = Integer.getInteger(MailSender.class.getName()+".maxLogLines",250);
-
+    protected static final int MAX_LOG_LINES = Integer.getInteger(MailSender.class.getName() + ".maxLogLines", 250);
     //TODO where it's used?
     public static boolean debug = false;
-
     /**
      * Whitespace-separated list of e-mail addresses that represent recipients.
      */
     private String recipients;
-
     /**
      * The charset to use for the text and subject.
      */
     private String charset;
-
     /**
      * The list of upstream projects.
      */
     private List<AbstractProject> upstreamProjects;
-
     /**
      * If true, individuals will receive e-mails regarding who broke the build.
      */
     private boolean sendToIndividuals;
 
-
     public BaseBuildResultMail(String recipients, boolean sendToIndividuals, List<AbstractProject> upstreamProjects,
-                               String charset) {
+            String charset) {
         this.recipients = recipients;
         this.sendToIndividuals = sendToIndividuals;
         this.upstreamProjects = upstreamProjects;
@@ -104,6 +98,7 @@ public abstract class BaseBuildResultMail implements BuildResultMail {
     protected String getSubjectPrefix() {
         return hudson.mail.Messages.hudson_email_subject_prefix();
     }
+
     /**
      * Creates empty mail.
      *
@@ -124,12 +119,12 @@ public abstract class BaseBuildResultMail implements BuildResultMail {
         StringTokenizer tokens = new StringTokenizer(getRecipients());
         while (tokens.hasMoreTokens()) {
             String address = tokens.nextToken();
-            if(address.startsWith("upstream-individuals:")) {
+            if (address.startsWith("upstream-individuals:")) {
                 // people who made a change in the upstream
                 String projectName = address.substring("upstream-individuals:".length());
-                AbstractProject up = Hudson.getInstance().getItemByFullName(projectName,AbstractProject.class);
-                if(up==null) {
-                    listener.getLogger().println("No such project exist: "+projectName);
+                AbstractProject up = Hudson.getInstance().getItemByFullName(projectName, AbstractProject.class);
+                if (up == null) {
+                    listener.getLogger().println("No such project exist: " + projectName);
                     continue;
                 }
                 includeCulpritsOf(up, build, listener, rcp);
@@ -153,19 +148,20 @@ public abstract class BaseBuildResultMail implements BuildResultMail {
         if (sendToIndividuals) {
             Set<User> culprits = build.getCulprits();
 
-            if(debug)
-                listener.getLogger().println("Trying to send e-mails to individuals who broke the build. sizeof(culprits)=="+culprits.size());
+            if (debug) {
+                listener.getLogger().println("Trying to send e-mails to individuals who broke the build. sizeof(culprits)==" + culprits.size());
+            }
 
-            rcp.addAll(buildCulpritList(listener,culprits));
+            rcp.addAll(buildCulpritList(listener, culprits));
         }
         msg.setRecipients(Message.RecipientType.TO, rcp.toArray(new InternetAddress[rcp.size()]));
 
         AbstractBuild<?, ?> pb = build.getPreviousBuild();
-        if(pb!=null) {
+        if (pb != null) {
             MailMessageIdAction b = pb.getAction(MailMessageIdAction.class);
-            if(b!=null) {
-                msg.setHeader("In-Reply-To",b.messageId);
-                msg.setHeader("References",b.messageId);
+            if (b != null) {
+                msg.setHeader("In-Reply-To", b.messageId);
+                msg.setHeader("References", b.messageId);
             }
         }
 
@@ -180,7 +176,7 @@ public abstract class BaseBuildResultMail implements BuildResultMail {
      */
     protected void appendBuildUrl(AbstractBuild<?, ?> build, StringBuilder buf) {
         appendUrl(Util.encode(build.getUrl())
-                  + (build.getChangeSet().isEmptySet() ? "" : "changes"), buf);
+                + (build.getChangeSet().isEmptySet() ? "" : "changes"), buf);
     }
 
     /**
@@ -191,8 +187,9 @@ public abstract class BaseBuildResultMail implements BuildResultMail {
      */
     protected void appendUrl(String url, StringBuilder buf) {
         String baseUrl = Mailer.descriptor().getUrl();
-        if (baseUrl != null)
+        if (baseUrl != null) {
             buf.append(Messages.MailSender_Link(baseUrl, url)).append("\n\n");
+        }
     }
 
     /**
@@ -207,7 +204,6 @@ public abstract class BaseBuildResultMail implements BuildResultMail {
         }
     }
 
-
     /**
      * Returns the subject of the mail.
      *
@@ -217,42 +213,42 @@ public abstract class BaseBuildResultMail implements BuildResultMail {
      */
     protected String getSubject(AbstractBuild<?, ?> build, String caption) {
         return new StringBuilder().append(getSubjectPrefix())
-            .append(" ")
-            .append(caption)
-            .append(" ")
-            .append(build.getFullDisplayName())
-            .toString();
+                .append(" ")
+                .append(caption)
+                .append(" ")
+                .append(build.getFullDisplayName())
+                .toString();
     }
 
     private void includeCulpritsOf(AbstractProject upstreamProject, AbstractBuild<?, ?> currentBuild, BuildListener listener, Set<InternetAddress> recipientList) throws AddressException {
-        AbstractBuild<?,?> upstreamBuild = currentBuild.getUpstreamRelationshipBuild(upstreamProject);
-        AbstractBuild<?,?> previousBuild = currentBuild.getPreviousBuild();
-        AbstractBuild<?,?> previousBuildUpstreamBuild = previousBuild!=null ? previousBuild.getUpstreamRelationshipBuild(upstreamProject) : null;
-        if(previousBuild==null && upstreamBuild==null && previousBuildUpstreamBuild==null) {
-            listener.getLogger().println("Unable to compute the changesets in "+ upstreamProject +". Is the fingerprint configured?");
+        AbstractBuild<?, ?> upstreamBuild = currentBuild.getUpstreamRelationshipBuild(upstreamProject);
+        AbstractBuild<?, ?> previousBuild = currentBuild.getPreviousBuild();
+        AbstractBuild<?, ?> previousBuildUpstreamBuild = previousBuild != null ? previousBuild.getUpstreamRelationshipBuild(upstreamProject) : null;
+        if (previousBuild == null && upstreamBuild == null && previousBuildUpstreamBuild == null) {
+            listener.getLogger().println("Unable to compute the changesets in " + upstreamProject + ". Is the fingerprint configured?");
             return;
         }
-        if(previousBuild==null || upstreamBuild==null || previousBuildUpstreamBuild==null) {
-            listener.getLogger().println("Unable to compute the changesets in "+ upstreamProject);
+        if (previousBuild == null || upstreamBuild == null || previousBuildUpstreamBuild == null) {
+            listener.getLogger().println("Unable to compute the changesets in " + upstreamProject);
             return;
         }
-        AbstractBuild<?,?> b=previousBuildUpstreamBuild;
+        AbstractBuild<?, ?> b = previousBuildUpstreamBuild;
         do {
-            recipientList.addAll(buildCulpritList(listener,b.getCulprits()));
+            recipientList.addAll(buildCulpritList(listener, b.getCulprits()));
             b = b.getNextBuild();
-        } while ( b != upstreamBuild && b != null );
+        } while (b != upstreamBuild && b != null);
     }
-
 
     private Set<InternetAddress> buildCulpritList(BuildListener listener, Set<User> culprits) throws AddressException {
         Set<InternetAddress> r = new HashSet<InternetAddress>();
         for (User a : culprits) {
             String adrs = Util.fixEmpty(a.getProperty(Mailer.UserProperty.class).getAddress());
-            if(debug)
-                listener.getLogger().println("  User "+a.getId()+" -> "+adrs);
-            if (adrs != null)
+            if (debug) {
+                listener.getLogger().println("  User " + a.getId() + " -> " + adrs);
+            }
+            if (adrs != null) {
                 r.add(new InternetAddress(adrs));
-            else {
+            } else {
                 listener.getLogger().println(Messages.MailSender_NoAddress(a.getFullName()));
             }
         }
@@ -267,5 +263,4 @@ public abstract class BaseBuildResultMail implements BuildResultMail {
     private String getTextFooter() {
         return hudson.mail.Messages.hudson_email_footer();
     }
-
 }

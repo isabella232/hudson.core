@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -21,12 +21,12 @@ import hudson.model.Action;
 /**
  * Remembers the message ID of the e-mail that was sent for the build.
  *
- * <p>
- * This allows us to send further updates as replies.
+ * <p> This allows us to send further updates as replies.
  *
  * @author Kohsuke Kawaguchi
  */
 public class MailMessageIdAction implements Action {
+
     /**
      * Message ID of the e-mail sent for the build.
      */

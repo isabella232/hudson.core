@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Daniel Dyer, id:cactusman, Tom Huybrechts, Yahoo!, Inc.
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Daniel Dyer, id:cactusman, Tom Huybrechts, Yahoo!, Inc.
+ *
  *
  *******************************************************************************/ 
 
@@ -34,14 +34,11 @@ import java.util.List;
  * @author Kohsuke Kawaguchi
  */
 public final class ClassResult extends TabulatedResult implements Comparable<ClassResult> {
+
     private final String className; // simple name
-
     private final List<CaseResult> cases = new ArrayList<CaseResult>();
-
-    private int passCount,failCount,skipCount;
-    
-    private float duration; 
-
+    private int passCount, failCount, skipCount;
+    private float duration;
     private final PackageResult parent;
 
     ClassResult(PackageResult parent, String className) {
@@ -51,7 +48,7 @@ public final class ClassResult extends TabulatedResult implements Comparable<Cla
 
     @Override
     public AbstractBuild<?, ?> getOwner() {
-        return (parent==null ? null: parent.getOwner()); 
+        return (parent == null ? null : parent.getOwner());
     }
 
     public PackageResult getParent() {
@@ -60,12 +57,16 @@ public final class ClassResult extends TabulatedResult implements Comparable<Cla
 
     @Override
     public ClassResult getPreviousResult() {
-        if(parent==null)   return null;
+        if (parent == null) {
+            return null;
+        }
         TestResult pr = parent.getPreviousResult();
-        if(pr==null)    return null;
-        if(pr instanceof PackageResult) {
-            return ((PackageResult)pr).getClassResult(getName());
-    }
+        if (pr == null) {
+            return null;
+        }
+        if (pr instanceof PackageResult) {
+            return ((PackageResult) pr).getClassResult(getName());
+        }
         return null;
     }
 
@@ -79,7 +80,7 @@ public final class ClassResult extends TabulatedResult implements Comparable<Cla
             caseName = id.substring(caseNameStart);
         } else {
             caseName = id;
-    }
+        }
 
         CaseResult child = getCaseResult(caseName);
         if (child != null) {
@@ -95,40 +96,44 @@ public final class ClassResult extends TabulatedResult implements Comparable<Cla
 
     @Override
     public String getChildTitle() {
-        return "Class Reults"; 
+        return "Class Reults";
     }
 
-    @Exported(visibility=999)
+    @Exported(visibility = 999)
     public String getName() {
         int idx = className.lastIndexOf('.');
-        if(idx<0)       return className;
-        else            return className.substring(idx+1);
+        if (idx < 0) {
+            return className;
+        } else {
+            return className.substring(idx + 1);
+        }
     }
 
-    public @Override String getSafeName() {
+    public @Override
+    String getSafeName() {
         return uniquifyName(parent.getChildren(), safe(getName()));
     }
-    
+
     public CaseResult getCaseResult(String name) {
         for (CaseResult c : cases) {
-            if(c.getSafeName().equals(name))
+            if (c.getSafeName().equals(name)) {
                 return c;
+            }
         }
         return null;
     }
 
     @Override
     public Object getDynamic(String name, StaplerRequest req, StaplerResponse rsp) {
-    	CaseResult c = getCaseResult(name);
-    	if (c != null) {
+        CaseResult c = getCaseResult(name);
+        if (c != null) {
             return c;
-    	} else {
+        } else {
             return super.getDynamic(name, req, rsp);
-    	}
+        }
     }
 
-
-    @Exported(name="child")
+    @Exported(name = "child")
     public List<CaseResult> getChildren() {
         return cases;
     }
@@ -139,9 +144,9 @@ public final class ClassResult extends TabulatedResult implements Comparable<Cla
 
     // TODO: wait for stapler 1.60     @Exported
     public float getDuration() {
-        return duration; 
+        return duration;
     }
-    
+
     @Exported
     public int getPassCount() {
         return passCount;
@@ -166,36 +171,31 @@ public final class ClassResult extends TabulatedResult implements Comparable<Cla
      */
     @Override
     public void tally() {
-        passCount=failCount=skipCount=0;
-        duration=0;
+        passCount = failCount = skipCount = 0;
+        duration = 0;
         for (CaseResult r : cases) {
             r.setClass(this);
             if (r.isSkipped()) {
                 skipCount++;
-            }
-            else if(r.isPassed()) {
+            } else if (r.isPassed()) {
                 passCount++;
-            }
-            else {
+            } else {
                 failCount++;
             }
             duration += r.getDuration();
         }
     }
 
-
     void freeze() {
-        passCount=failCount=skipCount=0;
-        duration=0;
+        passCount = failCount = skipCount = 0;
+        duration = 0;
         for (CaseResult r : cases) {
             r.setClass(this);
             if (r.isSkipped()) {
                 skipCount++;
-            }
-            else if(r.isPassed()) {
+            } else if (r.isPassed()) {
                 passCount++;
-            }
-            else {
+            } else {
                 failCount++;
             }
             duration += r.getDuration();
@@ -204,7 +204,7 @@ public final class ClassResult extends TabulatedResult implements Comparable<Cla
     }
 
     public String getClassName() {
-    	return className;
+        return className;
     }
 
     public int compareTo(ClassResult that) {
@@ -214,9 +214,9 @@ public final class ClassResult extends TabulatedResult implements Comparable<Cla
     public String getDisplayName() {
         return getName();
     }
-    
+
     public String getFullName() {
-    	return getParent().getDisplayName() + "." + className;
+        return getParent().getDisplayName() + "." + className;
     }
 
     /**
@@ -224,8 +224,8 @@ public final class ClassResult extends TabulatedResult implements Comparable<Cla
      */
     @Override
     public String getRelativePathFrom(TestObject it) {
-        if(it instanceof CaseResult) {
-        	return "..";
+        if (it instanceof CaseResult) {
+            return "..";
         } else {
             return super.getRelativePathFrom(it);
         }
