@@ -440,6 +440,12 @@
           <groupId>org.hudsonci.stapler</groupId>
           <artifactId>commons-jelly</artifactId>
           <version>${commons-jelly.version}</version>
+            <exclusions>
+              <exclusion>
+                <groupId>dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+              </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-jelly</groupId>
@@ -503,6 +509,10 @@
                 <exclusion>
                     <groupId>org.jvnet.hudson</groupId>
                     <artifactId>commons-jelly</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>dom4j</groupId>
+                    <artifactId>dom4j</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -687,6 +697,10 @@
                 <exclusion>
                     <groupId>commons-jelly</groupId>
                     <artifactId>commons-jelly</artifactId>
+                </exclusion>
+                <exclusion>
+                	<groupId>org.jvnet.hudson</groupId>
+                	<artifactId>commons-jelly</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>commons-jexl</groupId>
