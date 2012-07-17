@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *      
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -28,6 +28,7 @@ import org.kohsuke.stapler.QueryParameter;
 
 /**
  * Installs a tool by running an arbitrary shell command.
+ *
  * @since 1.305
  */
 public class CommandInstaller extends ToolInstaller {
@@ -36,7 +37,6 @@ public class CommandInstaller extends ToolInstaller {
      * Command to execute, similar to {@link CommandInterpreter#command}.
      */
     private final String command;
-
     /**
      * Resulting tool home directory.
      */
@@ -95,7 +95,5 @@ public class CommandInstaller extends ToolInstaller {
                 return FormValidation.error(Messages.CommandInstaller_no_toolHome());
             }
         }
-
     }
-
 }

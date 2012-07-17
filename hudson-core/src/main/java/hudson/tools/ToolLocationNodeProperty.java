@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -33,11 +33,13 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * {@link NodeProperty} that allows users to specify different locations for {@link ToolInstallation}s.
+ * {@link NodeProperty} that allows users to specify different locations for
+ * {@link ToolInstallation}s.
  *
  * @since 1.286
  */
 public class ToolLocationNodeProperty extends NodeProperty<Node> {
+
     /**
      * Override locations. Never null.
      */
@@ -45,7 +47,9 @@ public class ToolLocationNodeProperty extends NodeProperty<Node> {
 
     @DataBoundConstructor
     public ToolLocationNodeProperty(List<ToolLocation> locations) {
-        if(locations==null) throw new IllegalArgumentException();
+        if (locations == null) {
+            throw new IllegalArgumentException();
+        }
         this.locations = locations;
     }
 
@@ -67,29 +71,35 @@ public class ToolLocationNodeProperty extends NodeProperty<Node> {
     }
 
     /**
-     * Checks if the location of the tool is overridden for the given node, and if so,
-     * return the node-specific home directory. Otherwise return {@code installation.getHome()}
+     * Checks if the location of the tool is overridden for the given node, and
+     * if so, return the node-specific home directory. Otherwise return
+     * {@code installation.getHome()}
      *
-     * <p>
-     * This is the core logic behind {@link NodeSpecific#forNode(Node)} for {@link ToolInstallation}.
+     * <p> This is the core logic behind {@link NodeSpecific#forNode(Node)} for
+     * {@link ToolInstallation}.
      *
-     * @return
-     *      never null.
-     * @deprecated since 2009-04-09.
-     *      Use {@link ToolInstallation#translateFor(Node,TaskListener)} 
+     * @return never null.
+     * @deprecated since 2009-04-09. Use
+     * {@link ToolInstallation#translateFor(Node,TaskListener)}
      */
     public static String getToolHome(Node node, ToolInstallation installation, TaskListener log) throws IOException, InterruptedException {
         String result = null;
 
         // node-specific configuration takes precedence
         ToolLocationNodeProperty property = node.getNodeProperties().get(ToolLocationNodeProperty.class);
-        if (property != null)   result = property.getHome(installation);
-        if (result != null)     return result;
+        if (property != null) {
+            result = property.getHome(installation);
+        }
+        if (result != null) {
+            return result;
+        }
 
         // consult translators
-        for( ToolLocationTranslator t : ToolLocationTranslator.all() ) {
+        for (ToolLocationTranslator t : ToolLocationTranslator.all()) {
             result = t.getToolHome(node, installation, log);
-            if(result!=null)    return result;
+            if (result != null) {
+                return result;
+            }
         }
 
         // fall back is no-op
@@ -103,7 +113,7 @@ public class ToolLocationNodeProperty extends NodeProperty<Node> {
             return Messages.ToolLocationNodeProperty_displayName();
         }
 
-        public DescriptorExtensionList<ToolInstallation,ToolDescriptor<?>> getToolDescriptors() {
+        public DescriptorExtensionList<ToolInstallation, ToolDescriptor<?>> getToolDescriptors() {
             return ToolInstallation.all();
         }
 
@@ -118,6 +128,7 @@ public class ToolLocationNodeProperty extends NodeProperty<Node> {
     }
 
     public static final class ToolLocation {
+
         private final String type;
         private final String name;
         private final String home;
@@ -129,10 +140,10 @@ public class ToolLocationNodeProperty extends NodeProperty<Node> {
             this.name = name;
             this.home = home;
         }
-        
+
         @DataBoundConstructor
         public ToolLocation(String key, String home) {
-            this.type =  key.substring(0, key.indexOf('@'));
+            this.type = key.substring(0, key.indexOf('@'));
             this.name = key.substring(key.indexOf('@') + 1);
             this.home = home;
         }
@@ -146,15 +157,14 @@ public class ToolLocationNodeProperty extends NodeProperty<Node> {
         }
 
         public ToolDescriptor getType() {
-            if (descriptor == null) descriptor = (ToolDescriptor) Descriptor.find(type); 
+            if (descriptor == null) {
+                descriptor = (ToolDescriptor) Descriptor.find(type);
+            }
             return descriptor;
         }
 
         public String getKey() {
             return type + "@" + name;
         }
-
     }
-    
-
 }
