@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -22,6 +22,7 @@ import java.util.List;
  * @author Kohsuke Kawaguchi
  */
 public interface SearchIndex {
+
     void find(String token, List<SearchItem> result);
 
     /**
@@ -29,7 +30,6 @@ public interface SearchIndex {
      * This method returns the superset of {@link #find(String, List)}.
      */
     void suggest(String token, List<SearchItem> result);
-
     /**
      * Empty set.
      */
@@ -37,6 +37,7 @@ public interface SearchIndex {
         public void find(String token, List<SearchItem> result) {
             // no item to contribute
         }
+
         public void suggest(String token, List<SearchItem> result) {
             // nothing to suggest
         }

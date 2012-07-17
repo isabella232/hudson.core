@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -22,33 +22,37 @@ import java.util.Map;
 
 /**
  * {@link SearchIndex} built on a {@link Map}.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public abstract class CollectionSearchIndex<SMT extends SearchableModelObject> implements SearchIndex {
+
     /**
      * Gets a single item that exactly matches the given key.
      */
     protected abstract SearchItem get(String key);
 
     /**
-     * Returns all items in the map.
-     * The collection can include null items.
+     * Returns all items in the map. The collection can include null items.
      */
     protected abstract Collection<SMT> all();
 
     public void find(String token, List<SearchItem> result) {
         SearchItem p = get(token);
-        if(p!=null)
+        if (p != null) {
             result.add(p);
+        }
     }
 
     public void suggest(String token, List<SearchItem> result) {
         Collection<SMT> items = all();
-        if(items==null)     return;
+        if (items == null) {
+            return;
+        }
         for (SMT o : items) {
-            if(o!=null && getName(o).contains(token))
+            if (o != null && getName(o).contains(token)) {
                 result.add(o);
+            }
         }
     }
 

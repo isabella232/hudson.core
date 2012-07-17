@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -23,15 +23,15 @@ import java.util.List;
  * @author Kohsuke Kawaguchi
  */
 public final class SearchIndexBuilder {
-    private final List<SearchItem> items = new ArrayList<SearchItem>();
 
+    private final List<SearchItem> items = new ArrayList<SearchItem>();
     private final List<SearchIndex> indices = new ArrayList<SearchIndex>();
 
     /**
      * Adds all {@link QuickSilver}-annotated properties to the search index.
      */
     public SearchIndexBuilder addAllAnnotations(SearchableModelObject o) {
-        ParsedQuickSilver.get(o.getClass()).addTo(this,o);
+        ParsedQuickSilver.get(o.getClass()).addTo(this, o);
         return this;
     }
 
@@ -39,23 +39,23 @@ public final class SearchIndexBuilder {
      * Short for {@code add(urlAsWellAsName,urlAsWellAsName)}
      */
     public SearchIndexBuilder add(String urlAsWellAsName) {
-        return add(urlAsWellAsName,urlAsWellAsName);        
+        return add(urlAsWellAsName, urlAsWellAsName);
     }
 
     /**
      * Adds a search index under the keyword 'name' to the given URL.
      *
-     * @param url
-     *      Relative URL from the source of the search index. 
+     * @param url Relative URL from the source of the search index.
      */
     public SearchIndexBuilder add(String url, String name) {
-        items.add(SearchItems.create(name,url));
+        items.add(SearchItems.create(name, url));
         return this;
     }
 
     public SearchIndexBuilder add(String url, String... names) {
-        for (String name : names)
-            add(url,name);
+        for (String name : names) {
+            add(url, name);
+        }
         return this;
     }
 
@@ -65,13 +65,14 @@ public final class SearchIndexBuilder {
     }
 
     public SearchIndexBuilder add(String url, SearchableModelObject searchable, String name) {
-        items.add(SearchItems.create(name,url,searchable));
+        items.add(SearchItems.create(name, url, searchable));
         return this;
     }
 
     public SearchIndexBuilder add(String url, SearchableModelObject searchable, String... names) {
-        for (String name : names)
-            add(url,searchable,name);
+        for (String name : names) {
+            add(url, searchable, name);
+        }
         return this;
     }
 
@@ -86,8 +87,9 @@ public final class SearchIndexBuilder {
 
     public SearchIndex make() {
         SearchIndex r = new FixedSet(items);
-        for (SearchIndex index : indices)
-            r = new UnionSearchIndex(r,index);
+        for (SearchIndex index : indices) {
+            r = new UnionSearchIndex(r, index);
+        }
         return r;
     }
 }
