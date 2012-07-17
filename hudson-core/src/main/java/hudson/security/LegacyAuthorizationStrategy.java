@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -19,14 +19,14 @@ package hudson.security;
 import hudson.RestrictedSince;
 
 /**
- * {@link AuthorizationStrategy} implementation that emulates the legacy behavior.
+ * {@link AuthorizationStrategy} implementation that emulates the legacy
+ * behavior.
  *
  * @author Kohsuke Kawaguchi
- * @deprecated as of 2.2.0
- *             This strategy was removed due to <a href='http://issues.hudson-ci.org/browse/HUDSON-8944'>HUDSON-8944</a>
+ * @deprecated as of 2.2.0 This strategy was removed due to <a
+ * href='http://issues.hudson-ci.org/browse/HUDSON-8944'>HUDSON-8944</a>
  */
 @Deprecated
 @RestrictedSince("2.2.0")
 public final class LegacyAuthorizationStrategy extends FullControlOnceLoggedInAuthorizationStrategy {
 }
-

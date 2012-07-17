@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Winston Prakash
- *     
+ *
  *
  *******************************************************************************/ 
 package hudson.security;
@@ -25,32 +25,31 @@ import org.springframework.security.providers.ldap.authenticator.BindAuthenticat
 
 /**
  * {@link BindAuthenticator} with improved diagnostics.
- * 
+ *
  */
 public class BindAuthenticator2 extends BindAuthenticator {
+
     /**
-     * If we ever had a successful authentication, 
+     * If we ever had a successful authentication,
      */
     private boolean hadSuccessfulAuthentication;
 
     public BindAuthenticator2(SpringSecurityContextSource springSecurityContextSource) {
         super(springSecurityContextSource);
     }
-    
+
     @Override
     public DirContextOperations authenticate(Authentication authentication) {
-         DirContextOperations dirContextOperations = super.authenticate(authentication);
-         hadSuccessfulAuthentication = true;
-         return dirContextOperations;
+        DirContextOperations dirContextOperations = super.authenticate(authentication);
+        hadSuccessfulAuthentication = true;
+        return dirContextOperations;
     }
-
 
     @Override
     protected void handleBindException(String userDn, String username, Throwable cause) {
-        LOGGER.log(hadSuccessfulAuthentication? Level.FINE : Level.WARNING,
-            "Failed to bind to LDAP: userDn"+userDn+"  username="+username,cause);
+        LOGGER.log(hadSuccessfulAuthentication ? Level.FINE : Level.WARNING,
+                "Failed to bind to LDAP: userDn" + userDn + "  username=" + username, cause);
         super.handleBindException(userDn, username, cause);
     }
-
     private static final Logger LOGGER = Logger.getLogger(BindAuthenticator2.class.getName());
 }

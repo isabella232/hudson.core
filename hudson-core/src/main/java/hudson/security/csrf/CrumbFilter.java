@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *      
+ *
  *
  *******************************************************************************/ 
 
@@ -32,18 +32,22 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Checks for and validates crumbs on requests that cause state changes, to
  * protect against cross site request forgeries.
- * 
+ *
  * @author dty
  */
 public class CrumbFilter implements Filter {
+
     /**
-     * Because servlet containers generally don't specify the ordering of the initialization
-     * (and different implementations indeed do this differently --- See HUDSON-3878),
-     * we cannot use Hudson to the CrumbIssuer into CrumbFilter eagerly.
+     * Because servlet containers generally don't specify the ordering of the
+     * initialization (and different implementations indeed do this differently
+     * --- See HUDSON-3878), we cannot use Hudson to the CrumbIssuer into
+     * CrumbFilter eagerly.
      */
     public CrumbIssuer getCrumbIssuer() {
         Hudson h = Hudson.getInstance();
-        if(h==null)     return null;    // before Hudson is initialized?
+        if (h == null) {
+            return null;    // before Hudson is initialized?
+        }
         return h.getCrumbIssuer();
     }
 
@@ -78,8 +82,8 @@ public class CrumbFilter implements Filter {
                 if (crumbIssuer.validateCrumb(httpRequest, crumbSalt, crumb)) {
                     valid = true;
                 } else {
-                    LOGGER.warning("Found invalid crumb " + crumb +
-                            ".  Will check remaining parameters for a valid one...");
+                    LOGGER.warning("Found invalid crumb " + crumb
+                            + ".  Will check remaining parameters for a valid one...");
                 }
             }
             // Multipart requests need to be handled by each handler.
@@ -88,7 +92,7 @@ public class CrumbFilter implements Filter {
             } else {
                 LOGGER.warning("No valid crumb was included in request for " + httpRequest.getRequestURI() + ".  Returning " + HttpServletResponse.SC_FORBIDDEN + ".");
                 HttpServletResponse httpResponse = (HttpServletResponse) response;
-                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN,"No valid crumb was included in the request");
+                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "No valid crumb was included in the request");
             }
         } else {
             chain.doFilter(request, response);
@@ -124,6 +128,5 @@ public class CrumbFilter implements Filter {
      */
     public void destroy() {
     }
-
     private static final Logger LOGGER = Logger.getLogger(CrumbFilter.class.getName());
 }

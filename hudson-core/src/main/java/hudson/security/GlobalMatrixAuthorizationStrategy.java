@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Winston Prakash
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.security;
@@ -62,29 +62,30 @@ import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
  */
 // TODO: think about the concurrency commitment of this class
 public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
-    private transient SidACL acl = new AclImpl();
 
+    private transient SidACL acl = new AclImpl();
     /**
      * List up all permissions that are granted.
      *
-     * Strings are either the granted authority or the principal,
-     * which is not distinguished.
+     * Strings are either the granted authority or the principal, which is not
+     * distinguished.
      */
-    private final Map<Permission,Set<String>> grantedPermissions = new HashMap<Permission, Set<String>>();
-
+    private final Map<Permission, Set<String>> grantedPermissions = new HashMap<Permission, Set<String>>();
     private final Set<String> sids = new HashSet<String>();
 
     /**
-     * Adds to {@link #grantedPermissions}.
-     * Use of this method should be limited during construction,
-     * as this object itself is considered immutable once populated.
+     * Adds to {@link #grantedPermissions}. Use of this method should be limited
+     * during construction, as this object itself is considered immutable once
+     * populated.
      */
     public void add(Permission p, String sid) {
-        if (p==null)
+        if (p == null) {
             throw new IllegalArgumentException();
+        }
         Set<String> set = grantedPermissions.get(p);
-        if(set==null)
-            grantedPermissions.put(p,set = new HashSet<String>());
+        if (set == null) {
+            grantedPermissions.put(p, set = new HashSet<String>());
+        }
         set.add(sid);
         sids.add(sid);
     }
@@ -98,7 +99,7 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
         Permission p = Permission.fromId(shortForm.substring(0, idx));
         if (p != null) {
             add(p, shortForm.substring(idx + 1));
-        }else{
+        } else {
             // This should not happen if Hudson is fully initialized.
             // But Initial Setup also loads Security setup before Hudson Initialization
             if (Hudson.getInstance() != null) {
@@ -117,27 +118,28 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
     }
 
     /**
-     * Due to HUDSON-2324, we want to inject Item.READ permission to everyone who has Hudson.READ,
-     * to remain backward compatible.
+     * Due to HUDSON-2324, we want to inject Item.READ permission to everyone
+     * who has Hudson.READ, to remain backward compatible.
+     *
      * @param grantedPermissions
      */
-    /*package*/ static boolean migrateHudson2324(Map<Permission,Set<String>> grantedPermissions) {
+    /*package*/ static boolean migrateHudson2324(Map<Permission, Set<String>> grantedPermissions) {
         boolean result = false;
         // Hudson may not be initialized yet in case of Initial Setup
-        if (Hudson.getInstance() == null){
+        if (Hudson.getInstance() == null) {
             return false;
         }
-        if(Hudson.getInstance().isUpgradedFromBefore(new VersionNumber("1.300.*"))) {
+        if (Hudson.getInstance().isUpgradedFromBefore(new VersionNumber("1.300.*"))) {
             Set<String> f = grantedPermissions.get(Hudson.READ);
-            if (f!=null) {
+            if (f != null) {
                 Set<String> t = grantedPermissions.get(Item.READ);
-                if (t!=null)
+                if (t != null) {
                     result = t.addAll(f);
-                else {
+                } else {
                     t = new HashSet<String>(f);
                     result = true;
                 }
-                grantedPermissions.put(Item.READ,t);
+                grantedPermissions.put(Item.READ, t);
             }
         }
         return result;
@@ -147,16 +149,18 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
      * Checks if the given SID has the given permission.
      */
     public boolean hasPermission(String sid, Permission p) {
-        for(; p!=null; p=p.impliedBy) {
+        for (; p != null; p = p.impliedBy) {
             Set<String> set = grantedPermissions.get(p);
-            if(set!=null && set.contains(sid) && p.getEnabled())
+            if (set != null && set.contains(sid) && p.getEnabled()) {
                 return true;
+            }
         }
         return false;
     }
 
     /**
-     * Checks if the permission is explicitly given, instead of implied through {@link Permission#impliedBy}.
+     * Checks if the permission is explicitly given, instead of implied through
+     * {@link Permission#impliedBy}.
      */
     public boolean hasExplicitPermission(String sid, Permission p) {
         Set<String> set = grantedPermissions.get(p);
@@ -166,13 +170,13 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
     /**
      * Returns all SIDs configured in this matrix, minus "anonymous"
      *
-     * @return
-     *      Always non-null.
+     * @return Always non-null.
      */
     public List<String> getAllSIDs() {
         Set<String> r = new HashSet<String>();
-        for (Set<String> set : grantedPermissions.values())
+        for (Set<String> set : grantedPermissions.values()) {
             r.addAll(set);
+        }
         r.remove("anonymous");
 
         String[] data = r.toArray(new String[r.size()]);
@@ -181,13 +185,14 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
     }
 
     private final class AclImpl extends SidACL {
+
         protected Boolean hasPermission(Sid p, Permission permission) {
-            if(GlobalMatrixAuthorizationStrategy.this.hasPermission(toString(p),permission))
+            if (GlobalMatrixAuthorizationStrategy.this.hasPermission(toString(p), permission)) {
                 return true;
+            }
             return null;
         }
     }
-
     @Extension
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
@@ -196,12 +201,13 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
      * represent {@link GlobalMatrixAuthorizationStrategy#grantedPermissions}.
      */
     public static class ConverterImpl implements Converter {
+
         public boolean canConvert(Class type) {
-            return type==GlobalMatrixAuthorizationStrategy.class;
+            return type == GlobalMatrixAuthorizationStrategy.class;
         }
 
         public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-            GlobalMatrixAuthorizationStrategy strategy = (GlobalMatrixAuthorizationStrategy)source;
+            GlobalMatrixAuthorizationStrategy strategy = (GlobalMatrixAuthorizationStrategy) source;
 
             // Output in alphabetical order for readability.
             SortedMap<Permission, Set<String>> sortedPermissions = new TreeMap<Permission, Set<String>>(Permission.ID_COMPARATOR);
@@ -212,7 +218,7 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
                 Collections.sort(sids);
                 for (String sid : sids) {
                     writer.startNode("permission");
-                    writer.setValue(p+':'+sid);
+                    writer.setValue(p + ':' + sid);
                     writer.endNode();
                 }
             }
@@ -228,14 +234,15 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
                     as.add(reader.getValue());
                 } catch (IllegalArgumentException ex) {
                     Logger.getLogger(GlobalMatrixAuthorizationStrategy.class.getName())
-                          .log(Level.WARNING,"Skipping a non-existent permission",ex);
+                            .log(Level.WARNING, "Skipping a non-existent permission", ex);
                     RobustReflectionConverter.addErrorInContext(context, ex);
                 }
                 reader.moveUp();
             }
 
-            if (migrateHudson2324(as.grantedPermissions))
+            if (migrateHudson2324(as.grantedPermissions)) {
                 OldDataMonitor.report(context, "1.301");
+            }
 
             return as;
         }
@@ -244,8 +251,9 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
             return new GlobalMatrixAuthorizationStrategy();
         }
     }
-    
+
     public static class DescriptorImpl extends Descriptor<AuthorizationStrategy> {
+
         protected DescriptorImpl(Class<? extends GlobalMatrixAuthorizationStrategy> clazz) {
             super(clazz);
         }
@@ -260,12 +268,12 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
         @Override
         public AuthorizationStrategy newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             GlobalMatrixAuthorizationStrategy gmas = create();
-            for(Map.Entry<String,JSONObject> r : (Set<Map.Entry<String,JSONObject>>)formData.getJSONObject("data").entrySet()) {
+            for (Map.Entry<String, JSONObject> r : (Set<Map.Entry<String, JSONObject>>) formData.getJSONObject("data").entrySet()) {
                 String sid = r.getKey();
-                for(Map.Entry<String,Boolean> e : (Set<Map.Entry<String,Boolean>>)r.getValue().entrySet()) {
-                    if(e.getValue()) {
+                for (Map.Entry<String, Boolean> e : (Set<Map.Entry<String, Boolean>>) r.getValue().entrySet()) {
+                    if (e.getValue()) {
                         Permission p = Permission.fromId(e.getKey());
-                        gmas.add(p,sid);
+                        gmas.add(p, sid);
                     }
                 }
             }
@@ -286,24 +294,26 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
             return p.getEnabled();
         }
 
-        public FormValidation doCheckName(@QueryParameter String value ) throws IOException, ServletException {
+        public FormValidation doCheckName(@QueryParameter String value) throws IOException, ServletException {
             return doCheckName(value, Hudson.getInstance(), Hudson.ADMINISTER);
         }
 
         FormValidation doCheckName(String value, AccessControlled subject, Permission permission) throws IOException, ServletException {
-            if(!subject.hasPermission(permission))  return FormValidation.ok(); // can't check
-
-            final String v = value.substring(1,value.length()-1);
+            if (!subject.hasPermission(permission)) {
+                return FormValidation.ok(); // can't check
+            }
+            final String v = value.substring(1, value.length() - 1);
             SecurityRealm sr = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm();
             String ev = Functions.escape(v);
 
-            if(v.equals("authenticated"))
-                // system reserved group
-                return FormValidation.respond(Kind.OK, makeImg("user.png") +ev);
+            if (v.equals("authenticated")) // system reserved group
+            {
+                return FormValidation.respond(Kind.OK, makeImg("user.png") + ev);
+            }
 
             try {
                 sr.loadUserByUsername(v);
-                return FormValidation.respond(Kind.OK, makeImg("person.png")+ev);
+                return FormValidation.respond(Kind.OK, makeImg("person.png") + ev);
             } catch (UserMayOrMayNotExistException e) {
                 // undecidable, meaning the user may exist
                 return FormValidation.respond(Kind.OK, ev);
@@ -315,7 +325,7 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
 
             try {
                 sr.loadGroupByGroupname(v);
-                return FormValidation.respond(Kind.OK, makeImg("user.png") +ev);
+                return FormValidation.respond(Kind.OK, makeImg("user.png") + ev);
             } catch (UserMayOrMayNotExistException e) {
                 // undecidable, meaning the group may exist
                 return FormValidation.respond(Kind.OK, ev);
@@ -326,7 +336,7 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
             }
 
             // couldn't find it. it doesn't exist
-            return FormValidation.respond(Kind.ERROR, makeImg("error.png") +ev);
+            return FormValidation.respond(Kind.ERROR, makeImg("error.png") + ev);
         }
 
         private String makeImg(String png) {
@@ -334,4 +344,3 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
         }
     }
 }
-

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -20,19 +20,20 @@ import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.springframework.security.userdetails.UserDetailsService;
 
 /**
- * Thrown from {@link UserDetailsService#loadUserByUsername(String)}
- * to indicate that the underlying {@link SecurityRealm} is incapable
- * of retrieving the information, and furthermore, the system cannot
- * tell if such an user exists or not.
+ * Thrown from {@link UserDetailsService#loadUserByUsername(String)} to indicate
+ * that the underlying {@link SecurityRealm} is incapable of retrieving the
+ * information, and furthermore, the system cannot tell if such an user exists
+ * or not.
  *
- * <p>
- * This happens, for example, when the security realm is on top of the servlet implementation,
- * there's no way of even knowing if an user of a given name exists or not.
+ * <p> This happens, for example, when the security realm is on top of the
+ * servlet implementation, there's no way of even knowing if an user of a given
+ * name exists or not.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.280
  */
 public class UserMayOrMayNotExistException extends UsernameNotFoundException {
+
     public UserMayOrMayNotExistException(String msg) {
         super(msg);
     }

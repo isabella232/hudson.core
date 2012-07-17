@@ -7,8 +7,8 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
- *      
+ * Contributors:
+ *
  *  Kohsuke Kawaguchi, Winston Prakash
  *
  *******************************************************************************/ 
@@ -123,7 +123,6 @@ public class PAMSecurityRealm extends SecurityRealm {
         providerManager.setProviders(Arrays.asList(authenticationProvider));
 
         UserDetailsService userDetailsService = new UserDetailsService() {
-
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
                 try {
                     if (!NativeUtils.getInstance().checkUnixUser(username)) {
@@ -156,7 +155,6 @@ public class PAMSecurityRealm extends SecurityRealm {
         }
 
         return new GroupDetails() {
-
             @Override
             public String getName() {
                 return groupname;

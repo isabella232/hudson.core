@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
+ * Contributors:
+ * 
 *    Kohsuke Kawaguchi, Tom Huybrechts
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -22,9 +22,11 @@ import org.springframework.security.AccessDeniedException;
  * Object that has an {@link ACL}
  *
  * @since 1.220
- * @see http://wiki.hudson-ci.org/display/HUDSON/Making+your+plugin+behave+in+secured+Hudson
+ * @see
+ * http://wiki.hudson-ci.org/display/HUDSON/Making+your+plugin+behave+in+secured+Hudson
  */
 public interface AccessControlled {
+
     /**
      * Obtains the ACL associated with this object.
      *
@@ -41,5 +43,4 @@ public interface AccessControlled {
      * Convenient short-cut for {@code getACL().hasPermission(permission)}
      */
     boolean hasPermission(Permission permission);
-
 }

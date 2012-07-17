@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
+ * Contributors:
+ * 
 *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -26,6 +26,7 @@ import org.springframework.security.userdetails.UserDetails;
  * @see UserDetails
  */
 public abstract class GroupDetails {
+
     /**
      * Returns the name of the group.
      *
@@ -36,8 +37,7 @@ public abstract class GroupDetails {
     /**
      * Returns the human-readable name used for rendering in HTML.
      *
-     * <p>
-     * This may contain arbitrary character, and it can change.
+     * <p> This may contain arbitrary character, and it can change.
      *
      * @return never null.
      */

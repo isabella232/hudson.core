@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Yahoo! Inc., Seiji Sogabe, Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Yahoo! Inc., Seiji Sogabe, Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -32,14 +32,14 @@ import java.util.Set;
 /**
  * {@link GlobalMatrixAuthorizationStrategy} plus per-project ACL.
  *
- * <p>
- * Per-project ACL is stored in {@link AuthorizationMatrixProperty}.
+ * <p> Per-project ACL is stored in {@link AuthorizationMatrixProperty}.
  *
  * @author Kohsuke Kawaguchi
  */
 public class ProjectMatrixAuthorizationStrategy extends GlobalMatrixAuthorizationStrategy {
+
     @Override
-    public ACL getACL(Job<?,?> project) {
+    public ACL getACL(Job<?, ?> project) {
         AuthorizationMatrixProperty amp = project.getProperty(AuthorizationMatrixProperty.class);
         if (amp != null) {
             return amp.getACL().newInheritingACL(getRootACL());
@@ -52,14 +52,14 @@ public class ProjectMatrixAuthorizationStrategy extends GlobalMatrixAuthorizatio
     public Set<String> getGroups() {
         Set<String> r = new HashSet<String>();
         r.addAll(super.getGroups());
-        for (Job<?,?> j : Hudson.getInstance().getItems(Job.class)) {
+        for (Job<?, ?> j : Hudson.getInstance().getItems(Job.class)) {
             AuthorizationMatrixProperty amp = j.getProperty(AuthorizationMatrixProperty.class);
-            if (amp != null)
+            if (amp != null) {
                 r.addAll(amp.getGroups());
+            }
         }
         return r;
     }
-
     @Extension
     public static final Descriptor<AuthorizationStrategy> DESCRIPTOR = new DescriptorImpl() {
         @Override
@@ -74,10 +74,11 @@ public class ProjectMatrixAuthorizationStrategy extends GlobalMatrixAuthorizatio
     };
 
     public static class ConverterImpl extends GlobalMatrixAuthorizationStrategy.ConverterImpl {
+
         private RobustReflectionConverter ref;
 
         public ConverterImpl(Mapper m) {
-            ref = new RobustReflectionConverter(m,new JVM().bestReflectionProvider());
+            ref = new RobustReflectionConverter(m, new JVM().bestReflectionProvider());
         }
 
         @Override
@@ -88,18 +89,18 @@ public class ProjectMatrixAuthorizationStrategy extends GlobalMatrixAuthorizatio
         @Override
         public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
             String name = reader.peekNextChild();
-            if(name!=null && (name.equals("permission") || name.equals("useProjectSecurity")))
-                // the proper serialization form
+            if (name != null && (name.equals("permission") || name.equals("useProjectSecurity"))) // the proper serialization form
+            {
                 return super.unmarshal(reader, context);
-            else
-                // remain compatible with earlier problem where we used reflection converter
-                return ref.unmarshal(reader,context);
+            } else // remain compatible with earlier problem where we used reflection converter
+            {
+                return ref.unmarshal(reader, context);
+            }
         }
 
         @Override
         public boolean canConvert(Class type) {
-            return type==ProjectMatrixAuthorizationStrategy.class;
+            return type == ProjectMatrixAuthorizationStrategy.class;
         }
     }
 }
-
