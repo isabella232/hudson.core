@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Martin Eigenbrodt
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Martin Eigenbrodt
+ *
  *
  *******************************************************************************/ 
 
@@ -26,16 +26,17 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @see StatusIcon
  */
 public class StatusColumn extends ListViewColumn {
+
     @DataBoundConstructor
     public StatusColumn() {
     }
 
     @Extension
     public static class DescriptorImpl extends ListViewColumnDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.StatusColumn_DisplayName();
         }
     }
-
 }

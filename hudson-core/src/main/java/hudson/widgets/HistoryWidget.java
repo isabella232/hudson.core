@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -33,51 +33,44 @@ import java.util.List;
 /**
  * Displays the history of records (normally {@link Run}s) on the side panel.
  *
- * @param <O>
- *      Owner of the widget.
- * @param <T>
- *      Type individual record.
+ * @param <O> Owner of the widget.
+ * @param <T> Type individual record.
  * @author Kohsuke Kawaguchi
  */
-public class HistoryWidget<O extends ModelObject,T> extends Widget {
+public class HistoryWidget<O extends ModelObject, T> extends Widget {
+
     /**
      * The given data model of records. Newer ones first.
      */
     //TODO: review and check whether we can do it private
     public Iterable<T> baseList;
-
     /**
      * Indicates the next build number that client ajax should fetch.
      */
     private String nextBuildNumberToFetch;
-
     /**
      * URL of the {@link #owner}.
      */
     //TODO: review and check whether we can do it private
     public final String baseUrl;
-
     //TODO: review and check whether we can do it private
     public final O owner;
-
     private boolean trimmed;
-
     //TODO: review and check whether we can do it private
     public final Adapter<? super T> adapter;
-
     /**
-     * First transient build record. Everything >= this will be discarded when AJAX call is made.
+     * First transient build record. Everything >= this will be discarded when
+     * AJAX call is made.
      */
     private String firstTransientBuildKey;
 
     /**
-     * @param owner
-     *      The parent model object that owns this widget.
+     * @param owner The parent model object that owns this widget.
      */
     public HistoryWidget(O owner, Iterable<T> baseList, Adapter<? super T> adapter) {
         this.adapter = adapter;
         this.baseList = baseList;
-        this.baseUrl = Functions.getNearestAncestorUrl(Stapler.getCurrentRequest(),owner);
+        this.baseUrl = Functions.getNearestAncestorUrl(Stapler.getCurrentRequest(), owner);
         this.owner = owner;
     }
 
@@ -114,10 +107,12 @@ public class HistoryWidget<O extends ModelObject,T> extends Widget {
     }
 
     private Iterable<T> updateFirstTransientBuildKey(Iterable<T> source) {
-        String key=null;
-        for (T t : source)
-            if(adapter.isBuilding(t))
+        String key = null;
+        for (T t : source) {
+            if (adapter.isBuilding(t)) {
                 key = adapter.getKey(t);
+            }
+        }
         firstTransientBuildKey = key;
         return source;
     }
@@ -126,24 +121,27 @@ public class HistoryWidget<O extends ModelObject,T> extends Widget {
      * The records to be rendered this time.
      */
     public Iterable<T> getRenderList() {
-        if(trimmed) {
+        if (trimmed) {
             List<T> lst;
             if (baseList instanceof List) {
                 lst = (List<T>) baseList;
-                if(lst.size()>THRESHOLD)
-                    return updateFirstTransientBuildKey(lst.subList(0,THRESHOLD));
-                trimmed=false;
+                if (lst.size() > THRESHOLD) {
+                    return updateFirstTransientBuildKey(lst.subList(0, THRESHOLD));
+                }
+                trimmed = false;
                 return updateFirstTransientBuildKey(lst);
             } else {
                 lst = new ArrayList<T>(THRESHOLD);
                 Iterator<T> itr = baseList.iterator();
-                while(lst.size()<=THRESHOLD && itr.hasNext())
+                while (lst.size() <= THRESHOLD && itr.hasNext()) {
                     lst.add(itr.next());
+                }
                 trimmed = itr.hasNext(); // if we don't have enough items in the base list, setting this to false will optimize the next getRenderList() invocation.
                 return updateFirstTransientBuildKey(lst);
             }
-        } else
+        } else {
             return updateFirstTransientBuildKey(baseList);
+        }
     }
 
     public boolean isTrimmed() {
@@ -157,48 +155,48 @@ public class HistoryWidget<O extends ModelObject,T> extends Widget {
     /**
      * Handles AJAX requests from browsers to update build history.
      *
-     * @param n
-     *      The build 'number' to fetch. This is string because various variants
-     *      uses non-numbers as the build key.
+     * @param n The build 'number' to fetch. This is string because various
+     * variants uses non-numbers as the build key.
      */
-    public void doAjax( StaplerRequest req, StaplerResponse rsp,
-                  @Header("n") String n ) throws IOException, ServletException {
+    public void doAjax(StaplerRequest req, StaplerResponse rsp,
+            @Header("n") String n) throws IOException, ServletException {
 
         rsp.setContentType("text/html;charset=UTF-8");
 
         // pick up builds to send back
         List<T> items = new ArrayList<T>();
 
-        String nn=null; // we'll compute next n here
+        String nn = null; // we'll compute next n here
 
         // list up all builds >=n.
         for (T t : baseList) {
-            if(adapter.compare(t,n)>=0) {
+            if (adapter.compare(t, n) >= 0) {
                 items.add(t);
-                if(adapter.isBuilding(t))
+                if (adapter.isBuilding(t)) {
                     nn = adapter.getKey(t); // the next fetch should start from youngest build in progress
-            } else
+                }
+            } else {
                 break;
+            }
         }
 
-        if (nn==null) {
+        if (nn == null) {
             if (items.isEmpty()) {
                 // nothing to report back. next fetch should retry the same 'n'
-                nn=n;
+                nn = n;
             } else {
                 // every record fetched this time is frozen. next fetch should start from the next build
-                nn=adapter.getNextKey(adapter.getKey(items.get(0)));
+                nn = adapter.getNextKey(adapter.getKey(items.get(0)));
             }
         }
 
         baseList = items;
 
-        rsp.setHeader("n",nn);
+        rsp.setHeader("n", nn);
         firstTransientBuildKey = nn; // all builds >= nn should be marked transient
 
-        req.getView(this,"ajaxBuildHistory.jelly").forward(req,rsp);
+        req.getView(this, "ajaxBuildHistory.jelly").forward(req, rsp);
     }
-
     private static final int THRESHOLD = 30;
 
     public String getNextBuildNumberToFetch() {
@@ -210,12 +208,16 @@ public class HistoryWidget<O extends ModelObject,T> extends Widget {
     }
 
     public interface Adapter<T> {
+
         /**
          * If record is newer than the key, return a positive number.
          */
         int compare(T record, String key);
+
         String getKey(T record);
+
         boolean isBuilding(T record);
+
         String getNextKey(String key);
     }
 }

@@ -7,9 +7,9 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
+ *
  *       Winston Prakash
  *
  *******************************************************************************/ 
@@ -27,17 +27,18 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @see ViewsTabBar
  */
 public class DefaultViewsTabBar extends ViewsTabBar {
+
     @DataBoundConstructor
     public DefaultViewsTabBar() {
     }
 
     @Extension
     public static class DescriptorImpl extends ViewsTabBarDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.DefaultViewsTabsBar_DisplayName();
             //return "Default Views TabsBar";
         }
     }
-
 }
