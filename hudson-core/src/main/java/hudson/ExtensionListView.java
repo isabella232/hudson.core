@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -28,23 +28,23 @@ import java.util.Collection;
 /**
  * Compatibility layer for legacy manual registration of extension points.
  *
- * <p>
- * Instances of this class can be created statically as a singleton, but it provides the view
- * to {@link ExtensionList} of the current {@link Hudson}.
- * Write operations to this list will update the legacy instances on {@link ExtensionList}.
+ * <p> Instances of this class can be created statically as a singleton, but it
+ * provides the view to {@link ExtensionList} of the current {@link Hudson}.
+ * Write operations to this list will update the legacy instances on
+ * {@link ExtensionList}.
  *
- * <p>
- * Whereas we used to use some simple data structure to keep track of static singletons,
- * we can now use this instances, so that {@link ExtensionList} sees all the auto-registered
- * and manually registered instances.
+ * <p> Whereas we used to use some simple data structure to keep track of static
+ * singletons, we can now use this instances, so that {@link ExtensionList} sees
+ * all the auto-registered and manually registered instances.
  *
- * <p>
- * Similarly, the old list (such as {@link UserNameResolver#LIST} continues to show all
- * auto and manually registered instances, thus providing necessary bi-directional interoperability.
+ * <p> Similarly, the old list (such as {@link UserNameResolver#LIST} continues
+ * to show all auto and manually registered instances, thus providing necessary
+ * bi-directional interoperability.
  *
  * @author Kohsuke Kawaguchi
  */
 public class ExtensionListView {
+
     /**
      * Creates a plain {@link List} backed by the current {@link ExtensionList}.
      */
@@ -91,7 +91,8 @@ public class ExtensionListView {
     }
 
     /**
-     * Creates a enhanced {@link CopyOnWriteList} that acts as a view to the current {@link ExtensionList}.
+     * Creates a enhanced {@link CopyOnWriteList} that acts as a view to the
+     * current {@link ExtensionList}.
      */
     public static <T> CopyOnWriteList<T> createCopyOnWriteList(final Class<T> type) {
         return new CopyOnWriteList<T>() {
@@ -155,6 +156,5 @@ public class ExtensionListView {
             }
         };
     }
-
     // TODO: we need a few more types whose implementations get uglier
 }

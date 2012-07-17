@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -21,17 +21,17 @@ import java.io.File;
 /**
  * Strategy object that absorbs the platform differences.
  *
- * <p>
- * Do not switch/case on this enum, or do a comparison, as we may add new constants.
+ * <p> Do not switch/case on this enum, or do a comparison, as we may add new
+ * constants.
  *
  * @author Kohsuke Kawaguchi
  */
 public enum Platform {
-    WINDOWS(';'),UNIX(':');
 
+    WINDOWS(';'), UNIX(':');
     /**
-     * The character that separates paths in environment variables like PATH and CLASSPATH. 
-     * On Windows ';' and on Unix ':'.
+     * The character that separates paths in environment variables like PATH and
+     * CLASSPATH. On Windows ';' and on Unix ':'.
      *
      * @see File#pathSeparator
      */
@@ -42,7 +42,9 @@ public enum Platform {
     }
 
     public static Platform current() {
-        if(File.pathSeparatorChar==':') return UNIX;
+        if (File.pathSeparatorChar == ':') {
+            return UNIX;
+        }
         return WINDOWS;
     }
 }

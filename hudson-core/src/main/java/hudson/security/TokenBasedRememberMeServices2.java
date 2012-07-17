@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -21,17 +21,16 @@ import org.springframework.security.Authentication;
 import org.apache.commons.codec.digest.DigestUtils;
 
 /**
- * {@link TokenBasedRememberMeServices} with modification so as not to rely
- * on the user password being available.
+ * {@link TokenBasedRememberMeServices} with modification so as not to rely on
+ * the user password being available.
  *
- * <p>
- * This allows remember-me to work with security realms where the password
+ * <p> This allows remember-me to work with security realms where the password
  * is never available in clear text.
  *
  * @author Kohsuke Kawaguchi
  */
 public class TokenBasedRememberMeServices2 extends TokenBasedRememberMeServices {
-    
+
     @Override
     protected String makeTokenSignature(long tokenExpiryTime, String username, String password) {
         String expectedTokenSignature = DigestUtils.md5Hex(username + ":" + tokenExpiryTime + ":"

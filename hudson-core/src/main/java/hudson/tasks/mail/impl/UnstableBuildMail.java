@@ -30,7 +30,7 @@ import javax.mail.internet.MimeMessage;
 public class UnstableBuildMail extends BaseBuildResultMail {
 
     public UnstableBuildMail(String recipients, boolean sendToIndividuals,
-                             List<AbstractProject> upstreamProjects, String charset) {
+            List<AbstractProject> upstreamProjects, String charset) {
         super(recipients, sendToIndividuals, upstreamProjects, charset);
     }
 
@@ -38,7 +38,7 @@ public class UnstableBuildMail extends BaseBuildResultMail {
      * @inheritDoc
      */
     public MimeMessage getMail(AbstractBuild<?, ?> build, BuildListener listener)
-        throws MessagingException, InterruptedException {
+            throws MessagingException, InterruptedException {
         MimeMessage msg = createEmptyMail(build, listener);
 
         String subject = Messages.MailSender_UnstableMail_Subject();

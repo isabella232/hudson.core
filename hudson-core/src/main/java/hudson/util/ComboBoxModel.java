@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    CollabNet
- *        
+ *
  *
  *******************************************************************************/ 
 
@@ -31,11 +31,13 @@ import java.util.Collection;
 import static java.util.Arrays.asList;
 
 /**
- * Model object for dynamically filed combo box, which is really just {@code ArrayList<String>}
- * 
+ * Model object for dynamically filed combo box, which is really just
+ * {@code ArrayList<String>}
+ *
  * @author Kohsuke Kawaguchi
  */
 public class ComboBoxModel extends ArrayList<String> implements HttpResponse {
+
     public ComboBoxModel(int initialCapacity) {
         super(initialCapacity);
     }

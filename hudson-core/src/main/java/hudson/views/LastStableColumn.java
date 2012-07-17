@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *   Jesse Glick
- *      
+ *
  *
  *******************************************************************************/ 
 
@@ -20,12 +20,14 @@ import hudson.Extension;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 public class LastStableColumn extends ListViewColumn {
+
     @DataBoundConstructor
     public LastStableColumn() {
     }
 
     @Extension
     public static class DescriptorImpl extends ListViewColumnDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.LastStableColumn_DisplayName();

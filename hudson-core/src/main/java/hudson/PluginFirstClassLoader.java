@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Olivier Lamy
- *     
+ * Contributors:
+ * 
+ *    Olivier Lamy
+ *
  *
  *******************************************************************************/ 
 
@@ -29,70 +29,63 @@ import java.util.List;
 import org.apache.tools.ant.AntClassLoader;
 
 /**
- * classLoader which use first /WEB-INF/lib/*.jar and /WEB-INF/classes before core classLoader
- * <b>you must use the pluginFirstClassLoader true in the maven-hpi-plugin</b>
+ * classLoader which use first /WEB-INF/lib/*.jar and /WEB-INF/classes before
+ * core classLoader <b>you must use the pluginFirstClassLoader true in the
+ * maven-hpi-plugin</b>
+ *
  * @author olamy
  * @since 1.371
  */
 public class PluginFirstClassLoader
-    extends AntClassLoader
-    implements Closeable
-{
-    
+        extends AntClassLoader
+        implements Closeable {
+
     private List<URL> urls = new ArrayList<URL>();
 
-    public void addPathFiles( Collection<File> paths )
-        throws IOException
-    {
-        for ( File f : paths )
-        {
-            urls.add( f.toURI().toURL() );
-            addPathFile( f );
+    public void addPathFiles(Collection<File> paths)
+            throws IOException {
+        for (File f : paths) {
+            urls.add(f.toURI().toURL());
+            addPathFile(f);
         }
     }
 
     /**
-     * @return List of jar used by the plugin /WEB-INF/lib/*.jar and classes directory /WEB-INF/classes
+     * @return List of jar used by the plugin /WEB-INF/lib/*.jar and classes
+     * directory /WEB-INF/classes
      */
-    public List<URL> getURLs() 
-    {
+    public List<URL> getURLs() {
         return urls;
     }
-    
+
     public void close()
-        throws IOException
-    {
+            throws IOException {
         cleanup();
     }
 
     @Override
-    protected Enumeration findResources( String arg0, boolean arg1 )
-        throws IOException
-    {
-        Enumeration enu = super.findResources( arg0, arg1 );
+    protected Enumeration findResources(String arg0, boolean arg1)
+            throws IOException {
+        Enumeration enu = super.findResources(arg0, arg1);
         return enu;
     }
 
     @Override
-    protected Enumeration findResources( String name )
-        throws IOException
-    {
-        Enumeration enu = super.findResources( name );
+    protected Enumeration findResources(String name)
+            throws IOException {
+        Enumeration enu = super.findResources(name);
         return enu;
     }
 
     @Override
-    public URL getResource( String arg0 )
-    {
-        URL url = super.getResource( arg0 );
+    public URL getResource(String arg0) {
+        URL url = super.getResource(arg0);
         return url;
     }
 
     @Override
-    public InputStream getResourceAsStream( String name )
-    {
-        InputStream is = super.getResourceAsStream( name );
+    public InputStream getResourceAsStream(String name) {
+        InputStream is = super.getResourceAsStream(name);
         return is;
-    }   
-    
+    }
 }

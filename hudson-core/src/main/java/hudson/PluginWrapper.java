@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi,   Yahoo! Inc., Erik Ramfelt, Tom Huybrechts
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -42,90 +42,73 @@ import java.util.Enumeration;
 import java.util.jar.JarFile;
 
 /**
- * Represents a Hudson plug-in and associated control information
- * for Hudson to control {@link Plugin}.
+ * Represents a Hudson plug-in and associated control information for Hudson to
+ * control {@link Plugin}.
  *
- * <p>
- * A plug-in is packaged into a jar file whose extension is <tt>".hpi"</tt>,
+ * <p> A plug-in is packaged into a jar file whose extension is <tt>".hpi"</tt>,
  * A plugin needs to have a special manifest entry to identify what it is.
  *
- * <p>
- * At the runtime, a plugin has two distinct state axis.
- * <ol>
- *  <li>Enabled/Disabled. If enabled, Hudson is going to use it
- *      next time Hudson runs. Otherwise the next run will ignore it.
- *  <li>Activated/Deactivated. If activated, that means Hudson is using
- *      the plugin in this session. Otherwise it's not.
- * </ol>
- * <p>
- * For example, an activated but disabled plugin is still running but the next
- * time it won't.
+ * <p> At the runtime, a plugin has two distinct state axis. <ol>
+ * <li>Enabled/Disabled. If enabled, Hudson is going to use it next time Hudson
+ * runs. Otherwise the next run will ignore it. <li>Activated/Deactivated. If
+ * activated, that means Hudson is using the plugin in this session. Otherwise
+ * it's not. </ol> <p> For example, an activated but disabled plugin is still
+ * running but the next time it won't.
  *
  * @author Kohsuke Kawaguchi
  */
 public class PluginWrapper implements Comparable<PluginWrapper> {
-    
+
     private static final Logger LOGGER = Logger.getLogger(PluginWrapper.class.getName());
-    
     /**
      * {@link PluginManager} to which this belongs to.
      */
     //TODO: review and check whether we can do it private
     public final PluginManager parent;
-
     /**
-     * Plugin manifest.
-     * Contains description of the plugin.
+     * Plugin manifest. Contains description of the plugin.
      */
     private final Manifest manifest;
-
     /**
-     * {@link ClassLoader} for loading classes from this plugin.
-     * Null if disabled.
+     * {@link ClassLoader} for loading classes from this plugin. Null if
+     * disabled.
      */
     //TODO: review and check whether we can do it private
     public final ClassLoader classLoader;
-
     /**
-     * Base URL for loading static resources from this plugin.
-     * Null if disabled. The static resources are mapped under
-     * <tt>hudson/plugin/SHORTNAME/</tt>.
+     * Base URL for loading static resources from this plugin. Null if disabled.
+     * The static resources are mapped under <tt>hudson/plugin/SHORTNAME/</tt>.
      */
     //TODO: review and check whether we can do it private
     public final URL baseResourceURL;
-
     /**
-     * Used to control enable/disable setting of the plugin.
-     * If this file exists, plugin will be disabled.
+     * Used to control enable/disable setting of the plugin. If this file
+     * exists, plugin will be disabled.
      */
     private final File disableFile;
-
     /**
-     * Used to control the unpacking of the bundled plugin.
-     * If a pin file exists, Hudson assumes that the user wants to pin down a particular version
-     * of a plugin, and will not try to overwrite it. Otherwise, it'll be overwritten
-     * by a bundled copy, to ensure consistency across upgrade/downgrade.
+     * Used to control the unpacking of the bundled plugin. If a pin file
+     * exists, Hudson assumes that the user wants to pin down a particular
+     * version of a plugin, and will not try to overwrite it. Otherwise, it'll
+     * be overwritten by a bundled copy, to ensure consistency across
+     * upgrade/downgrade.
+     *
      * @since 1.325
      */
     private final File pinFile;
-
     /**
-     * Short name of the plugin. The artifact Id of the plugin.
-     * This is also used in the URL within Hudson, so it needs
-     * to remain stable even when the *.hpi file name is changed
-     * (like Maven does.)
+     * Short name of the plugin. The artifact Id of the plugin. This is also
+     * used in the URL within Hudson, so it needs to remain stable even when the
+     * *.hpi file name is changed (like Maven does.)
      */
     private final String shortName;
-
     /**
-     * True if this plugin is activated for this session.
-     * The snapshot of <tt>disableFile.exists()</tt> as of the start up.
+     * True if this plugin is activated for this session. The snapshot of
+     * <tt>disableFile.exists()</tt> as of the start up.
      */
     private final boolean active;
-
     private final List<Dependency> dependencies;
     private final List<Dependency> optionalDependencies;
-
     /**
      * Is this plugin bundled in hudson.war?
      */
@@ -133,6 +116,7 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
 
     public static final class Dependency {
         //TODO: review and check whether we can do it private
+
         public final String shortName;
         public final String version;
         public final boolean optional;
@@ -144,7 +128,7 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
             }
             this.shortName = s.substring(0, idx);
             this.version = s.substring(idx + 1);
-            
+
             boolean isOptional = false;
             String[] osgiProperties = s.split(";");
             for (int i = 1; i < osgiProperties.length; i++) {
@@ -171,36 +155,33 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
         @Override
         public String toString() {
             return shortName + " (" + version + ")";
-        }        
+        }
     }
 
     /**
-     * @param archive
-     *      A .hpi archive file jar file, or a .hpl linked plugin.
-     *  @param manifest
-     *          The manifest for the plugin
-     *  @param baseResourceURL
-     *          A URL pointing to the resources for this plugin
-     *  @param classLoader
-     *          a classloader that loads classes from this plugin and its dependencies
-     *  @param disableFile
-     *          if this file exists on startup, the plugin will not be activated
-     *  @param dependencies a list of mandatory dependencies
-     *  @param optionalDependencies a list of optional dependencies
+     * @param archive A .hpi archive file jar file, or a .hpl linked plugin.
+     * @param manifest The manifest for the plugin
+     * @param baseResourceURL A URL pointing to the resources for this plugin
+     * @param classLoader a classloader that loads classes from this plugin and
+     * its dependencies
+     * @param disableFile if this file exists on startup, the plugin will not be
+     * activated
+     * @param dependencies a list of mandatory dependencies
+     * @param optionalDependencies a list of optional dependencies
      */
-    public PluginWrapper(PluginManager parent, File archive, Manifest manifest, URL baseResourceURL, 
-			ClassLoader classLoader, File disableFile, 
-			List<Dependency> dependencies, List<Dependency> optionalDependencies) {
+    public PluginWrapper(PluginManager parent, File archive, Manifest manifest, URL baseResourceURL,
+            ClassLoader classLoader, File disableFile,
+            List<Dependency> dependencies, List<Dependency> optionalDependencies) {
         this.parent = parent;
-		this.manifest = manifest;
-		this.shortName = computeShortName(manifest, archive);
-		this.baseResourceURL = baseResourceURL;
-		this.classLoader = classLoader;
-		this.disableFile = disableFile;
+        this.manifest = manifest;
+        this.shortName = computeShortName(manifest, archive);
+        this.baseResourceURL = baseResourceURL;
+        this.classLoader = classLoader;
+        this.disableFile = disableFile;
         this.pinFile = new File(archive.getPath() + ".pinned");
-		this.active = !disableFile.exists();
-		this.dependencies = dependencies;
-		this.optionalDependencies = optionalDependencies;
+        this.active = !disableFile.exists();
+        this.dependencies = dependencies;
+        this.optionalDependencies = optionalDependencies;
     }
 
     public PluginManager getParent() {
@@ -252,7 +233,6 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
         return getBaseName(archive);
     }
 
-
     /**
      * Gets the "abc" portion from "abc.ext".
      */
@@ -273,7 +253,6 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
         return optionalDependencies;
     }
 
-
     /**
      * Returns the short name suitable for URL.
      */
@@ -290,8 +269,8 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
 
     /**
      * Gets the URL that shows more information about this plugin.
-     * @return
-     *      null if this information is unavailable.
+     *
+     * @return null if this information is unavailable.
      * @since 1.283
      */
     public String getUrl() {
@@ -352,7 +331,8 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
     }
 
     /**
-     * Returns true if the version of this plugin is older than the given version.
+     * Returns true if the version of this plugin is older than the given
+     * version.
      */
     public boolean isOlderThan(VersionNumber v) {
         try {
@@ -384,7 +364,7 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
             try {
                 ((Closeable) classLoader).close();
             } catch (IOException e) {
-                LOGGER.log(WARNING, "Failed to shut down classloader",e);
+                LOGGER.log(WARNING, "Failed to shut down classloader", e);
             }
         }
     }
@@ -419,8 +399,7 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
     }
 
     /**
-     * If true, the plugin is going to be activated next time
-     * Hudson runs.
+     * If true, the plugin is going to be activated next time Hudson runs.
      */
     public boolean isEnabled() {
         return !disableFile.exists();
@@ -440,11 +419,11 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
     }
 
     /**
-     * Makes sure that all the dependencies exist, and then accept optional dependencies
-     * as real dependencies.
+     * Makes sure that all the dependencies exist, and then accept optional
+     * dependencies as real dependencies.
      *
-     * @throws IOException
-     *             thrown if one or several mandatory dependencies doesn't exists.
+     * @throws IOException thrown if one or several mandatory dependencies
+     * doesn't exists.
      */
     /*package*/ void resolvePluginDependencies() throws IOException {
         List<String> missingDependencies = new ArrayList<String>();
@@ -455,7 +434,7 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
             }
         }
         if (!missingDependencies.isEmpty()) {
-            throw new IOException("Dependency "+Util.join(missingDependencies, ", ")+" doesn't exist");
+            throw new IOException("Dependency " + Util.join(missingDependencies, ", ") + " doesn't exist");
         }
         // add the optional dependencies that exists
         for (Dependency d : optionalDependencies) {
@@ -466,12 +445,11 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
     }
 
     /**
-     * If the plugin has {@link #getUpdateInfo() an update},
-     * returns the {@link UpdateSite.Plugin} object.
+     * If the plugin has {@link #getUpdateInfo() an update}, returns the
+     * {@link UpdateSite.Plugin} object.
      *
-     * @return
-     *      This method may return null &mdash; for example,
-     *      the user may have installed a plugin locally developed.
+     * @return This method may return null &mdash; for example, the user may
+     * have installed a plugin locally developed.
      */
     public UpdateSite.Plugin getUpdateInfo() {
         UpdateCenter uc = Hudson.getInstance().getUpdateCenter();
@@ -481,7 +459,7 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
         }
         return null;
     }
-    
+
     /**
      * returns the {@link UpdateSite.Plugin} object, or null.
      */
@@ -493,14 +471,13 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
     /**
      * Returns true if this plugin has update in the update center.
      *
-     * <p>
-     * This method is conservative in the sense that if the version number is incomprehensible,
-     * it always returns false.
+     * <p> This method is conservative in the sense that if the version number
+     * is incomprehensible, it always returns false.
      */
     public boolean hasUpdate() {
         return getUpdateInfo() != null;
     }
-    
+
     public boolean isPinned() {
         return pinFile.exists();
     }
@@ -528,8 +505,8 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
     }
 
     /**
-     * returns the version of the backed up plugin,
-     * or null if there's no back up.
+     * returns the version of the backed up plugin, or null if there's no back
+     * up.
      */
     public String getBackupVersion() {
         if (getBackupFile().exists()) {
@@ -558,6 +535,7 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
 // Action methods
 //
 //
+
     public HttpResponse doMakeEnabled() throws IOException {
         Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
         enable();
@@ -581,5 +559,4 @@ public class PluginWrapper implements Comparable<PluginWrapper> {
         pinFile.delete();
         return HttpResponses.ok();
     }
-
 }

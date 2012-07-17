@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utility class for taking the current input value and computing a list
- * of potential terms to match against the list of defined labels.
+ * Utility class for taking the current input value and computing a list of
+ * potential terms to match against the list of defined labels.
  */
 public class AutoCompleteSeeder {
+
     private String source;
 
     public AutoCompleteSeeder(String source) {

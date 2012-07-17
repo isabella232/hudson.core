@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -36,12 +36,13 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
- * A crumb issuing algorithm based on the request principal and the remote address.
- * 
+ * A crumb issuing algorithm based on the request principal and the remote
+ * address.
+ *
  * @author dty
  */
 public class DefaultCrumbIssuer extends CrumbIssuer {
-    
+
     private transient MessageDigest md;
     private boolean excludeClientIPFromCrumb;
 
@@ -60,7 +61,7 @@ public class DefaultCrumbIssuer extends CrumbIssuer {
     public boolean isExcludeClientIPFromCrumb() {
         return this.excludeClientIPFromCrumb;
     }
-    
+
     private Object readResolve() {
         try {
             this.md = MessageDigest.getInstance("MD5");
@@ -68,10 +69,10 @@ public class DefaultCrumbIssuer extends CrumbIssuer {
             this.md = null;
             LOGGER.log(Level.SEVERE, "Can't find MD5", e);
         }
-        
+
         return this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -120,21 +121,20 @@ public class DefaultCrumbIssuer extends CrumbIssuer {
         }
         return false;
     }
-
     private final String PROXY_HEADER = "X-Forwarded-For";
 
     private String getClientIP(HttpServletRequest req) {
         String defaultAddress = req.getRemoteAddr();
         String forwarded = req.getHeader(PROXY_HEADER);
         if (forwarded != null) {
-	        String[] hopList = forwarded.split(",");
+            String[] hopList = forwarded.split(",");
             if (hopList.length >= 1) {
                 return hopList[0];
             }
         }
         return defaultAddress;
     }
-    
+
     @Extension
     public static final class DescriptorImpl extends CrumbIssuerDescriptor<DefaultCrumbIssuer> implements ModelObject {
 
@@ -153,6 +153,5 @@ public class DefaultCrumbIssuer extends CrumbIssuer {
             return req.bindJSON(DefaultCrumbIssuer.class, formData);
         }
     }
-    
     private static final Logger LOGGER = Logger.getLogger(DefaultCrumbIssuer.class.getName());
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *      
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -26,12 +26,13 @@ import java.util.concurrent.Semaphore;
 
 /**
  * Actually runs installations.
+ *
  * @since 1.305
  */
 @Extension
 public class InstallerTranslator extends ToolLocationTranslator {
 
-    private static final Map<Node,Map<ToolInstallation,Semaphore>> mutexByNode = new WeakHashMap<Node,Map<ToolInstallation,Semaphore>>();
+    private static final Map<Node, Map<ToolInstallation, Semaphore>> mutexByNode = new WeakHashMap<Node, Map<ToolInstallation, Semaphore>>();
 
     public String getToolHome(Node node, ToolInstallation tool, TaskListener log) throws IOException, InterruptedException {
         InstallSourceProperty isp = tool.getProperties().get(InstallSourceProperty.class);
@@ -58,5 +59,4 @@ public class InstallerTranslator extends ToolLocationTranslator {
         }
         return null;
     }
-
 }

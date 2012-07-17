@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -36,46 +36,42 @@ import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 
 /**
- * Makes sure that no other Hudson uses our <tt>HUDSON_HOME</tt> directory,
- * to forestall the problem of running multiple instances of Hudson that point to the same data directory.
+ * Makes sure that no other Hudson uses our <tt>HUDSON_HOME</tt> directory, to
+ * forestall the problem of running multiple instances of Hudson that point to
+ * the same data directory.
  *
- * <p>
- * This set up error occasionally happens especialy when the user is trying to reassign the context path of the app,
- * and it results in a hard-to-diagnose error, so we actively check this.
+ * <p> This set up error occasionally happens especialy when the user is trying
+ * to reassign the context path of the app, and it results in a hard-to-diagnose
+ * error, so we actively check this.
  *
- * <p>
- * The mechanism is simple. This class occasionally updates a known file inside the hudson home directory,
- * and whenever it does so, it monitors the timestamp of the file to make sure no one else is updating
- * this file. In this way, while we cannot detect the problem right away, within a reasonable time frame
- * we can detect the collision.
+ * <p> The mechanism is simple. This class occasionally updates a known file
+ * inside the hudson home directory, and whenever it does so, it monitors the
+ * timestamp of the file to make sure no one else is updating this file. In this
+ * way, while we cannot detect the problem right away, within a reasonable time
+ * frame we can detect the collision.
  *
- * <p>
- * More traditional way of doing this is to use a lock file with PID in it, but unfortunately in Java,
- * there's no reliabe way to obtain PID.
+ * <p> More traditional way of doing this is to use a lock file with PID in it,
+ * but unfortunately in Java, there's no reliabe way to obtain PID.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.178
  */
 public class DoubleLaunchChecker {
+
     /**
-     * The timestamp of the owner file when we updated it for the last time.
-     * 0 to indicate that there was no update before.
+     * The timestamp of the owner file when we updated it for the last time. 0
+     * to indicate that there was no update before.
      */
     private long lastWriteTime = 0L;
-
     /**
-     * Once the error is reported, the user can choose to ignore and proceed anyway,
-     * in which case the flag is set to true.
+     * Once the error is reported, the user can choose to ignore and proceed
+     * anyway, in which case the flag is set to true.
      */
     private boolean ignore = false;
-
     private final Random random = new Random();
-
     public final File home;
-
     /**
-     * ID string of the other Hudson that we are colliding with. 
-     * Can be null.
+     * ID string of the other Hudson that we are colliding with. Can be null.
      */
     private String collidingId;
 
@@ -84,10 +80,10 @@ public class DoubleLaunchChecker {
     }
 
     protected void execute() {
-        File timestampFile = new File(home,".owner");
+        File timestampFile = new File(home, ".owner");
 
         long t = timestampFile.lastModified();
-        if(t!=0 && lastWriteTime!=0 && t!=lastWriteTime && !ignore) {
+        if (t != 0 && lastWriteTime != 0 && t != lastWriteTime && !ignore) {
             try {
                 collidingId = FileUtils.readFileToString(timestampFile);
             } catch (IOException e) {
@@ -96,7 +92,7 @@ public class DoubleLaunchChecker {
             // we noticed that someone else have updated this file.
             // switch GUI to display this error.
             WebAppController.get().install(this);
-            LOGGER.severe("Collision detected. timestamp="+t+", expected="+lastWriteTime);
+            LOGGER.severe("Collision detected. timestamp=" + t + ", expected=" + lastWriteTime);
             // we need to continue updating this file, so that the other Hudson would notice the problem, too.
         }
 
@@ -105,7 +101,7 @@ public class DoubleLaunchChecker {
             lastWriteTime = timestampFile.lastModified();
         } catch (IOException e) {
             // if failed to write, err on the safe side and assume things are OK.
-            lastWriteTime=0;
+            lastWriteTime = 0;
         }
 
         schedule();
@@ -118,15 +114,15 @@ public class DoubleLaunchChecker {
         Hudson h = Hudson.getInstance();
 
         // in servlet 2.5, we can get the context path
-        String contextPath="";
+        String contextPath = "";
         try {
             Method m = ServletContext.class.getMethod("getContextPath");
-            contextPath=" contextPath=\""+m.invoke(h.servletContext)+"\"";
+            contextPath = " contextPath=\"" + m.invoke(h.servletContext) + "\"";
         } catch (Exception e) {
             // maybe running with Servlet 2.4
         }
 
-        return h.hashCode()+contextPath+" at "+ManagementFactory.getRuntimeMXBean().getName();
+        return h.hashCode() + contextPath + " at " + ManagementFactory.getRuntimeMXBean().getName();
     }
 
     public String getCollidingId() {
@@ -138,12 +134,12 @@ public class DoubleLaunchChecker {
      */
     public void schedule() {
         // randomize the scheduling so that multiple Hudson instances will write at the file at different time
-        long MINUTE = 1000*60;
+        long MINUTE = 1000 * 60;
         Trigger.timer.schedule(new SafeTimerTask() {
             protected void doRun() {
                 execute();
             }
-        },(random.nextInt(30)+60)*MINUTE);
+        }, (random.nextInt(30) + 60) * MINUTE);
     }
 
     /**
@@ -151,7 +147,7 @@ public class DoubleLaunchChecker {
      */
     public void doDynamic(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         rsp.setStatus(SC_INTERNAL_SERVER_ERROR);
-        req.getView(this,"index.jelly").forward(req,rsp);
+        req.getView(this, "index.jelly").forward(req, rsp);
     }
 
     /**
@@ -160,8 +156,7 @@ public class DoubleLaunchChecker {
     public void doIgnore(StaplerRequest req, StaplerResponse rsp) throws IOException {
         ignore = true;
         WebAppController.get().install(Hudson.getInstance());
-        rsp.sendRedirect2(req.getContextPath()+'/');
+        rsp.sendRedirect2(req.getContextPath() + '/');
     }
-
     private static final Logger LOGGER = Logger.getLogger(DoubleLaunchChecker.class.getName());
 }

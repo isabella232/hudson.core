@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -41,16 +41,16 @@ import javax.servlet.ServletException;
 /**
  * {@link Descriptor} for {@link Slave}.
  *
- * <h2>Views</h2>
- * <p>
- * This object needs to have <tt>newInstanceDetail.jelly</tt> view, which shows up in
- * <tt>http://server/hudson/computers/new</tt> page as an explanation of this job type.
+ * <h2>Views</h2> <p> This object needs to have <tt>newInstanceDetail.jelly</tt>
+ * view, which shows up in <tt>http://server/hudson/computers/new</tt> page as
+ * an explanation of this job type.
  *
  * <h2>Other Implementation Notes</h2>
  *
  * @author Kohsuke Kawaguchi
  */
 public abstract class NodeDescriptor extends Descriptor<Node> {
+
     protected NodeDescriptor(Class<? extends Node> clazz) {
         super(clazz);
     }
@@ -61,27 +61,29 @@ public abstract class NodeDescriptor extends Descriptor<Node> {
     /**
      * Can the administrator create this type of nodes from UI?
      *
-     * Return false if it only makes sense for programs to create it, not through the "new node" UI.
+     * Return false if it only makes sense for programs to create it, not
+     * through the "new node" UI.
      */
     public boolean isInstantiable() {
         return true;
     }
 
     public final String newInstanceDetailPage() {
-        return '/'+clazz.getName().replace('.','/').replace('$','/')+"/newInstanceDetail.jelly";
+        return '/' + clazz.getName().replace('.', '/').replace('$', '/') + "/newInstanceDetail.jelly";
     }
 
     /**
-     * Handles the form submission from the "/computer/new" page, which is the first form for creating a new node.
-     * By default, it shows the configuration page for entering details, but subtypes can override this differently.
+     * Handles the form submission from the "/computer/new" page, which is the
+     * first form for creating a new node. By default, it shows the
+     * configuration page for entering details, but subtypes can override this
+     * differently.
      *
-     * @param name
-     *      Name of the new node.
+     * @param name Name of the new node.
      */
     public void handleNewNodePage(ComputerSet computerSet, String name, StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         computerSet.checkName(name);
         req.setAttribute("descriptor", this);
-        req.getView(computerSet,"_new.jelly").forward(req,rsp);
+        req.getView(computerSet, "_new.jelly").forward(req, rsp);
     }
 
     @Override
@@ -89,10 +91,11 @@ public abstract class NodeDescriptor extends Descriptor<Node> {
         return getViewPage(clazz, "configure-entries.jelly");
     }
 
-    public FormValidation doCheckName(@QueryParameter String value ) {
+    public FormValidation doCheckName(@QueryParameter String value) {
         String name = Util.fixEmptyAndTrim(value);
-        if(name==null)
+        if (name == null) {
             return FormValidation.error(Messages.NodeDescripter_CheckName_Mandatory());
+        }
         try {
             Hudson.checkGoodName(name);
         } catch (Failure f) {
@@ -104,22 +107,24 @@ public abstract class NodeDescriptor extends Descriptor<Node> {
     /**
      * Returns all the registered {@link NodeDescriptor} descriptors.
      */
-    public static DescriptorExtensionList<Node,NodeDescriptor> all() {
-        return Hudson.getInstance().<Node,NodeDescriptor>getDescriptorList(Node.class);
+    public static DescriptorExtensionList<Node, NodeDescriptor> all() {
+        return Hudson.getInstance().<Node, NodeDescriptor>getDescriptorList(Node.class);
     }
-
     /**
      * All the registered instances.
-     * @deprecated as of 1.286
-     *      Use {@link #all()} for read access, and {@link Extension} for registration.
+     *
+     * @deprecated as of 1.286 Use {@link #all()} for read access, and
+     * {@link Extension} for registration.
      */
     public static final DescriptorList<Node> ALL = new DescriptorList<Node>(Node.class);
 
     public static List<NodeDescriptor> allInstantiable() {
         List<NodeDescriptor> r = new ArrayList<NodeDescriptor>();
-        for (NodeDescriptor d : all())
-            if(d.isInstantiable())
+        for (NodeDescriptor d : all()) {
+            if (d.isInstantiable()) {
                 r.add(d);
+            }
+        }
         return r;
     }
 }

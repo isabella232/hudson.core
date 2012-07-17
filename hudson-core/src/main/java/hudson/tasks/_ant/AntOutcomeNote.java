@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -28,20 +28,24 @@ import hudson.console.ConsoleNote;
  * @author Kohsuke Kawaguchi
  */
 public class AntOutcomeNote extends ConsoleNote {
+
     public AntOutcomeNote() {
     }
 
     @Override
     public ConsoleAnnotator annotate(Object context, MarkupText text, int charPos) {
-        if (text.getText().contains("FAIL"))
-            text.addMarkup(0,text.length(),"<span class=ant-outcome-failure>","</span>");
-        if (text.getText().contains("SUCCESS"))
-            text.addMarkup(0,text.length(),"<span class=ant-outcome-success>","</span>");
+        if (text.getText().contains("FAIL")) {
+            text.addMarkup(0, text.length(), "<span class=ant-outcome-failure>", "</span>");
+        }
+        if (text.getText().contains("SUCCESS")) {
+            text.addMarkup(0, text.length(), "<span class=ant-outcome-success>", "</span>");
+        }
         return null;
     }
 
     @Extension
     public static final class DescriptorImpl extends ConsoleAnnotationDescriptor {
+
         public String getDisplayName() {
             return "Ant build outcome";
         }

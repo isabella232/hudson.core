@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -32,6 +32,7 @@ import java.io.StringWriter;
  * @author Kohsuke Kawaguchi
  */
 public class TextFile {
+
     public final File file;
 
     public TextFile(File file) {
@@ -52,12 +53,13 @@ public class TextFile {
     public String read() throws IOException {
         StringWriter out = new StringWriter();
         PrintWriter w = new PrintWriter(out);
-        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file),"UTF-8"));
+        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
         try {
             String line;
-            while((line=in.readLine())!=null)
+            while ((line = in.readLine()) != null) {
                 w.println(line);
-        } finally{
+            }
+        } finally {
             in.close();
         }
         return out.toString();

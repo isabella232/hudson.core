@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Tom Huybrechts, Yahoo!, Inc., Seiji Sogabe, Winston Prakash
- *     
+ *
  *
  *******************************************************************************/
 package hudson.tasks.junit;
@@ -113,7 +113,7 @@ public class History {
 
         for (hudson.tasks.test.TestResult o : list) {
             xSeries.add(o.getOwner().getDisplayName());
-            
+
             double duration = o.getDuration() / 60;
             if (o.getFailCount() > 0) {
                 ySeriesFailed.add(duration);
@@ -131,7 +131,6 @@ public class History {
 
             // For backward compatibility with JFreechart
             data.add(duration, "", new HistoryChartLabel(o) {
-
                 @Override
                 public Color getColor(int row, int column) {
                     if (o.getFailCount() > 0) {
@@ -159,18 +158,18 @@ public class History {
 
     private DataSet<String, HistoryChartLabel> getCountGraphDataSet() {
         DataSet<String, HistoryChartLabel> data = new DataSet<String, HistoryChartLabel>();
-        
+
         GraphSeries<String> xSeries = new GraphSeries<String>("Build No.");
         data.setXSeries(xSeries);
-        
+
         GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Failed", ColorPalette.RED);
         //ySeriesFailed.setBaseURL(getRelPath(req)); 
         data.addYSeries(ySeriesFailed);
-        
+
         GraphSeries<Number> ySeriesSkipped = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Skipped", ColorPalette.YELLOW);
         //ySeriesSkipped.setBaseURL(getRelPath(req));
         data.addYSeries(ySeriesSkipped);
-        
+
         GraphSeries<Number> ySeriesPassed = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Passed", ColorPalette.BLUE);
         //ySeriesPassed.setBaseURL(getRelPath(req));
         data.addYSeries(ySeriesPassed);
@@ -186,10 +185,10 @@ public class History {
 
         for (TestResult o : list) {
             xSeries.add(o.getOwner().getDisplayName());
-            ySeriesFailed.add((double)o.getFailCount());
-            ySeriesSkipped.add((double)o.getSkipCount());
-            ySeriesPassed.add((double)(o.getTotalCount() - o.getFailCount() - o.getSkipCount()));
-            
+            ySeriesFailed.add((double) o.getFailCount());
+            ySeriesSkipped.add((double) o.getSkipCount());
+            ySeriesPassed.add((double) (o.getTotalCount() - o.getFailCount() - o.getSkipCount()));
+
             // For backward compatibility with JFreechart
             data.add(o.getPassCount(), "2Passed", new HistoryChartLabel(o));
             data.add(o.getFailCount(), "1Failed", new HistoryChartLabel(o));
@@ -247,7 +246,7 @@ public class History {
 
         @Override
         public Color getColor(int row, int column) {
-            return  ColorPalette.BLUE;
+            return ColorPalette.BLUE;
         }
 
         @Override

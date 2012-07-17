@@ -7,9 +7,9 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
- * 
- *       
+ * Contributors:
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -36,7 +36,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package hudson.util.io;
 
 import hudson.util.IOException2;
@@ -50,15 +49,14 @@ import java.io.OutputStream;
 /**
  * {@link OutputStream} that writes to a file.
  *
- * <p>
- * Unlike regular {@link FileOutputStream}, this implementation allows the caller to close,
- * and then keep writing.
+ * <p> Unlike regular {@link FileOutputStream}, this implementation allows the
+ * caller to close, and then keep writing.
  *
  * @author Kohsuke Kawaguchi
  */
 public class ReopenableFileOutputStream extends OutputStream {
-    private final File out;
 
+    private final File out;
     private OutputStream current;
     private boolean appendOnNextOpen = false;
 
@@ -67,12 +65,13 @@ public class ReopenableFileOutputStream extends OutputStream {
     }
 
     private synchronized OutputStream current() throws IOException {
-        if (current==null)
+        if (current == null) {
             try {
-                current = new FileOutputStream(out,appendOnNextOpen);
+                current = new FileOutputStream(out, appendOnNextOpen);
             } catch (FileNotFoundException e) {
-                throw new IOException2("Failed to open "+out,e);
+                throw new IOException2("Failed to open " + out, e);
             }
+        }
         return current;
     }
 
@@ -98,7 +97,7 @@ public class ReopenableFileOutputStream extends OutputStream {
 
     @Override
     public synchronized void close() throws IOException {
-        if (current!=null) {
+        if (current != null) {
             current.close();
             appendOnNextOpen = true;
             current = null;
@@ -106,7 +105,8 @@ public class ReopenableFileOutputStream extends OutputStream {
     }
 
     /**
-     * In addition to close, ensure that the next "open" would truncate the file.
+     * In addition to close, ensure that the next "open" would truncate the
+     * file.
      */
     public synchronized void rewind() throws IOException {
         close();

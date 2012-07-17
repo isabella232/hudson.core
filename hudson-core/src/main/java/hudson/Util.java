@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Winston Prakash
- *     
+ *
  *
  *******************************************************************************/
 package hudson;
@@ -103,6 +103,7 @@ public class Util {
 
     /**
      * Creates a filtered sublist.
+     *
      * @since 1.176
      */
     public static <T> List<T> filter(Iterable<?> base, Class<T> type) {
@@ -122,15 +123,16 @@ public class Util {
         return filter((Iterable) base, type);
     }
     /**
-     * Pattern for capturing variables. Either $xyz or ${xyz}, while ignoring "$$"
+     * Pattern for capturing variables. Either $xyz or ${xyz}, while ignoring
+     * "$$"
      */
     private static final Pattern VARIABLE = Pattern.compile("\\$([A-Za-z0-9_]+|\\{[A-Za-z0-9_\\.+]+\\}|\\$)");
 
     /**
      * Replaces the occurrence of '$key' by <tt>properties.get('key')</tt>.
      *
-     * <p>
-     * Unlike shell, undefined variables are left as-is (this behavior is the same as Ant.)
+     * <p> Unlike shell, undefined variables are left as-is (this behavior is
+     * the same as Ant.)
      *
      */
     public static String replaceMacro(String s, Map<String, String> properties) {
@@ -140,8 +142,8 @@ public class Util {
     /**
      * Replaces the occurrence of '$key' by <tt>resolver.get('key')</tt>.
      *
-     * <p>
-     * Unlike shell, undefined variables are left as-is (this behavior is the same as Ant.)
+     * <p> Unlike shell, undefined variables are left as-is (this behavior is
+     * the same as Ant.)
      */
     public static String replaceMacro(String s, VariableResolver<String> resolver) {
         if (s == null) {
@@ -191,7 +193,7 @@ public class Util {
 
         BufferedReader r = null;
         StringBuilder str = new StringBuilder((int) logfile.length());
-        try {            
+        try {
             r = new BufferedReader(new InputStreamReader(new FileInputStream(logfile), charset));
             char[] buf = new char[1024];
             int len;
@@ -206,11 +208,10 @@ public class Util {
     }
 
     /**
-     * Deletes the contents of the given directory (but not the directory itself)
-     * recursively.
+     * Deletes the contents of the given directory (but not the directory
+     * itself) recursively.
      *
-     * @throws IOException
-     *      if the operation fails.
+     * @throws IOException if the operation fails.
      */
     public static void deleteContentsRecursive(File file) throws IOException {
         File[] files = file.listFiles();
@@ -224,6 +225,7 @@ public class Util {
 
     /**
      * Deletes this file (and does not take no for an answer).
+     *
      * @param f a file to delete
      * @throws IOException if it exists but could not be successfully deleted
      */
@@ -237,17 +239,17 @@ public class Util {
             // perhaps this file is read-only?
             makeWritable(f);
             /*
-            on Unix both the file and the directory that contains it has to be writable
-            for a file deletion to be successful. (Confirmed on Solaris 9)
+             on Unix both the file and the directory that contains it has to be writable
+             for a file deletion to be successful. (Confirmed on Solaris 9)
             
-            $ ls -la
-            total 6
-            dr-xr-sr-x   2 hudson   hudson       512 Apr 18 14:41 .
-            dr-xr-sr-x   3 hudson   hudson       512 Apr 17 19:36 ..
-            -r--r--r--   1 hudson   hudson       469 Apr 17 19:36 manager.xml
-            -rw-r--r--   1 hudson   hudson         0 Apr 18 14:41 x
-            $ rm x
-            rm: x not removed: Permission denied
+             $ ls -la
+             total 6
+             dr-xr-sr-x   2 hudson   hudson       512 Apr 18 14:41 .
+             dr-xr-sr-x   3 hudson   hudson       512 Apr 17 19:36 ..
+             -r--r--r--   1 hudson   hudson       469 Apr 17 19:36 manager.xml
+             -rw-r--r--   1 hudson   hudson         0 Apr 18 14:41 x
+             $ rm x
+             rm: x not removed: Permission denied
              */
 
             makeWritable(f.getParentFile());
@@ -338,8 +340,8 @@ public class Util {
     private static final Pattern errorCodeParser = Pattern.compile(".*CreateProcess.*error=([0-9]+).*");
 
     /**
-     * On Windows, error messages for IOException aren't very helpful.
-     * This method generates additional user-friendly error message to the listener
+     * On Windows, error messages for IOException aren't very helpful. This
+     * method generates additional user-friendly error message to the listener
      */
     public static void displayIOException(IOException e, TaskListener listener) {
         String msg = getWin32ErrorMessage(e);
@@ -355,8 +357,8 @@ public class Util {
     /**
      * Extracts the Win32 error message from {@link Throwable} if possible.
      *
-     * @return
-     *      null if there seems to be no error code or if the platform is not Win32.
+     * @return null if there seems to be no error code or if the platform is not
+     * Win32.
      */
     public static String getWin32ErrorMessage(Throwable e) {
         String msg = e.getMessage();
@@ -381,8 +383,7 @@ public class Util {
     /**
      * Gets a human readable message for the given Win32 error code.
      *
-     * @return
-     *      null if no such message is available.
+     * @return null if no such message is available.
      */
     public static String getWin32ErrorMessage(int n) {
         try {
@@ -442,9 +443,8 @@ public class Util {
     /**
      * Tokenizes the text separated by delimiters.
      *
-     * <p>
-     * In 1.210, this method was changed to handle quotes like Unix shell does.
-     * Before that, this method just used {@link StringTokenizer}.
+     * <p> In 1.210, this method was changed to handle quotes like Unix shell
+     * does. Before that, this method just used {@link StringTokenizer}.
      *
      * @since 1.145
      * @see QuotedStringTokenizer
@@ -458,7 +458,8 @@ public class Util {
     }
 
     /**
-     * Converts the map format of the environment variables to the K=V format in the array.
+     * Converts the map format of the environment variables to the K=V format in
+     * the array.
      */
     public static String[] mapToEnv(Map<String, String> m) {
         String[] r = new String[m.size()];
@@ -501,10 +502,9 @@ public class Util {
     /**
      * Computes MD5 digest of the given input stream.
      *
-     * @param source
-     *      The stream will be closed by this method at the end of this method.
-     * @return
-     *      32-char wide string
+     * @param source The stream will be closed by this method at the end of this
+     * method.
+     * @return 32-char wide string
      */
     public static String getDigestOf(InputStream source) throws IOException {
         try {
@@ -533,6 +533,7 @@ public class Util {
 
     /**
      * Converts a string into 128-bit AES key.
+     *
      * @since 1.308
      */
     public static SecretKey toAes128Key(String s) {
@@ -576,11 +577,11 @@ public class Util {
     }
 
     /**
-     * Returns a human readable text of the time duration, for example "3 minutes 40 seconds".
-     * This version should be used for representing a duration of some activity (like build)
+     * Returns a human readable text of the time duration, for example "3
+     * minutes 40 seconds". This version should be used for representing a
+     * duration of some activity (like build)
      *
-     * @param duration
-     *      number of milliseconds.
+     * @param duration number of milliseconds.
      */
     public static String getTimeSpanString(long duration) {
         // Break the duration up in to units.
@@ -620,13 +621,13 @@ public class Util {
     }
 
     /**
-     * Create a string representation of a time duration.  If the quantity of
-     * the most significant unit is big (>=10), then we use only that most
+     * Create a string representation of a time duration. If the quantity of the
+     * most significant unit is big (>=10), then we use only that most
      * significant unit in the string representation. If the quantity of the
-     * most significant unit is small (a single-digit value), then we also
-     * use a secondary, smaller unit for increased precision.
-     * So 13 minutes and 43 seconds returns just "13 minutes", but 3 minutes
-     * and 43 seconds is "3 minutes 43 seconds".
+     * most significant unit is small (a single-digit value), then we also use a
+     * secondary, smaller unit for increased precision. So 13 minutes and 43
+     * seconds returns just "13 minutes", but 3 minutes and 43 seconds is "3
+     * minutes 43 seconds".
      */
     private static String makeTimeSpanString(long bigUnit,
             String bigLabel,
@@ -649,11 +650,10 @@ public class Util {
 
     /**
      * Combines number and unit, with a plural suffix if needed.
-     * 
-     * @deprecated 
-     *   Use individual localization methods instead. 
-     *   See {@link Messages#Util_year(Object)} for an example.
-     *   Deprecated since 2009-06-24, remove method after 2009-12-24.
+     *
+     * @deprecated Use individual localization methods instead. See
+     * {@link Messages#Util_year(Object)} for an example. Deprecated since
+     * 2009-06-24, remove method after 2009-12-24.
      */
     public static String combine(long n, String suffix) {
         String s = Long.toString(n) + ' ' + suffix;
@@ -680,11 +680,10 @@ public class Util {
     /**
      * Escapes non-ASCII characters in URL.
      *
-     * <p>
-     * Note that this methods only escapes non-ASCII but leaves other URL-unsafe characters,
-     * such as '#'.
-     * {@link #rawEncode(String)} should generally be used instead, though be careful to pass only
-     * a single path component to that method (it will encode /, but this method does not).
+     * <p> Note that this methods only escapes non-ASCII but leaves other
+     * URL-unsafe characters, such as '#'. {@link #rawEncode(String)} should
+     * generally be used instead, though be careful to pass only a single path
+     * component to that method (it will encode /, but this method does not).
      */
     public static String encode(String s) {
         try {
@@ -738,12 +737,13 @@ public class Util {
     }
 
     /**
-     * Encode a single path component for use in an HTTP URL.
-     * Escapes all non-ASCII, general unsafe (space and "#%<>[\]^`{|}~)
-     * and HTTP special characters (/;:?) as specified in RFC1738.
-     * (so alphanumeric and !@$&*()-_=+',. are not encoded)
-     * Note that slash(/) is encoded, so the given string should be a
-     * single path component used in constructing a URL.
+     * Encode a single path component for use in an HTTP URL. Escapes all
+     * non-ASCII, general unsafe (space and "#%<>[\]^`{|}~) and HTTP special
+     * characters (/;:?) as specified in RFC1738. (so alphanumeric and !
+     *
+     * @$&*()-_=+',. are not encoded) Note that slash(/) is encoded, so the
+     * given string should be a single path component used in constructing a
+     * URL.
      */
     public static String rawEncode(String s) {
         boolean escaped = false;
@@ -793,7 +793,8 @@ public class Util {
     }
 
     /**
-     * Escapes HTML unsafe characters like &lt;, &amp; to the respective character entities.
+     * Escapes HTML unsafe characters like &lt;, &amp; to the respective
+     * character entities.
      */
     public static String escape(String text) {
         if (text == null) {
@@ -842,8 +843,8 @@ public class Util {
     }
 
     /**
-     * Methods acts as {@link #xmlEscape(String)} method with only difference that it also escapes
-     * '\n', '\r' symbols
+     * Methods acts as {@link #xmlEscape(String)} method with only difference
+     * that it also escapes '\n', '\r' symbols
      *
      * @param text string to escape
      * @return escaped string.
@@ -990,18 +991,16 @@ public class Util {
     /**
      * Creates Ant {@link FileSet} with the base dir and include pattern.
      *
-     * <p>
-     * The difference with this and using {@link FileSet#setIncludes(String)}
-     * is that this method doesn't treat whitespace as a pattern separator,
-     * which makes it impossible to use space in the file path.
+     * <p> The difference with this and using
+     * {@link FileSet#setIncludes(String)} is that this method doesn't treat
+     * whitespace as a pattern separator, which makes it impossible to use space
+     * in the file path.
      *
-     * @param includes
-     *      String like "foo/bar/*.xml" Multiple patterns can be separated
-     *      by ',', and whitespace can surround ',' (so that you can write
-     *      "abc, def" and "abc,def" to mean the same thing.
-     * @param excludes
-     *      Exclusion pattern. Follows the same format as the 'includes' parameter.
-     *      Can be null.
+     * @param includes String like "foo/bar/*.xml" Multiple patterns can be
+     * separated by ',', and whitespace can surround ',' (so that you can write
+     * "abc, def" and "abc,def" to mean the same thing.
+     * @param excludes Exclusion pattern. Follows the same format as the
+     * 'includes' parameter. Can be null.
      * @since 1.172
      */
     public static FileSet createFileSet(File baseDir, String includes, String excludes) {
@@ -1031,16 +1030,12 @@ public class Util {
     }
 
     /**
-     * Creates a symlink to baseDir+targetPath at baseDir+symlinkPath.
-     * <p>
-     * If there's a prior symlink at baseDir+symlinkPath, it will be overwritten.
+     * Creates a symlink to baseDir+targetPath at baseDir+symlinkPath. <p> If
+     * there's a prior symlink at baseDir+symlinkPath, it will be overwritten.
      *
-     * @param baseDir
-     *      Base directory to resolve the 'symlinkPath' parameter.
-     * @param targetPath
-     *      The file that the symlink should point to.
-     * @param symlinkPath
-     *      Where to create a symlink in.
+     * @param baseDir Base directory to resolve the 'symlinkPath' parameter.
+     * @param targetPath The file that the symlink should point to.
+     * @param symlinkPath Where to create a symlink in.
      */
     public static void createSymlink(File baseDir, String targetPath, String symlinkPath, TaskListener listener) throws InterruptedException {
         if (Functions.isWindows() || NO_SYMLINK) {
@@ -1114,12 +1109,10 @@ public class Util {
 
     /**
      * Resolves symlink, if the given file is a symlink. Otherwise return null.
-     * <p>
-     * If the resolution fails, report an error.
+     * <p> If the resolution fails, report an error.
      *
-     * @param listener
-     *      If we rely on an external command to resolve symlink, this is it.
-     *      (TODO: try readlink(1) available on some platforms)
+     * @param listener If we rely on an external command to resolve symlink,
+     * this is it. (TODO: try readlink(1) available on some platforms)
      */
     public static String resolveSymlink(File link, TaskListener listener) {
         if (Functions.isWindows()) {
@@ -1140,14 +1133,14 @@ public class Util {
     /**
      * Encodes the URL by RFC 2396.
      *
-     * I thought there's another spec that refers to UTF-8 as the encoding,
-     * but don't remember it right now.
+     * I thought there's another spec that refers to UTF-8 as the encoding, but
+     * don't remember it right now.
      *
      * @since 1.204
-     * @deprecated since 2008-05-13. This method is broken (see ISSUE#1666). It should probably
-     * be removed but I'm not sure if it is considered part of the public API
-     * that needs to be maintained for backwards compatibility.
-     * Use {@link #encode(String)} instead. 
+     * @deprecated since 2008-05-13. This method is broken (see ISSUE#1666). It
+     * should probably be removed but I'm not sure if it is considered part of
+     * the public API that needs to be maintained for backwards compatibility.
+     * Use {@link #encode(String)} instead.
      */
     @Deprecated
     public static String encodeRFC2396(String url) {
@@ -1161,6 +1154,7 @@ public class Util {
 
     /**
      * Wraps with the error icon and the CSS class to render error message.
+     *
      * @since 1.173
      */
     public static String wrapToErrorSpan(String s) {
@@ -1171,9 +1165,10 @@ public class Util {
     }
 
     /**
-     * Returns the parsed string if parsed successful; otherwise returns the default number.
-     * If the string is null, empty or a ParseException is thrown then the defaultNumber
-     * is returned.
+     * Returns the parsed string if parsed successful; otherwise returns the
+     * default number. If the string is null, empty or a ParseException is
+     * thrown then the defaultNumber is returned.
+     *
      * @param numberStr string to parse
      * @param defaultNumber number to return if the string can not be parsed
      * @return returns the parsed string; otherwise the default number
@@ -1190,8 +1185,8 @@ public class Util {
     }
 
     /**
-     * Checks if the public method defined on the base type with the given arguments
-     * are overridden in the given derived type.
+     * Checks if the public method defined on the base type with the given
+     * arguments are overridden in the given derived type.
      */
     public static boolean isOverridden(Class base, Class derived, String methodName, Class... types) {
         // the rewriteHudsonWar method isn't overridden.
@@ -1206,8 +1201,7 @@ public class Util {
     /**
      * Returns a file name by changing its extension.
      *
-     * @param ext
-     *      For example, ".zip"
+     * @param ext For example, ".zip"
      */
     public static File changeExtension(File dst, String ext) {
         String p = dst.getPath();
@@ -1228,6 +1222,7 @@ public class Util {
 
     /**
      * Loads a key/value pair string as {@link Properties}
+     *
      * @since 1.392
      */
     public static Properties loadProperties(String properties) throws IOException {

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -40,26 +40,25 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Persisted list of {@link Describable}s with some operations specific
- * to {@link Descriptor}s.
+ * Persisted list of {@link Describable}s with some operations specific to
+ * {@link Descriptor}s.
  *
- * <p>
- * This class allows multiple instances of the same descriptor. Some clients
- * use this semantics, while other clients use it as "up to one instance per
- * one descriptor" model.
+ * <p> This class allows multiple instances of the same descriptor. Some clients
+ * use this semantics, while other clients use it as "up to one instance per one
+ * descriptor" model.
  *
- * Some of the methods defined in this class only makes sense in the latter model,
- * such as {@link #remove(Descriptor)}.
+ * Some of the methods defined in this class only makes sense in the latter
+ * model, such as {@link #remove(Descriptor)}.
  *
  * @author Kohsuke Kawaguchi
  */
 public class DescribableList<T extends Describable<T>, D extends Descriptor<T>> extends PersistedList<T> {
+
     protected DescribableList() {
     }
 
     /**
-     * @deprecated since 2008-08-15.
-     *      Use {@link #DescribableList(Saveable)} 
+     * @deprecated since 2008-08-15. Use {@link #DescribableList(Saveable)}
      */
     public DescribableList(Owner owner) {
         setOwner(owner);
@@ -75,8 +74,7 @@ public class DescribableList<T extends Describable<T>, D extends Descriptor<T>> 
     }
 
     /**
-     * @deprecated since 2008-08-15.
-     *      Use {@link #setOwner(Saveable)}
+     * @deprecated since 2008-08-15. Use {@link #setOwner(Saveable)}
      */
     public void setOwner(Owner owner) {
         this.owner = owner;
@@ -86,25 +84,27 @@ public class DescribableList<T extends Describable<T>, D extends Descriptor<T>> 
      * Removes all instances of the same type, then add the new one.
      */
     public void replace(T item) throws IOException {
-        removeAll((Class)item.getClass());
+        removeAll((Class) item.getClass());
         data.add(item);
         onModified();
     }
 
     public T get(D descriptor) {
-        for (T t : data)
-            if(t.getDescriptor()==descriptor)
+        for (T t : data) {
+            if (t.getDescriptor() == descriptor) {
                 return t;
+            }
+        }
         return null;
     }
 
     public boolean contains(D d) {
-        return get(d)!=null;
+        return get(d) != null;
     }
 
     public void remove(D descriptor) throws IOException {
         for (T t : data) {
-            if(t.getDescriptor()==descriptor) {
+            if (t.getDescriptor() == descriptor) {
                 data.remove(t);
                 onModified();
                 return;
@@ -113,26 +113,29 @@ public class DescribableList<T extends Describable<T>, D extends Descriptor<T>> 
     }
 
     /**
-     * Creates a detached map from the current snapshot of the data, keyed from a descriptor to an instance.
+     * Creates a detached map from the current snapshot of the data, keyed from
+     * a descriptor to an instance.
      */
     @SuppressWarnings("unchecked")
-    public Map<D,T> toMap() {
-        return (Map)Descriptor.toMap(data);
+    public Map<D, T> toMap() {
+        return (Map) Descriptor.toMap(data);
     }
 
     /**
      * Rebuilds the list by creating a fresh instances from the submitted form.
      * <p/>
-     * <p/>
-     * This method is almost always used by the owner.
-     * This method does not invoke the save method.
+     * <
+     * p/>
+     * This method is almost always used by the owner. This method does not
+     * invoke the save method.
      *
-     * @param json Structured form data that includes the data for nested descriptor list.
-     * @deprecated as of 2.2.0,
-     *             use {@link DescribableListUtil#buildFromJson(hudson.model.Saveable, org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject, java.util.List)}
+     * @param json Structured form data that includes the data for nested
+     * descriptor list.
+     * @deprecated as of 2.2.0, use
+     * {@link DescribableListUtil#buildFromJson(hudson.model.Saveable, org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject, java.util.List)}
      */
     public void rebuild(StaplerRequest req, JSONObject json, List<? extends Descriptor<T>> descriptors)
-        throws FormException, IOException {
+            throws FormException, IOException {
         List<T> newList = new ArrayList<T>();
 
         for (Descriptor<T> d : descriptors) {
@@ -147,50 +150,51 @@ public class DescribableList<T extends Describable<T>, D extends Descriptor<T>> 
     }
 
     /**
-     * @deprecated as of 1.271
-     *      Use {@link #rebuild(StaplerRequest, JSONObject, List)} instead.
+     * @deprecated as of 1.271 Use
+     * {@link #rebuild(StaplerRequest, JSONObject, List)} instead.
      */
     public void rebuild(StaplerRequest req, JSONObject json, List<? extends Descriptor<T>> descriptors, String prefix) throws FormException, IOException {
-        rebuild(req,json,descriptors);
+        rebuild(req, json, descriptors);
     }
 
     /**
      * Rebuilds the list by creating a fresh instances from the submitted form.
      * <p/>
      * This version works with the the &lt;f:hetero-list> UI tag, where the user
-     * is allowed to create multiple instances of the same descriptor. Order is also
-     * significant.
+     * is allowed to create multiple instances of the same descriptor. Order is
+     * also significant.
      *
-     * @deprecated as of 2.2.0,
-     *             use {@link DescribableListUtil#buildFromHetero(hudson.model.Saveable, org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject, String, java.util.Collection)}
-     *             or {@link Descriptor#newInstancesFromHeteroList(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject, String, java.util.Collection)}
+     * @deprecated as of 2.2.0, use
+     * {@link DescribableListUtil#buildFromHetero(hudson.model.Saveable, org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject, String, java.util.Collection)}
+     * or
+     * {@link Descriptor#newInstancesFromHeteroList(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject, String, java.util.Collection)}
      */
     public void rebuildHetero(StaplerRequest req,
-                              JSONObject formData,
-                              Collection<? extends Descriptor<T>> descriptors,
-                              String key)
-        throws FormException, IOException {
+            JSONObject formData,
+            Collection<? extends Descriptor<T>> descriptors,
+            String key)
+            throws FormException, IOException {
         replaceBy(Descriptor.newInstancesFromHeteroList(req, formData, key, descriptors));
     }
 
     /**
      * Picks up {@link DependecyDeclarer}s and allow it to build dependencies.
      */
-    public void buildDependencyGraph(AbstractProject owner,DependencyGraph graph) {
+    public void buildDependencyGraph(AbstractProject owner, DependencyGraph graph) {
         for (Object o : this) {
             if (o instanceof DependecyDeclarer) {
                 DependecyDeclarer dd = (DependecyDeclarer) o;
-                dd.buildDependencyGraph(owner,graph);
+                dd.buildDependencyGraph(owner, graph);
             }
         }
     }
 
-/*
-    The following two seemingly pointless method definitions are necessary to produce
-    backward compatible binary signatures. Without this we only get
-    get(Ljava/lang/Class;)Ljava/lang/Object; from PersistedList where we need
-    get(Ljava/lang/Class;)Lhudson/model/Describable;
- */
+    /*
+     The following two seemingly pointless method definitions are necessary to produce
+     backward compatible binary signatures. Without this we only get
+     get(Ljava/lang/Class;)Ljava/lang/Object; from PersistedList where we need
+     get(Ljava/lang/Class;)Lhudson/model/Describable;
+     */
     public <U extends T> U get(Class<U> type) {
         return super.get(type);
     }
@@ -200,8 +204,7 @@ public class DescribableList<T extends Describable<T>, D extends Descriptor<T>> 
     }
 
     /**
-     * @deprecated since 2008-08-15.
-     *      Just implement {@link Saveable}.
+     * @deprecated since 2008-08-15. Just implement {@link Saveable}.
      */
     public interface Owner extends Saveable {
     }
@@ -212,6 +215,7 @@ public class DescribableList<T extends Describable<T>, D extends Descriptor<T>> 
      * Serializaion form is compatible with plain {@link List}.
      */
     public static class ConverterImpl extends AbstractCollectionConverter {
+
         CopyOnWriteList.ConverterImpl copyOnWriteListConverter;
 
         public ConverterImpl(Mapper mapper) {
@@ -225,15 +229,16 @@ public class DescribableList<T extends Describable<T>, D extends Descriptor<T>> 
         }
 
         public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-            for (Object o : (DescribableList) source)
+            for (Object o : (DescribableList) source) {
                 writeItem(o, context, writer);
+            }
         }
 
         public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
             CopyOnWriteList core = copyOnWriteListConverter.unmarshal(reader, context);
 
             try {
-                DescribableList r = (DescribableList)context.getRequiredType().newInstance();
+                DescribableList r = (DescribableList) context.getRequiredType().newInstance();
                 r.data.replaceBy(core);
                 return r;
             } catch (InstantiationException e) {

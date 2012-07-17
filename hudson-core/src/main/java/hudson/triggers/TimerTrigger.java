@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Jean-Baptiste Quenot, Martin Eigenbrodt
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Jean-Baptiste Quenot, Martin Eigenbrodt
+ *
  *
  *******************************************************************************/ 
 
@@ -27,7 +27,6 @@ import org.antlr.runtime.RecognitionException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-
 
 /**
  * {@link Trigger} that runs a job periodically.
@@ -48,6 +47,7 @@ public class TimerTrigger extends Trigger<BuildableItem> {
 
     @Extension
     public static class DescriptorImpl extends TriggerDescriptor {
+
         public boolean isApplicable(Item item) {
             return item instanceof BuildableItem;
         }
@@ -60,22 +60,25 @@ public class TimerTrigger extends Trigger<BuildableItem> {
         public FormValidation doCheck(@QueryParameter String value) {
             return doCheckSpec(value);
         }
-        
+
         /**
          * Performs syntax check.
          */
         public FormValidation doCheckSpec(@QueryParameter String value) {
             try {
                 String msg = CronTabList.create(fixNull(value)).checkSanity();
-                if(msg!=null)   return FormValidation.warning(msg);
+                if (msg != null) {
+                    return FormValidation.warning(msg);
+                }
                 return FormValidation.ok();
             } catch (RecognitionException e) {
                 return FormValidation.error(e.getMessage());
             }
         }
     }
-    
+
     public static class TimerTriggerCause extends Cause {
+
         @Override
         public String getShortDescription() {
             return Messages.TimerTrigger_TimerTriggerCause_ShortDescription();

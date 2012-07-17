@@ -29,6 +29,7 @@ import net.sf.json.util.JSONUtils;
  * Json utils for canonical writing.
  */
 public class JSONCanonicalUtils {
+
     /**
      * Write JSON object to writer in canonical form.
      *
@@ -139,7 +140,7 @@ public class JSONCanonicalUtils {
                     if (c < ' ') {
                         String t = "000" + Integer.toHexString(c);
                         sb.append("\\u")
-                            .append(t.substring(t.length() - 4));
+                                .append(t.substring(t.length() - 4));
                     } else {
                         sb.append(c);
                     }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -27,34 +27,35 @@ import java.util.List;
 /**
  * Displays the build history on the side panel.
  *
- * <p>
- * This widget enhances {@link HistoryWidget} by groking the notion
- * that {@link #owner} can be in the queue toward the next build.
+ * <p> This widget enhances {@link HistoryWidget} by groking the notion that
+ * {@link #owner} can be in the queue toward the next build.
  *
  * @author Kohsuke Kawaguchi
  */
-public class BuildHistoryWidget<T> extends HistoryWidget<Task,T> {
+public class BuildHistoryWidget<T> extends HistoryWidget<Task, T> {
+
     /**
-     * @param owner
-     *      The parent model object that owns this widget.
+     * @param owner The parent model object that owns this widget.
      */
-    public BuildHistoryWidget(Task owner, Iterable<T> baseList,Adapter<? super T> adapter) {
-        super(owner,baseList, adapter);
+    public BuildHistoryWidget(Task owner, Iterable<T> baseList, Adapter<? super T> adapter) {
+        super(owner, baseList, adapter);
     }
 
     /**
-     * Returns the first queue item if the owner is scheduled for execution in the queue.
+     * Returns the first queue item if the owner is scheduled for execution in
+     * the queue.
      */
     public Item getQueuedItem() {
         return Hudson.getInstance().getQueue().getItem(owner);
     }
 
     /**
-     * Returns the queue item if the owner is scheduled for execution in the queue, in REVERSE ORDER
+     * Returns the queue item if the owner is scheduled for execution in the
+     * queue, in REVERSE ORDER
      */
     public List<Item> getQueuedItems() {
-    	List<Item> list = new ArrayList<Item>(Hudson.getInstance().getQueue().getItems(owner));
-    	Collections.reverse(list);
-    	return list;
+        List<Item> list = new ArrayList<Item>(Hudson.getInstance().getQueue().getItems(owner));
+        Collections.reverse(list);
+        return list;
     }
 }

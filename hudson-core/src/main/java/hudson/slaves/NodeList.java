@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -31,12 +31,13 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * {@link CopyOnWriteArrayList} for {@link Node} that has special serialization semantics
- * of not serializing {@link EphemeralNode}s.
+ * {@link CopyOnWriteArrayList} for {@link Node} that has special serialization
+ * semantics of not serializing {@link EphemeralNode}s.
  *
  * @author Kohsuke Kawaguchi
  */
 public final class NodeList extends CopyOnWriteArrayList<Node> {
+
     public NodeList() {
     }
 
@@ -54,20 +55,22 @@ public final class NodeList extends CopyOnWriteArrayList<Node> {
      * Serializaion form is compatible with plain {@link List}.
      */
     public static final class ConverterImpl extends RobustCollectionConverter {
+
         public ConverterImpl(XStream xstream) {
             super(xstream);
         }
 
         @Override
         public boolean canConvert(Class type) {
-            return type==NodeList.class;
+            return type == NodeList.class;
         }
 
         @Override
         public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
             for (Node o : (NodeList) source) {
-                if(o instanceof EphemeralNode)
+                if (o instanceof EphemeralNode) {
                     continue;   // skip
+                }
                 writeItem(o, context, writer);
             }
         }
@@ -79,7 +82,7 @@ public final class NodeList extends CopyOnWriteArrayList<Node> {
 
         @Override
         public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-            return new NodeList((List<Node>)super.unmarshal(reader, context));
+            return new NodeList((List<Node>) super.unmarshal(reader, context));
         }
     }
 }

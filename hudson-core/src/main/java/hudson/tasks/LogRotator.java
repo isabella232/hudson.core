@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Martin Eigenbrodt
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Martin Eigenbrodt
+ *
  *
  *******************************************************************************/ 
 
@@ -34,47 +34,47 @@ import static java.util.logging.Level.FINER;
 /**
  * Deletes old log files.
  *
- * TODO: is there any other task that follows the same pattern?
- * try to generalize this just like {@link SCM} or {@link BuildStep}.
+ * TODO: is there any other task that follows the same pattern? try to
+ * generalize this just like {@link SCM} or {@link BuildStep}.
  *
  * @author Kohsuke Kawaguchi
  */
 public class LogRotator implements Describable<LogRotator> {
 
     private static final Logger LOGGER = Logger.getLogger(LogRotator.class.getName());
-
     /**
      * If not -1, history is only kept up to this days.
      */
     private final int daysToKeep;
-
     /**
      * If not -1, only this number of build logs are kept.
      */
     private final int numToKeep;
-
     /**
-     * If not -1 nor null, artifacts are only kept up to this days.
-     * Null handling is necessary to remain data compatible with old versions.
+     * If not -1 nor null, artifacts are only kept up to this days. Null
+     * handling is necessary to remain data compatible with old versions.
+     *
      * @since 1.350
      */
     private final Integer artifactDaysToKeep;
-
     /**
      * If not -1 nor null, only this number of builds have their artifacts kept.
      * Null handling is necessary to remain data compatible with old versions.
+     *
      * @since 1.350
      */
     private final Integer artifactNumToKeep;
 
     @DataBoundConstructor
-    public LogRotator (String logrotate_days, String logrotate_nums, String logrotate_artifact_days, String logrotate_artifact_nums) {
-        this (parse(logrotate_days),parse(logrotate_nums),
-              parse(logrotate_artifact_days),parse(logrotate_artifact_nums));
+    public LogRotator(String logrotate_days, String logrotate_nums, String logrotate_artifact_days, String logrotate_artifact_nums) {
+        this(parse(logrotate_days), parse(logrotate_nums),
+                parse(logrotate_artifact_days), parse(logrotate_artifact_nums));
     }
 
     public static int parse(String p) {
-        if(p==null)     return -1;
+        if (p == null) {
+            return -1;
+        }
         try {
             return Integer.parseInt(p);
         } catch (NumberFormatException e) {
@@ -83,8 +83,7 @@ public class LogRotator implements Describable<LogRotator> {
     }
 
     /**
-     * @deprecated since 1.350.
-     *      Use {@link #LogRotator(int, int, int, int)}
+     * @deprecated since 1.350. Use {@link #LogRotator(int, int, int, int)}
      */
     public LogRotator(int daysToKeep, int numToKeep) {
         this(daysToKeep, numToKeep, -1, -1);
@@ -146,7 +145,7 @@ public class LogRotator implements Describable<LogRotator> {
      * @throws IOException if configured
      */
     private void deleteBuilds(List<? extends Run<?, ?>> builds, Run lastSuccessBuild, Run lastStableBuild, Calendar cal)
-        throws IOException {
+            throws IOException {
         for (Run currentBuild : builds) {
             if (allowDeleteBuild(lastSuccessBuild, lastStableBuild, currentBuild, cal)) {
                 LOGGER.log(FINER, currentBuild.getFullDisplayName() + " is to be removed");
@@ -156,9 +155,10 @@ public class LogRotator implements Describable<LogRotator> {
     }
 
     /**
-     * Checks whether current build could be deleted.
-     * If current build equals to last Success Build or last Stable Build or currentBuild is configured to keep logs or
-     * currentBuild timestamp is before configured calendar value - return false, otherwise return true.
+     * Checks whether current build could be deleted. If current build equals to
+     * last Success Build or last Stable Build or currentBuild is configured to
+     * keep logs or currentBuild timestamp is before configured calendar value -
+     * return false, otherwise return true.
      *
      * @param lastSuccessBuild {@link Run}
      * @param lastStableBuild {@link Run}
@@ -173,7 +173,7 @@ public class LogRotator implements Describable<LogRotator> {
         }
         if (currentBuild == lastSuccessBuild) {
             LOGGER.log(FINER,
-                currentBuild.getFullDisplayName() + " is not GC-ed because it's the last successful build");
+                    currentBuild.getFullDisplayName() + " is not GC-ed because it's the last successful build");
             return false;
         }
         if (currentBuild == lastStableBuild) {
@@ -197,7 +197,7 @@ public class LogRotator implements Describable<LogRotator> {
      * @throws IOException if configured
      */
     private void deleteBuildArtifacts(List<? extends Run<?, ?>> builds, Run lastSuccessBuild, Run lastStableBuild,
-                                      Calendar cal) throws IOException {
+            Calendar cal) throws IOException {
         for (Run currentBuild : builds) {
             if (allowDeleteArtifact(lastSuccessBuild, lastStableBuild, currentBuild, cal)) {
                 currentBuild.deleteArtifacts();
@@ -206,9 +206,10 @@ public class LogRotator implements Describable<LogRotator> {
     }
 
     /**
-     * Checks whether artifacts from build could be deleted.
-     * If current build equals to last Success Build or last Stable Build or currentBuild is configured to keep logs or
-     * currentBuild timestamp is before configured calendar value - return false, otherwise return true.
+     * Checks whether artifacts from build could be deleted. If current build
+     * equals to last Success Build or last Stable Build or currentBuild is
+     * configured to keep logs or currentBuild timestamp is before configured
+     * calendar value - return false, otherwise return true.
      *
      * @param lastSuccessBuild {@link Run}
      * @param lastStableBuild {@link Run}
@@ -219,17 +220,17 @@ public class LogRotator implements Describable<LogRotator> {
     private boolean allowDeleteArtifact(Run lastSuccessBuild, Run lastStableBuild, Run currentBuild, Calendar cal) {
         if (currentBuild.isKeepLog()) {
             LOGGER.log(FINER,
-                currentBuild.getFullDisplayName() + " is not purged of artifacts because it's marked as a keeper");
+                    currentBuild.getFullDisplayName() + " is not purged of artifacts because it's marked as a keeper");
             return false;
         }
         if (currentBuild == lastSuccessBuild) {
             LOGGER.log(FINER, currentBuild.getFullDisplayName()
-                + " is not purged of artifacts because it's the last successful build");
+                    + " is not purged of artifacts because it's the last successful build");
             return false;
         }
         if (currentBuild == lastStableBuild) {
             LOGGER.log(FINER,
-                currentBuild.getFullDisplayName() + " is not purged of artifacts because it's the last stable build");
+                    currentBuild.getFullDisplayName() + " is not purged of artifacts because it's the last stable build");
             return false;
         }
         if (null != cal && !currentBuild.getTimestamp().before(cal)) {
@@ -272,22 +273,23 @@ public class LogRotator implements Describable<LogRotator> {
     }
 
     private int unbox(Integer i) {
-        return i==null ? -1: i;
+        return i == null ? -1 : i;
     }
 
     private String toString(Integer i) {
-        if (i==null || i==-1)   return "";
+        if (i == null || i == -1) {
+            return "";
+        }
         return String.valueOf(i);
     }
-
 
     public LRDescriptor getDescriptor() {
         return DESCRIPTOR;
     }
-
     public static final LRDescriptor DESCRIPTOR = new LRDescriptor();
 
     public static final class LRDescriptor extends Descriptor<LogRotator> {
+
         public String getDisplayName() {
             return "Log Rotation";
         }
@@ -311,11 +313,11 @@ public class LogRotator implements Describable<LogRotator> {
             return false;
         }
         if (artifactDaysToKeep != null ? !artifactDaysToKeep.equals(that.artifactDaysToKeep)
-            : that.artifactDaysToKeep != null) {
+                : that.artifactDaysToKeep != null) {
             return false;
         }
         if (artifactNumToKeep != null ? !artifactNumToKeep.equals(that.artifactNumToKeep)
-            : that.artifactNumToKeep != null) {
+                : that.artifactNumToKeep != null) {
             return false;
         }
 

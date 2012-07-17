@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Martin Eigenbrodt
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Martin Eigenbrodt
+ *
  *
  *******************************************************************************/ 
 
@@ -20,16 +20,17 @@ import hudson.Extension;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 public class JobColumn extends ListViewColumn {
+
     @DataBoundConstructor
     public JobColumn() {
     }
 
     @Extension
     public static class DescriptorImpl extends ListViewColumnDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.JobColumn_DisplayName();
         }
     }
-
 }

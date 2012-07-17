@@ -7,7 +7,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:       
+ * Contributors:
  *
  *******************************************************************************/ 
 
@@ -34,7 +34,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package hudson.util;
 
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -54,55 +53,52 @@ import java.util.Set;
 import java.util.TreeMap;
 
 /**
- * Read-only map implementation that uses less memory than {@link HashMap}/{@link TreeMap}.
+ * Read-only map implementation that uses less memory than
+ * {@link HashMap}/{@link TreeMap}.
  *
- * <p>
- * The implementation is backed by a single exact-length array, so this implementation has the following
- * performance characteristics.
+ * <p> The implementation is backed by a single exact-length array, so this
+ * implementation has the following performance characteristics.
  *
- * <ul>
- * <li>iteration is fast (but creates a lot of short-lived objects.)
- * <li>lookup is O(N)
- * <li>memory consumption is low
- * </ul>
+ * <ul> <li>iteration is fast (but creates a lot of short-lived objects.)
+ * <li>lookup is O(N) <li>memory consumption is low </ul>
  *
  * @author Kohsuke Kawaguchi
  */
 @SuppressWarnings({"unchecked"})
-public final class PackedMap<K,V> extends AbstractMap<K,V> {
+public final class PackedMap<K, V> extends AbstractMap<K, V> {
+
     private Object[] kvpairs;
 
     /**
      *
-     * @param src
-     *      Map to copy contents from. Iteration order is preserved.
+     * @param src Map to copy contents from. Iteration order is preserved.
      */
-    public static <K,V> PackedMap<K,V> of(Map<? extends K,? extends V> src) {
+    public static <K, V> PackedMap<K, V> of(Map<? extends K, ? extends V> src) {
         return new PackedMap<K, V>(src);
     }
 
-    private PackedMap(Map<? extends K,? extends V> src) {
-        kvpairs = new Object[src.size()*2];
-        int i=0;
+    private PackedMap(Map<? extends K, ? extends V> src) {
+        kvpairs = new Object[src.size() * 2];
+        int i = 0;
         for (Entry<? extends K, ? extends V> e : src.entrySet()) {
             kvpairs[i++] = e.getKey();
             kvpairs[i++] = e.getValue();
         }
     }
-
-    private final Set<Entry<K,V>> entrySet = new AbstractSet<Entry<K, V>>() {
+    private final Set<Entry<K, V>> entrySet = new AbstractSet<Entry<K, V>>() {
         @Override
         public Iterator<Entry<K, V>> iterator() {
             return new Iterator<Entry<K, V>>() {
-                int index=0;
+                int index = 0;
+
                 public boolean hasNext() {
-                    return index<kvpairs.length;
+                    return index < kvpairs.length;
                 }
 
                 @SuppressWarnings({"unchecked"})
                 public Entry<K, V> next() {
-                    final K k = (K)kvpairs[index++];
-                    final V v = (V)kvpairs[index++];
+                    final K k = (K) kvpairs[index++];
+                    final V v = (V) kvpairs[index++];
                     return new Entry<K, V>() {
                         public K getKey() {
                             return k;
@@ -126,7 +122,7 @@ public final class PackedMap<K,V> extends AbstractMap<K,V> {
 
         @Override
         public int size() {
-            return kvpairs.length/2;
+            return kvpairs.length / 2;
         }
     };
 
@@ -137,17 +133,21 @@ public final class PackedMap<K,V> extends AbstractMap<K,V> {
 
     @Override
     public boolean containsKey(Object key) {
-        for (int i=0; i<kvpairs.length; i+=2)
-            if (key.equals(kvpairs[i]))
+        for (int i = 0; i < kvpairs.length; i += 2) {
+            if (key.equals(kvpairs[i])) {
                 return true;
+            }
+        }
         return false;
     }
 
     @Override
     public V get(Object key) {
-        for (int i=0; i<kvpairs.length; i+=2)
-            if (key.equals(kvpairs[i]))
-                return (V)kvpairs[i+1];
+        for (int i = 0; i < kvpairs.length; i += 2) {
+            if (key.equals(kvpairs[i])) {
+                return (V) kvpairs[i + 1];
+            }
+        }
         return null;
     }
 
@@ -156,7 +156,7 @@ public final class PackedMap<K,V> extends AbstractMap<K,V> {
         return new AbstractList<V>() {
             @Override
             public V get(int index) {
-                return (V)kvpairs[index*2];
+                return (V) kvpairs[index * 2];
             }
 
             @Override
@@ -170,23 +170,24 @@ public final class PackedMap<K,V> extends AbstractMap<K,V> {
      * Should persist like a regular map.
      */
     public static class ConverterImpl extends MapConverter {
+
         public ConverterImpl(Mapper mapper) {
             super(mapper);
         }
 
         @Override
         public boolean canConvert(Class type) {
-            return type==PackedMap.class;
+            return type == PackedMap.class;
         }
 
         @Override
         protected Object createCollection(Class type) {
-            return new LinkedHashMap<String,String>();
+            return new LinkedHashMap<String, String>();
         }
 
         @Override
         public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-            return PackedMap.of((Map)super.unmarshal(reader, context));
+            return PackedMap.of((Map) super.unmarshal(reader, context));
         }
     }
 }

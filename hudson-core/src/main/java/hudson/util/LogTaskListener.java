@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *      
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -32,7 +32,7 @@ import java.util.logging.Logger;
  * {@link TaskListener} which sends messages to a {@link Logger}.
  */
 public class LogTaskListener extends AbstractTaskListener implements Serializable {
-    
+
     private final TaskListener delegate;
 
     public LogTaskListener(Logger logger, Level level) {
@@ -104,8 +104,6 @@ public class LogTaskListener extends AbstractTaskListener implements Serializabl
         public void close() throws IOException {
             flush();
         }
-
     }
-
     private static final long serialVersionUID = 1L;
 }

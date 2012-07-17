@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -34,14 +34,12 @@ import java.util.Arrays;
 /**
  * {@link XMLFilter} that checks the proper nesting of table related tags.
  *
- * <p>
- * Browser often "fixes" HTML by moving tables into the right place,
- * so failure to generate proper tables can result in a hard-to-track bugs.
+ * <p> Browser often "fixes" HTML by moving tables into the right place, so
+ * failure to generate proper tables can result in a hard-to-track bugs.
  *
- * <p>
- * TODO: where to apply this in stapler?
- * JellyClassTearOff creates XMLOutput. Perhaps we define a decorator?
- * We can also wrap Script. would that work better?
+ * <p> TODO: where to apply this in stapler? JellyClassTearOff creates
+ * XMLOutput. Perhaps we define a decorator? We can also wrap Script. would that
+ * work better?
  *
  * @author Kohsuke Kawaguchi
  */
@@ -68,11 +66,14 @@ public class TableNestChecker extends XMLFilterImpl {
         String tagName = localName.toUpperCase(Locale.ENGLISH);
 
         // make sure that this tag occurs in the proper context
-        if(!elements.peek().isAllowed(tagName))
-            throw new SAXException(tagName+" is not allowed inside "+tagNames.peek());
+        if (!elements.peek().isAllowed(tagName)) {
+            throw new SAXException(tagName + " is not allowed inside " + tagNames.peek());
+        }
 
         Checker next = CHECKERS.get(tagName);
-        if(next==null)  next = ALL_ALLOWED;
+        if (next == null) {
+            next = ALL_ALLOWED;
+        }
         elements.push(next);
         tagNames.push(tagName);
 
@@ -86,11 +87,10 @@ public class TableNestChecker extends XMLFilterImpl {
         super.endElement(uri, localName, qName);
     }
 
-
     private interface Checker {
+
         boolean isAllowed(String childTag);
     }
-
     private static final Checker ALL_ALLOWED = new Checker() {
         public boolean isAllowed(String childTag) {
             return true;
@@ -98,6 +98,7 @@ public class TableNestChecker extends XMLFilterImpl {
     };
 
     private static final class InList implements Checker {
+
         private final Set<String> tags;
 
         private InList(String... tags) {
@@ -108,14 +109,13 @@ public class TableNestChecker extends XMLFilterImpl {
             return tags.contains(childTag);
         }
     }
-
-    private static final Map<String,Checker> CHECKERS = new HashMap<String, Checker>();
+    private static final Map<String, Checker> CHECKERS = new HashMap<String, Checker>();
 
     static {
-        CHECKERS.put("TABLE",new InList("TR","THEAD","TBODY"));
+        CHECKERS.put("TABLE", new InList("TR", "THEAD", "TBODY"));
         InList rows = new InList("TR");
-        CHECKERS.put("THEAD",rows);
-        CHECKERS.put("THEAD",rows);
-        CHECKERS.put("TR",   new InList("TD","TH"));
+        CHECKERS.put("THEAD", rows);
+        CHECKERS.put("THEAD", rows);
+        CHECKERS.put("TR", new InList("TD", "TH"));
     }
 }

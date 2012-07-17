@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *      
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -34,6 +34,7 @@ import java.io.IOException;
 public class InstallSourceProperty extends ToolProperty<ToolInstallation> {
     // TODO: get the proper Saveable
     //TODO: review and check whether we can do it private
+
     public final DescribableList<ToolInstaller, Descriptor<ToolInstaller>> installers =
             new DescribableList<ToolInstaller, Descriptor<ToolInstaller>>(Saveable.NOOP);
 
@@ -51,8 +52,9 @@ public class InstallSourceProperty extends ToolProperty<ToolInstallation> {
     @Override
     public void setTool(ToolInstallation t) {
         super.setTool(t);
-        for (ToolInstaller installer : installers)
+        for (ToolInstaller installer : installers) {
             installer.setTool(t);
+        }
     }
 
     public Class<ToolInstallation> type() {
@@ -61,6 +63,7 @@ public class InstallSourceProperty extends ToolProperty<ToolInstallation> {
 
     @Extension
     public static class DescriptorImpl extends ToolPropertyDescriptor {
+
         public String getDisplayName() {
             return Messages.InstallSourceProperty_DescriptorImpl_displayName();
         }

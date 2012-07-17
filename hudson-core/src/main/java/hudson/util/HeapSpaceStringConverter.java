@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -20,13 +20,11 @@ import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 import com.thoughtworks.xstream.converters.basic.StringConverter;
 
 /**
- * The default {@link StringConverter} in XStream
- * uses {@link String#intern()}, which stresses the
- * (rather limited) PermGen space with a large XML file.
+ * The default {@link StringConverter} in XStream uses {@link String#intern()},
+ * which stresses the (rather limited) PermGen space with a large XML file.
  *
- * <p>
- * Use this to avoid that (instead those strings will
- * now be allocated to the heap space.)
+ * <p> Use this to avoid that (instead those strings will now be allocated to
+ * the heap space.)
  *
  * @author Kohsuke Kawaguchi
  */

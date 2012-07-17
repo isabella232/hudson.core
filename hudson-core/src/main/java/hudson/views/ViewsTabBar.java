@@ -7,9 +7,9 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
+ *
  *      Winston Prakash
  *
  *******************************************************************************/ 
@@ -26,20 +26,19 @@ import hudson.model.ListView;
 /**
  * Extension point for adding a ViewsTabBar header to Projects {@link ListView}.
  *
- * <p>
- * This object must have the <tt>viewTabs.jelly</tt>. This view
- * is called once when the project views main panel is built.
- * The "views" attribute is set to the "Collection of views".
+ * <p> This object must have the <tt>viewTabs.jelly</tt>. This view is called
+ * once when the project views main panel is built. The "views" attribute is set
+ * to the "Collection of views".
  *
- * <p>
- * There also must be a default constructor, which is invoked to create a Views TabBar in
- * the default configuration.
+ * <p> There also must be a default constructor, which is invoked to create a
+ * Views TabBar in the default configuration.
  *
  * @author Winston Prakash
  * @since 1.381
  * @see ViewsTabBarDescriptor
  */
 public abstract class ViewsTabBar extends AbstractDescribableImpl<ViewsTabBar> implements ExtensionPoint {
+
     /**
      * Returns all the registered {@link ViewsTabBar} descriptors.
      */
@@ -49,6 +48,6 @@ public abstract class ViewsTabBar extends AbstractDescribableImpl<ViewsTabBar> i
 
     @Override
     public ViewsTabBarDescriptor getDescriptor() {
-        return (ViewsTabBarDescriptor)super.getDescriptor();
+        return (ViewsTabBarDescriptor) super.getDescriptor();
     }
 }

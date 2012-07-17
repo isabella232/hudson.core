@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -23,13 +23,14 @@ import hudson.tools.PropertyDescriptor;
 /**
  * Descriptor for {@link NodeProperty}.
  *
- * <p>
- * Put {@link Extension} on your descriptor implementation to have it auto-registered.
+ * <p> Put {@link Extension} on your descriptor implementation to have it
+ * auto-registered.
  *
  * @since 1.286
  * @see NodeProperty
  */
-public abstract class NodePropertyDescriptor extends PropertyDescriptor<NodeProperty<?>,Node> {
+public abstract class NodePropertyDescriptor extends PropertyDescriptor<NodeProperty<?>, Node> {
+
     protected NodePropertyDescriptor(Class<? extends NodeProperty<?>> clazz) {
         super(clazz);
     }

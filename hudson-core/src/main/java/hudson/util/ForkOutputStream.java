@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -23,6 +23,7 @@ import java.io.OutputStream;
  * @author Kohsuke Kawaguchi
  */
 public class ForkOutputStream extends OutputStream {
+
     private final OutputStream lhs;
     private final OutputStream rhs;
 

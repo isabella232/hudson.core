@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -34,13 +34,15 @@ import java.util.HashMap;
  * @author Kohsuke Kawaguchi
  */
 public class MultipartFormDataParser {
+
     private final ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
-    private final Map<String,FileItem> byName = new HashMap<String,FileItem>();
+    private final Map<String, FileItem> byName = new HashMap<String, FileItem>();
 
     public MultipartFormDataParser(HttpServletRequest request) throws ServletException {
         try {
-            for( FileItem fi : (List<FileItem>)upload.parseRequest(request) )
-                byName.put(fi.getFieldName(),fi);
+            for (FileItem fi : (List<FileItem>) upload.parseRequest(request)) {
+                byName.put(fi.getFieldName(), fi);
+            }
         } catch (FileUploadException e) {
             throw new ServletException(e);
         }
@@ -48,7 +50,9 @@ public class MultipartFormDataParser {
 
     public String get(String key) {
         FileItem fi = byName.get(key);
-        if(fi==null)    return null;
+        if (fi == null) {
+            return null;
+        }
         return fi.getString();
     }
 
@@ -57,11 +61,12 @@ public class MultipartFormDataParser {
     }
 
     /**
-     * If any file is created on the disk, delete them all.
-     * Even if this method is not called, the resource will be still cleaned up later by GC.
+     * If any file is created on the disk, delete them all. Even if this method
+     * is not called, the resource will be still cleaned up later by GC.
      */
     public void cleanUp() {
-        for (FileItem item : byName.values())
+        for (FileItem item : byName.values()) {
             item.delete();
+        }
     }
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -42,8 +42,8 @@ public class RingBufferLogHandler extends Handler {
 
     public synchronized void publish(LogRecord record) {
         int len = records.length;
-        records[(start+size)%len]=record;
-        if(size==len) {
+        records[(start + size) % len] = record;
+        if (size == len) {
             start++;
         } else {
             size++;
@@ -53,15 +53,14 @@ public class RingBufferLogHandler extends Handler {
     /**
      * Returns the list view of {@link LogRecord}s in the ring buffer.
      *
-     * <p>
-     * New records are always placed early in the list.
+     * <p> New records are always placed early in the list.
      */
     public List<LogRecord> getView() {
         return new AbstractList<LogRecord>() {
             public LogRecord get(int index) {
                 // flip the order
                 synchronized (RingBufferLogHandler.this) {
-                    return records[(start+(size-(index+1)))%records.length];
+                    return records[(start + (size - (index + 1))) % records.length];
                 }
             }
 
@@ -72,6 +71,9 @@ public class RingBufferLogHandler extends Handler {
     }
 
     // noop
-    public void flush() {}
-    public void close() throws SecurityException {}
+    public void flush() {
+    }
+
+    public void close() throws SecurityException {
+    }
 }

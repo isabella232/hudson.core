@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -29,19 +29,20 @@ import javax.servlet.FilterChain;
 import java.io.IOException;
 
 /**
- * If {@link SpringSecurityException} caused {@link JellyTagException},
- * rethrow it accordingly so that {@link ExceptionTranslationFilter}
- * can pick it up and initiate the redirection.
- * 
+ * If {@link SpringSecurityException} caused {@link JellyTagException}, rethrow
+ * it accordingly so that {@link ExceptionTranslationFilter} can pick it up and
+ * initiate the redirection.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class UnwrapSecurityExceptionFilter implements Filter {
+
     public void init(FilterConfig filterConfig) throws ServletException {
     }
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         try {
-            chain.doFilter(request,response);
+            chain.doFilter(request, response);
         } catch (ServletException e) {
             Throwable t = e.getRootCause();
             if (t instanceof JellyTagException) {

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -43,35 +43,36 @@ import java.util.logging.Logger;
 /**
  * {@link TaskListener} that generates output into a single stream.
  *
- * <p>
- * This object is remotable.
- * 
+ * <p> This object is remotable.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class StreamTaskListener extends AbstractTaskListener implements Serializable, Closeable {
+
     private PrintStream out;
     private Charset charset;
 
     /**
-     * @deprecated as of 1.349
-     *      The caller should use {@link #StreamTaskListener(OutputStream, Charset)} to pass in
-     *      the charset and output stream separately, so that this class can handle encoding correctly,
-     *      or use {@link #fromStdout()} or {@link #fromStderr()}.
+     * @deprecated as of 1.349 The caller should use
+     * {@link #StreamTaskListener(OutputStream, Charset)} to pass in the charset
+     * and output stream separately, so that this class can handle encoding
+     * correctly, or use {@link #fromStdout()} or {@link #fromStderr()}.
      */
     public StreamTaskListener(PrintStream out) {
-        this(out,null);
+        this(out, null);
     }
 
     public StreamTaskListener(OutputStream out) {
-        this(out,null);
+        this(out, null);
     }
 
     public StreamTaskListener(OutputStream out, Charset charset) {
         try {
-            if (charset == null)
-                this.out = (out instanceof PrintStream) ? (PrintStream)out : new PrintStream(out, false);
-            else
+            if (charset == null) {
+                this.out = (out instanceof PrintStream) ? (PrintStream) out : new PrintStream(out, false);
+            } else {
                 this.out = new PrintStream(out, false, charset.name());
+            }
             this.charset = charset;
         } catch (UnsupportedEncodingException e) {
             // it's not very pretty to do this, but otherwise we'd have to touch too many call sites.
@@ -80,14 +81,14 @@ public class StreamTaskListener extends AbstractTaskListener implements Serializ
     }
 
     public StreamTaskListener(File out) throws IOException {
-        this(out,null);
+        this(out, null);
     }
 
     public StreamTaskListener(File out, Charset charset) throws IOException {
         // don't do buffering so that what's written to the listener
         // gets reflected to the file immediately, which can then be
         // served to the browser immediately
-        this(new FileOutputStream(out),charset);
+        this(new FileOutputStream(out), charset);
     }
 
     public StreamTaskListener(Writer w) throws IOException {
@@ -95,19 +96,18 @@ public class StreamTaskListener extends AbstractTaskListener implements Serializ
     }
 
     /**
-     * @deprecated as of 1.349
-     *      Use {@link #NULL}
+     * @deprecated as of 1.349 Use {@link #NULL}
      */
     public StreamTaskListener() throws IOException {
         this(new NullStream());
     }
 
     public static StreamTaskListener fromStdout() {
-        return new StreamTaskListener(System.out,Charset.defaultCharset());
+        return new StreamTaskListener(System.out, Charset.defaultCharset());
     }
 
     public static StreamTaskListener fromStderr() {
-        return new StreamTaskListener(System.err,Charset.defaultCharset());
+        return new StreamTaskListener(System.err, Charset.defaultCharset());
     }
 
     public PrintStream getLogger() {
@@ -127,23 +127,23 @@ public class StreamTaskListener extends AbstractTaskListener implements Serializ
             // for signature compatibility, we have to swallow this error
         }
         return new PrintWriter(
-            charset!=null ? new OutputStreamWriter(out,charset) : new OutputStreamWriter(out),true);
+                charset != null ? new OutputStreamWriter(out, charset) : new OutputStreamWriter(out), true);
     }
 
     public PrintWriter error(String msg) {
-        return _error("ERROR: ",msg);
+        return _error("ERROR: ", msg);
     }
 
     public PrintWriter error(String format, Object... args) {
-        return error(String.format(format,args));
+        return error(String.format(format, args));
     }
 
     public PrintWriter fatalError(String msg) {
-        return _error("FATAL: ",msg);
+        return _error("FATAL: ", msg);
     }
 
     public PrintWriter fatalError(String format, Object... args) {
-        return fatalError(String.format(format,args));
+        return fatalError(String.format(format, args));
     }
 
     public void annotate(ConsoleNote ann) throws IOException {
@@ -152,13 +152,13 @@ public class StreamTaskListener extends AbstractTaskListener implements Serializ
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeObject(new RemoteOutputStream(new CloseProofOutputStream(this.out)));
-        out.writeObject(charset==null? null : charset.name());
+        out.writeObject(charset == null ? null : charset.name());
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        out = new PrintStream((OutputStream)in.readObject(),true);
-        String name = (String)in.readObject();
-        charset = name==null ? null : Charset.forName(name);
+        out = new PrintStream((OutputStream) in.readObject(), true);
+        String name = (String) in.readObject();
+        charset = name == null ? null : Charset.forName(name);
     }
 
     public void close() throws IOException {
@@ -174,11 +174,9 @@ public class StreamTaskListener extends AbstractTaskListener implements Serializ
         try {
             close();
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING,"Failed to close",e);
+            LOGGER.log(Level.WARNING, "Failed to close", e);
         }
     }
-
     private static final long serialVersionUID = 1L;
-
     private static final Logger LOGGER = Logger.getLogger(StreamTaskListener.class.getName());
 }

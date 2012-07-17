@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -32,36 +32,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Default partial implementation of {@link TestResultParser} that handles GLOB dereferencing
- * and other checks for user errors, such as misconfigured GLOBs, up-to-date checks on test reports.
+ * Default partial implementation of {@link TestResultParser} that handles GLOB
+ * dereferencing and other checks for user errors, such as misconfigured GLOBs,
+ * up-to-date checks on test reports.
  *
- * <p>
- * The instance of the parser will be serialized to the node that performed the build and the parsing will be done
- * remotely on that slave.
+ * <p> The instance of the parser will be serialized to the node that performed
+ * the build and the parsing will be done remotely on that slave.
  *
  * @since 1.343
  * @author Kohsuke Kawaguchi
  */
 public abstract class DefaultTestResultParserImpl extends TestResultParser implements Serializable {
+
     /**
-     * This method is executed on the slave that has the report files to parse test reports and builds {@link TestResult}.
+     * This method is executed on the slave that has the report files to parse
+     * test reports and builds {@link TestResult}.
      *
-     * @param reportFiles
-     *      List of files to be parsed. Never be empty nor null.
-     * @param launcher
-     *      Can be used to fork processes on the machine where the build is running. Never null.
-     * @param listener
-     *      Use this to report progress and other problems. Never null.
+     * @param reportFiles List of files to be parsed. Never be empty nor null.
+     * @param launcher Can be used to fork processes on the machine where the
+     * build is running. Never null.
+     * @param listener Use this to report progress and other problems. Never
+     * null.
      *
-     * @throws InterruptedException
-     *      If the user cancels the build, it will be received as a thread interruption. Do not catch
-     *      it, and instead just forward that through the call stack.
-     * @throws IOException
-     *      If you don't care about handling exceptions gracefully, you can just throw IOException
-     *      and let the default exception handling in Hudson takes care of it.
-     * @throws AbortException
-     *      If you encounter an error that you handled gracefully, throw this exception and Hudson
-     *      will not show a stack trace.
+     * @throws InterruptedException If the user cancels the build, it will be
+     * received as a thread interruption. Do not catch it, and instead just
+     * forward that through the call stack.
+     * @throws IOException If you don't care about handling exceptions
+     * gracefully, you can just throw IOException and let the default exception
+     * handling in Hudson takes care of it.
+     * @throws AbortException If you encounter an error that you handled
+     * gracefully, throw this exception and Hudson will not show a stack trace.
      */
     protected abstract TestResult parse(List<File> reportFiles, Launcher launcher, TaskListener listener) throws InterruptedException, IOException;
 
@@ -79,8 +79,9 @@ public abstract class DefaultTestResultParserImpl extends TestResultParser imple
                 long localBuildTime = buildTime + (nowSlave - nowMaster);
 
                 FilePath[] paths = new FilePath(dir).list(testResultLocations);
-                if (paths.length==0)
-                    throw new AbortException("No test reports that matches "+testResultLocations+" found. Configuration error?");
+                if (paths.length == 0) {
+                    throw new AbortException("No test reports that matches " + testResultLocations + " found. Configuration error?");
+                }
 
                 // since dir is local, paths all point to the local files
                 List<File> files = new ArrayList<File>(paths.length);
@@ -95,18 +96,16 @@ public abstract class DefaultTestResultParserImpl extends TestResultParser imple
                 if (files.isEmpty()) {
                     // none of the files were new
                     throw new AbortException(
-                        String.format(
-                        "Test reports were found but none of them are new. Did tests run? \n"+
-                        "For example, %s is %s old\n", paths[0].getRemote(),
-                        Util.getTimeSpanString(localBuildTime-paths[0].lastModified())));
+                            String.format(
+                            "Test reports were found but none of them are new. Did tests run? \n"
+                            + "For example, %s is %s old\n", paths[0].getRemote(),
+                            Util.getTimeSpanString(localBuildTime - paths[0].lastModified())));
                 }
 
-                return parse(files,launcher,listener);
+                return parse(files, launcher, listener);
             }
         });
     }
-
     private static final long serialVersionUID = 1L;
-
-    public static final boolean IGNORE_TIMESTAMP_CHECK = Boolean.getBoolean(TestResultParser.class.getName()+".ignoreTimestampCheck");
+    public static final boolean IGNORE_TIMESTAMP_CHECK = Boolean.getBoolean(TestResultParser.class.getName() + ".ignoreTimestampCheck");
 }

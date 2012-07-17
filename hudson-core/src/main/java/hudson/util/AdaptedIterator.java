@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -21,14 +21,15 @@ import java.util.Iterator;
 /**
  * {@link Iterator} that adapts the values returned from another iterator.
  *
- * <p>
- * This class should be really in {@link Iterators} but for historical reasons it's here.
+ * <p> This class should be really in {@link Iterators} but for historical
+ * reasons it's here.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.121
  * @see Iterators
  */
-public abstract class AdaptedIterator<T,U> implements Iterator<U> {
+public abstract class AdaptedIterator<T, U> implements Iterator<U> {
+
     private final Iterator<? extends T> core;
 
     protected AdaptedIterator(Iterator<? extends T> core) {

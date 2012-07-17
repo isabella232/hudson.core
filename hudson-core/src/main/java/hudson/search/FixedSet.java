@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -26,6 +26,7 @@ import java.util.List;
  * @author Kohsuke Kawaguchi
  */
 public class FixedSet implements SearchIndex {
+
     private final Collection<? extends SearchItem> items;
 
     public FixedSet(Collection<? extends SearchItem> items) {
@@ -37,14 +38,18 @@ public class FixedSet implements SearchIndex {
     }
 
     public void find(String token, List<SearchItem> result) {
-        for (SearchItem i : items)
-            if(token.equals(i.getSearchName()))
+        for (SearchItem i : items) {
+            if (token.equals(i.getSearchName())) {
                 result.add(i);
+            }
+        }
     }
 
     public void suggest(String token, List<SearchItem> result) {
-        for (SearchItem i : items)
-            if(i.getSearchName().contains(token))
+        for (SearchItem i : items) {
+            if (i.getSearchName().contains(token)) {
                 result.add(i);
+            }
+        }
     }
 }

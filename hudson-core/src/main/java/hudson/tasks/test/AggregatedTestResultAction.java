@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Daniel Dyer, Red Hat, Inc., Yahoo!, Inc.
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Daniel Dyer, Red Hat, Inc., Yahoo!, Inc.
+ *
  *
  *******************************************************************************/ 
 
@@ -27,24 +27,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link AbstractTestResultAction} that aggregates all the test results
- * from the corresponding {@link AbstractBuild}s.
+ * {@link AbstractTestResultAction} that aggregates all the test results from
+ * the corresponding {@link AbstractBuild}s.
  *
- * <p>
- * (This has nothing to do with {@link AggregatedTestResultPublisher}, unfortunately)
+ * <p> (This has nothing to do with {@link AggregatedTestResultPublisher},
+ * unfortunately)
  *
  * @author Kohsuke Kawaguchi
  */
 @ExportedBean
 public abstract class AggregatedTestResultAction extends AbstractTestResultAction {
-    private int failCount,skipCount,totalCount;
+
+    private int failCount, skipCount, totalCount;
 
     public static final class Child {
+
         /**
-         * Name of the module. Could be relative to something.
-         * The interpretation of this is done by
-         * {@link AggregatedTestResultAction#getChildName(AbstractTestResultAction)} and
-         * {@link AggregatedTestResultAction#resolveChild(Child)} and
+         * Name of the module. Could be relative to something. The
+         * interpretation of this is done by
+         * {@link AggregatedTestResultAction#getChildName(AbstractTestResultAction)}
+         * and {@link AggregatedTestResultAction#resolveChild(Child)} and
          */
         public final String name;
         public final int build;
@@ -54,7 +56,6 @@ public abstract class AggregatedTestResultAction extends AbstractTestResultActio
             this.build = build;
         }
     }
-
     /**
      * child builds whose test results are used for aggregation.
      */
@@ -72,15 +73,16 @@ public abstract class AggregatedTestResultAction extends AbstractTestResultActio
     protected void update(List<? extends AbstractTestResultAction> children) {
         failCount = skipCount = totalCount = 0;
         this.children.clear();
-        for (AbstractTestResultAction tr : children)
+        for (AbstractTestResultAction tr : children) {
             add(tr);
+        }
     }
 
     protected void add(AbstractTestResultAction child) {
         failCount += child.getFailCount();
         skipCount += child.getSkipCount();
         totalCount += child.getTotalCount();
-        this.children.add(new Child(getChildName(child),child.owner.number));
+        this.children.add(new Child(getChildName(child), child.owner.number));
     }
 
     public int getFailCount() {
@@ -95,7 +97,7 @@ public abstract class AggregatedTestResultAction extends AbstractTestResultActio
     public int getTotalCount() {
         return totalCount;
     }
-   
+
     public List<ChildReport> getResult() {
         // I think this is a reasonable default.
         return getChildReports();
@@ -115,11 +117,12 @@ public abstract class AggregatedTestResultAction extends AbstractTestResultActio
     /**
      * Data-binding bean for the remote API.
      */
-    @ExportedBean(defaultVisibility=2)
+    @ExportedBean(defaultVisibility = 2)
     public static final class ChildReport {
         //TODO: review and check whether we can do it private
+
         @Exported
-        public final AbstractBuild<?,?> child;
+        public final AbstractBuild<?, ?> child;
         //TODO: review and check whether we can do it private
         @Exported
         public final Object result;
@@ -141,7 +144,7 @@ public abstract class AggregatedTestResultAction extends AbstractTestResultActio
     /**
      * Mainly for the remote API. Expose results from children.
      */
-    @Exported(inline=true)
+    @Exported(inline = true)
     public List<ChildReport> getChildReports() {
         return new AbstractList<ChildReport>() {
             public ChildReport get(int index) {
@@ -157,25 +160,27 @@ public abstract class AggregatedTestResultAction extends AbstractTestResultActio
     }
 
     protected abstract String getChildName(AbstractTestResultAction tr);
-    public abstract AbstractBuild<?,?> resolveChild(Child child);
+
+    public abstract AbstractBuild<?, ?> resolveChild(Child child);
 
     /**
      * Uses {@link #resolveChild(Child)} and obtain the
      * {@link AbstractTestResultAction} object for the given child.
      */
     protected AbstractTestResultAction getChildReport(Child child) {
-        AbstractBuild<?,?> b = resolveChild(child);
-        if(b==null) return null;
+        AbstractBuild<?, ?> b = resolveChild(child);
+        if (b == null) {
+            return null;
+        }
         return b.getAction(AbstractTestResultAction.class);
     }
 
     /**
      * Since there's no TestObject that points this action as the owner
-     * (aggregated {@link TestObject}s point to their respective real owners, not 'this'),
-     * so this method should be never invoked.
+     * (aggregated {@link TestObject}s point to their respective real owners,
+     * not 'this'), so this method should be never invoked.
      *
-     * @deprecated
-     *      so that IDE warns you if you accidentally try to call it.
+     * @deprecated so that IDE warns you if you accidentally try to call it.
      */
     @Override
     protected final String getDescription(TestObject object) {
@@ -185,8 +190,7 @@ public abstract class AggregatedTestResultAction extends AbstractTestResultActio
     /**
      * See {@link #getDescription(TestObject)}
      *
-     * @deprecated
-     *      so that IDE warns you if you accidentally try to call it.
+     * @deprecated so that IDE warns you if you accidentally try to call it.
      */
     @Override
     protected final void setDescription(TestObject object, String description) {

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.util;
@@ -27,6 +27,7 @@ import java.io.IOException;
  * @author Kohsuke Kawaguchi
  */
 public class SignatureOutputStream extends FilterOutputStream {
+
     private final Signature sig;
 
     public SignatureOutputStream(OutputStream out, Signature sig) {
@@ -35,26 +36,26 @@ public class SignatureOutputStream extends FilterOutputStream {
     }
 
     public SignatureOutputStream(Signature sig) {
-        this(new NullOutputStream(),sig);
+        this(new NullOutputStream(), sig);
     }
 
     @Override
     public void write(int b) throws IOException {
         try {
-            sig.update((byte)b);
+            sig.update((byte) b);
             out.write(b);
         } catch (SignatureException e) {
-            throw (IOException)new IOException(e.getMessage()).initCause(e);
+            throw (IOException) new IOException(e.getMessage()).initCause(e);
         }
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         try {
-            sig.update(b,off,len);
-            out.write(b,off,len);
+            sig.update(b, off, len);
+            out.write(b, off, len);
         } catch (SignatureException e) {
-            throw (IOException)new IOException(e.getMessage()).initCause(e);
+            throw (IOException) new IOException(e.getMessage()).initCause(e);
         }
     }
 }

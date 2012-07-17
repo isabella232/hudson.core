@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *  Kohsuke Kawaguchi, Winston Prakash
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.security;
@@ -27,35 +27,37 @@ import java.util.ArrayList;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
- * {@link Authentication} implementation for {@link Principal}
- * given through {@link HttpServletRequest}.
+ * {@link Authentication} implementation for {@link Principal} given through
+ * {@link HttpServletRequest}.
  *
- * <p>
- * This is used to plug the container authentication to Spring Security,
- * for backward compatibility with Hudson &lt; 1.160.
+ * <p> This is used to plug the container authentication to Spring Security, for
+ * backward compatibility with Hudson &lt; 1.160.
  *
  * @author Kohsuke Kawaguchi
  */
 public final class ContainerAuthentication implements Authentication {
+
     private final Principal principal;
     private GrantedAuthority[] authorities;
 
     /**
-     * Servlet container can tie a {@link ServletRequest} to the request handling thread,
-     * so we need to capture all the information upfront to allow {@link Authentication}
-     * to be passed to other threads, like update center does. See HUDSON-5382. 
+     * Servlet container can tie a {@link ServletRequest} to the request
+     * handling thread, so we need to capture all the information upfront to
+     * allow {@link Authentication} to be passed to other threads, like update
+     * center does. See HUDSON-5382.
      */
     public ContainerAuthentication(HttpServletRequest request) {
         this.principal = request.getUserPrincipal();
-        if (principal==null)
+        if (principal == null) {
             throw new IllegalStateException(); // for anonymous users, we just don't call SecurityContextHolder.getContext().setAuthentication.   
-
+        }
         // Servlet API doesn't provide a way to list up all roles the current user
         // has, so we need to ask AuthorizationStrategy what roles it is going to check against.
         List<GrantedAuthority> l = new ArrayList<GrantedAuthority>();
-        for( String g : HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy().getGroups()) {
-            if(request.isUserInRole(g))
+        for (String g : HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy().getGroups()) {
+            if (request.isUserInRole(g)) {
                 l.add(new GrantedAuthorityImpl(g));
+            }
         }
         l.add(SecurityRealm.AUTHENTICATED_AUTHORITY);
         authorities = l.toArray(new GrantedAuthority[l.size()]);

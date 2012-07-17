@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Martin Eigenbrodt, Peter Hayes
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Martin Eigenbrodt, Peter Hayes
+ *
  *
  *******************************************************************************/ 
 
@@ -37,11 +37,12 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Saves Javadoc for the project and publish them. 
+ * Saves Javadoc for the project and publish them.
  *
  * @author Kohsuke Kawaguchi
  */
 public class JavadocArchiver extends Recorder {
+
     /**
      * Path to the Javadoc directory in the workspace.
      */
@@ -50,7 +51,7 @@ public class JavadocArchiver extends Recorder {
      * If true, retain javadoc for all the successful builds.
      */
     private final boolean keepAll;
-    
+
     @DataBoundConstructor
     public JavadocArchiver(String javadoc_dir, boolean keep_all) {
         this.javadocDir = javadoc_dir;
@@ -78,45 +79,46 @@ public class JavadocArchiver extends Recorder {
      * Gets the directory where the Javadoc is stored for the given project.
      */
     private static File getJavadocDir(AbstractItem project) {
-        return new File(project.getRootDir(),"javadoc");
+        return new File(project.getRootDir(), "javadoc");
     }
 
     /**
      * Gets the directory where the Javadoc is stored for the given build.
      */
     private static File getJavadocDir(Run run) {
-        return new File(run.getRootDir(),"javadoc");
+        return new File(run.getRootDir(), "javadoc");
     }
 
-    public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         listener.getLogger().println(Messages.JavadocArchiver_Publishing());
 
         EnvVars env = build.getEnvironment(listener);
-        
+
         FilePath javadoc = build.getWorkspace().child(env.expand(javadocDir));
         FilePath target = new FilePath(keepAll ? getJavadocDir(build) : getJavadocDir(build.getProject()));
 
         try {
-            if (javadoc.copyRecursiveTo("**/*",target)==0) {
-                if(build.getResult().isBetterOrEqualTo(Result.UNSTABLE)) {
+            if (javadoc.copyRecursiveTo("**/*", target) == 0) {
+                if (build.getResult().isBetterOrEqualTo(Result.UNSTABLE)) {
                     // If the build failed, don't complain that there was no javadoc.
                     // The build probably didn't even get to the point where it produces javadoc.
-                    listener.error(Messages.JavadocArchiver_NoMatchFound(javadoc,javadoc.validateAntFileMask("**/*")));
+                    listener.error(Messages.JavadocArchiver_NoMatchFound(javadoc, javadoc.validateAntFileMask("**/*")));
                 }
                 build.setResult(Result.FAILURE);
                 return true;
             }
         } catch (IOException e) {
-            Util.displayIOException(e,listener);
-            e.printStackTrace(listener.fatalError(Messages.JavadocArchiver_UnableToCopy(javadoc,target)));
+            Util.displayIOException(e, listener);
+            e.printStackTrace(listener.fatalError(Messages.JavadocArchiver_UnableToCopy(javadoc, target)));
             build.setResult(Result.FAILURE);
-             return true;
+            return true;
         }
-        
+
         // add build action, if javadoc is recorded for each build
-        if(keepAll)
+        if (keepAll) {
             build.addAction(new JavadocBuildAction(build));
-        
+        }
+
         return true;
     }
 
@@ -128,32 +130,35 @@ public class JavadocArchiver extends Recorder {
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
     }
-    
+
     protected static abstract class BaseJavadocAction implements Action {
+
         public String getUrlName() {
             return "javadoc";
         }
 
         public String getDisplayName() {
-            if (new File(dir(), "help-doc.html").exists())
+            if (new File(dir(), "help-doc.html").exists()) {
                 return Messages.JavadocArchiver_DisplayName_Javadoc();
-            else
+            } else {
                 return Messages.JavadocArchiver_DisplayName_Generic();
+            }
         }
 
         public String getIconFileName() {
-            if(dir().exists())
+            if (dir().exists()) {
                 return "help.png";
-            else
-                // hide it since we don't have javadoc yet.
+            } else // hide it since we don't have javadoc yet.
+            {
                 return null;
+            }
         }
 
         /**
          * Serves javadoc.
          */
         public void doDynamic(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
-            new DirectoryBrowserSupport(this, new FilePath(dir()), getTitle(), "help.png", false).generateResponse(req,rsp,this);
+            new DirectoryBrowserSupport(this, new FilePath(dir()), getTitle(), "help.png", false).generateResponse(req, rsp, this);
         }
 
         protected abstract String getTitle();
@@ -162,6 +167,7 @@ public class JavadocArchiver extends Recorder {
     }
 
     public static class JavadocAction extends BaseJavadocAction implements ProminentProjectAction {
+
         private final AbstractItem project;
 
         public JavadocAction(AbstractItem project) {
@@ -178,8 +184,9 @@ public class JavadocArchiver extends Recorder {
                 if (run != null) {
                     File javadocDir = getJavadocDir(run);
 
-                    if (javadocDir.exists())
+                    if (javadocDir.exists()) {
                         return javadocDir;
+                    }
                 }
             }
 
@@ -187,19 +194,20 @@ public class JavadocArchiver extends Recorder {
         }
 
         protected String getTitle() {
-            return project.getDisplayName()+" javadoc";
+            return project.getDisplayName() + " javadoc";
         }
     }
-    
+
     public static class JavadocBuildAction extends BaseJavadocAction {
-    	private final AbstractBuild<?,?> build;
-    	
-    	public JavadocBuildAction(AbstractBuild<?,?> build) {
-    	    this.build = build;
-    	}
+
+        private final AbstractBuild<?, ?> build;
+
+        public JavadocBuildAction(AbstractBuild<?, ?> build) {
+            this.build = build;
+        }
 
         protected String getTitle() {
-            return build.getDisplayName()+" javadoc";
+            return build.getDisplayName() + " javadoc";
         }
 
         protected File dir() {
@@ -209,6 +217,7 @@ public class JavadocArchiver extends Recorder {
 
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+
         public String getDisplayName() {
             return Messages.JavadocArchiver_DisplayName();
         }

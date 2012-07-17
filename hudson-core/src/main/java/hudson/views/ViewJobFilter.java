@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Martin Eigenbrodt
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -27,7 +27,8 @@ import hudson.model.View;
 import java.util.List;
 
 /**
- * Each ViewJobFilter contributes to or removes from the list of Jobs for a view.
+ * Each ViewJobFilter contributes to or removes from the list of Jobs for a
+ * view.
  *
  * @author Jacob Robertson
  */
@@ -41,16 +42,19 @@ public abstract class ViewJobFilter implements ExtensionPoint, Describable<ViewJ
     }
 
     @SuppressWarnings("unchecked")
-	public Descriptor<ViewJobFilter> getDescriptor() {
+    public Descriptor<ViewJobFilter> getDescriptor() {
         return Hudson.getInstance().getDescriptorOrDie(getClass());
     }
-    
+
     /**
      * Choose which jobs to show for a view.
-     * @param added which jobs have been added so far.  This JobFilter can remove or add to this list.
+     *
+     * @param added which jobs have been added so far. This JobFilter can remove
+     * or add to this list.
      * @param all All jobs that are possible.
      * @param filteringView The view that we are filtering jobs for.
-     * @return a new list based off of the jobs added so far, and all jobs available.
+     * @return a new list based off of the jobs added so far, and all jobs
+     * available.
      */
     abstract public List<TopLevelItem> filter(List<TopLevelItem> added, List<TopLevelItem> all, View filteringView);
 }

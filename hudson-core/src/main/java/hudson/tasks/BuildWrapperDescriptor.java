@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -28,14 +28,16 @@ import hudson.model.AbstractProject.AbstractProjectDescriptor;
  * @since 1.150
  */
 public abstract class BuildWrapperDescriptor extends Descriptor<BuildWrapper> {
+
     protected BuildWrapperDescriptor(Class<? extends BuildWrapper> clazz) {
         super(clazz);
     }
 
     /**
-     * Infers the type of the corresponding {@link Describable} from the outer class.
-     * This version works when you follow the common convention, where a descriptor
-     * is written as the static nested class of the describable class.
+     * Infers the type of the corresponding {@link Describable} from the outer
+     * class. This version works when you follow the common convention, where a
+     * descriptor is written as the static nested class of the describable
+     * class.
      *
      * @since 1.278
      */
@@ -45,10 +47,9 @@ public abstract class BuildWrapperDescriptor extends Descriptor<BuildWrapper> {
     /**
      * Returns true if this task is applicable to the given project.
      *
-     * @return
-     *      true to allow user to configure this post-promotion task for the given project.
-     * @see AbstractProjectDescriptor#isApplicable(Descriptor) 
+     * @return true to allow user to configure this post-promotion task for the
+     * given project.
+     * @see AbstractProjectDescriptor#isApplicable(Descriptor)
      */
-    public abstract boolean isApplicable(AbstractProject<?,?> item);
+    public abstract boolean isApplicable(AbstractProject<?, ?> item);
 }
-

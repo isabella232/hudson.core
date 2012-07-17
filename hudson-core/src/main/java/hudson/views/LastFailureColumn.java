@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Martin Eigenbrodt
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Martin Eigenbrodt
+ *
  *
  *******************************************************************************/ 
 
@@ -20,12 +20,14 @@ import hudson.Extension;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 public class LastFailureColumn extends ListViewColumn {
+
     @DataBoundConstructor
     public LastFailureColumn() {
     }
 
     @Extension
     public static class DescriptorImpl extends ListViewColumnDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.LastFailureColumn_DisplayName();

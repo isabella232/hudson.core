@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -29,12 +29,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Partial implementation of {@link Slave} to be used by {@link AbstractCloudImpl}.
+ * Partial implementation of {@link Slave} to be used by
+ * {@link AbstractCloudImpl}.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.382
  */
 public abstract class AbstractCloudSlave extends Slave {
+
     public AbstractCloudSlave(String name, String nodeDescription, String remoteFS, String numExecutors, Mode mode, String labelString, ComputerLauncher launcher, RetentionStrategy retentionStrategy, List<? extends NodeProperty<?>> nodeProperties) throws FormException, IOException {
         super(name, nodeDescription, remoteFS, numExecutors, mode, labelString, launcher, retentionStrategy, nodeProperties);
     }
@@ -57,7 +59,7 @@ public abstract class AbstractCloudSlave extends Slave {
             try {
                 Hudson.getInstance().removeNode(this);
             } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Failed to remove "+name,e);
+                LOGGER.log(Level.WARNING, "Failed to remove " + name, e);
             }
         }
     }
@@ -66,6 +68,5 @@ public abstract class AbstractCloudSlave extends Slave {
      * Performs the removal of the underlying resource from the cloud.
      */
     protected abstract void _terminate(TaskListener listener) throws IOException, InterruptedException;
-
     private static final Logger LOGGER = Logger.getLogger(AbstractCloudSlave.class.getName());
 }

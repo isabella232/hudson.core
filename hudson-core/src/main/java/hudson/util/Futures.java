@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -22,12 +22,14 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Various {@link Future} implementations.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public class Futures {
+
     /**
-     * Creates a {@link Future} instance that already has its value pre-computed.
+     * Creates a {@link Future} instance that already has its value
+     * pre-computed.
      */
     public static <T> Future<T> precomputed(final T value) {
         return new Future<T>() {

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -33,27 +33,26 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * List of {@link Descriptor}s.
  *
- * <p>
- * Before Hudson 1.286, this class stored {@link Descriptor}s directly, but since 1.286,
- * this class works in two modes that are rather different.
+ * <p> Before Hudson 1.286, this class stored {@link Descriptor}s directly, but
+ * since 1.286, this class works in two modes that are rather different.
  *
- * <p>
- * One is the compatibility mode, where it works just like pre 1.286 and store everything locally,
- * disconnected from any of the additions of 1.286. This is necessary for situations where
- * {@link DescriptorList} is owned by pre-1.286 plugins where this class doesn't know 'T'.
- * In this mode, {@link #legacy} is non-null but {@link #type} is null.
+ * <p> One is the compatibility mode, where it works just like pre 1.286 and
+ * store everything locally, disconnected from any of the additions of 1.286.
+ * This is necessary for situations where {@link DescriptorList} is owned by
+ * pre-1.286 plugins where this class doesn't know 'T'. In this mode,
+ * {@link #legacy} is non-null but {@link #type} is null.
  *
- * <p>
- * The other mode is the new mode, where the {@link Descriptor}s are actually stored in {@link ExtensionList}
- * (see {@link Hudson#getDescriptorList(Class)}) and this class acts as a view to it. This enables
- * bi-directional interoperability &mdash; both descriptors registred automatically and descriptors registered
- * manually are visible from both {@link DescriptorList} and {@link ExtensionList}. In this mode,
+ * <p> The other mode is the new mode, where the {@link Descriptor}s are
+ * actually stored in {@link ExtensionList} (see
+ * {@link Hudson#getDescriptorList(Class)}) and this class acts as a view to it.
+ * This enables bi-directional interoperability &mdash; both descriptors
+ * registred automatically and descriptors registered manually are visible from
+ * both {@link DescriptorList} and {@link ExtensionList}. In this mode,
  * {@link #legacy} is null but {@link #type} is non-null.
  *
- * <p>
- * The number of plugins that define extension points are limited, so we expect to be able to remove
- * this dual behavior first, then when everyone stops using {@link DescriptorList},  we can remove this class
- * altogether.
+ * <p> The number of plugins that define extension points are limited, so we
+ * expect to be able to remove this dual behavior first, then when everyone
+ * stops using {@link DescriptorList}, we can remove this class altogether.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.161
@@ -61,15 +60,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public final class DescriptorList<T extends Describable<T>> extends AbstractList<Descriptor<T>> {
 
     private final Class<T> type;
-
     private final CopyOnWriteArrayList<Descriptor<T>> legacy;
 
     /**
-     * This will create a legacy {@link DescriptorList} that is disconnected from
-     * {@link ExtensionList}.
+     * This will create a legacy {@link DescriptorList} that is disconnected
+     * from {@link ExtensionList}.
      *
-     * @deprecated
-     *      As of 1.286. Use {@link #DescriptorList(Class)} instead.
+     * @deprecated As of 1.286. Use {@link #DescriptorList(Class)} instead.
      */
     public DescriptorList(Descriptor<T>... descriptors) {
         this.type = null;
@@ -102,9 +99,8 @@ public final class DescriptorList<T extends Describable<T>> extends AbstractList
     /**
      * {@inheritDoc}
      *
-     * @deprecated
-     *      As of 1.286. Put {@link Extension} on your descriptor to have it auto-registered,
-     *      instead of registering a descriptor manually.
+     * @deprecated As of 1.286. Put {@link Extension} on your descriptor to have
+     * it auto-registered, instead of registering a descriptor manually.
      */
     @Override
     public boolean add(Descriptor<T> d) {
@@ -114,9 +110,8 @@ public final class DescriptorList<T extends Describable<T>> extends AbstractList
     /**
      * {@inheritDoc}
      *
-     * @deprecated
-     *      As of 1.286. Put {@link Extension} on your descriptor to have it auto-registered,
-     *      instead of registering a descriptor manually.
+     * @deprecated As of 1.286. Put {@link Extension} on your descriptor to have
+     * it auto-registered, instead of registering a descriptor manually.
      */
     @Override
     public void add(int index, Descriptor<T> element) {
@@ -129,25 +124,27 @@ public final class DescriptorList<T extends Describable<T>> extends AbstractList
     }
 
     /**
-     * Gets the actual data store. This is the key to control the dual-mode nature of {@link DescriptorList}
+     * Gets the actual data store. This is the key to control the dual-mode
+     * nature of {@link DescriptorList}
      */
     private List<Descriptor<T>> store() {
-        if(type==null)
+        if (type == null) {
             return legacy;
-        else
-            return Hudson.getInstance().<T,Descriptor<T>>getDescriptorList(type);
+        } else {
+            return Hudson.getInstance().<T, Descriptor<T>>getDescriptorList(type);
+        }
     }
 
     /**
-     * Creates a new instance of a {@link Describable}
-     * from the structured form submission data posted
-     * by a radio button group. 
+     * Creates a new instance of a {@link Describable} from the structured form
+     * submission data posted by a radio button group.
      */
     public T newInstanceFromRadioList(JSONObject config) throws FormException {
-        if(config.isNullObject())
+        if (config.isNullObject()) {
             return null;    // none was selected
+        }
         int idx = config.getInt("value");
-        return get(idx).newInstance(Stapler.getCurrentRequest(),config);
+        return get(idx).newInstance(Stapler.getCurrentRequest(), config);
     }
 
     public T newInstanceFromRadioList(JSONObject parent, String name) throws FormException {
@@ -160,21 +157,22 @@ public final class DescriptorList<T extends Describable<T>> extends AbstractList
      * If none is found, null is returned.
      */
     public Descriptor<T> findByName(String id) {
-        for (Descriptor<T> d : this)
-            if(d.getId().equals(id))
+        for (Descriptor<T> d : this) {
+            if (d.getId().equals(id)) {
                 return d;
+            }
+        }
         return null;
     }
 
     /**
      * No-op method used to force the class initialization of the given class.
-     * The class initialization in turn is expected to put the descriptor
-     * into the {@link DescriptorList}.
+     * The class initialization in turn is expected to put the descriptor into
+     * the {@link DescriptorList}.
      *
-     * <p>
-     * This is necessary to resolve the class initialization order problem.
-     * Often a {@link DescriptorList} is defined in the base class, and
-     * when it tries to initialize itself by listing up descriptors of known
+     * <p> This is necessary to resolve the class initialization order problem.
+     * Often a {@link DescriptorList} is defined in the base class, and when it
+     * tries to initialize itself by listing up descriptors of known
      * sub-classes, they might not be available in time.
      *
      * @since 1.162
@@ -191,6 +189,6 @@ public final class DescriptorList<T extends Describable<T>> extends AbstractList
      * Finds the descriptor that has the matching fully-qualified class name.
      */
     public Descriptor<T> find(String fqcn) {
-        return Descriptor.find(this,fqcn);
+        return Descriptor.find(this, fqcn);
     }
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *      
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -25,44 +25,46 @@ import java.util.Collection;
 
 import static java.util.Collections.emptyList;
 
-
 /**
  * A class that represents a general concept of a test result, without any
- * language or implementation specifics.
- * Subclasses must add @Exported annotation to the fields they want to export.
+ * language or implementation specifics. Subclasses must add
+ *
+ * @Exported annotation to the fields they want to export.
  *
  * @sine 1.343
  */
 public abstract class TestResult extends TestObject {
 
     /**
-     * If the concept of a parent action is important to a subclass, then it should
-     * provide a non-noop implementation of this method. 
+     * If the concept of a parent action is important to a subclass, then it
+     * should provide a non-noop implementation of this method.
+     *
      * @param action
      */
     public void setParentAction(AbstractTestResultAction action) {
     }
 
     /**
-     * Returns the action that points to the top level test result includes
-     * this test result.
-     * 
+     * Returns the action that points to the top level test result includes this
+     * test result.
+     *
      * @return
      */
     public AbstractTestResultAction getParentAction() {
         return getOwner().getTestResultAction();
     }
-    
+
     /**
      * Request that the result update its counts of its children. Does not
-     * require a parent action or owner or siblings. Subclasses should
-     * implement this, unless they are *always* in a tallied state.  
+     * require a parent action or owner or siblings. Subclasses should implement
+     * this, unless they are *always* in a tallied state.
      */
     public void tally() {
     }
-    
+
     /**
      * Sets the parent test result
+     *
      * @param parent
      */
     public void setParent(TestObject parent) {
@@ -71,7 +73,7 @@ public abstract class TestResult extends TestObject {
     /**
      * Gets the human readable title of this result object.
      */
-    public /* abstract */ String getTitle(){
+    public /* abstract */ String getTitle() {
         return "";
     }
 
@@ -79,7 +81,8 @@ public abstract class TestResult extends TestObject {
      * Mark a build as unstable if there are failures. Otherwise, leave the
      * build result unchanged.
      *
-     * @return {@link Result#UNSTABLE} if there are test failures, null otherwise.
+     * @return {@link Result#UNSTABLE} if there are test failures, null
+     * otherwise.
      *
      */
     public Result getBuildResult() {
@@ -111,33 +114,34 @@ public abstract class TestResult extends TestObject {
         return 0;
     }
 
-
     /**
      * Gets the total number of skipped tests.
      */
     public /* abstract */ int getSkipCount() {
         return 0;
     }
-    
+
     /**
      * Gets the counter part of this {@link TestResult} in the previous run.
      *
      * @return null if no such counter part exists.
      */
     public TestResult getPreviousResult() {
-        AbstractBuild<?,?> b = getOwner();
+        AbstractBuild<?, ?> b = getOwner();
         if (b == null) {
             return null;
         }
-        while(true) {
+        while (true) {
             b = b.getPreviousBuild();
-            if(b==null)
+            if (b == null) {
                 return null;
+            }
             AbstractTestResultAction r = b.getAction(getParentAction().getClass());
-            if(r!=null) {
+            if (r != null) {
                 TestResult result = r.findCorrespondingResult(this.getId());
-                if (result!=null)
+                if (result != null) {
                     return result;
+                }
             }
         }
     }
@@ -147,7 +151,7 @@ public abstract class TestResult extends TestObject {
      *
      * @return null if no such counter part exists.
      */
-    public TestResult getResultInBuild(AbstractBuild<?,?> build) {
+    public TestResult getResultInBuild(AbstractBuild<?, ?> build) {
         AbstractTestResultAction tra = build.getAction(getParentAction().getClass());
         if (tra == null) {
             tra = build.getAction(AbstractTestResultAction.class);
@@ -157,15 +161,16 @@ public abstract class TestResult extends TestObject {
 
     /**
      * Gets the "children" of this test result that failed
+     *
      * @return the children of this test result, if any, or an empty collection
      */
     public Collection<? extends TestResult> getFailedTests() {
         return emptyList();
     }
 
-
     /**
      * Gets the "children" of this test result that passed
+     *
      * @return the children of this test result, if any, or an empty collection
      */
     public Collection<? extends TestResult> getPassedTests() {
@@ -174,6 +179,7 @@ public abstract class TestResult extends TestObject {
 
     /**
      * Gets the "children" of this test result that were skipped
+     *
      * @return the children of this test result, if any, or an empty list
      */
     public Collection<? extends TestResult> getSkippedTests() {
@@ -181,18 +187,17 @@ public abstract class TestResult extends TestObject {
     }
 
     /**
-     * If this test failed, then return the build number
-     * when this test started failing.
+     * If this test failed, then return the build number when this test started
+     * failing.
      */
     public int getFailedSince() {
         return 0;
     }
 
     /**
-     * If this test failed, then return the run
-     * when this test started failing.
+     * If this test failed, then return the run when this test started failing.
      */
-    public Run<?,?> getFailedSinceRun() {
+    public Run<?, ?> getFailedSinceRun() {
         return null;
     }
 
@@ -211,7 +216,8 @@ public abstract class TestResult extends TestObject {
     }
 
     /**
-     * If there was an error or a failure, this is the stack trace, or otherwise null.
+     * If there was an error or a failure, this is the stack trace, or otherwise
+     * null.
      */
     public String getErrorStackTrace() {
         return "";
@@ -221,11 +227,12 @@ public abstract class TestResult extends TestObject {
      * If there was an error or a failure, this is the text from the message.
      */
     public String getErrorDetails() {
-        return ""; 
+        return "";
     }
 
     /**
-     * @return true if the test was not skipped and did not fail, false otherwise.
+     * @return true if the test was not skipped and did not fail, false
+     * otherwise.
      */
     public boolean isPassed() {
         return ((getSkipCount() == 0) && (getFailCount() == 0));
@@ -240,23 +247,25 @@ public abstract class TestResult extends TestObject {
         sb.append("Fail: ").append(this.getFailCount()).append(", ");
         sb.append("Skipt: ").append(this.getSkipCount()).append(", ");
         sb.append("Pass: ").append(this.getSkipCount()).append(",\n");
-        sb.append("Test Result Class: " ).append(this.getClass().getName()).append(" }\n");
-        return sb.toString(); 
+        sb.append("Test Result Class: ").append(this.getClass().getName()).append(" }\n");
+        return sb.toString();
     }
 
     /**
-     * Annotate some text -- what does this do? 
+     * Annotate some text -- what does this do?
+     *
      * @param text
      * @return
      */
     public String annotate(String text) {
-        if (text == null)
-                return null;
+        if (text == null) {
+            return null;
+        }
         text = text.replace("&", "&amp;").replace("<", "&lt;").replaceAll(
-                        "\\b(https?://[^\\s)>]+)", "<a href=\"$1\">$1</a>");
+                "\\b(https?://[^\\s)>]+)", "<a href=\"$1\">$1</a>");
 
-        for (TestAction action: getTestActions()) {
-                text = action.annotate(text);
+        for (TestAction action : getTestActions()) {
+            text = action.annotate(text);
         }
         return text;
     }

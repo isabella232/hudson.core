@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
+ * Contributors:
+ * 
 *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -24,22 +24,23 @@ import java.util.List;
  * @author Kohsuke Kawaguchi
  */
 public class UnionSearchIndex implements SearchIndex {
+
     public static SearchIndex combine(SearchIndex... sets) {
-        SearchIndex p=EMPTY;
+        SearchIndex p = EMPTY;
         for (SearchIndex q : sets) {
             // allow some of the inputs to be null,
             // and also recognize EMPTY
             if (q != null && q != EMPTY) {
-                if (p == EMPTY)
+                if (p == EMPTY) {
                     p = q;
-                else
-                    p = new UnionSearchIndex(p,q);
+                } else {
+                    p = new UnionSearchIndex(p, q);
+                }
             }
         }
         return p;
     }
-
-    private final SearchIndex lhs,rhs;
+    private final SearchIndex lhs, rhs;
 
     public UnionSearchIndex(SearchIndex lhs, SearchIndex rhs) {
         this.lhs = lhs;
@@ -47,12 +48,12 @@ public class UnionSearchIndex implements SearchIndex {
     }
 
     public void find(String token, List<SearchItem> result) {
-        lhs.find(token,result);
-        rhs.find(token,result);
+        lhs.find(token, result);
+        rhs.find(token, result);
     }
 
     public void suggest(String token, List<SearchItem> result) {
-        lhs.suggest(token,result);
-        rhs.suggest(token,result);
+        lhs.suggest(token, result);
+        rhs.suggest(token, result);
     }
 }

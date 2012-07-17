@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -31,6 +31,7 @@ import java.io.IOException;
  * @since 1.382
  */
 public class AbstractCloudComputer<T extends AbstractCloudSlave> extends SlaveComputer {
+
     public AbstractCloudComputer(T slave) {
         super(slave);
     }
@@ -50,7 +51,7 @@ public class AbstractCloudComputer<T extends AbstractCloudSlave> extends SlaveCo
             getNode().terminate();
             return new HttpRedirect("..");
         } catch (InterruptedException e) {
-            return HttpResponses.error(500,e);
+            return HttpResponses.error(500, e);
         }
     }
 }

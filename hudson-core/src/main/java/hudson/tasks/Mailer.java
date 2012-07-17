@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi,   Bruce Chapman, Erik Ramfelt, Jean-Baptiste Quenot, Luca Domenico Milanesio, Anton Kozak
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -63,20 +63,18 @@ import static hudson.Util.fixEmptyAndTrim;
  * @author Kohsuke Kawaguchi
  */
 public class Mailer extends Notifier {
-    protected static final Logger LOGGER = Logger.getLogger(Mailer.class.getName());
 
+    protected static final Logger LOGGER = Logger.getLogger(Mailer.class.getName());
     /**
      * Whitespace-separated list of e-mail addresses that represent recipients.
      */
     //TODO: review and check whether we can do it private
     public String recipients;
-
     /**
      * If true, only the first unstable build will be reported.
      */
     //TODO: review and check whether we can do it private
     public boolean dontNotifyEveryUnstableBuild;
-
     /**
      * If true, individuals will receive e-mails regarding who broke the build.
      */
@@ -94,7 +92,6 @@ public class Mailer extends Notifier {
     public boolean isSendToIndividuals() {
         return sendToIndividuals;
     }
-
     // TODO: left so that XStream won't get angry. figure out how to set the error handling behavior
     // in XStream.  Deprecated since 2005-04-23.
     private transient String from;
@@ -104,7 +101,7 @@ public class Mailer extends Notifier {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
-        throws IOException, InterruptedException {
+            throws IOException, InterruptedException {
         if (debug) {
             listener.getLogger().println("Running mailer");
         }
@@ -113,7 +110,7 @@ public class Mailer extends Notifier {
         String recip = env.expand(recipients);
 
         return new MailSender(recip, dontNotifyEveryUnstableBuild, sendToIndividuals,
-            descriptor().getCharset()).execute(build, listener);
+                descriptor().getCharset()).execute(build, listener);
     }
 
     /**
@@ -122,10 +119,9 @@ public class Mailer extends Notifier {
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
     }
-
     /**
-     * @deprecated as of 1.286
-     *      Use {@link #descriptor()} to obtain the current instance.
+     * @deprecated as of 1.286 Use {@link #descriptor()} to obtain the current
+     * instance.
      */
     @Deprecated
     @RestrictedSince("1.355")
@@ -137,57 +133,49 @@ public class Mailer extends Notifier {
 
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+
         /**
-         * The default e-mail address suffix appended to the user name found from changelog,
-         * to send e-mails. Null if not configured.
+         * The default e-mail address suffix appended to the user name found
+         * from changelog, to send e-mails. Null if not configured.
          */
         private String defaultSuffix;
-
         /**
          * Hudson's own URL, to put into the e-mail.
          */
         private String hudsonUrl = "http://localhost:8080/";
-
         /**
          * If non-null, use SMTP-AUTH with these information.
          */
         private String smtpAuthUsername;
-
         private Secret smtpAuthPassword;
-
         /**
-         * The e-mail address that Hudson puts to "From:" field in outgoing e-mails.
-         * Null if not configured.
+         * The e-mail address that Hudson puts to "From:" field in outgoing
+         * e-mails. Null if not configured.
          */
         private String adminAddress;
-
         /**
-         * The SMTP server to use for sending e-mail. Null for default to the environment,
-         * which is usually <tt>localhost</tt>.
+         * The SMTP server to use for sending e-mail. Null for default to the
+         * environment, which is usually <tt>localhost</tt>.
          */
         private String smtpHost;
-
         /**
-         * If true use SSL on port 465 (standard SMTPS) unless <code>smtpPort</code> is set.
+         * If true use SSL on port 465 (standard SMTPS) unless
+         * <code>smtpPort</code> is set.
          */
         private boolean useSsl;
-
         /**
-         * The SMTP port to use for sending e-mail. Null for default to the environment,
-         * which is usually <tt>25</tt>.
+         * The SMTP port to use for sending e-mail. Null for default to the
+         * environment, which is usually <tt>25</tt>.
          */
         private String smtpPort;
-
         /**
          * The charset to use for the text and subject.
          */
         private String charset;
-
         /**
          * Used to keep track of number test e-mails.
          */
         private static transient int testEmailCount = 0;
-
 
         public DescriptorImpl() {
             load();
@@ -207,54 +195,61 @@ public class Mailer extends Notifier {
             return defaultSuffix;
         }
 
-        /** JavaMail session. */
+        /**
+         * JavaMail session.
+         */
         public Session createSession() {
-            return createSession(smtpHost,smtpPort,useSsl,smtpAuthUsername,smtpAuthPassword);
+            return createSession(smtpHost, smtpPort, useSsl, smtpAuthUsername, smtpAuthPassword);
         }
+
         private static Session createSession(String smtpHost, String smtpPort, boolean useSsl, String smtpAuthUserName, Secret smtpAuthPassword) {
             smtpPort = fixEmptyAndTrim(smtpPort);
             smtpAuthUserName = fixEmptyAndTrim(smtpAuthUserName);
 
             Properties props = new Properties(System.getProperties());
             props.put("mail.transport.protocol", "smtp");
-            if(fixEmptyAndTrim(smtpHost)!=null)
-                props.put("mail.smtp.host",smtpHost);
-            if (smtpPort!=null) {
+            if (fixEmptyAndTrim(smtpHost) != null) {
+                props.put("mail.smtp.host", smtpHost);
+            }
+            if (smtpPort != null) {
                 props.put("mail.smtp.port", smtpPort);
             }
             if (useSsl) {
-            	/* This allows the user to override settings by setting system properties but
-            	 * also allows us to use the default SMTPs port of 465 if no port is already set.
-            	 * It would be cleaner to use smtps, but that's done by calling session.getTransport()...
-            	 * and thats done in mail sender, and it would be a bit of a work around to get it all to
-            	 * coordinate, and we can make it work through setting mail.smtp properties.
-            	 */
-            	if (props.getProperty("mail.smtp.socketFactory.port") == null) {
-                    String port = smtpPort==null?"465":smtpPort;
+                /* This allows the user to override settings by setting system properties but
+                 * also allows us to use the default SMTPs port of 465 if no port is already set.
+                 * It would be cleaner to use smtps, but that's done by calling session.getTransport()...
+                 * and thats done in mail sender, and it would be a bit of a work around to get it all to
+                 * coordinate, and we can make it work through setting mail.smtp properties.
+                 */
+                if (props.getProperty("mail.smtp.socketFactory.port") == null) {
+                    String port = smtpPort == null ? "465" : smtpPort;
                     props.put("mail.smtp.port", port);
                     props.put("mail.smtp.socketFactory.port", port);
-            	}
-            	if (props.getProperty("mail.smtp.socketFactory.class") == null) {
-            		props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
-            	}
-				props.put("mail.smtp.socketFactory.fallback", "false");
-			}
-            if(smtpAuthUserName!=null)
-                props.put("mail.smtp.auth","true");
+                }
+                if (props.getProperty("mail.smtp.socketFactory.class") == null) {
+                    props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+                }
+                props.put("mail.smtp.socketFactory.fallback", "false");
+            }
+            if (smtpAuthUserName != null) {
+                props.put("mail.smtp.auth", "true");
+            }
 
             // avoid hang by setting some timeout. 
-            props.put("mail.smtp.timeout","60000");
-            props.put("mail.smtp.connectiontimeout","60000");
+            props.put("mail.smtp.timeout", "60000");
+            props.put("mail.smtp.connectiontimeout", "60000");
 
-            return Session.getInstance(props,getAuthenticator(smtpAuthUserName,Secret.toString(smtpAuthPassword)));
+            return Session.getInstance(props, getAuthenticator(smtpAuthUserName, Secret.toString(smtpAuthPassword)));
         }
 
         private static Authenticator getAuthenticator(final String smtpAuthUserName, final String smtpAuthPassword) {
-            if(smtpAuthUserName==null)    return null;
+            if (smtpAuthUserName == null) {
+                return null;
+            }
             return new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(smtpAuthUserName,smtpAuthPassword);
+                    return new PasswordAuthentication(smtpAuthUserName, smtpAuthPassword);
                 }
             };
         }
@@ -267,11 +262,12 @@ public class Mailer extends Notifier {
 
             defaultSuffix = nullify(json.getString("defaultSuffix"));
             String url = nullify(json.getString("url"));
-            if(url!=null && !url.endsWith("/"))
+            if (url != null && !url.endsWith("/")) {
                 url += '/';
+            }
             hudsonUrl = url;
 
-            if(json.has("useSMTPAuth")) {
+            if (json.has("useSMTPAuth")) {
                 JSONObject auth = json.getJSONObject("useSMTPAuth");
                 smtpAuthUsername = nullify(auth.getString("smtpAuthUserName"));
                 smtpAuthPassword = Secret.fromString(nullify(auth.getString("smtpAuthPassword")));
@@ -282,15 +278,18 @@ public class Mailer extends Notifier {
             smtpPort = nullify(json.getString("smtpPort"));
             useSsl = json.getBoolean("useSsl");
             charset = json.getString("charset");
-            if (charset == null || charset.length() == 0)
-            	charset = "UTF-8";
+            if (charset == null || charset.length() == 0) {
+                charset = "UTF-8";
+            }
 
             save();
             return true;
         }
 
         private String nullify(String v) {
-            if(v!=null && v.length()==0)    v=null;
+            if (v != null && v.length() == 0) {
+                v = null;
+            }
             return v;
         }
 
@@ -300,7 +299,9 @@ public class Mailer extends Notifier {
 
         public String getAdminAddress() {
             String v = adminAddress;
-            if(v==null)     v = Messages.Mailer_Address_Not_Configured();
+            if (v == null) {
+                v = Messages.Mailer_Address_Not_Configured();
+            }
             return v;
         }
 
@@ -313,22 +314,26 @@ public class Mailer extends Notifier {
         }
 
         public String getSmtpAuthPassword() {
-            if (smtpAuthPassword==null) return null;
+            if (smtpAuthPassword == null) {
+                return null;
+            }
             return Secret.toString(smtpAuthPassword);
         }
 
         public boolean getUseSsl() {
-        	return useSsl;
+            return useSsl;
         }
 
         public String getSmtpPort() {
-        	return smtpPort;
+            return smtpPort;
         }
 
         public String getCharset() {
-        	String c = charset;
-        	if (c == null || c.length() == 0)	c = "UTF-8";
-        	return c;
+            String c = charset;
+            if (c == null || c.length() == 0) {
+                c = "UTF-8";
+            }
+            return c;
         }
 
         public void setDefaultSuffix(String defaultSuffix) {
@@ -340,10 +345,10 @@ public class Mailer extends Notifier {
         }
 
         public void setAdminAddress(String adminAddress) {
-            if(adminAddress.startsWith("\"") && adminAddress.endsWith("\"")) {
+            if (adminAddress.startsWith("\"") && adminAddress.endsWith("\"")) {
                 // some users apparently quote the whole thing. Don't konw why
                 // anyone does this, but it's a machine's job to forgive human mistake
-                adminAddress = adminAddress.substring(1,adminAddress.length()-1);
+                adminAddress = adminAddress.substring(1, adminAddress.length() - 1);
             }
             this.adminAddress = adminAddress;
         }
@@ -372,10 +377,10 @@ public class Mailer extends Notifier {
         @Override
         public Publisher newInstance(StaplerRequest req, JSONObject formData) {
             Mailer m = new Mailer();
-            req.bindParameters(m,"mailer_");
-            m.dontNotifyEveryUnstableBuild = req.getParameter("mailer_notifyEveryUnstableBuild")==null;
+            req.bindParameters(m, "mailer_");
+            m.dontNotifyEveryUnstableBuild = req.getParameter("mailer_notifyEveryUnstableBuild") == null;
 
-            if(hudsonUrl==null) {
+            if (hudsonUrl == null) {
                 // if Hudson URL is not configured yet, infer some default
                 hudsonUrl = Functions.inferHudsonURL(req);
                 save();
@@ -388,8 +393,9 @@ public class Mailer extends Notifier {
          * Checks the URL in <tt>global.jelly</tt>
          */
         public FormValidation doCheckUrl(@QueryParameter String value) {
-            if(value.startsWith("http://localhost"))
+            if (value.startsWith("http://localhost")) {
                 return FormValidation.warning(Messages.Mailer_Localhost_Error());
+            }
             return FormValidation.ok();
         }
 
@@ -404,11 +410,12 @@ public class Mailer extends Notifier {
 
         public FormValidation doCheckSmtpServer(@QueryParameter String value) {
             try {
-                if (fixEmptyAndTrim(value)!=null)
+                if (fixEmptyAndTrim(value) != null) {
                     InetAddress.getByName(value);
+                }
                 return FormValidation.ok();
             } catch (UnknownHostException e) {
-                return FormValidation.error(Messages.Mailer_Unknown_Host_Name()+value);
+                return FormValidation.error(Messages.Mailer_Unknown_Host_Name() + value);
             }
         }
 
@@ -417,14 +424,16 @@ public class Mailer extends Notifier {
         }
 
         public FormValidation doCheckDefaultSuffix(@QueryParameter String value) {
-            if (value.matches("@[A-Za-z0-9.\\-]+") || fixEmptyAndTrim(value)==null)
+            if (value.matches("@[A-Za-z0-9.\\-]+") || fixEmptyAndTrim(value) == null) {
                 return FormValidation.ok();
-            else
+            } else {
                 return FormValidation.error(Messages.Mailer_Suffix_Error());
+            }
         }
 
         /**
          * Send an email to the admin address
+         *
          * @throws IOException
          * @throws ServletException
          * @throws InterruptedException
@@ -434,10 +443,12 @@ public class Mailer extends Notifier {
                 @QueryParameter String smtpAuthUserName, @QueryParameter String smtpAuthPassword,
                 @QueryParameter boolean useSsl, @QueryParameter String smtpPort) throws IOException, ServletException, InterruptedException {
             try {
-                if (!useSMTPAuth)   smtpAuthUserName = smtpAuthPassword = null;
+                if (!useSMTPAuth) {
+                    smtpAuthUserName = smtpAuthPassword = null;
+                }
 
                 Session session = createSession(smtpServer, smtpPort, useSsl, smtpAuthUserName,
-                    Secret.fromString(smtpAuthPassword));
+                        Secret.fromString(smtpAuthPassword));
                 MimeMessage msg = new HudsonMimeMessage(session);
                 msg.setSubject("Test email #" + ++testEmailCount);
                 msg.setContent("This is test email #" + testEmailCount + " sent from Hudson Continuous Integration server.", "text/plain");
@@ -451,12 +462,13 @@ public class Mailer extends Notifier {
 
                 return FormValidation.ok("Email was successfully sent");
             } catch (MessagingException e) {
-                return FormValidation.errorWithMarkup("<p>Failed to send out e-mail</p><pre>"+Util.escape(Functions.printThrowable(e))+"</pre>");
+                return FormValidation.errorWithMarkup("<p>Failed to send out e-mail</p><pre>" + Util.escape(Functions.printThrowable(e)) + "</pre>");
             }
         }
 
         /**
          * Sends message
+         *
          * @param msg {@link MimeMessage}
          * @throws MessagingException if any.
          */
@@ -465,9 +477,10 @@ public class Mailer extends Notifier {
         }
 
         /**
-         * Wrap {@link Transport#send(javax.mail.Message)} method. Based on
-         * <a href="http://www.oracle.com/technetwork/java/faq-135477.html#smtpauth">javax.mail recommendations</a>
-         * and fix <a href="http://issues.hudson-ci.org/browse/HUDSON-7426">HUDSON-7426</a>
+         * Wrap {@link Transport#send(javax.mail.Message)} method. Based on <a
+         * href="http://www.oracle.com/technetwork/java/faq-135477.html#smtpauth">javax.mail
+         * recommendations</a> and fix <a
+         * href="http://issues.hudson-ci.org/browse/HUDSON-7426">HUDSON-7426</a>
          *
          * @param smtpServer smtp server
          * @param smtpAuthUserName username
@@ -475,14 +488,15 @@ public class Mailer extends Notifier {
          * @param smtpPort port.
          * @param msg {@link MimeMessage}
          * @throws MessagingException if any.
-         * @see {@link #createSession(String, String, boolean, String, hudson.util.Secret)}
+         * @see
+         * {@link #createSession(String, String, boolean, String, hudson.util.Secret)}
          */
         public static void send(String smtpServer, String smtpAuthUserName, String smtpAuthPassword, String smtpPort,
-                                HudsonMimeMessage msg) throws MessagingException {
-            if (null != msg && null !=msg.getSession()) {
+                HudsonMimeMessage msg) throws MessagingException {
+            if (null != msg && null != msg.getSession()) {
                 Session session = msg.getSession();
-                Transport t = null != session.getProperty("mail.transport.protocol") ?
-                    session.getTransport() : session.getTransport("smtp");
+                Transport t = null != session.getProperty("mail.transport.protocol")
+                        ? session.getTransport() : session.getTransport("smtp");
                 smtpPort = fixEmptyAndTrim(smtpPort);
                 int port = -1;
                 if (StringUtils.isNumeric(smtpPort)) {
@@ -504,9 +518,9 @@ public class Mailer extends Notifier {
      * Per user property that is e-mail address.
      */
     public static class UserProperty extends hudson.model.UserProperty {
+
         /**
-         * The user's e-mail address.
-         * Null to leave it to default.
+         * The user's e-mail address. Null to leave it to default.
          */
         private final String emailAddress;
 
@@ -516,8 +530,9 @@ public class Mailer extends Notifier {
 
         @Exported
         public String getAddress() {
-            if(emailAddress!=null)
+            if (emailAddress != null) {
                 return emailAddress;
+            }
 
             // try the inference logic
             return MailAddressResolver.resolve(user);
@@ -525,6 +540,7 @@ public class Mailer extends Notifier {
 
         @Extension
         public static final class DescriptorImpl extends UserPropertyDescriptor {
+
             public String getDisplayName() {
                 return Messages.Mailer_UserProperty_DisplayName();
             }
@@ -539,17 +555,22 @@ public class Mailer extends Notifier {
             }
         }
     }
-
     /**
      * Debug probe point to be activated by the scripting console.
      */
     public static boolean debug = false;
 
     public static class ConverterImpl extends XStream2.PassthruConverter<Mailer> {
-        public ConverterImpl(XStream2 xstream) { super(xstream); }
-        @Override protected void callback(Mailer m, UnmarshallingContext context) {
-            if (m.from != null || m.subject != null || m.failureOnly || m.charset != null)
+
+        public ConverterImpl(XStream2 xstream) {
+            super(xstream);
+        }
+
+        @Override
+        protected void callback(Mailer m, UnmarshallingContext context) {
+            if (m.from != null || m.subject != null || m.failureOnly || m.charset != null) {
                 OldDataMonitor.report(context, "1.10");
+            }
         }
     }
 }

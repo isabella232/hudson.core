@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -32,12 +32,12 @@ import java.util.TreeMap;
  * @since 1.361
  */
 public class JVMBuilder implements Serializable {
+
     private final ClasspathBuilder classpath = new ClasspathBuilder();
-    private final Map<String,String> systemProperties = new TreeMap<String,String>();
+    private final Map<String, String> systemProperties = new TreeMap<String, String>();
     private final ArgumentListBuilder args = new ArgumentListBuilder();
     private final ArgumentListBuilder vmopts = new ArgumentListBuilder();
     private FilePath pwd;
-
     private String mainClass;
 
     /**
@@ -48,16 +48,18 @@ public class JVMBuilder implements Serializable {
     }
 
     public JVMBuilder systemProperty(String key, String value) {
-        this.systemProperties.put(key,value);
+        this.systemProperties.put(key, value);
         return this;
     }
 
-    public Map<String,String> systemProperties() {
+    public Map<String, String> systemProperties() {
         return this.systemProperties;
     }
 
-    public JVMBuilder systemProperties(Map<String,String> props) {
-        if (props!=null)    this.systemProperties.putAll(props);
+    public JVMBuilder systemProperties(Map<String, String> props) {
+        if (props != null) {
+            this.systemProperties.putAll(props);
+        }
         return this;
     }
 
@@ -87,13 +89,13 @@ public class JVMBuilder implements Serializable {
      * Enables the debugger support on the given port.
      */
     public JVMBuilder debug(int port) {
-        vmopts.add("-Xrunjdwp:transport=dt_socket,server=y,address="+port);
+        vmopts.add("-Xrunjdwp:transport=dt_socket,server=y,address=" + port);
         return this;
     }
 
     /**
-     * Sets the current directory for the new JVM.
-     * This overloaded version only makes sense when you are launching JVM locally.
+     * Sets the current directory for the new JVM. This overloaded version only
+     * makes sense when you are launching JVM locally.
      */
     public JVMBuilder pwd(File pwd) {
         return pwd(new FilePath(pwd));
@@ -110,8 +112,8 @@ public class JVMBuilder implements Serializable {
 
     public ArgumentListBuilder toFullArguments() {
         ArgumentListBuilder args = new ArgumentListBuilder();
-        args.add(new File(System.getProperty("java.home"),"bin/java")); // TODO: if we are to support a remote launch, JVM would be on a different path.
-        args.addKeyValuePairs("-D",systemProperties);
+        args.add(new File(System.getProperty("java.home"), "bin/java")); // TODO: if we are to support a remote launch, JVM would be on a different path.
+        args.addKeyValuePairs("-D", systemProperties);
         args.add("-cp").add(classpath.toString());
         args.add(this.vmopts.toCommandArray());
         args.add(mainClass);
@@ -120,12 +122,11 @@ public class JVMBuilder implements Serializable {
     }
 
     /**
-     * Fills a {@link ProcStarter} with all the parameters configured by this builder.
+     * Fills a {@link ProcStarter} with all the parameters configured by this
+     * builder.
      */
     public ProcStarter launch(Launcher launcher) {
         return launcher.launch().cmds(toFullArguments()).pwd(pwd);
     }
-
-
     private static final long serialVersionUID = 1L;
 }
