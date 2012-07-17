@@ -67,7 +67,8 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link import org.eclipse.hudson.api.model.IProjectProperty} instance or null.
+     * @return {@link import org.eclipse.hudson.api.model.IProjectProperty}
+     * instance or null.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static IProjectProperty getProjectProperty(Job currentJob, String key) {
@@ -75,12 +76,14 @@ public class CascadingUtil {
     }
 
     /**
-     * Returns StringProjectProperty by specified key. If property doesn't exists, it will be initialized and added to
-     * current job.
+     * Returns StringProjectProperty by specified key. If property doesn't
+     * exists, it will be initialized and added to current job.
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.StringProjectProperty} instance.
+     * @return
+     * {@link org.eclipse.hudson.model.project.property.StringProjectProperty}
+     * instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static StringProjectProperty getStringProjectProperty(Job currentJob, String key) {
@@ -88,12 +91,14 @@ public class CascadingUtil {
     }
 
     /**
-     * Returns BaseProjectProperty by specified key. If property doesn't exists, it will be initialized and added to
-     * current job.
+     * Returns BaseProjectProperty by specified key. If property doesn't exists,
+     * it will be initialized and added to current job.
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.BaseProjectProperty} instance.
+     * @return
+     * {@link org.eclipse.hudson.model.project.property.BaseProjectProperty}
+     * instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static BaseProjectProperty getBaseProjectProperty(Job currentJob, String key) {
@@ -101,12 +106,14 @@ public class CascadingUtil {
     }
 
     /**
-     * Returns ExternalProjectProperty by specified key. If property doesn't exists, it will be initialized and added to
-     * current job.
+     * Returns ExternalProjectProperty by specified key. If property doesn't
+     * exists, it will be initialized and added to current job.
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.ExternalProjectProperty} instance.
+     * @return
+     * {@link org.eclipse.hudson.model.project.property.ExternalProjectProperty}
+     * instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static ExternalProjectProperty getExternalProjectProperty(Job currentJob, String key) {
@@ -114,12 +121,14 @@ public class CascadingUtil {
     }
 
     /**
-     * Returns CopyOnWriteListProjectProperty by specified key. If property doesn't exists,
-     * it will be initialized and added to current job.
+     * Returns CopyOnWriteListProjectProperty by specified key. If property
+     * doesn't exists, it will be initialized and added to current job.
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty} instance.
+     * @return
+     * {@link org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty}
+     * instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static CopyOnWriteListProjectProperty getCopyOnWriteListProjectProperty(Job currentJob, String key) {
@@ -127,12 +136,14 @@ public class CascadingUtil {
     }
 
     /**
-     * Returns ResultProjectProperty by specified key. If property doesn't exists, it will be initialized and added to
-     * current job.
+     * Returns ResultProjectProperty by specified key. If property doesn't
+     * exists, it will be initialized and added to current job.
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.ResultProjectProperty} instance.
+     * @return
+     * {@link org.eclipse.hudson.model.project.property.ResultProjectProperty}
+     * instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static ResultProjectProperty getResultProjectProperty(Job currentJob, String key) {
@@ -140,12 +151,14 @@ public class CascadingUtil {
     }
 
     /**
-     * Returns BooleanProjectProperty by specified key. If property doesn't exists, it will be initialized and added to
-     * current job.
+     * Returns BooleanProjectProperty by specified key. If property doesn't
+     * exists, it will be initialized and added to current job.
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.BooleanProjectProperty} instance.
+     * @return
+     * {@link org.eclipse.hudson.model.project.property.BooleanProjectProperty}
+     * instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static BooleanProjectProperty getBooleanProjectProperty(Job currentJob, String key) {
@@ -153,12 +166,14 @@ public class CascadingUtil {
     }
 
     /**
-     * Returns IntegerProjectProperty by specified key. If property doesn't exists, it will be initialized and added to
-     * current job.
+     * Returns IntegerProjectProperty by specified key. If property doesn't
+     * exists, it will be initialized and added to current job.
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.IntegerProjectProperty} instance.
+     * @return
+     * {@link org.eclipse.hudson.model.project.property.IntegerProjectProperty}
+     * instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static IntegerProjectProperty getIntegerProjectProperty(Job currentJob, String key) {
@@ -166,12 +181,14 @@ public class CascadingUtil {
     }
 
     /**
-     * Returns LogRotatorProjectProperty by specified key. If property doesn't exists, it will be initialized and added
-     * to current job.
+     * Returns LogRotatorProjectProperty by specified key. If property doesn't
+     * exists, it will be initialized and added to current job.
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.LogRotatorProjectProperty} instance.
+     * @return
+     * {@link org.eclipse.hudson.model.project.property.LogRotatorProjectProperty}
+     * instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static LogRotatorProjectProperty getLogRotatorProjectProperty(Job currentJob, String key) {
@@ -179,12 +196,14 @@ public class CascadingUtil {
     }
 
     /**
-     * Returns DescribableListProjectProperty by specified key. If property doesn't exists, it will be initialized and
-     * added to current job.
+     * Returns DescribableListProjectProperty by specified key. If property
+     * doesn't exists, it will be initialized and added to current job.
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.DescribableListProjectProperty} instance.
+     * @return
+     * {@link org.eclipse.hudson.model.project.property.DescribableListProjectProperty}
+     * instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static DescribableListProjectProperty getDescribableListProjectProperty(Job currentJob, String key) {
@@ -192,12 +211,14 @@ public class CascadingUtil {
     }
 
     /**
-     * Returns AxisListProjectProperty by specified key. If property doesn't exists, it will be initialized and added to
-     * current job.
+     * Returns AxisListProjectProperty by specified key. If property doesn't
+     * exists, it will be initialized and added to current job.
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.AxisListProjectProperty} instance.
+     * @return
+     * {@link org.eclipse.hudson.model.project.property.AxisListProjectProperty}
+     * instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static AxisListProjectProperty getAxesListProjectProperty(Job currentJob, String key) {
@@ -205,12 +226,14 @@ public class CascadingUtil {
     }
 
     /**
-     * Returns SCMProjectProperty by specified key. If property doesn't exists, it will be initialized and added to
-     * current job.
+     * Returns SCMProjectProperty by specified key. If property doesn't exists,
+     * it will be initialized and added to current job.
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.SCMProjectProperty} instance.
+     * @return
+     * {@link org.eclipse.hudson.model.project.property.SCMProjectProperty}
+     * instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static SCMProjectProperty getScmProjectProperty(Job currentJob, String key) {
@@ -218,12 +241,14 @@ public class CascadingUtil {
     }
 
     /**
-     * Returns TriggerProjectProperty by specified key. If property doesn't exists, it will be initialized and added to
-     * current job.
+     * Returns TriggerProjectProperty by specified key. If property doesn't
+     * exists, it will be initialized and added to current job.
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @return {@link org.eclipse.hudson.model.project.property.TriggerProjectProperty} instance.
+     * @return
+     * {@link org.eclipse.hudson.model.project.property.TriggerProjectProperty}
+     * instance.
      * @throws IllegalArgumentException if currentJob is null.
      */
     public static TriggerProjectProperty getTriggerProjectProperty(Job currentJob, String key) {
@@ -235,9 +260,10 @@ public class CascadingUtil {
      *
      * @param currentJob job that should be analyzed.
      * @param key key.
-     * @param clazz required property class.
-     * If class is not null and property was not found, property of given class will be created.
-     * @return {@link org.eclipse.hudson.api.model.IProjectProperty} instance or null.
+     * @param clazz required property class. If class is not null and property
+     * was not found, property of given class will be created.
+     * @return {@link org.eclipse.hudson.api.model.IProjectProperty} instance or
+     * null.
      * @throws IllegalArgumentException if currentJob is null.
      */
     @SuppressWarnings("unchecked")
@@ -265,11 +291,13 @@ public class CascadingUtil {
     }
 
     /**
-     * Checks whether cascadingCandidate project can produce cycle cascading dependencies.
+     * Checks whether cascadingCandidate project can produce cycle cascading
+     * dependencies.
      *
      * @param cascadingCandidate candidate.
      * @param cascadingChildren children of given job.
-     * @return false - if cyclic cascading dependency is not possible, true - otherwise.
+     * @return false - if cyclic cascading dependency is not possible, true -
+     * otherwise.
      */
     @SuppressWarnings("unchecked")
     public static boolean hasCyclicCascadingLink(Job cascadingCandidate, Set<String> cascadingChildren) {
@@ -292,11 +320,12 @@ public class CascadingUtil {
      *
      * @param cascadingProject cascading project to start from.
      * @param projectToUnlink project that should be unlinked.
-     * @return true if project was unlinked, false - if cascadingProject or projectToUnlink is Null
+     * @return true if project was unlinked, false - if cascadingProject or
+     * projectToUnlink is Null
      * @throws java.io.IOException if cascading project couldn't be saved.
      */
     public static boolean unlinkProjectFromCascadingParents(ICascadingJob cascadingProject, String projectToUnlink)
-        throws IOException {
+            throws IOException {
         if (null != cascadingProject && null != projectToUnlink) {
             Job job = Functions.getItemByName(Hudson.getInstance().getAllItems(Job.class), projectToUnlink);
             if (null != job) {
@@ -317,7 +346,7 @@ public class CascadingUtil {
      * @throws java.io.IOException if cascading project couldn't be saved.
      */
     private static boolean unlinkProjectFromCascadingParents(ICascadingJob cascadingProject, Set<String> projectsToUnlink)
-        throws IOException {
+            throws IOException {
         if (null != cascadingProject && null != projectsToUnlink) {
             for (String toUnlink : projectsToUnlink) {
                 cascadingProject.removeCascadingChild(toUnlink);
@@ -331,8 +360,8 @@ public class CascadingUtil {
     }
 
     /**
-     * Links cascading project to children project. Method updates all parent cascading projects starting
-     * from the specified cascadingProject.
+     * Links cascading project to children project. Method updates all parent
+     * cascading projects starting from the specified cascadingProject.
      *
      * @param cascadingProject cascadingProject.
      * @param childProjectName the name of child project name.
@@ -348,9 +377,10 @@ public class CascadingUtil {
     }
 
     /**
-     * Updates the name of the project in all children cascading references.
-     * If this project uses some cascading parent, the name of this project will be renamed in the cascading children
-     * collection of the cascading parent project.
+     * Updates the name of the project in all children cascading references. If
+     * this project uses some cascading parent, the name of this project will be
+     * renamed in the cascading children collection of the cascading parent
+     * project.
      *
      * @param cascadingProject cascading project.
      * @param oldName old project name.
@@ -358,7 +388,7 @@ public class CascadingUtil {
      * @throws java.io.IOException if cascading project couldn't be saved.
      */
     public static void renameCascadingChildLinks(ICascadingJob cascadingProject, String oldName, String newName)
-        throws IOException {
+            throws IOException {
         if (cascadingProject != null) {
             cascadingProject.renameCascadingChildName(oldName, newName);
             if (cascadingProject.hasCascadingProject()) {
@@ -368,8 +398,9 @@ public class CascadingUtil {
     }
 
     /**
-     * Updates the name of the project in all parent cascading references.
-     * If this project is used as cascading parent, it's name will be renamed in all children projects.
+     * Updates the name of the project in all parent cascading references. If
+     * this project is used as cascading parent, it's name will be renamed in
+     * all children projects.
      *
      * @param oldName old project name.
      * @param newName new project name.
@@ -386,8 +417,8 @@ public class CascadingUtil {
     }
 
     /**
-     * Returns possible cascading parents for current job, which are filtered by type and checked for avoidness cyclic
-     * dependency
+     * Returns possible cascading parents for current job, which are filtered by
+     * type and checked for avoidness cyclic dependency
      *
      * @param type project type.
      * @param currentJob current job instance
@@ -405,7 +436,7 @@ public class CascadingUtil {
         for (T item : allItems) {
             Job job = (Job) item;
             if (!StringUtils.equals(currentJob.getName(), job.getName())
-                && !hasCyclicCascadingLink(job, currentJob.getCascadingChildrenNames())) {
+                    && !hasCyclicCascadingLink(job, currentJob.getCascadingChildrenNames())) {
                 result.add(job);
             }
         }
@@ -413,7 +444,9 @@ public class CascadingUtil {
     }
 
     /**
-     * Creates {@link org.eclipse.hudson.model.project.property.ExternalProjectProperty} based on Descriptors collection, StaplerRequest and JSON resonse.
+     * Creates
+     * {@link org.eclipse.hudson.model.project.property.ExternalProjectProperty}
+     * based on Descriptors collection, StaplerRequest and JSON resonse.
      *
      * @param req StaplerRequest
      * @param json JSONObject
@@ -424,8 +457,8 @@ public class CascadingUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T extends Describable<T>> void buildExternalProperties(StaplerRequest req, JSONObject json,
-                                                                          List<Descriptor<T>> descriptors, Job owner)
-        throws Descriptor.FormException {
+            List<Descriptor<T>> descriptors, Job owner)
+            throws Descriptor.FormException {
         for (Descriptor d : descriptors) {
             String name = d.getJsonSafeClassName();
             ExternalProjectProperty<Describable> baseProperty = getExternalProjectProperty(owner, name);
@@ -445,12 +478,11 @@ public class CascadingUtil {
      * @param key trigger property key
      * @param req stapler request
      * @param json submited json
-     * @throws hudson.model.Descriptor.FormException
-     *          if incorrect parameters
+     * @throws hudson.model.Descriptor.FormException if incorrect parameters
      */
     @SuppressWarnings("unchecked")
     public static void setChildrenTrigger(Job job, TriggerDescriptor descriptor, String key, StaplerRequest req,
-                                          JSONObject json) throws Descriptor.FormException {
+            JSONObject json) throws Descriptor.FormException {
         TriggerProjectProperty property = CascadingUtil.getTriggerProjectProperty(job, key);
         if (property.getValue() != null) {
             property.getValue().stop();
@@ -476,9 +508,11 @@ public class CascadingUtil {
             }
         }
     }
+
     /**
-     * Sets parameterDefinitionProperties for current job. This method is recursively executed for cascading children
-     * for setting valid {@link ParametersDefinitionProperty#owner} value.
+     * Sets parameterDefinitionProperties for current job. This method is
+     * recursively executed for cascading children for setting valid
+     * {@link ParametersDefinitionProperty#owner} value.
      *
      * @param job job.
      * @param key parameter key,
@@ -486,15 +520,14 @@ public class CascadingUtil {
      */
     @SuppressWarnings("unchecked")
     public static void setParameterDefinitionProperties(Job job,
-                                                        String key,
-                                                        CopyOnWriteList<ParametersDefinitionProperty> parameterDefinitionProperties) {
+            String key,
+            CopyOnWriteList<ParametersDefinitionProperty> parameterDefinitionProperties) {
         CopyOnWriteListProjectProperty projectProperty = getCopyOnWriteListProjectProperty(job, key);
-        CopyOnWriteList<ParametersDefinitionProperty> pdProperties
-            = new CopyOnWriteList<ParametersDefinitionProperty>();
+        CopyOnWriteList<ParametersDefinitionProperty> pdProperties = new CopyOnWriteList<ParametersDefinitionProperty>();
         //Create new instance for each parameter in order to set owner and use in cascading children.
         for (ParametersDefinitionProperty pdp : parameterDefinitionProperties) {
             ParametersDefinitionProperty copiedDefinitionProperty = new ParametersDefinitionProperty(
-                new ArrayList<ParameterDefinition>(pdp.getParameterDefinitions()));
+                    new ArrayList<ParameterDefinition>(pdp.getParameterDefinitions()));
             copiedDefinitionProperty.setOwner((AbstractProject) job);
             pdProperties.add(copiedDefinitionProperty);
         }
@@ -520,19 +553,24 @@ public class CascadingUtil {
     }
 
     /**
-     * Checks whether JobProperty supports cascading.
-     * Method skips {@link AuthorizationMatrixProperty} and {@link ParametersDefinitionProperty} classes.
-     * {@link AuthorizationMatrixProperty} doesn't support cascading for now.
-     * As for {@link ParametersDefinitionProperty} single instance doesn't support cascading, so, classes are
-     * grouped into list of {@link ParametersDefinitionProperty} and whole list could be inherited or overridden.
-
+     * Checks whether JobProperty supports cascading. Method skips
+     * {@link AuthorizationMatrixProperty} and
+     * {@link ParametersDefinitionProperty} classes.
+     * {@link AuthorizationMatrixProperty} doesn't support cascading for now. As
+     * for {@link ParametersDefinitionProperty} single instance doesn't support
+     * cascading, so, classes are grouped into list of
+     * {@link ParametersDefinitionProperty} and whole list could be inherited or
+     * overridden.
+     *
      * @param d property descriptor.
-     * @return true - if JobProperty could be used for cascading, false - otherwise.
-     * @see #setParameterDefinitionProperties(hudson.model.Job, String, CopyOnWriteList)
+     * @return true - if JobProperty could be used for cascading, false -
+     * otherwise.
+     * @see #setParameterDefinitionProperties(hudson.model.Job, String,
+     * CopyOnWriteList)
      * @see hudson.model.Job#getParameterDefinitionProperties()
      */
     public static boolean isCascadableJobProperty(JobPropertyDescriptor d) {
         return !(d instanceof AuthorizationMatrixProperty.DescriptorImpl
-            || d instanceof ParametersDefinitionProperty.DescriptorImpl);
+                || d instanceof ParametersDefinitionProperty.DescriptorImpl);
     }
 }

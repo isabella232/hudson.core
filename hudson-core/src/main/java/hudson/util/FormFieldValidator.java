@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
+ * Contributors:
+ * 
 *    Kohsuke Kawaguchi, Jene Jasper, Tom Huybrechts
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -44,63 +44,63 @@ import org.springframework.security.AccessDeniedException;
 import org.kohsuke.stapler.Stapler;
 
 /**
- * Base class that provides the framework for doing on-the-fly form field validation.
+ * Base class that provides the framework for doing on-the-fly form field
+ * validation.
  *
- * <p>
- * The {@link #check()} method is to be implemented by derived classes to perform
- * the validation. See hudson-behavior.js 'validated' CSS class and 'checkUrl' attribute.
+ * <p> The {@link #check()} method is to be implemented by derived classes to
+ * perform the validation. See hudson-behavior.js 'validated' CSS class and
+ * 'checkUrl' attribute.
  *
  * @author Kohsuke Kawaguchi
- * @deprecated as of 1.294
- *      Use {@link FormValidation} as a return value in your check method.
+ * @deprecated as of 1.294 Use {@link FormValidation} as a return value in your
+ * check method.
  */
 public abstract class FormFieldValidator {
-    public static final Permission CHECK = Hudson.ADMINISTER;
 
+    public static final Permission CHECK = Hudson.ADMINISTER;
     protected final StaplerRequest request;
     protected final StaplerResponse response;
     /**
-     * Permission to check, or null if this check doesn't require any permission.
+     * Permission to check, or null if this check doesn't require any
+     * permission.
      */
     protected final Permission permission;
-
     /**
-     * The object to which the permission is checked against.
-     * If {@link #permission} is non-null, must be non-null.
+     * The object to which the permission is checked against. If
+     * {@link #permission} is non-null, must be non-null.
      */
     protected final AccessControlled subject;
 
     /**
-     * @param adminOnly
-     *      Pass true to only let admin users to run the check. This is necessary
-     *      for security reason, so that unauthenticated user cannot obtain sensitive
-     *      information or run a process that may have side-effect.
+     * @param adminOnly Pass true to only let admin users to run the check. This
+     * is necessary for security reason, so that unauthenticated user cannot
+     * obtain sensitive information or run a process that may have side-effect.
      */
     protected FormFieldValidator(StaplerRequest request, StaplerResponse response, boolean adminOnly) {
-        this(request, response, adminOnly?Hudson.getInstance():null, adminOnly?CHECK:null);
+        this(request, response, adminOnly ? Hudson.getInstance() : null, adminOnly ? CHECK : null);
     }
 
     /**
-     * @deprecated
-     *      Use {@link #FormFieldValidator(Permission)} and remove {@link StaplerRequest} and {@link StaplerResponse}
-     *      from your "doCheck..." method parameter
+     * @deprecated Use {@link #FormFieldValidator(Permission)} and remove
+     * {@link StaplerRequest} and {@link StaplerResponse} from your "doCheck..."
+     * method parameter
      */
     protected FormFieldValidator(StaplerRequest request, StaplerResponse response, Permission permission) {
-        this(request,response,Hudson.getInstance(),permission);
+        this(request, response, Hudson.getInstance(), permission);
     }
 
     /**
-     * @param permission
-     *      Permission needed to perform this validation, or null if no permission is necessary.
+     * @param permission Permission needed to perform this validation, or null
+     * if no permission is necessary.
      */
     protected FormFieldValidator(Permission permission) {
-        this(Stapler.getCurrentRequest(),Stapler.getCurrentResponse(),permission);
+        this(Stapler.getCurrentRequest(), Stapler.getCurrentResponse(), permission);
     }
 
     /**
-     * @deprecated
-     *      Use {@link #FormFieldValidator(AccessControlled,Permission)} and remove {@link StaplerRequest} and {@link StaplerResponse}
-     *      from your "doCheck..." method parameter
+     * @deprecated Use {@link #FormFieldValidator(AccessControlled,Permission)}
+     * and remove {@link StaplerRequest} and {@link StaplerResponse} from your
+     * "doCheck..." method parameter
      */
     protected FormFieldValidator(StaplerRequest request, StaplerResponse response, AccessControlled subject, Permission permission) {
         this.request = request;
@@ -110,24 +110,27 @@ public abstract class FormFieldValidator {
     }
 
     protected FormFieldValidator(AccessControlled subject, Permission permission) {
-        this(Stapler.getCurrentRequest(),Stapler.getCurrentResponse(),subject,permission);
+        this(Stapler.getCurrentRequest(), Stapler.getCurrentResponse(), subject, permission);
     }
 
     /**
      * Runs the validation code.
      */
     public final void process() throws IOException, ServletException {
-        if(permission!=null)
+        if (permission != null) {
             try {
-                if(subject==null)
+                if (subject == null) {
                     throw new AccessDeniedException("No subject");
+                }
                 subject.checkPermission(permission);
             } catch (AccessDeniedException e) {
                 // if the user has hudson-wisde admin permission, all checks are allowed
                 // this is to protect Hudson administrator from broken ACL/SecurityRealm implementation/configuration.
-                if(!Hudson.getInstance().hasPermission(Hudson.ADMINISTER))
+                if (!Hudson.getInstance().hasPermission(Hudson.ADMINISTER)) {
                     throw e;
+                }
             }
+        }
 
         check();
     }
@@ -159,78 +162,74 @@ public abstract class FormFieldValidator {
     /**
      * Sends out a string error message that indicates an error.
      *
-     * @param message
-     *      Human readable message to be sent. <tt>error(null)</tt>
-     *      can be used as <tt>ok()</tt>.
+     * @param message Human readable message to be sent. <tt>error(null)</tt>
+     * can be used as <tt>ok()</tt>.
      */
     public void error(String message) throws IOException, ServletException {
-        errorWithMarkup(message==null?null:Util.escape(message));
+        errorWithMarkup(message == null ? null : Util.escape(message));
     }
 
     public void warning(String message) throws IOException, ServletException {
-        warningWithMarkup(message==null?null:Util.escape(message));
+        warningWithMarkup(message == null ? null : Util.escape(message));
     }
 
     public void ok(String message) throws IOException, ServletException {
-        okWithMarkup(message==null?null:Util.escape(message));
+        okWithMarkup(message == null ? null : Util.escape(message));
     }
 
     /**
-     * Sends out a string error message that indicates an error,
-     * by formatting it with {@link String#format(String, Object[])}
+     * Sends out a string error message that indicates an error, by formatting
+     * it with {@link String#format(String, Object[])}
      */
     public void error(String format, Object... args) throws IOException, ServletException {
-        error(String.format(format,args));
+        error(String.format(format, args));
     }
 
     public void warning(String format, Object... args) throws IOException, ServletException {
-        warning(String.format(format,args));
+        warning(String.format(format, args));
     }
 
     public void ok(String format, Object... args) throws IOException, ServletException {
-        ok(String.format(format,args));
+        ok(String.format(format, args));
     }
 
     /**
      * Sends out an HTML fragment that indicates an error.
      *
-     * <p>
-     * This method must be used with care to avoid cross-site scripting
+     * <p> This method must be used with care to avoid cross-site scripting
      * attack.
      *
-     * @param message
-     *      Human readable message to be sent. <tt>error(null)</tt>
-     *      can be used as <tt>ok()</tt>.
+     * @param message Human readable message to be sent. <tt>error(null)</tt>
+     * can be used as <tt>ok()</tt>.
      */
     public void errorWithMarkup(String message) throws IOException, ServletException {
-        _errorWithMarkup(message,"error");
+        _errorWithMarkup(message, "error");
     }
 
     public void warningWithMarkup(String message) throws IOException, ServletException {
-        _errorWithMarkup(message,"warning");
+        _errorWithMarkup(message, "warning");
     }
 
     public void okWithMarkup(String message) throws IOException, ServletException {
-        _errorWithMarkup(message,"ok");
+        _errorWithMarkup(message, "ok");
     }
 
     private void _errorWithMarkup(String message, String cssClass) throws IOException, ServletException {
-        if(message==null) {
+        if (message == null) {
             ok();
         } else {
             response.setContentType("text/html;charset=UTF-8");
             // 1x16 spacer needed for IE since it doesn't support min-height
-            response.getWriter().print("<div class="+ cssClass +"><img src='"+
-                    request.getContextPath()+Hudson.RESOURCE_PATH+"/images/none.gif' height=16 width=1>"+
-                    message+"</div>");
+            response.getWriter().print("<div class=" + cssClass + "><img src='"
+                    + request.getContextPath() + Hudson.RESOURCE_PATH + "/images/none.gif' height=16 width=1>"
+                    + message + "</div>");
         }
     }
 
     /**
      * Convenient base class for checking the validity of URLs
      *
-     * @deprecated as of 1.294
-     *      Use {@link FormValidation.URLCheck}
+     * @deprecated as of 1.294 Use {@link FormValidation.URLCheck}
      */
     public static abstract class URLCheck extends FormFieldValidator {
 
@@ -241,8 +240,8 @@ public abstract class FormFieldValidator {
         }
 
         /**
-         * Opens the given URL and reads text content from it.
-         * This method honors Content-type header.
+         * Opens the given URL and reads text content from it. This method
+         * honors Content-type header.
          */
         protected BufferedReader open(URL url) throws IOException {
             // use HTTP content type to find out the charset.
@@ -251,46 +250,51 @@ public abstract class FormFieldValidator {
                 throw new IOException(url.toExternalForm());
             }
             return new BufferedReader(
-                new InputStreamReader(con.getInputStream(),getCharset(con)));
+                    new InputStreamReader(con.getInputStream(), getCharset(con)));
         }
 
         /**
          * Finds the string literal from the given reader.
-         * @return
-         *      true if found, false otherwise.
+         *
+         * @return true if found, false otherwise.
          */
         protected boolean findText(BufferedReader in, String literal) throws IOException {
             String line;
-            while((line=in.readLine())!=null)
-                if(line.indexOf(literal)!=-1)
+            while ((line = in.readLine()) != null) {
+                if (line.indexOf(literal) != -1) {
                     return true;
+                }
+            }
             return false;
         }
 
         /**
-         * Calls the {@link #error(String)} method with a reasonable error message.
-         * Use this method when the {@link #open(URL)} or {@link #findText(BufferedReader, String)} fails.
+         * Calls the {@link #error(String)} method with a reasonable error
+         * message. Use this method when the {@link #open(URL)} or
+         * {@link #findText(BufferedReader, String)} fails.
          *
-         * @param url
-         *      Pass in the URL that was connected. Used for error diagnosis.
+         * @param url Pass in the URL that was connected. Used for error
+         * diagnosis.
          */
         protected void handleIOException(String url, IOException e) throws IOException, ServletException {
             // any invalid URL comes here
-            if(e.getMessage().equals(url))
-                // Sun JRE (and probably others too) often return just the URL in the error.
-                error("Unable to connect "+url);
-            else
+            if (e.getMessage().equals(url)) // Sun JRE (and probably others too) often return just the URL in the error.
+            {
+                error("Unable to connect " + url);
+            } else {
                 error(e.getMessage());
+            }
         }
 
         /**
          * Figures out the charset from the content-type header.
          */
         private String getCharset(URLConnection con) {
-            for( String t : con.getContentType().split(";") ) {
+            for (String t : con.getContentType().split(";")) {
                 t = t.trim().toLowerCase(Locale.ENGLISH);
-                if(t.startsWith("charset="))
+                if (t.startsWith("charset=")) {
                     return t.substring(8);
+                }
             }
             // couldn't find it. HTML spec says default is US-ASCII,
             // but UTF-8 is a better choice since
@@ -302,35 +306,39 @@ public abstract class FormFieldValidator {
 
     /**
      * Checks if the given value is an URL to some Hudson's top page.
+     *
      * @since 1.192
      */
     public static class HudsonURL extends URLCheck {
+
         public HudsonURL(StaplerRequest request, StaplerResponse response) {
             super(request, response);
         }
 
         protected void check() throws IOException, ServletException {
             String value = fixEmpty(request.getParameter("value"));
-            if(value==null) {// nothing entered yet
+            if (value == null) {// nothing entered yet
                 ok();
                 return;
             }
 
-            if(!value.endsWith("/")) value+='/';
+            if (!value.endsWith("/")) {
+                value += '/';
+            }
 
             try {
                 URL url = new URL(value);
-                HttpURLConnection con = (HttpURLConnection)url.openConnection();
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.connect();
-                if(con.getResponseCode()!=200
-                || con.getHeaderField("X-Hudson")==null) {
-                    error(value+" is not Hudson ("+con.getResponseMessage()+")");
+                if (con.getResponseCode() != 200
+                        || con.getHeaderField("X-Hudson") == null) {
+                    error(value + " is not Hudson (" + con.getResponseMessage() + ")");
                     return;
                 }
 
                 ok();
             } catch (IOException e) {
-                handleIOException(value,e);
+                handleIOException(value, e);
             }
         }
     }
@@ -338,10 +346,13 @@ public abstract class FormFieldValidator {
     /**
      * Checks the file mask (specified in the 'value' query parameter) against
      * the current workspace.
+     *
      * @since 1.90.
-     * @deprecated as of 1.294. Use {@link FilePath#validateFileMask(String, boolean)} 
+     * @deprecated as of 1.294. Use
+     * {@link FilePath#validateFileMask(String, boolean)}
      */
     public static class WorkspaceFileMask extends FormFieldValidator {
+
         private final boolean errorIfNotExist;
 
         public WorkspaceFileMask(StaplerRequest request, StaplerResponse response) {
@@ -356,9 +367,9 @@ public abstract class FormFieldValidator {
 
         protected void check() throws IOException, ServletException {
             String value = fixEmpty(request.getParameter("value"));
-            AbstractProject<?,?> p = (AbstractProject<?,?>)subject;
+            AbstractProject<?, ?> p = (AbstractProject<?, ?>) subject;
 
-            if(value==null || p==null) {
+            if (value == null || p == null) {
                 ok(); // none entered yet, or something is seriously wrong
                 return;
             }
@@ -366,14 +377,17 @@ public abstract class FormFieldValidator {
             try {
                 FilePath ws = getBaseDirectory(p);
 
-                if(ws==null || !ws.exists()) {// no workspace. can't check
+                if (ws == null || !ws.exists()) {// no workspace. can't check
                     ok();
                     return;
                 }
 
                 String msg = ws.validateAntFileMask(value);
-                if(errorIfNotExist)     error(msg);
-                else                    warning(msg);
+                if (errorIfNotExist) {
+                    error(msg);
+                } else {
+                    warning(msg);
+                }
             } catch (InterruptedException e) {
                 ok(); // coundn't check
             }
@@ -382,19 +396,22 @@ public abstract class FormFieldValidator {
         /**
          * The base directory from which the path name is resolved.
          */
-        protected FilePath getBaseDirectory(AbstractProject<?,?> p) {
+        protected FilePath getBaseDirectory(AbstractProject<?, ?> p) {
             return p.getSomeWorkspace();
         }
     }
 
     /**
-     * Checks a valid directory name (specified in the 'value' query parameter) against
-     * the current workspace.
+     * Checks a valid directory name (specified in the 'value' query parameter)
+     * against the current workspace.
+     *
      * @since 1.116
-     * @deprecated as of 1.294. Use {@link FilePath#validateRelativeDirectory(String, boolean)}
-     *      (see {@link hudson.tasks.JavadocArchiver.DescriptorImpl#doCheck(AbstractProject, String)}
+     * @deprecated as of 1.294. Use
+     * {@link FilePath#validateRelativeDirectory(String, boolean)} (see
+     * {@link hudson.tasks.JavadocArchiver.DescriptorImpl#doCheck(AbstractProject, String)}
      */
     public static class WorkspaceDirectory extends WorkspaceFilePath {
+
         public WorkspaceDirectory(StaplerRequest request, StaplerResponse response, boolean errorIfNotExist) {
             super(request, response, errorIfNotExist, false);
         }
@@ -405,12 +422,15 @@ public abstract class FormFieldValidator {
     }
 
     /**
-     * Checks a valid file name or directory (specified in the 'value' query parameter) against
-     * the current workspace.
+     * Checks a valid file name or directory (specified in the 'value' query
+     * parameter) against the current workspace.
+     *
      * @since 1.160
-     * @deprecated as of 1.294. Use {@link FilePath#validateRelativePath(String, boolean, boolean)}
+     * @deprecated as of 1.294. Use
+     * {@link FilePath#validateRelativePath(String, boolean, boolean)}
      */
     public static class WorkspaceFilePath extends FormFieldValidator {
+
         private final boolean errorIfNotExist;
         private final boolean expectingFile;
 
@@ -423,14 +443,14 @@ public abstract class FormFieldValidator {
 
         protected void check() throws IOException, ServletException {
             String value = fixEmpty(request.getParameter("value"));
-            AbstractProject<?,?> p = (AbstractProject<?,?>)subject;
+            AbstractProject<?, ?> p = (AbstractProject<?, ?>) subject;
 
-            if(value==null || p==null) {
+            if (value == null || p == null) {
                 ok(); // none entered yet, or something is seriously wrong
                 return;
             }
 
-            if(value.contains("*")) {
+            if (value.contains("*")) {
                 // a common mistake is to use wildcard
                 error("Wildcard is not allowed here");
                 return;
@@ -439,32 +459,37 @@ public abstract class FormFieldValidator {
             try {
                 FilePath ws = getBaseDirectory(p);
 
-                if(ws==null) {// can't check
+                if (ws == null) {// can't check
                     ok();
                     return;
                 }
 
-                if(!ws.exists()) {// no workspace. can't check
+                if (!ws.exists()) {// no workspace. can't check
                     ok();
                     return;
                 }
 
-                if(ws.child(value).exists()) {
+                if (ws.child(value).exists()) {
                     if (expectingFile) {
-                        if(!ws.child(value).isDirectory())
+                        if (!ws.child(value).isDirectory()) {
                             ok();
-                        else
-                            error(value+" is not a file");
+                        } else {
+                            error(value + " is not a file");
+                        }
                     } else {
-                        if(ws.child(value).isDirectory())
+                        if (ws.child(value).isDirectory()) {
                             ok();
-                        else
-                            error(value+" is not a directory");
+                        } else {
+                            error(value + " is not a directory");
+                        }
                     }
                 } else {
-                    String msg = "No such "+(expectingFile?"file":"directory")+": " + value;
-                    if(errorIfNotExist)     error(msg);
-                    else                    warning(msg);
+                    String msg = "No such " + (expectingFile ? "file" : "directory") + ": " + value;
+                    if (errorIfNotExist) {
+                        error(msg);
+                    } else {
+                        warning(msg);
+                    }
                 }
             } catch (InterruptedException e) {
                 ok(); // coundn't check
@@ -474,24 +499,24 @@ public abstract class FormFieldValidator {
         /**
          * The base directory from which the path name is resolved.
          */
-        protected FilePath getBaseDirectory(AbstractProject<?,?> p) {
+        protected FilePath getBaseDirectory(AbstractProject<?, ?> p) {
             return p.getSomeWorkspace();
         }
     }
 
     /**
-     * Checks a valid executable binary (specified in the 'value' query parameter).
-     * It has to be either given as a full path to the executable, or else
-     * it will be searched in PATH.
+     * Checks a valid executable binary (specified in the 'value' query
+     * parameter). It has to be either given as a full path to the executable,
+     * or else it will be searched in PATH.
      *
-     * <p>
-     * This file also handles ".exe" omission in Windows --- I thought Windows
-     * has actually more generic mechanism for the executable extension omission,
-     * so perhaps this needs to be extended to handle that correctly. More info
-     * needed.
+     * <p> This file also handles ".exe" omission in Windows --- I thought
+     * Windows has actually more generic mechanism for the executable extension
+     * omission, so perhaps this needs to be extended to handle that correctly.
+     * More info needed.
      *
      * @since 1.124
-     * @deprecated as of 1.294. Use {@link FormValidation#validateExecutable(String)}
+     * @deprecated as of 1.294. Use
+     * {@link FormValidation#validateExecutable(String)}
      */
     public static class Executable extends FormFieldValidator {
 
@@ -502,70 +527,69 @@ public abstract class FormFieldValidator {
 
         protected void check() throws IOException, ServletException {
             String exe = fixEmpty(request.getParameter("value"));
-            if(exe==null) {
+            if (exe == null) {
                 ok(); // nothing entered yet
                 return;
             }
 
-            if(exe.indexOf(File.separatorChar)>=0) {
+            if (exe.indexOf(File.separatorChar) >= 0) {
                 // this is full path
                 File f = new File(exe);
-                if(f.exists()) {
+                if (f.exists()) {
                     checkExecutable(f);
                     return;
                 }
 
-                File fexe = new File(exe+".exe");
-                if(fexe.exists()) {
+                File fexe = new File(exe + ".exe");
+                if (fexe.exists()) {
                     checkExecutable(fexe);
                     return;
                 }
 
-                error("There's no such file: "+exe);
+                error("There's no such file: " + exe);
             } else {
                 // look in PATH
                 String path = EnvVars.masterEnvVars.get("PATH");
                 String tokenizedPath = "";
                 String delimiter = null;
-                if(path!=null) {
-                    for (String _dir : Util.tokenize(path.replace("\\", "\\\\"),File.pathSeparator)) {
+                if (path != null) {
+                    for (String _dir : Util.tokenize(path.replace("\\", "\\\\"), File.pathSeparator)) {
                         if (delimiter == null) {
-                          delimiter = ", ";
-                        }
-                        else {
-                          tokenizedPath += delimiter;
+                            delimiter = ", ";
+                        } else {
+                            tokenizedPath += delimiter;
                         }
 
                         tokenizedPath += _dir.replace('\\', '/');
-                        
+
                         File dir = new File(_dir);
 
-                        File f = new File(dir,exe);
-                        if(f.exists()) {
+                        File f = new File(dir, exe);
+                        if (f.exists()) {
                             checkExecutable(f);
                             return;
                         }
 
-                        File fexe = new File(dir,exe+".exe");
-                        if(fexe.exists()) {
+                        File fexe = new File(dir, exe + ".exe");
+                        if (fexe.exists()) {
                             checkExecutable(fexe);
                             return;
                         }
                     }
-                    
+
                     tokenizedPath += ".";
-                }
-                else {
-                  tokenizedPath = "unavailable.";
+                } else {
+                    tokenizedPath = "unavailable.";
                 }
 
                 // didn't find it
-                error("There's no such executable "+exe+" in PATH: "+tokenizedPath);
+                error("There's no such executable " + exe + " in PATH: " + tokenizedPath);
             }
         }
 
         /**
-         * Provides an opportunity for derived classes to do additional checks on the executable.
+         * Provides an opportunity for derived classes to do additional checks
+         * on the executable.
          */
         protected void checkExecutable(File exe) throws IOException, ServletException {
             ok();
@@ -576,10 +600,12 @@ public abstract class FormFieldValidator {
      * Verifies that the 'value' parameter is correct base64 encoded text.
      *
      * @since 1.257
-     * @deprecated as of 1.305
-     *      Use {@link FormValidation#validateBase64(String, boolean, boolean, String)} instead.
+     * @deprecated as of 1.305 Use
+     * {@link FormValidation#validateBase64(String, boolean, boolean, String)}
+     * instead.
      */
     public static class Base64 extends FormFieldValidator {
+
         private final boolean allowWhitespace;
         private final boolean allowEmpty;
         private final String errorMessage;
@@ -594,18 +620,18 @@ public abstract class FormFieldValidator {
         protected void check() throws IOException, ServletException {
             try {
                 String v = request.getParameter("value");
-                if(!allowWhitespace) {
-                    if(v.indexOf(' ')>=0 || v.indexOf('\n')>=0) {
+                if (!allowWhitespace) {
+                    if (v.indexOf(' ') >= 0 || v.indexOf('\n') >= 0) {
                         fail();
                         return;
                     }
                 }
-                v=v.trim();
-                if(!allowEmpty && v.length()==0) {
+                v = v.trim();
+                if (!allowEmpty && v.length() == 0) {
                     fail();
                     return;
                 }
-                
+
                 org.apache.commons.codec.binary.Base64.decodeBase64(v);
                 ok();
             } catch (IOException e) {
@@ -622,10 +648,11 @@ public abstract class FormFieldValidator {
      * Verifies that the 'value' parameter is an integer >= 0.
      *
      * @since 1.282
-     * @deprecated as of 1.294
-     *      Use {@link FormValidation#validateNonNegativeInteger(String)}
+     * @deprecated as of 1.294 Use
+     * {@link FormValidation#validateNonNegativeInteger(String)}
      */
     public static class NonNegativeInteger extends FormFieldValidator {
+
         public NonNegativeInteger() {
             super(null);
         }
@@ -633,10 +660,11 @@ public abstract class FormFieldValidator {
         protected void check() throws IOException, ServletException {
             try {
                 String value = request.getParameter("value");
-                if(Integer.parseInt(value)<0)
+                if (Integer.parseInt(value) < 0) {
                     error(hudson.model.Messages.Hudson_NotAPositiveNumber());
-                else
+                } else {
                     ok();
+                }
             } catch (NumberFormatException e) {
                 error(hudson.model.Messages.Hudson_NotANumber());
             }

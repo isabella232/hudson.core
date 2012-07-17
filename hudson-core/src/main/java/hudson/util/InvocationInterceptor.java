@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -26,12 +26,12 @@ import java.lang.reflect.InvocationHandler;
  * @since 1.232
  */
 public interface InvocationInterceptor {
+
     /**
-     * This method can intercept the invocation of {@link InvocationHandler} either before or after
-     * the invocation happens.
+     * This method can intercept the invocation of {@link InvocationHandler}
+     * either before or after the invocation happens.
      *
-     * <p>
-     * The general coding pattern is:
+     * <p> The general coding pattern is:
      *
      * <pre>
      * Object invoke(Object proxy, Method method, Object[] args, InvocationHandler delegate) {
@@ -42,9 +42,8 @@ public interface InvocationInterceptor {
      * }
      * </pre>
      *
-     * <p>
-     * But the implementation may choose to skip calling the 'delegate' object, alter arguments,
-     * and alter the return value. 
+     * <p> But the implementation may choose to skip calling the 'delegate'
+     * object, alter arguments, and alter the return value.
      */
     public Object invoke(Object proxy, Method method, Object[] args, InvocationHandler delegate) throws Throwable;
 }

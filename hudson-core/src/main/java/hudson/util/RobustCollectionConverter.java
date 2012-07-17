@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -35,27 +35,28 @@ import static java.util.logging.Level.WARNING;
 /**
  * {@link CollectionConverter} that ignores {@link CannotResolveClassException}.
  *
- * <p>
- * This allows Hudson to load XML files that contain non-existent classes
- * (the expected scenario is that those classes belong to plugins that were unloaded.) 
+ * <p> This allows Hudson to load XML files that contain non-existent classes
+ * (the expected scenario is that those classes belong to plugins that were
+ * unloaded.)
  *
  * @author Kohsuke Kawaguchi
  */
 public class RobustCollectionConverter extends CollectionConverter {
+
     private final SerializableConverter sc;
 
     public RobustCollectionConverter(XStream xs) {
-        this(xs.getMapper(),xs.getReflectionProvider());
+        this(xs.getMapper(), xs.getReflectionProvider());
     }
 
     public RobustCollectionConverter(Mapper mapper, ReflectionProvider reflectionProvider) {
         super(mapper);
-        sc = new SerializableConverter(mapper,reflectionProvider);
+        sc = new SerializableConverter(mapper, reflectionProvider);
     }
 
     @Override
     public boolean canConvert(Class type) {
-        return super.canConvert(type) || type==CopyOnWriteArrayList.class || type==CopyOnWriteArraySet.class;
+        return super.canConvert(type) || type == CopyOnWriteArrayList.class || type == CopyOnWriteArraySet.class;
     }
 
     @Override
@@ -63,8 +64,8 @@ public class RobustCollectionConverter extends CollectionConverter {
         // CopyOnWriteArrayList used to serialize as custom serialization,
         // so read it in a compatible fashion.
         String s = reader.getAttribute("serialization");
-        if(s!=null && s.equals("custom")) {
-            return sc.unmarshal(reader,context);
+        if (s != null && s.equals("custom")) {
+            return sc.unmarshal(reader, context);
         } else {
             return super.unmarshal(reader, context);
         }
@@ -87,6 +88,5 @@ public class RobustCollectionConverter extends CollectionConverter {
             reader.moveUp();
         }
     }
-
     private static final Logger LOGGER = Logger.getLogger(RobustCollectionConverter.class.getName());
 }

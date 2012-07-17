@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -18,7 +18,7 @@ package hudson.util;
 
 /**
  * Unary function <tt>y=f(x)</tt>.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public interface Function1<R,P1> {

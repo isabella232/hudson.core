@@ -7,9 +7,9 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
- *  
- *       
+ * Contributors:
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -36,7 +36,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package hudson.util;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,35 +50,37 @@ import java.util.Map;
 /**
  * Parses the query string of the URL into a key/value pair.
  *
- * <p>
- * This class is even useful on the server side, as {@link HttpServletRequest#getParameter(String)}
- * can try to parse into the payload (and that can cause an exception if the payload is already consumed.
+ * <p> This class is even useful on the server side, as
+ * {@link HttpServletRequest#getParameter(String)} can try to parse into the
+ * payload (and that can cause an exception if the payload is already consumed.
  * See HUDSON-8056.)
  *
- * <p>
- * So if you are handling the payload yourself and only want to access the query parameters,
- * use this class.
+ * <p> So if you are handling the payload yourself and only want to access the
+ * query parameters, use this class.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.394
  */
 public class QueryParameterMap {
-    private final Map<String,List<String>> store = new HashMap<String, List<String>>();
+
+    private final Map<String, List<String>> store = new HashMap<String, List<String>>();
 
     /**
-     * @param queryString
-     *      String that looks like "abc=def&ghi=jkl"
+     * @param queryString String that looks like "abc=def&ghi=jkl"
      */
     public QueryParameterMap(String queryString) {
-        if (queryString==null || queryString.length()==0)   return;
+        if (queryString == null || queryString.length() == 0) {
+            return;
+        }
         try {
             for (String param : queryString.split("&")) {
                 String[] kv = param.split("=");
                 String key = URLDecoder.decode(kv[0], "UTF-8");
                 String value = URLDecoder.decode(kv[1], "UTF-8");
                 List<String> values = store.get(key);
-                if (values == null)
+                if (values == null) {
                     store.put(key, values = new ArrayList<String>());
+                }
                 values.add(value);
             }
         } catch (UnsupportedEncodingException e) {
@@ -93,11 +94,11 @@ public class QueryParameterMap {
 
     public String get(String name) {
         List<String> v = store.get(name);
-        return v!=null?v.get(0):null;
+        return v != null ? v.get(0) : null;
     }
 
     public List<String> getAll(String name) {
         List<String> v = store.get(name);
-        return v!=null? Collections.unmodifiableList(v) : Collections.<String>emptyList();
+        return v != null ? Collections.unmodifiableList(v) : Collections.<String>emptyList();
     }
 }

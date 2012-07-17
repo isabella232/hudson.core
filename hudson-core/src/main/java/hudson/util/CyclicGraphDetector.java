@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -27,32 +27,39 @@ import java.util.Stack;
  * @author Kohsuke Kawaguchi
  */
 public abstract class CyclicGraphDetector<N> {
+
     private final Set<N> visited = new HashSet<N>();
     private final Set<N> visiting = new HashSet<N>();
     private final Stack<N> path = new Stack<N>();
 
     public void run(Iterable<? extends N> allNodes) throws CycleDetectedException {
-        for (N n : allNodes)
+        for (N n : allNodes) {
             visit(n);
+        }
     }
 
     /**
-     * List up edges from the given node (by listing nodes that those edges point to.)
+     * List up edges from the given node (by listing nodes that those edges
+     * point to.)
      *
-     * @return
-     *      Never null.
+     * @return Never null.
      */
     protected abstract Iterable<? extends N> getEdges(N n);
 
     private void visit(N p) throws CycleDetectedException {
-        if (!visited.add(p))    return;
+        if (!visited.add(p)) {
+            return;
+        }
 
         visiting.add(p);
         path.push(p);
         for (N q : getEdges(p)) {
-            if (q==null)        continue;   // ignore unresolved references
-            if (visiting.contains(q))
+            if (q == null) {
+                continue;   // ignore unresolved references
+            }
+            if (visiting.contains(q)) {
                 detectedCycle(q);
+            }
             visit(q);
         }
         visiting.remove(p);
@@ -67,6 +74,7 @@ public abstract class CyclicGraphDetector<N> {
 
     public static final class CycleDetectedException extends Exception {
         //TODO: review and check whether we can do it private
+
         public final List cycle;
 
         public List getCycle() {
@@ -74,7 +82,7 @@ public abstract class CyclicGraphDetector<N> {
         }
 
         public CycleDetectedException(List cycle) {
-            super("Cycle detected: "+Util.join(cycle," -> "));
+            super("Cycle detected: " + Util.join(cycle, " -> "));
             this.cycle = cycle;
         }
     }

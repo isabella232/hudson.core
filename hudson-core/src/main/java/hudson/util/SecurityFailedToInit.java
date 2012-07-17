@@ -7,24 +7,25 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *  Winston Prakash
- *     
+ *
  *******************************************************************************/ 
 package hudson.util;
 
 import hudson.Functions;
 
 /**
- * Model object used to display error page if any Hudson Security initialization error occurs.
+ * Model object used to display error page if any Hudson Security initialization
+ * error occurs.
  *
- * <p>
- * <tt>index.jelly</tt> would display a nice friendly error page.
+ * <p> <tt>index.jelly</tt> would display a nice friendly error page.
  *
  * @author Winston Prakash
  */
 public class SecurityFailedToInit extends ErrorObject {
+
     public final Throwable exception;
 
     public SecurityFailedToInit(Throwable exception) {

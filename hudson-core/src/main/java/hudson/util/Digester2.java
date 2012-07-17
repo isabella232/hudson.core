@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
+ * Contributors:
+ * 
 *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -32,12 +32,14 @@ import org.xml.sax.Attributes;
 @Deprecated
 @RestrictedSince("2.1.2")
 public class Digester2 extends Digester {
+
     @Override
     public void addObjectCreate(String pattern, Class clazz) {
-        addRule(pattern,new ObjectCreateRule2(clazz));
+        addRule(pattern, new ObjectCreateRule2(clazz));
     }
 
     private static final class ObjectCreateRule2 extends Rule {
+
         private final Class clazz;
 
         public ObjectCreateRule2(Class clazz) {

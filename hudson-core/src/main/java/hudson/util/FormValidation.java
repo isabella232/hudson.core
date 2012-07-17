@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -41,23 +41,23 @@ import org.apache.commons.codec.binary.Base64;
 /**
  * Represents the result of the form field validation.
  *
- * <p>
- * Use one of the factory methods to create an instance, then return it from your <tt>doCheckXyz</tt>
- * method. (Via {@link HttpResponse}, the returned object will render the result into {@link StaplerResponse}.)
- * This way of designing form field validation allows you to reuse {@code doCheckXyz()} methods
- * programmatically as well (by using {@link #kind}.
+ * <p> Use one of the factory methods to create an instance, then return it from
+ * your <tt>doCheckXyz</tt> method. (Via {@link HttpResponse}, the returned
+ * object will render the result into {@link StaplerResponse}.) This way of
+ * designing form field validation allows you to reuse {@code doCheckXyz()}
+ * methods programmatically as well (by using {@link #kind}.
  *
- * <p>
- * For typical validation needs, this class offers a number of {@code validateXXX(...)} methods, such as
- * {@link #validateExecutable(String)}. {@link FilePath} also has a number of {@code validateXXX(...)} methods
- * that you may be able to reuse.
+ * <p> For typical validation needs, this class offers a number of
+ * {@code validateXXX(...)} methods, such as
+ * {@link #validateExecutable(String)}. {@link FilePath} also has a number of
+ * {@code validateXXX(...)} methods that you may be able to reuse.
  *
- * <p>
- * Also see {@link CVSSCM.DescriptorImpl#doCheckCvsRoot(String)} as an example.
+ * <p> Also see {@link CVSSCM.DescriptorImpl#doCheckCvsRoot(String)} as an
+ * example.
  *
- * <p>
- * This class extends {@link IOException} so that it can be thrown from a method. This allows one to reuse
- * the checking logic as a part of the real computation, such as:
+ * <p> This class extends {@link IOException} so that it can be thrown from a
+ * method. This allows one to reuse the checking logic as a part of the real
+ * computation, such as:
  *
  * <pre>
  * String getAntVersion(File antHome) throws FormValidation {
@@ -69,37 +69,36 @@ import org.apache.commons.codec.binary.Base64;
  *
  * ...
  *
- * public FormValidation doCheckAntVersion(@QueryParameter String f) {
- *     try {
- *         return ok(getAntVersion(new File(f)));
- *     } catch (FormValidation f) {
- *         return f;
- *     }
- * }
+ * public FormValidation doCheckAntVersion(
+ *
+ * @QueryParameter String f) { try { return ok(getAntVersion(new File(f))); }
+ * catch (FormValidation f) { return f; } }
  *
  * ...
  *
- * public void {@linkplain hudson.tasks.Builder#perform(hudson.model.AbstractBuild, hudson.Launcher, hudson.model.BuildListener) perform}(...) {
- *     String version = getAntVersion(antHome);
- *     ...
- * }
+ * public void
+ * {@linkplain hudson.tasks.Builder#perform(hudson.model.AbstractBuild, hudson.Launcher, hudson.model.BuildListener) perform}(...)
+ * { String version = getAntVersion(antHome); ... }
  * </pre>
  *
  * @author Kohsuke Kawaguchi
  * @since 1.294
  */
 public abstract class FormValidation extends IOException implements HttpResponse {
+
     /**
      * Indicates the kind of result.
      */
     public enum Kind {
+
         /**
          * Form field value was OK and no problem was detected.
          */
         OK,
         /**
-         * Form field value contained something suspicious. For some limited use cases
-         * the value could be valid, but we suspect the user made a mistake.
+         * Form field value contained something suspicious. For some limited use
+         * cases the value could be valid, but we suspect the user made a
+         * mistake.
          */
         WARNING,
         /**
@@ -111,53 +110,52 @@ public abstract class FormValidation extends IOException implements HttpResponse
     /**
      * Sends out a string error message that indicates an error.
      *
-     * @param message
-     *      Human readable message to be sent. <tt>error(null)</tt>
-     *      can be used as <tt>ok()</tt>.
+     * @param message Human readable message to be sent. <tt>error(null)</tt>
+     * can be used as <tt>ok()</tt>.
      */
     public static FormValidation error(String message) {
-        return errorWithMarkup(message==null?null: Util.escape(message));
+        return errorWithMarkup(message == null ? null : Util.escape(message));
     }
 
     public static FormValidation warning(String message) {
-        return warningWithMarkup(message==null?null:Util.escape(message));
+        return warningWithMarkup(message == null ? null : Util.escape(message));
     }
 
     public static FormValidation ok(String message) {
-        return okWithMarkup(message==null?null:Util.escape(message));
+        return okWithMarkup(message == null ? null : Util.escape(message));
     }
-
     /**
      * Singleton instance that represents "OK".
      */
-    private static final FormValidation OK = respond(Kind.OK,"<div/>");
+    private static final FormValidation OK = respond(Kind.OK, "<div/>");
 
     public static FormValidation ok() {
         return OK;
     }
 
     /**
-     * Sends out a string error message that indicates an error,
-     * by formatting it with {@link String#format(String, Object[])}
+     * Sends out a string error message that indicates an error, by formatting
+     * it with {@link String#format(String, Object[])}
      */
     public static FormValidation error(String format, Object... args) {
-        return error(String.format(format,args));
+        return error(String.format(format, args));
     }
 
     public static FormValidation warning(String format, Object... args) {
-        return warning(String.format(format,args));
+        return warning(String.format(format, args));
     }
 
     public static FormValidation ok(String format, Object... args) {
-        return ok(String.format(format,args));
+        return ok(String.format(format, args));
     }
 
     /**
-     * Sends out a string error message, with optional "show details" link that expands to the full stack trace.
+     * Sends out a string error message, with optional "show details" link that
+     * expands to the full stack trace.
      *
-     * <p>
-     * Use this with caution, so that anonymous users do not gain too much insights into the state of the system,
-     * as error stack trace often reveals a lot of information. Consider if a check operation needs to be exposed
+     * <p> Use this with caution, so that anonymous users do not gain too much
+     * insights into the state of the system, as error stack trace often reveals
+     * a lot of information. Consider if a check operation needs to be exposed
      * to everyone or just those who have higher access to job/hudson/etc.
      */
     public static FormValidation error(Throwable e, String message) {
@@ -169,59 +167,57 @@ public abstract class FormValidation extends IOException implements HttpResponse
     }
 
     private static FormValidation _error(Kind kind, Throwable e, String message) {
-        if (e==null)    return _errorWithMarkup(Util.escape(message),kind);
+        if (e == null) {
+            return _errorWithMarkup(Util.escape(message), kind);
+        }
 
-        return _errorWithMarkup(Util.escape(message)+
-            " <a href='#' class='showDetails'>"
-            + Messages.FormValidation_Error_Details()
-            + "</a><pre style='display:none'>"
-            + Functions.printThrowable(e) +
-            "</pre>",kind
-        );
+        return _errorWithMarkup(Util.escape(message)
+                + " <a href='#' class='showDetails'>"
+                + Messages.FormValidation_Error_Details()
+                + "</a><pre style='display:none'>"
+                + Functions.printThrowable(e)
+                + "</pre>", kind);
     }
 
     public static FormValidation error(Throwable e, String format, Object... args) {
-        return error(e,String.format(format,args));
+        return error(e, String.format(format, args));
     }
 
     public static FormValidation warning(Throwable e, String format, Object... args) {
-        return warning(e,String.format(format,args));
+        return warning(e, String.format(format, args));
     }
-
-
 
     /**
      * Sends out an HTML fragment that indicates an error.
      *
-     * <p>
-     * This method must be used with care to avoid cross-site scripting
+     * <p> This method must be used with care to avoid cross-site scripting
      * attack.
      *
-     * @param message
-     *      Human readable message to be sent. <tt>error(null)</tt>
-     *      can be used as <tt>ok()</tt>.
+     * @param message Human readable message to be sent. <tt>error(null)</tt>
+     * can be used as <tt>ok()</tt>.
      */
     public static FormValidation errorWithMarkup(String message) {
-        return _errorWithMarkup(message,Kind.ERROR);
+        return _errorWithMarkup(message, Kind.ERROR);
     }
 
     public static FormValidation warningWithMarkup(String message) {
-        return _errorWithMarkup(message,Kind.WARNING);
+        return _errorWithMarkup(message, Kind.WARNING);
     }
 
     public static FormValidation okWithMarkup(String message) {
-        return _errorWithMarkup(message,Kind.OK);
+        return _errorWithMarkup(message, Kind.OK);
     }
 
     private static FormValidation _errorWithMarkup(final String message, final Kind kind) {
-        if(message==null)
+        if (message == null) {
             return ok();
+        }
         return new FormValidation(kind, message) {
             public String renderHtml() {
                 // 1x16 spacer needed for IE since it doesn't support min-height
-                return "<div class="+ kind.name().toLowerCase(Locale.ENGLISH) +"><img src='"+
-                        Stapler.getCurrentRequest().getContextPath()+ Hudson.RESOURCE_PATH+"/images/none.gif' height=16 width=1>"+
-                        message+"</div>";
+                return "<div class=" + kind.name().toLowerCase(Locale.ENGLISH) + "><img src='"
+                        + Stapler.getCurrentRequest().getContextPath() + Hudson.RESOURCE_PATH + "/images/none.gif' height=16 width=1>"
+                        + message + "</div>";
             }
         };
     }
@@ -240,12 +236,11 @@ public abstract class FormValidation extends IOException implements HttpResponse
     /**
      * Performs an application-specific validation on the given file.
      *
-     * <p>
-     * This is used as a piece in a bigger validation effort.
+     * <p> This is used as a piece in a bigger validation effort.
      */
     public static abstract class FileValidator {
-        public abstract FormValidation validate(File f);
 
+        public abstract FormValidation validate(File f);
         /**
          * Singleton instance that does no check.
          */
@@ -266,52 +261,62 @@ public abstract class FormValidation extends IOException implements HttpResponse
     /**
      * Makes sure that the given string points to an executable file.
      *
-     * @param exeValidator
-     *      If the validation process discovers a valid executable program on the given path,
-     *      the specified {@link FileValidator} can perform additional checks (such as making sure
-     *      that it has the right version, etc.)
+     * @param exeValidator If the validation process discovers a valid
+     * executable program on the given path, the specified {@link FileValidator}
+     * can perform additional checks (such as making sure that it has the right
+     * version, etc.)
      */
     public static FormValidation validateExecutable(String exe, FileValidator exeValidator) {
         // insufficient permission to perform validation?
-        if(!Hudson.getInstance().hasPermission(Hudson.ADMINISTER)) return ok();
+        if (!Hudson.getInstance().hasPermission(Hudson.ADMINISTER)) {
+            return ok();
+        }
 
         exe = fixEmpty(exe);
-        if(exe==null)
+        if (exe == null) {
             return ok();
+        }
 
-        if(exe.indexOf(File.separatorChar)>=0) {
+        if (exe.indexOf(File.separatorChar) >= 0) {
             // this is full path
             File f = new File(exe);
-            if(f.exists())  return exeValidator.validate(f);
+            if (f.exists()) {
+                return exeValidator.validate(f);
+            }
 
-            File fexe = new File(exe+".exe");
-            if(fexe.exists())   return exeValidator.validate(fexe);
+            File fexe = new File(exe + ".exe");
+            if (fexe.exists()) {
+                return exeValidator.validate(fexe);
+            }
 
-            return error("There's no such file: "+exe);
+            return error("There's no such file: " + exe);
         }
 
         // look in PATH
         String path = EnvVars.masterEnvVars.get("PATH");
         String tokenizedPath = "";
         String delimiter = null;
-        if(path!=null) {
-            for (String _dir : Util.tokenize(path.replace("\\", "\\\\"),File.pathSeparator)) {
+        if (path != null) {
+            for (String _dir : Util.tokenize(path.replace("\\", "\\\\"), File.pathSeparator)) {
                 if (delimiter == null) {
-                  delimiter = ", ";
-                }
-                else {
-                  tokenizedPath += delimiter;
+                    delimiter = ", ";
+                } else {
+                    tokenizedPath += delimiter;
                 }
 
                 tokenizedPath += _dir.replace('\\', '/');
 
                 File dir = new File(_dir);
 
-                File f = new File(dir,exe);
-                if(f.exists())  return exeValidator.validate(f);
+                File f = new File(dir, exe);
+                if (f.exists()) {
+                    return exeValidator.validate(f);
+                }
 
-                File fexe = new File(dir,exe+".exe");
-                if(fexe.exists())   return exeValidator.validate(fexe);
+                File fexe = new File(dir, exe + ".exe");
+                if (fexe.exists()) {
+                    return exeValidator.validate(fexe);
+                }
             }
 
             tokenizedPath += ".";
@@ -320,7 +325,7 @@ public abstract class FormValidation extends IOException implements HttpResponse
         }
 
         // didn't find it
-        return error("There's no such executable "+exe+" in PATH: "+tokenizedPath);
+        return error("There's no such executable " + exe + " in PATH: " + tokenizedPath);
     }
 
     /**
@@ -328,8 +333,9 @@ public abstract class FormValidation extends IOException implements HttpResponse
      */
     public static FormValidation validateNonNegativeInteger(String value) {
         try {
-            if(Integer.parseInt(value)<0)
+            if (Integer.parseInt(value) < 0) {
                 return error(hudson.model.Messages.Hudson_NotANonNegativeNumber());
+            }
             return ok();
         } catch (NumberFormatException e) {
             return error(hudson.model.Messages.Hudson_NotANumber());
@@ -341,8 +347,9 @@ public abstract class FormValidation extends IOException implements HttpResponse
      */
     public static FormValidation validatePositiveInteger(String value) {
         try {
-            if(Integer.parseInt(value)<=0)
+            if (Integer.parseInt(value) <= 0) {
                 return error(hudson.model.Messages.Hudson_NotAPositiveNumber());
+            }
             return ok();
         } catch (NumberFormatException e) {
             return error(hudson.model.Messages.Hudson_NotANumber());
@@ -353,20 +360,19 @@ public abstract class FormValidation extends IOException implements HttpResponse
      * Makes sure that the given string is not null or empty.
      */
     public static FormValidation validateRequired(String value) {
-        if (Util.fixEmptyAndTrim(value) == null)
+        if (Util.fixEmptyAndTrim(value) == null) {
             return error(Messages.FormValidation_ValidateRequired());
+        }
         return ok();
     }
 
     /**
      * Makes sure that the given string is a base64 encoded text.
      *
-     * @param allowWhitespace
-     *      if you allow whitespace (CR,LF,etc) in base64 encoding
-     * @param allowEmpty
-     *      Is empty string allowed?
-     * @param errorMessage
-     *      Error message.
+     * @param allowWhitespace if you allow whitespace (CR,LF,etc) in base64
+     * encoding
+     * @param allowEmpty Is empty string allowed?
+     * @param errorMessage Error message.
      * @since 1.305
      */
     public static FormValidation validateBase64(String value, boolean allowWhitespace, boolean allowEmpty, String errorMessage) {
@@ -388,13 +394,14 @@ public abstract class FormValidation extends IOException implements HttpResponse
     /**
      * Convenient base class for checking the validity of URLs.
      *
-     * <p>
-     * This allows the check method to call various utility methods in a concise syntax.
+     * <p> This allows the check method to call various utility methods in a
+     * concise syntax.
      */
     public static abstract class URLCheck {
+
         /**
-         * Opens the given URL and reads text content from it.
-         * This method honors Content-type header.
+         * Opens the given URL and reads text content from it. This method
+         * honors Content-type header.
          */
         protected BufferedReader open(URL url) throws IOException {
             // use HTTP content type to find out the charset.
@@ -403,46 +410,51 @@ public abstract class FormValidation extends IOException implements HttpResponse
                 throw new IOException(url.toExternalForm());
             }
             return new BufferedReader(
-                new InputStreamReader(con.getInputStream(),getCharset(con)));
+                    new InputStreamReader(con.getInputStream(), getCharset(con)));
         }
 
         /**
          * Finds the string literal from the given reader.
-         * @return
-         *      true if found, false otherwise.
+         *
+         * @return true if found, false otherwise.
          */
         protected boolean findText(BufferedReader in, String literal) throws IOException {
             String line;
-            while((line=in.readLine())!=null)
-                if(line.indexOf(literal)!=-1)
+            while ((line = in.readLine()) != null) {
+                if (line.indexOf(literal) != -1) {
                     return true;
+                }
+            }
             return false;
         }
 
         /**
-         * Calls the {@link FormValidation#error(String)} method with a reasonable error message.
-         * Use this method when the {@link #open(URL)} or {@link #findText(BufferedReader, String)} fails.
+         * Calls the {@link FormValidation#error(String)} method with a
+         * reasonable error message. Use this method when the {@link #open(URL)}
+         * or {@link #findText(BufferedReader, String)} fails.
          *
-         * @param url
-         *      Pass in the URL that was connected. Used for error diagnosis.
+         * @param url Pass in the URL that was connected. Used for error
+         * diagnosis.
          */
         protected FormValidation handleIOException(String url, IOException e) throws IOException, ServletException {
             // any invalid URL comes here
-            if(e.getMessage().equals(url))
-                // Sun JRE (and probably others too) often return just the URL in the error.
-                return error("Unable to connect "+url);
-            else
+            if (e.getMessage().equals(url)) // Sun JRE (and probably others too) often return just the URL in the error.
+            {
+                return error("Unable to connect " + url);
+            } else {
                 return error(e.getMessage());
+            }
         }
 
         /**
          * Figures out the charset from the content-type header.
          */
         private String getCharset(URLConnection con) {
-            for( String t : con.getContentType().split(";") ) {
+            for (String t : con.getContentType().split(";")) {
                 t = t.trim().toLowerCase(Locale.ENGLISH);
-                if(t.startsWith("charset="))
+                if (t.startsWith("charset=")) {
                     return t.substring(8);
+                }
             }
             // couldn't find it. HTML spec says default is US-ASCII,
             // but UTF-8 is a better choice since
@@ -452,13 +464,12 @@ public abstract class FormValidation extends IOException implements HttpResponse
         }
 
         /**
-         * Implement the actual form validation logic, by using other convenience methosd defined in this class.
-         * If you are not using any of those, you don't need to extend from this class.
+         * Implement the actual form validation logic, by using other
+         * convenience methosd defined in this class. If you are not using any
+         * of those, you don't need to extend from this class.
          */
         protected abstract FormValidation check() throws IOException, ServletException;
     }
-
-
     //TODO: review and check whether we can do it private
     public final Kind kind;
 
@@ -468,6 +479,7 @@ public abstract class FormValidation extends IOException implements HttpResponse
 
     /**
      * Instances should be created via one of the factory methods above.
+     *
      * @param kind
      */
     private FormValidation(Kind kind) {

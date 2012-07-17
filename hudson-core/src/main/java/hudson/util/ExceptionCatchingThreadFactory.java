@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -22,13 +22,14 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 
 /**
- * {@link ThreadFactory} that creates a thread, which in turn displays a stack trace
- * when it terminates unexpectedly.
+ * {@link ThreadFactory} that creates a thread, which in turn displays a stack
+ * trace when it terminates unexpectedly.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.226
  */
 public class ExceptionCatchingThreadFactory implements ThreadFactory, Thread.UncaughtExceptionHandler {
+
     private final ThreadFactory core;
 
     public ExceptionCatchingThreadFactory() {
@@ -46,8 +47,7 @@ public class ExceptionCatchingThreadFactory implements ThreadFactory, Thread.Unc
     }
 
     public void uncaughtException(Thread t, Throwable e) {
-        LOGGER.log(Level.WARNING, "Thread "+t.getName()+" terminated unexpectedly",e);
+        LOGGER.log(Level.WARNING, "Thread " + t.getName() + " terminated unexpectedly", e);
     }
-
     private static final Logger LOGGER = Logger.getLogger(ExceptionCatchingThreadFactory.class.getName());
 }

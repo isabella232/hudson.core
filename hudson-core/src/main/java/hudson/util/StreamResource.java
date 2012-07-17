@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -23,14 +23,15 @@ import java.io.IOException;
 
 /**
  * Wraps {@link InputStream} to {@link Resource}.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class StreamResource extends Resource {
+
     private final InputStream in;
 
     /**
-     * @param name
-     *      Used for display purpose.
+     * @param name Used for display purpose.
      */
     public StreamResource(String name, InputStream in) {
         this.in = in;

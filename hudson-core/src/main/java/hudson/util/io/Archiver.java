@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -27,7 +27,8 @@ import java.io.Closeable;
  * @see ArchiverFactory
  */
 public abstract class Archiver extends FileVisitor implements Closeable {
-    protected int entriesWritten =0;
+
+    protected int entriesWritten = 0;
 
     /**
      * Number of files/directories archived.

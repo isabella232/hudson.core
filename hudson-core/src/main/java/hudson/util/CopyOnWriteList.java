@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Nikita Levyankov
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Nikita Levyankov
+ *
  *
  *******************************************************************************/ 
 
@@ -39,17 +39,17 @@ import static java.util.logging.Level.WARNING;
 /**
  * {@link List}-like implementation that has copy-on-write semantics.
  *
- * <p>
- * This class is suitable where highly concurrent access is needed, yet
- * the write operation is relatively uncommon.
+ * <p> This class is suitable where highly concurrent access is needed, yet the
+ * write operation is relatively uncommon.
  *
  * @author Kohsuke Kawaguchi
  */
 public class CopyOnWriteList<E> implements Iterable<E> {
+
     private volatile List<? extends E> core;
 
     public CopyOnWriteList(List<E> core) {
-        this(core,false);
+        this(core, false);
     }
 
     private CopyOnWriteList(List<E> core, boolean noCopy) {
@@ -75,9 +75,8 @@ public class CopyOnWriteList<E> implements Iterable<E> {
     /**
      * Removes an item from the list.
      *
-     * @return
-     *      true if the list contained the item. False if it didn't,
-     *      in which case there's no change.
+     * @return true if the list contained the item. False if it didn't, in which
+     * case there's no change.
      */
     public synchronized boolean remove(E e) {
         List<E> n = new ArrayList<E>(core);
@@ -93,12 +92,13 @@ public class CopyOnWriteList<E> implements Iterable<E> {
         final Iterator<? extends E> itr = core.iterator();
         return new Iterator<E>() {
             private E last;
+
             public boolean hasNext() {
                 return itr.hasNext();
             }
 
             public E next() {
-                return last=itr.next();
+                return last = itr.next();
             }
 
             public void remove() {
@@ -160,17 +160,19 @@ public class CopyOnWriteList<E> implements Iterable<E> {
      * {@link Converter} implementation for XStream.
      */
     public static final class ConverterImpl extends AbstractCollectionConverter {
+
         public ConverterImpl(Mapper mapper) {
             super(mapper);
         }
 
         public boolean canConvert(Class type) {
-            return type==CopyOnWriteList.class;
+            return type == CopyOnWriteList.class;
         }
 
         public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-            for (Object o : (CopyOnWriteList) source)
+            for (Object o : (CopyOnWriteList) source) {
                 writeItem(o, context, writer);
+            }
         }
 
         @SuppressWarnings("unchecked")
@@ -183,16 +185,16 @@ public class CopyOnWriteList<E> implements Iterable<E> {
                     Object item = readItem(reader, context, items);
                     items.add(item);
                 } catch (CannotResolveClassException e) {
-                    LOGGER.log(WARNING,"Failed to resolve class",e);
+                    LOGGER.log(WARNING, "Failed to resolve class", e);
                     RobustReflectionConverter.addErrorInContext(context, e);
                 } catch (LinkageError e) {
-                    LOGGER.log(WARNING,"Failed to resolve class",e);
+                    LOGGER.log(WARNING, "Failed to resolve class", e);
                     RobustReflectionConverter.addErrorInContext(context, e);
                 }
                 reader.moveUp();
             }
 
-            return new CopyOnWriteList(items,true);
+            return new CopyOnWriteList(items, true);
         }
     }
 
@@ -213,6 +215,5 @@ public class CopyOnWriteList<E> implements Iterable<E> {
     public int hashCode() {
         return core != null ? core.hashCode() : 0;
     }
-
     private static final Logger LOGGER = Logger.getLogger(CopyOnWriteList.class.getName());
 }

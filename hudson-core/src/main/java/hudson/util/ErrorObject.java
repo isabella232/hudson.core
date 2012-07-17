@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -29,8 +29,9 @@ import java.io.IOException;
  * @author Kohsuke Kawaguchi
  */
 public abstract class ErrorObject {
+
     public void doDynamic(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, InterruptedException {
         rsp.setStatus(SC_SERVICE_UNAVAILABLE);
-        req.getView(this,"index.jelly").forward(req,rsp);
+        req.getView(this, "index.jelly").forward(req, rsp);
     }
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -25,13 +25,14 @@ import java.io.Serializable;
  * @author Kohsuke Kawaguchi
  */
 public final class CaseInsensitiveComparator implements Comparator<String>, Serializable {
+
     public static final Comparator<String> INSTANCE = new CaseInsensitiveComparator();
 
-    private CaseInsensitiveComparator() {}
+    private CaseInsensitiveComparator() {
+    }
 
     public int compare(String lhs, String rhs) {
         return lhs.compareToIgnoreCase(rhs);
     }
-
     private static final long serialVersionUID = 1L;
 }

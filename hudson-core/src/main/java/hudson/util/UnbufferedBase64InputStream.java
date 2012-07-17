@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -24,14 +24,15 @@ import java.io.InputStream;
 /**
  * Filter InputStream that decodes base64 without doing any buffering.
  *
- * <p>
- * This is slower implementation, but it won't consume unnecessary bytes from the underlying {@link InputStream},
- * allowing the reader to switch between the unencoded bytes and base64 bytes.
+ * <p> This is slower implementation, but it won't consume unnecessary bytes
+ * from the underlying {@link InputStream}, allowing the reader to switch
+ * between the unencoded bytes and base64 bytes.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.349
  */
 public class UnbufferedBase64InputStream extends FilterInputStream {
+
     private byte[] encoded = new byte[4];
     private byte[] decoded;
     private int pos;
@@ -47,37 +48,44 @@ public class UnbufferedBase64InputStream extends FilterInputStream {
 
     @Override
     public int read() throws IOException {
-        if (decoded.length==0)
+        if (decoded.length == 0) {
             return -1; // EOF
-
-        if (pos==decoded.length) {
+        }
+        if (pos == decoded.length) {
             din.readFully(encoded);
             decoded = Base64.decodeBase64(encoded);
-            if (decoded.length==0)  return -1; // EOF
+            if (decoded.length == 0) {
+                return -1; // EOF
+            }
             pos = 0;
         }
 
-        return (decoded[pos++])&0xFF;
+        return (decoded[pos++]) & 0xFF;
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int i;
-        for (i=0; i<len; i++) {
+        for (i = 0; i < len; i++) {
             int ch = read();
-            if (ch<0)   break;
-            b[off+i] = (byte)ch;
+            if (ch < 0) {
+                break;
+            }
+            b[off + i] = (byte) ch;
         }
-        return i==0 ? -1 : i;
+        return i == 0 ? -1 : i;
     }
 
     @Override
     public long skip(long n) throws IOException {
-        long r=0;
-        while (n>0) {
+        long r = 0;
+        while (n > 0) {
             int ch = read();
-            if (ch<0)   break;
-            n--; r++;
+            if (ch < 0) {
+                break;
+            }
+            n--;
+            r++;
         }
         return r;
     }

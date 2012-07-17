@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -31,10 +31,9 @@ import java.io.OutputStream;
  * @see ArchiverFactory#ZIP
  */
 final class ZipArchiver extends Archiver {
-    
+
     // Bitmask indicating directories in 'external attributes' of a ZIP archive entry.
-    private static final long BITMASK_IS_DIRECTORY = 1 << 4;    
-    
+    private static final long BITMASK_IS_DIRECTORY = 1 << 4;
     private final byte[] buf = new byte[8192];
     private final ZipOutputStream zip;
 

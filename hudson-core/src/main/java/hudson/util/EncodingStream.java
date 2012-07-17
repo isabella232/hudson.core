@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -29,6 +29,7 @@ import java.io.OutputStream;
  * @see DecodingStream
  */
 public class EncodingStream extends FilterOutputStream {
+
     public EncodingStream(OutputStream out) {
         super(out);
     }
@@ -38,6 +39,5 @@ public class EncodingStream extends FilterOutputStream {
         out.write(chars.charAt((b >> 4) & 0xF));
         out.write(chars.charAt(b & 0xF));
     }
-
     private static final String chars = "0123456789ABCDEF";
 }

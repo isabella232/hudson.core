@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -22,21 +22,22 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * {@link Writer} that spools the output and writes to another {@link Writer} later.
+ * {@link Writer} that spools the output and writes to another {@link Writer}
+ * later.
  *
  * @author Kohsuke Kawaguchi
  * @deprecated since 2008-05-28. moved to stapler
  */
 public final class CharSpool extends Writer {
-    private List<char[]> buf;
 
+    private List<char[]> buf;
     private char[] last = new char[1024];
     private int pos;
 
     public void write(char cbuf[], int off, int len) {
-        while(len>0) {
-            int sz = Math.min(last.length-pos,len);
-            System.arraycopy(cbuf,off,last,pos,sz);
+        while (len > 0) {
+            int sz = Math.min(last.length - pos, len);
+            System.arraycopy(cbuf, off, last, pos, sz);
             len -= sz;
             off += sz;
             pos += sz;
@@ -45,11 +46,13 @@ public final class CharSpool extends Writer {
     }
 
     private void renew() {
-        if(pos<last.length)
+        if (pos < last.length) {
             return;
+        }
 
-        if(buf==null)
+        if (buf == null) {
             buf = new LinkedList<char[]>();
+        }
         buf.add(last);
         last = new char[1024];
         pos = 0;
@@ -57,7 +60,7 @@ public final class CharSpool extends Writer {
 
     public void write(int c) {
         renew();
-        last[pos++] = (char)c;
+        last[pos++] = (char) c;
     }
 
     public void flush() {
@@ -69,11 +72,11 @@ public final class CharSpool extends Writer {
     }
 
     public void writeTo(Writer w) throws IOException {
-        if(buf!=null) {
+        if (buf != null) {
             for (char[] cb : buf) {
                 w.write(cb);
             }
         }
-        w.write(last,0,pos);
+        w.write(last, 0, pos);
     }
 }

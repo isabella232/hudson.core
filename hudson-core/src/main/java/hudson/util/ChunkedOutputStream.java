@@ -27,41 +27,40 @@
  * <http://www.apache.org/>.
  *
  */
-
 package hudson.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Implements HTTP chunking support. Writes are buffered to an internal buffer (2048 default size).
- * Chunks are guaranteed to be at least as large as the buffer size (except for the last chunk).
+ * Implements HTTP chunking support. Writes are buffered to an internal buffer
+ * (2048 default size). Chunks are guaranteed to be at least as large as the
+ * buffer size (except for the last chunk).
  *
  * @author Mohammad Rezaei, Goldman, Sachs & Co.
  */
 public class ChunkedOutputStream extends OutputStream {
 
     // ------------------------------------------------------- Static Variables
-    private static final byte CRLF[] = new byte[] {(byte) 13, (byte) 10};
-
-    /** End chunk */
+    private static final byte CRLF[] = new byte[]{(byte) 13, (byte) 10};
+    /**
+     * End chunk
+     */
     private static final byte ENDCHUNK[] = CRLF;
-
-    /** 0 */
-    private static final byte ZERO[] = new byte[] {(byte) '0'};
-
+    /**
+     * 0
+     */
+    private static final byte ZERO[] = new byte[]{(byte) '0'};
     // ----------------------------------------------------- Instance Variables
     private OutputStream stream = null;
-
     private byte[] cache;
-
     private int cachePosition = 0;
-
     private boolean wroteLastChunk = false;
 
     // ----------------------------------------------------------- Constructors
     /**
      * Wraps a stream and chunks the output.
+     *
      * @param stream to wrap
      * @param bufferSize minimum chunk size (excluding last chunk)
      * @throws IOException
@@ -74,8 +73,9 @@ public class ChunkedOutputStream extends OutputStream {
     }
 
     /**
-     * Wraps a stream and chunks the output. The default buffer size of 2048 was chosen because
-     * the chunk overhead is less than 0.5%
+     * Wraps a stream and chunks the output. The default buffer size of 2048 was
+     * chosen because the chunk overhead is less than 0.5%
+     *
      * @param stream
      * @throws IOException
      */
@@ -86,6 +86,7 @@ public class ChunkedOutputStream extends OutputStream {
     // ----------------------------------------------------------- Internal methods
     /**
      * Writes the cache out onto the underlying stream
+     *
      * @throws IOException
      *
      * @since 3.0
@@ -101,8 +102,9 @@ public class ChunkedOutputStream extends OutputStream {
     }
 
     /**
-     * Writes the cache and bufferToAppend to the underlying stream
-     * as one large chunk
+     * Writes the cache and bufferToAppend to the underlying stream as one large
+     * chunk
+     *
      * @param bufferToAppend
      * @param off
      * @param len
@@ -129,7 +131,9 @@ public class ChunkedOutputStream extends OutputStream {
 
     // ----------------------------------------------------------- Public Methods
     /**
-     * Must be called to ensure the internal cache is flushed and the closing chunk is written.
+     * Must be called to ensure the internal cache is flushed and the closing
+     * chunk is written.
+     *
      * @throws IOException
      *
      * @since 3.0
@@ -146,8 +150,8 @@ public class ChunkedOutputStream extends OutputStream {
     /**
      * Write the specified byte to our output stream.
      *
-     * Note: Avoid this method as it will cause an inefficient single byte chunk.
-     * Use write (byte[], int, int) instead.
+     * Note: Avoid this method as it will cause an inefficient single byte
+     * chunk. Use write (byte[], int, int) instead.
      *
      * @param b The byte to be written
      * @throws IOException if an input/output error occurs
@@ -155,12 +159,15 @@ public class ChunkedOutputStream extends OutputStream {
     public void write(int b) throws IOException {
         cache[cachePosition] = (byte) b;
         cachePosition++;
-        if (cachePosition == cache.length) flushCache();
+        if (cachePosition == cache.length) {
+            flushCache();
+        }
     }
 
     /**
-     * Writes the array. If the array does not fit within the buffer, it is
-     * not split, but rather written out as one large chunk.
+     * Writes the array. If the array does not fit within the buffer, it is not
+     * split, but rather written out as one large chunk.
+     *
      * @param b
      * @throws IOException
      *
@@ -183,6 +190,7 @@ public class ChunkedOutputStream extends OutputStream {
 
     /**
      * Flushes the underlying stream, but leaves the internal buffer alone.
+     *
      * @throws IOException
      */
     @Override
@@ -192,7 +200,9 @@ public class ChunkedOutputStream extends OutputStream {
     }
 
     /**
-     * Finishes writing to the underlying stream, but does NOT close the underlying stream.
+     * Finishes writing to the underlying stream, but does NOT close the
+     * underlying stream.
+     *
      * @throws IOException
      */
     @Override

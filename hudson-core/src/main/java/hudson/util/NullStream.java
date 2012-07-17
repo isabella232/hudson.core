@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -22,7 +22,9 @@ import java.io.OutputStream;
  * @author Kohsuke Kawaguchi
  */
 public final class NullStream extends OutputStream {
-    public NullStream() {}
+
+    public NullStream() {
+    }
 
     @Override
     public void write(byte b[]) {

@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -32,6 +32,7 @@ import java.util.ArrayList;
  * @since 1.300
  */
 public class ClasspathBuilder implements Serializable, Iterable<String> {
+
     private final List<String> args = new ArrayList<String>();
 
     /**
@@ -58,6 +59,7 @@ public class ClasspathBuilder implements Serializable, Iterable<String> {
 
     /**
      * Adds a jar file that contains the given class.
+     *
      * @since 1.361
      */
     public ClasspathBuilder addJarOf(Class c) throws IOException {
@@ -67,11 +69,12 @@ public class ClasspathBuilder implements Serializable, Iterable<String> {
     /**
      * Adds all the files that matches the given glob in the directory.
      *
-     * @see FilePath#list(String)  
+     * @see FilePath#list(String)
      */
     public ClasspathBuilder addAll(FilePath base, String glob) throws IOException, InterruptedException {
-        for(FilePath item : base.list(glob))
+        for (FilePath item : base.list(glob)) {
             add(item);
+        }
         return this;
     }
 
@@ -94,6 +97,6 @@ public class ClasspathBuilder implements Serializable, Iterable<String> {
      * @since 2.1.0
      */
     public String toString(final String sep) {
-        return Util.join(args,sep);
+        return Util.join(args, sep);
     }
 }

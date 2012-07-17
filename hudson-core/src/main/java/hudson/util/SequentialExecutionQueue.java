@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -22,27 +22,27 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 /**
- * {@link Executor} that collapses two equal {@link Runnable}s into one,
- * and makes sure no two equal {@link Runnable}s get executed simultaneously.
+ * {@link Executor} that collapses two equal {@link Runnable}s into one, and
+ * makes sure no two equal {@link Runnable}s get executed simultaneously.
  *
- * <p>
- * That is, if a {@link Runnable} is executing and another one gets submitted,
- * the 2nd one waits for the completion of the 1st one.
+ * <p> That is, if a {@link Runnable} is executing and another one gets
+ * submitted, the 2nd one waits for the completion of the 1st one.
  *
- * {@link Object#equals(Object)} is used on {@link Runnable} to identify
- * two equal {@link Runnable}s.
+ * {@link Object#equals(Object)} is used on {@link Runnable} to identify two
+ * equal {@link Runnable}s.
  *
  * @author Kohsuke Kawaguchi
  */
 public class SequentialExecutionQueue implements Executor {
+
     /**
      * Access is sycnhronized by {@code Queue.this}
      */
-    private final Map<Runnable,QueueEntry> entries = new HashMap<Runnable,QueueEntry>();
+    private final Map<Runnable, QueueEntry> entries = new HashMap<Runnable, QueueEntry>();
     private ExecutorService executors;
-
     /**
-     * {@link Runnable}s that are currently executing. Useful for trouble-shooting.
+     * {@link Runnable}s that are currently executing. Useful for
+     * trouble-shooting.
      */
     private final Set<QueueEntry> inProgress = new HashSet<QueueEntry>();
 
@@ -60,9 +60,8 @@ public class SequentialExecutionQueue implements Executor {
     /**
      * Starts using a new {@link ExecutorService} to carry out executions.
      *
-     * <p>
-     * The older {@link ExecutorService} will be shut down (but it's still expected to
-     * complete whatever they are doing and scheduled.)
+     * <p> The older {@link ExecutorService} will be shut down (but it's still
+     * expected to complete whatever they are doing and scheduled.)
      */
     public synchronized void setExecutors(ExecutorService svc) {
         ExecutorService old = this.executors;
@@ -71,12 +70,11 @@ public class SequentialExecutionQueue implements Executor {
         old.shutdown();
     }
 
-
     public synchronized void execute(Runnable item) {
         QueueEntry e = entries.get(item);
-        if(e==null) {
+        if (e == null) {
             e = new QueueEntry(item);
-            entries.put(item,e);
+            entries.put(item, e);
             e.submit();
         } else {
             e.queued = true;
@@ -84,14 +82,16 @@ public class SequentialExecutionQueue implements Executor {
     }
 
     /**
-     * Returns true if too much time is spent since some {@link Runnable} is submitted into the queue
-     * until they get executed. 
+     * Returns true if too much time is spent since some {@link Runnable} is
+     * submitted into the queue until they get executed.
      */
     public synchronized boolean isStarving(long threshold) {
         long now = System.currentTimeMillis();
-        for (QueueEntry e : entries.values())
-            if (now-e.submissionTime > threshold)
+        for (QueueEntry e : entries.values()) {
+            if (now - e.submissionTime > threshold) {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -107,6 +107,7 @@ public class SequentialExecutionQueue implements Executor {
     }
 
     private final class QueueEntry implements Runnable {
+
         private final Runnable item;
         private boolean queued;
         private long submissionTime;
@@ -132,11 +133,12 @@ public class SequentialExecutionQueue implements Executor {
                 item.run();
             } finally {
                 synchronized (SequentialExecutionQueue.this) {
-                    if(queued)
-                        // another polling for this job is requested while we were doing the polling. do it again.
+                    if (queued) // another polling for this job is requested while we were doing the polling. do it again.
+                    {
                         submit();
-                    else
+                    } else {
                         entries.remove(item);
+                    }
                     inProgress.remove(this);
                 }
             }

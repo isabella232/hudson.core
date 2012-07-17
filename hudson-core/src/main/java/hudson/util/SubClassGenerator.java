@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -32,6 +32,7 @@ import static org.objectweb.asm.Opcodes.*;
  * @author Kohsuke Kawaguchi
  */
 public class SubClassGenerator extends ClassLoader {
+
     public SubClassGenerator(ClassLoader parent) {
         super(parent);
     }
@@ -39,20 +40,21 @@ public class SubClassGenerator extends ClassLoader {
     public <T> Class<? extends T> generate(Class<T> base, String name) {
         ClassWriter cw = new ClassWriter(false, false);//?
         cw.visit(49, ACC_PUBLIC, name.replace('.', '/'), null,
-                Type.getInternalName(base),null);
+                Type.getInternalName(base), null);
 
         for (Constructor c : base.getDeclaredConstructors()) {
             Class[] et = c.getExceptionTypes();
             String[] exceptions = new String[et.length];
-            for (int i = 0; i < et.length; i++)
+            for (int i = 0; i < et.length; i++) {
                 exceptions[i] = Type.getInternalName(et[i]);
+            }
 
             String methodDescriptor = getMethodDescriptor(c);
             MethodVisitor m = cw.visitMethod(c.getModifiers(), "<init>", methodDescriptor, null, exceptions);
             m.visitCode();
 
-            int index=1;
-            m.visitVarInsn(ALOAD,0);
+            int index = 1;
+            m.visitVarInsn(ALOAD, 0);
             for (Class param : c.getParameterTypes()) {
                 Type t = Type.getType(param);
                 m.visitVarInsn(t.getOpcode(ILOAD), index);
@@ -60,7 +62,7 @@ public class SubClassGenerator extends ClassLoader {
             }
             m.visitMethodInsn(INVOKESPECIAL, Type.getInternalName(base), "<init>", methodDescriptor);
             m.visitInsn(RETURN);
-            m.visitMaxs(index,index);
+            m.visitMaxs(index, index);
             m.visitEnd();
         }
 
@@ -70,17 +72,19 @@ public class SubClassGenerator extends ClassLoader {
         Class<? extends T> c = defineClass(name, image, 0, image.length).asSubclass(base);
 
         Hudson h = Hudson.getInstance();
-        if (h!=null)    // null only during tests.
-            ((UberClassLoader)h.pluginManager.uberClassLoader).addNamedClass(name,c); // can't change the field type as it breaks binary compatibility
-        
+        if (h != null) // null only during tests.
+        {
+            ((UberClassLoader) h.pluginManager.uberClassLoader).addNamedClass(name, c); // can't change the field type as it breaks binary compatibility
+        }
         return c;
     }
 
     private String getMethodDescriptor(Constructor c) {
         StringBuilder buf = new StringBuilder();
         buf.append('(');
-        for (Class p : c.getParameterTypes())
+        for (Class p : c.getParameterTypes()) {
             buf.append(Type.getDescriptor(p));
+        }
 
         buf.append(")V");
         return buf.toString();

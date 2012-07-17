@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -19,10 +19,12 @@ import java.io.OutputStream;
 
 /**
  * {@link OutputStream} that blocks {@link #flush()} method.
+ *
  * @author Kohsuke Kawaguchi
  * @since 1.349
  */
 public class FlushProofOutputStream extends DelegatingOutputStream {
+
     public FlushProofOutputStream(OutputStream out) {
         super(out);
     }
@@ -31,4 +33,3 @@ public class FlushProofOutputStream extends DelegatingOutputStream {
     public void flush() throws IOException {
     }
 }
-
