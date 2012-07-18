@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -33,6 +33,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Kohsuke Kawaguchi
  */
 public class MockBuilder extends Builder {
+
     public final Result result;
 
     public MockBuilder(Result result) {
@@ -40,13 +41,14 @@ public class MockBuilder extends Builder {
     }
 
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        listener.getLogger().println("Simulating a specific result code "+result);
+        listener.getLogger().println("Simulating a specific result code " + result);
         build.setResult(result);
         return true;
     }
 
     @Extension
     public static final class DescriptorImpl extends Descriptor<Builder> {
+
         public Builder newInstance(StaplerRequest req, JSONObject data) {
             throw new UnsupportedOperationException();
         }
@@ -56,4 +58,3 @@ public class MockBuilder extends Builder {
         }
     }
 }
-

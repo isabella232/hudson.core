@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -36,27 +36,29 @@ import java.util.Locale;
 @Target(METHOD)
 @Retention(RUNTIME)
 public @interface PresetData {
+
     /**
      * One of the preset data to choose from.
      */
     DataSet value();
 
     public enum DataSet {
+
         /**
-         * Secured Hudson that has no anonymous read access.
-         * Any logged in user can do anything.
+         * Secured Hudson that has no anonymous read access. Any logged in user
+         * can do anything.
          */
         NO_ANONYMOUS_READACCESS,
         /**
-         * Secured Hudson where anonymous user is read-only,
-         * and any logged in user has a full access.
+         * Secured Hudson where anonymous user is read-only, and any logged in
+         * user has a full access.
          */
-        ANONYMOUS_READONLY,
-    }
+        ANONYMOUS_READONLY,}
 
     public class RunnerImpl extends Recipe.Runner<PresetData> {
+
         public void setup(HudsonTestCase testCase, PresetData recipe) {
-            testCase.withPresetData(recipe.value().name().toLowerCase(Locale.ENGLISH).replace('_','-'));
+            testCase.withPresetData(recipe.value().name().toLowerCase(Locale.ENGLISH).replace('_', '-'));
         }
     }
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *      
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -26,13 +26,14 @@ import java.io.IOException;
 import java.io.Serializable;
 
 public class TouchBuilder extends Builder implements Serializable {
-        @Override
-        public boolean perform(AbstractBuild<?, ?> build,
-                               Launcher launcher, BuildListener listener)
-                throws InterruptedException, IOException {
-            for (FilePath f : build.getWorkspace().list()) {
-                f.touch(System.currentTimeMillis());
-            }
-            return true;
+
+    @Override
+    public boolean perform(AbstractBuild<?, ?> build,
+            Launcher launcher, BuildListener listener)
+            throws InterruptedException, IOException {
+        for (FilePath f : build.getWorkspace().list()) {
+            f.touch(System.currentTimeMillis());
         }
+        return true;
     }
+}

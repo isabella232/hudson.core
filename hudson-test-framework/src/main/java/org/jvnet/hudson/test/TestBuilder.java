@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -25,11 +25,12 @@ import hudson.Launcher;
 import java.io.IOException;
 
 /**
- * Partial {@link Builder} implementation for writing a one-off throw-away builder used during tests.
+ * Partial {@link Builder} implementation for writing a one-off throw-away
+ * builder used during tests.
  *
- * <p>
- * Because this builder tends to be written as an inner class, this builder doesn't write itself
- * to a disk when persisted. Configuration screen won't work, either.
+ * <p> Because this builder tends to be written as an inner class, this builder
+ * doesn't write itself to a disk when persisted. Configuration screen won't
+ * work, either.
  *
  * @author Kohsuke Kawaguchi
  */
@@ -41,5 +42,7 @@ public abstract class TestBuilder extends Builder {
         throw new UnsupportedOperationException();
     }
 
-    private Object writeReplace() { return new Object(); }
+    private Object writeReplace() {
+        return new Object();
+    }
 }

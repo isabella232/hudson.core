@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -35,15 +35,14 @@ import java.net.URL;
  * Acts as a reverse proxy to https://hudson.java.net/ , so that during a test
  * we can avoid hitting java.net.
  *
- * <p>
- * The contents are cached locally.
+ * <p> The contents are cached locally.
  *
  * @author Kohsuke Kawaguchi
  */
 public class JavaNetReverseProxy extends HttpServlet {
+
     private final Server server;
     public final int localPort;
-
     private final File cacheFolder;
 
     public JavaNetReverseProxy(File cacheFolder) throws Exception {
@@ -86,39 +85,41 @@ public class JavaNetReverseProxy extends HttpServlet {
 //            data.writeTo(rsp.getOutputStream());
 //        }
 //    }
-
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getServletPath();
         String d = Util.getDigestOf(path);
 
         File cache = new File(cacheFolder, d);
-        if(!cache.exists()) {
+        if (!cache.exists()) {
             URL url = new URL("http://hudson-ci.org/" + path);
-            FileUtils.copyURLToFile(url,cache);
+            FileUtils.copyURLToFile(url, cache);
         }
 
         resp.setContentType(getMimeType(path));
-        IOUtils.copy(cache,resp.getOutputStream());
+        IOUtils.copy(cache, resp.getOutputStream());
     }
 
     private String getMimeType(String path) {
         int idx = path.indexOf('?');
-        if(idx>=0)
-            path = path.substring(0,idx);
-        if(path.endsWith(".json"))  return "text/javascript";
+        if (idx >= 0) {
+            path = path.substring(0, idx);
+        }
+        if (path.endsWith(".json")) {
+            return "text/javascript";
+        }
         return getServletContext().getMimeType(path);
     }
-
     private static volatile JavaNetReverseProxy INSTANCE;
 
     /**
      * Gets the default instance.
      */
     public static synchronized JavaNetReverseProxy getInstance() throws Exception {
-        if(INSTANCE==null)
-            // TODO: think of a better location --- ideally inside the target/ dir so that clean would wipe them out
-            INSTANCE = new JavaNetReverseProxy(new File(new File(System.getProperty("java.io.tmpdir")),"hudson-ci.org-cache2"));
+        if (INSTANCE == null) // TODO: think of a better location --- ideally inside the target/ dir so that clean would wipe them out
+        {
+            INSTANCE = new JavaNetReverseProxy(new File(new File(System.getProperty("java.io.tmpdir")), "hudson-ci.org-cache2"));
+        }
         return INSTANCE;
     }
 }

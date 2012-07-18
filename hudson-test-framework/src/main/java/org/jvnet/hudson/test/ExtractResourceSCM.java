@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -28,26 +28,29 @@ import java.io.IOException;
 import java.net.URL;
 
 /**
- * {@link SCM} useful for testing that extracts the given resource as a zip file.
+ * {@link SCM} useful for testing that extracts the given resource as a zip
+ * file.
  *
  * @author Kohsuke Kawaguchi
  */
 public class ExtractResourceSCM extends NullSCM {
+
     private final URL zip;
 
     public ExtractResourceSCM(URL zip) {
-        if(zip==null)
+        if (zip == null) {
             throw new IllegalArgumentException();
+        }
         this.zip = zip;
     }
 
     @Override
     public boolean checkout(AbstractBuild build, Launcher launcher, FilePath workspace, BuildListener listener, File changeLogFile) throws IOException, InterruptedException {
-    	if (workspace.exists()) {
+        if (workspace.exists()) {
             listener.getLogger().println("Deleting existing workspace " + workspace.getRemote());
-    		workspace.deleteRecursive();
-    	}
-        listener.getLogger().println("Staging "+zip);
+            workspace.deleteRecursive();
+        }
+        listener.getLogger().println("Staging " + zip);
         workspace.unzipFrom(zip.openStream());
         return true;
     }

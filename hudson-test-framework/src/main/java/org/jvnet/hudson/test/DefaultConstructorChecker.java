@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -22,11 +22,12 @@ import junit.framework.TestCase;
  * @author Kohsuke Kawaguchi
  */
 public class DefaultConstructorChecker extends TestCase {
+
     private final Class clazz;
 
     public DefaultConstructorChecker(Class clazz) {
         this.clazz = clazz;
-        setName(clazz.getName()+".verifyDefaultConstructor");
+        setName(clazz.getName() + ".verifyDefaultConstructor");
     }
 
     @Override
@@ -34,9 +35,9 @@ public class DefaultConstructorChecker extends TestCase {
         try {
             clazz.getConstructor();
         } catch (NoSuchMethodException e) {
-            throw new Error(clazz+" must have the default constructor",e);
+            throw new Error(clazz + " must have the default constructor", e);
         } catch (SecurityException e) {
-            throw new Error(clazz+" must have the default constructor",e);
+            throw new Error(clazz + " must have the default constructor", e);
         }
     }
 }

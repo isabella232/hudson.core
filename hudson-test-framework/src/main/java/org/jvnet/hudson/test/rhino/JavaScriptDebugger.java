@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -26,26 +26,25 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Monitors the execution of the JavaScript inside HtmlUnit, and provides debug information
- * such as call stacks, variables, arguments, etc.
+ * Monitors the execution of the JavaScript inside HtmlUnit, and provides debug
+ * information such as call stacks, variables, arguments, etc.
  *
- * <h2>Usage</h2>
- * <p>
- * When you set a break point in Java code that are directly/indirectly invoked through JavaScript,
- * use {@link #toString()} to see the JavaScript stack trace (and variables at each stack frame.)
- * This helps you see where the problem is.
+ * <h2>Usage</h2> <p> When you set a break point in Java code that are
+ * directly/indirectly invoked through JavaScript, use {@link #toString()} to
+ * see the JavaScript stack trace (and variables at each stack frame.) This
+ * helps you see where the problem is.
  *
- * <p>
- * TODO: add programmatic break point API, selective method invocation tracing, and
- * allow arbitrary script evaluation in arbitrary stack frame.
+ * <p> TODO: add programmatic break point API, selective method invocation
+ * tracing, and allow arbitrary script evaluation in arbitrary stack frame.
  *
  * @author Kohsuke Kawaguchi
  * @see HudsonTestCase#jsDebugger
  */
 public class JavaScriptDebugger implements Debugger {
+
     /**
-     * Call stack as a list. The list grows at the end, so the first element in the list
-     * is the oldest stack frame.
+     * Call stack as a list. The list grows at the end, so the first element in
+     * the list is the oldest stack frame.
      */
     public final List<CallStackFrame> callStack = new ArrayList<CallStackFrame>();
 
@@ -53,7 +52,7 @@ public class JavaScriptDebugger implements Debugger {
     }
 
     public DebugFrame getFrame(Context cx, DebuggableScript fnOrScript) {
-        return new CallStackFrame(this,fnOrScript);
+        return new CallStackFrame(this, fnOrScript);
     }
 
     /**
@@ -61,8 +60,9 @@ public class JavaScriptDebugger implements Debugger {
      */
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        for( int i=callStack.size()-1; i>=0; i-- )
+        for (int i = callStack.size() - 1; i >= 0; i--) {
             buf.append(callStack.get(i)).append('\n');
+        }
         return buf.toString();
     }
 }

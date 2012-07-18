@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -30,6 +30,7 @@ import java.util.TreeMap;
  * @author Kohsuke Kawaguchi
  */
 public class CallStackFrame implements DebugFrame {
+
     /**
      * {@link JavaScriptDebugger} that this stack frame lives in.
      */
@@ -38,7 +39,6 @@ public class CallStackFrame implements DebugFrame {
      * The function being executed.
      */
     public final DebuggableScript fnOrScript;
-
     private Scriptable activation;
     private Scriptable thisObj;
     private Object[] args;
@@ -60,11 +60,12 @@ public class CallStackFrame implements DebugFrame {
         // can't simply call removeFirst, because due to tail call elimination,
         // intermediate frames can be dropped at any time
         // TODO: shouldn't it be suffice to just check the end?
-        for( int i=owner.callStack.size()-1; i>=0; i-- )
-            if(owner.callStack.get(i)==this) {
+        for (int i = owner.callStack.size() - 1; i >= 0; i--) {
+            if (owner.callStack.get(i) == this) {
                 owner.callStack.remove(i);
                 break;
             }
+        }
 
         activation = null;
         thisObj = null;
@@ -85,31 +86,34 @@ public class CallStackFrame implements DebugFrame {
     /**
      * In-scope variables.
      */
-    public SortedMap<String,Object> getVariables() {
-        SortedMap<String,Object> r = new TreeMap<String,Object>();
-        for( int i=fnOrScript.getParamAndVarCount()-1; i>=0; i-- ) {
-            String name =fnOrScript.getParamOrVarName(i);
-            r.put(name,activation.get(name,activation));
+    public SortedMap<String, Object> getVariables() {
+        SortedMap<String, Object> r = new TreeMap<String, Object>();
+        for (int i = fnOrScript.getParamAndVarCount() - 1; i >= 0; i--) {
+            String name = fnOrScript.getParamOrVarName(i);
+            r.put(name, activation.get(name, activation));
         }
         return r;
     }
 
     /**
-     * Formats this call stack, arguments, and its local variables as a human readable string.
+     * Formats this call stack, arguments, and its local variables as a human
+     * readable string.
      */
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append(fnOrScript.getFunctionName());
         buf.append('(');
-        for( int i=0; i<args.length; i++ ) {
-            if(i!=0)    buf.append(',');
+        for (int i = 0; i < args.length; i++) {
+            if (i != 0) {
+                buf.append(',');
+            }
             buf.append(args[i]);
         }
         buf.append(')');
         buf.append("\n  at ").append(fnOrScript.getSourceName()).append('#').append(line);
 
         buf.append("\n  variables=").append(getVariables());
-        
+
         return buf.toString();
     }
 }

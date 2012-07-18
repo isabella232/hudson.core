@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -19,12 +19,13 @@ package org.jvnet.hudson.test.junit;
 import junit.framework.TestCase;
 
 /**
- * {@link TestCase} implementation that has already failed.
- * Used to represent a problem happened during a test suite construction.
+ * {@link TestCase} implementation that has already failed. Used to represent a
+ * problem happened during a test suite construction.
  *
  * @author Kohsuke Kawaguchi
  */
 public class FailedTest extends TestCase {
+
     /**
      * The failure. If null, the test will succeed, despite the class name.
      */
@@ -36,12 +37,13 @@ public class FailedTest extends TestCase {
     }
 
     public FailedTest(Class name, Throwable problem) {
-        this(name.getName(),problem);
+        this(name.getName(), problem);
     }
 
     @Override
     protected void runTest() throws Throwable {
-        if (problem!=null)
+        if (problem != null) {
             throw problem;
+        }
     }
 }

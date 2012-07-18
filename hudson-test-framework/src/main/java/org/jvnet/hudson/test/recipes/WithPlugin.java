@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 import java.net.URL;
 
 /**
- * Installs the specified plugin before launching Hudson. 
+ * Installs the specified plugin before launching Hudson.
  *
  * @author Kohsuke Kawaguchi
  */
@@ -37,15 +37,18 @@ import java.net.URL;
 @Target(METHOD)
 @Retention(RUNTIME)
 public @interface WithPlugin {
+
     /**
      * Name of the plugin.
      *
-     * For now, this has to be one of the plugins statically available in resources
-     * "/plugins/NAME". TODO: support retrieval through Maven repository.
+     * For now, this has to be one of the plugins statically available in
+     * resources "/plugins/NAME". TODO: support retrieval through Maven
+     * repository.
      */
     String value();
 
     public class RunnerImpl extends Recipe.Runner<WithPlugin> {
+
         private WithPlugin a;
 
         @Override
@@ -57,7 +60,7 @@ public @interface WithPlugin {
         @Override
         public void decorateHome(HudsonTestCase testCase, File home) throws Exception {
             URL res = getClass().getClassLoader().getResource("plugins/" + a.value());
-            FileUtils.copyURLToFile(res,new File(home,"plugins/"+a.value()));
+            FileUtils.copyURLToFile(res, new File(home, "plugins/" + a.value()));
         }
     }
 }
