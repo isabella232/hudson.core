@@ -51,6 +51,12 @@ p {
     color: #863566;
 }
 
+#container td {
+    border-bottom-style: dotted;
+    border-bottom-width: 1px;
+    border-bottom-color: #dfcdeb;
+}
+
 #headerLeft {
     width: 450px;
     float:left;
