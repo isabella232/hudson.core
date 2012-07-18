@@ -19,6 +19,7 @@ package org.eclipse.hudson.init;
 import hudson.ProxyConfiguration;
 import hudson.Util;
 import hudson.XmlFile;
+import hudson.markup.MarkupFormatter;
 import hudson.model.Hudson;
 import hudson.model.User;
 import hudson.security.Permission;
@@ -146,7 +147,11 @@ final public class InitialSetup {
     public ProxyConfiguration getProxyConfig() {
         return proxyConfig;
     }
-    
+
+    public MarkupFormatter getMarkupFormatter() {
+        return hudsonSecurityManager.getMarkupFormatter();
+    }
+
     public List<AvailablePluginInfo> getInstalledRecommendedPlugins() {
         return installedRecommendedPlugins;
     }
