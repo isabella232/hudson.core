@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Martin Eigenbrodt
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Martin Eigenbrodt
+ *
  *
  *******************************************************************************/ 
 
@@ -27,9 +27,9 @@ import java.net.URL;
 /**
  * Ensures that <tt>hudson.war</tt> is exploded.
  *
- * <p>
- * Depending on where the test is run (for example, inside Maven vs IDE), this code attempts to
- * use hudson.war from the right place, thereby improving the productivity.
+ * <p> Depending on where the test is run (for example, inside Maven vs IDE),
+ * this code attempts to use hudson.war from the right place, thereby improving
+ * the productivity.
  *
  * @author Kohsuke Kawaguchi
  */
@@ -39,10 +39,11 @@ final class WarExploder {
         // rethrow an exception every time someone tries to do this, so that when explode()
         // fails, you can see the cause no matter which test case you look at.
         // see http://www.nabble.com/Failing-tests-in-test-harness-module-on-hudson.ramfelt.se-td19258722.html
-        if(FAILURE !=null)   throw new Exception("Failed to initialize exploded war", FAILURE);
+        if (FAILURE != null) {
+            throw new Exception("Failed to initialize exploded war", FAILURE);
+        }
         return EXPLODE_DIR;
     }
-
     private static File EXPLODE_DIR;
     private static Exception FAILURE;
 
@@ -68,11 +69,11 @@ final class WarExploder {
             return new File(d, "main/war/target/hudson");
         }
 
-        for( ; d!=null; d=d.getParentFile()) {
-            if(new File(d,".hudson").exists()) {
-                File dir = new File(d,"war/target/hudson");
-                if(dir.exists()) {
-                    System.out.println("Using hudson.war resources from "+dir);
+        for (; d != null; d = d.getParentFile()) {
+            if (new File(d, ".hudson").exists()) {
+                File dir = new File(d, "war/target/hudson");
+                if (dir.exists()) {
+                    System.out.println("Using hudson.war resources from " + dir);
                     return dir;
                 }
             }
@@ -82,18 +83,20 @@ final class WarExploder {
         File war = Which.jarFile(Class.forName("org.eclipse.hudson.war.Executable"));
 
         File explodeDir = new File("./target/hudson-for-test").getAbsoluteFile();
-        File timestamp = new File(explodeDir,".timestamp");
+        File timestamp = new File(explodeDir, ".timestamp");
 
-        if(!timestamp.exists() || (timestamp.lastModified()!=war.lastModified())) {
-            System.out.println("Exploding hudson.war at "+war);
+        if (!timestamp.exists() || (timestamp.lastModified() != war.lastModified())) {
+            System.out.println("Exploding hudson.war at " + war);
             new FilePath(explodeDir).deleteRecursive();
             new FilePath(war).unzip(new FilePath(explodeDir));
-            if(!explodeDir.exists())    // this is supposed to be impossible, but I'm investigating HUDSON-2605
-                throw new IOException("Failed to explode "+war);
+            if (!explodeDir.exists()) // this is supposed to be impossible, but I'm investigating HUDSON-2605
+            {
+                throw new IOException("Failed to explode " + war);
+            }
             new FileOutputStream(timestamp).close();
             timestamp.setLastModified(war.lastModified());
         } else {
-            System.out.println("Picking up existing exploded hudson.war at "+explodeDir.getAbsolutePath());
+            System.out.println("Picking up existing exploded hudson.war at " + explodeDir.getAbsolutePath());
         }
 
         return explodeDir;

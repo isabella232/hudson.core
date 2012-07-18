@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Nikita Levyankov
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -37,6 +37,7 @@ import java.util.List;
  * @author Andrew Bayer
  */
 public class ExtractChangeLogParser extends ChangeLogParser {
+
     @Override
     public ExtractChangeLogSet parse(AbstractBuild build, File changeLogFile) throws IOException, SAXException {
         if (changeLogFile.exists()) {
@@ -71,9 +72,9 @@ public class ExtractChangeLogParser extends ChangeLogParser {
         return new ExtractChangeLogSet(build, changeLog);
     }
 
-
     @ExportedBean(defaultVisibility = 999)
     public static class ExtractChangeLogEntry extends ChangeLogSet.Entry {
+
         private List<FileInZip> files = new ArrayList<FileInZip>();
         private String zipFile;
 
@@ -131,6 +132,7 @@ public class ExtractChangeLogParser extends ChangeLogParser {
 
     @ExportedBean(defaultVisibility = 999)
     public static class FileInZip {
+
         private String fileName = "";
 
         public FileInZip() {
@@ -149,5 +151,4 @@ public class ExtractChangeLogParser extends ChangeLogParser {
             this.fileName = fileName;
         }
     }
-
 }

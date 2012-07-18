@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -34,26 +34,30 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * {@link SCM} useful for testing that extracts the given resource as a zip file.
+ * {@link SCM} useful for testing that extracts the given resource as a zip
+ * file.
  *
  * @author Kohsuke Kawaguchi
  */
 public class ExtractResourceWithChangesSCM extends NullSCM {
+
     private final URL firstZip;
     private final URL secondZip;
     private final String moduleRoot;
-    
+
     public ExtractResourceWithChangesSCM(URL firstZip, URL secondZip) {
-        if ((firstZip == null) || (secondZip == null))
+        if ((firstZip == null) || (secondZip == null)) {
             throw new IllegalArgumentException();
+        }
         this.firstZip = firstZip;
         this.secondZip = secondZip;
         this.moduleRoot = null;
     }
 
     public ExtractResourceWithChangesSCM(URL firstZip, URL secondZip, String moduleRoot) {
-        if ((firstZip == null) || (secondZip == null))
+        if ((firstZip == null) || (secondZip == null)) {
             throw new IllegalArgumentException();
+        }
         this.firstZip = firstZip;
         this.secondZip = secondZip;
         this.moduleRoot = moduleRoot;
@@ -61,12 +65,12 @@ public class ExtractResourceWithChangesSCM extends NullSCM {
 
     @Override
     public FilePath getModuleRoot(FilePath workspace) {
-        if (moduleRoot!=null) {
+        if (moduleRoot != null) {
             return workspace.child(moduleRoot);
         }
         return workspace;
     }
-    
+
     @Override
     public boolean checkout(AbstractBuild build, Launcher launcher, FilePath workspace, BuildListener listener, File changeLogFile) throws IOException, InterruptedException {
         if (workspace.exists()) {
@@ -85,11 +89,11 @@ public class ExtractResourceWithChangesSCM extends NullSCM {
 
         try {
             while ((e = zip.getNextEntry()) != null) {
-                if (!e.isDirectory())
+                if (!e.isDirectory()) {
                     changeLog.addFile(new ExtractChangeLogParser.FileInZip(e.getName()));
+                }
             }
-        }
-        finally {
+        } finally {
             zip.close();
         }
         saveToChangeLog(changeLogFile, changeLog);
@@ -129,7 +133,10 @@ public class ExtractResourceWithChangesSCM extends NullSCM {
     }
 
     /**
-     * Don't write 'this', so that subtypes can be implemented as anonymous class.
+     * Don't write 'this', so that subtypes can be implemented as anonymous
+     * class.
      */
-    private Object writeReplace() { return new Object(); }
+    private Object writeReplace() {
+        return new Object();
+    }
 }

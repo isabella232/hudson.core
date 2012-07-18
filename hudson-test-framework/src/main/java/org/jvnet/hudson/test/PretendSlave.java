@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -32,25 +32,24 @@ import java.util.Collections;
  * Slave that pretends to fork processes.
  *
  * @author Kohsuke Kawaguchi
- * @see HudsonTestCase#createPretendSlave(FakeLauncher) 
+ * @see HudsonTestCase#createPretendSlave(FakeLauncher)
  */
 public class PretendSlave extends Slave {
-    private transient FakeLauncher faker;
 
+    private transient FakeLauncher faker;
     /**
      * Number of processed that are launched.
      */
     public int numLaunch;
 
     public PretendSlave(String name, String remoteFS, int numExecutors, Mode mode, String labelString, ComputerLauncher launcher, FakeLauncher faker) throws IOException, FormException {
-    	super(name, "pretending a slave", remoteFS, String.valueOf(numExecutors), mode, labelString, launcher, RetentionStrategy.NOOP, Collections.<NodeProperty<?>>emptyList());
+        super(name, "pretending a slave", remoteFS, String.valueOf(numExecutors), mode, labelString, launcher, RetentionStrategy.NOOP, Collections.<NodeProperty<?>>emptyList());
         this.faker = faker;
     }
 
     public PretendSlave(String name, String remoteFS, String labelString, ComputerLauncher launcher, FakeLauncher faker) throws IOException, FormException {
-    	this(name, remoteFS, 1, Mode.NORMAL, labelString, launcher, faker);
+        this(name, remoteFS, 1, Mode.NORMAL, labelString, launcher, faker);
     }
-
 
     @Override
     public Launcher createLauncher(TaskListener listener) {
@@ -60,7 +59,9 @@ public class PretendSlave extends Slave {
                     numLaunch++;
                 }
                 Proc p = faker.onLaunch(starter);
-                if (p!=null)    return p;
+                if (p != null) {
+                    return p;
+                }
                 return super.launch(starter);
             }
         };
@@ -68,6 +69,7 @@ public class PretendSlave extends Slave {
 
     @Extension
     public static final class DescriptorImpl extends SlaveDescriptor {
+
         public String getDisplayName() {
             return "Test mock up slave";
         }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -28,21 +28,23 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Server-side logic that implements {@link HudsonTestCase#executeOnServer(Callable)}.
+ * Server-side logic that implements
+ * {@link HudsonTestCase#executeOnServer(Callable)}.
  *
  * @author Kohsuke Kawaguchi
  */
 @Extension
 public final class ClosureExecuterAction implements RootAction {
-    private final Map<UUID,Runnable> runnables = Collections.synchronizedMap(new HashMap<UUID, Runnable>());
+
+    private final Map<UUID, Runnable> runnables = Collections.synchronizedMap(new HashMap<UUID, Runnable>());
 
     public void add(UUID uuid, Runnable r) {
-        runnables.put(uuid,r);
+        runnables.put(uuid, r);
     }
 
     public void doIndex(StaplerResponse rsp, @QueryParameter("uuid") String uuid) throws IOException {
         Runnable r = runnables.remove(UUID.fromString(uuid));
-        if (r!=null) {
+        if (r != null) {
             r.run();
         } else {
             rsp.sendError(404);

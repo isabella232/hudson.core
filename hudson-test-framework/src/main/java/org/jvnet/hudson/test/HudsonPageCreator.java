@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -27,17 +27,18 @@ import java.util.Locale;
 
 /**
  * {@link PageCreator} that understands JNLP file.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public class HudsonPageCreator extends DefaultPageCreator {
+
     @Override
     public Page createPage(WebResponse webResponse, WebWindow webWindow) throws IOException {
         String contentType = webResponse.getContentType().toLowerCase(Locale.ENGLISH);
-        if(contentType.equals("application/x-java-jnlp-file"))
+        if (contentType.equals("application/x-java-jnlp-file")) {
             return createXmlPage(webResponse, webWindow);
+        }
         return super.createPage(webResponse, webWindow);
     }
-
     public static final HudsonPageCreator INSTANCE = new HudsonPageCreator();
 }

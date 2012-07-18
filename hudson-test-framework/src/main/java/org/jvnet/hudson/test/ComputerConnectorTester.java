@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -29,12 +29,14 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Test bed to verify the configuration roundtripness of the {@link ComputerConnector}.
+ * Test bed to verify the configuration roundtripness of the
+ * {@link ComputerConnector}.
  *
  * @author Kohsuke Kawaguchi
  * @see HudsonTestCase#computerConnectorTester
  */
 public class ComputerConnectorTester extends AbstractDescribableImpl<ComputerConnectorTester> {
+
     public final HudsonTestCase testCase;
     public ComputerConnector connector;
 
@@ -49,9 +51,10 @@ public class ComputerConnectorTester extends AbstractDescribableImpl<ComputerCon
     public List getConnectorDescriptors() {
         return ComputerConnectorDescriptor.all();
     }
-    
+
     @Extension
     public static class DescriptorImpl extends Descriptor<ComputerConnectorTester> {
+
         @Override
         public String getDisplayName() {
             return "";

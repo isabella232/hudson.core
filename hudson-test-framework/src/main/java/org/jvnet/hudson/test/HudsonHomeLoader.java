@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -31,16 +31,16 @@ import java.net.URL;
  * @author Kohsuke Kawaguchi
  */
 public interface HudsonHomeLoader {
-    /** 
-     * Returns a directory to be used as <tt>HUDSON_HOME</tt>
-     *
-     * @throws Exception
-     *      to cause a test to fail.
-     */
-    File allocate() throws Exception;
 
     /**
-     * Allocates a new empty directory, meaning this will emulate the fresh Hudson installation.
+     * Returns a directory to be used as <tt>HUDSON_HOME</tt>
+     *
+     * @throws Exception to cause a test to fail.
+     */
+    File allocate() throws Exception;
+    /**
+     * Allocates a new empty directory, meaning this will emulate the fresh
+     * Hudson installation.
      */
     public static final HudsonHomeLoader NEW = new HudsonHomeLoader() {
         public File allocate() throws IOException {
@@ -49,9 +49,11 @@ public interface HudsonHomeLoader {
     };
 
     /**
-     * Allocates a new directory by copying from an existing directory, or unzipping from a zip file.
+     * Allocates a new directory by copying from an existing directory, or
+     * unzipping from a zip file.
      */
     public static final class CopyExisting implements HudsonHomeLoader {
+
         private final URL source;
 
         /**
@@ -64,9 +66,8 @@ public interface HudsonHomeLoader {
         /**
          * Extracts from a zip file in the resource.
          *
-         * <p>
-         * This is useful in case you want to have a test data in the resources.
-         * Only file URL is supported. 
+         * <p> This is useful in case you want to have a test data in the
+         * resources. Only file URL is supported.
          */
         public CopyExisting(URL source) {
             this.source = source;
@@ -74,17 +75,17 @@ public interface HudsonHomeLoader {
 
         public File allocate() throws Exception {
             File target = NEW.allocate();
-            if(source.getProtocol().equals("file")) {
+            if (source.getProtocol().equals("file")) {
                 File src = new File(source.toURI());
-                if(src.isDirectory())
-                    new FilePath(src).copyRecursiveTo("**/*",new FilePath(target));
-                else
-                if(src.getName().endsWith(".zip"))
+                if (src.isDirectory()) {
+                    new FilePath(src).copyRecursiveTo("**/*", new FilePath(target));
+                } else if (src.getName().endsWith(".zip")) {
                     new FilePath(src).unzip(new FilePath(target));
+                }
             } else {
-                File tmp = File.createTempFile("hudson","zip");
+                File tmp = File.createTempFile("hudson", "zip");
                 try {
-                    FileUtils.copyURLToFile(source,tmp);
+                    FileUtils.copyURLToFile(source, tmp);
                     new FilePath(tmp).unzip(new FilePath(target));
                 } finally {
                     tmp.delete();
@@ -98,6 +99,7 @@ public interface HudsonHomeLoader {
      * Allocates a new directory by copying from a test resource
      */
     public static final class Local implements HudsonHomeLoader {
+
         private final Method testMethod;
 
         public Local(Method testMethod) {
@@ -106,12 +108,14 @@ public interface HudsonHomeLoader {
 
         public File allocate() throws Exception {
             URL res = findDataResource();
-            if(!res.getProtocol().equals("file"))
-                throw new AssertionError("Test data is not available in the file system: "+res);
+            if (!res.getProtocol().equals("file")) {
+                throw new AssertionError("Test data is not available in the file system: " + res);
+            }
             // if we picked up a directory, it's one level above config.xml
             File home = new File(res.toURI());
-            if(!home.getName().endsWith(".zip"))
+            if (!home.getName().endsWith(".zip")) {
                 home = home.getParentFile();
+            }
 
             return new CopyExisting(home).allocate();
         }
@@ -119,17 +123,18 @@ public interface HudsonHomeLoader {
         private URL findDataResource() {
             // first, check method specific resource
             Class<?> clazz = testMethod.getDeclaringClass();
-            
-            for( String middle : new String[]{ '/'+testMethod.getName(), "" }) {
-                for( String suffix : SUFFIXES ) {
-                    URL res = clazz.getResource(clazz.getSimpleName() + middle+suffix);
-                    if(res!=null)   return res;
+
+            for (String middle : new String[]{'/' + testMethod.getName(), ""}) {
+                for (String suffix : SUFFIXES) {
+                    URL res = clazz.getResource(clazz.getSimpleName() + middle + suffix);
+                    if (res != null) {
+                        return res;
+                    }
                 }
             }
 
-            throw new AssertionError("No test resource was found for "+testMethod);
+            throw new AssertionError("No test resource was found for " + testMethod);
         }
-
-        private static final String[] SUFFIXES = {"/config.xml",".zip"};
+        private static final String[] SUFFIXES = {"/config.xml", ".zip"};
     }
 }

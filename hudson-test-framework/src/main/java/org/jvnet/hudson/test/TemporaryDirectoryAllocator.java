@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -26,14 +26,15 @@ import java.util.Set;
 
 /**
  * Allocates temporary directories and cleans it up at the end.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class TemporaryDirectoryAllocator {
+
     /**
      * Remember allocated directories to delete them later.
      */
     private final Set<File> tmpDirectories = new HashSet<File>();
-
     /**
      * Directory in which we allocate temporary directories.
      */
@@ -50,8 +51,8 @@ public class TemporaryDirectoryAllocator {
     /**
      * Allocates a new empty temporary directory and returns it.
      *
-     * This directory will be wiped out when {@link TemporaryDirectoryAllocator} gets disposed.
-     * When this method returns, the directory already exists. 
+     * This directory will be wiped out when {@link TemporaryDirectoryAllocator}
+     * gets disposed. When this method returns, the directory already exists.
      */
     public synchronized File allocate() throws IOException {
         try {
@@ -61,7 +62,7 @@ public class TemporaryDirectoryAllocator {
             tmpDirectories.add(f);
             return f;
         } catch (IOException e) {
-            throw new IOException2("Failed to create a temporary directory in "+base,e);
+            throw new IOException2("Failed to create a temporary directory in " + base, e);
         }
     }
 
@@ -70,12 +71,13 @@ public class TemporaryDirectoryAllocator {
      */
     public synchronized void dispose() throws IOException, InterruptedException {
         IOException x = null;
-        for (File dir : tmpDirectories)
+        for (File dir : tmpDirectories) {
             try {
                 new FilePath(dir).deleteRecursive();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
         tmpDirectories.clear();
     }
 
@@ -86,9 +88,9 @@ public class TemporaryDirectoryAllocator {
         final Set<File> tbr = new HashSet<File>(tmpDirectories);
         tmpDirectories.clear();
 
-        new Thread("Disposing "+base) {
+        new Thread("Disposing " + base) {
             public void run() {
-                for (File dir : tbr)
+                for (File dir : tbr) {
                     try {
                         new FilePath(dir).deleteRecursive();
                     } catch (IOException e) {
@@ -96,6 +98,7 @@ public class TemporaryDirectoryAllocator {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                }
             }
         }.start();
     }

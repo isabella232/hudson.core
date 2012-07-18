@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Seiji Sogabe
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Seiji Sogabe
+ *
  *
  *******************************************************************************/ 
 
@@ -37,6 +37,7 @@ import org.apache.commons.io.IOUtils;
  * @author Kohsuke Kawaguchi
  */
 public class SingleFileSCM extends NullSCM {
+
     private final String path;
     private final byte[] contents;
 
@@ -51,7 +52,8 @@ public class SingleFileSCM extends NullSCM {
     }
 
     /**
-     * When a check out is requested, serve the contents of the URL and place it with the given path name. 
+     * When a check out is requested, serve the contents of the URL and place it
+     * with the given path name.
      */
     public SingleFileSCM(String path, URL resource) throws IOException {
         this.path = path;
@@ -60,7 +62,7 @@ public class SingleFileSCM extends NullSCM {
 
     @Override
     public boolean checkout(AbstractBuild build, Launcher launcher, FilePath workspace, BuildListener listener, File changeLogFile) throws IOException, InterruptedException {
-        listener.getLogger().println("Staging "+path);
+        listener.getLogger().println("Staging " + path);
         OutputStream os = workspace.child(path).write();
         IOUtils.write(contents, os);
         os.close();
@@ -68,7 +70,10 @@ public class SingleFileSCM extends NullSCM {
     }
 
     /**
-     * Don't write 'this', so that subtypes can be implemented as anonymous class.
+     * Don't write 'this', so that subtypes can be implemented as anonymous
+     * class.
      */
-    private Object writeReplace() { return new Object(); }
+    private Object writeReplace() {
+        return new Object();
+    }
 }

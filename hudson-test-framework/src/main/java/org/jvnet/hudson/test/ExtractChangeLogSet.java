@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Nikita Levyankov
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -23,11 +23,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Collections;
 
-
 /**
  * @author Andrew Bayer
  */
 public class ExtractChangeLogSet extends ChangeLogSet<ExtractChangeLogParser.ExtractChangeLogEntry> {
+
     private List<ExtractChangeLogParser.ExtractChangeLogEntry> changeLogs = null;
 
     public ExtractChangeLogSet(AbstractBuild<?, ?> build, List<ExtractChangeLogParser.ExtractChangeLogEntry> changeLogs) {
