@@ -397,14 +397,19 @@ public final class FilePath implements Serializable {
      * to check for a situation where nothing is archived.
      */
     public int archive(final ArchiverFactory factory, OutputStream os, final DirScanner scanner) throws IOException, InterruptedException {
-        final OutputStream out = (channel != null) ? new RemoteOutputStream(os) : os;
+    	if (channel != null) {
+    		os = new RemoteOutputStream(os);
+    	}
+    	final OutputStream out = os;
+    	
         return act(new FileCallable<Integer>() {
             public Integer invoke(File f, VirtualChannel channel) throws IOException {
                 Archiver a = factory.create(out);
                 try {
                     scanner.scan(f, a);
                 } finally {
-                    a.close();
+                	IOUtils.closeQuietly(out);
+                    IOUtils.closeQuietly(a);
                 }
                 return a.countEntries();
             }
@@ -1327,11 +1332,17 @@ public final class FilePath implements Serializable {
             public Void invoke(File f, VirtualChannel channel) throws IOException {
                 f.getParentFile().mkdirs();
                 FileOutputStream fos = new FileOutputStream(f);
-                Writer w = encoding != null ? new OutputStreamWriter(fos, encoding) : new OutputStreamWriter(fos);
+                Writer w;
+                if (encoding != null) {
+                    w = new OutputStreamWriter(fos, encoding);
+                } else {
+                    w = new OutputStreamWriter(fos);
+                }
+
                 try {
                     w.write(content);
                 } finally {
-                    w.close();
+                    IOUtils.closeQuietly(w);
                 }
                 return null;
             }

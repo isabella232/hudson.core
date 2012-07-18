@@ -106,13 +106,14 @@ public class AnnotatedLargeText<T> extends LargeText {
     }
 
     private ConsoleAnnotator createAnnotator(StaplerRequest req) throws IOException {
+    	ObjectInputStream ois = null;
         try {
             String base64 = req!=null ? req.getHeader("X-ConsoleAnnotator") : null;
             if (base64!=null) {
                 Cipher sym = Secret.getCipher("AES");
                 sym.init(Cipher.DECRYPT_MODE, Hudson.getInstance().getSecretKeyAsAES128());
 
-                ObjectInputStream ois = new ObjectInputStreamEx(new GZIPInputStream(
+                ois = new ObjectInputStreamEx(new GZIPInputStream(
                         new CipherInputStream(new ByteArrayInputStream(Base64.decodeBase64(base64)),sym)),
                         Hudson.getInstance().pluginManager.uberClassLoader);
                 long timestamp = ois.readLong();
@@ -124,6 +125,8 @@ public class AnnotatedLargeText<T> extends LargeText {
             throw new IOException2(e);
         } catch (ClassNotFoundException e) {
             throw new IOException2(e);
+        } finally {
+        	IOUtils.closeQuietly(ois);
         }
         // start from scratch
         return ConsoleAnnotator.initial(context==null ? null : context.getClass());

@@ -727,9 +727,23 @@ public abstract class Launcher {
         }
 
         public Proc launch(ProcStarter ps) throws IOException {
-            final OutputStream out = ps.stdout == null ? null : new RemoteOutputStream(new CloseProofOutputStream(ps.stdout));
-            final OutputStream err = ps.stderr == null ? null : new RemoteOutputStream(new CloseProofOutputStream(ps.stderr));
-            final InputStream in = ps.stdin == null ? null : new RemoteInputStream(ps.stdin);
+            OutputStream out = null; 
+            OutputStream err = null; 
+            InputStream in = null; 
+
+            if (ps.stdout != null) {
+            	out = new RemoteOutputStream(new CloseProofOutputStream(ps.stdout));
+            }
+            
+            if (ps.stderr != null) {
+            	err = new RemoteOutputStream(new CloseProofOutputStream(ps.stderr));
+            }
+            
+            if (ps.stdin != null) { 
+            	in = new RemoteInputStream(ps.stdin);
+            }
+            		
+            
             final String workDir = ps.pwd == null ? null : ps.pwd.getRemote();
 
             return new RemoteProc(getChannel().callAsync(new RemoteLaunchCallable(ps.commands, ps.masks, ps.envs, in, out, err, workDir, listener)));

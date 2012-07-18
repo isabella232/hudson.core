@@ -34,6 +34,7 @@ public class LineEndNormalizingWriterTest extends TestCase {
         w.write("\n");
 
         assertEquals(sw.toString(),"abc\r\ndef\r\n");
+        IOUtils.closeQuietly(w);
     }
 
     public void test2() throws IOException {
@@ -44,6 +45,7 @@ public class LineEndNormalizingWriterTest extends TestCase {
         w.write("\n");
 
         assertEquals(sw.toString(),"abc\r\ndef\r\n\r\n");
+        IOUtils.closeQuietly(w);
     }
 
     public void test3() throws IOException {
@@ -53,5 +55,6 @@ public class LineEndNormalizingWriterTest extends TestCase {
         w.write("\r\n\n");
 
         assertEquals(sw.toString(),"\r\n\r\n");
+        IOUtils.closeQuietly(w);
     }
 }

@@ -44,6 +44,7 @@ import java.util.jar.Attributes;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.AntClassLoader;
@@ -77,8 +78,8 @@ public class ClassicPluginStrategy implements PluginStrategy {
         boolean isLinked = archive.getName().endsWith(".hpl");
         if (isLinked) {
             // resolve the .hpl file to the location of the manifest file
-            String firstLine = new BufferedReader(new FileReader(archive))
-                    .readLine();
+            BufferedReader br = new BufferedReader(new FileReader(archive));
+            String firstLine = br.readLine();
             if (firstLine.startsWith("Manifest-Version:")) {
                 // this is the manifest already
             } else {
@@ -92,7 +93,8 @@ public class ClassicPluginStrategy implements PluginStrategy {
             } catch (IOException e) {
                 throw new IOException2("Failed to load " + archive, e);
             } finally {
-                in.close();
+                IOUtils.closeQuietly(in);
+                IOUtils.closeQuietly(br);
             }
         } else {
             if (archive.isDirectory()) {// already expanded

@@ -205,13 +205,16 @@ public abstract class ConsoleNote<T> implements Serializable, Describable<Consol
      * @return null if the encoded form is malformed.
      */
     public static ConsoleNote readFrom(DataInputStream in) throws IOException, ClassNotFoundException {
+    	ObjectInputStream ois = null;
+    	DataInputStream decoded = null;
+    	
         try {
             byte[] preamble = new byte[PREAMBLE.length];
             in.readFully(preamble);
             if (!Arrays.equals(preamble,PREAMBLE))
                 return null;    // not a valid preamble
 
-            DataInputStream decoded = new DataInputStream(new UnbufferedBase64InputStream(in));
+            decoded = new DataInputStream(new UnbufferedBase64InputStream(in));
             int sz = decoded.readInt();
             //Size should be greater than Zero. See http://issues.hudson-ci.org/browse/HUDSON-6558
             if (sz < 0) {
@@ -225,13 +228,16 @@ public abstract class ConsoleNote<T> implements Serializable, Describable<Consol
             if (!Arrays.equals(postamble,POSTAMBLE))
                 return null;    // not a valid postamble
 
-            ObjectInputStream ois = new ObjectInputStreamEx(
+            ois = new ObjectInputStreamEx(
                     new GZIPInputStream(new ByteArrayInputStream(buf)), Hudson.getInstance().pluginManager.uberClassLoader);
             return (ConsoleNote) ois.readObject();
         } catch (Error e) {
             // for example, bogus 'sz' can result in OutOfMemoryError.
             // package that up as IOException so that the caller won't fatally die.
             throw new IOException2(e);
+        } finally {
+        	IOUtils.closeQuietly(ois);
+        	IOUtils.closeQuietly(decoded);
         }
     }
 
