@@ -76,6 +76,7 @@ public class TextFile {
             w.commit();
         } finally {
             w.abort();
+            IOUtils.closeQuietly(w);
         }
     }
 
