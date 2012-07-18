@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -30,6 +30,7 @@ public class JobParameterDefinition extends SimpleParameterDefinition {
 
     // @Extension --- not live yet
     public static class DescriptorImpl extends ParameterDescriptor {
+
         @Override
         public String getDisplayName() {
             return "Project Parameter";
@@ -39,7 +40,6 @@ public class JobParameterDefinition extends SimpleParameterDefinition {
         public ParameterDefinition newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             return req.bindJSON(JobParameterDefinition.class, formData);
         }
-
     }
 
     @Override
@@ -48,6 +48,6 @@ public class JobParameterDefinition extends SimpleParameterDefinition {
     }
 
     public ParameterValue createValue(String value) {
-        return new JobParameterValue(getName(),Hudson.getInstance().getItemByFullName(value,Job.class));
+        return new JobParameterValue(getName(), Hudson.getInstance().getItemByFullName(value, Job.class));
     }
 }

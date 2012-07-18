@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -46,6 +46,7 @@ public class RunParameterDefinition extends SimpleParameterDefinition {
 
     @Extension
     public static class DescriptorImpl extends ParameterDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.RunParameterDefinition_DisplayName();
@@ -64,11 +65,11 @@ public class RunParameterDefinition extends SimpleParameterDefinition {
 
     @Override
     public ParameterValue getDefaultParameterValue() {
-        Run<?,?> lastBuild = getProject().getLastBuild();
+        Run<?, ?> lastBuild = getProject().getLastBuild();
         if (lastBuild != null) {
-        	return createValue(lastBuild.getExternalizableId());
+            return createValue(lastBuild.getExternalizableId());
         } else {
-        	return null;
+            return null;
         }
     }
 
@@ -86,15 +87,15 @@ public class RunParameterDefinition extends SimpleParameterDefinition {
     @Override
     public boolean equals(Object o) {
         return super.equals(o) && new EqualsBuilder()
-            .append(getProjectName(), ((RunParameterDefinition) o).getProjectName())
-            .isEquals();
+                .append(getProjectName(), ((RunParameterDefinition) o).getProjectName())
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-            .appendSuper(super.hashCode())
-            .append(getProjectName())
-            .toHashCode();
+                .appendSuper(super.hashCode())
+                .append(getProjectName())
+                .toHashCode();
     }
 }

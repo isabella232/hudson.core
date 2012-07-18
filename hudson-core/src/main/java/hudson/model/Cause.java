@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Michael B. Donohue, Seiji Sogabe, Winston Prakash
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -28,17 +28,14 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 
 /**
- * Cause object base class.  This class hierarchy is used to keep track of why 
- * a given build was started. This object encapsulates the UI rendering of the cause,
- * as well as providing more useful information in respective subypes.
+ * Cause object base class. This class hierarchy is used to keep track of why a
+ * given build was started. This object encapsulates the UI rendering of the
+ * cause, as well as providing more useful information in respective subypes.
  *
  * The Cause object is connected to a build via the {@link CauseAction} object.
  *
- * <h2>Views</h2>
- * <dl>
- * <dt>description.jelly
- * <dd>Renders the cause to HTML. By default, it puts the short description.
- * </dl>
+ * <h2>Views</h2> <dl> <dt>description.jelly <dd>Renders the cause to HTML. By
+ * default, it puts the short description. </dl>
  *
  * @author Michael Donohue
  * @see Run#getCauses()
@@ -46,26 +43,27 @@ import org.eclipse.hudson.security.HudsonSecurityManager;
  */
 @ExportedBean
 public abstract class Cause {
+
     /**
      * One-line human-readable text of the cause.
      *
-     * <p>
-     * By default, this method is used to render HTML as well.
+     * <p> By default, this method is used to render HTML as well.
      */
-    @Exported(visibility=3)
+    @Exported(visibility = 3)
     public abstract String getShortDescription();
 
     /**
      * Called when the cause is registered to {@link AbstractBuild}.
      *
-     * @param build
-     *      never null
+     * @param build never null
      * @since 1.376
      */
-    public void onAddedTo(AbstractBuild build) {}
+    public void onAddedTo(AbstractBuild build) {
+    }
 
     /**
      * Report a line to the listener about this cause.
+     *
      * @since 1.362
      */
     public void print(TaskListener listener) {
@@ -74,24 +72,29 @@ public abstract class Cause {
 
     /**
      * Fall back implementation when no other type is available.
+     *
      * @deprecated since 2009-02-08
      */
     public static class LegacyCodeCause extends Cause {
-        private StackTraceElement [] stackTrace;
+
+        private StackTraceElement[] stackTrace;
+
         public LegacyCodeCause() {
             stackTrace = new Exception().getStackTrace();
         }
-        
+
         @Override
         public String getShortDescription() {
             return Messages.Cause_LegacyCodeCause_ShortDescription();
         }
     }
-    
+
     /**
-     * A build is triggered by the completion of another build (AKA upstream build.)
+     * A build is triggered by the completion of another build (AKA upstream
+     * build.)
      */
     public static class UpstreamCause extends Cause {
+
         private String upstreamProject, upstreamUrl;
         private int upstreamBuild;
         /**
@@ -105,10 +108,10 @@ public abstract class Cause {
          * @deprecated since 2009-02-28
          */
         // for backward bytecode compatibility
-        public UpstreamCause(AbstractBuild<?,?> up) {
-            this((Run<?,?>)up);
+        public UpstreamCause(AbstractBuild<?, ?> up) {
+            this((Run<?, ?>) up);
         }
-        
+
         public UpstreamCause(Run<?, ?> up) {
             upstreamBuild = up.getNumber();
             upstreamProject = up.getParent().getFullName();
@@ -119,32 +122,32 @@ public abstract class Cause {
         /**
          * Returns true if this cause points to a build in the specified job.
          */
-        public boolean pointsTo(Job<?,?> j) {
+        public boolean pointsTo(Job<?, ?> j) {
             return j.getFullName().equals(upstreamProject);
         }
 
         /**
          * Returns true if this cause points to the specified build.
          */
-        public boolean pointsTo(Run<?,?> r) {
-            return r.getNumber()==upstreamBuild && pointsTo(r.getParent());
+        public boolean pointsTo(Run<?, ?> r) {
+            return r.getNumber() == upstreamBuild && pointsTo(r.getParent());
         }
 
-        @Exported(visibility=3)
+        @Exported(visibility = 3)
         public String getUpstreamProject() {
             return upstreamProject;
         }
 
-        @Exported(visibility=3)
+        @Exported(visibility = 3)
         public int getUpstreamBuild() {
             return upstreamBuild;
         }
 
-        @Exported(visibility=3)
+        @Exported(visibility = 3)
         public String getUpstreamUrl() {
             return upstreamUrl;
         }
-        
+
         @Override
         public String getShortDescription() {
             return Messages.Cause_UpstreamCause_ShortDescription(upstreamProject, upstreamBuild);
@@ -153,17 +156,23 @@ public abstract class Cause {
         @Override
         public void print(TaskListener listener) {
             listener.getLogger().println(
-                Messages.Cause_UpstreamCause_ShortDescription(
-                    HyperlinkNote.encodeTo('/'+upstreamUrl, upstreamProject),
-                    HyperlinkNote.encodeTo('/'+upstreamUrl+upstreamBuild, Integer.toString(upstreamBuild)))
-            );
+                    Messages.Cause_UpstreamCause_ShortDescription(
+                    HyperlinkNote.encodeTo('/' + upstreamUrl, upstreamProject),
+                    HyperlinkNote.encodeTo('/' + upstreamUrl + upstreamBuild, Integer.toString(upstreamBuild))));
         }
 
         public static class ConverterImpl extends XStream2.PassthruConverter<UpstreamCause> {
-            public ConverterImpl(XStream2 xstream) { super(xstream); }
-            @Override protected void callback(UpstreamCause uc, UnmarshallingContext context) {
+
+            public ConverterImpl(XStream2 xstream) {
+                super(xstream);
+            }
+
+            @Override
+            protected void callback(UpstreamCause uc, UnmarshallingContext context) {
                 if (uc.upstreamCause != null) {
-                    if (uc.upstreamCauses == null) uc.upstreamCauses = new ArrayList<Cause>();
+                    if (uc.upstreamCauses == null) {
+                        uc.upstreamCauses = new ArrayList<Cause>();
+                    }
                     uc.upstreamCauses.add(uc.upstreamCause);
                     uc.upstreamCause = null;
                     OldDataMonitor.report(context, "1.288");
@@ -176,14 +185,16 @@ public abstract class Cause {
      * A build is started by an user action.
      */
     public static class UserCause extends Cause {
+
         private String authenticationName;
+
         public UserCause() {
             this.authenticationName = HudsonSecurityManager.getAuthentication().getName();
         }
 
-        @Exported(visibility=3)
+        @Exported(visibility = 3)
         public String getUserName() {
-        	User u = User.get(authenticationName, false);
+            User u = User.get(authenticationName, false);
             return u != null ? u.getDisplayName() : authenticationName;
         }
 
@@ -194,8 +205,8 @@ public abstract class Cause {
 
         @Override
         public boolean equals(Object o) {
-            return o instanceof UserCause && Arrays.equals(new Object[] {authenticationName},
-                    new Object[] {((UserCause)o).authenticationName});
+            return o instanceof UserCause && Arrays.equals(new Object[]{authenticationName},
+                    new Object[]{((UserCause) o).authenticationName});
         }
 
         @Override
@@ -205,6 +216,7 @@ public abstract class Cause {
     }
 
     public static class RemoteCause extends Cause {
+
         private String addr;
         private String note;
 
@@ -215,7 +227,7 @@ public abstract class Cause {
 
         @Override
         public String getShortDescription() {
-            if(note != null) {
+            if (note != null) {
                 return Messages.Cause_RemoteCause_ShortDescriptionWithNote(addr, note);
             } else {
                 return Messages.Cause_RemoteCause_ShortDescription(addr);
@@ -224,8 +236,8 @@ public abstract class Cause {
 
         @Override
         public boolean equals(Object o) {
-            return o instanceof RemoteCause && Arrays.equals(new Object[] {addr, note},
-                    new Object[] {((RemoteCause)o).addr, ((RemoteCause)o).note});
+            return o instanceof RemoteCause && Arrays.equals(new Object[]{addr, note},
+                    new Object[]{((RemoteCause) o).addr, ((RemoteCause) o).note});
         }
 
         @Override

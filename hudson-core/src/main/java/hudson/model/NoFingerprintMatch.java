@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -20,6 +20,7 @@ package hudson.model;
  * @author Kohsuke Kawaguchi
  */
 public class NoFingerprintMatch implements ModelObject {
+
     private final String md5sum;
 
     public NoFingerprintMatch(String md5sum) {

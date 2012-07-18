@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -44,32 +44,30 @@ public class RunParameterValue extends ParameterValue {
     public String getRunId() {
         return runId;
     }
-    
+
     @Exported
     public String getJobName() {
-    	return runId.split("#")[0];
+        return runId.split("#")[0];
     }
-    
+
     @Exported
     public String getNumber() {
-    	return runId.split("#")[1];
+        return runId.split("#")[1];
     }
-    
 
     /**
      * Exposes the name/value as an environment variable.
      */
     @Override
-    public void buildEnvVars(AbstractBuild<?,?> build, EnvVars env) {
+    public void buildEnvVars(AbstractBuild<?, ?> build, EnvVars env) {
         String value = Hudson.getInstance().getRootUrl() + getRun().getUrl();
         env.put(name, value);
-        env.put(name.toUpperCase(Locale.ENGLISH),value); // backward compatibility pre 1.345
+        env.put(name.toUpperCase(Locale.ENGLISH), value); // backward compatibility pre 1.345
 
     }
-    
+
     @Override
     public String getShortDescription() {
-    	return "(RunParameterValue) " + getName() + "='" + getRunId() + "'";
+        return "(RunParameterValue) " + getName() + "='" + getRunId() + "'";
     }
-
 }

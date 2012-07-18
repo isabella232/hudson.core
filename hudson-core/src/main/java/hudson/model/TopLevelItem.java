@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -21,17 +21,18 @@ import hudson.ExtensionPoint;
 import hudson.matrix.MatrixConfiguration;
 
 /**
- * {@link Item} that can be directly displayed under {@link Hudson} or other containers.
- * Ones that don't need to be under specific parent (say, unlike {@link MatrixConfiguration}),
- * and thus can be freely moved, copied, etc.
+ * {@link Item} that can be directly displayed under {@link Hudson} or other
+ * containers. Ones that don't need to be under specific parent (say, unlike
+ * {@link MatrixConfiguration}), and thus can be freely moved, copied, etc.
  *
- * <p>
- * To register a custom {@link TopLevelItem} class from a plugin, put {@link Extension} on your
- * {@link TopLevelItemDescriptor}. Also see {@link Items#XSTREAM}.
+ * <p> To register a custom {@link TopLevelItem} class from a plugin, put
+ * {@link Extension} on your {@link TopLevelItemDescriptor}. Also see
+ * {@link Items#XSTREAM}.
  *
  * @author Kohsuke Kawaguchi
  */
 public interface TopLevelItem extends Item, ExtensionPoint, Describable<TopLevelItem> {
+
     /**
      *
      * @see Describable#getDescriptor()

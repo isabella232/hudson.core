@@ -8,9 +8,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  * Kohsuke Kawaguchi, Winston Prakash
- * 
+ *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -25,19 +25,18 @@ import org.eclipse.hudson.security.HudsonSecurityManager;
 /**
  * {@link PeriodicWork} that takes a long time to run.
  *
- * <p>
- * Subclasses will implement the {@link #execute(TaskListener)} method and can carry out a long-running task.
- * This runs in a separate thread so as not to block the timer thread, and this class handles
- * all those details.
+ * <p> Subclasses will implement the {@link #execute(TaskListener)} method and
+ * can carry out a long-running task. This runs in a separate thread so as not
+ * to block the timer thread, and this class handles all those details.
  *
  * @author Kohsuke Kawaguchi
  */
 public abstract class AsyncPeriodicWork extends PeriodicWork {
+
     /**
      * Name of the work.
      */
     public final String name;
-
     private Thread thread;
 
     protected AsyncPeriodicWork(String name) {
@@ -45,23 +44,24 @@ public abstract class AsyncPeriodicWork extends PeriodicWork {
     }
 
     /**
-     * Schedules this periodic work now in a new thread, if one isn't already running.
+     * Schedules this periodic work now in a new thread, if one isn't already
+     * running.
      */
     public final void doRun() {
         try {
-            if(thread!=null && thread.isAlive()) {
-                logger.log(Level.INFO, name+" thread is still running. Execution aborted.");
+            if (thread != null && thread.isAlive()) {
+                logger.log(Level.INFO, name + " thread is still running. Execution aborted.");
                 return;
             }
             thread = new Thread(new Runnable() {
                 public void run() {
-                    logger.log(Level.INFO, "Started "+name);
+                    logger.log(Level.INFO, "Started " + name);
                     long startTime = System.currentTimeMillis();
 
                     StreamTaskListener l = createListener();
                     try {
                         HudsonSecurityManager.grantFullControl();
-                        
+
                         execute(l);
                     } catch (IOException e) {
                         e.printStackTrace(l.fatalError(e.getMessage()));
@@ -71,13 +71,13 @@ public abstract class AsyncPeriodicWork extends PeriodicWork {
                         l.closeQuietly();
                     }
 
-                    logger.log(Level.INFO, "Finished "+name+". "+
-                        (System.currentTimeMillis()-startTime)+" ms");
+                    logger.log(Level.INFO, "Finished " + name + ". "
+                            + (System.currentTimeMillis() - startTime) + " ms");
                 }
-            },name+" thread");
+            }, name + " thread");
             thread.start();
         } catch (Throwable t) {
-            logger.log(Level.SEVERE, name+" thread failed with error", t);
+            logger.log(Level.SEVERE, name + " thread failed with error", t);
         }
     }
 
@@ -93,18 +93,17 @@ public abstract class AsyncPeriodicWork extends PeriodicWork {
      * Determines the log file that records the result of this task.
      */
     protected File getLogFile() {
-        return new File(Hudson.getInstance().getRootDir(),name+".log");
+        return new File(Hudson.getInstance().getRootDir(), name + ".log");
     }
 
     /**
      * Executes the task.
      *
-     * @param listener
-     *      Output sent will be reported to the users. (this work is TBD.)
-     * @throws InterruptedException
-     *      The caller will record the exception and moves on.
-     * @throws IOException
-     *      The caller will record the exception and moves on.
+     * @param listener Output sent will be reported to the users. (this work is
+     * TBD.)
+     * @throws InterruptedException The caller will record the exception and
+     * moves on.
+     * @throws IOException The caller will record the exception and moves on.
      */
     protected abstract void execute(TaskListener listener) throws IOException, InterruptedException;
 }

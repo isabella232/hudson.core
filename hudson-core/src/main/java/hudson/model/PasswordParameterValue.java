@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Romain Seguy, Yahoo! Inc.
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -42,10 +42,10 @@ public class PasswordParameterValue extends ParameterValue {
     }
 
     @Override
-    public void buildEnvVars(AbstractBuild<?,?> build, EnvVars env) {
+    public void buildEnvVars(AbstractBuild<?, ?> build, EnvVars env) {
         String v = Secret.toString(value);
         env.put(name, v);
-        env.put(name.toUpperCase(Locale.ENGLISH),v); // backward compatibility pre 1.345
+        env.put(name.toUpperCase(Locale.ENGLISH), v); // backward compatibility pre 1.345
     }
 
     @Override
@@ -60,5 +60,5 @@ public class PasswordParameterValue extends ParameterValue {
     @Override
     public boolean isSensitive() {
         return true;
-}
+    }
 }

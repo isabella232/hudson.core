@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -28,10 +28,11 @@ import java.util.logging.Logger;
  * @since 1.378
  */
 public abstract class ComputerPinger implements ExtensionPoint {
+
     /**
      * Is the specified address reachable?
      *
-     * @param ia      The address to check.
+     * @param ia The address to check.
      * @param timeout Timeout in seconds.
      */
     public abstract boolean isReachable(InetAddress ia, int timeout) throws IOException;
@@ -46,7 +47,7 @@ public abstract class ComputerPinger implements ExtensionPoint {
     /**
      * Is this computer reachable via the given address?
      *
-     * @param ia      The address to check.
+     * @param ia The address to check.
      * @param timeout Timeout in seconds.
      */
     public static boolean checkIsReachable(InetAddress ia, int timeout) throws IOException {
@@ -62,18 +63,18 @@ public abstract class ComputerPinger implements ExtensionPoint {
 
         return false;
     }
-    
+
     /**
-     * Default pinger - use Java built-in functionality.  This doesn't always work,
-     * a host may be reachable even if this returns false.
+     * Default pinger - use Java built-in functionality. This doesn't always
+     * work, a host may be reachable even if this returns false.
      */
     @Extension
     public static class BuiltInComputerPinger extends ComputerPinger {
+
         @Override
         public boolean isReachable(InetAddress ia, int timeout) throws IOException {
             return ia.isReachable(timeout * 1000);
         }
     }
-
     private static final Logger LOGGER = Logger.getLogger(ComputerPinger.class.getName());
 }

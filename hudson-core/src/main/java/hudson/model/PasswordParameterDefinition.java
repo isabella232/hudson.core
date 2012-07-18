@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Romain Seguy
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Romain Seguy
+ *
  *
  *******************************************************************************/ 
 
@@ -68,11 +68,12 @@ public class PasswordParameterDefinition extends SimpleParameterDefinition {
 
     @Extension
     public final static class ParameterDescriptorImpl extends ParameterDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.PasswordParameterDefinition_DisplayName();
         }
-        
+
         @Override
         public String getHelpFile() {
             return "/help/parameter/string.html";
@@ -82,15 +83,15 @@ public class PasswordParameterDefinition extends SimpleParameterDefinition {
     @Override
     public boolean equals(Object o) {
         return super.equals(o) && new EqualsBuilder()
-            .append(getDefaultValue(), ((PasswordParameterDefinition) o).getDefaultValue())
-            .isEquals();
+                .append(getDefaultValue(), ((PasswordParameterDefinition) o).getDefaultValue())
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-            .appendSuper(super.hashCode())
-            .append(getDefaultValue())
-            .toHashCode();
+                .appendSuper(super.hashCode())
+                .append(getDefaultValue())
+                .toHashCode();
     }
 }

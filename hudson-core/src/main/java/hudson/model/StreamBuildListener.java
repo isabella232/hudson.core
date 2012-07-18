@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -29,10 +29,11 @@ import java.util.List;
  * {@link BuildListener} that writes to an {@link OutputStream}.
  *
  * This class is remotable.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public class StreamBuildListener extends StreamTaskListener implements BuildListener {
+
     public StreamBuildListener(OutputStream out, Charset charset) {
         super(out, charset);
     }
@@ -46,30 +47,32 @@ public class StreamBuildListener extends StreamTaskListener implements BuildList
     }
 
     /**
-     * @deprecated as of 1.349
-     *      The caller should use {@link #StreamBuildListener(OutputStream, Charset)} to pass in
-     *      the charset and output stream separately, so that this class can handle encoding correctly.
+     * @deprecated as of 1.349 The caller should use
+     * {@link #StreamBuildListener(OutputStream, Charset)} to pass in the
+     * charset and output stream separately, so that this class can handle
+     * encoding correctly.
      */
     public StreamBuildListener(PrintStream w) {
         super(w);
     }
 
     public StreamBuildListener(PrintStream w, Charset charset) {
-        super(w,charset);
+        super(w, charset);
     }
 
     public void started(List<Cause> causes) {
         PrintStream l = getLogger();
-        if (causes==null || causes.isEmpty())
+        if (causes == null || causes.isEmpty()) {
             l.println("Started");
-        else for (Cause cause : causes) {
-            cause.print(this);
+        } else {
+            for (Cause cause : causes) {
+                cause.print(this);
+            }
         }
     }
 
     public void finished(Result result) {
-        getLogger().println("Finished: "+result);
+        getLogger().println("Finished: " + result);
     }
-
     private static final long serialVersionUID = 1L;
 }

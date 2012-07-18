@@ -40,47 +40,45 @@ import org.kohsuke.stapler.StaplerResponse;
  *
  * @author Anton Kozak.
  */
-public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B extends AbstractBuild<P,B>>
-    extends AbstractProject<P, B>
-    implements Saveable, BuildableItemWithBuildWrappers, IBaseBuildableProject {
+public abstract class BaseBuildableProject<P extends BaseBuildableProject<P, B>, B extends AbstractBuild<P, B>>
+        extends AbstractProject<P, B>
+        implements Saveable, BuildableItemWithBuildWrappers, IBaseBuildableProject {
 
     public static final String BUILDERS_PROPERTY_NAME = "builders";
-
     /**
      * List of active {@link Builder}s configured for this project.
      *
-     * @deprecated as of 2.2.0
-     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     *             Use getter/setter for accessing to this field.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to
+     * {@link org.eclipse.hudson.api.model.IProjectProperty}. Use getter/setter
+     * for accessing to this field.
      */
     @Deprecated
-    private DescribableList<Builder,Descriptor<Builder>> builders =
-            new DescribableList<Builder,Descriptor<Builder>>(this);
-
+    private DescribableList<Builder, Descriptor<Builder>> builders =
+            new DescribableList<Builder, Descriptor<Builder>>(this);
     /**
      * List of active {@link Publisher}s configured for this project.
      *
-     * @deprecated as of 2.2.0
-     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     *             Use getter/setter for accessing to this field.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to
+     * {@link org.eclipse.hudson.api.model.IProjectProperty}. Use getter/setter
+     * for accessing to this field.
      */
     @Deprecated
-    private DescribableList<Publisher,Descriptor<Publisher>> publishers =
-            new DescribableList<Publisher,Descriptor<Publisher>>(this);
-
+    private DescribableList<Publisher, Descriptor<Publisher>> publishers =
+            new DescribableList<Publisher, Descriptor<Publisher>>(this);
     /**
      * List of active {@link BuildWrapper}s configured for this project.
      *
-     * @deprecated as of 2.2.0
-     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     *             Use getter/setter for accessing to this field.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to
+     * {@link org.eclipse.hudson.api.model.IProjectProperty}. Use getter/setter
+     * for accessing to this field.
      */
     @Deprecated
-    private DescribableList<BuildWrapper,Descriptor<BuildWrapper>> buildWrappers =
-            new DescribableList<BuildWrapper,Descriptor<BuildWrapper>>(this);
+    private DescribableList<BuildWrapper, Descriptor<BuildWrapper>> buildWrappers =
+            new DescribableList<BuildWrapper, Descriptor<BuildWrapper>>(this);
 
     /**
      * Creates a new project.
+     *
      * @param parent parent {@link ItemGroup}.
      * @param name the name of the project.
      */
@@ -106,14 +104,14 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
     }
 
     protected void buildDependencyGraph(DependencyGraph graph) {
-        getPublishersList().buildDependencyGraph(this,graph);
-        getBuildersList().buildDependencyGraph(this,graph);
-        getBuildWrappersList().buildDependencyGraph(this,graph);
+        getPublishersList().buildDependencyGraph(this, graph);
+        getBuildersList().buildDependencyGraph(this, graph);
+        getBuildWrappersList().buildDependencyGraph(this, graph);
     }
 
     @Override
-    protected void submit( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException, FormException {
-        super.submit(req,rsp);
+    protected void submit(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, FormException {
+        super.submit(req, rsp);
         JSONObject json = req.getSubmittedForm();
         buildBuildWrappers(req, json, BuildWrappers.getFor(this));
         setBuilders(DescribableListUtil.buildFromHetero(this, req, json, "builder", Builder.all()));
@@ -125,14 +123,18 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
     protected List<Action> createTransientActions() {
         List<Action> r = super.createTransientActions();
 
-        for (BuildStep step : getBuildersList())
+        for (BuildStep step : getBuildersList()) {
             r.addAll(step.getProjectActions(this));
-        for (BuildStep step : getPublishersList())
+        }
+        for (BuildStep step : getPublishersList()) {
             r.addAll(step.getProjectActions(this));
-        for (BuildWrapper step : getBuildWrappersList())
+        }
+        for (BuildWrapper step : getBuildWrappersList()) {
             r.addAll(step.getProjectActions(this));
-        for (Trigger trigger : getTriggersList())
+        }
+        for (Trigger trigger : getTriggersList()) {
             r.addAll(trigger.getProjectActions());
+        }
         return r;
     }
 
@@ -147,21 +149,21 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
      * @inheritDoc
      */
     @SuppressWarnings("unchecked")
-    public DescribableList<Builder,Descriptor<Builder>> getBuildersList() {
+    public DescribableList<Builder, Descriptor<Builder>> getBuildersList() {
         return CascadingUtil.getDescribableListProjectProperty(this, BUILDERS_PROPERTY_NAME).getValue();
     }
 
     /**
      * @inheritDoc
      */
-    public void setBuilders(DescribableList<Builder,Descriptor<Builder>> builders) {
+    public void setBuilders(DescribableList<Builder, Descriptor<Builder>> builders) {
         CascadingUtil.getDescribableListProjectProperty(this, BUILDERS_PROPERTY_NAME).setValue(builders);
     }
 
     /**
      * @inheritDoc
      */
-    public Map<Descriptor<Publisher>,Publisher> getPublishers() {
+    public Map<Descriptor<Publisher>, Publisher> getPublishers() {
         return getPublishersList().toMap();
     }
 
@@ -179,7 +181,8 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
     }
 
     /**
-     * Adds a new {@link BuildStep} to this {@link Project} and saves the configuration.
+     * Adds a new {@link BuildStep} to this {@link Project} and saves the
+     * configuration.
      *
      * @param publisher publisher.
      * @throws java.io.IOException exception.
@@ -187,7 +190,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
     @SuppressWarnings("unchecked")
     public void addPublisher(Publisher publisher) throws IOException {
         CascadingUtil.getExternalProjectProperty(this,
-            publisher.getDescriptor().getJsonSafeClassName()).setValue(publisher);
+                publisher.getDescriptor().getJsonSafeClassName()).setValue(publisher);
         save();
     }
 
@@ -205,7 +208,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
     /**
      * @inheritDoc
      */
-    public Map<Descriptor<BuildWrapper>,BuildWrapper> getBuildWrappers() {
+    public Map<Descriptor<BuildWrapper>, BuildWrapper> getBuildWrappers() {
         return getBuildWrappersList().toMap();
     }
 
@@ -225,7 +228,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
      * @throws hudson.model.Descriptor.FormException if any.
      */
     protected void buildPublishers(StaplerRequest req, JSONObject json, List<Descriptor<Publisher>> descriptors)
-        throws FormException {
+            throws FormException {
         CascadingUtil.buildExternalProperties(req, json, descriptors, this);
     }
 
@@ -238,7 +241,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P,B>,B
      * @throws hudson.model.Descriptor.FormException if any.
      */
     protected void buildBuildWrappers(StaplerRequest req, JSONObject json, List<Descriptor<BuildWrapper>> descriptors)
-        throws FormException {
+            throws FormException {
         CascadingUtil.buildExternalProperties(req, json, descriptors, this);
     }
 

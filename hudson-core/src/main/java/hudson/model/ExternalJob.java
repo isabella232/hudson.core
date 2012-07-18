@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, id:cactusman
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, id:cactusman
+ *
  *
  *******************************************************************************/ 
 
@@ -27,38 +27,38 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Job that runs outside Hudson whose result is submitted to Hudson
- * (either via web interface, or simply by placing files on the file system,
- * for compatibility.)
+ * Job that runs outside Hudson whose result is submitted to Hudson (either via
+ * web interface, or simply by placing files on the file system, for
+ * compatibility.)
  *
  * @author Kohsuke Kawaguchi
  */
-public class ExternalJob extends ViewJob<ExternalJob,ExternalRun> implements TopLevelItem {
+public class ExternalJob extends ViewJob<ExternalJob, ExternalRun> implements TopLevelItem {
+
     public ExternalJob(String name) {
-        this(Hudson.getInstance(),name);
+        this(Hudson.getInstance(), name);
     }
 
     public ExternalJob(ItemGroup parent, String name) {
-        super(parent,name);
+        super(parent, name);
     }
 
     @Override
     protected void reload() {
-        this.runs.load(this,new Constructor<ExternalRun>() {
+        this.runs.load(this, new Constructor<ExternalRun>() {
             public ExternalRun create(File dir) throws IOException {
-                return new ExternalRun(ExternalJob.this,dir);
+                return new ExternalRun(ExternalJob.this, dir);
             }
         });
     }
-
-
     // keep track of the previous time we started a build
     private transient long lastBuildStartTime;
 
     /**
      * Creates a new build of this project for immediate execution.
      *
-     * Needs to be synchronized so that two {@link #newBuild()} invocations serialize each other.
+     * Needs to be synchronized so that two {@link #newBuild()} invocations
+     * serialize each other.
      */
     public synchronized ExternalRun newBuild() throws IOException {
         // make sure we don't start two builds in the same second
@@ -78,7 +78,8 @@ public class ExternalJob extends ViewJob<ExternalJob,ExternalRun> implements Top
     }
 
     /**
-     * Used to check if this is an external job and ready to accept a build result.
+     * Used to check if this is an external job and ready to accept a build
+     * result.
      */
     public void doAcceptBuildResult(StaplerResponse rsp) throws IOException, ServletException {
         rsp.setStatus(HttpServletResponse.SC_OK);
@@ -87,7 +88,7 @@ public class ExternalJob extends ViewJob<ExternalJob,ExternalRun> implements Top
     /**
      * Used to post the build result from a remote machine.
      */
-    public void doPostBuildResult( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
+    public void doPostBuildResult(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         checkPermission(AbstractProject.BUILD);
         ExternalRun run = newBuild();
         run.acceptRemoteSubmission(req.getReader());
@@ -97,7 +98,6 @@ public class ExternalJob extends ViewJob<ExternalJob,ExternalRun> implements Top
     public TopLevelItemDescriptor getDescriptor() {
         return DESCRIPTOR;
     }
-
     @Extension
     public static final TopLevelItemDescriptor DESCRIPTOR = new DescriptorImpl();
 
@@ -107,12 +107,13 @@ public class ExternalJob extends ViewJob<ExternalJob,ExternalRun> implements Top
     }
 
     public static final class DescriptorImpl extends TopLevelItemDescriptor {
+
         public String getDisplayName() {
             return Messages.ExternalJob_DisplayName();
         }
 
         public ExternalJob newInstance(ItemGroup parent, String name) {
-            return new ExternalJob(parent,name);
+            return new ExternalJob(parent, name);
         }
     }
 }

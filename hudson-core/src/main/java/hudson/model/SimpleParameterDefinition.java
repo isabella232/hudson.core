@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -20,11 +20,13 @@ import hudson.cli.CLICommand;
 import java.io.IOException;
 
 /**
- * Convenient base class for {@link ParameterDefinition} whose value can be represented in a context-independent single string token.
+ * Convenient base class for {@link ParameterDefinition} whose value can be
+ * represented in a context-independent single string token.
  *
  * @author Kohsuke Kawaguchi
  */
 public abstract class SimpleParameterDefinition extends ParameterDefinition {
+
     protected SimpleParameterDefinition(String name) {
         super(name);
     }

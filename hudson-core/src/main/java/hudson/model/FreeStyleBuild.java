@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -25,7 +25,8 @@ import java.io.File;
 /**
  * @author Kohsuke Kawaguchi
  */
-public class FreeStyleBuild extends Build<FreeStyleProject,FreeStyleBuild> {
+public class FreeStyleBuild extends Build<FreeStyleProject, FreeStyleBuild> {
+
     public FreeStyleBuild(FreeStyleProject project) throws IOException {
         super(project);
     }
@@ -39,14 +40,16 @@ public class FreeStyleBuild extends Build<FreeStyleProject,FreeStyleBuild> {
         run(new RunnerImpl());
     }
 
-    protected class RunnerImpl extends Build<FreeStyleProject,FreeStyleBuild>.RunnerImpl {
+    protected class RunnerImpl extends Build<FreeStyleProject, FreeStyleBuild>.RunnerImpl {
+
         @Override
         protected Lease decideWorkspace(Node n, WorkspaceList wsl) throws IOException, InterruptedException {
             String customWorkspace = getProject().getCustomWorkspace();
-            if (customWorkspace != null)
-                // we allow custom workspaces to be concurrently used between jobs.
+            if (customWorkspace != null) // we allow custom workspaces to be concurrently used between jobs.
+            {
                 return Lease.createDummyLease(n.getRootPath().child(getEnvironment(listener).expand(customWorkspace)));
-            return super.decideWorkspace(n,wsl);
+            }
+            return super.decideWorkspace(n, wsl);
         }
     }
 }

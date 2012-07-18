@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -23,16 +23,16 @@ package hudson.model;
  * @since 1.269
  */
 public abstract class ViewDescriptor extends Descriptor<View> {
+
     /**
-     * Returns the human-readable name of this type of view. Used
-     * in the view creation screen. The string should look like
-     * "Abc Def Ghi".
+     * Returns the human-readable name of this type of view. Used in the view
+     * creation screen. The string should look like "Abc Def Ghi".
      */
     public abstract String getDisplayName();
 
     /**
-     * Some special views are not instantiable, and for those
-     * this method returns false.
+     * Some special views are not instantiable, and for those this method
+     * returns false.
      */
     public boolean isInstantiable() {
         return true;
@@ -42,7 +42,7 @@ public abstract class ViewDescriptor extends Descriptor<View> {
      * Jelly fragment included in the "new view" page.
      */
     public final String getNewViewDetailPage() {
-        return '/'+clazz.getName().replace('.','/').replace('$','/')+"/newViewDetail.jelly";
+        return '/' + clazz.getName().replace('.', '/').replace('$', '/') + "/newViewDetail.jelly";
     }
 
     protected ViewDescriptor(Class<? extends View> clazz) {

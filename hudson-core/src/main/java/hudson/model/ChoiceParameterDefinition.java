@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -31,13 +31,14 @@ import java.util.Arrays;
  * @author huybrechts
  */
 public class ChoiceParameterDefinition extends SimpleParameterDefinition {
+
     private final List<String> choices;
 
     @DataBoundConstructor
     public ChoiceParameterDefinition(String name, String choices, String description) {
         super(name, description);
         this.choices = Arrays.asList(choices.split("\\r?\\n"));
-        if (choices.length()==0) {
+        if (choices.length() == 0) {
             throw new IllegalArgumentException("No choices found");
         }
     }
@@ -49,7 +50,7 @@ public class ChoiceParameterDefinition extends SimpleParameterDefinition {
             throw new IllegalArgumentException("No choices found");
         }
     }
-    
+
     @Exported
     public List<String> getChoices() {
         return choices;
@@ -64,10 +65,10 @@ public class ChoiceParameterDefinition extends SimpleParameterDefinition {
         return new StringParameterValue(getName(), choices.get(0), getDescription());
     }
 
-
     private StringParameterValue checkValue(StringParameterValue value) {
-        if (!choices.contains(value.value))
+        if (!choices.contains(value.value)) {
             throw new IllegalArgumentException("Illegal choice: " + value.value);
+        }
         return value;
     }
 
@@ -84,6 +85,7 @@ public class ChoiceParameterDefinition extends SimpleParameterDefinition {
 
     @Extension
     public static class DescriptorImpl extends ParameterDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.ChoiceParameterDefinition_DisplayName();
@@ -98,16 +100,15 @@ public class ChoiceParameterDefinition extends SimpleParameterDefinition {
     @Override
     public boolean equals(Object o) {
         return super.equals(o) && new EqualsBuilder()
-            .append(getChoices(), ((ChoiceParameterDefinition) o).getChoices())
-            .isEquals();
+                .append(getChoices(), ((ChoiceParameterDefinition) o).getChoices())
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-            .appendSuper(super.hashCode())
-            .append(getChoices())
-            .toHashCode();
+                .appendSuper(super.hashCode())
+                .append(getChoices())
+                .toHashCode();
     }
-
 }

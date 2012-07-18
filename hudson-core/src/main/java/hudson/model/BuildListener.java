@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -28,8 +28,7 @@ public interface BuildListener extends TaskListener {
     /**
      * Called when a build is started.
      *
-     * @param causes
-     *      Causes that started a build. See {@link Run#getCauses()}.
+     * @param causes Causes that started a build. See {@link Run#getCauses()}.
      */
     void started(List<Cause> causes);
 

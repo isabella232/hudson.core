@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Seiji Sogabe, Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Seiji Sogabe, Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -29,12 +29,13 @@ import java.io.File;
 /**
  * {@link ParameterDefinition} for doing file upload.
  *
- * <p>
- * The file will be then placed into the workspace at the beginning of a build.
+ * <p> The file will be then placed into the workspace at the beginning of a
+ * build.
  *
  * @author Kohsuke Kawaguchi
  */
 public class FileParameterDefinition extends ParameterDefinition {
+
     @DataBoundConstructor
     public FileParameterDefinition(String name, String description) {
         super(name, description);
@@ -49,6 +50,7 @@ public class FileParameterDefinition extends ParameterDefinition {
 
     @Extension
     public static class DescriptorImpl extends ParameterDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.FileParameterDefinition_DisplayName();
@@ -60,16 +62,16 @@ public class FileParameterDefinition extends ParameterDefinition {
         }
     }
 
-	@Override
-	public ParameterValue createValue(StaplerRequest req) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public ParameterValue createValue(StaplerRequest req) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public ParameterValue createValue(CLICommand command, String value) throws IOException, InterruptedException {
         // capture the file to the server
-        FilePath src = new FilePath(command.channel,value);
-        File local = File.createTempFile("hudson","parameter");
+        FilePath src = new FilePath(command.channel, value);
+        File local = File.createTempFile("hudson", "parameter");
         src.copyTo(new FilePath(local));
 
         FileParameterValue p = new FileParameterValue(getName(), local, src.getName());

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -29,6 +29,7 @@ import hudson.Extension;
  * @author huybrechts
  */
 public class BooleanParameterDefinition extends SimpleParameterDefinition {
+
     private final boolean defaultValue;
 
     @DataBoundConstructor
@@ -49,7 +50,7 @@ public class BooleanParameterDefinition extends SimpleParameterDefinition {
     }
 
     public ParameterValue createValue(String value) {
-        return new BooleanParameterValue(getName(),Boolean.valueOf(value),getDescription());
+        return new BooleanParameterValue(getName(), Boolean.valueOf(value), getDescription());
     }
 
     @Override
@@ -59,6 +60,7 @@ public class BooleanParameterDefinition extends SimpleParameterDefinition {
 
     @Extension
     public static class DescriptorImpl extends ParameterDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.BooleanParameterDefinition_DisplayName();
@@ -73,15 +75,15 @@ public class BooleanParameterDefinition extends SimpleParameterDefinition {
     @Override
     public boolean equals(Object o) {
         return super.equals(o) && new EqualsBuilder()
-            .append(isDefaultValue(), ((BooleanParameterDefinition) o).isDefaultValue())
-            .isEquals();
+                .append(isDefaultValue(), ((BooleanParameterDefinition) o).isDefaultValue())
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-            .appendSuper(super.hashCode())
-            .append(isDefaultValue())
-            .toHashCode();
+                .appendSuper(super.hashCode())
+                .append(isDefaultValue())
+                .toHashCode();
     }
 }

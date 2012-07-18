@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -21,27 +21,28 @@ import org.kohsuke.stapler.export.ExportedBean;
 import org.kohsuke.stapler.export.Exported;
 
 /**
- * Scalar value that changes over the time (such as load average, Q length, # of executors, etc.)
+ * Scalar value that changes over the time (such as load average, Q length, # of
+ * executors, etc.)
  *
- * <p>
- * This class computes <a href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average">
- * the exponential moving average</a> from the raw data (to be supplied by {@link #update(float)}).
+ * <p> This class computes <a
+ * href="http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average">
+ * the exponential moving average</a> from the raw data (to be supplied by
+ * {@link #update(float)}).
  *
  * @author Kohsuke Kawaguchi
  */
 @ExportedBean
 public final class TimeSeries {
+
     /**
      * Decay ratio. Normally 1-e for some small e.
      */
     private final float decay;
-
     /**
      * Historical exponential moving average data. Newer ones first.
      */
     @CopyOnWrite
     private volatile float[] history;
-
     /**
      * Maximum history size.
      */
@@ -56,26 +57,24 @@ public final class TimeSeries {
     /**
      * Pushes a new data point.
      *
-     * <p>
-     * Exponential moving average is calculated, and the {@link #history} is updated.
-     * This method needs to be called periodically and regularly, and it represents
-     * the raw data stream.
+     * <p> Exponential moving average is calculated, and the {@link #history} is
+     * updated. This method needs to be called periodically and regularly, and
+     * it represents the raw data stream.
      */
     public void update(float newData) {
-        float data = history[0]*decay + newData*(1-decay);
+        float data = history[0] * decay + newData * (1 - decay);
 
-        float[] r = new float[Math.min(history.length+1,historySize)];
-        System.arraycopy(history,0,r,1,Math.min(history.length,r.length-1));
+        float[] r = new float[Math.min(history.length + 1, historySize)];
+        System.arraycopy(history, 0, r, 1, Math.min(history.length, r.length - 1));
         r[0] = data;
         history = r;
     }
 
     /**
-     * Gets the history data of the exponential moving average. The returned array should be treated
-     * as read-only and immutable.
+     * Gets the history data of the exponential moving average. The returned
+     * array should be treated as read-only and immutable.
      *
-     * @return
-     *      Always non-null, contains at least one entry.
+     * @return Always non-null, contains at least one entry.
      */
     @Exported
     public float[] getHistory() {

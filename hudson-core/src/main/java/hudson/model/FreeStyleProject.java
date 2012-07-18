@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, id:cactusman, Anton Kozak, Nikita Levyankov
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, id:cactusman, Anton Kozak, Nikita Levyankov
+ *
  *
  *******************************************************************************/ 
 
@@ -29,19 +29,19 @@ import javax.servlet.ServletException;
 
 /**
  * Free-style software project.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
-public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> implements TopLevelItem,
-    IFreeStyleProject {
+public class FreeStyleProject extends Project<FreeStyleProject, FreeStyleBuild> implements TopLevelItem,
+        IFreeStyleProject {
 
     /**
      * See {@link #setCustomWorkspace(String)}.
      *
      * @since 1.216
-     * @deprecated as of 2.2.0
-     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     *             Use getter/setter for accessing to this field.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to
+     * {@link org.eclipse.hudson.api.model.IProjectProperty}. Use getter/setter
+     * for accessing to this field.
      */
     @Deprecated
     private String customWorkspace;
@@ -76,10 +76,10 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
 
     @Override
     protected void submit(StaplerRequest req, StaplerResponse rsp)
-        throws IOException, ServletException, Descriptor.FormException {
+            throws IOException, ServletException, Descriptor.FormException {
         super.submit(req, rsp);
         setCustomWorkspace(
-            req.hasParameter("customWorkspace") ? req.getParameter("customWorkspace.directory") : null);
+                req.hasParameter("customWorkspace") ? req.getParameter("customWorkspace.directory") : null);
     }
 
     @Override
@@ -103,17 +103,17 @@ public class FreeStyleProject extends Project<FreeStyleProject,FreeStyleBuild> i
     public DescriptorImpl getDescriptor() {
         return DESCRIPTOR;
     }
-
-    @Extension(ordinal=1000)
+    @Extension(ordinal = 1000)
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
     public static final class DescriptorImpl extends AbstractProjectDescriptor {
+
         public String getDisplayName() {
             return Messages.FreeStyleProject_DisplayName();
         }
 
         public FreeStyleProject newInstance(ItemGroup parent, String name) {
-            return new FreeStyleProject(parent,name);
+            return new FreeStyleProject(parent, name);
         }
     }
 }

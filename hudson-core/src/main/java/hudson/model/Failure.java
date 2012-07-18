@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -24,21 +24,23 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 
 /**
- * Represents an error induced by user, encountered during HTTP request processing.
+ * Represents an error induced by user, encountered during HTTP request
+ * processing.
  *
- * <p>
- * The error page is rendered into HTML, but without a stack trace. So only use
- * this exception when the error condition is anticipated by the program, and where
- * we nor users don't need to see the stack trace to figure out the root cause. 
+ * <p> The error page is rendered into HTML, but without a stack trace. So only
+ * use this exception when the error condition is anticipated by the program,
+ * and where we nor users don't need to see the stack trace to figure out the
+ * root cause.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.321
  */
 public class Failure extends RuntimeException implements HttpResponse {
+
     private final boolean pre;
 
     public Failure(String message) {
-        this(message,false);
+        this(message, false);
     }
 
     public Failure(String message, boolean pre) {
@@ -47,12 +49,15 @@ public class Failure extends RuntimeException implements HttpResponse {
     }
 
     public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
-        req.setAttribute("message",getMessage());
-        if(pre)
-            req.setAttribute("pre",true);
+        req.setAttribute("message", getMessage());
+        if (pre) {
+            req.setAttribute("pre", true);
+        }
         if (node instanceof AbstractItem) // Maintain ancestors
-            rsp.forward(Hudson.getInstance(), ((AbstractItem)node).getUrl() + "error", req);
-        else
-            rsp.forward(node instanceof AbstractModelObject ? node : Hudson.getInstance() ,"error", req);
+        {
+            rsp.forward(Hudson.getInstance(), ((AbstractItem) node).getUrl() + "error", req);
+        } else {
+            rsp.forward(node instanceof AbstractModelObject ? node : Hudson.getInstance(), "error", req);
+        }
     }
 }

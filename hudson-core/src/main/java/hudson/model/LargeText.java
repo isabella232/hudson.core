@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -37,23 +37,25 @@ import java.io.InputStreamReader;
 /**
  * Represents a large text data.
  *
- * <p>
- * This class defines methods for handling progressive text update.
+ * <p> This class defines methods for handling progressive text update.
  *
  * @author Kohsuke Kawaguchi
  * @deprecated moved to stapler, as of Hudson 1.220
  */
 public class LargeText {
+
     /**
      * Represents the data source of this text.
      */
     private interface Source {
+
         Session open() throws IOException;
+
         long length();
+
         boolean exists();
     }
     private final Source source;
-
     private volatile boolean completed;
 
     public LargeText(final File file, boolean completed) {
@@ -104,15 +106,19 @@ public class LargeText {
     public Reader readAll() throws IOException {
         return new InputStreamReader(new InputStream() {
             final Session session = source.open();
+
             public int read() throws IOException {
                 byte[] buf = new byte[1];
                 int n = session.read(buf);
-                if(n==1)    return buf[0];
-                else        return -1; // EOF
+                if (n == 1) {
+                    return buf[0];
+                } else {
+                    return -1; // EOF
+                }
             }
 
             public int read(byte[] buf, int off, int len) throws IOException {
-                return session.read(buf,off,len);
+                return session.read(buf, off, len);
             }
 
             public void close() throws IOException {
@@ -124,16 +130,14 @@ public class LargeText {
     /**
      * Writes the tail portion of the file to the {@link Writer}.
      *
-     * <p>
-     * The text file is assumed to be in the system default encoding.
+     * <p> The text file is assumed to be in the system default encoding.
      *
-     * @param start
-     *      The byte offset in the input file where the write operation starts.
+     * @param start The byte offset in the input file where the write operation
+     * starts.
      *
-     * @return
-     *      if the file is still being written, this method writes the file
-     *      until the last newline character and returns the offset to start
-     *      the next write operation.
+     * @return if the file is still being written, this method writes the file
+     * until the last newline character and returns the offset to start the next
+     * write operation.
      */
     public long writeLogTo(long start, Writer w) throws IOException {
         CountingOutputStream os = new CountingOutputStream(new WriterOutputStream(w));
@@ -141,19 +145,20 @@ public class LargeText {
         Session f = source.open();
         f.skip(start);
 
-        if(completed) {
+        if (completed) {
             // write everything till EOF
             byte[] buf = new byte[1024];
             int sz;
-            while((sz=f.read(buf))>=0)
-                os.write(buf,0,sz);
+            while ((sz = f.read(buf)) >= 0) {
+                os.write(buf, 0, sz);
+            }
         } else {
-            ByteBuf buf = new ByteBuf(null,f);
+            ByteBuf buf = new ByteBuf(null, f);
             HeadMark head = new HeadMark(buf);
             TailMark tail = new TailMark(buf);
 
-            while(tail.moveToNextLine(f)) {
-                head.moveTo(tail,os);
+            while (tail.moveToNextLine(f)) {
+                head.moveTo(tail, os);
             }
             head.finish(os);
         }
@@ -161,45 +166,48 @@ public class LargeText {
         f.close();
         os.flush();
 
-        return os.getCount()+start;
+        return os.getCount() + start;
     }
 
     /**
-     * Implements the progressive text handling.
-     * This method is used as a "web method" with progressiveText.jelly.
+     * Implements the progressive text handling. This method is used as a "web
+     * method" with progressiveText.jelly.
      */
     public void doProgressText(StaplerRequest req, StaplerResponse rsp) throws IOException {
         rsp.setContentType("text/plain");
         rsp.setStatus(HttpServletResponse.SC_OK);
 
-        if(!source.exists()) {
+        if (!source.exists()) {
             // file doesn't exist yet
-            rsp.addHeader("X-Text-Size","0");
-            rsp.addHeader("X-More-Data","true");
+            rsp.addHeader("X-Text-Size", "0");
+            rsp.addHeader("X-More-Data", "true");
             return;
         }
 
         long start = 0;
         String s = req.getParameter("start");
-        if(s!=null)
+        if (s != null) {
             start = Long.parseLong(s);
+        }
 
-        if(source.length() < start )
+        if (source.length() < start) {
             start = 0;  // text rolled over
-
+        }
         CharSpool spool = new CharSpool();
-        long r = writeLogTo(start,spool);
+        long r = writeLogTo(start, spool);
 
-        rsp.addHeader("X-Text-Size",String.valueOf(r));
-        if(!completed)
-            rsp.addHeader("X-More-Data","true");
+        rsp.addHeader("X-Text-Size", String.valueOf(r));
+        if (!completed) {
+            rsp.addHeader("X-More-Data", "true");
+        }
 
         // when sending big text, try compression. don't bother if it's small
         Writer w;
-        if(r-start>4096)
+        if (r - start > 4096) {
             w = rsp.getCompressedWriter(req);
-        else
+        } else {
             w = rsp.getWriter();
+        }
         spool.writeTo(new LineEndNormalizingWriter(w));
         w.close();
 
@@ -209,6 +217,7 @@ public class LargeText {
      * Points to a byte in the buffer.
      */
     private static class Mark {
+
         protected ByteBuf buf;
         protected int pos;
 
@@ -218,21 +227,21 @@ public class LargeText {
     }
 
     /**
-     * Points to the start of the region that's not committed
-     * to the output yet.
+     * Points to the start of the region that's not committed to the output yet.
      */
     private static final class HeadMark extends Mark {
+
         public HeadMark(ByteBuf buf) {
             super(buf);
         }
 
         /**
-         * Moves this mark to 'that' mark, and writes the data
-         * to {@link OutputStream} if necessary.
+         * Moves this mark to 'that' mark, and writes the data to
+         * {@link OutputStream} if necessary.
          */
         void moveTo(Mark that, OutputStream os) throws IOException {
-            while(this.buf!=that.buf) {
-                os.write(buf.buf,0,buf.size);
+            while (this.buf != that.buf) {
+                os.write(buf.buf, 0, buf.size);
                 buf = buf.next;
                 pos = 0;
             }
@@ -241,7 +250,7 @@ public class LargeText {
         }
 
         void finish(OutputStream os) throws IOException {
-            os.write(buf.buf,0,pos);
+            os.write(buf.buf, 0, pos);
         }
     }
 
@@ -249,61 +258,69 @@ public class LargeText {
      * Points to the end of the region.
      */
     private static final class TailMark extends Mark {
+
         public TailMark(ByteBuf buf) {
             super(buf);
         }
 
         boolean moveToNextLine(Session f) throws IOException {
-            while(true) {
-                while(pos==buf.size) {
-                    if(!buf.isFull()) {
+            while (true) {
+                while (pos == buf.size) {
+                    if (!buf.isFull()) {
                         // read until EOF
                         return false;
                     } else {
                         // read into the next buffer
-                        buf = new ByteBuf(buf,f);
+                        buf = new ByteBuf(buf, f);
                         pos = 0;
                     }
                 }
                 byte b = buf.buf[pos++];
-                if(b=='\r' || b=='\n')
+                if (b == '\r' || b == '\n') {
                     return true;
+                }
             }
         }
     }
 
     private static final class ByteBuf {
+
         private final byte[] buf = new byte[1024];
         private int size = 0;
         private ByteBuf next;
 
         public ByteBuf(ByteBuf previous, Session f) throws IOException {
-            if(previous!=null) {
-                assert previous.next==null;
+            if (previous != null) {
+                assert previous.next == null;
                 previous.next = this;
             }
 
-            while(!this.isFull()) {
+            while (!this.isFull()) {
                 int chunk = f.read(buf, size, buf.length - size);
-                if(chunk==-1)
+                if (chunk == -1) {
                     return;
-                size+= chunk;
+                }
+                size += chunk;
             }
         }
 
         public boolean isFull() {
-            return buf.length==size;
+            return buf.length == size;
         }
     }
 
     /**
-     * Represents the read session of the {@link Source}.
-     * Methods generally follow the contracts of {@link InputStream}.
+     * Represents the read session of the {@link Source}. Methods generally
+     * follow the contracts of {@link InputStream}.
      */
     private interface Session {
+
         void close() throws IOException;
+
         void skip(long start) throws IOException;
+
         int read(byte[] buf) throws IOException;
+
         int read(byte[] buf, int offset, int length) throws IOException;
     }
 
@@ -311,10 +328,11 @@ public class LargeText {
      * {@link Session} implementation over {@link RandomAccessFile}.
      */
     private static final class FileSession implements Session {
+
         private final RandomAccessFile file;
 
         public FileSession(File file) throws IOException {
-            this.file = new RandomAccessFile(file,"r");
+            this.file = new RandomAccessFile(file, "r");
         }
 
         public void close() throws IOException {
@@ -322,7 +340,7 @@ public class LargeText {
         }
 
         public void skip(long start) throws IOException {
-            file.seek(file.getFilePointer()+start);
+            file.seek(file.getFilePointer() + start);
         }
 
         public int read(byte[] buf) throws IOException {
@@ -330,7 +348,7 @@ public class LargeText {
         }
 
         public int read(byte[] buf, int offset, int length) throws IOException {
-            return file.read(buf,offset,length);
+            return file.read(buf, offset, length);
         }
     }
 
@@ -338,20 +356,21 @@ public class LargeText {
      * {@link Session} implementation over {@link ByteBuffer}.
      */
     private static final class BufferSession implements Session {
+
         private final InputStream in;
 
         public BufferSession(ByteBuffer buf) {
             this.in = buf.newInputStream();
         }
 
-
         public void close() throws IOException {
             in.close();
         }
 
         public void skip(long n) throws IOException {
-            while(n>0)
+            while (n > 0) {
                 n -= in.skip(n);
+            }
         }
 
         public int read(byte[] buf) throws IOException {
@@ -359,7 +378,7 @@ public class LargeText {
         }
 
         public int read(byte[] buf, int offset, int length) throws IOException {
-            return in.read(buf,offset,length);
+            return in.read(buf, offset, length);
         }
     }
 }

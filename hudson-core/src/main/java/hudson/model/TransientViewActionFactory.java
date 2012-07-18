@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -27,30 +27,29 @@ import java.util.List;
  */
 public abstract class TransientViewActionFactory implements ExtensionPoint {
 
-	/**
-	 * returns a list of (transient) actions never null, may be empty
-	 * 
-	 * @param v
-	 * @return
-	 */
-	public abstract List<Action> createFor(View v);
-	
+    /**
+     * returns a list of (transient) actions never null, may be empty
+     *
+     * @param v
+     * @return
+     */
+    public abstract List<Action> createFor(View v);
+
     /**
      * Returns all the registered {@link TransientViewActionFactory}s.
      */
-	public static ExtensionList<TransientViewActionFactory> all() {
-		return Hudson.getInstance().getExtensionList(TransientViewActionFactory.class);
-	}
-	
+    public static ExtensionList<TransientViewActionFactory> all() {
+        return Hudson.getInstance().getExtensionList(TransientViewActionFactory.class);
+    }
+
     /**
      * Creates {@link Action)s for a view, using all registered {@link TransientViewActionFactory}s.
      */
-	public static List<Action> createAllFor(View v) {
-		List<Action> result = new ArrayList<Action>();
-		for (TransientViewActionFactory f: all()) {
-			result.addAll(f.createFor(v));
-		}
-		return result;
-	}
-
+    public static List<Action> createAllFor(View v) {
+        List<Action> result = new ArrayList<Action>();
+        for (TransientViewActionFactory f : all()) {
+            result.addAll(f.createFor(v));
+        }
+        return result;
+    }
 }

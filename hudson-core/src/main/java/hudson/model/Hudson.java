@@ -7,11 +7,11 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *  Kohsuke Kawaguchi, Winston Prakash, Nikita Levyankov, Erik Ramfelt, Koichi Fujikawa, 
  *  Seiji Sogabe, Stephen Connolly, Tom Huybrechts, Alan Harder
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -221,7 +221,6 @@ import org.springframework.security.ui.AbstractProcessingFilter;
 public final class Hudson extends Node implements ItemGroup<TopLevelItem>, StaplerProxy, StaplerFallback, ViewGroup, AccessControlled, DescriptorByNameOwner {
 
     private transient Logger logger = LoggerFactory.getLogger(Hudson.class);
-    
     private transient final Queue queue;
     /**
      * Stores various objects scoped to {@link Hudson}.
@@ -232,13 +231,14 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     private transient final Map<Node, Computer> computers = new CopyOnWriteMap.Hash<Node, Computer>();
     /**
-     * We update this field to the current version of Hudson whenever we save {@code config.xml}.
-     * This can be used to detect when an upgrade happens from one version to next.
+     * We update this field to the current version of Hudson whenever we save
+     * {@code config.xml}. This can be used to detect when an upgrade happens
+     * from one version to next.
      *
-     * <p>
-     * Since this field is introduced starting 1.301, "1.0" is used to represent every version
-     * up to 1.300. This value may also include non-standard versions like "1.301-SNAPSHOT" or
-     * "?", etc., so parsing needs to be done with a care.
+     * <p> Since this field is introduced starting 1.301, "1.0" is used to
+     * represent every version up to 1.300. This value may also include
+     * non-standard versions like "1.301-SNAPSHOT" or "?", etc., so parsing
+     * needs to be done with a care.
      *
      * @since 1.301
      */
@@ -252,14 +252,14 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Job allocation strategy.
      */
     private Mode mode = Mode.NORMAL;
-     
     /**
      * Message displayed in the top page.
      */
     private String systemMessage;
     private static transient final String HUDSON_WORKSPACES_PROPERTY_KEY = "HUDSON_WORKSPACES";
     /**
-     * Workspace root dir which could be configured by setting HUDSON_WORKSPACES property.
+     * Workspace root dir which could be configured by setting HUDSON_WORKSPACES
+     * property.
      */
     private volatile String configuredWorkspaceRoot;
     /**
@@ -290,26 +290,24 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Currently active My Views tab bar.
      */
     private volatile MyViewsTabBar myViewsTabBar = new DefaultMyViewsTabBar();
-    
     /**
      * Script support (if available)
      */
     private volatile ScriptSupport scriptSupport;
-    
     /**
-     * All {@link ExtensionList} keyed by their {@link ExtensionList#extensionType}.
+     * All {@link ExtensionList} keyed by their
+     * {@link ExtensionList#extensionType}.
      */
     private transient final Memoizer<Class, ExtensionList> extensionLists = new Memoizer<Class, ExtensionList>() {
-
         public ExtensionList compute(Class key) {
             return ExtensionList.create(Hudson.this, key);
         }
     };
     /**
-     * All {@link DescriptorExtensionList} keyed by their {@link DescriptorExtensionList#describableType}.
+     * All {@link DescriptorExtensionList} keyed by their
+     * {@link DescriptorExtensionList#describableType}.
      */
     private transient final Memoizer<Class, DescriptorExtensionList> descriptorLists = new Memoizer<Class, DescriptorExtensionList>() {
-
         public DescriptorExtensionList compute(Class key) {
             return DescriptorExtensionList.createDescriptorList(Hudson.this, key);
         }
@@ -344,21 +342,19 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         }
     }
     /**
-     * Set of installed cluster nodes.
-     * <p>
-     * We use this field with copy-on-write semantics.
-     * This field has mutable list (to keep the serialization look clean),
-     * but it shall never be modified. Only new completely populated slave
-     * list can be set here.
-     * <p>
-     * The field name should be really {@code nodes}, but again the backward compatibility
-     * prevents us from renaming.
+     * Set of installed cluster nodes. <p> We use this field with copy-on-write
+     * semantics. This field has mutable list (to keep the serialization look
+     * clean), but it shall never be modified. Only new completely populated
+     * slave list can be set here. <p> The field name should be really
+     * {@code nodes}, but again the backward compatibility prevents us from
+     * renaming.
      */
     private volatile NodeList slaves;
     /**
      * Quiet period.
      *
-     * This is {@link Integer} so that we can initialize it to '5' for upgrading users.
+     * This is {@link Integer} so that we can initialize it to '5' for upgrading
+     * users.
      */
     /*package*/ Integer quietPeriod;
     /**
@@ -370,9 +366,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     private final CopyOnWriteArrayList<View> views = new CopyOnWriteArrayList<View>();
     /**
-     * Name of the primary view.
-     * <p>
-     * Start with null, so that we can upgrade pre-1.269 data well.
+     * Name of the primary view. <p> Start with null, so that we can upgrade
+     * pre-1.269 data well.
+     *
      * @since 1.269
      */
     private volatile String primaryView;
@@ -381,14 +377,13 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Loaded plugins.
      */
     public transient final PluginManager pluginManager;
-    
     private transient PluginCenter pluginCenter;
-    
     public transient volatile TcpSlaveAgentListener tcpSlaveAgentListener;
     private transient UDPBroadcastThread udpBroadcastThread;
     private transient DNSMultiCast dnsMultiCast;
     /**
      * List of registered {@link ItemListener}s.
+     *
      * @deprecated as of 1.286
      */
     private transient final CopyOnWriteList<ItemListener> itemListeners = ExtensionListView.createCopyOnWriteList(ItemListener.class);
@@ -398,12 +393,12 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     private transient final CopyOnWriteList<SCMListener> scmListeners = new CopyOnWriteList<SCMListener>();
     /**
      * List of registered {@link ComputerListener}s.
+     *
      * @deprecated as of 1.286
      */
     private transient final CopyOnWriteList<ComputerListener> computerListeners = ExtensionListView.createCopyOnWriteList(ComputerListener.class);
     /**
-     * TCP slave agent port.
-     * 0 for random, -1 to disable.
+     * TCP slave agent port. 0 for random, -1 to disable.
      */
     private int slaveAgentPort = 0;
     /**
@@ -415,8 +410,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     private volatile CrumbIssuer crumbIssuer;
     /**
-     * All labels known to Hudson. This allows us to reuse the same label instances
-     * as much as possible, even though that's not a strict requirement.
+     * All labels known to Hudson. This allows us to reuse the same label
+     * instances as much as possible, even though that's not a strict
+     * requirement.
      */
     private transient final ConcurrentHashMap<String, Label> labels = new ConcurrentHashMap<String, Label>();
     /**
@@ -430,8 +426,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public transient final NodeProvisioner overallNodeProvisioner = new NodeProvisioner(null, overallLoad);
     public transient final ServletContext servletContext;
     /**
-     * Transient action list. Useful for adding navigation items to the navigation bar
-     * on the left.
+     * Transient action list. Useful for adding navigation items to the
+     * navigation bar on the left.
      */
     private transient final List<Action> actions = new CopyOnWriteArrayList<Action>();
     /**
@@ -462,7 +458,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Code that handles {@link ItemGroup} work.
      */
     private transient final ItemGroupMixIn itemGroupMixIn = new ItemGroupMixIn(this, this) {
-
         @Override
         protected void add(TopLevelItem item) {
             items.put(item.getName(), item);
@@ -474,8 +469,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         }
 
         /**
-         *send the browser to the config page
-         * use View to trim view/{default-view} from URL if possible
+         * send the browser to the config page use View to trim
+         * view/{default-view} from URL if possible
          */
         @Override
         protected String redirectAfterCreateItem(StaplerRequest req, TopLevelItem result) throws IOException {
@@ -496,10 +491,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public static Hudson getInstance() {
         return theInstance;
     }
-     
     private transient final UpdateCenter updateCenter = new UpdateCenter();
     /**
-     * True if the user opted out from the statistics tracking. We'll never send anything if this is true.
+     * True if the user opted out from the statistics tracking. We'll never send
+     * anything if this is true.
      */
     private Boolean noUsageStatistics;
     /**
@@ -516,8 +511,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * @param pluginManager
-     *      If non-null, use existing plugin manager.  create a new one.
+     * @param pluginManager If non-null, use existing plugin manager. create a
+     * new one.
      */
     public Hudson(File root, ServletContext context, PluginManager pluginManager) throws IOException, InterruptedException, ReactorException {
         // As hudson is starting, grant this process full control
@@ -556,9 +551,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                 pluginManager = new LocalPluginManager(this);
             }
             this.pluginManager = pluginManager;
-            
+
             pluginCenter = new PluginCenter(root);
-                    
+
             // JSON binding needs to be able to see all the classes from all the plugins
             WebApp.get(servletContext).setClassLoader(pluginManager.uberClassLoader);
 
@@ -609,11 +604,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             for (ItemListener l : ItemListener.all()) {
                 l.onLoaded();
             }
-            
-            if (!ScriptSupport.getAvailableScriptSupports().isEmpty()){
+
+            if (!ScriptSupport.getAvailableScriptSupports().isEmpty()) {
                 scriptSupport = ScriptSupport.getAvailableScriptSupports().get(0);
             }
-                    
+
         } finally {
             HudsonSecurityManager.resetFullControl();
         }
@@ -622,12 +617,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Executes a reactor.
      *
-     * @param is
-     *      If non-null, this can be consulted for ignoring some tasks. Only used during the initialization of Hudson.
+     * @param is If non-null, this can be consulted for ignoring some tasks.
+     * Only used during the initialization of Hudson.
      */
     private void executeReactor(final InitStrategy is, TaskBuilder... builders) throws IOException, InterruptedException, ReactorException {
         Reactor reactor = new Reactor(builders) {
-
             /**
              * Sets the thread name to the task for better diagnostics.
              */
@@ -638,7 +632,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                 }
 
                 // full access in the initialization thread
-                HudsonSecurityManager.grantFullControl();    
+                HudsonSecurityManager.grantFullControl();
                 String taskName = task.getDisplayName();
 
                 Thread t = Thread.currentThread();
@@ -677,14 +671,13 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Aggregates all the listeners into one and returns it.
      *
-     * <p>
-     * At this point plugins are not loaded yet, so we fall back to the META-INF/services look up to discover implementations.
-     * As such there's no way for plugins to participate into this process.
+     * <p> At this point plugins are not loaded yet, so we fall back to the
+     * META-INF/services look up to discover implementations. As such there's no
+     * way for plugins to participate into this process.
      */
     private ReactorListener buildReactorListener() throws IOException {
         List<ReactorListener> r = (List) Service.loadInstances(Thread.currentThread().getContextClassLoader(), InitReactorListener.class);
         r.add(new ReactorListener() {
-
             public void onTaskStarted(Task t) {
                 logger.debug("Started " + t.getDisplayName());
             }
@@ -698,7 +691,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             }
 
             public void onAttained(Milestone milestone) {
-                 
+
                 String s = "Attained " + milestone.toString();
                 if (milestone instanceof InitMilestone) {
                     initLevel = (InitMilestone) milestone;
@@ -715,9 +708,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Makes {@link AdjunctManager} URL-bound.
-     * The dummy parameter allows us to use different URLs for the same adjunct,
-     * for proper cache handling.
+     * Makes {@link AdjunctManager} URL-bound. The dummy parameter allows us to
+     * use different URLs for the same adjunct, for proper cache handling.
      */
     public AdjunctManager getAdjuncts(String dummy) {
         return adjuncts;
@@ -755,11 +747,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public PluginManager getPluginManager() {
         return pluginManager;
     }
-    
+
     public PluginCenter getPluginCenter() {
         return pluginCenter;
     }
-    
+
     public HudsonSecurityManager getSecurityManager() {
         return HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
     }
@@ -793,9 +785,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Returns a secret key that survives across container start/stop.
-     * <p>
-     * This value is useful for implementing some of the security features.
+     * Returns a secret key that survives across container start/stop. <p> This
+     * value is useful for implementing some of the security features.
      */
     public String getSecretKey() {
         return getSecurityManager().getSecretKey();
@@ -803,6 +794,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     /**
      * Gets {@linkplain #getSecretKey() the secret key} as a key for AES-128.
+     *
      * @since 1.308
      */
     public SecretKey getSecretKeyAsAES128() {
@@ -810,56 +802,64 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Gets the SCM descriptor by name. Primarily used for making them web-visible.
+     * Gets the SCM descriptor by name. Primarily used for making them
+     * web-visible.
      */
     public Descriptor<SCM> getScm(String shortClassName) {
         return findDescriptor(shortClassName, SCM.all());
     }
 
     /**
-     * Gets the repository browser descriptor by name. Primarily used for making them web-visible.
+     * Gets the repository browser descriptor by name. Primarily used for making
+     * them web-visible.
      */
     public Descriptor<RepositoryBrowser<?>> getRepositoryBrowser(String shortClassName) {
         return findDescriptor(shortClassName, RepositoryBrowser.all());
     }
 
     /**
-     * Gets the builder descriptor by name. Primarily used for making them web-visible.
+     * Gets the builder descriptor by name. Primarily used for making them
+     * web-visible.
      */
     public Descriptor<Builder> getBuilder(String shortClassName) {
         return findDescriptor(shortClassName, Builder.all());
     }
 
     /**
-     * Gets the build wrapper descriptor by name. Primarily used for making them web-visible.
+     * Gets the build wrapper descriptor by name. Primarily used for making them
+     * web-visible.
      */
     public Descriptor<BuildWrapper> getBuildWrapper(String shortClassName) {
         return findDescriptor(shortClassName, BuildWrapper.all());
     }
 
     /**
-     * Gets the publisher descriptor by name. Primarily used for making them web-visible.
+     * Gets the publisher descriptor by name. Primarily used for making them
+     * web-visible.
      */
     public Descriptor<Publisher> getPublisher(String shortClassName) {
         return findDescriptor(shortClassName, Publisher.all());
     }
 
     /**
-     * Gets the trigger descriptor by name. Primarily used for making them web-visible.
+     * Gets the trigger descriptor by name. Primarily used for making them
+     * web-visible.
      */
     public TriggerDescriptor getTrigger(String shortClassName) {
         return (TriggerDescriptor) findDescriptor(shortClassName, Trigger.all());
     }
 
     /**
-     * Gets the retention strategy descriptor by name. Primarily used for making them web-visible.
+     * Gets the retention strategy descriptor by name. Primarily used for making
+     * them web-visible.
      */
     public Descriptor<RetentionStrategy<?>> getRetentionStrategy(String shortClassName) {
         return findDescriptor(shortClassName, RetentionStrategy.all());
     }
 
     /**
-     * Gets the {@link JobPropertyDescriptor} by name. Primarily used for making them web-visible.
+     * Gets the {@link JobPropertyDescriptor} by name. Primarily used for making
+     * them web-visible.
      */
     public JobPropertyDescriptor getJobProperty(String shortClassName) {
         // combining these two lines triggers javac bug. See issue #610.
@@ -870,11 +870,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Exposes {@link Descriptor} by its name to URL.
      *
-     * After doing all the {@code getXXX(shortClassName)} methods, I finally realized that
-     * this just doesn't scale.
+     * After doing all the {@code getXXX(shortClassName)} methods, I finally
+     * realized that this just doesn't scale.
      *
-     * @param id
-     *      Either {@link Descriptor#getId()} (recommended) or the short name of a {@link Describable} subtype (for compatibility)
+     * @param id Either {@link Descriptor#getId()} (recommended) or the short
+     * name of a {@link Describable} subtype (for compatibility)
      */
     public Descriptor getDescriptor(String id) {
         // legacy descriptors that are reigstered manually doesn't show up in getExtensionList, so check them explicitly.
@@ -898,10 +898,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Gets the {@link Descriptor} that corresponds to the given {@link Describable} type.
-     * <p>
-     * If you have an instance of {@code type} and call {@link Describable#getDescriptor()},
-     * you'll get the same instance that this method returns.
+     * Gets the {@link Descriptor} that corresponds to the given
+     * {@link Describable} type. <p> If you have an instance of {@code type} and
+     * call {@link Describable#getDescriptor()}, you'll get the same instance
+     * that this method returns.
      */
     public Descriptor getDescriptor(Class<? extends Describable> type) {
         for (Descriptor d : getExtensionList(Descriptor.class)) {
@@ -913,10 +913,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Works just like {@link #getDescriptor(Class)} but don't take no for an answer.
+     * Works just like {@link #getDescriptor(Class)} but don't take no for an
+     * answer.
      *
-     * @throws AssertionError
-     *      If the descriptor is missing.
+     * @throws AssertionError If the descriptor is missing.
      * @since 1.326
      */
     public Descriptor getDescriptorOrDie(Class<? extends Describable> type) {
@@ -940,7 +940,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Gets the {@link SecurityRealm} descriptors by name. Primarily used for making them web-visible.
+     * Gets the {@link SecurityRealm} descriptors by name. Primarily used for
+     * making them web-visible.
      */
     public Descriptor<SecurityRealm> getSecurityRealms(String shortClassName) {
         return findDescriptor(shortClassName, SecurityRealm.all());
@@ -962,8 +963,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Gets all the installed {@link ItemListener}s.
      *
-     * @deprecated as of 1.286.
-     *      Use {@link ItemListener#all()}.
+     * @deprecated as of 1.286. Use {@link ItemListener#all()}.
      */
     public CopyOnWriteList<ItemListener> getJobListeners() {
         return itemListeners;
@@ -979,8 +979,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Gets all the installed {@link ComputerListener}s.
      *
-     * @deprecated as of 1.286.
-     *      Use {@link ComputerListener#all()}.
+     * @deprecated as of 1.286. Use {@link ComputerListener#all()}.
      */
     public CopyOnWriteList<ComputerListener> getComputerListeners() {
         return computerListeners;
@@ -989,8 +988,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Gets the plugin object from its short name.
      *
-     * <p>
-     * This allows URL <tt>hudson/plugin/ID</tt> to be served by the views
+     * <p> This allows URL <tt>hudson/plugin/ID</tt> to be served by the views
      * of the plugin class.
      */
     public Plugin getPlugin(String shortName) {
@@ -1004,12 +1002,12 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Gets the plugin object from its class.
      *
-     * <p>
-     * This allows easy storage of plugin information in the plugin singleton without
-     * every plugin reimplementing the singleton pattern.
+     * <p> This allows easy storage of plugin information in the plugin
+     * singleton without every plugin reimplementing the singleton pattern.
      *
-     * @param clazz The plugin class (beware class-loader fun, this will probably only work
-     * from within the hpi that defines the plugin class, it may or may not work in other cases)
+     * @param clazz The plugin class (beware class-loader fun, this will
+     * probably only work from within the hpi that defines the plugin class, it
+     * may or may not work in other cases)
      *
      * @return The plugin instance.
      */
@@ -1083,9 +1081,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Updates {@link #computers} by using {@link #getSlaves()}.
      *
-     * <p>
-     * This method tries to reuse existing {@link Computer} objects
-     * so that we won't upset {@link Executor}s running in it.
+     * <p> This method tries to reuse existing {@link Computer} objects so that
+     * we won't upset {@link Executor}s running in it.
      */
     private void updateComputerList() throws IOException {
         synchronized (updateComputerLock) {// just so that we don't have two code updating computer list at the same time
@@ -1163,17 +1160,16 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Returns the transient {@link Action}s associated with the top page.
      *
-     * <p>
-     * Adding {@link Action} is primarily useful for plugins to contribute
-     * an item to the navigation bar of the top page. See existing {@link Action}
-     * implementation for it affects the GUI.
+     * <p> Adding {@link Action} is primarily useful for plugins to contribute
+     * an item to the navigation bar of the top page. See existing
+     * {@link Action} implementation for it affects the GUI.
      *
-     * <p>
-     * To register an {@link Action}, implement {@link RootAction} extension point, or write code like
+     * <p> To register an {@link Action}, implement {@link RootAction} extension
+     * point, or write code like
      * {@code Hudson.getInstance().getActions().add(...)}.
      *
-     * @return
-     *      Live list where the changes can be made. Can be empty but never null.
+     * @return Live list where the changes can be made. Can be empty but never
+     * null.
      * @since 1.172
      */
     public List<Action> getActions() {
@@ -1210,9 +1206,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Returns the read-only view of all the {@link TopLevelItem}s keyed by their names.
-     * <p>
-     * This method is efficient, as it doesn't involve any copying.
+     * Returns the read-only view of all the {@link TopLevelItem}s keyed by
+     * their names. <p> This method is efficient, as it doesn't involve any
+     * copying.
      *
      * @since 1.296
      */
@@ -1234,8 +1230,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Gets all the {@link Item}s recursively in the {@link ItemGroup} tree
-     * and filter them by the given type.
+     * Gets all the {@link Item}s recursively in the {@link ItemGroup} tree and
+     * filter them by the given type.
      */
     public <T extends Item> List<T> getAllItems(Class<T> type) {
         List<T> r = new ArrayList<T>();
@@ -1263,9 +1259,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Gets the list of all the projects.
      *
-     * <p>
-     * Since {@link Project} can only show up under {@link Hudson},
-     * no need to search recursively.
+     * <p> Since {@link Project} can only show up under {@link Hudson}, no need
+     * to search recursively.
      */
     public List<Project> getProjects() {
         return Util.createSubList(items.values(), Project.class);
@@ -1344,22 +1339,23 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public MyViewsTabBar getMyViewsTabBar() {
         return myViewsTabBar;
     }
-    
+
     public ScriptSupport getScriptSupport() {
         return scriptSupport;
     }
 
     /**
-     * Returns true if the current running Hudson is upgraded from a version earlier than the specified version.
+     * Returns true if the current running Hudson is upgraded from a version
+     * earlier than the specified version.
      *
-     * <p>
-     * This method continues to return true until the system configuration is saved, at which point
-     * {@link #version} will be overwritten and Hudson forgets the upgrade history.
+     * <p> This method continues to return true until the system configuration
+     * is saved, at which point {@link #version} will be overwritten and Hudson
+     * forgets the upgrade history.
      *
-     * <p>
-     * To handle SNAPSHOTS correctly, pass in "1.N.*" to test if it's upgrading from the version
-     * equal or younger than N. So say if you implement a feature in 1.301 and you want to check
-     * if the installation upgraded from pre-1.301, pass in "1.300.*"
+     * <p> To handle SNAPSHOTS correctly, pass in "1.N.*" to test if it's
+     * upgrading from the version equal or younger than N. So say if you
+     * implement a feature in 1.301 and you want to check if the installation
+     * upgraded from pre-1.301, pass in "1.300.*"
      *
      * @since 1.301
      */
@@ -1378,7 +1374,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public Computer[] getComputers() {
         Computer[] r = computers.values().toArray(new Computer[computers.size()]);
         Arrays.sort(r, new Comparator<Computer>() {
-
             final Collator collator = Collator.getInstance();
 
             public int compare(Computer lhs, Computer rhs) {
@@ -1413,8 +1408,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * @deprecated
-     *      UI method. Not meant to be used programmatically.
+     * @deprecated UI method. Not meant to be used programmatically.
      */
     public ComputerSet getComputer() {
         return new ComputerSet();
@@ -1530,8 +1524,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Gets the slave node of the give name, hooked under this Hudson.
      *
-     * @deprecated
-     *      Use {@link #getNode(String)}. Since 1.252.
+     * @deprecated Use {@link #getNode(String)}. Since 1.252.
      */
     public Slave getSlave(String name) {
         Node n = getNode(name);
@@ -1561,16 +1554,15 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * @deprecated
-     *      Use {@link #getNodes()}. Since 1.252.
+     * @deprecated Use {@link #getNodes()}. Since 1.252.
      */
     public List<Slave> getSlaves() {
         return (List) Collections.unmodifiableList(slaves);
     }
 
     /**
-     * Returns all {@link Node}s in the system, excluding {@link Hudson} instance itself which
-     * represents the master.
+     * Returns all {@link Node}s in the system, excluding {@link Hudson}
+     * instance itself which represents the master.
      */
     public List<Node> getNodes() {
         return Collections.unmodifiableList(slaves);
@@ -1579,8 +1571,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Updates the slave list.
      *
-     * @deprecated
-     *      Use {@link #setNodes(List)}. Since 1.252.
+     * @deprecated Use {@link #setNodes(List)}. Since 1.252.
      */
     public void setSlaves(List<Slave> slaves) throws IOException {
         setNodes(slaves);
@@ -1705,9 +1696,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * @deprecated
-     *      Why are you calling a method that always returns ""?
-     *      Perhaps you meant {@link #getRootUrl()}.
+     * @deprecated Why are you calling a method that always returns ""? Perhaps
+     * you meant {@link #getRootUrl()}.
      */
     public String getUrl() {
         return "";
@@ -1725,7 +1715,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     @Override
     public SearchIndexBuilder makeSearchIndex() {
         return super.makeSearchIndex().add("configure", "config", "configure").add("manage").add("log").add(getPrimaryView().makeSearchIndex()).add(new CollectionSearchIndex() {// for computers
-
             protected Computer get(String key) {
                 return getComputer(key);
             }
@@ -1734,7 +1723,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                 return computers.values();
             }
         }).add(new CollectionSearchIndex() {// for users
-
             protected User get(String key) {
                 return User.get(key, false);
             }
@@ -1743,7 +1731,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                 return User.getAll();
             }
         }).add(new CollectionSearchIndex() {// for views
-
             protected View get(String key) {
                 return getView(key);
             }
@@ -1772,19 +1759,15 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Gets the absolute URL of Hudson,
-     * such as "http://localhost/hudson/".
+     * Gets the absolute URL of Hudson, such as "http://localhost/hudson/".
      *
-     * <p>
-     * This method first tries to use the manually configured value, then
-     * fall back to {@link StaplerRequest#getRootPath()}.
-     * It is done in this order so that it can work correctly even in the face
-     * of a reverse proxy.
+     * <p> This method first tries to use the manually configured value, then
+     * fall back to {@link StaplerRequest#getRootPath()}. It is done in this
+     * order so that it can work correctly even in the face of a reverse proxy.
      *
-     * @return
-     *      This method returns null if this parameter is not configured by the user.
-     *      The caller must gracefully deal with this situation.
-     *      The returned URL will always have the trailing '/'.
+     * @return This method returns null if this parameter is not configured by
+     * the user. The caller must gracefully deal with this situation. The
+     * returned URL will always have the trailing '/'.
      * @since 1.66
      * @see Descriptor#getCheckUrl(String)
      * @see #getRootUrlFromRequest()
@@ -1804,14 +1787,15 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Gets the absolute URL of Hudson top page, such as "http://localhost/hudson/".
+     * Gets the absolute URL of Hudson top page, such as
+     * "http://localhost/hudson/".
      *
-     * <p>
-     * Unlike {@link #getRootUrl()}, which uses the manually configured value,
-     * this one uses the current request to reconstruct the URL. The benefit is
-     * that this is immune to the configuration mistake (users often fail to set the root URL
-     * correctly, especially when a migration is involved), but the downside
-     * is that unless you are processing a request, this method doesn't work.
+     * <p> Unlike {@link #getRootUrl()}, which uses the manually configured
+     * value, this one uses the current request to reconstruct the URL. The
+     * benefit is that this is immune to the configuration mistake (users often
+     * fail to set the root URL correctly, especially when a migration is
+     * involved), but the downside is that unless you are processing a request,
+     * this method doesn't work.
      *
      * @since 1.263
      */
@@ -1834,8 +1818,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * {@inheritDoc}
      * <p/>
-     * If {@link Hudson#HUDSON_WORKSPACES_PROPERTY_KEY} is set through JNDI
-     * or system properties or environment variables. workspaceRoot will be set based on property value.
+     * If {@link Hudson#HUDSON_WORKSPACES_PROPERTY_KEY} is set through JNDI or
+     * system properties or environment variables. workspaceRoot will be set
+     * based on property value.
      */
     public FilePath getWorkspaceFor(TopLevelItem item) {
         String workspaceRoot = getConfiguredWorkspaceRoot();
@@ -1847,7 +1832,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Checks jndi,environment properties and system properties for {@link Hudson#HUDSON_WORKSPACES_PROPERTY_KEY} value
+     * Checks jndi,environment properties and system properties for
+     * {@link Hudson#HUDSON_WORKSPACES_PROPERTY_KEY} value
      *
      * @return configured workspace root or "" if it is not set
      */
@@ -1873,8 +1859,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * For binding {@link LogRecorderManager} to "/log".
-     * Everything below here is admin-only, so do the check here.
+     * For binding {@link LogRecorderManager} to "/log". Everything below here
+     * is admin-only, so do the check here.
      */
     public LogRecorderManager getLog() {
         checkPermission(ADMINISTER);
@@ -1882,8 +1868,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * A convenience method to check if there's some security
-     * restrictions in place.
+     * A convenience method to check if there's some security restrictions in
+     * place.
      */
     @Exported
     public boolean isUseSecurity() {
@@ -1891,8 +1877,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * If true, all the POST requests to Hudson would have to have crumb in it to protect
-     * Hudson from CSRF vulnerabilities.
+     * If true, all the POST requests to Hudson would have to have crumb in it
+     * to protect Hudson from CSRF vulnerabilities.
      */
     @Exported
     public boolean isUseCrumbs() {
@@ -1900,21 +1886,20 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Returns the constant that captures the three basic security modes
-     * in Hudson.
+     * Returns the constant that captures the three basic security modes in
+     * Hudson.
      */
     public SecurityMode getSecurity() {
         return getSecurityManager().getSecurity();
     }
 
     /**
-     * @return
-     *      never null.
+     * @return never null.
      */
     public SecurityRealm getSecurityRealm() {
         return getSecurityManager().getSecurityRealm();
     }
-    
+
     public void setSecurityRealm(SecurityRealm securityRealm) {
         getSecurityManager().setSecurityRealm(securityRealm);
     }
@@ -1924,13 +1909,13 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Returns {@link ExtensionList} that retains the discovered instances for the given extension type.
+     * Returns {@link ExtensionList} that retains the discovered instances for
+     * the given extension type.
      *
-     * @param extensionType
-     *      The base type that represents the extension point. Normally {@link ExtensionPoint} subtype
-     *      but that's not a hard requirement.
-     * @return
-     *      Can be an empty list but never null.
+     * @param extensionType The base type that represents the extension point.
+     * Normally {@link ExtensionPoint} subtype but that's not a hard
+     * requirement.
+     * @return Can be an empty list but never null.
      */
     @SuppressWarnings({"unchecked"})
     public <T> ExtensionList<T> getExtensionList(Class<T> extensionType) {
@@ -1947,11 +1932,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Returns {@link ExtensionList} that retains the discovered {@link Descriptor} instances for the given
-     * kind of {@link Describable}.
+     * Returns {@link ExtensionList} that retains the discovered
+     * {@link Descriptor} instances for the given kind of {@link Describable}.
      *
-     * @return
-     *      Can be an empty list but never null.
+     * @return Can be an empty list but never null.
      */
     @SuppressWarnings({"unchecked"})
     public <T extends Describable<T>, D extends Descriptor<T>> DescriptorExtensionList<T, D> getDescriptorList(Class<T> type) {
@@ -1969,30 +1953,28 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * @return
-     *      never null.
+     * @return never null.
      */
     public AuthorizationStrategy getAuthorizationStrategy() {
         return getSecurityManager().getAuthorizationStrategy();
     }
-    
+
     public void setAuthorizationStrategy(AuthorizationStrategy authorizationStrategy) {
-        getSecurityManager().setAuthorizationStrategy(authorizationStrategy); 
+        getSecurityManager().setAuthorizationStrategy(authorizationStrategy);
     }
 
     /**
-     * Returns true if Hudson is quieting down.
-     * <p>
-     * No further jobs will be executed unless it
-     * can be finished while other current pending builds
-     * are still in progress.
+     * Returns true if Hudson is quieting down. <p> No further jobs will be
+     * executed unless it can be finished while other current pending builds are
+     * still in progress.
      */
     public boolean isQuietingDown() {
         return isQuietingDown;
     }
 
     /**
-     * Returns true if the container initiated the termination of the web application.
+     * Returns true if the container initiated the termination of the web
+     * application.
      */
     public boolean isTerminating() {
         return terminating;
@@ -2001,9 +1983,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Gets the initialization milestone that we've already reached.
      *
-     * @return
-     *      {@link InitMilestone#STARTED} even if the initialization hasn't been started, so that this method
-     *      never returns null.
+     * @return {@link InitMilestone#STARTED} even if the initialization hasn't
+     * been started, so that this method never returns null.
      */
     public InitMilestone getInitLevel() {
         return initLevel;
@@ -2015,17 +1996,16 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * @deprecated
-     *      Left only for the compatibility of URLs.
-     *      Should not be invoked for any other purpose.
+     * @deprecated Left only for the compatibility of URLs. Should not be
+     * invoked for any other purpose.
      */
     public TopLevelItem getJob(String name) {
         return getItem(name);
     }
 
     /**
-     * @deprecated
-     *      Used only for mapping jobs to URL in a case-insensitive fashion.
+     * @deprecated Used only for mapping jobs to URL in a case-insensitive
+     * fashion.
      */
     public TopLevelItem getJobCaseInsensitive(String name) {
         String match = Functions.toEmailSafeString(name);
@@ -2060,13 +2040,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Gets the {@link Item} object by its full name.
-     * Full names are like path names, where each name of {@link Item} is
-     * combined by '/'.
+     * Gets the {@link Item} object by its full name. Full names are like path
+     * names, where each name of {@link Item} is combined by '/'.
      *
-     * @return
-     *      null if either such {@link Item} doesn't exist under the given full name,
-     *      or it exists but it's no an instance of the given type.
+     * @return null if either such {@link Item} doesn't exist under the given
+     * full name, or it exists but it's no an instance of the given type.
      */
     public <T extends Item> T getItemByFullName(String fullName, Class<T> type) {
         StringTokenizer tokens = new StringTokenizer(fullName, "/");
@@ -2099,8 +2077,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Gets the user of the given name.
      *
-     * @return
-     *      This method returns a non-null object for any user name, without validation.
+     * @return This method returns a non-null object for any user name, without
+     * validation.
      */
     public User getUser(String name) {
         return User.get(name, false);
@@ -2109,8 +2087,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Creates a new job.
      *
-     * @throws IllegalArgumentException
-     *      if the project of the given name already exists.
+     * @throws IllegalArgumentException if the project of the given name already
+     * exists.
      */
     public synchronized TopLevelItem createProject(TopLevelItemDescriptor type, String name) throws IOException {
         return createProject(type, name, true);
@@ -2118,11 +2096,12 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     /**
      * Creates a new job.
+     *
      * @param type Descriptor for job type
      * @param name Name for job
      * @param notify Whether to fire onCreated method for all ItemListeners
-     * @throws IllegalArgumentException
-     *      if a project of the give name already exists.
+     * @throws IllegalArgumentException if a project of the give name already
+     * exists.
      */
     public synchronized TopLevelItem createProject(TopLevelItemDescriptor type, String name, boolean notify) throws IOException {
         return itemGroupMixIn.createProject(type, name, notify);
@@ -2131,8 +2110,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Overwrites the existing item by new one.
      *
-     * <p>
-     * This is a short cut for deleting an existing job and adding a new one.
+     * <p> This is a short cut for deleting an existing job and adding a new
+     * one.
      */
     public synchronized void putItem(TopLevelItem item) throws IOException, InterruptedException {
         String name = item.getName();
@@ -2151,11 +2130,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Creates a new job.
      *
-     * <p>
-     * This version infers the descriptor from the type of the top-level item.
+     * <p> This version infers the descriptor from the type of the top-level
+     * item.
      *
-     * @throws IllegalArgumentException
-     *      if the project of the given name already exists.
+     * @throws IllegalArgumentException if the project of the given name already
+     * exists.
      */
     public synchronized <T extends TopLevelItem> T createProject(Class<T> type, String name) throws IOException {
         return type.cast(createProject((TopLevelItemDescriptor) getDescriptor(type), name));
@@ -2176,7 +2155,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Called in response to {@link Job#doDoDelete(StaplerRequest, StaplerResponse)}
+     * Called in response to
+     * {@link Job#doDoDelete(StaplerRequest, StaplerResponse)}
      */
     public void onDeleted(TopLevelItem item) throws IOException {
         for (ItemListener l : ItemListener.all()) {
@@ -2205,8 +2185,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Gets a {@link Fingerprint} object if it exists.
-     * Otherwise null.
+     * Gets a {@link Fingerprint} object if it exists. Otherwise null.
      */
     public Fingerprint _getFingerprint(String md5sum) throws IOException {
         return fingerprintMap.get(md5sum);
@@ -2249,7 +2228,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             throw new IOException("Unable to create " + projectsDir + "\nPermission issue? Please create this directory manually.");
         }
         File[] subdirs = projectsDir.listFiles(new FileFilter() {
-
             public boolean accept(File child) {
                 return child.isDirectory() && Items.getConfigFile(child).exists();
             }
@@ -2257,7 +2235,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
         TaskGraphBuilder g = new TaskGraphBuilder();
         Handle loadHudson = g.requires(EXTENSIONS_AUGMENTED).attains(JOB_LOADED).add("Loading global config", new Executable() {
-
             public void run(Reactor session) throws Exception {
                 XmlFile cfg = getConfigFile();
                 if (cfg.exists()) {
@@ -2282,7 +2259,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
         for (final File subdir : subdirs) {
             g.requires(loadHudson).attains(JOB_LOADED).notFatal().add("Loading job " + subdir.getName(), new Executable() {
-
                 public void run(Reactor session) throws Exception {
                     TopLevelItem item = (TopLevelItem) Items.load(Hudson.this, subdir);
                     items.put(item.getName(), item);
@@ -2291,7 +2267,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         }
 
         g.requires(JOB_LOADED).add("Finalizing set up", new Executable() {
-
             public void run(Reactor session) throws Exception {
                 rebuildDependencyGraph();
 
@@ -2576,8 +2551,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * @deprecated as of 1.317
-     *      Use {@link #doQuietDown()} instead.
+     * @deprecated as of 1.317 Use {@link #doQuietDown()} instead.
      */
     public synchronized void doQuietDown(StaplerResponse rsp) throws IOException, ServletException {
         doQuietDown().generateResponse(null, rsp, this);
@@ -2632,8 +2606,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Creates a new job from its configuration XML. The type of the job created will be determined by
-     * what's in this XML.
+     * Creates a new job from its configuration XML. The type of the job created
+     * will be determined by what's in this XML.
+     *
      * @since 1.319
      */
     public TopLevelItem createProjectFromXML(String name, InputStream xml) throws IOException {
@@ -2642,6 +2617,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     /**
      * Reload a project to update its definition.
+     *
      * @since 2.x.x
      */
     public TopLevelItem reloadProjectFromDisk(File jobDir) throws IOException {
@@ -2654,12 +2630,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Copys a job.
      *
-     * @param src
-     *      A {@link TopLevelItem} to be copied.
-     * @param name
-     *      Name of the newly created project.
-     * @return
-     *      Newly created {@link TopLevelItem}.
+     * @param src A {@link TopLevelItem} to be copied.
+     * @param name Name of the newly created project.
+     * @return Newly created {@link TopLevelItem}.
      */
     @SuppressWarnings({"unchecked"})
     public <T extends TopLevelItem> T copy(T src, String name) throws IOException {
@@ -2678,11 +2651,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Check if the given name is suitable as a name
-     * for job, view, etc.
+     * Check if the given name is suitable as a name for job, view, etc.
      *
-     * @throws ParseException
-     *      if the given name is not good
+     * @throws ParseException if the given name is not good
      */
     public static void checkGoodName(String name) throws Failure {
         if (name == null || name.length() == 0) {
@@ -2704,6 +2675,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     /**
      * Makes sure that the given name is good as a job name.
+     *
      * @return trimmed name if valid; throws ParseException if not
      */
     private String checkJobName(String name) throws Failure {
@@ -2798,8 +2770,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * RSS feed for log entries.
      *
-     * @deprecated
-     *   As on 1.267, moved to "/log/rss..."
+     * @deprecated As on 1.267, moved to "/log/rss..."
      */
     public void doLogRss(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         String qs = req.getQueryString();
@@ -2814,10 +2785,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         checkPermission(ADMINISTER);
 
         // engage "loading ..." UI and then run the actual task in a separate thread
-        WebAppController.get().install( new HudsonIsLoading());
+        WebAppController.get().install(new HudsonIsLoading());
 
         new Thread("Hudson config reload thread") {
-
             @Override
             public void run() {
                 try {
@@ -2843,7 +2813,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         executeReactor(null, loadTasks());
         User.reload();
         initLevel = InitMilestone.COMPLETED;
-        WebAppController.get().install( this);
+        WebAppController.get().install(this);
     }
 
     /**
@@ -2882,8 +2852,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Simulates OutOfMemoryError.
-     * Useful to make sure OutOfMemoryHeapDump setting.
+     * Simulates OutOfMemoryError. Useful to make sure OutOfMemoryHeapDump
+     * setting.
      */
     public void doSimulateOutOfMemory() throws IOException {
         checkPermission(ADMINISTER);
@@ -2916,7 +2886,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         FullDuplexHttpChannel server;
         if (req.getHeader("Side").equals("download")) {
             duplexChannels.put(uuid, server = new FullDuplexHttpChannel(uuid, !hasPermission(ADMINISTER)) {
-
                 protected void main(Channel channel) throws IOException, InterruptedException {
                     // capture the identity given by the transport, since this can be useful for SecurityRealm.createCliAuthenticator()
                     channel.setProperty(CLICommand.TRANSPORT_AUTHENTICATION, getAuthentication());
@@ -2962,7 +2931,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Queues up a restart of Hudson for when there are no builds running, if we can.
+     * Queues up a restart of Hudson for when there are no builds running, if we
+     * can.
      *
      * This first replaces "app" to {@link HudsonIsRestarting}
      *
@@ -2990,10 +2960,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public void restart() throws RestartNotSupportedException {
         final Lifecycle lifecycle = Lifecycle.get();
         lifecycle.verifyRestartable(); // verify that Hudson is restartable
-        WebAppController.get().install( new HudsonIsRestarting());
+        WebAppController.get().install(new HudsonIsRestarting());
 
         new Thread("restart thread") {
-
             final String exitUser = getAuthentication().getName();
 
             @Override
@@ -3018,7 +2987,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Queues up a restart to be performed once there are no builds currently running.
+     * Queues up a restart to be performed once there are no builds currently
+     * running.
+     *
      * @since 1.332
      */
     public void safeRestart() throws RestartNotSupportedException {
@@ -3028,7 +2999,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         isQuietingDown = true;
 
         new Thread("safe-restart thread") {
-
             final String exitUser = getAuthentication().getName();
 
             @Override
@@ -3064,6 +3034,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     /**
      * Shutdown the system.
+     *
      * @since 1.161
      */
     public void doExit(StaplerRequest req, StaplerResponse rsp) throws IOException {
@@ -3081,6 +3052,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     /**
      * Shutdown the system safely.
+     *
      * @since 1.332
      */
     public void doSafeExit(StaplerRequest req, StaplerResponse rsp) throws IOException {
@@ -3094,7 +3066,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         final String exitUser = getAuthentication().getName();
         final String exitAddr = req.getRemoteAddr().toString();
         new Thread("safe-exit thread") {
-
             @Override
             public void run() {
                 try {
@@ -3119,15 +3090,16 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * @deprecated As of release 3.0.0, replaced by {@link HudsonSecurityManager#getAuthentication()}
+     * @deprecated As of release 3.0.0, replaced by
+     * {@link HudsonSecurityManager#getAuthentication()}
      */
-    @Deprecated public static Authentication getAuthentication() {
+    @Deprecated
+    public static Authentication getAuthentication() {
         return HudsonSecurityManager.getAuthentication();
     }
 
     /**
-     * For system diagnostics.
-     * Run arbitrary Dynamic Language script.
+     * For system diagnostics. Run arbitrary Dynamic Language script.
      */
     public void doScript(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         doScript(req, rsp, req.getView(this, "_script.jelly"));
@@ -3143,7 +3115,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     private void doScript(StaplerRequest req, StaplerResponse rsp, RequestDispatcher view) throws IOException, ServletException {
         // ability to run arbitrary script is dangerous
         checkPermission(ADMINISTER);
-        
+
 //        if ("post".equals(req.getMethod().toLowerCase())) {
 //            JSONObject json = req.getSubmittedForm();
 //
@@ -3151,16 +3123,16 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 //                scriptSupport = req.bindJSON(ScriptSupport.class, json.getJSONObject("scriptSupport"));
 //            }
 
-            String text = req.getParameter("script");
-            if (text != null) {
-                try {
-                    req.setAttribute("output",
-                            RemotingDiagnostics.executeScript(text, MasterComputer.localChannel, scriptSupport));
-                } catch (InterruptedException e) {
-                    throw new ServletException(e);
-                }
+        String text = req.getParameter("script");
+        if (text != null) {
+            try {
+                req.setAttribute("output",
+                        RemotingDiagnostics.executeScript(text, MasterComputer.localChannel, scriptSupport));
+            } catch (InterruptedException e) {
+                throw new ServletException(e);
             }
-            
+        }
+
 //        }
 
         view.forward(req, rsp);
@@ -3280,8 +3252,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * @deprecated as of 1.294
-     *      Define your own check method, instead of relying on this generic one.
+     * @deprecated as of 1.294 Define your own check method, instead of relying
+     * on this generic one.
      */
     public void doFieldCheck(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         doFieldCheck(
@@ -3292,17 +3264,17 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Checks if the value for a field is set; if not an error or warning text is displayed.
-     * If the parameter "value" is not set then the parameter "errorText" is displayed
-     * as an error text. If the parameter "errorText" is not set, then the parameter "warningText"
-     * is displayed as a warning text.
-     * <p>
-     * If the text is set and the parameter "type" is set, it will validate that the value is of the
-     * correct type. Supported types are "number, "number-positive" and "number-negative".
+     * Checks if the value for a field is set; if not an error or warning text
+     * is displayed. If the parameter "value" is not set then the parameter
+     * "errorText" is displayed as an error text. If the parameter "errorText"
+     * is not set, then the parameter "warningText" is displayed as a warning
+     * text. <p> If the text is set and the parameter "type" is set, it will
+     * validate that the value is of the correct type. Supported types are
+     * "number, "number-positive" and "number-negative".
      *
-     * @deprecated as of 1.324
-     *      Either use client-side validation (e.g. class="required number")
-     *      or define your own check method, instead of relying on this generic one.
+     * @deprecated as of 1.324 Either use client-side validation (e.g.
+     * class="required number") or define your own check method, instead of
+     * relying on this generic one.
      */
     public FormValidation doFieldCheck(@QueryParameter(fixEmpty = true) String value,
             @QueryParameter(fixEmpty = true) String type,
@@ -3340,12 +3312,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Serves static resources placed along with Jelly view files.
-     * <p>
-     * This method can serve a lot of files, so care needs to be taken
-     * to make this method secure. It's not clear to me what's the best
-     * strategy here, though the current implementation is based on
-     * file extensions.
+     * Serves static resources placed along with Jelly view files. <p> This
+     * method can serve a lot of files, so care needs to be taken to make this
+     * method secure. It's not clear to me what's the best strategy here, though
+     * the current implementation is based on file extensions.
      */
     public void doResources(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         String path = req.getRestOfPath();
@@ -3367,8 +3337,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         rsp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
     /**
-     * Extension list that {@link #doResources(StaplerRequest, StaplerResponse)} can serve.
-     * This set is mutable to allow plugins to add additional extensions.
+     * Extension list that {@link #doResources(StaplerRequest, StaplerResponse)}
+     * can serve. This set is mutable to allow plugins to add additional
+     * extensions.
      */
     public static final Set<String> ALLOWED_RESOURCE_EXTENSIONS = new HashSet<String>(Arrays.asList(
             "js|css|jpeg|jpg|png|gif|html|htm".split("\\|")));
@@ -3395,8 +3366,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * @deprecated
-     *      Use {@link Functions#isWindows()}.
+     * @deprecated Use {@link Functions#isWindows()}.
      */
     public static boolean isWindows() {
         return File.pathSeparatorChar == ';';
@@ -3437,9 +3407,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Gets the {@link Widget}s registered on this object.
      *
-     * <p>
-     * Plugins who wish to contribute boxes on the side panel can add widgets
-     * by {@code getWidgets().add(new MyWidget())} from {@link Plugin#start()}.
+     * <p> Plugins who wish to contribute boxes on the side panel can add
+     * widgets by {@code getWidgets().add(new MyWidget())} from
+     * {@link Plugin#start()}.
      */
     public List<Widget> getWidgets() {
         return widgets;
@@ -3575,7 +3545,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             return Futures.precomputed(null);
         }
         /**
-         * {@link LocalChannel} instance that can be used to execute programs locally.
+         * {@link LocalChannel} instance that can be used to execute programs
+         * locally.
          */
         public static final LocalChannel localChannel = new LocalChannel(threadPoolForRemoting);
     }
@@ -3588,16 +3559,14 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * @deprecated since 2007-12-18.
-     *      Use {@link #checkPermission(Permission)}
+     * @deprecated since 2007-12-18. Use {@link #checkPermission(Permission)}
      */
     public static boolean adminCheck() throws IOException {
         return adminCheck(Stapler.getCurrentRequest(), Stapler.getCurrentResponse());
     }
 
     /**
-     * @deprecated since 2007-12-18.
-     *      Use {@link #checkPermission(Permission)}
+     * @deprecated since 2007-12-18. Use {@link #checkPermission(Permission)}
      */
     public static boolean adminCheck(StaplerRequest req, StaplerResponse rsp) throws IOException {
         if (isAdmin(req)) {
@@ -3609,31 +3578,29 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Checks if the current user (for which we are processing the current request)
-     * has the admin access.
+     * Checks if the current user (for which we are processing the current
+     * request) has the admin access.
      *
-     * @deprecated since 2007-12-18.
-     *      This method is deprecated when Hudson moved from simple Unix root-like model
-     *      of "admin gets to do everything, and others don't have any privilege" to more
-     *      complex {@link ACL} and {@link Permission} based scheme.
+     * @deprecated since 2007-12-18. This method is deprecated when Hudson moved
+     * from simple Unix root-like model of "admin gets to do everything, and
+     * others don't have any privilege" to more complex {@link ACL} and
+     * {@link Permission} based scheme.
      *
-     *      <p>
-     *      For a quick migration, use {@code Hudson.getInstance().getACL().hasPermission(Hudson.ADMINISTER)}
-     *      To check if the user has the 'administer' role in Hudson.
+     * <p> For a quick migration, use
+     * {@code Hudson.getInstance().getACL().hasPermission(Hudson.ADMINISTER)} To
+     * check if the user has the 'administer' role in Hudson.
      *
-     *      <p>
-     *      But ideally, your plugin should first identify a suitable {@link Permission} (or create one,
-     *      if appropriate), then identify a suitable {@link AccessControlled} object to check its permission
-     *      against.
+     * <p> But ideally, your plugin should first identify a suitable
+     * {@link Permission} (or create one, if appropriate), then identify a
+     * suitable {@link AccessControlled} object to check its permission against.
      */
     public static boolean isAdmin() {
         return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getACL().hasPermission(ADMINISTER);
     }
 
     /**
-     * @deprecated since 2007-12-18.
-     *      Define a custom {@link Permission} and check against ACL.
-     *      See {@link #isAdmin()} for more instructions.
+     * @deprecated since 2007-12-18. Define a custom {@link Permission} and
+     * check against ACL. See {@link #isAdmin()} for more instructions.
      */
     public static boolean isAdmin(StaplerRequest req) {
         return isAdmin();
@@ -3648,9 +3615,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public static final XStream XSTREAM = new XStream2();
     private static final int TWICE_CPU_NUM = Runtime.getRuntime().availableProcessors() * 2;
     /**
-     * Thread pool used to load configuration in parallel, to improve the start up time.
-     * <p>
-     * The idea here is to overlap the CPU and I/O, so we want more threads than CPU numbers.
+     * Thread pool used to load configuration in parallel, to improve the start
+     * up time. <p> The idea here is to overlap the CPU and I/O, so we want more
+     * threads than CPU numbers.
      */
     /*package*/ transient final ExecutorService threadPoolForLoad = new ThreadPoolExecutor(
             TWICE_CPU_NUM, TWICE_CPU_NUM,
@@ -3689,8 +3656,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public static String VERSION = "?";
 
     /**
-     * Parses {@link #VERSION} into {@link VersionNumber}, or null if it's not parseable as a version number
-     * (such as when Hudson is run with "mvn hudson-dev:run")
+     * Parses {@link #VERSION} into {@link VersionNumber}, or null if it's not
+     * parseable as a version number (such as when Hudson is run with "mvn
+     * hudson-dev:run")
      */
     public static VersionNumber getVersion() {
         try {
@@ -3719,18 +3687,16 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public static String VERSION_HASH;
     /**
      * Prefix to static resources like images and javascripts in the war file.
-     * Either "" or strings like "/static/VERSION", which avoids Hudson to pick up
-     * stale cache when the user upgrades to a different version.
-     * <p>
-     * Value computed in {@link WebAppMain}.
+     * Either "" or strings like "/static/VERSION", which avoids Hudson to pick
+     * up stale cache when the user upgrades to a different version. <p> Value
+     * computed in {@link WebAppMain}.
      */
     public static String RESOURCE_PATH = "";
     /**
-     * Prefix to resources alongside view scripts.
-     * Strings like "/resources/VERSION", which avoids Hudson to pick up
-     * stale cache when the user upgrades to a different version.
-     * <p>
-     * Value computed in {@link WebAppMain}.
+     * Prefix to resources alongside view scripts. Strings like
+     * "/resources/VERSION", which avoids Hudson to pick up stale cache when the
+     * user upgrades to a different version. <p> Value computed in
+     * {@link WebAppMain}.
      */
     public static String VIEW_RESOURCE_PATH = "/resources/TBD";
     public static boolean PARALLEL_LOAD = !"false".equals(System.getProperty(Hudson.class.getName() + ".parallelLoad"));
@@ -3738,13 +3704,15 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public static boolean LOG_STARTUP_PERFORMANCE = Boolean.getBoolean(Hudson.class.getName() + ".logStartupPerformance");
     private static final boolean CONSISTENT_HASH = true; // Boolean.getBoolean(Hudson.class.getName()+".consistentHash");
     /**
-     * Enabled by default as of 1.337. Will keep it for a while just in case we have some serious problems.
+     * Enabled by default as of 1.337. Will keep it for a while just in case we
+     * have some serious problems.
      */
     public static boolean FLYWEIGHT_SUPPORT = !"false".equals(System.getProperty(Hudson.class.getName() + ".flyweightSupport"));
     /**
-     * Tentative switch to activate the concurrent build behavior.
-     * When we merge this back to the trunk, this allows us to keep
-     * this feature hidden for a while until we iron out the kinks.
+     * Tentative switch to activate the concurrent build behavior. When we merge
+     * this back to the trunk, this allows us to keep this feature hidden for a
+     * while until we iron out the kinks.
+     *
      * @see AbstractProject#isConcurrentBuild()
      */
     public static boolean CONCURRENT_BUILD = true;
@@ -3753,16 +3721,16 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     private static final String WORKSPACE_DIRNAME = System.getProperty(Hudson.class.getName() + ".workspaceDirName", "workspace");
     /**
-     * Automatically try to launch a slave when Hudson is initialized or a new slave is created.
+     * Automatically try to launch a slave when Hudson is initialized or a new
+     * slave is created.
      */
     public static boolean AUTOMATIC_SLAVE_LAUNCH = true;
     private static final Pattern ICON_SIZE = Pattern.compile("\\d+x\\d+");
     public static final PermissionGroup PERMISSIONS = Permission.HUDSON_PERMISSIONS;
     public static final Permission ADMINISTER = Permission.HUDSON_ADMINISTER;
     public static final Permission READ = new Permission(PERMISSIONS, "Read", Messages._Hudson_ReadPermission_Description(), Permission.READ);
-     
     public static final Authentication ANONYMOUS = HudsonSecurityManager.ANONYMOUS;
-     
+
     static {
         XSTREAM.alias("hudson", Hudson.class);
         XSTREAM.alias("slave", DumbSlave.class);
