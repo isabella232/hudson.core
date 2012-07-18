@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, CloudBees, Inc.
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, CloudBees, Inc.
+ *
  *
  *******************************************************************************/ 
 
@@ -34,12 +34,14 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
- * Defines a bunch of static methods to be used as a "mix-in" for {@link ItemGroup}
- * implementations. Not meant for a consumption from outside {@link ItemGroup}s.
+ * Defines a bunch of static methods to be used as a "mix-in" for
+ * {@link ItemGroup} implementations. Not meant for a consumption from outside
+ * {@link ItemGroup}s.
  *
  * @author Kohsuke Kawaguchi
  */
 public abstract class ItemGroupMixIn {
+
     /**
      * {@link ItemGroup} for which we are working.
      */
@@ -52,9 +54,8 @@ public abstract class ItemGroupMixIn {
     }
 
     /*
-    * Callback methods to be implemented by the ItemGroup implementation.
-    */
-
+     * Callback methods to be implemented by the ItemGroup implementation.
+     */
     /**
      * Adds a newly created item to the parent.
      */
@@ -66,17 +67,16 @@ public abstract class ItemGroupMixIn {
     protected abstract File getRootDirFor(String name);
 
 
-/*
- * The rest is the methods that provide meat.
- */
-
+    /*
+     * The rest is the methods that provide meat.
+     */
     /**
      * Loads all the child {@link Item}s.
      *
-     * @param modulesDir
-     *      Directory that contains sub-directories for each child item.
+     * @param modulesDir Directory that contains sub-directories for each child
+     * item.
      */
-    public static <K,V extends Item> Map<K,V> loadChildren(ItemGroup parent, File modulesDir, Function1<? extends K,? super V> key) {
+    public static <K, V extends Item> Map<K, V> loadChildren(ItemGroup parent, File modulesDir, Function1<? extends K, ? super V> key) {
         modulesDir.mkdirs(); // make sure it exists
 
         File[] subdirs = modulesDir.listFiles(new FileFilter() {
@@ -84,10 +84,10 @@ public abstract class ItemGroupMixIn {
                 return child.isDirectory();
             }
         });
-        CopyOnWriteMap.Tree<K,V> configurations = new CopyOnWriteMap.Tree<K,V>();
+        CopyOnWriteMap.Tree<K, V> configurations = new CopyOnWriteMap.Tree<K, V>();
         for (File subdir : subdirs) {
             try {
-                V item = (V) Items.load(parent,subdir);
+                V item = (V) Items.load(parent, subdir);
                 configurations.put(key.call(item), item);
             } catch (IOException e) {
                 e.printStackTrace(); // TODO: logging
@@ -96,69 +96,75 @@ public abstract class ItemGroupMixIn {
 
         return configurations;
     }
-
     /**
      * {@link Item} -> name function.
      */
-    public static final Function1<String,Item> KEYED_BY_NAME = new Function1<String, Item>() {
+    public static final Function1<String, Item> KEYED_BY_NAME = new Function1<String, Item>() {
         public String call(Item item) {
             return item.getName();
         }
     };
 
     /**
-     * Creates a {@link TopLevelItem} from the submission of the '/lib/hudson/newFromList/formList'
-     * or throws an exception if it fails.
+     * Creates a {@link TopLevelItem} from the submission of the
+     * '/lib/hudson/newFromList/formList' or throws an exception if it fails.
      */
-    public synchronized TopLevelItem createTopLevelItem( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
+    public synchronized TopLevelItem createTopLevelItem(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         acl.checkPermission(Job.CREATE);
 
         TopLevelItem result;
 
         String requestContentType = req.getContentType();
-        if(requestContentType==null)
+        if (requestContentType == null) {
             throw new Failure("No Content-Type header set");
+        }
 
         boolean isXmlSubmission = requestContentType.startsWith("application/xml") || requestContentType.startsWith("text/xml");
 
         String name = req.getParameter("name");
-        if(name==null)
+        if (name == null) {
             throw new Failure("Query parameter 'name' is required");
+        }
 
         {// check if the name looks good
             Hudson.checkGoodName(name);
             name = name.trim();
-            if(parent.getItem(name)!=null)
+            if (parent.getItem(name) != null) {
                 throw new Failure(Messages.Hudson_JobAlreadyExists(name));
+            }
         }
 
         String mode = req.getParameter("mode");
-        if(mode!=null && mode.equals("copy")) {
+        if (mode != null && mode.equals("copy")) {
             String from = req.getParameter("from");
 
             // resolve a name to Item
             Item src = parent.getItem(from);
-            if (src==null)
+            if (src == null) {
                 src = Hudson.getInstance().getItemByFullName(from);
-
-            if(src==null) {
-                if(Util.fixEmpty(from)==null)
-                    throw new Failure("Specify which job to copy");
-                else
-                    throw new Failure("No such job: "+from);
             }
-            if (!(src instanceof TopLevelItem))
-                throw new Failure(from+" cannot be copied");
 
-            result = copy((TopLevelItem) src,name);
+            if (src == null) {
+                if (Util.fixEmpty(from) == null) {
+                    throw new Failure("Specify which job to copy");
+                } else {
+                    throw new Failure("No such job: " + from);
+                }
+            }
+            if (!(src instanceof TopLevelItem)) {
+                throw new Failure(from + " cannot be copied");
+            }
+
+            result = copy((TopLevelItem) src, name);
         } else {
-            if(isXmlSubmission) {
+            if (isXmlSubmission) {
                 result = createProjectFromXML(name, req.getInputStream());
                 rsp.setStatus(HttpServletResponse.SC_OK);
                 return result;
             } else {
-                if(mode==null)
+                if (mode == null) {
                     throw new Failure("No mode given");
+                }
 
                 // create empty job and redirect to the project config screen
                 result = createProject(Items.getDescriptor(mode), name, true);
@@ -170,33 +176,36 @@ public abstract class ItemGroupMixIn {
     }
 
     /**
-     * Computes the redirection target URL for the newly created {@link TopLevelItem}.
+     * Computes the redirection target URL for the newly created
+     * {@link TopLevelItem}.
      */
     protected String redirectAfterCreateItem(StaplerRequest req, TopLevelItem result) throws IOException {
-        return req.getContextPath()+'/'+result.getUrl()+"configure";
+        return req.getContextPath() + '/' + result.getUrl() + "configure";
     }
 
     /**
      * Copies an existing {@link TopLevelItem} to a new name.
      *
-     * The caller is responsible for calling {@link ItemListener#fireOnCopied(Item, Item)}. This method
-     * cannot do that because it doesn't know how to make the newly added item reachable from the parent.
+     * The caller is responsible for calling
+     * {@link ItemListener#fireOnCopied(Item, Item)}. This method cannot do that
+     * because it doesn't know how to make the newly added item reachable from
+     * the parent.
      */
     @SuppressWarnings({"unchecked"})
     public synchronized <T extends TopLevelItem> T copy(T src, String name) throws IOException {
         acl.checkPermission(Job.CREATE);
 
-        T result = (T)createProject(src.getDescriptor(),name,false);
+        T result = (T) createProject(src.getDescriptor(), name, false);
 
         // copy config
-        Util.copyFile(Items.getConfigFile(src).getFile(),Items.getConfigFile(result).getFile());
+        Util.copyFile(Items.getConfigFile(src).getFile(), Items.getConfigFile(result).getFile());
 
         // reload from the new config
-        result = (T)Items.load(parent,result.getRootDir());
+        result = (T) Items.load(parent, result.getRootDir());
         result.onCopiedFrom(src);
 
         add(result);
-        ItemListener.fireOnCopied(src,result);
+        ItemListener.fireOnCopied(src, result);
 
         return result;
     }
@@ -208,10 +217,10 @@ public abstract class ItemGroupMixIn {
         File configXml = Items.getConfigFile(getRootDirFor(name)).getFile();
         configXml.getParentFile().mkdirs();
         try {
-            IOUtils.copy(xml,configXml);
+            IOUtils.copy(xml, configXml);
 
             // load it
-            TopLevelItem result = (TopLevelItem)Items.load(parent,configXml.getParentFile());
+            TopLevelItem result = (TopLevelItem) Items.load(parent, configXml.getParentFile());
             add(result);
 
             ItemListener.fireOnCreated(result);
@@ -225,16 +234,17 @@ public abstract class ItemGroupMixIn {
         }
     }
 
-    public synchronized TopLevelItem createProject( TopLevelItemDescriptor type, String name, boolean notify )
+    public synchronized TopLevelItem createProject(TopLevelItemDescriptor type, String name, boolean notify)
             throws IOException {
         acl.checkPermission(Job.CREATE);
 
-        if(parent.getItem(name)!=null)
-            throw new IllegalArgumentException("Project of the name "+name+" already exists");
+        if (parent.getItem(name) != null) {
+            throw new IllegalArgumentException("Project of the name " + name + " already exists");
+        }
 
         TopLevelItem item;
         try {
-            item = type.newInstance(parent,name);
+            item = type.newInstance(parent, name);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -242,8 +252,9 @@ public abstract class ItemGroupMixIn {
         item.save();
         add(item);
 
-        if (notify)
+        if (notify) {
             ItemListener.fireOnCreated(item);
+        }
 
         return item;
     }

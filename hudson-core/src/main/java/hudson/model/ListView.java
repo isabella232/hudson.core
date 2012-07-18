@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi,   Erik Ramfelt, Seiji Sogabe, Martin Eigenbrodt, Alan Harder
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -50,24 +50,19 @@ public class ListView extends View implements Saveable {
      * List of job names. This is what gets serialized.
      */
     /*package*/ final SortedSet<String> jobNames = new TreeSet<String>(CaseInsensitiveComparator.INSTANCE);
-    
     private DescribableList<ViewJobFilter, Descriptor<ViewJobFilter>> jobFilters;
-
     private DescribableList<ListViewColumn, Descriptor<ListViewColumn>> columns;
-
     /**
      * Include regex string.
      */
     private String includeRegex;
-    
     /**
      * Compiled include pattern from the includeRegex string.
      */
     private transient Pattern includePattern;
-
     /**
-     * Filter by enabled/disabled status of jobs.
-     * Null for no filter, true for enabled-only, false for disabled-only.
+     * Filter by enabled/disabled status of jobs. Null for no filter, true for
+     * enabled-only, false for disabled-only.
      */
     private Boolean statusFilter;
 
@@ -86,49 +81,52 @@ public class ListView extends View implements Saveable {
     public void save() throws IOException {
         // persistence is a part of the owner.
         // due to the initialization timing issue, it can be null when this method is called.
-        if (owner!=null)
+        if (owner != null) {
             owner.save();
+        }
     }
 
     private Object readResolve() {
-        if(includeRegex!=null)
+        if (includeRegex != null) {
             includePattern = Pattern.compile(includeRegex);
+        }
         initColumns();
         initJobFilters();
         return this;
     }
 
     protected void initColumns() {
-        if (columns == null)
-            columns = new DescribableList<ListViewColumn, Descriptor<ListViewColumn>>(this,ListViewColumn.createDefaultInitialColumnList());
+        if (columns == null) {
+            columns = new DescribableList<ListViewColumn, Descriptor<ListViewColumn>>(this, ListViewColumn.createDefaultInitialColumnList());
+        }
     }
 
     protected void initJobFilters() {
-        if (jobFilters == null)
+        if (jobFilters == null) {
             jobFilters = new DescribableList<ViewJobFilter, Descriptor<ViewJobFilter>>(this);
+        }
     }
 
     /**
      * Used to determine if we want to display the Add button.
      */
     public boolean hasJobFilterExtensions() {
-    	return !ViewJobFilter.all().isEmpty();
+        return !ViewJobFilter.all().isEmpty();
     }
 
     public DescribableList<ViewJobFilter, Descriptor<ViewJobFilter>> getJobFilters() {
-    	return jobFilters;
+        return jobFilters;
     }
-    
+
     public Iterable<ListViewColumn> getColumns() {
         return columns;
     }
-    
+
     /**
      * Returns a read-only view of all {@link Job}s in this view.
      *
-     * <p>
-     * This method returns a separate copy each time to avoid
-     * concurrent modification issue.
+     * <p> This method returns a separate copy each time to avoid concurrent
+     * modification issue.
      */
     public synchronized List<TopLevelItem> getItems() {
         SortedSet<String> names = new TreeSet<String>(jobNames);
@@ -146,20 +144,21 @@ public class ListView extends View implements Saveable {
         for (String n : names) {
             TopLevelItem item = Hudson.getInstance().getItem(n);
             // Add if no status filter or filter matches enabled/disabled status:
-            if(item!=null && (statusFilter == null || !(item instanceof AbstractProject)
-                              || ((AbstractProject)item).isDisabled() ^ statusFilter))
+            if (item != null && (statusFilter == null || !(item instanceof AbstractProject)
+                    || ((AbstractProject) item).isDisabled() ^ statusFilter)) {
                 items.add(item);
+            }
         }
 
         // check the filters
         Iterable<ViewJobFilter> jobFilters = getJobFilters();
         List<TopLevelItem> allItems = Hudson.getInstance().getItems();
-    	for (ViewJobFilter jobFilter: jobFilters) {
-    		items = jobFilter.filter(items, allItems, this);
-    	}
+        for (ViewJobFilter jobFilter : jobFilters) {
+            items = jobFilter.filter(items, allItems, this);
+        }
         // for sanity, trim off duplicates
         items = new ArrayList<TopLevelItem>(new LinkedHashSet<TopLevelItem>(items));
-        
+
         return items;
     }
 
@@ -182,8 +181,8 @@ public class ListView extends View implements Saveable {
     }
 
     /**
-     * Filter by enabled/disabled status of jobs.
-     * Null for no filter, true for enabled-only, false for disabled-only.
+     * Filter by enabled/disabled status of jobs. Null for no filter, true for
+     * enabled-only, false for disabled-only.
      */
     public Boolean getStatusFilter() {
         return statusFilter;
@@ -191,7 +190,7 @@ public class ListView extends View implements Saveable {
 
     public synchronized Item doCreateItem(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         Item item = Hudson.getInstance().doCreateItem(req, rsp);
-        if(item!=null) {
+        if (item != null) {
             jobNames.add(item.getName());
             owner.save();
         }
@@ -200,8 +199,9 @@ public class ListView extends View implements Saveable {
 
     @Override
     public synchronized void onJobRenamed(Item item, String oldName, String newName) {
-        if(jobNames.remove(oldName) && newName!=null)
+        if (jobNames.remove(oldName) && newName != null) {
             jobNames.add(newName);
+        }
     }
 
     /**
@@ -213,28 +213,30 @@ public class ListView extends View implements Saveable {
     protected void submit(StaplerRequest req) throws ServletException, FormException, IOException {
         jobNames.clear();
         for (TopLevelItem item : Hudson.getInstance().getItems()) {
-            if(req.getParameter(item.getName())!=null)
+            if (req.getParameter(item.getName()) != null) {
                 jobNames.add(item.getName());
+            }
         }
 
         if (req.getParameter("useincluderegex") != null) {
             includeRegex = Util.nullify(req.getParameter("includeRegex"));
-            if (includeRegex == null)
+            if (includeRegex == null) {
                 includePattern = null;
-            else
+            } else {
                 includePattern = Pattern.compile(includeRegex);
+            }
         } else {
             includeRegex = null;
             includePattern = null;
         }
 
         if (columns == null) {
-            columns = new DescribableList<ListViewColumn,Descriptor<ListViewColumn>>(this);
+            columns = new DescribableList<ListViewColumn, Descriptor<ListViewColumn>>(this);
         }
         columns.rebuildHetero(req, req.getSubmittedForm(), ListViewColumn.all(), "columns");
-        
+
         if (jobFilters == null) {
-        	jobFilters = new DescribableList<ViewJobFilter,Descriptor<ViewJobFilter>>(this);
+            jobFilters = new DescribableList<ViewJobFilter, Descriptor<ViewJobFilter>>(this);
         }
         jobFilters.rebuildHetero(req, req.getSubmittedForm(), ViewJobFilter.all(), "jobFilters");
 
@@ -244,6 +246,7 @@ public class ListView extends View implements Saveable {
 
     @Extension
     public static final class DescriptorImpl extends ViewDescriptor {
+
         public String getDisplayName() {
             return Messages.ListView_DisplayName();
         }
@@ -251,7 +254,7 @@ public class ListView extends View implements Saveable {
         /**
          * Checks if the include regular expression is valid.
          */
-        public FormValidation doCheckIncludeRegex( @QueryParameter String value ) throws IOException, ServletException, InterruptedException  {
+        public FormValidation doCheckIncludeRegex(@QueryParameter String value) throws IOException, ServletException, InterruptedException {
             String v = Util.fixEmpty(value);
             if (v != null) {
                 try {
@@ -265,8 +268,8 @@ public class ListView extends View implements Saveable {
     }
 
     /**
-     * @deprecated as of 1.391
-     *  Use {@link ListViewColumn#createDefaultInitialColumnList()}
+     * @deprecated as of 1.391 Use
+     * {@link ListViewColumn#createDefaultInitialColumnList()}
      */
     public static List<ListViewColumn> getDefaultColumns() {
         return ListViewColumn.createDefaultInitialColumnList();

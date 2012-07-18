@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -47,27 +47,28 @@ import org.eclipse.hudson.model.project.property.TriggerProjectProperty;
 
 /**
  * Convenience methods related to {@link Item}.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public class Items {
+
     /**
      * List of all installed {@link TopLevelItem} types.
      *
-     * @deprecated as of 1.286
-     *      Use {@link #all()} for read access and {@link Extension} for registration.
+     * @deprecated as of 1.286 Use {@link #all()} for read access and
+     * {@link Extension} for registration.
      */
-    public static final List<TopLevelItemDescriptor> LIST = (List)new DescriptorList<TopLevelItem>(TopLevelItem.class);
+    public static final List<TopLevelItemDescriptor> LIST = (List) new DescriptorList<TopLevelItem>(TopLevelItem.class);
 
     /**
      * Returns all the registered {@link TopLevelItemDescriptor}s.
      */
-    public static DescriptorExtensionList<TopLevelItem,TopLevelItemDescriptor> all() {
-        return Hudson.getInstance().<TopLevelItem,TopLevelItemDescriptor>getDescriptorList(TopLevelItem.class);
+    public static DescriptorExtensionList<TopLevelItem, TopLevelItemDescriptor> all() {
+        return Hudson.getInstance().<TopLevelItem, TopLevelItemDescriptor>getDescriptorList(TopLevelItem.class);
     }
 
     public static TopLevelItemDescriptor getDescriptor(String fqcn) {
-        return Descriptor.find(all(),fqcn);
+        return Descriptor.find(all(), fqcn);
     }
 
     /**
@@ -76,8 +77,9 @@ public class Items {
     public static String toNameList(Collection<? extends Item> items) {
         StringBuilder buf = new StringBuilder();
         for (Item item : items) {
-            if(buf.length()>0)
+            if (buf.length() > 0) {
                 buf.append(", ");
+            }
             buf.append(item.getFullName());
         }
         return buf.toString();
@@ -90,12 +92,13 @@ public class Items {
         Hudson hudson = Hudson.getInstance();
 
         List<T> r = new ArrayList<T>();
-        StringTokenizer tokens = new StringTokenizer(list,",");
-        while(tokens.hasMoreTokens()) {
+        StringTokenizer tokens = new StringTokenizer(list, ",");
+        while (tokens.hasMoreTokens()) {
             String fullName = tokens.nextToken().trim();
-            T item = hudson.getItemByFullName(fullName,type);
-            if(item!=null)
+            T item = hudson.getItemByFullName(fullName, type);
+            if (item != null) {
                 r.add(item);
+            }
         }
         return r;
     }
@@ -103,12 +106,12 @@ public class Items {
     /**
      * Loads a {@link Item} from a config file.
      *
-     * @param dir
-     *      The directory that contains the config file, not the config file itself.
+     * @param dir The directory that contains the config file, not the config
+     * file itself.
      */
     public static Item load(ItemGroup parent, File dir) throws IOException {
-        Item item = (Item)getConfigFile(dir).read();
-        item.onLoad(parent,dir.getName());
+        Item item = (Item) getConfigFile(dir).read();
+        item.onLoad(parent, dir.getName());
         return item;
     }
 
@@ -116,7 +119,7 @@ public class Items {
      * The file we save our configuration.
      */
     public static XmlFile getConfigFile(File dir) {
-        return new XmlFile(XSTREAM,new File(dir,"config.xml"));
+        return new XmlFile(XSTREAM, new File(dir, "config.xml"));
     }
 
     /**
@@ -125,20 +128,19 @@ public class Items {
     public static XmlFile getConfigFile(Item item) {
         return getConfigFile(item.getRootDir());
     }
-
     /**
      * Used to load/save job configuration.
      *
-     * When you extend {@link Job} in a plugin, try to put the alias so
-     * that it produces a reasonable XML.
+     * When you extend {@link Job} in a plugin, try to put the alias so that it
+     * produces a reasonable XML.
      */
     public static final XStream XSTREAM = new XStream2();
 
     static {
-        XSTREAM.alias("project",FreeStyleProject.class);
-        XSTREAM.alias("matrix-project",MatrixProject.class);
+        XSTREAM.alias("project", FreeStyleProject.class);
+        XSTREAM.alias("matrix-project", MatrixProject.class);
         XSTREAM.alias("axis", Axis.class);
-        XSTREAM.alias("matrix-config",MatrixConfiguration.class);
+        XSTREAM.alias("matrix-config", MatrixConfiguration.class);
 
         //aliases for project properties.
         //TODO: think about migrating to xstream's annotations.

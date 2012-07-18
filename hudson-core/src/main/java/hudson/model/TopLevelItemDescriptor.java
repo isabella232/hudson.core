@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
+ * Contributors:
+ * 
 *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -25,14 +25,16 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Kohsuke Kawaguchi
  */
 public abstract class TopLevelItemDescriptor extends Descriptor<TopLevelItem> {
+
     protected TopLevelItemDescriptor(Class<? extends TopLevelItem> clazz) {
         super(clazz);
     }
 
     /**
-     * Infers the type of the corresponding {@link TopLevelItem} from the outer class.
-     * This version works when you follow the common convention, where a descriptor
-     * is written as the static nested class of the describable class.
+     * Infers the type of the corresponding {@link TopLevelItem} from the outer
+     * class. This version works when you follow the common convention, where a
+     * descriptor is written as the static nested class of the describable
+     * class.
      *
      * @since 1.278
      */
@@ -40,12 +42,12 @@ public abstract class TopLevelItemDescriptor extends Descriptor<TopLevelItem> {
     }
 
     /**
-     * {@link TopLevelItemDescriptor}s often uses other descriptors to decorate itself.
-     * This method allows the subtype of {@link TopLevelItemDescriptor}s to filter them out.
+     * {@link TopLevelItemDescriptor}s often uses other descriptors to decorate
+     * itself. This method allows the subtype of {@link TopLevelItemDescriptor}s
+     * to filter them out.
      *
-     * <p>
-     * This is useful for a workflow/company specific job type that wants to eliminate
-     * options that the user would see.
+     * <p> This is useful for a workflow/company specific job type that wants to
+     * eliminate options that the user would see.
      *
      * @since 1.294
      */
@@ -56,17 +58,16 @@ public abstract class TopLevelItemDescriptor extends Descriptor<TopLevelItem> {
     /**
      * {@inheritDoc}
      *
-     * <p>
-     * Used as the caption when the user chooses what job type to create.
-     * The descriptor implementation also needs to have <tt>newJobDetail.jelly</tt>
-     * script, which will be used to render the text below the caption
-     * that explains the job type.
+     * <p> Used as the caption when the user chooses what job type to create.
+     * The descriptor implementation also needs to have
+     * <tt>newJobDetail.jelly</tt> script, which will be used to render the text
+     * below the caption that explains the job type.
      */
     public abstract String getDisplayName();
 
     /**
-     * @deprecated since 2007-01-19.
-     *      This is not a valid operation for {@link Job}s.
+     * @deprecated since 2007-01-19. This is not a valid operation for
+     * {@link Job}s.
      */
     @Deprecated
     public TopLevelItem newInstance(StaplerRequest req) throws FormException {
@@ -76,8 +77,7 @@ public abstract class TopLevelItemDescriptor extends Descriptor<TopLevelItem> {
     /**
      * Creates a new {@link TopLevelItem}.
      *
-     * @deprecated as of 1.390
-     *      Use {@link #newInstance(ItemGroup, String)}
+     * @deprecated as of 1.390 Use {@link #newInstance(ItemGroup, String)}
      */
     public TopLevelItem newInstance(String name) {
         return newInstance(Hudson.getInstance(), name);
@@ -96,5 +96,4 @@ public abstract class TopLevelItemDescriptor extends Descriptor<TopLevelItem> {
     public static ExtensionList<TopLevelItemDescriptor> all() {
         return Items.all();
     }
-
 }

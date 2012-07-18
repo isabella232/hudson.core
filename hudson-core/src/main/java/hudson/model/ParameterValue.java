@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Tom Huybrechts,        Yahoo! Inc.
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -31,33 +31,30 @@ import org.kohsuke.stapler.export.ExportedBean;
 /**
  * A value for a parameter in a build.
  *
- * Created by {@link ParameterDefinition#createValue(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject)} for
- * a particular build (although this 'owner' build object is passed in for every method
- * call as a parameter so that the parameter won't have to persist it.)
+ * Created by
+ * {@link ParameterDefinition#createValue(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject)}
+ * for a particular build (although this 'owner' build object is passed in for
+ * every method call as a parameter so that the parameter won't have to persist
+ * it.)
  *
- * <h2>Persistence</h2>
- * <p>
- * Instances of {@link ParameterValue}s are persisted into build's <tt>build.xml</tt>
- * through XStream (via {@link ParametersAction}), so instances need to be persistable.
+ * <h2>Persistence</h2> <p> Instances of {@link ParameterValue}s are persisted
+ * into build's <tt>build.xml</tt> through XStream (via
+ * {@link ParametersAction}), so instances need to be persistable.
  *
- * <h2>Assocaited Views</h2>
- * <h4>value.jelly</h4>
- * The <tt>value.jelly</tt> view contributes a UI fragment to display the parameter
- * values used for a build.
+ * <h2>Assocaited Views</h2> <h4>value.jelly</h4> The <tt>value.jelly</tt> view
+ * contributes a UI fragment to display the parameter values used for a build.
  *
- * <h2>Notes</h2>
- * <ol>
- * <li>{@link ParameterValue} is used to record values of the past build, but
- *     {@link ParameterDefinition} used back then might be gone already, or represent
- *     a different parameter now. So don't try to use the name to infer
- *     {@link ParameterDefinition} is.
- * </ol>
+ * <h2>Notes</h2> <ol> <li>{@link ParameterValue} is used to record values of
+ * the past build, but {@link ParameterDefinition} used back then might be gone
+ * already, or represent a different parameter now. So don't try to use the name
+ * to infer {@link ParameterDefinition} is. </ol>
+ *
  * @see ParameterDefinition
  */
-@ExportedBean(defaultVisibility=3)
+@ExportedBean(defaultVisibility = 3)
 public abstract class ParameterValue implements Serializable {
-    protected final String name;
 
+    protected final String name;
     private String description;
 
     protected ParameterValue(String name, String description) {
@@ -81,7 +78,8 @@ public abstract class ParameterValue implements Serializable {
      * Name of the parameter.
      *
      * This uniquely distinguishes {@link ParameterValue} among other parameters
-     * for the same build. This must be the same as {@link ParameterDefinition#getName()}.
+     * for the same build. This must be the same as
+     * {@link ParameterDefinition#getName()}.
      */
     @Exported
     public final String getName() {
@@ -91,32 +89,29 @@ public abstract class ParameterValue implements Serializable {
     /**
      * Adds environmental variables for the builds to the given map.
      *
-     * <p>
-     * This provides a means for a parameter to pass the parameter
-     * values to the build to be performed.
+     * <p> This provides a means for a parameter to pass the parameter values to
+     * the build to be performed.
      *
-     * <p>
-     * When this method is invoked, the map already contains the
-     * current "planned export" list. The implementation is
-     * expected to add more values to this map (or do nothing)
+     * <p> When this method is invoked, the map already contains the current
+     * "planned export" list. The implementation is expected to add more values
+     * to this map (or do nothing)
      *
-     * <p>
-     * <strike>Environment variables should be by convention all upper case.
-     * (This is so that a Windows/Unix heterogeneous environment
-     * won't get inconsistent result depending on which platform to
-     * execute.)</strike> (see {@link EnvVars} why upper casing is a bad idea.)
+     * <p> <strike>Environment variables should be by convention all upper case.
+     * (This is so that a Windows/Unix heterogeneous environment won't get
+     * inconsistent result depending on which platform to execute.)</strike>
+     * (see {@link EnvVars} why upper casing is a bad idea.)
      *
-     * @param env
-     *      never null.
-     * @param build
-     *      The build for which this parameter is being used. Never null.
-     * @deprecated as of 1.344
-     *      Use {@link #buildEnvVars(AbstractBuild, EnvVars)} instead.
+     * @param env never null.
+     * @param build The build for which this parameter is being used. Never
+     * null.
+     * @deprecated as of 1.344 Use {@link #buildEnvVars(AbstractBuild, EnvVars)}
+     * instead.
      */
-    public void buildEnvVars(AbstractBuild<?,?> build, Map<String,String> env) {
-        if (env instanceof EnvVars && Util.isOverridden(ParameterValue.class,getClass(),"buildEnvVars", AbstractBuild.class,EnvVars.class))
-            // if the subtype already derives buildEnvVars(AbstractBuild,Map), then delegate to it
-            buildEnvVars(build,(EnvVars)env);
+    public void buildEnvVars(AbstractBuild<?, ?> build, Map<String, String> env) {
+        if (env instanceof EnvVars && Util.isOverridden(ParameterValue.class, getClass(), "buildEnvVars", AbstractBuild.class, EnvVars.class)) // if the subtype already derives buildEnvVars(AbstractBuild,Map), then delegate to it
+        {
+            buildEnvVars(build, (EnvVars) env);
+        }
 
         // otherwise no-op by default
     }
@@ -124,69 +119,66 @@ public abstract class ParameterValue implements Serializable {
     /**
      * Adds environmental variables for the builds to the given map.
      *
-     * <p>
-     * This provides a means for a parameter to pass the parameter
-     * values to the build to be performed.
+     * <p> This provides a means for a parameter to pass the parameter values to
+     * the build to be performed.
      *
-     * <p>
-     * When this method is invoked, the map already contains the
-     * current "planned export" list. The implementation is
-     * expected to add more values to this map (or do nothing)
+     * <p> When this method is invoked, the map already contains the current
+     * "planned export" list. The implementation is expected to add more values
+     * to this map (or do nothing)
      *
-     * @param env
-     *      never null.
-     * @param build
-     *      The build for which this parameter is being used. Never null.
+     * @param env never null.
+     * @param build The build for which this parameter is being used. Never
+     * null.
      */
-    public void buildEnvVars(AbstractBuild<?,?> build, EnvVars env) {
+    public void buildEnvVars(AbstractBuild<?, ?> build, EnvVars env) {
         // for backward compatibility
-        buildEnvVars(build,(Map<String,String>)env);
+        buildEnvVars(build, (Map<String, String>) env);
     }
 
     /**
-     * Called at the beginning of a build (but after {@link SCM} operations
-     * have taken place) to let a {@link ParameterValue} contributes a
+     * Called at the beginning of a build (but after {@link SCM} operations have
+     * taken place) to let a {@link ParameterValue} contributes a
      * {@link BuildWrapper} to the build.
      *
-     * <p>
-     * This provides a means for a parameter to perform more extensive
-     * set up / tear down during a build.
+     * <p> This provides a means for a parameter to perform more extensive set
+     * up / tear down during a build.
      *
-     * @param build
-     *      The build for which this parameter is being used. Never null.
-     * @return
-     *      null if the parameter has no {@link BuildWrapper} to contribute to.
+     * @param build The build for which this parameter is being used. Never
+     * null.
+     * @return null if the parameter has no {@link BuildWrapper} to contribute
+     * to.
      */
-    public BuildWrapper createBuildWrapper(AbstractBuild<?,?> build) {
+    public BuildWrapper createBuildWrapper(AbstractBuild<?, ?> build) {
         return null;
     }
 
     /**
-     * Returns a {@link VariableResolver} so that other components like {@link Builder}s
-     * can perform variable substitution to reflect parameter values into the build process.
+     * Returns a {@link VariableResolver} so that other components like
+     * {@link Builder}s can perform variable substitution to reflect parameter
+     * values into the build process.
      *
-     * <p.
-     * This is yet another means in which a {@link ParameterValue} can influence
-     * a build.
+     * <p. This is yet another means in which a {@link ParameterValue} can
+     * influence a build.
      *
-     * @param build
-     *      The build for which this parameter is being used. Never null.
-     * @return
-     *      if the parameter value is not interested in participating to the
-     *      variable replacement process, return {@link VariableResolver#NONE}.
+
+     *
+     * @param build The build for which this parameter is being used. Never
+     * null.
+     * @return if the parameter value is not interested in participating to the
+     * variable replacement process, return {@link VariableResolver#NONE}.
      */
-    public VariableResolver<String> createVariableResolver(AbstractBuild<?,?> build) {
+    public VariableResolver<String> createVariableResolver(AbstractBuild<?, ?> build) {
         return VariableResolver.NONE;
     }
 
     /**
      * Accessing {@link ParameterDefinition} is not a good idea.
      *
-     * @deprecated since 2008-09-20.
-     *    parameter definition may change any time. So if you find yourself
-     *    in need of accessing the information from {@link ParameterDefinition},
-     *    instead copy them in {@link ParameterDefinition#createValue(StaplerRequest, JSONObject)}
-     *    into {@link ParameterValue}.
+     * @deprecated since 2008-09-20. parameter definition may change any time.
+     * So if you find yourself in need of accessing the information from
+     * {@link ParameterDefinition}, instead copy them in
+     * {@link ParameterDefinition#createValue(StaplerRequest, JSONObject)} into
+     * {@link ParameterValue}.
      */
     public ParameterDefinition getDefinition() {
         throw new UnsupportedOperationException();
@@ -202,27 +194,33 @@ public abstract class ParameterValue implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         ParameterValue other = (ParameterValue) obj;
         if (name == null) {
-            if (other.name != null)
+            if (other.name != null) {
                 return false;
-        } else if (!name.equals(other.name))
+            }
+        } else if (!name.equals(other.name)) {
             return false;
+        }
         return true;
     }
 
     /**
-     * Computes a human-readable possible-localized one-line description of the parameter value.
+     * Computes a human-readable possible-localized one-line description of the
+     * parameter value.
      *
-     * <P>
-     * This message is used as a tooltip to describe jobs in the queue. The text should be one line without
-     * new line. No HTML allowed (the caller will perform necessary HTML escapes, so any text can be returend.)
+     * <P> This message is used as a tooltip to describe jobs in the queue. The
+     * text should be one line without new line. No HTML allowed (the caller
+     * will perform necessary HTML escapes, so any text can be returend.)
      *
      * @since 1.323
      */
@@ -235,12 +233,11 @@ public abstract class ParameterValue implements Serializable {
      * sensitive or security related. Used to determine whether the value
      * provided by this object should be masked in output.
      *
-     * <p>
-     * Subclasses can override this to control the returne value.
+     * <p> Subclasses can override this to control the returne value.
      *
      * @since 1.378
      */
     public boolean isSensitive() {
         return false;
-}
+    }
 }

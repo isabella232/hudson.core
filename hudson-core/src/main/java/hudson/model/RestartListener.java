@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -27,6 +27,7 @@ import java.io.IOException;
  * @since 1.376
  */
 public abstract class RestartListener implements ExtensionPoint {
+
     /**
      * Called periodically during the safe restart.
      *
@@ -37,7 +38,8 @@ public abstract class RestartListener implements ExtensionPoint {
     /**
      * Called immediately before the restart is actually triggered.
      */
-    public void onRestart() {}
+    public void onRestart() {
+    }
 
     /**
      * Returns all the registered {@link LabelFinder}s.
@@ -51,8 +53,9 @@ public abstract class RestartListener implements ExtensionPoint {
      */
     public static boolean isAllReady() throws IOException, InterruptedException {
         for (RestartListener listener : all()) {
-            if (!listener.isReadyToRestart())
+            if (!listener.isReadyToRestart()) {
                 return false;
+            }
         }
         return true;
     }
@@ -62,6 +65,7 @@ public abstract class RestartListener implements ExtensionPoint {
      */
     @Extension
     public static class Default extends RestartListener {
+
         @Override
         public boolean isReadyToRestart() throws IOException, InterruptedException {
             Hudson h = Hudson.getInstance();

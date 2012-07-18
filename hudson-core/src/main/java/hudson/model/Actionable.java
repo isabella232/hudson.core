@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Stephen Connolly
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Stephen Connolly
+ *
  *
  *******************************************************************************/ 
 
@@ -32,26 +32,27 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @ExportedBean
 public abstract class Actionable extends AbstractModelObject {
+
     /**
      * Actions contributed to this model object.
      *
-     * Typed more strongly than it should to improve the serialization signature.
+     * Typed more strongly than it should to improve the serialization
+     * signature.
      */
     private volatile CopyOnWriteArrayList<Action> actions;
 
     /**
      * Gets actions contributed to this build.
      *
-     * <p>
-     * A new {@link Action} can be added by {@code getActions().add(...)}.
+     * <p> A new {@link Action} can be added by {@code getActions().add(...)}.
      *
-     * @return
-     *      may be empty but never null.
+     * @return may be empty but never null.
      */
     @Exported
     public synchronized List<Action> getActions() {
-        if(actions==null)
+        if (actions == null) {
             actions = new CopyOnWriteArrayList<Action>();
+        }
         return actions;
     }
 
@@ -59,15 +60,16 @@ public abstract class Actionable extends AbstractModelObject {
      * Gets all actions of a specified type that contributed to this build.
      *
      * @param type The type of action to return.
-     * @return
-     *      may be empty but never null.
+     * @return may be empty but never null.
      * @see #getAction(Class)
      */
     public <T extends Action> List<T> getActions(Class<T> type) {
         List<T> result = new Vector<T>();
-        for (Action a : getActions())
-            if (type.isInstance(a))
+        for (Action a : getActions()) {
+            if (type.isInstance(a)) {
                 result.add(type.cast(a));
+            }
+        }
         return result;
     }
 
@@ -77,38 +79,48 @@ public abstract class Actionable extends AbstractModelObject {
      * Short for <tt>getActions().add(a)</tt>
      */
     public void addAction(Action a) {
-        if(a==null) throw new IllegalArgumentException();
+        if (a == null) {
+            throw new IllegalArgumentException();
+        }
         getActions().add(a);
     }
 
     public Action getAction(int index) {
-        if(actions==null)   return null;
+        if (actions == null) {
+            return null;
+        }
         return actions.get(index);
     }
 
     /**
-     * Gets the action (first instance to be found) of a specified type that contributed to this build.
+     * Gets the action (first instance to be found) of a specified type that
+     * contributed to this build.
      *
      * @param type
      * @return The action or <code>null</code> if no such actions exist.
      * @see #getActions(Class)
      */
     public <T extends Action> T getAction(Class<T> type) {
-        for (Action a : getActions())
-            if (type.isInstance(a))
+        for (Action a : getActions()) {
+            if (type.isInstance(a)) {
                 return type.cast(a);
+            }
+        }
         return null;
     }
 
     public Object getDynamic(String token, StaplerRequest req, StaplerResponse rsp) {
         for (Action a : getActions()) {
-            if(a==null)
+            if (a == null) {
                 continue;   // be defensive
+            }
             String urlName = a.getUrlName();
-            if(urlName==null)
+            if (urlName == null) {
                 continue;
-            if(urlName.equals(token))
+            }
+            if (urlName.equals(token)) {
                 return a;
+            }
         }
         return null;
     }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -21,17 +21,17 @@ import hudson.slaves.NodeSpecific;
 
 /**
  * Represents any concept that can be adapted for a certain environment.
- * 
+ *
  * Mainly for documentation purposes.
  *
  * @since 1.286
- * @param <T>
- *      Concrete type that represents the thing that can be adapted.
+ * @param <T> Concrete type that represents the thing that can be adapted.
  * @see NodeSpecific
  */
 public interface EnvironmentSpecific<T extends EnvironmentSpecific<T>> {
-	/**
-	 * Returns a specialized copy of T for functioning in the given environment.
-	 */
-	T forEnvironment(EnvVars environment);
+
+    /**
+     * Returns a specialized copy of T for functioning in the given environment.
+     */
+    T forEnvironment(EnvVars environment);
 }

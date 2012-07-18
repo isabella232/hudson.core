@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -36,23 +36,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
- * <h2>EXPERIMENTAL</h2>
- * <p>
- * The intention is to eventually merge this with the {@link ListView}.
- * This class is here for experimentation.
+ * <h2>EXPERIMENTAL</h2> <p> The intention is to eventually merge this with the
+ * {@link ListView}. This class is here for experimentation.
  *
- * <p>
- * Until this class is sufficiently stable, there's no need for l10n.
+ * <p> Until this class is sufficiently stable, there's no need for l10n.
  *
  * @author Kohsuke Kawaguchi
  */
 public class TreeView extends View implements ViewGroup {
+
     /**
      * List of job names. This is what gets serialized.
      */
-    private final Set<String> jobNames
-        = new TreeSet<String>(CaseInsensitiveComparator.INSTANCE);
-
+    private final Set<String> jobNames = new TreeSet<String>(CaseInsensitiveComparator.INSTANCE);
     /**
      * Nested views.
      */
@@ -64,22 +60,23 @@ public class TreeView extends View implements ViewGroup {
     }
 
     /**
-     * Returns {@link Indenter} that has the fixed indentation width.
-     * Used for assisting view rendering.
+     * Returns {@link Indenter} that has the fixed indentation width. Used for
+     * assisting view rendering.
      */
     public Indenter createFixedIndenter(String d) {
         final int depth = Integer.parseInt(d);
         return new Indenter() {
-            protected int getNestLevel(Job job) { return depth; }
+            protected int getNestLevel(Job job) {
+                return depth;
+            }
         };
     }
 
     /**
      * Returns a read-only view of all {@link Job}s in this view.
      *
-     * <p>
-     * This method returns a separate copy each time to avoid
-     * concurrent modification issue.
+     * <p> This method returns a separate copy each time to avoid concurrent
+     * modification issue.
      */
     public synchronized List<TopLevelItem> getItems() {
         return Hudson.getInstance().getItems();
@@ -99,7 +96,7 @@ public class TreeView extends View implements ViewGroup {
 
     public Item doCreateItem(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         Item item = Hudson.getInstance().doCreateItem(req, rsp);
-        if(item!=null) {
+        if (item != null) {
             jobNames.add(item.getName());
             owner.save();
         }
@@ -108,11 +105,13 @@ public class TreeView extends View implements ViewGroup {
 
     @Override
     public synchronized void onJobRenamed(Item item, String oldName, String newName) {
-        if(jobNames.remove(oldName) && newName!=null)
+        if (jobNames.remove(oldName) && newName != null) {
             jobNames.add(newName);
+        }
         // forward to children
-        for (View v : views)
-            v.onJobRenamed(item,oldName,newName);
+        for (View v : views) {
+            v.onJobRenamed(item, oldName, newName);
+        }
     }
 
     protected void submit(StaplerRequest req) throws IOException, ServletException, FormException {
@@ -131,9 +130,11 @@ public class TreeView extends View implements ViewGroup {
     }
 
     public View getView(String name) {
-        for (View v : views)
-            if(v.getViewName().equals(name))
+        for (View v : views) {
+            if (v.getViewName().equals(name)) {
                 return v;
+            }
+        }
         return null;
     }
 
@@ -145,22 +146,24 @@ public class TreeView extends View implements ViewGroup {
         owner.save();
     }
 
-    public void doCreateView( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException, FormException {
+    public void doCreateView(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, FormException {
         checkPermission(View.CREATE);
-        views.add(View.create(req,rsp,this));
+        views.add(View.create(req, rsp, this));
         save();
     }
 
     // this feature is not public yet
     @Extension
     public static ViewDescriptor register() {
-        if(Boolean.getBoolean("hudson.TreeView"))
+        if (Boolean.getBoolean("hudson.TreeView")) {
             return new DescriptorImpl();
-        else
+        } else {
             return null;
+        }
     }
 
     public static final class DescriptorImpl extends ViewDescriptor {
+
         public String getDisplayName() {
             return "Tree View";
         }

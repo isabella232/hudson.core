@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Tom Huybrechts
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -55,7 +55,6 @@ import org.kohsuke.stapler.StaplerResponse;
 public class MyViewsProperty extends UserProperty implements ViewGroup, Action {
 
     private static final Logger log = Logger.getLogger(MyViewsProperty.class.getName());
-
     private String primaryViewName;
     /**
      * Always hold at least one view.
@@ -68,7 +67,7 @@ public class MyViewsProperty extends UserProperty implements ViewGroup, Action {
     }
 
     private MyViewsProperty() {
-		views.add(new AllView(Messages.Hudson_ViewName(), this));
+        views.add(new AllView(Messages.Hudson_ViewName(), this));
         primaryViewName = views.get(0).getViewName();
     }
 
@@ -142,8 +141,10 @@ public class MyViewsProperty extends UserProperty implements ViewGroup, Action {
     public View getPrimaryView() {
         if (primaryViewName != null) {
             View view = getView(primaryViewName);
-            if (view != null) return view;
-        } 
+            if (view != null) {
+                return view;
+            }
+        }
 
         return views.get(0);
     }
@@ -159,23 +160,26 @@ public class MyViewsProperty extends UserProperty implements ViewGroup, Action {
     }
 
     /**
-     * Checks if a private view with the given name exists.
-     * An error is returned if exists==true but the view does not exist.
-     * An error is also returned if exists==false but the view does exist.
-     **/
+     * Checks if a private view with the given name exists. An error is returned
+     * if exists==true but the view does not exist. An error is also returned if
+     * exists==false but the view does exist.
+     *
+     */
     public FormValidation doViewExistsCheck(@QueryParameter String value, @QueryParameter boolean exists) {
         checkPermission(View.CREATE);
 
         String view = Util.fixEmpty(value);
-        if (view == null) return FormValidation.ok();
+        if (view == null) {
+            return FormValidation.ok();
+        }
         if (exists) {
-        	return (getView(view)!=null) ?
-            		FormValidation.ok() :
-            		FormValidation.error(Messages.MyViewsProperty_ViewExistsCheck_NotExist(view));
+            return (getView(view) != null)
+                    ? FormValidation.ok()
+                    : FormValidation.error(Messages.MyViewsProperty_ViewExistsCheck_NotExist(view));
         } else {
-        	return (getView(view)==null) ?
-        			FormValidation.ok() :
-        			FormValidation.error(Messages.MyViewsProperty_ViewExistsCheck_AlreadyExists(view));
+            return (getView(view) == null)
+                    ? FormValidation.ok()
+                    : FormValidation.error(Messages.MyViewsProperty_ViewExistsCheck_AlreadyExists(view));
         }
     }
 
@@ -217,21 +221,23 @@ public class MyViewsProperty extends UserProperty implements ViewGroup, Action {
             return new MyViewsProperty();
         }
     }
-    
+
     @Override
     public UserProperty reconfigure(StaplerRequest req, JSONObject form) throws FormException {
-    	req.bindJSON(this, form);
-    	return this;
+        req.bindJSON(this, form);
+        return this;
     }
-    
-    public Object readResolve() {
-        if (views == null)
-            // this shouldn't happen, but an error in 1.319 meant the last view could be deleted
-            views = new CopyOnWriteArrayList<View>();
 
-        if (views.isEmpty())
-            // preserve the non-empty invariant
+    public Object readResolve() {
+        if (views == null) // this shouldn't happen, but an error in 1.319 meant the last view could be deleted
+        {
+            views = new CopyOnWriteArrayList<View>();
+        }
+
+        if (views.isEmpty()) // preserve the non-empty invariant
+        {
             views.add(new AllView(Messages.Hudson_ViewName(), this));
+        }
         return this;
     }
 
@@ -242,27 +248,25 @@ public class MyViewsProperty extends UserProperty implements ViewGroup, Action {
     public MyViewsTabBar getMyViewsTabBar() {
         return Hudson.getInstance().getMyViewsTabBar();
     }
-    
+
     @Extension
     public static class GlobalAction implements RootAction {
 
-		public String getDisplayName() {
-			return Messages.MyViewsProperty_GlobalAction_DisplayName();
-		}
+        public String getDisplayName() {
+            return Messages.MyViewsProperty_GlobalAction_DisplayName();
+        }
 
-		public String getIconFileName() {
-			// do not show when not logged in
-			if (User.current() == null ) {
-				return null;
-			} 
-			
-			return "user.png";
-		}
+        public String getIconFileName() {
+            // do not show when not logged in
+            if (User.current() == null) {
+                return null;
+            }
 
-		public String getUrlName() {
-			return "/me/my-views";
-		}
-		
+            return "user.png";
+        }
+
+        public String getUrlName() {
+            return "/me/my-views";
+        }
     }
-
 }

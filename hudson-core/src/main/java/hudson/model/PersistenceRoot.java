@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
+ * Contributors:
+ * 
 *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -19,19 +19,19 @@ package hudson.model;
 import java.io.File;
 
 /**
- * Root object of a persisted object tree
- * that gets its own file system directory.
+ * Root object of a persisted object tree that gets its own file system
+ * directory.
  *
  * @author Kohsuke Kawaguchi
  */
 public interface PersistenceRoot extends Saveable {
+
     /**
-     * Gets the root directory on the file system that this
-     * {@link Item} can use freely for storing the configuration data.
+     * Gets the root directory on the file system that this {@link Item} can use
+     * freely for storing the configuration data.
      *
-     * <p>
-     * This parameter is given by the {@link ItemGroup} when
-     * {@link Item} is loaded from memory.
+     * <p> This parameter is given by the {@link ItemGroup} when {@link Item} is
+     * loaded from memory.
      */
     File getRootDir();
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Martin Eigenbrodt
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Martin Eigenbrodt
+ *
  *
  *******************************************************************************/ 
 
@@ -32,46 +32,47 @@ import java.util.logging.Logger;
 
 import static hudson.model.Result.FAILURE;
 import static hudson.model.Result.ABORTED;
+
 /**
  * A build of a {@link Project}.
  *
- * <h2>Steps of a build</h2>
- * <p>
- * Roughly speaking, a {@link Build} goes through the following stages:
+ * <h2>Steps of a build</h2> <p> Roughly speaking, a {@link Build} goes through
+ * the following stages:
  *
- * <dl>
- * <dt>SCM checkout
- * <dd>Hudson decides which directory to use for a build, then the source code is checked out
+ * <dl> <dt>SCM checkout <dd>Hudson decides which directory to use for a build,
+ * then the source code is checked out
  *
- * <dt>Pre-build steps
- * <dd>Everyone gets their {@link BuildStep#prebuild(AbstractBuild, BuildListener)} invoked
- * to indicate that the build is starting
+ * <dt>Pre-build steps <dd>Everyone gets their
+ * {@link BuildStep#prebuild(AbstractBuild, BuildListener)} invoked to indicate
+ * that the build is starting
  *
  * <dt>Build wrapper set up
- * <dd>{@link BuildWrapper#setUp(AbstractBuild, Launcher, BuildListener)} is invoked. This is normally
- * to prepare an environment for the build.
+ * <dd>{@link BuildWrapper#setUp(AbstractBuild, Launcher, BuildListener)} is
+ * invoked. This is normally to prepare an environment for the build.
  *
  * <dt>Builder runs
- * <dd>{@link Builder#perform(AbstractBuild, Launcher, BuildListener)} is invoked. This is where
- * things that are useful to users happen, like calling Ant, Make, etc.
+ * <dd>{@link Builder#perform(AbstractBuild, Launcher, BuildListener)} is
+ * invoked. This is where things that are useful to users happen, like calling
+ * Ant, Make, etc.
  *
  * <dt>Recorder runs
- * <dd>{@link Recorder#perform(AbstractBuild, Launcher, BuildListener)} is invoked. This is normally
- * to record the output from the build, such as test results.
+ * <dd>{@link Recorder#perform(AbstractBuild, Launcher, BuildListener)} is
+ * invoked. This is normally to record the output from the build, such as test
+ * results.
  *
  * <dt>Notifier runs
- * <dd>{@link Notifier#perform(AbstractBuild, Launcher, BuildListener)} is invoked. This is normally
- * to send out notifications, based on the results determined so far.
- * </dl>
+ * <dd>{@link Notifier#perform(AbstractBuild, Launcher, BuildListener)} is
+ * invoked. This is normally to send out notifications, based on the results
+ * determined so far. </dl>
  *
- * <p>
- * And beyond that, the build is considered complete, and from then on {@link Build} object is there to
- * keep the record of what happened in this build. 
+ * <p> And beyond that, the build is considered complete, and from then on
+ * {@link Build} object is there to keep the record of what happened in this
+ * build.
  *
  * @author Kohsuke Kawaguchi
  */
-public abstract class Build <P extends BaseBuildableProject<P,B>,B extends Build<P,B>>
-    extends AbstractBuild<P,B> {
+public abstract class Build<P extends BaseBuildableProject<P, B>, B extends Build<P, B>>
+        extends AbstractBuild<P, B> {
 
     /**
      * Creates a new build.
@@ -88,7 +89,7 @@ public abstract class Build <P extends BaseBuildableProject<P,B>,B extends Build
      * Loads a build from a log file.
      */
     protected Build(P project, File buildDir) throws IOException {
-        super(project,buildDir);
+        super(project, buildDir);
     }
 
 //
@@ -104,55 +105,67 @@ public abstract class Build <P extends BaseBuildableProject<P,B>,B extends Build
     protected Runner createRunner() {
         return new RunnerImpl();
     }
-    
+
     protected class RunnerImpl extends AbstractRunner {
+
         protected Result doRun(BuildListener listener) throws Exception {
-            if(!preBuild(listener,project.getBuilders()))
+            if (!preBuild(listener, project.getBuilders())) {
                 return FAILURE;
-            if(!preBuild(listener,project.getPublishers()))
+            }
+            if (!preBuild(listener, project.getPublishers())) {
                 return FAILURE;
+            }
 
             Result r = null;
             try {
                 List<BuildWrapper> wrappers = new ArrayList<BuildWrapper>(project.getBuildWrappers().values());
-                
-                ParametersAction parameters = getAction(ParametersAction.class);
-                if (parameters != null)
-                    parameters.createBuildWrappers(Build.this,wrappers);
 
-                for( BuildWrapper w : wrappers ) {
-                    Environment e = w.setUp((AbstractBuild<?,?>)Build.this, launcher, listener);
-                    if(e==null)
+                ParametersAction parameters = getAction(ParametersAction.class);
+                if (parameters != null) {
+                    parameters.createBuildWrappers(Build.this, wrappers);
+                }
+
+                for (BuildWrapper w : wrappers) {
+                    Environment e = w.setUp((AbstractBuild<?, ?>) Build.this, launcher, listener);
+                    if (e == null) {
                         return (r = FAILURE);
+                    }
                     buildEnvironments.add(e);
                 }
 
-                if(!build(listener,project.getBuilders()))
+                if (!build(listener, project.getBuilders())) {
                     r = FAILURE;
+                }
             } catch (InterruptedException e) {
                 r = ABORTED;
                 throw e;
             } finally {
-                if (r != null) setResult(r);
+                if (r != null) {
+                    setResult(r);
+                }
                 // tear down in reverse order
-                boolean failed=false;
-                for( int i=buildEnvironments.size()-1; i>=0; i-- ) {
-                    if (!buildEnvironments.get(i).tearDown(Build.this,listener)) {
-                        failed=true;
-                    }                    
+                boolean failed = false;
+                for (int i = buildEnvironments.size() - 1; i >= 0; i--) {
+                    if (!buildEnvironments.get(i).tearDown(Build.this, listener)) {
+                        failed = true;
+                    }
                 }
                 // WARNING The return in the finally clause will trump any return before
-                if (failed) return FAILURE;
+                if (failed) {
+                    return FAILURE;
+                }
             }
 
             return r;
         }
 
         public void post2(BuildListener listener) throws IOException, InterruptedException {
-            if (!performAllBuildSteps(listener, project.getPublishers(), true))
+            if (!performAllBuildSteps(listener, project.getPublishers(), true)) {
                 setResult(FAILURE);
-            if (!performAllBuildSteps(listener, project.getProperties(), true))
+            }
+            if (!performAllBuildSteps(listener, project.getProperties(), true)) {
                 setResult(FAILURE);
+            }
         }
 
         @Override
@@ -164,12 +177,13 @@ public abstract class Build <P extends BaseBuildableProject<P,B>,B extends Build
         }
 
         private boolean build(BuildListener listener, Collection<Builder> steps) throws IOException, InterruptedException {
-            for( BuildStep bs : steps )
-                if(!perform(bs,listener))
+            for (BuildStep bs : steps) {
+                if (!perform(bs, listener)) {
                     return false;
+                }
+            }
             return true;
         }
     }
-
     private static final Logger LOGGER = Logger.getLogger(Build.class.getName());
 }

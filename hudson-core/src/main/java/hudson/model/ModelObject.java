@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -18,9 +18,10 @@ package hudson.model;
 
 /**
  * A model object has a URL.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public interface ModelObject {
+
     String getDisplayName();
 }

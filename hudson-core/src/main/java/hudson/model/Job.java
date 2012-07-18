@@ -7,11 +7,11 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *   Kohsuke Kawaguchi, Winston Prakash, Martin Eigenbrodt, Matthew R. Harrah,
  *   Stephen Connolly, Tom Huybrechts, Anton Kozak, Nikita Levyankov
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -70,7 +70,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import javax.servlet.ServletException;
 import net.sf.json.JSONException;
- 
+
 import net.sf.json.JSONObject;
 
 import org.eclipse.hudson.api.model.ICascadingJob;
@@ -97,47 +97,42 @@ import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 /**
  * A job is an runnable entity under the monitoring of Hudson.
  *
- * <p>
- * Every time it "runs", it will be recorded as a {@link Run} object.
+ * <p> Every time it "runs", it will be recorded as a {@link Run} object.
  *
- * <p>
- * To create a custom job type, extend {@link TopLevelItemDescriptor} and put {@link Extension} on it.
+ * <p> To create a custom job type, extend {@link TopLevelItemDescriptor} and
+ * put {@link Extension} on it.
  *
  * @author Kohsuke Kawaguchi
  * @author Nikita Levyankov
  */
 public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, RunT>>
         extends AbstractItem implements ExtensionPoint, StaplerOverridable, IJob, ICascadingJob {
+
     private static transient final String HUDSON_BUILDS_PROPERTY_KEY = "HUDSON_BUILDS";
     private static transient final String PROJECT_PROPERTY_KEY_PREFIX = "has";
     public static final String PROPERTY_NAME_SEPARATOR = ";";
     public static final String LOG_ROTATOR_PROPERTY_NAME = "logRotator";
     public static final String PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME = "parametersDefinitionProperties";
-
     /**
      * Next build number. Kept in a separate file because this is the only
      * information that gets updated often. This allows the rest of the
-     * configuration to be in the VCS.
-     * <p>
-     * In 1.28 and earlier, this field was stored in the project configuration
-     * file, so even though this is marked as transient, don't move it around.
+     * configuration to be in the VCS. <p> In 1.28 and earlier, this field was
+     * stored in the project configuration file, so even though this is marked
+     * as transient, don't move it around.
      */
     protected transient volatile int nextBuildNumber = 1;
     /**
-     * Newly copied jobs get this flag set, so that Hudson doesn't try to run the job until its configuration
-     * is saved once.
+     * Newly copied jobs get this flag set, so that Hudson doesn't try to run
+     * the job until its configuration is saved once.
      */
     private transient volatile boolean holdOffBuildUntilSave;
-
     /**
-     * @deprecated as of 2.2.0
-     *             don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     *             Use getter/setter for accessing to this field.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to
+     * {@link org.eclipse.hudson.api.model.IProjectProperty}. Use getter/setter
+     * for accessing to this field.
      */
     private volatile LogRotator logRotator;
-
     private ConcurrentMap<String, IProjectProperty> jobProperties = new ConcurrentHashMap<String, IProjectProperty>();
-
     /**
      * Not all plugins are good at calculating their health report quickly.
      * These fields are used to cache the health reports to speed up rendering
@@ -150,47 +145,44 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * The author of the job;
      */
     protected volatile String createdBy;
-
     /**
      * The time when the job was created;
      */
     private volatile long creationTime;
-
     /**
-     * List of {@link UserProperty}s configured for this project.
-     * According to new implementation {@link hudson.model.ParametersDefinitionProperty} were moved from this collection. So, this
-     * field was left protected for backward compatibility. Don't use this field directly for adding or removing
-     * values. Use {@link #addProperty(JobProperty)}, {@link #removeProperty(JobProperty)},
+     * List of {@link UserProperty}s configured for this project. According to
+     * new implementation {@link hudson.model.ParametersDefinitionProperty} were
+     * moved from this collection. So, this field was left protected for
+     * backward compatibility. Don't use this field directly for adding or
+     * removing values. Use {@link #addProperty(JobProperty)}, {@link #removeProperty(JobProperty)},
      * {@link #removeProperty(Class)} instead.
      *
      * @since 2.2.0
      */
     protected CopyOnWriteList<JobProperty<? super JobT>> properties = new CopyOnWriteList<JobProperty<? super JobT>>();
-
     /**
      * The name of the cascadingProject.
      */
     String cascadingProjectName;
-
     /**
-     * The list with the names of children cascading projects. Required to avoid cyclic references and
-     * to prohibition parent project "delete" action in case it has cascading children projects.
+     * The list with the names of children cascading projects. Required to avoid
+     * cyclic references and to prohibition parent project "delete" action in
+     * case it has cascading children projects.
      */
     private Set<String> cascadingChildrenNames = new CopyOnWriteArraySet<String>();
-
     /**
-     * Set contains json-save names of cascadable {@link JobProperty} classes. Intended to be used for cascading support
-     * of external hudson plugins, that extends {@link JobProperty} class.
-     * See {@link #properties} field description
+     * Set contains json-save names of cascadable {@link JobProperty} classes.
+     * Intended to be used for cascading support of external hudson plugins,
+     * that extends {@link JobProperty} class. See {@link #properties} field
+     * description
+     *
      * @since 2.2.0
      */
     private Set<String> cascadingJobProperties = new CopyOnWriteArraySet<String>();
-
     /**
      * Selected cascadingProject for this job.
      */
     protected transient JobT cascadingProject;
-
     private transient ThreadLocal<Boolean> allowSave = new ThreadLocal<Boolean>() {
         @Override
         protected Boolean initialValue() {
@@ -223,7 +215,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         super(parent, name);
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -244,7 +235,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     /**
      * {@inheritDoc}
      */
-    public void removeProjectProperty(String key){
+    public void removeProjectProperty(String key) {
         jobProperties.remove(key);
     }
 
@@ -252,10 +243,11 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Put map of job properties to existing ones.
      *
      * @param projectProperties new properties map.
-     * @param replace true - to replace current properties, false - add to existing map
+     * @param replace true - to replace current properties, false - add to
+     * existing map
      */
     protected void putAllProjectProperties(Map<String, ? extends IProjectProperty> projectProperties,
-                                           boolean replace) {
+            boolean replace) {
         if (null != projectProperties) {
             if (replace) {
                 jobProperties.clear();
@@ -267,7 +259,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     /**
      * {@inheritDoc}
      */
-    public IProjectProperty getProperty(String key){
+    public IProjectProperty getProperty(String key) {
         return CascadingUtil.getProjectProperty(this, key);
     }
 
@@ -321,7 +313,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Override
     public synchronized void save() throws IOException {
         if (null == allowSave) {
-           initAllowSave();
+            initAllowSave();
         }
         if (isAllowSave()) {
             super.save();
@@ -335,7 +327,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             throws IOException {
         super.onLoad(parent, name);
         cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
-            cascadingProjectName);
+                cascadingProjectName);
         initAllowSave();
         TextFile f = getNextBuildNumberFile();
         if (f.exists()) {
@@ -356,10 +348,12 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
 
         if (properties == null) // didn't exist < 1.72
+        {
             properties = new CopyOnWriteList<JobProperty<? super JobT>>();
+        }
 
-        if(cascadingChildrenNames == null){
-             cascadingChildrenNames = new CopyOnWriteArraySet<String>();
+        if (cascadingChildrenNames == null) {
+            cascadingChildrenNames = new CopyOnWriteArraySet<String>();
         }
         buildProjectProperties();
         for (JobProperty p : getAllProperties()) {
@@ -370,8 +364,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     /**
      * Resets overridden properties to the values defined in parent.
      *
-     * @param propertyName the name of the properties. It possible to pass several names
-     * separated with {@link #PROPERTY_NAME_SEPARATOR}.
+     * @param propertyName the name of the properties. It possible to pass
+     * several names separated with {@link #PROPERTY_NAME_SEPARATOR}.
      * @throws java.io.IOException exception.
      */
     public void doResetProjectProperty(@QueryParameter final String propertyName) throws IOException {
@@ -395,8 +389,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Initializes and builds project properties. Also converts legacy properties to IProjectProperties.
-     * Subclasses should inherit and override this behavior.
+     * Initializes and builds project properties. Also converts legacy
+     * properties to IProjectProperties. Subclasses should inherit and override
+     * this behavior.
      *
      * @throws IOException if any.
      */
@@ -451,7 +446,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
     }
 
-
     /**
      * Initialize project properties if null.
      */
@@ -469,7 +463,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             this.holdOffBuildUntilSave = true;
             this.creationTime = new GregorianCalendar().getTimeInMillis();
             User user = User.current();
-            if (user != null){
+            if (user != null) {
                 this.createdBy = user.getId();
                 grantProjectMatrixPermissions(user);
             }
@@ -615,7 +609,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         CascadingUtil.getLogRotatorProjectProperty(this, LOG_ROTATOR_PROPERTY_NAME).setValue(logRotator);
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -632,13 +625,15 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     public boolean supportsLogRotator() {
         return true;
     }
+
     /**
      * Method converts JobProperties to cascading values.
      * <p/>
      * If property is {@link AuthorizationMatrixProperty} - it will be skipped.
-     * If property is {@link ParametersDefinitionProperty} - it will be added to list of parameterDefinition properties.
-     * All the rest properties will be converted to {@link BaseProjectProperty} classes and added
-     * to cascadingJobProperties set.
+     * If property is {@link ParametersDefinitionProperty} - it will be added to
+     * list of parameterDefinition properties. All the rest properties will be
+     * converted to {@link BaseProjectProperty} classes and added to
+     * cascadingJobProperties set.
      *
      * @param properties list of {@link JobProperty}
      */
@@ -654,7 +649,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 continue;
             }
             BaseProjectProperty projectProperty = CascadingUtil.getBaseProjectProperty(this,
-                property.getDescriptor().getJsonSafeClassName());
+                    property.getDescriptor().getJsonSafeClassName());
             addCascadingJobProperty(projectProperty);
         }
         if (null == getProperty(PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME)) {
@@ -663,8 +658,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * @return list of cascading {@link JobProperty} instances. Includes {@link ParametersDefinitionProperty} and
-     *         children of {@link JobProperty} from external plugins.
+     * @return list of cascading {@link JobProperty} instances. Includes
+     * {@link ParametersDefinitionProperty} and children of {@link JobProperty}
+     * from external plugins.
      */
     @SuppressWarnings("unchecked")
     private CopyOnWriteList getCascadingJobProperties() {
@@ -686,28 +682,29 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Sets list of {@link ParametersDefinitionProperty}. Supports cascading functionality.
+     * Sets list of {@link ParametersDefinitionProperty}. Supports cascading
+     * functionality.
      *
      * @param properties properties to set.
      */
     private void setParameterDefinitionProperties(CopyOnWriteList<ParametersDefinitionProperty> properties) {
         CascadingUtil.setParameterDefinitionProperties(this, PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME,
-            properties);
+                properties);
     }
 
     /**
-     * @return list of {@link ParametersDefinitionProperty}. Supports cascading functionality.
+     * @return list of {@link ParametersDefinitionProperty}. Supports cascading
+     * functionality.
      */
     @SuppressWarnings("unchecked")
     private CopyOnWriteList<ParametersDefinitionProperty> getParameterDefinitionProperties() {
         return CascadingUtil.getCopyOnWriteListProjectProperty(this, PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME)
-            .getValue();
+                .getValue();
     }
 
     @Override
     protected SearchIndexBuilder makeSearchIndex() {
         return super.makeSearchIndex().add(new SearchIndex() {
-
             public void find(String token, List<SearchItem> result) {
                 try {
                     if (token.startsWith("#")) {
@@ -747,13 +744,13 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             properties.add(jobProp);
         } else if (jobProperty instanceof ParametersDefinitionProperty) {
             CopyOnWriteList list = CascadingUtil.getCopyOnWriteListProjectProperty(this,
-                PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME).getOriginalValue();
+                    PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME).getOriginalValue();
             if (null != list) {
                 list.add(jobProp);
             }
         } else {
             BaseProjectProperty projectProperty = CascadingUtil.getBaseProjectProperty(this,
-                jobProperty.getDescriptor().getJsonSafeClassName());
+                    jobProperty.getDescriptor().getJsonSafeClassName());
             projectProperty.setValue(jobProperty);
             addCascadingJobProperty(projectProperty);
         }
@@ -772,7 +769,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             properties.remove(jobProp);
         } else if (jobProperty instanceof ParametersDefinitionProperty) {
             CopyOnWriteList list = CascadingUtil.getCopyOnWriteListProjectProperty(this,
-                PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME).getOriginalValue();
+                    PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME).getOriginalValue();
             if (null != list) {
                 list.remove(jobProp);
             }
@@ -793,7 +790,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         CopyOnWriteList<JobProperty<? super JobT>> sourceProperties;
         if (clazz.equals(ParametersDefinitionProperty.class)) {
             sourceProperties = CascadingUtil.getCopyOnWriteListProjectProperty(this,
-                PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME).getOriginalValue();
+                    PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME).getOriginalValue();
         } else if (clazz.equals(AuthorizationMatrixProperty.class)) {
             sourceProperties = properties;
         } else {
@@ -821,6 +818,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     /**
      * List of all {@link JobProperty} exposed primarily for the remoting API.
      * List contains cascadable {@link JobProperty} if any.
+     *
      * @since 2.2.0
      */
     @Exported(name = "property", inline = true)
@@ -836,8 +834,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     /**
      * Gets the specific property, or null if the propert is not configured for
-     * this job.
-     * Supports cascading properties
+     * this job. Supports cascading properties
+     *
      * @since 2.2.0
      */
     @SuppressWarnings("unchecked")
@@ -863,8 +861,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     public Collection<?> getOverrides() {
         List<Object> r = new ArrayList<Object>();
-        for (JobProperty<? super JobT> p : getAllProperties())
+        for (JobProperty<? super JobT> p : getAllProperties()) {
             r.addAll(p.getJobOverrides());
+        }
         return r;
     }
 
@@ -878,7 +877,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         return new HistoryWidget<Job, RunT>(this, getBuilds(), HISTORY_ADAPTER);
     }
     protected static final HistoryWidget.Adapter<Run> HISTORY_ADAPTER = new Adapter<Run>() {
-
         public int compare(Run record, String key) {
             try {
                 int k = Integer.parseInt(key);
@@ -940,7 +938,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Obtains all the {@link Run}s whose build numbers matches the given {@link RangeSet}.
+     * Obtains all the {@link Run}s whose build numbers matches the given
+     * {@link RangeSet}.
      */
     public synchronized List<RunT> getBuilds(RangeSet rs) {
         List<RunT> builds = new LinkedList<RunT>();
@@ -962,8 +961,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * @deprecated since 2008-06-15.
-     *     This is only used to support backward compatibility with old URLs.
+     * @deprecated since 2008-06-15. This is only used to support backward
+     * compatibility with old URLs.
      */
     @Deprecated
     public RunT getBuild(String id) {
@@ -976,8 +975,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * @param n
-     *            The build number.
+     * @param n The build number.
      * @return null if no such build exists.
      * @see Run#getNumber()
      */
@@ -986,11 +984,12 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Obtains a list of builds, in the descending order, that are within the specified time range [start,end).
+     * Obtains a list of builds, in the descending order, that are within the
+     * specified time range [start,end).
      *
      * @return can be empty but never null.
-     * @deprecated
-     *      as of 1.372. Should just do {@code getBuilds().byTimestamp(s,e)} to avoid code bloat in {@link Job}.
+     * @deprecated as of 1.372. Should just do
+     * {@code getBuilds().byTimestamp(s,e)} to avoid code bloat in {@link Job}.
      */
     public RunList<RunT> getBuildsByTimestamp(long start, long end) {
         return getBuilds().byTimestamp(start, end);
@@ -1069,8 +1068,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * <p/>
      * Some {@link Job}s may not have backing data store for {@link Run}s, but
      * those {@link Job}s that use file system for storing data should use this
-     * directory for consistency.
-     * This dir could be configured by setting HUDSON_BUILDS property in JNDI or Environment or System properties.
+     * directory for consistency. This dir could be configured by setting
+     * HUDSON_BUILDS property in JNDI or Environment or System properties.
      *
      * @return result directory
      * @see RunMap
@@ -1129,8 +1128,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Returns the last successful build, if any. Otherwise null. A successful build
-     * would include either {@link Result#SUCCESS} or {@link Result#UNSTABLE}.
+     * Returns the last successful build, if any. Otherwise null. A successful
+     * build would include either {@link Result#SUCCESS} or
+     * {@link Result#UNSTABLE}.
      *
      * @see #getLastStableBuild()
      */
@@ -1147,7 +1147,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Returns the last build that was anything but stable, if any. Otherwise null.
+     * Returns the last build that was anything but stable, if any. Otherwise
+     * null.
+     *
      * @see #getLastSuccessfulBuild
      */
     @Exported
@@ -1163,6 +1165,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     /**
      * Returns the last unstable build, if any. Otherwise null.
+     *
      * @see #getLastSuccessfulBuild
      */
     @Exported
@@ -1178,6 +1181,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     /**
      * Returns the last stable build, if any. Otherwise null.
+     *
      * @see #getLastSuccessfulBuild
      */
     @Exported
@@ -1218,10 +1222,12 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Returns the last 'numberOfBuilds' builds with a build result >= 'threshold'
+     * Returns the last 'numberOfBuilds' builds with a build result >=
+     * 'threshold'
      *
-     * @return a list with the builds. May be smaller than 'numberOfBuilds' or even empty
-     *   if not enough builds satisfying the threshold have been found. Never null.
+     * @return a list with the builds. May be smaller than 'numberOfBuilds' or
+     * even empty if not enough builds satisfying the threshold have been found.
+     * Never null.
      */
     public List<RunT> getLastBuildsOverThreshold(int numberOfBuilds, Result threshold) {
 
@@ -1460,7 +1466,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 }
             } else {
                 BaseProjectProperty property = CascadingUtil.getBaseProjectProperty(this,
-                    d.getJsonSafeClassName());
+                        d.getJsonSafeClassName());
                 JobProperty prop = d.newInstance(req, json.getJSONObject(d.getJsonSafeClassName()));
                 if (null != prop) {
                     prop.setOwner(this);
@@ -1515,7 +1521,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     public String getBuildStatusUrl() {
         return getIconColor().getImage();
     }
-    
+
     /**
      * Renames this job.
      */
@@ -1561,9 +1567,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Returns the {@link ACL} for this object.
-     * We need to override the identical method in AbstractItem because we won't
-     * call getACL(Job) otherwise (single dispatch)
+     * Returns the {@link ACL} for this object. We need to override the
+     * identical method in AbstractItem because we won't call getACL(Job)
+     * otherwise (single dispatch)
      */
     @Override
     public ACL getACL() {
@@ -1622,7 +1628,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     public synchronized void doUpdateCascadingProject(@QueryParameter(fixEmpty = true) String projectName)
-        throws IOException {
+            throws IOException {
         setCascadingProjectName(projectName);
     }
 
@@ -1631,9 +1637,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             if (StringUtils.startsWith(propertyName, PROJECT_PROPERTY_KEY_PREFIX)) {
                 propertyName = StringUtils.substring(propertyName, 3);
                 propertyName = new StringBuilder(propertyName.length())
-                    .append(Character.toLowerCase((propertyName.charAt(0))))
-                    .append(propertyName.substring(1))
-                    .toString();
+                        .append(Character.toLowerCase((propertyName.charAt(0))))
+                        .append(propertyName.substring(1))
+                        .toString();
             }
             IProjectProperty property = getProperty(propertyName);
             if (null != property && property instanceof ExternalProjectProperty) {
@@ -1656,7 +1662,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             CascadingUtil.unlinkProjectFromCascadingParents(cascadingProject, name);
             this.cascadingProjectName = cascadingProjectName;
             cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
-                cascadingProjectName);
+                    cascadingProjectName);
             CascadingUtil.linkCascadingProjectsToChild(cascadingProject, name);
             for (IProjectProperty property : jobProperties.values()) {
                 property.onCascadingProjectChanged();
@@ -1665,8 +1671,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Renames cascading project name. For the properties processing and children links updating
-     * please use {@link #setCascadingProjectName} instead.
+     * Renames cascading project name. For the properties processing and
+     * children links updating please use {@link #setCascadingProjectName}
+     * instead.
      *
      * @param cascadingProjectName new project name.
      */
@@ -1683,13 +1690,14 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     public synchronized JobT getCascadingProject() {
         if (StringUtils.isNotBlank(cascadingProjectName) && cascadingProject == null) {
             cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
-                cascadingProjectName);
+                    cascadingProjectName);
         }
         return cascadingProject;
     }
 
     /**
      * Checks whether current job is inherited from other project.
+     *
      * @return boolean.
      */
     public boolean hasCascadingProject() {
@@ -1697,7 +1705,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Removes cascading project data, marks all project properties as non-overridden and saves configuration
+     * Removes cascading project data, marks all project properties as
+     * non-overridden and saves configuration
      *
      * @throws java.io.IOException if configuration couldn't be saved.
      */
@@ -1714,26 +1723,26 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         Graph graph = new Graph(getLastBuild().getTimestamp(), 500, 400);
 
         DataSet<String, ChartLabel> data = new DataSet<String, ChartLabel>();
-        
+
         GraphSeries<String> xSeries = new GraphSeries<String>("Build No.");
         data.setXSeries(xSeries);
-        
+
         GraphSeries<Number> ySeriesAborted = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Aborted", ColorPalette.GREY, true, false);
         //ySeriesFailed.setBaseURL(getRelPath(req)); 
         data.addYSeries(ySeriesAborted);
-        
+
         GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Failed", ColorPalette.RED, true, false);
         //ySeriesFailed.setBaseURL(getRelPath(req)); 
         data.addYSeries(ySeriesFailed);
-        
+
         GraphSeries<Number> ySeriesUnstable = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Unstable", ColorPalette.YELLOW, true, false);
         //ySeriesSkipped.setBaseURL(getRelPath(req));
         data.addYSeries(ySeriesUnstable);
-        
+
         GraphSeries<Number> ySeriesSuccessful = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Successful", ColorPalette.BLUE, true, false);
         //ySeriesTotal.setBaseURL(getRelPath(req));
         data.addYSeries(ySeriesSuccessful);
-        
+
         for (Run run : getBuilds()) {
             if (run.isBuilding()) {
                 continue;
@@ -1762,7 +1771,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 ySeriesFailed.add(0.);
                 ySeriesUnstable.add(0.);
             }
-            
+
             // For backward compatibility with JFreechart
             data.add(duration, "min",
                     new TimeTrendChartLabel(run));
@@ -1783,7 +1792,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
 
         public int compareTo(ChartLabel that) {
-            return Run.ORDER_BY_DATE.compare(run, ((TimeTrendChartLabel)that).run);
+            return Run.ORDER_BY_DATE.compare(run, ((TimeTrendChartLabel) that).run);
         }
 
         @Override

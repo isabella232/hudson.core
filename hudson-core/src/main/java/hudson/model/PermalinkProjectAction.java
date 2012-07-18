@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -20,30 +20,27 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Optional interface for {@link Action}s that are attached
- * to {@link AbstractProject} (through {@link JobProperty#getJobActions(Job)}),
+ * Optional interface for {@link Action}s that are attached to
+ * {@link AbstractProject} (through {@link JobProperty#getJobActions(Job)}),
  * which allows plugins to define additional permalinks in the project.
  *
- * <p>
- * Permalinks are listed together in the UI for better ease of use,
- * plus other plugins can use this information elsewhere (for example,
- * a plugin to download an artifact from one of the permalinks.)
+ * <p> Permalinks are listed together in the UI for better ease of use, plus
+ * other plugins can use this information elsewhere (for example, a plugin to
+ * download an artifact from one of the permalinks.)
  *
  * @author Kohsuke Kawaguchi
  * @since 1.253
  * @see JobProperty
  */
 public interface PermalinkProjectAction extends Action {
+
     /**
      * Gets the permalinks defined for this project.
      *
-     * <p>
-     * Because {@link Permalink} is a strategy-pattern object,
-     * this method should normally return a pre-initialzied
-     * read-only static list object.  
+     * <p> Because {@link Permalink} is a strategy-pattern object, this method
+     * should normally return a pre-initialzied read-only static list object.
      *
-     * @return
-     *      can be empty, but never null.
+     * @return can be empty, but never null.
      */
     List<Permalink> getPermalinks();
 
@@ -51,6 +48,7 @@ public interface PermalinkProjectAction extends Action {
      * Permalink as a strategy pattern.
      */
     public static abstract class Permalink {
+
         /**
          * String to be displayed in the UI, such as "Last successful build".
          * The convention is to upper case the first letter.
@@ -60,24 +58,20 @@ public interface PermalinkProjectAction extends Action {
         /**
          * ID that uniquely identifies this permalink.
          *
-         * <p>
-         * The is also used as an URL token to represent the permalink.
-         * This becomes the part of the permanent URL.
+         * <p> The is also used as an URL token to represent the permalink. This
+         * becomes the part of the permanent URL.
          *
-         * <p>
-         * The expected format is the camel case,
-         * such as "lastSuccessfulBuild".
+         * <p> The expected format is the camel case, such as
+         * "lastSuccessfulBuild".
          */
         public abstract String getId();
 
         /**
          * Resolves the permalink to a build.
          *
-         * @return null
-         *      if the target of the permalink doesn't exist.
+         * @return null if the target of the permalink doesn't exist.
          */
-        public abstract Run<?,?> resolve(Job<?,?> job);
-
+        public abstract Run<?, ?> resolve(Job<?, ?> job);
         /**
          * List of {@link Permalink}s that are built into Hudson.
          */
@@ -93,7 +87,7 @@ public interface PermalinkProjectAction extends Action {
                     return "lastBuild";
                 }
 
-                public Run<?,?> resolve(Job<?,?> job) {
+                public Run<?, ?> resolve(Job<?, ?> job) {
                     return job.getLastBuild();
                 }
             });
@@ -107,7 +101,7 @@ public interface PermalinkProjectAction extends Action {
                     return "lastStableBuild";
                 }
 
-                public Run<?,?> resolve(Job<?,?> job) {
+                public Run<?, ?> resolve(Job<?, ?> job) {
                     return job.getLastStableBuild();
                 }
             });
@@ -121,7 +115,7 @@ public interface PermalinkProjectAction extends Action {
                     return "lastSuccessfulBuild";
                 }
 
-                public Run<?,?> resolve(Job<?,?> job) {
+                public Run<?, ?> resolve(Job<?, ?> job) {
                     return job.getLastSuccessfulBuild();
                 }
             });
@@ -135,7 +129,7 @@ public interface PermalinkProjectAction extends Action {
                     return "lastFailedBuild";
                 }
 
-                public Run<?,?> resolve(Job<?,?> job) {
+                public Run<?, ?> resolve(Job<?, ?> job) {
                     return job.getLastFailedBuild();
                 }
             });
@@ -149,7 +143,7 @@ public interface PermalinkProjectAction extends Action {
                     return "lastUnstableBuild";
                 }
 
-                public Run<?,?> resolve(Job<?,?> job) {
+                public Run<?, ?> resolve(Job<?, ?> job) {
                     return job.getLastUnstableBuild();
                 }
             });
@@ -163,7 +157,7 @@ public interface PermalinkProjectAction extends Action {
                     return "lastUnsuccessfulBuild";
                 }
 
-                public Run<?,?> resolve(Job<?,?> job) {
+                public Run<?, ?> resolve(Job<?, ?> job) {
                     return job.getLastUnsuccessfulBuild();
                 }
             });

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Luca Domenico Milanesio, Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Luca Domenico Milanesio, Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -28,7 +28,8 @@ import hudson.util.VariableResolver;
  * {@link ParameterValue} created from {@link BooleanParameterDefinition}.
  */
 public class BooleanParameterValue extends ParameterValue {
-    @Exported(visibility=4)
+
+    @Exported(visibility = 4)
     public final boolean value;
 
     @DataBoundConstructor
@@ -45,9 +46,9 @@ public class BooleanParameterValue extends ParameterValue {
      * Exposes the name/value as an environment variable.
      */
     @Override
-    public void buildEnvVars(AbstractBuild<?,?> build, EnvVars env) {
-        env.put(name,Boolean.toString(value));
-        env.put(name.toUpperCase(Locale.ENGLISH),Boolean.toString(value)); // backward compatibility pre 1.345
+    public void buildEnvVars(AbstractBuild<?, ?> build, EnvVars env) {
+        env.put(name, Boolean.toString(value));
+        env.put(name.toUpperCase(Locale.ENGLISH), Boolean.toString(value)); // backward compatibility pre 1.345
     }
 
     @Override
@@ -61,13 +62,21 @@ public class BooleanParameterValue extends ParameterValue {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
 
         BooleanParameterValue that = (BooleanParameterValue) o;
 
-        if (value != that.value) return false;
+        if (value != that.value) {
+            return false;
+        }
 
         return true;
     }
@@ -81,6 +90,6 @@ public class BooleanParameterValue extends ParameterValue {
 
     @Override
     public String toString() {
-    	return "(BooleanParameterValue) " + getName() + "='" + value + "'";
+        return "(BooleanParameterValue) " + getName() + "='" + value + "'";
     }
 }

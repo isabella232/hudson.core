@@ -140,16 +140,19 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     public static final String SLAVE_KEY = "slave";
     public static final String ASSIGNED_LABEL_KEY = "_.assignedLabelString";
     /**
-     * {@link SCM} associated with the project. To allow derived classes to link {@link SCM}
-     * config to elsewhere, access to this variable should always go through {@link #getScm()}.
+     * {@link SCM} associated with the project. To allow derived classes to link
+     * {@link SCM} config to elsewhere, access to this variable should always go
+     * through {@link #getScm()}.
      *
-     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     * Use getter/setter for accessing to this field.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to
+     * {@link org.eclipse.hudson.api.model.IProjectProperty}. Use getter/setter
+     * for accessing to this field.
      */
     @Deprecated
     private volatile SCM scm = new NullSCM();
     /**
-     * State returned from {@link SCM#poll(AbstractProject, Launcher, FilePath, TaskListener, SCMRevisionState)}.
+     * State returned from
+     * {@link SCM#poll(AbstractProject, Launcher, FilePath, TaskListener, SCMRevisionState)}.
      */
     private volatile transient SCMRevisionState pollingBaseline = null;
     /**
@@ -161,8 +164,9 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     /**
      * The quiet period. Null to delegate to the system default.
      *
-     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     * Use getter/setter for accessing to this field.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to
+     * {@link org.eclipse.hudson.api.model.IProjectProperty}. Use getter/setter
+     * for accessing to this field.
      *
      */
     @Deprecated
@@ -170,8 +174,9 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     /**
      * The retry count. Null to delegate to the system default.
      *
-     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     * Use getter/setter for accessing to this field.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to
+     * {@link org.eclipse.hudson.api.model.IProjectProperty}. Use getter/setter
+     * for accessing to this field.
      */
     @Deprecated
     private volatile Integer scmCheckoutRetryCount = null;
@@ -185,7 +190,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      * @see #canRoam
      *
      * @deprecated as of 2.2.0 don't use this field directly, logic was moved to
-     *             {@link hudson.model.AbstractProject#getAppointedNode()#getName()}.
+     * {@link hudson.model.AbstractProject#getAppointedNode()#getName()}.
      */
     @Deprecated
     private String assignedNode;
@@ -193,7 +198,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      * Node list is dropdown or textfield
      *
      * @deprecated as of 2.2.0 don't use this field directly, logic was moved to
-     *             {@link hudson.model.AbstractProject#getAppointedNode()#isAdvancedAffinityChooser()}.
+     * {@link hudson.model.AbstractProject#getAppointedNode()#isAdvancedAffinityChooser()}.
      */
     @Deprecated
     private Boolean advancedAffinityChooser;
@@ -204,7 +209,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      * existing Hudson installations nicely.
      *
      * @deprecated as of 2.2.0 don't use this field directly, logic was moved to
-     *             {@link hudson.model.AbstractProject#getAppointedNode()#getCanRoam}.
+     * {@link hudson.model.AbstractProject#getAppointedNode()#getCanRoam}.
      */
     @Deprecated
     private volatile boolean canRoam;
@@ -236,12 +241,13 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      * Identifies {@link JDK} to be used. Null if no explicit configuration is
      * required.
      *
-     * <p> Can't store {@link JDK} directly because {@link Hudson} and {@link Project}
-     * are saved independently.
+     * <p> Can't store {@link JDK} directly because {@link Hudson} and
+     * {@link Project} are saved independently.
      *
      * @see Hudson#getJDK(String)
-     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     * Use getter/setter for accessing to this field.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to
+     * {@link org.eclipse.hudson.api.model.IProjectProperty}. Use getter/setter
+     * for accessing to this field.
      */
     @Deprecated
     private volatile String jdk;
@@ -256,8 +262,9 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      *
      * @deprecated as of 2.2.0
      *
-     * don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     * Use getter/setter for accessing to this field.
+     * don't use this field directly, logic was moved to
+     * {@link org.eclipse.hudson.api.model.IProjectProperty}. Use getter/setter
+     * for accessing to this field.
      */
     protected List<Trigger<?>> triggers = new Vector<Trigger<?>>();
     /**
@@ -271,16 +278,18 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     @CopyOnWrite
     protected transient volatile List<Action> transientActions = new Vector<Action>();
     /**
-     * @deprecated as of 2.2.0 Don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     * Use getter/setter for accessing to this field.
+     * @deprecated as of 2.2.0 Don't use this field directly, logic was moved to
+     * {@link org.eclipse.hudson.api.model.IProjectProperty}. Use getter/setter
+     * for accessing to this field.
      */
     @Deprecated
     private boolean concurrentBuild;
     /**
      * True to clean the workspace prior to each build.
      *
-     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to {@link org.eclipse.hudson.api.model.IProjectProperty}.
-     * Use getter/setter for accessing to this field.
+     * @deprecated as of 2.2.0 don't use this field directly, logic was moved to
+     * {@link org.eclipse.hudson.api.model.IProjectProperty}. Use getter/setter
+     * for accessing to this field.
      */
     @Deprecated
     private volatile boolean cleanWorkspaceRequired;
@@ -315,7 +324,6 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
 
         this.builds = new RunMap<R>();
         this.builds.load(this, new Constructor<R>() {
-
             public R create(File dir) throws IOException {
                 return loadBuild(dir);
             }
@@ -498,7 +506,8 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     }
 
     /**
-     * Assigns this job to the given node. A convenience method over {@link #setAssignedLabel(Label)}.
+     * Assigns this job to the given node. A convenience method over
+     * {@link #setAssignedLabel(Label)}.
      *
      * @param node node.
      * @throws java.io.IOException exception
@@ -554,8 +563,8 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     }
 
     /**
-     * Get the term used in the UI to represent this kind of {@link AbstractProject}.
-     * Must start with a capital letter.
+     * Get the term used in the UI to represent this kind of
+     * {@link AbstractProject}. Must start with a capital letter.
      */
     @Override
     public String getPronoun() {
@@ -581,9 +590,9 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      * @return null if the workspace is on a slave that's not connected.
      * @deprecated as of 1.319 To support concurrent builds of the same project,
      * this method is moved to {@link AbstractBuild}. For backward
-     * compatibility, this method returns the right {@link AbstractBuild#getWorkspace()}
-     * if called from {@link Executor}, and otherwise the workspace of the last
-     * build.
+     * compatibility, this method returns the right
+     * {@link AbstractBuild#getWorkspace()} if called from {@link Executor}, and
+     * otherwise the workspace of the last build.
      *
      * <p> If you are calling this method during a build from an executor,
      * switch it to {@link AbstractBuild#getWorkspace()}. If you are calling
@@ -1456,15 +1465,14 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      * Useful for locking and mutual exclusion control.
      *
      * @deprecated as of 1.319 Projects no longer have a fixed workspace, ands
-     * builds will find an available workspace via
-     *      {@link WorkspaceList} for each build (furthermore, that happens after a
-     * build is started.) So a {@link Resource} representation for a workspace
-     * at the project level no longer makes sense.
+     * builds will find an available workspace via {@link WorkspaceList} for
+     * each build (furthermore, that happens after a build is started.) So a
+     * {@link Resource} representation for a workspace at the project level no
+     * longer makes sense.
      *
      * <p> If you need to lock a workspace while you do some computation, see
-     * the source code of
-     *      {@link #pollSCMChanges(TaskListener)} for how to obtain a lock of a
-     * workspace through {@link WorkspaceList}.
+     * the source code of {@link #pollSCMChanges(TaskListener)} for how to
+     * obtain a lock of a workspace through {@link WorkspaceList}.
      */
     public Resource getWorkspaceResource() {
         return new Resource(getFullDisplayName() + " workspace");
@@ -2031,8 +2039,8 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     }
 
     /**
-     * @deprecated As of 1.261. Use {@link #buildDescribable(StaplerRequest, List)}
-     * instead.
+     * @deprecated As of 1.261. Use
+     * {@link #buildDescribable(StaplerRequest, List)} instead.
      */
     protected final <T extends Describable<T>> List<T> buildDescribable(StaplerRequest req, List<? extends Descriptor<T>> descriptors, String prefix) throws FormException, ServletException {
         return buildDescribable(req, descriptors);
@@ -2163,7 +2171,6 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
                 getDisplayName() + ' ' + getScm().getDescriptor().getDisplayName() + " changes",
                 getUrl() + "changes",
                 entries, new FeedAdapter<FeedItem>() {
-
             public String getEntryTitle(FeedItem item) {
                 return "#" + item.getBuild().number + ' ' + item.e.getMsg() + " (" + item.e.getAuthor() + ")";
             }
@@ -2211,10 +2218,11 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
          * given to the users.
          *
          * <p> Some {@link Descriptor}s define their own schemes for controlling
-         * applicability (such as {@link BuildStepDescriptor#isApplicable(Class)}),
-         * This method works like AND in conjunction with them; Both this method
-         * and that method need to return true in order for a given {@link Descriptor}
-         * to show up for the given {@link Project}.
+         * applicability (such as
+         * {@link BuildStepDescriptor#isApplicable(Class)}), This method works
+         * like AND in conjunction with them; Both this method and that method
+         * need to return true in order for a given {@link Descriptor} to show
+         * up for the given {@link Project}.
          *
          * <p> The default implementation returns true for everything.
          *
@@ -2275,14 +2283,14 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
         return (AbstractProject) Hudson.getInstance().getItem(nearest);
     }
     private static final Comparator<Integer> REVERSE_INTEGER_COMPARATOR = new Comparator<Integer>() {
-
         public int compare(Integer o1, Integer o2) {
             return o2 - o1;
         }
     };
     private static final Logger LOGGER = Logger.getLogger(AbstractProject.class.getName());
     /**
-     * Permission to abort a build. For now, let's make it the same as {@link #BUILD}
+     * Permission to abort a build. For now, let's make it the same as
+     * {@link #BUILD}
      */
     public static final Permission ABORT = BUILD;
 

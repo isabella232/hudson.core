@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -62,7 +62,6 @@ public class UsageStatistics extends PageDecorator {
      * When was the last time we asked a browser to send the usage stats for us?
      */
     private volatile transient long lastAttempt = -1;
-
     /**
      * Public key (Hex encoded) to encrypt the usage statistics
      */
@@ -179,10 +178,12 @@ public class UsageStatistics extends PageDecorator {
     }
 
     /**
-     * Assymetric cipher is slow and in case of Sun RSA implementation it can only encyrypt the first block.
+     * Assymetric cipher is slow and in case of Sun RSA implementation it can
+     * only encyrypt the first block.
      *
-     * So first create a symmetric key, then place this key in the beginning of the stream by encrypting it
-     * with the assymetric cipher. The rest of the stream will be encrypted by a symmetric cipher.
+     * So first create a symmetric key, then place this key in the beginning of
+     * the stream by encrypting it with the assymetric cipher. The rest of the
+     * stream will be encrypted by a symmetric cipher.
      */
     public static final class CombinedCipherOutputStream extends FilterOutputStream {
 
@@ -208,9 +209,9 @@ public class UsageStatistics extends PageDecorator {
     public static final class CombinedCipherInputStream extends FilterInputStream {
 
         /**
-         * @param keyLength
-         *      Block size of the asymmetric cipher, in bits. I thought I can get it from {@code asym.getBlockSize()}
-         *      but that doesn't work with Sun's implementation.
+         * @param keyLength Block size of the asymmetric cipher, in bits. I
+         * thought I can get it from {@code asym.getBlockSize()} but that
+         * doesn't work with Sun's implementation.
          */
         public CombinedCipherInputStream(InputStream in, Cipher asym, String algorithm, int keyLength) throws IOException, GeneralSecurityException {
             super(in);

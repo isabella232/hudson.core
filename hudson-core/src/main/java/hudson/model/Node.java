@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *   Kohsuke Kawaguchi, Winston Prakash, Seiji Sogabe, Stephen Connolly
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -50,10 +50,10 @@ import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
 /**
- * Base type of Hudson slaves (although in practice, you probably extend {@link Slave} to define a new slave type.)
+ * Base type of Hudson slaves (although in practice, you probably extend
+ * {@link Slave} to define a new slave type.)
  *
- * <p>
- * As a special case, {@link Hudson} extends from here.
+ * <p> As a special case, {@link Hudson} extends from here.
  *
  * @author Kohsuke Kawaguchi
  * @see NodeMonitor
@@ -63,13 +63,11 @@ import org.kohsuke.stapler.export.ExportedBean;
 public abstract class Node extends AbstractModelObject implements Describable<Node>, ExtensionPoint, AccessControlled {
 
     private static final Logger LOGGER = Logger.getLogger(Node.class.getName());
-
     /**
-     * Newly copied slaves get this flag set, so that Hudson doesn't try to start this node until its configuration
-     * is saved once.
+     * Newly copied slaves get this flag set, so that Hudson doesn't try to
+     * start this node until its configuration is saved once.
      */
     protected volatile transient boolean holdOffLaunchUntilSave;
-
     /**
      * Contains info about reason the node is offline.
      */
@@ -80,6 +78,7 @@ public abstract class Node extends AbstractModelObject implements Describable<No
      */
     @Extension
     public static class NodeListener extends ComputerListener {
+
         @Override
         public void onOnline(Computer c, TaskListener listener) {
             Node node = c.getNode();
@@ -110,7 +109,7 @@ public abstract class Node extends AbstractModelObject implements Describable<No
     }
 
     public String getSearchUrl() {
-        return "computer/"+getNodeName();
+        return "computer/" + getNodeName();
     }
 
     public boolean isHoldOffLaunchUntilSave() {
@@ -120,21 +119,21 @@ public abstract class Node extends AbstractModelObject implements Describable<No
     /**
      * Name of this node.
      *
-     * @return
-     *      "" if this is master
+     * @return "" if this is master
      */
-    @Exported(visibility=999)
+    @Exported(visibility = 999)
     public abstract String getNodeName();
 
     /**
-     * When the user clones a {@link Node}, Hudson uses this method to change the node name right after
-     * the cloned {@link Node} object is instantiated.
+     * When the user clones a {@link Node}, Hudson uses this method to change
+     * the node name right after the cloned {@link Node} object is instantiated.
      *
-     * <p>
-     * This method is never used for any other purpose, and as such for all practical intents and purposes,
-     * the node name should be treated like immutable.
+     * <p> This method is never used for any other purpose, and as such for all
+     * practical intents and purposes, the node name should be treated like
+     * immutable.
      *
-     * @deprecated to indicate that this method isn't really meant to be called by random code.
+     * @deprecated to indicate that this method isn't really meant to be called
+     * by random code.
      */
     public abstract void setNodeName(String name);
 
@@ -147,24 +146,24 @@ public abstract class Node extends AbstractModelObject implements Describable<No
     /**
      * Returns a {@link Launcher} for executing programs on this node.
      *
-     * <p>
-     * The callee must call {@link Launcher#decorateFor(Node)} before returning to complete the decoration. 
+     * <p> The callee must call {@link Launcher#decorateFor(Node)} before
+     * returning to complete the decoration.
      */
     public abstract Launcher createLauncher(TaskListener listener);
 
     /**
      * Returns the number of {@link Executor}s.
      *
-     * This may be different from <code>getExecutors().size()</code>
-     * because it takes time to adjust the number of executors.
+     * This may be different from
+     * <code>getExecutors().size()</code> because it takes time to adjust the
+     * number of executors.
      */
     @Exported
     public abstract int getNumExecutors();
 
     /**
-     * Returns {@link Mode#EXCLUSIVE} if this node is only available
-     * for those jobs that exclusively specifies this node
-     * as the assigned node.
+     * Returns {@link Mode#EXCLUSIVE} if this node is only available for those
+     * jobs that exclusively specifies this node as the assigned node.
      */
     @Exported
     public abstract Mode getMode();
@@ -172,9 +171,8 @@ public abstract class Node extends AbstractModelObject implements Describable<No
     /**
      * Gets the corresponding {@link Computer} object.
      *
-     * @return
-     *      this method can return null if there's no {@link Computer} object for this node,
-     *      such as when this node has no executors at all.
+     * @return this method can return null if there's no {@link Computer} object
+     * for this node, such as when this node has no executors at all.
      */
     public final Computer toComputer() {
         return Hudson.getInstance().getComputer(this);
@@ -183,16 +181,18 @@ public abstract class Node extends AbstractModelObject implements Describable<No
     /**
      * Gets the current channel, if the node is connected and online, or null.
      *
-     * This is just a convenience method for {@link Computer#getChannel()} with null check. 
+     * This is just a convenience method for {@link Computer#getChannel()} with
+     * null check.
      */
     public final VirtualChannel getChannel() {
         Computer c = toComputer();
-        return c==null ? null : c.getChannel();
+        return c == null ? null : c.getChannel();
     }
 
     /**
-     * Creates a new {@link Computer} object that acts as the UI peer of this {@link Node}.
-     * Nobody but {@link Hudson#updateComputerList()} should call this method.
+     * Creates a new {@link Computer} object that acts as the UI peer of this
+     * {@link Node}. Nobody but {@link Hudson#updateComputerList()} should call
+     * this method.
      */
     protected abstract Computer createComputer();
 
@@ -200,12 +200,13 @@ public abstract class Node extends AbstractModelObject implements Describable<No
      * Return the possibly empty tag cloud for the labels of this node.
      */
     public TagCloud<LabelAtom> getLabelCloud() {
-        return new TagCloud<LabelAtom>(getAssignedLabels(),new WeightFunction<LabelAtom>() {
+        return new TagCloud<LabelAtom>(getAssignedLabels(), new WeightFunction<LabelAtom>() {
             public float weight(LabelAtom item) {
                 return item.getTiedJobs().size();
             }
         });
     }
+
     /**
      * Returns the possibly empty set of labels that are assigned to this node,
      * including the automatic {@link #getSelfLabel() self label}, manually
@@ -225,9 +226,10 @@ public abstract class Node extends AbstractModelObject implements Describable<No
     }
 
     /**
-     * Return all the labels assigned dynamically to this node.
-     * This calls all the LabelFinder implementations with the node converts
-     * the results into Labels.
+     * Return all the labels assigned dynamically to this node. This calls all
+     * the LabelFinder implementations with the node converts the results into
+     * Labels.
+     *
      * @return HashSet<Label>.
      */
     private HashSet<LabelAtom> getDynamicLabels() {
@@ -235,19 +237,21 @@ public abstract class Node extends AbstractModelObject implements Describable<No
         for (LabelFinder labeler : LabelFinder.all()) {
             // Filter out any bad(null) results from plugins
             // for compatibility reasons, findLabels may return LabelExpression and not atom.
-            for (Label label : labeler.findLabels(this))
-                if (label instanceof LabelAtom) result.add((LabelAtom)label);
+            for (Label label : labeler.findLabels(this)) {
+                if (label instanceof LabelAtom) {
+                    result.add((LabelAtom) label);
+                }
+            }
         }
         return result;
     }
 
-
     /**
      * Returns the manually configured label for a node. The list of assigned
-     * and dynamically determined labels is available via 
+     * and dynamically determined labels is available via
      * {@link #getAssignedLabels()} and includes all labels that have been
      * manually configured.
-     * 
+     *
      * Mainly for form binding.
      */
     public abstract String getLabelString();
@@ -271,17 +275,19 @@ public abstract class Node extends AbstractModelObject implements Describable<No
      */
     public CauseOfBlockage canTake(Task task) {
         Label l = task.getAssignedLabel();
-        if(l!=null && !l.contains(this))
-            return CauseOfBlockage.fromMessage(Messages._Node_LabelMissing(getNodeName(),l));   // the task needs to be executed on label that this node doesn't have.
-
-        if(l==null && getMode()== Mode.EXCLUSIVE)
+        if (l != null && !l.contains(this)) {
+            return CauseOfBlockage.fromMessage(Messages._Node_LabelMissing(getNodeName(), l));   // the task needs to be executed on label that this node doesn't have.
+        }
+        if (l == null && getMode() == Mode.EXCLUSIVE) {
             return CauseOfBlockage.fromMessage(Messages._Node_BecauseNodeIsReserved(getNodeName()));   // this node is reserved for tasks that are tied to it
-
+        }
         // Check each NodeProperty to see whether they object to this node
         // taking the task
-        for (NodeProperty prop: getNodeProperties()) {
+        for (NodeProperty prop : getNodeProperties()) {
             CauseOfBlockage c = prop.canTake(task);
-            if (c!=null)    return c;
+            if (c != null) {
+                return c;
+            }
         }
 
         // Looks like we can take the task
@@ -291,12 +297,11 @@ public abstract class Node extends AbstractModelObject implements Describable<No
     /**
      * Returns a "workspace" directory for the given {@link TopLevelItem}.
      *
-     * <p>
-     * Workspace directory is usually used for keeping out the checked out
+     * <p> Workspace directory is usually used for keeping out the checked out
      * source code, but it can be used for anything.
      *
-     * @return
-     *      null if this node is not connected hence the path is not available
+     * @return null if this node is not connected hence the path is not
+     * available
      */
     // TODO: should this be modified now that getWorkspace is moved from AbstractProject to AbstractBuild?
     public abstract FilePath getWorkspaceFor(TopLevelItem item);
@@ -304,13 +309,11 @@ public abstract class Node extends AbstractModelObject implements Describable<No
     /**
      * Gets the root directory of this node.
      *
-     * <p>
-     * Hudson always owns a directory on every node. This method
-     * returns that.
+     * <p> Hudson always owns a directory on every node. This method returns
+     * that.
      *
-     * @return
-     *      null if the node is offline and hence the {@link FilePath}
-     *      object is not available.
+     * @return null if the node is offline and hence the {@link FilePath} object
+     * is not available.
      */
     public abstract FilePath getRootPath();
 
@@ -319,8 +322,10 @@ public abstract class Node extends AbstractModelObject implements Describable<No
      */
     public FilePath createPath(String absolutePath) {
         VirtualChannel ch = getChannel();
-        if(ch==null)    return null;    // offline
-        return new FilePath(ch,absolutePath);
+        if (ch == null) {
+            return null;    // offline
+        }
+        return new FilePath(ch, absolutePath);
     }
 
     public FileSystemProvisioner getFileSystemProvisioner() {
@@ -337,11 +342,11 @@ public abstract class Node extends AbstractModelObject implements Describable<No
     public List<NodePropertyDescriptor> getNodePropertyDescriptors() {
         return NodeProperty.for_(this);
     }
-    
+
     public ACL getACL() {
         return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy().getACL(this);
     }
-    
+
     public final void checkPermission(Permission permission) {
         getACL().checkPermission(permission);
     }
@@ -355,10 +360,8 @@ public abstract class Node extends AbstractModelObject implements Describable<No
     /**
      * Estimates the clock difference with this slave.
      *
-     * @return
-     *      always non-null.
-     * @throws InterruptedException
-     *      if the operation is aborted.
+     * @return always non-null.
+     * @throws InterruptedException if the operation is aborted.
      */
     public abstract ClockDifference getClockDifference() throws IOException, InterruptedException;
 
@@ -366,9 +369,9 @@ public abstract class Node extends AbstractModelObject implements Describable<No
      * Constants that control how Hudson allocates jobs to slaves.
      */
     public enum Mode {
+
         NORMAL(Messages.Node_Mode_NORMAL()),
         EXCLUSIVE(Messages.Node_Mode_EXCLUSIVE());
-
         private final String description;
 
         public String getDescription() {
@@ -387,5 +390,4 @@ public abstract class Node extends AbstractModelObject implements Describable<No
             Stapler.CONVERT_UTILS.register(new EnumConverter(), Mode.class);
         }
     }
-
 }

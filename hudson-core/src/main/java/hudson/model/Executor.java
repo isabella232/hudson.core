@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Winston Prakash, Brian Westrich, Stephen Connolly, Tom Huybrechts
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -40,7 +40,6 @@ import java.lang.reflect.Method;
 import static hudson.model.queue.Executables.*;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 
-
 /**
  * Thread that executes builds.
  *
@@ -48,32 +47,30 @@ import org.eclipse.hudson.security.HudsonSecurityManager;
  */
 @ExportedBean
 public class Executor extends Thread implements ModelObject {
+
     protected final Computer owner;
     private final Queue queue;
-
     private long startTime;
     /**
      * Used to track when a job was last executed.
      */
     private long finishTime;
-
     /**
-     * Executor number that identifies it among other executors for the same {@link Computer}.
+     * Executor number that identifies it among other executors for the same
+     * {@link Computer}.
      */
     private int number;
     /**
-     * {@link Queue.Executable} being executed right now, or null if the executor is idle.
+     * {@link Queue.Executable} being executed right now, or null if the
+     * executor is idle.
      */
     private volatile Queue.Executable executable;
-
     private volatile WorkUnit workUnit;
-
     private Throwable causeOfDeath;
-
     private boolean induceDeath;
 
     public Executor(Computer owner, int n) {
-        super("Executor #"+n+" for "+owner.getDisplayName());
+        super("Executor #" + n + " for " + owner.getDisplayName());
         this.owner = owner;
         this.queue = Hudson.getInstance().getQueue();
         this.number = n;
@@ -86,12 +83,12 @@ public class Executor extends Thread implements ModelObject {
 
         try {
             finishTime = System.currentTimeMillis();
-            while(shouldRun()) {
+            while (shouldRun()) {
                 executable = null;
                 workUnit = null;
 
-                synchronized(owner) {
-                    if(owner.getNumExecutors()<owner.getExecutors().size()) {
+                synchronized (owner) {
+                    if (owner.getNumExecutors() < owner.getExecutors().size()) {
                         // we've got too many executors.
                         owner.removeExecutor(this);
                         return;
@@ -101,8 +98,12 @@ public class Executor extends Thread implements ModelObject {
                 // clear the interrupt flag as a precaution.
                 // sometime an interrupt aborts a build but without clearing the flag.
                 // see issue #1583
-                if (Thread.interrupted())   continue;
-                if (induceDeath)        throw new ThreadDeath();
+                if (Thread.interrupted()) {
+                    continue;
+                }
+                if (induceDeath) {
+                    throw new ThreadDeath();
+                }
 
                 SubTask task;
                 try {
@@ -128,11 +129,11 @@ public class Executor extends Thread implements ModelObject {
                     workUnit.context.synchronizeStart();
 
                     if (executable instanceof Actionable) {
-                        for (Action action: workUnit.context.actions) {
+                        for (Action action : workUnit.context.actions) {
                             ((Actionable) executable).addAction(action);
                         }
                     }
-                    setName(threadName+" : executing "+executable.toString());
+                    setName(threadName + " : executing " + executable.toString());
                     queue.execute(executable, task);
                 } catch (Throwable e) {
                     // for some reason the executor died. this is really
@@ -145,7 +146,7 @@ public class Executor extends Thread implements ModelObject {
                     setName(threadName);
                     finishTime = System.currentTimeMillis();
                     try {
-                        workUnit.context.synchronizeEnd(executable,problems,finishTime - startTime);
+                        workUnit.context.synchronizeEnd(executable, problems, finishTime - startTime);
                     } catch (InterruptedException e) {
                         workUnit.context.abort(e);
                         continue;
@@ -154,7 +155,7 @@ public class Executor extends Thread implements ModelObject {
                     }
                 }
             }
-        } catch(RuntimeException e) {
+        } catch (RuntimeException e) {
             causeOfDeath = e;
             throw e;
         } catch (Error e) {
@@ -185,8 +186,7 @@ public class Executor extends Thread implements ModelObject {
     /**
      * Returns the current {@link Queue.Task} this executor is running.
      *
-     * @return
-     *      null if the executor is idle.
+     * @return null if the executor is idle.
      */
     @Exported
     public Queue.Executable getCurrentExecutable() {
@@ -194,11 +194,11 @@ public class Executor extends Thread implements ModelObject {
     }
 
     /**
-     * Returns the current {@link WorkUnit} (of {@link #getCurrentExecutable() the current executable})
-     * that this executor is running.
+     * Returns the current {@link WorkUnit} (of
+     * {@link #getCurrentExecutable() the current executable}) that this
+     * executor is running.
      *
-     * @return
-     *      null if the executor is idle.
+     * @return null if the executor is idle.
      */
     @Exported
     public WorkUnit getCurrentWorkUnit() {
@@ -206,13 +206,15 @@ public class Executor extends Thread implements ModelObject {
     }
 
     /**
-     * If {@linkplain #getCurrentExecutable() current executable} is {@link AbstractBuild},
-     * return the workspace that this executor is using, or null if the build hasn't gotten
-     * to that point yet.
+     * If {@linkplain #getCurrentExecutable() current executable} is
+     * {@link AbstractBuild}, return the workspace that this executor is using,
+     * or null if the build hasn't gotten to that point yet.
      */
     public FilePath getCurrentWorkspace() {
         Executable e = executable;
-        if(e==null) return null;
+        if (e == null) {
+            return null;
+        }
         if (e instanceof AbstractBuild) {
             AbstractBuild ab = (AbstractBuild) e;
             return ab.getWorkspace();
@@ -224,15 +226,14 @@ public class Executor extends Thread implements ModelObject {
      * Same as {@link #getName()}.
      */
     public String getDisplayName() {
-        return "Executor #"+getNumber();
+        return "Executor #" + getNumber();
     }
 
     /**
-     * Gets the executor number that uniquely identifies it among
-     * other {@link Executor}s for the same computer.
+     * Gets the executor number that uniquely identifies it among other
+     * {@link Executor}s for the same computer.
      *
-     * @return
-     *      a sequential number starting from 0.
+     * @return a sequential number starting from 0.
      */
     @Exported
     public int getNumber() {
@@ -244,20 +245,22 @@ public class Executor extends Thread implements ModelObject {
      */
     @Exported
     public boolean isIdle() {
-        return executable==null && causeOfDeath==null;
+        return executable == null && causeOfDeath == null;
     }
 
     /**
-     * The opposite of {@link #isIdle()} &mdash; the executor is doing some work.
+     * The opposite of {@link #isIdle()} &mdash; the executor is doing some
+     * work.
      */
     public boolean isBusy() {
-        return executable!=null || causeOfDeath!=null;
+        return executable != null || causeOfDeath != null;
     }
 
     /**
      * If this thread dies unexpectedly, obtain the cause of the failure.
      *
-     * @return null if the death is expected death or the thread is {@link #isAlive() still alive}.
+     * @return null if the death is expected death or the thread is
+     * {@link #isAlive() still alive}.
      * @since 1.142
      */
     public Throwable getCauseOfDeath() {
@@ -267,41 +270,47 @@ public class Executor extends Thread implements ModelObject {
     /**
      * Returns the progress of the current build in the number between 0-100.
      *
-     * @return -1
-     *      if it's impossible to estimate the progress.
+     * @return -1 if it's impossible to estimate the progress.
      */
     @Exported
     public int getProgress() {
         Queue.Executable e = executable;
-        if(e==null)     return -1;
+        if (e == null) {
+            return -1;
+        }
         long d = Executables.getEstimatedDurationFor(e);
-        if(d<0)         return -1;
+        if (d < 0) {
+            return -1;
+        }
 
-        int num = (int)(getElapsedTime()*100/d);
-        if(num>=100)    num=99;
+        int num = (int) (getElapsedTime() * 100 / d);
+        if (num >= 100) {
+            num = 99;
+        }
         return num;
     }
 
     /**
      * Returns true if the current build is likely stuck.
      *
-     * <p>
-     * This is a heuristics based approach, but if the build is suspiciously taking for a long time,
-     * this method returns true.
+     * <p> This is a heuristics based approach, but if the build is suspiciously
+     * taking for a long time, this method returns true.
      */
     @Exported
     public boolean isLikelyStuck() {
         Queue.Executable e = executable;
-        if(e==null)     return false;
+        if (e == null) {
+            return false;
+        }
 
         long elapsed = getElapsedTime();
         long d = Executables.getEstimatedDurationFor(e);
-        if(d>=0) {
+        if (d >= 0) {
             // if it's taking 10 times longer than ETA, consider it stuck
-            return d*10 < elapsed;
+            return d * 10 < elapsed;
         } else {
             // if no ETA is available, a build taking longer than a day is considered stuck
-            return TimeUnit2.MILLISECONDS.toHours(elapsed)>24;
+            return TimeUnit2.MILLISECONDS.toHours(elapsed) > 24;
         }
     }
 
@@ -312,8 +321,7 @@ public class Executor extends Thread implements ModelObject {
     /**
      * Gets the string that says how long since this build has started.
      *
-     * @return
-     *      string like "3 minutes" "1 day" etc.
+     * @return string like "3 minutes" "1 day" etc.
      */
     public String getTimestampString() {
         return Util.getPastTimeString(getElapsedTime());
@@ -325,30 +333,42 @@ public class Executor extends Thread implements ModelObject {
      */
     public String getEstimatedRemainingTime() {
         Queue.Executable e = executable;
-        if(e==null)     return Messages.Executor_NotAvailable();
+        if (e == null) {
+            return Messages.Executor_NotAvailable();
+        }
 
         long d = Executables.getEstimatedDurationFor(e);
-        if(d<0)         return Messages.Executor_NotAvailable();
+        if (d < 0) {
+            return Messages.Executor_NotAvailable();
+        }
 
-        long eta = d-getElapsedTime();
-        if(eta<=0)      return Messages.Executor_NotAvailable();
+        long eta = d - getElapsedTime();
+        if (eta <= 0) {
+            return Messages.Executor_NotAvailable();
+        }
 
         return Util.getTimeSpanString(eta);
     }
 
     /**
-     * The same as {@link #getEstimatedRemainingTime()} but return
-     * it as a number of milli-seconds.
+     * The same as {@link #getEstimatedRemainingTime()} but return it as a
+     * number of milli-seconds.
      */
     public long getEstimatedRemainingTimeMillis() {
         Queue.Executable e = executable;
-        if(e==null)     return -1;
+        if (e == null) {
+            return -1;
+        }
 
         long d = Executables.getEstimatedDurationFor(e);
-        if(d<0)         return -1;
+        if (d < 0) {
+            return -1;
+        }
 
-        long eta = d-getElapsedTime();
-        if(eta<=0)      return -1;
+        long eta = d - getElapsedTime();
+        if (eta <= 0) {
+            return -1;
+        }
 
         return eta;
     }
@@ -356,9 +376,9 @@ public class Executor extends Thread implements ModelObject {
     /**
      * Stops the current build.
      */
-    public void doStop( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
+    public void doStop(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         Queue.Executable e = executable;
-        if(e!=null) {
+        if (e != null) {
             Tasks.getOwnerTaskOf(getParentOf(e)).checkAbortPermission();
             interrupt();
         }
@@ -370,8 +390,9 @@ public class Executor extends Thread implements ModelObject {
      */
     public HttpResponse doYank() {
         Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
-        if (isAlive())
+        if (isAlive()) {
             throw new Failure("Can't yank a live executor");
+        }
         owner.removeExecutor(this);
         return HttpResponses.redirectViaContextPath("/");
     }
@@ -381,7 +402,7 @@ public class Executor extends Thread implements ModelObject {
      */
     public boolean hasStopPermission() {
         Queue.Executable e = executable;
-        return e!=null && Tasks.getOwnerTaskOf(getParentOf(e)).hasAbortPermission();
+        return e != null && Tasks.getOwnerTaskOf(getParentOf(e)).hasAbortPermission();
     }
 
     public Computer getOwner() {
@@ -393,9 +414,9 @@ public class Executor extends Thread implements ModelObject {
      */
     public long getIdleStartMilliseconds() {
         Queue.Executable e = executable;
-        if (e == null)
+        if (e == null) {
             return Math.max(finishTime, owner.getConnectTime());
-        else {
+        } else {
             return Math.max(startTime + Math.max(0, Executables.getEstimatedDurationFor(e)),
                     System.currentTimeMillis() + 15000);
         }
@@ -409,8 +430,9 @@ public class Executor extends Thread implements ModelObject {
     }
 
     /**
-     * Creates a proxy object that executes the callee in the context that impersonates
-     * this executor. Useful to export an object to a remote channel. 
+     * Creates a proxy object that executes the callee in the context that
+     * impersonates this executor. Useful to export an object to a remote
+     * channel.
      */
     public <T> T newImpersonatingProxy(Class<T> type, T core) {
         return new InterceptingProxy() {
@@ -418,41 +440,43 @@ public class Executor extends Thread implements ModelObject {
                 final Executor old = IMPERSONATION.get();
                 IMPERSONATION.set(Executor.this);
                 try {
-                    return m.invoke(o,args);
+                    return m.invoke(o, args);
                 } finally {
                     IMPERSONATION.set(old);
                 }
             }
-        }.wrap(type,core);
+        }.wrap(type, core);
     }
 
     /**
-     * Returns the executor of the current thread or null if current thread is not an executor.
+     * Returns the executor of the current thread or null if current thread is
+     * not an executor.
      */
     public static Executor currentExecutor() {
         Thread t = Thread.currentThread();
-        if (t instanceof Executor) return (Executor) t;
+        if (t instanceof Executor) {
+            return (Executor) t;
+        }
         return IMPERSONATION.get();
     }
-    
+
     /**
-     * Returns the estimated duration for the executable.
-     * Protects against {@link AbstractMethodError}s if the {@link Executable} implementation
-     * was compiled against Hudson < 1.383
+     * Returns the estimated duration for the executable. Protects against
+     * {@link AbstractMethodError}s if the {@link Executable} implementation was
+     * compiled against Hudson < 1.383
      *
-     * @deprecated as of 1.388
-     *      Use {@link Executables#getEstimatedDurationFor(Executable)}
+
+     *
+     * @deprecated as of 1.388 Use
+     * {@link Executables#getEstimatedDurationFor(Executable)}
      */
     public static long getEstimatedDurationFor(Executable e) {
         return Executables.getEstimatedDurationFor(e);
     }
-
     /**
-     * Mechanism to allow threads (in particular the channel request handling threads) to
-     * run on behalf of {@link Executor}.
+     * Mechanism to allow threads (in particular the channel request handling
+     * threads) to run on behalf of {@link Executor}.
      */
     private static final ThreadLocal<Executor> IMPERSONATION = new ThreadLocal<Executor>();
-
     private static final Logger LOGGER = Logger.getLogger(Executor.class.getName());
-
 }

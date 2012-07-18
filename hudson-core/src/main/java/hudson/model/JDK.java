@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -45,6 +45,7 @@ import org.kohsuke.stapler.QueryParameter;
  * @author Kohsuke Kawaguchi
  */
 public final class JDK extends ToolInstallation implements NodeSpecific<JDK>, EnvironmentSpecific<JDK> {
+
     /**
      * @deprecated since 2009-02-25
      */
@@ -63,8 +64,7 @@ public final class JDK extends ToolInstallation implements NodeSpecific<JDK>, En
     /**
      * install directory.
      *
-     * @deprecated as of 1.304
-     *      Use {@link #getHome()}
+     * @deprecated as of 1.304 Use {@link #getHome()}
      */
     public String getJavaHome() {
         return getHome();
@@ -74,14 +74,15 @@ public final class JDK extends ToolInstallation implements NodeSpecific<JDK>, En
      * Gets the path to the bin directory.
      */
     public File getBinDir() {
-        return new File(getHome(),"bin");
+        return new File(getHome(), "bin");
     }
+
     /**
      * Gets the path to 'java'.
      */
     public File getExecutable() {
         String execName = (File.separatorChar == '\\') ? "java.exe" : "java";
-        return new File(getHome(),"bin/"+execName);
+        return new File(getHome(), "bin/" + execName);
     }
 
     /**
@@ -94,10 +95,10 @@ public final class JDK extends ToolInstallation implements NodeSpecific<JDK>, En
     /**
      * Sets PATH and JAVA_HOME from this JDK.
      */
-    public void buildEnvVars(Map<String,String> env) {
+    public void buildEnvVars(Map<String, String> env) {
         // see EnvVars javadoc for why this adss PATH.
-        env.put("PATH+JDK",getHome()+"/bin");
-        env.put("JAVA_HOME",getHome());
+        env.put("PATH+JDK", getHome() + "/bin");
+        env.put("JAVA_HOME", getHome());
     }
 
     public JDK forNode(Node node, TaskListener log) throws IOException, InterruptedException {
@@ -111,15 +112,14 @@ public final class JDK extends ToolInstallation implements NodeSpecific<JDK>, En
     /**
      * Checks if "java" is in PATH on the given node.
      *
-     * <p>
-     * If it's not, then the user must specify a configured JDK,
-     * so this is often useful for form field validation.
+     * <p> If it's not, then the user must specify a configured JDK, so this is
+     * often useful for form field validation.
      */
     public static boolean isDefaultJDKValid(Node n) {
         try {
             TaskListener listener = new StreamTaskListener(new NullStream());
             Launcher launcher = n.createLauncher(listener);
-            return launcher.launch().cmds("java","-fullversion").stdout(listener).join()==0;
+            return launcher.launch().cmds("java", "-fullversion").stdout(listener).join() == 0;
         } catch (IOException e) {
             return false;
         } catch (InterruptedException e) {
@@ -149,7 +149,7 @@ public final class JDK extends ToolInstallation implements NodeSpecific<JDK>, En
 
         @Override
         public List<JDKInstaller> getDefaultInstallers() {
-            return Collections.singletonList(new JDKInstaller(null,false));
+            return Collections.singletonList(new JDKInstaller(null, false));
         }
 
         /**
@@ -159,16 +159,19 @@ public final class JDK extends ToolInstallation implements NodeSpecific<JDK>, En
             // this can be used to check the existence of a file on the server, so needs to be protected
             Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
 
-            if(value.getPath().equals(""))
+            if (value.getPath().equals("")) {
                 return FormValidation.ok();
+            }
 
-            if(!value.isDirectory())
+            if (!value.isDirectory()) {
                 return FormValidation.error(Messages.Hudson_NotADirectory(value));
+            }
 
-            File toolsJar = new File(value,"lib/tools.jar");
-            File mac = new File(value,"lib/dt.jar");
-            if(!toolsJar.exists() && !mac.exists())
+            File toolsJar = new File(value, "lib/tools.jar");
+            File mac = new File(value, "lib/dt.jar");
+            if (!toolsJar.exists() && !mac.exists()) {
                 return FormValidation.error(Messages.Hudson_NotJDKDir(value));
+            }
 
             return FormValidation.ok();
         }
@@ -179,9 +182,14 @@ public final class JDK extends ToolInstallation implements NodeSpecific<JDK>, En
     }
 
     public static class ConverterImpl extends ToolConverter {
-        public ConverterImpl(XStream2 xstream) { super(xstream); }
-        @Override protected String oldHomeField(ToolInstallation obj) {
-            return ((JDK)obj).javaHome;
+
+        public ConverterImpl(XStream2 xstream) {
+            super(xstream);
+        }
+
+        @Override
+        protected String oldHomeField(ToolInstallation obj) {
+            return ((JDK) obj).javaHome;
         }
     }
 }

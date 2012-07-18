@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -32,9 +32,9 @@ import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * A view that delegates to another.
- * 
+ *
  * TODO: this does not respond to renaming or deleting the proxied view.
- * 
+ *
  * @author Tom Huybrechts
  *
  */
@@ -108,12 +108,15 @@ public class ProxyView extends View implements StaplerFallback {
         checkPermission(View.CREATE);
 
         String view = Util.fixEmpty(value);
-        if(view==null) return FormValidation.ok();
-
-        if(Hudson.getInstance().getView(view)!=null)
+        if (view == null) {
             return FormValidation.ok();
-        else
+        }
+
+        if (Hudson.getInstance().getView(view) != null) {
+            return FormValidation.ok();
+        } else {
             return FormValidation.error(Messages.ProxyView_NoSuchViewExists(value));
+        }
     }
 
     @Extension
@@ -123,17 +126,15 @@ public class ProxyView extends View implements StaplerFallback {
         public String getDisplayName() {
             return Messages.ProxyView_DisplayName();
         }
-        
+
         @Override
         public boolean isInstantiable() {
-        	// doesn't make sense to add a ProxyView to the global views
-        	return !(Stapler.getCurrentRequest().findAncestorObject(ViewGroup.class) instanceof Hudson);
+            // doesn't make sense to add a ProxyView to the global views
+            return !(Stapler.getCurrentRequest().findAncestorObject(ViewGroup.class) instanceof Hudson);
         }
-
     }
 
     public Object getStaplerFallback() {
         return getProxiedView();
     }
-
 }

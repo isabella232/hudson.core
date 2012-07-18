@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Seiji Sogabe, Winston Prakash
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -23,27 +23,29 @@ import org.eclipse.hudson.graph.MultiStageTimeSeries.TrendChart;
 import org.kohsuke.stapler.export.Exported;
 
 /**
- * {@link LoadStatistics} for the entire system (the master and all the slaves combined.)
+ * {@link LoadStatistics} for the entire system (the master and all the slaves
+ * combined.)
  *
- * <p>
- * {@link #computeQueueLength()} and {@link #queueLength} counts those tasks
- * that are unassigned to any node, whereas {@link #totalQueueLength}
- * tracks the queue length including tasks that are assigned to a specific node.
+ * <p> {@link #computeQueueLength()} and {@link #queueLength} counts those tasks
+ * that are unassigned to any node, whereas {@link #totalQueueLength} tracks the
+ * queue length including tasks that are assigned to a specific node.
  *
  * @author Kohsuke Kawaguchi
  * @see Hudson#overallLoad
  */
 public class OverallLoadStatistics extends LoadStatistics {
+
     /**
-     * Number of total {@link Queue.BuildableItem}s that represents blocked builds.
+     * Number of total {@link Queue.BuildableItem}s that represents blocked
+     * builds.
      */
     //TODO: review and check whether we can do it private
     @Exported
     public final MultiStageTimeSeries totalQueueLength = new MultiStageTimeSeries(
-            Messages._LoadStatistics_Legends_QueueLength(), ColorPalette.GREY, 0,DECAY);
+            Messages._LoadStatistics_Legends_QueueLength(), ColorPalette.GREY, 0, DECAY);
 
     /*package*/ OverallLoadStatistics() {
-        super(0,0);
+        super(0, 0);
     }
 
     public MultiStageTimeSeries getTotalQueueLength() {
@@ -66,10 +68,11 @@ public class OverallLoadStatistics extends LoadStatistics {
     }
 
     /**
-     * When drawing the overall load statistics, use the total queue length,
-     * not {@link #queueLength}, which just shows jobs that are to be run on the master. 
+     * When drawing the overall load statistics, use the total queue length, not
+     * {@link #queueLength}, which just shows jobs that are to be run on the
+     * master.
      */
     protected TrendChart createOverallTrendChart(TimeScale timeScale) {
-        return MultiStageTimeSeries.createTrendChart(timeScale,busyExecutors,totalExecutors,totalQueueLength);
+        return MultiStageTimeSeries.createTrendChart(timeScale, busyExecutors, totalExecutors, totalQueueLength);
     }
 }

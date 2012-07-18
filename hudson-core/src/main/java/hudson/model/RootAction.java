@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -22,9 +22,8 @@ import hudson.Extension;
 /**
  * Marker interface for actions that are added to {@link Hudson}.
  *
- * <p>
- * Extend from this interface and put {@link Extension} on your subtype
- * to have them auto-registered to {@link Hudson}.
+ * <p> Extend from this interface and put {@link Extension} on your subtype to
+ * have them auto-registered to {@link Hudson}.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.311

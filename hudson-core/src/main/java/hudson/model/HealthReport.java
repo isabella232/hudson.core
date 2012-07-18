@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Stephen Connolly
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -29,8 +29,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Represents health of something (typically project).
- * A number between 0-100.
+ * Represents health of something (typically project). A number between 0-100.
  *
  * @author connollys
  * @since 1.115
@@ -39,28 +38,30 @@ import java.util.Locale;
 // this is always exported as a part of Job and never on its own, so start with 2.
 public class HealthReport implements Serializable, Comparable<HealthReport> {
     // These are now 0-20, 21-40, 41-60, 61-80, 81+ but filenames unchanged for compatibility
+
     private static final String HEALTH_OVER_80 = "health-80plus.png";
     private static final String HEALTH_61_TO_80 = "health-60to79.png";
     private static final String HEALTH_41_TO_60 = "health-40to59.png";
     private static final String HEALTH_21_TO_40 = "health-20to39.png";
     private static final String HEALTH_0_TO_20 = "health-00to19.png";
     private static final String HEALTH_UNKNOWN = "empty.png";
-
     /**
      * The percentage health score (from 0 to 100 inclusive).
      */
     private int score;
-
     /**
-     * The path to the icon corresponding to this health score or <code>null</code> to use the default icon
-     * corresponding to the current health score.
+     * The path to the icon corresponding to this health score or
+     * <code>null</code> to use the default icon corresponding to the current
+     * health score.
      * <p/>
-     * If the path begins with a '/' then it will be the absolute path, otherwise the image is assumed to be in one of
-     * <code>/images/16x16/</code>, <code>/images/24x24/</code> or <code>/images/32x32/</code> depending on the icon
-     * size selected by the user.
+     * If the path begins with a '/' then it will be the absolute path,
+     * otherwise the image is assumed to be in one of
+     * <code>/images/16x16/</code>,
+     * <code>/images/24x24/</code> or
+     * <code>/images/32x32/</code> depending on the icon size selected by the
+     * user.
      */
     private String iconUrl;
-
     /**
      * Recover the health icon's tool-tip when deserializing.
      *
@@ -68,7 +69,6 @@ public class HealthReport implements Serializable, Comparable<HealthReport> {
      */
     @Deprecated
     private transient String description;
-
     /**
      * The health icon's tool-tip.
      */
@@ -77,18 +77,21 @@ public class HealthReport implements Serializable, Comparable<HealthReport> {
     /**
      * Create a new HealthReport.
      *
-     * @param score       The percentage health score (from 0 to 100 inclusive).
-     * @param iconUrl     The path to the icon corresponding to this {@link Action}'s health or <code>null</code> to
-     *                    display the default icon corresponding to the current health score.
-     *                    <p/>
-     *                    If the path begins with a '/' then it will be the absolute path, otherwise the image is
-     *                    assumed to be in one of <code>/images/16x16/</code>, <code>/images/24x24/</code> or
-     *                    <code>/images/32x32/</code> depending on the icon size selected by the user.
-     *                    When calculating the url to display for absolute paths, the getIconUrl(String) method
-     *                    will replace /32x32/ in the path with the appropriate size.
+     * @param score The percentage health score (from 0 to 100 inclusive).
+     * @param iconUrl The path to the icon corresponding to this
+     * {@link Action}'s health or <code>null</code> to display the default icon
+     * corresponding to the current health score.
+     * <p/>
+     * If the path begins with a '/' then it will be the absolute path,
+     * otherwise the image is assumed to be in one
+     * of <code>/images/16x16/</code>, <code>/images/24x24/</code> or
+     * <code>/images/32x32/</code> depending on the icon size selected by the
+     * user. When calculating the url to display for absolute paths, the
+     * getIconUrl(String) method will replace /32x32/ in the path with the
+     * appropriate size.
      * @param description The health icon's tool-tip.
-     * @deprecated since 2008-10-18.
-     *     Use {@link #HealthReport(int, String, org.jvnet.localizer.Localizable)}
+     * @deprecated since 2008-10-18. Use
+     * {@link #HealthReport(int, String, org.jvnet.localizer.Localizable)}
      */
     @Deprecated
     public HealthReport(int score, String iconUrl, String description) {
@@ -98,15 +101,18 @@ public class HealthReport implements Serializable, Comparable<HealthReport> {
     /**
      * Create a new HealthReport.
      *
-     * @param score       The percentage health score (from 0 to 100 inclusive).
-     * @param iconUrl     The path to the icon corresponding to this {@link Action}'s health or <code>null</code> to
-     *                    display the default icon corresponding to the current health score.
-     *                    <p/>
-     *                    If the path begins with a '/' then it will be the absolute path, otherwise the image is
-     *                    assumed to be in one of <code>/images/16x16/</code>, <code>/images/24x24/</code> or
-     *                    <code>/images/32x32/</code> depending on the icon size selected by the user.
-     *                    When calculating the url to display for absolute paths, the getIconUrl(String) method
-     *                    will replace /32x32/ in the path with the appropriate size.
+     * @param score The percentage health score (from 0 to 100 inclusive).
+     * @param iconUrl The path to the icon corresponding to this
+     * {@link Action}'s health or <code>null</code> to display the default icon
+     * corresponding to the current health score.
+     * <p/>
+     * If the path begins with a '/' then it will be the absolute path,
+     * otherwise the image is assumed to be in one
+     * of <code>/images/16x16/</code>, <code>/images/24x24/</code> or
+     * <code>/images/32x32/</code> depending on the icon size selected by the
+     * user. When calculating the url to display for absolute paths, the
+     * getIconUrl(String) method will replace /32x32/ in the path with the
+     * appropriate size.
      * @param description The health icon's tool-tip.
      */
     public HealthReport(int score, String iconUrl, Localizable description) {
@@ -133,10 +139,10 @@ public class HealthReport implements Serializable, Comparable<HealthReport> {
     /**
      * Create a new HealthReport.
      *
-     * @param score       The percentage health score (from 0 to 100 inclusive).
+     * @param score The percentage health score (from 0 to 100 inclusive).
      * @param description The health icon's tool-tip.
-     * @deprecated since 2008-10-18.
-     *     Use {@link #HealthReport(int, org.jvnet.localizer.Localizable)}
+     * @deprecated since 2008-10-18. Use
+     * {@link #HealthReport(int, org.jvnet.localizer.Localizable)}
      */
     @Deprecated
     public HealthReport(int score, String description) {
@@ -146,7 +152,7 @@ public class HealthReport implements Serializable, Comparable<HealthReport> {
     /**
      * Create a new HealthReport.
      *
-     * @param score       The percentage health score (from 0 to 100 inclusive).
+     * @param score The percentage health score (from 0 to 100 inclusive).
      * @param description The health icon's tool-tip.
      */
     public HealthReport(int score, Localizable description) {
@@ -245,7 +251,8 @@ public class HealthReport implements Serializable, Comparable<HealthReport> {
     /**
      * Setter for property 'localizibleDescription'.
      *
-     * @param localizibleDescription Value to set for property 'localizibleDescription'.
+     * @param localizibleDescription Value to set for property
+     * 'localizibleDescription'.
      */
     public void setLocalizibleDescription(Localizable localizibleDescription) {
         this.localizibleDescription = localizibleDescription;
@@ -280,10 +287,18 @@ public class HealthReport implements Serializable, Comparable<HealthReport> {
      * Utility method to find the report with the lowest health.
      */
     public static HealthReport min(HealthReport a, HealthReport b) {
-        if (a == null && b == null) return null;
-        if (a == null) return b;
-        if (b == null) return a;
-        if (a.compareTo(b) <= 0) return a;
+        if (a == null && b == null) {
+            return null;
+        }
+        if (a == null) {
+            return b;
+        }
+        if (b == null) {
+            return a;
+        }
+        if (a.compareTo(b) <= 0) {
+            return a;
+        }
         return b;
     }
 
@@ -291,10 +306,18 @@ public class HealthReport implements Serializable, Comparable<HealthReport> {
      * Utility method to find the report with the highest health.
      */
     public static HealthReport max(HealthReport a, HealthReport b) {
-        if (a == null && b == null) return null;
-        if (a == null) return b;
-        if (b == null) return a;
-        if (a.compareTo(b) >= 0) return a;
+        if (a == null && b == null) {
+            return null;
+        }
+        if (a == null) {
+            return b;
+        }
+        if (b == null) {
+            return a;
+        }
+        if (a.compareTo(b) >= 0) {
+            return a;
+        }
         return b;
     }
 
@@ -302,8 +325,13 @@ public class HealthReport implements Serializable, Comparable<HealthReport> {
      * Fix deserialization of older data.
      */
     public static class ConverterImpl extends XStream2.PassthruConverter<HealthReport> {
-        public ConverterImpl(XStream2 xstream) { super(xstream); }
-        @Override protected void callback(HealthReport hr, UnmarshallingContext context) {
+
+        public ConverterImpl(XStream2 xstream) {
+            super(xstream);
+        }
+
+        @Override
+        protected void callback(HealthReport hr, UnmarshallingContext context) {
             // If we are being read back in from an older version
             if (hr.localizibleDescription == null) {
                 hr.localizibleDescription = new NonLocalizable(hr.description == null ? "" : hr.description);
@@ -313,9 +341,11 @@ public class HealthReport implements Serializable, Comparable<HealthReport> {
     }
 
     /**
-     * In order to provide backwards compatibility, we use this crazy class to fake out localization.
+     * In order to provide backwards compatibility, we use this crazy class to
+     * fake out localization.
      */
     private static class NonLocalizable extends Localizable {
+
         /**
          * The string that we don't know how to localize
          */
