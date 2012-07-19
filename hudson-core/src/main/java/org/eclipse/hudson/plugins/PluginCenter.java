@@ -19,7 +19,6 @@ package org.eclipse.hudson.plugins;
 import hudson.ProxyConfiguration;
 import hudson.Util;
 import hudson.markup.MarkupFormatter;
-import hudson.model.Hudson;
 import hudson.security.Permission;
 import hudson.util.DaemonThreadFactory;
 import hudson.util.VersionNumber;
@@ -36,8 +35,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
-import org.eclipse.hudson.plugins.UpdateSiteManager.AvailablePluginInfo;
 import org.eclipse.hudson.plugins.InstalledPluginManager.InstalledPluginInfo;
+import org.eclipse.hudson.plugins.UpdateSiteManager.AvailablePluginInfo;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.kohsuke.stapler.*;
@@ -57,6 +56,7 @@ final public class PluginCenter {
     private UpdateSiteManager updateSiteManager;
     private InstalledPluginManager installedPluginManager;
     private ProxyConfiguration proxyConfig;
+    List<PluginInstallationJob> installationsJobs = new CopyOnWriteArrayList<PluginInstallationJob>();
     private ExecutorService installerService = Executors.newSingleThreadExecutor(
             new DaemonThreadFactory(new ThreadFactory() {
 
@@ -95,7 +95,7 @@ final public class PluginCenter {
     }
 
     public List<AvailablePluginInfo> getAvailablePlugins(String pluginType) {
-       return updateSiteManager.getAvailablePlugins(pluginType);
+        return updateSiteManager.getAvailablePlugins(pluginType);
     }
 
     public List<AvailablePluginInfo> getCategorizedAvailablePlugins(String pluginType, String category) {
@@ -181,24 +181,37 @@ final public class PluginCenter {
         return Boolean.getBoolean("hudson.pluginManager.disableUpdateCenterSwitch");
     }
 
-    public HttpResponse doupdatePlugin(@QueryParameter String pluginName) {
-        return doinstallPlugin(pluginName);
+    public HttpResponse doUpdatePlugin(@QueryParameter String pluginName) {
+        return doInstallPlugin(pluginName);
     }
-    
-    public HttpResponse doinstallPlugin(@QueryParameter String pluginName) {
+
+    public HttpResponse doInstallPlugin(@QueryParameter String pluginName) {
         if (!hudsonSecurityManager.hasPermission(Permission.HUDSON_ADMINISTER)) {
             return HttpResponses.forbidden();
         }
         AvailablePluginInfo plugin = updateSiteManager.getAvailablePlugin(pluginName);
         if (plugin != null) {
-            Future<PluginInstallationJob> installJob = install(plugin, false);
             try {
-                PluginInstallationJob job = installJob.get();
-                if (!job.getStatus()) {
-                    new ErrorHttpResponse("Plugin " + pluginName + " could not be installed. " + job.getErrorMsg());
+                PluginInstallationJob installJob = null;
+                // If the plugin is already being installed, don't schedule another. Make the search thread safe
+                List<PluginInstallationJob> jobs = Collections.synchronizedList(installationsJobs);
+                synchronized (jobs) {
+                    for (PluginInstallationJob job : jobs) {
+                        if (job.getName().equals(pluginName)) {
+                            installJob = job;
+                        }
+                    }
+                }
+                // No previous install of the plugn, create new
+                if (installJob == null) {
+                    Future<PluginInstallationJob> newJob = install(plugin, false);
+                    installJob = newJob.get();
+                }
+                if (!installJob.getStatus()) {
+                    return new ErrorHttpResponse("Plugin " + pluginName + " could not be installed. " + installJob.getErrorMsg());
                 }
             } catch (Exception ex) {
-                new ErrorHttpResponse("Plugin " + pluginName + " could not be installed. " + ex.getLocalizedMessage());
+                return new ErrorHttpResponse("Plugin " + pluginName + " could not be installed. " + ex.getLocalizedMessage());
             }
             installedPluginManager.loadInstalledPlugins();
             return HttpResponses.ok();
@@ -211,16 +224,36 @@ final public class PluginCenter {
             return HttpResponses.forbidden();
         }
         InstalledPluginInfo plugin = installedPluginManager.getInstalledPlugin(pluginName);
-        PluginEnableJob job = new PluginEnableJob(plugin, enable);
-        Future<PluginEnableJob> installJob = installerService.submit(job, job);
         try {
-            // Wait to execute
-            PluginEnableJob finishedJob = installJob.get();
-            if (!finishedJob.getStatus()) {
-                new ErrorHttpResponse("Plugin " + pluginName + " could not be installed. " + job.getErrorMsg());
-            }
+           plugin.setEnable(enable);  
         } catch (Exception ex) {
-            new ErrorHttpResponse("Plugin " + pluginName + " could not be installed. " + ex.getLocalizedMessage());
+            return new ErrorHttpResponse("Plugin " + pluginName + " could not be enabled/disabled. " + ex.getLocalizedMessage());
+        }
+        return HttpResponses.ok();
+    }
+    
+    public HttpResponse doDowngradePlugin(@QueryParameter String pluginName) {
+        if (!hudsonSecurityManager.hasPermission(Permission.HUDSON_ADMINISTER)) {
+            return HttpResponses.forbidden();
+        }
+        InstalledPluginInfo plugin = installedPluginManager.getInstalledPlugin(pluginName);
+        try {
+           plugin.downgade();  
+        } catch (Exception ex) {
+            return new ErrorHttpResponse("Plugin " + pluginName + " could not be reverted to previous version. " + ex.getLocalizedMessage());
+        }
+        return HttpResponses.ok();
+    }
+    
+    public HttpResponse doUnpinPlugin(@QueryParameter String pluginName) {
+        if (!hudsonSecurityManager.hasPermission(Permission.HUDSON_ADMINISTER)) {
+            return HttpResponses.forbidden();
+        }
+        InstalledPluginInfo plugin = installedPluginManager.getInstalledPlugin(pluginName);
+        try {
+           plugin.unpin();  
+        } catch (Exception ex) {
+            return new ErrorHttpResponse("Plugin " + pluginName + " could not be unpinned. " + ex.getLocalizedMessage());
         }
         return HttpResponses.ok();
     }
@@ -355,7 +388,7 @@ final public class PluginCenter {
             updateSiteManager.setUpdateSiteUrl(siteUrl);
             // Ok a valid update site URL set it to the plugin manager. 
             // For now let Plugin Manager periodically update the local cache.
-            Hudson.getInstance().getPluginManager().doSiteConfigure(siteUrl);
+            //Hudson.getInstance().getPluginManager().doSiteConfigure(site);
 
         } catch (IOException ex) {
             return new ErrorHttpResponse("Update Site Could not be set. " + ex.getLocalizedMessage());
@@ -386,8 +419,9 @@ final public class PluginCenter {
     }
 
     private Future<PluginInstallationJob> submitInstallationJob(AvailablePluginInfo plugin, boolean useProxy) {
-        PluginInstallationJob job = new PluginInstallationJob(plugin, pluginsDir, useProxy);
-        return installerService.submit(job, job);
+        PluginInstallationJob newJob = new PluginInstallationJob(plugin, pluginsDir, useProxy);
+        installationsJobs.add(newJob);
+        return installerService.submit(newJob, newJob);
     }
 
     private boolean isNewerThan(String availableVersion, String installedVersion) {
@@ -426,6 +460,7 @@ final public class PluginCenter {
     }
 
     public String getLastUpdatedString() {
-        return Hudson.getInstance().getUpdateCenter().getLastUpdatedString();
+        return "17 Minutes";
+        //return Hudson.getInstance().getUpdateCenter().getLastUpdatedString();
     }
 }

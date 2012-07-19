@@ -1,8 +1,17 @@
-/* 
-    Document   : plugin-center.jss
-    Author     : Winston  Prakash <winston.prakash@oracle.com>
-    Description:
-        Javascript for Plugin Center
+/*  
+ * ******************************************************************************
+ *  Copyright (c) 2012 Oracle Corporation.
+ * 
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ * 
+ *  Contributors: 
+ * 
+ *     Winston Prakash
+ *    
+ * ******************************************************************************  
  */
 
 jQuery.noConflict();
@@ -16,7 +25,8 @@ jQuery(document).ready(function() {
     var images = [
     imageRoot + '/green-check.jpg',
     imageRoot + '/progressbar.gif',
-    imageRoot + '/error.png'
+    imageRoot + '/error.png',
+    imageRoot + '/16x16/warning.png'
     ];
 
     jQuery(images).each(function() {
@@ -61,7 +71,7 @@ jQuery(document).ready(function() {
         });
     });
 
-    jQuery('#installedTab button').each(function(){
+    jQuery('#installedTab button.enable').each(function(){
         jQuery(this).button();
         jQuery(this).click(function(){
             var selected = this;
@@ -92,6 +102,59 @@ jQuery(document).ready(function() {
             });
         });
             
+    });
+    
+    jQuery('#installedTab button.downgrade').each(function(){
+        jQuery(this).button();
+        jQuery(this).click(function(){
+            var selected = this;
+            var title = "Downgrade Plugin?";
+            jQuery('#confirmMsg').text("Do you want to downgrade Plugin - " + jQuery(selected).val() + " ?");
+             
+            jQuery('#dialog-confirm').dialog({
+                resizable: false,
+                height:150,
+                width: 350,
+                modal: true,
+                title: title,
+                buttons: {
+                    'Yes': function() {
+                        jQuery( this ).dialog( "close" );
+                        downgradePlugin(selected);
+                    },
+                    Cancel: function() {
+                        jQuery( this ).dialog( "close" );
+                    }
+                }
+            });
+        });
+            
+    });
+    
+    jQuery('#installedTab button.unpin').each(function(){
+        jQuery(this).button();
+        jQuery(this).click(function(){
+            var selected = this;
+            var title = "Unpin Plugin?";
+            jQuery('#confirmMsg').text("Do you want to unpin Plugin - " + jQuery(selected).val() + " ?");
+             
+            jQuery('#dialog-confirm').dialog({
+                resizable: false,
+                height:150,
+                width: 350,
+                modal: true,
+                title: title,
+                buttons: {
+                    'Yes': function() {
+                        jQuery( this ).dialog( "close" );
+                        unpinPlugin(selected);
+                    },
+                    Cancel: function() {
+                        jQuery( this ).dialog( "close" );
+                    }
+                }
+            });
+        });   
     });
     
     var fileSelect = jQuery('#fileSelect');
@@ -142,11 +205,11 @@ jQuery(document).ready(function() {
         jQuery(this).next().toggle();
         var child = jQuery(this).children(":eq(0)");
         if (jQuery(child).hasClass("ui-icon-collapsed")){
-           jQuery(child).removeClass("ui-icon-collapsed");
-           jQuery(child).addClass("ui-icon-expanded");
+            jQuery(child).removeClass("ui-icon-collapsed");
+            jQuery(child).addClass("ui-icon-expanded");
         }else{
             jQuery(child).addClass("ui-icon-collapsed");
-           jQuery(child).removeClass("ui-icon-expanded");
+            jQuery(child).removeClass("ui-icon-expanded");
         }
         return false;
     });
@@ -180,7 +243,17 @@ function refreshProxyUser(){
 function getPluginsToInstall(){
     var installables = [];
     jQuery('#availableTab .items-container input[@type=checkbox]:checked').each(function(){
-        installables.push(this);
+        //Filter out duplicate plugins in different categories
+        var pluginName = jQuery(this).val();
+        var alreadyAdded = false;
+        for (var i = 0; i < installables.length; i++) {
+            if (jQuery(installables[1]).val() === pluginName) {
+                alreadyAdded = true;
+            }
+        }
+        if (!alreadyAdded){
+            installables.push(this);
+        }
     });
     return installables;
 }
@@ -310,10 +383,6 @@ function enablePlugin(selected){
         jQuery(this).attr('src', imageRoot + '/progressbar.gif');
     });
     
-    jQuery(".installed_cb_" + jQuery(selected).val()).each(function(){
-        jQuery(this).hide();
-    });
-    
     jQuery.ajax({
         type: 'POST',
         url: "enablePlugin",
@@ -329,8 +398,8 @@ function enablePlugin(selected){
                 });
                 jQuery(selected).children('span').text('Disable');
             }else{
-                jQuery(".update_img_" + jQuery(selected).val()).each(function(){
-                    jQuery(this).hide();
+                jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+                    jQuery(this).attr('src', imageRoot + '/16x16/warning.png');
                 });
                 jQuery(selected).children('span').text('Enable');
             }
@@ -341,7 +410,81 @@ function enablePlugin(selected){
                 jQuery(this).show();
                 jQuery(this).attr('src', imageRoot + '/error.png');
             });
-            showMessage(jQuery("#pluginDisableMsg"), msg.responseText, true);
+            showMessage(jQuery("#pluginActionMsg"), msg.responseText, true);
+        },
+        statusCode: {
+            403: function() {
+                showLoginDialog();
+            }
+        },
+        dataType: "html"
+    }); 
+}
+
+function downgradePlugin(selected){
+    jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+        jQuery(this).show();
+        jQuery(this).attr('src', imageRoot + '/progressbar.gif');
+    });
+    
+    jQuery.ajax({
+        type: 'POST',
+        url: "downgradePlugin",
+        data: {
+            pluginName:jQuery(selected).val()
+        },
+        success: function(){
+            jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+                jQuery(this).show();
+                jQuery(this).attr('src', imageRoot + '/green-check.jpg');
+            });
+                
+            jQuery('#restart-message').show();
+            jQuery(selected).remove();
+        },
+        error: function(msg){
+            jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+                jQuery(this).show();
+                jQuery(this).attr('src', imageRoot + '/error.png');
+            });
+            showMessage(jQuery("#pluginActionMsg"), msg.responseText, true);
+        },
+        statusCode: {
+            403: function() {
+                showLoginDialog();
+            }
+        },
+        dataType: "html"
+    }); 
+}
+
+function unpinPlugin(selected){
+    jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+        jQuery(this).show();
+        jQuery(this).attr('src', imageRoot + '/progressbar.gif');
+    });
+    
+    jQuery.ajax({
+        type: 'POST',
+        url: "unpinPlugin",
+        data: {
+            pluginName:jQuery(selected).val()
+        },
+        success: function(){
+            jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+                jQuery(this).show();
+                jQuery(this).attr('src', imageRoot + '/green-check.jpg');
+            });
+                
+            jQuery('#restart-message').show();
+            jQuery(selected).parent().remove();
+        },
+        error: function(msg){
+            jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+                jQuery(this).show();
+                jQuery(this).attr('src', imageRoot + '/error.png');
+            });
+            showMessage(jQuery("#pluginActionMsg"), msg.responseText, true);
         },
         statusCode: {
             403: function() {

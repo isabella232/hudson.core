@@ -1,9 +1,18 @@
-/* 
-    Document   : plugin-center.css
-    Author     : Winston  Prakash <winston.prakash@oracle.com>
-    Description:
-        Style sheet for Plugin Center
-*/
+/*  
+ * ******************************************************************************
+ *  Copyright (c) 2012 Oracle Corporation.
+ * 
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ * 
+ *  Contributors: 
+ * 
+ *     Winston Prakash
+ *    
+ * ******************************************************************************  
+ */
 
 body {
     margin-top: 10px;   
@@ -186,6 +195,35 @@ p {
     margin-top: 0px;
     padding: 5px 4px;
     width: 100%;
+}
+
+#updatesTab .column1, #installedTab .column1{
+    width:3%
+}
+
+#updatesTab .column2, #installedTab .column2{
+    width:67%
+}
+
+#updatesTab .column3, #installedTab .column3{
+    width:12%
+}
+
+#updatesTab .column4, #installedTab .column4{
+    width:18%
+}
+
+
+#availableTab .column1 {
+    width:3%
+}
+
+#availableTab .column2 {
+    width:87%
+}
+
+#availableTab .column3 {
+    width:10%
 }
 
 #dialog-confirm{

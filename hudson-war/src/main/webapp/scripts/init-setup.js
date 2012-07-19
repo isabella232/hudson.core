@@ -199,8 +199,9 @@ function submitLoginForm(){
             }
             jQuery('#loginNeededMsg').hide();
         },
-        error: function(msg){
-            showMessage(jQuery('#loginMsg'), msg.responseText, "red");
+        error: function(){
+            var msg = 'Failed to login. Check your credentials and try again.';
+            showMessage(jQuery('#loginMsg'), msg, "red");
         },
         dataType: "html"
     }); 

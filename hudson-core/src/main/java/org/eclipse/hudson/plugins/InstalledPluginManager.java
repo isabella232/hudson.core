@@ -16,6 +16,7 @@
  */
 package org.eclipse.hudson.plugins;
 
+import hudson.Util;
 import hudson.util.VersionNumber;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -129,14 +130,50 @@ public final class InstalledPluginManager {
             File disabledMarker = new File(hpiArchive.getPath() + ".disabled");
             return !disabledMarker.exists();
         }
-        
+
         public void setEnable(boolean enable) throws IOException {
             File disabledMarker = new File(hpiArchive.getPath() + ".disabled");
-            if (enable && disabledMarker.exists()){
-                FileUtils.deleteQuietly(disabledMarker); 
+            if (enable && disabledMarker.exists()) {
+                FileUtils.deleteQuietly(disabledMarker);
             }
-            if (!enable && !disabledMarker.exists()){
-                FileUtils.touch(disabledMarker);; 
+            if (!enable && !disabledMarker.exists()) {
+                FileUtils.touch(disabledMarker);;
+            }
+        }
+
+        public boolean isDowngrdable() {
+            File backupFile = Util.changeExtension(hpiArchive, ".bak");
+            return backupFile.exists();
+        }
+        
+        public String getBackupVersion() throws IOException{
+            File backupFile = Util.changeExtension(hpiArchive, ".bak");
+            if (backupFile.exists()){
+                InstalledPluginInfo bakPluginInfo = new InstalledPluginInfo(backupFile);
+                return bakPluginInfo.version;
+            }
+            return "";
+        }
+
+        public boolean isPinned() {
+            File pinnedMarker = new File(hpiArchive.getPath() + ".pinned");
+            return pinnedMarker.exists();
+        }
+        
+        public void unpin() {
+            File pinnedMarker = new File(hpiArchive.getPath() + ".pinned");
+            if (pinnedMarker.exists()) {
+                FileUtils.deleteQuietly(pinnedMarker);
+            }
+        }
+
+        public void downgade() throws IOException {
+            File backupFile = Util.changeExtension(hpiArchive, ".bak");
+            if (backupFile.exists()){
+                hpiArchive.delete();
+            }
+            if (!backupFile.renameTo(hpiArchive)) {
+                throw new IOException("Failed to rename " + backupFile + " to " + hpiArchive);
             }
         }
 

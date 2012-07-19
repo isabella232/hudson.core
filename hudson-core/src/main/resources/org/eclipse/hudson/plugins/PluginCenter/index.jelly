@@ -84,10 +84,10 @@
                                                             <j:out value="${it.markupFormatter.translate(p.description)}" />
                                                         </div>
                                                     </td>
-                                                    <td class="column3" style="white-space:nowrap">
+                                                    <td class="column3">
                                                         ${p.version}
                                                     </td>
-                                                    <td class="column4" style="white-space:nowrap">
+                                                    <td class="column4" >
                                                         ${it.getInstalled(p).version} (Installed)
                                                     </td>
                                                 </tr> 
@@ -170,7 +170,7 @@
                                                                             <j:out value="${it.markupFormatter.translate(p.description)}" />
                                                                         </div>
                                                                     </td>
-                                                                    <td class="column3" style="white-space:nowrap">
+                                                                    <td class="column3" >
                                                                         ${p.version}
                                                                     </td>
                                                                 </tr>
@@ -225,7 +225,7 @@
                                                                             <j:out value="${it.markupFormatter.translate(p.description)}" />
                                                                         </div>
                                                                     </td>
-                                                                    <td class="column3" style="white-space:nowrap">
+                                                                    <td class="column3">
                                                                         ${p.version}
                                                                     </td>
                                                                 </tr>
@@ -235,10 +235,10 @@
                                                 </j:forEach> 
                                             </div>
                                         </div>
-                                    </li>
-                                </ul> 
+                                    </li> 
+                                </ul>
                             </div>
-                            
+                             
                             <div id="othersTab"> 
                                 <ul id="installList" class="setup">
                                     <li>
@@ -280,7 +280,7 @@
                                                                             <j:out value="${it.markupFormatter.translate(p.description)}" />
                                                                         </div>
                                                                     </td>
-                                                                    <td class="column3" style="white-space:nowrap">
+                                                                    <td class="column3" >
                                                                         ${p.version}
                                                                     </td>
                                                                 </tr>
@@ -357,7 +357,7 @@
                                                     </j:if>
                                                     <j:if test="${!it.getInstalled(p).isEnabled()}">
                                                         <td class="column1">
-                                                            <img class="installed_img_${p.name}" style="display:none;"/>
+                                                            <img class="installed_img_${p.name}" src="${imagesURL}/16x16/warning.png"/>
                                                         </td>
                                                     </j:if>
                                             
@@ -372,18 +372,30 @@
                                                         </div>
                                                     </td>
                                                     <td class="column3">
-                                                        ${it.getInstalled(p).version} 
+                                                        ${it.getInstalled(p).version}  
                                                     </td>
-                                                    <j:if test="${it.getInstalled(p).isEnabled()}">
-                                                        <td class="column4">
-                                                            <button value="${p.name}">Disable</button>
-                                                        </td>
-                                                    </j:if> 
-                                                    <j:if test="${!it.getInstalled(p).isEnabled()}">
-                                                        <td class="column4">
-                                                            <button value="${p.name}">Enable</button>
-                                                        </td>
-                                                    </j:if>
+                                                    <td class="column4">
+                                                        <span style="font-size:10px" class="actionsColumn">
+                                                            <j:if test="${it.getInstalled(p).isEnabled()}">
+                                                                <button class="enable" value="${p.name}">Disable</button>
+                                                            </j:if> 
+                                                      
+                                                            <j:if test="${!it.getInstalled(p).isEnabled()}">
+                                                                <button class="enable" value="${p.name}">Enable</button>
+                                                            </j:if>
+                                                            <j:if test="${it.getInstalled(p).isDowngrdable()}">
+                                                                <button class="downgrade" style="margin-top: 3px; margin-bottom: 3px;" value="${p.name}" >Downgrade to ${it.getInstalled(p).backupVersion} </button>
+                                                            </j:if>
+                                                            <j:if test="${it.getInstalled(p).isPinned()}">
+                                                                <span>
+                                                                    <button class="unpin" style="margin-right: 3px;" value="${p.name}">Unpin</button>
+                                                                    <a href="http://wiki.hudson-ci.org/display/HUDSON/Pinned+Plugins" target="_blank"> 
+                                                                        <img src="${imagesURL}/16x16/help.png"/>
+                                                                    </a>
+                                                                </span>
+                                                            </j:if>
+                                                        </span>
+                                                    </td>
                                                 </tr>
                                             </j:forEach>
                                         </table> 
@@ -393,7 +405,7 @@
                             </li>
                         </ul> 
                         <br/>
-                        <span id="pluginDisableMsg">
+                        <span id="pluginActionMsg">
                                   <!-- Plugin Enable/Disable operation message injected -->
                         </span>
                     </div>
@@ -471,7 +483,7 @@
                                                     <input type="file" name="fileSelect" id="fileSelect" style="margin-top: 10px; margin-right: 10px;" size="76"/>
                                                 </div>
                                             </form>
-                                            <div style="margin-left: 500px; margin-top: 10px;"> 
+                                            <div style="margin-left: 500px;"> 
                                                 <input style="width: 150px;" type="button" id="uploadButton" value="${%Upload}" />
                                             </div>
                                             <div id="progressbar"></div>
@@ -504,7 +516,7 @@
                                                         <input type="text" name="siteUrl" style="margin-top: 10px; margin-right: 10px;" size="103" value="${it.updateSiteManager.updateSiteUrl}"/>
                                                     </div>
                                                 </form>
-                                                <div style="margin-left: 500px; margin-top: 10px;"> 
+                                                <div style="margin-left: 500px;"> 
                                                     <input style="width: 150px;" type="button" id="configureUpdateSiteButton" value="${%Configure}" />
                                                 </div>
                                            
