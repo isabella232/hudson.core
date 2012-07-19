@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -38,10 +38,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class EventPublisherImpl
-    implements EventPublisher
-{
-    private static final Logger log = LoggerFactory.getLogger(EventPublisherImpl.class);
+        implements EventPublisher {
 
+    private static final Logger log = LoggerFactory.getLogger(EventPublisherImpl.class);
     private final List<EventConsumer> consumers;
 
     @Inject
@@ -67,11 +66,9 @@ public class EventPublisherImpl
 
             try {
                 target.consume(event);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 log.error("Consumer raised an exception", e);
-            }
-            finally {
+            } finally {
                 Thread.currentThread().setContextClassLoader(cl);
             }
         }

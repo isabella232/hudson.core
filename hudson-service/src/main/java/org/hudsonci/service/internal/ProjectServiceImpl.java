@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -43,7 +43,6 @@ import org.hudsonci.utils.tasks.JobUuid;
 
 import com.google.common.base.Preconditions;
 
-
 /**
  * Default {@link ProjectService} implementation.
  *
@@ -52,13 +51,13 @@ import com.google.common.base.Preconditions;
 @Named
 @Singleton
 public class ProjectServiceImpl extends ServiceSupport implements ProjectService {
+
     private final SecurityService securityService;
 
     @Inject
     ProjectServiceImpl(final SecurityService securityService) {
         this.securityService = Preconditions.checkNotNull(securityService);
     }
-
 
     public AbstractProject<?, ?> getProject(final UUID id) {
         AbstractProject<?, ?> project = findProject(id);
@@ -185,5 +184,4 @@ public class ProjectServiceImpl extends ServiceSupport implements ProjectService
         // Hudson only returns jobnames when the current context has Item.READ perms on it
         return getHudson().getJobNames();
     }
-
 }

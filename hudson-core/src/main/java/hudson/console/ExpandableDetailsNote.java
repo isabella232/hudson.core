@@ -7,8 +7,8 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
- *    
+ * Contributors:
+ *
  *
  *******************************************************************************/ 
 
@@ -35,7 +35,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package hudson.console;
 
 import hudson.Extension;
@@ -46,15 +45,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Renders a button that can be clicked to reveal additional block tag (and HTML inside it.)
+ * Renders a button that can be clicked to reveal additional block tag (and HTML
+ * inside it.)
  *
- * <p>
- * Useful if you want the user to be able to see additional details.
+ * <p> Useful if you want the user to be able to see additional details.
  *
  * @author Kohsuke Kawaguchi
  * @since 1.395
  */
 public class ExpandableDetailsNote extends ConsoleNote {
+
     private final String caption;
     private final String html;
 
@@ -66,7 +66,7 @@ public class ExpandableDetailsNote extends ConsoleNote {
     @Override
     public ConsoleAnnotator annotate(Object context, MarkupText text, int charPos) {
         text.addMarkup(charPos,
-                "<input type=button value='"+caption+"' class='reveal-expandable-detail'><div class='expandable-detail'>"+html+"</div>");
+                "<input type=button value='" + caption + "' class='reveal-expandable-detail'><div class='expandable-detail'>" + html + "</div>");
         return null;
     }
 
@@ -75,17 +75,17 @@ public class ExpandableDetailsNote extends ConsoleNote {
             return new ExpandableDetailsNote(buttonCaption, html).encode();
         } catch (IOException e) {
             // impossible, but don't make this a fatal problem
-            LOGGER.log(Level.WARNING, "Failed to serialize "+HyperlinkNote.class,e);
+            LOGGER.log(Level.WARNING, "Failed to serialize " + HyperlinkNote.class, e);
             return "";
         }
     }
 
     @Extension
     public static final class DescriptorImpl extends ConsoleAnnotationDescriptor {
+
         public String getDisplayName() {
             return "Expandable details";
         }
     }
-
     private static final Logger LOGGER = Logger.getLogger(ExpandableDetailsNote.class.getName());
 }

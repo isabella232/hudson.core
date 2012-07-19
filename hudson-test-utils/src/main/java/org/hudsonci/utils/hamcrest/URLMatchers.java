@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -24,12 +24,12 @@ import org.hamcrest.Matcher;
 public class URLMatchers {
 
     @Factory
-    public static Matcher<URL> respondsWithStatus(int statusCode){
+    public static Matcher<URL> respondsWithStatus(int statusCode) {
         return new URLRespondsWithStatusMatcher(statusCode);
     }
 
     @Factory
-    public static Matcher<URL> respondsWithStatusWithin(int statusCode, int timeoutMillis){
+    public static Matcher<URL> respondsWithStatusWithin(int statusCode, int timeoutMillis) {
         return new URLRespondsWithStatusMatcher(statusCode, timeoutMillis);
     }
 }

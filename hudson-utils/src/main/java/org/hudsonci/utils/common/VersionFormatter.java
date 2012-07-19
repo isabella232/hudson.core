@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -18,56 +18,50 @@ package org.hudsonci.utils.common;
 
 /**
  * Utility supplying different ways to format a version number.
- *  
+ *
  * @author Jamie Whitehouse
  * @since 2.1.0
  */
-class VersionFormatter
-{
+class VersionFormatter {
+
     /**
      * @return a formatted version number containing the raw information
      */
-    public static String asRawVersion( String version, String timestamp, String sequence )
-    {
+    public static String asRawVersion(String version, String timestamp, String sequence) {
         StringBuilder buff = new StringBuilder();
 
-        if ( version == null )
-        {
+        if (version == null) {
             version = VersionSupport.UNKNOWN;
         }
-        buff.append( version );
+        buff.append(version);
 
-        if ( timestamp != null )
-        {
-            buff.append( "," ).append( timestamp );
+        if (timestamp != null) {
+            buff.append(",").append(timestamp);
         }
 
-        if ( sequence != null )
-        {
-            buff.append( "#" ).append( sequence );
+        if (sequence != null) {
+            buff.append("#").append(sequence);
         }
 
         return buff.toString();
     }
 
     /**
-     * Generates an appropriate format based on the project being a release or development version. Example:
-     * 0.2.1,201009291818#1
-     * 
-     * @return a formatted version number in the simplest and most significant form
+     * Generates an appropriate format based on the project being a release or
+     * development version. Example: 0.2.1,201009291818#1
+     *
+     * @return a formatted version number in the simplest and most significant
+     * form
      */
-    public static String asCanonicalVersion( String version, String timestamp, String sequence )
-    {
+    public static String asCanonicalVersion(String version, String timestamp, String sequence) {
         String derivedVersion = version;
-        if ( derivedVersion == null )
-        {
+        if (derivedVersion == null) {
             derivedVersion = VersionSupport.UNKNOWN;
         }
 
         String snapshot = "-SNAPSHOT";
-        if ( derivedVersion.contains( snapshot ) )
-        {
-            derivedVersion = asRawVersion( version.replace( snapshot, "" ), timestamp, sequence );
+        if (derivedVersion.contains(snapshot)) {
+            derivedVersion = asRawVersion(version.replace(snapshot, ""), timestamp, sequence);
         }
 
         return derivedVersion;

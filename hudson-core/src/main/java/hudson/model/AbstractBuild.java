@@ -688,8 +688,8 @@ public abstract class AbstractBuild<P extends AbstractProject<P, R>, R extends A
             }
         }
 
-        if (changeSet == null) // cached value
-        {
+        // cached value
+        if (changeSet == null) {
             try {
                 changeSet = calcChangeSet();
             } finally {
@@ -1174,8 +1174,8 @@ public abstract class AbstractBuild<P extends AbstractProject<P, R>, R extends A
         Executor e = getExecutor();
         if (e != null) {
             e.doStop(req, rsp);
-        } else // nothing is building
-        {
+        } else  {
+            // nothing is building
             rsp.forwardToPreviousPage(req);
         }
     }

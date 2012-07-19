@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -22,6 +22,7 @@ package org.hudsonci.service;
  * @since 2.1.0
  */
 public class NodeNotFoundException extends NotFoundException {
+
     public NodeNotFoundException(String message) {
         super(message);
     }

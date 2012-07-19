@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -27,23 +27,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Base Hudson Service from which all service implementations should extend.
  *
- * <p>Common {@literal preconditions} of service implementation methods
- * include:
+ * <p>Common {@literal preconditions} of service implementation methods include:
  *
- * <ul>
- * <li>throw a {@link NullPointerException} if a null object
- * reference is passed in any parameter.
- * <li>throw an {@link org.springframework.security.AccessDeniedException} if the current thread context does not hold a required authority
- * to perform an operation
+ * <ul> <li>throw a {@link NullPointerException} if a null object reference is
+ * passed in any parameter. <li>throw an
+ * {@link org.springframework.security.AccessDeniedException} if the current
+ * thread context does not hold a required authority to perform an operation
  * </ul>
  *
  * @author plynch
  * @since 2.1.0
  */
-public abstract class ServiceSupport
-{
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+public abstract class ServiceSupport {
 
+    protected final Logger log = LoggerFactory.getLogger(getClass());
     private Hudson hudson;
 
     @Inject
@@ -51,8 +48,7 @@ public abstract class ServiceSupport
         this.hudson = checkNotNull(hudson);
     }
 
-    protected Hudson getHudson()
-    {
+    protected Hudson getHudson() {
         return hudson;
     }
 }

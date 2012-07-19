@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -33,8 +33,8 @@ import java.util.EventObject;
 @Named
 @Singleton
 public class DiagnosticEventConsumer
-    implements EventConsumer
-{
+        implements EventConsumer {
+
     private static final Logger log = LoggerFactory.getLogger(DiagnosticEventConsumer.class);
 
     public void consume(final EventObject event) throws Exception {

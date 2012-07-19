@@ -678,7 +678,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
         private String generateSalt() {
             StringBuilder buf = new StringBuilder();
             SecureRandom sr = new SecureRandom();
-            for (int i = 0; i < 6; i++) {// log2(52^6)=34.20... so, this is about 32bit strong.
+            for (int i = 0; i < 6; i++) { // log2(52^6)=34.20... so, this is about 32bit strong.
                 boolean upper = sr.nextBoolean();
                 char ch = (char) (sr.nextInt(26) + 'a');
                 if (upper) {
@@ -712,7 +712,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
             if (req.getRequestURI().equals(req.getContextPath() + "/")) {
                 if (needsToCreateFirstUser()) {
                     ((HttpServletResponse) response).sendRedirect("securityRealm/firstUser");
-                } else {// the first user already created. the role of this filter is over.
+                } else { // the first user already created. the role of this filter is over.
                     PluginServletFilter.removeFilter(this);
                     chain.doFilter(request, response);
                 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -39,9 +39,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class ScriptServiceImpl
-    extends ServiceSupport
-    implements ScriptService
-{
+        extends ServiceSupport
+        implements ScriptService {
+
     private final SecurityService security;
 
     @Inject

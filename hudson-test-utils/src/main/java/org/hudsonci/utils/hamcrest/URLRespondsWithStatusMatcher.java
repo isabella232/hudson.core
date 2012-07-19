@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -38,10 +38,10 @@ public class URLRespondsWithStatusMatcher extends TypeSafeMatcher<URL> {
     }
 
     public URLRespondsWithStatusMatcher(final int statusCode, final int timeout) {
-        if(timeout < 0){
+        if (timeout < 0) {
             throw new IllegalArgumentException("timeout cannot be negative");
         }
-        if(statusCode < -1){
+        if (statusCode < -1) {
             throw new IllegalArgumentException("status code cannot be less than negative one");
         }
         this.statusCode = statusCode;
@@ -49,24 +49,23 @@ public class URLRespondsWithStatusMatcher extends TypeSafeMatcher<URL> {
     }
 
     public void describeTo(Description description) {
-        if(timedOut){
+        if (timedOut) {
             description.appendValue(urlString).appendText(" to connect within ").appendValue(timeout).appendText("ms");
-        } else if (e != null){
+        } else if (e != null) {
             description.appendValue(urlString).appendText(" to successfully connect");
         } else {
             description.appendValue(urlString).appendText(" to respond with ").appendValue(statusCode);
         }
     }
 
-
     @Override
     protected void describeMismatchSafely(URL item, Description mismatchDescription) {
-        if(timedOut){
+        if (timedOut) {
             mismatchDescription.appendText("took longer.");
-            if(this.e != null){
+            if (this.e != null) {
                 mismatchDescription.appendText(this.e.getMessage());
             }
-        } else if (e != null){
+        } else if (e != null) {
             mismatchDescription.appendText("got ").appendValue(this.e);
             // description.appendText("got exception ").appendValue(e);
         } else {
@@ -81,23 +80,22 @@ public class URLRespondsWithStatusMatcher extends TypeSafeMatcher<URL> {
         try {
             URL url = new URL(item.toString());
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            if(timeout > -1){
+            if (timeout > -1) {
                 urlConnection.setConnectTimeout(timeout);
                 urlConnection.setReadTimeout(timeout);
             }
             urlConnection.setUseCaches(false);
             urlConnection.connect();
             this.receivedStatusCode = urlConnection.getResponseCode();
-        } catch (SocketTimeoutException ste){
+        } catch (SocketTimeoutException ste) {
             timedOut = true;
             this.e = ste;
         } catch (IOException ioe) {
             this.e = ioe;
-        } catch (Exception e){
+        } catch (Exception e) {
             this.e = e;
         }
         return (!timedOut && e == null && this.receivedStatusCode == this.statusCode);
 
     }
-
 }

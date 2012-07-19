@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -75,7 +75,8 @@ public abstract class ServicePreconditions {
     }
 
     /**
-     * Check the projectName of an {@link hudson.model.AbstractProject} for shallow validity
+     * Check the projectName of an {@link hudson.model.AbstractProject} for
+     * shallow validity
      *
      * @param projectName the project name to check
      * @return the unmodified projectName if not null
@@ -98,8 +99,8 @@ public abstract class ServicePreconditions {
     }
 
     /**
-     * Check a {@link org.hudsonci.rest.model.DocumentDTO} ID (UUID) for
-     * shallow validity
+     * Check a {@link org.hudsonci.rest.model.DocumentDTO} ID (UUID) for shallow
+     * validity
      *
      * @param id the Document id to check
      * @return the unmodified document id
@@ -140,11 +141,9 @@ public abstract class ServicePreconditions {
 
     /**
      * IF the passed reference is null, throws a NullPointerException with
-     * appropriate message.
-     * <p>
-     * While not itself a precondition, this is a common operation if a
-     * precondition fails and can be used when custom validation was performed
-     * for a rest argument.
+     * appropriate message. <p> While not itself a precondition, this is a
+     * common operation if a precondition fails and can be used when custom
+     * validation was performed for a rest argument.
      *
      * @param <T> reference to a value to check for null
      * @param reference reference to a value to check for null

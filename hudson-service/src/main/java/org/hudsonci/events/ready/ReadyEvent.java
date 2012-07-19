@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -27,13 +27,13 @@ import java.util.EventObject;
  * @since 2.1.0
  */
 public class ReadyEvent
-    extends EventObject
-{
+        extends EventObject {
+
     public ReadyEvent(final Hudson hudson) {
         super(hudson);
     }
 
     public Hudson getHudson() {
-        return (Hudson)getSource();
+        return (Hudson) getSource();
     }
 }

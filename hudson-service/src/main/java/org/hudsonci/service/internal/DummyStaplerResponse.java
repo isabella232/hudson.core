@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -39,10 +39,10 @@ import java.util.Locale;
  * @since 2.1.0
  */
 public class DummyStaplerResponse
-    implements StaplerResponse
-{
+        implements StaplerResponse {
+
     public static final DummyStaplerResponse INSTANCE = new DummyStaplerResponse();
-    
+
     public void forward(Object it, String url, StaplerRequest request) throws ServletException, IOException {
     }
 
@@ -65,23 +65,19 @@ public class DummyStaplerResponse
     }
 
     public void serveFile(StaplerRequest req, InputStream data, long lastModified, long expiration, long contentLength, String fileName) throws
-        ServletException, IOException
-    {
+            ServletException, IOException {
     }
 
     public void serveFile(StaplerRequest req, InputStream data, long lastModified, long expiration, int contentLength, String fileName) throws
-        ServletException, IOException
-    {
+            ServletException, IOException {
     }
 
     public void serveFile(StaplerRequest req, InputStream data, long lastModified, long contentLength, String fileName) throws
-        ServletException, IOException
-    {
+            ServletException, IOException {
     }
 
     public void serveFile(StaplerRequest req, InputStream data, long lastModified, int contentLength, String fileName) throws
-        ServletException, IOException
-    {
+            ServletException, IOException {
     }
 
     public void serveExposedBean(StaplerRequest req, Object exposedBean, Flavor flavor) throws ServletException, IOException {

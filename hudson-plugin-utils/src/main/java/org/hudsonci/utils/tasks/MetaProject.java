@@ -45,37 +45,34 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Provides a unified interface for {@link AbstractProject} types.
- * 
- * Avoiding generic types where possible to avoid <tt>"inconvertible types" due to capture###</tt>.
+ *
+ * Avoiding generic types where possible to avoid <tt>"inconvertible types" due
+ * to capture###</tt>.
  *
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
  * @since 2.1.0
  */
-@SuppressWarnings( {"rawtypes", "unchecked"} )
-public class MetaProject
-{
-    private static final Logger log = LoggerFactory.getLogger(MetaProject.class);
+@SuppressWarnings({"rawtypes", "unchecked" })
+public class MetaProject {
 
+    private static final Logger log = LoggerFactory.getLogger(MetaProject.class);
     private final AbstractProject delegate;
 
-    public static enum Type
-    {
+    public static enum Type {
+
         /**
          * Any other project type (like MavenModuleSet, etc).
          */
         UNSUPPORTED,
-
         /**
          * Sub-class of {@link Project}.
          */
         NORMAL,
-
         /**
          * Sub-class of {@link MatrixProject}.
          */
         MULTICONFIG
     }
-    
     private final Type type;
 
     public MetaProject(final AbstractProject project) {
@@ -83,11 +80,9 @@ public class MetaProject
 
         if (delegate instanceof MatrixProject) {
             type = Type.MULTICONFIG;
-        }
-        else if (delegate instanceof Project) {
+        } else if (delegate instanceof Project) {
             type = Type.NORMAL;
-        }
-        else {
+        } else {
             type = Type.UNSUPPORTED;
             log.debug("Unsupported project type: {}", project.getClass().getName());
         }
@@ -121,15 +116,15 @@ public class MetaProject
     /**
      * Typed access to project instance as a normal {@link Project}.
      */
-    public Project<?,?> asNormal() {
-        return (Project)getDelegate();
+    public Project<?, ?> asNormal() {
+        return (Project) getDelegate();
     }
 
     /**
      * Typed access to project instance as a multi-config {@link MatrixProject}.
      */
     public MatrixProject asMultiConfig() {
-        return (MatrixProject)getDelegate();
+        return (MatrixProject) getDelegate();
     }
 
     public ItemGroup getParent() {
@@ -176,16 +171,17 @@ public class MetaProject
     public Collection<Trigger> getTriggers() {
         return getDelegate().getTriggers().values();
     }
-    
+
     public void addTrigger(final Trigger item) throws IOException {
         checkNotNull(item);
         getDelegate().addTrigger(item);
     }
 
     /**
-     * @throws UnsupportedProjectException if the Project type is {@link Type#UNSUPPORTED}.
+     * @throws UnsupportedProjectException if the Project type is
+     * {@link Type#UNSUPPORTED}.
      */
-    public DescribableList<BuildWrapper,Descriptor<BuildWrapper>> getBuildWrappersList() {
+    public DescribableList<BuildWrapper, Descriptor<BuildWrapper>> getBuildWrappersList() {
         switch (getType()) {
             case NORMAL:
                 return asNormal().getBuildWrappersList();
@@ -198,16 +194,18 @@ public class MetaProject
     }
 
     /**
-     * @throws UnsupportedProjectException if the Project type is {@link Type#UNSUPPORTED}.
+     * @throws UnsupportedProjectException if the Project type is
+     * {@link Type#UNSUPPORTED}.
      */
     public Collection<BuildWrapper> getBuildWrappers() {
         return getBuildWrappersList().toList();
     }
 
     /**
-     * @throws UnsupportedProjectException if the Project type is {@link Type#UNSUPPORTED}.
+     * @throws UnsupportedProjectException if the Project type is
+     * {@link Type#UNSUPPORTED}.
      */
-    public DescribableList<Builder,Descriptor<Builder>> getBuildersList() {
+    public DescribableList<Builder, Descriptor<Builder>> getBuildersList() {
         switch (getType()) {
             case NORMAL:
                 return asNormal().getBuildersList();
@@ -220,16 +218,18 @@ public class MetaProject
     }
 
     /**
-     * @throws UnsupportedProjectException if the Project type is {@link Type#UNSUPPORTED}.
+     * @throws UnsupportedProjectException if the Project type is
+     * {@link Type#UNSUPPORTED}.
      */
     public Collection<Builder> getBuilders() {
         return getBuildersList().toList();
     }
 
     /**
-     * @throws UnsupportedProjectException if the Project type is {@link Type#UNSUPPORTED}.
+     * @throws UnsupportedProjectException if the Project type is
+     * {@link Type#UNSUPPORTED}.
      */
-    public DescribableList<Publisher,Descriptor<Publisher>> getPublishersList() {
+    public DescribableList<Publisher, Descriptor<Publisher>> getPublishersList() {
         switch (getType()) {
             case NORMAL:
                 return asNormal().getPublishersList();
@@ -242,7 +242,8 @@ public class MetaProject
     }
 
     /**
-     * @throws UnsupportedProjectException if the Project type is {@link Type#UNSUPPORTED}.
+     * @throws UnsupportedProjectException if the Project type is
+     * {@link Type#UNSUPPORTED}.
      */
     public Collection<Publisher> getPublishers() {
         return getPublishersList().toList();
@@ -271,13 +272,12 @@ public class MetaProject
     }
 
     // FIXME: Extract out to service
+    public static interface Filter {
 
-    public static interface Filter
-    {
         /**
          * Return true to include the given project in the result.
          *
-         * @param project   Never null
+         * @param project Never null
          */
         boolean accept(MetaProject project);
     }
@@ -287,7 +287,7 @@ public class MetaProject
 
         for (Item item : Hudson.getInstance().getItems()) {
             if (item instanceof AbstractProject) {
-                MetaProject project = new MetaProject((AbstractProject)item);
+                MetaProject project = new MetaProject((AbstractProject) item);
                 if (filter == null || filter.accept(project)) {
                     projects.add(project);
                 }
@@ -305,7 +305,7 @@ public class MetaProject
         checkNotNull(id);
         Job job = JobUuid.find(id);
         if (job instanceof AbstractProject) {
-            return new MetaProject((AbstractProject)job);
+            return new MetaProject((AbstractProject) job);
         }
         return null;
     }

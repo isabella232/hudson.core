@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -30,7 +30,7 @@ public class URLIsReachable {
     private String message = ""; // arg 3, ideally the test name
 
     public URLIsReachable(final String urlString) throws MalformedURLException {
-        final String[] args = new String[] { urlString };
+        final String[] args = new String[]{urlString};
         init(args);
     }
 
@@ -57,10 +57,9 @@ public class URLIsReachable {
         } catch (AssertionError ae) {
             System.err.println("[WARN] "
                     + String.format("%s caused a test to be ignored %s, %s", this.getClass().getSimpleName(),
-                            this.message, ae.getMessage()));
+                    this.message, ae.getMessage()));
             return false;
         }
         return true;
     }
-
 }

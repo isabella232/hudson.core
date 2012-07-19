@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -36,9 +36,9 @@ import org.hudsonci.service.SecurityService;
 @Named
 @Singleton
 public class QueueServiceImpl
-    extends ServiceSupport
-    implements QueueService
-{
+        extends ServiceSupport
+        implements QueueService {
+
     private final SecurityService security;
 
     @Inject

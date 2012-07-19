@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -48,9 +48,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class SystemServiceImpl
-    extends ServiceSupport
-    implements SystemService
-{
+        extends ServiceSupport
+        implements SystemService {
+
     private final SecurityService securityService;
 
     @Inject
@@ -71,8 +71,7 @@ public class SystemServiceImpl
             // Jar containing Launcher is expected in <install>/lib/some.jar (so .jar file - lib dir - should get us the install dir)
             dir = dir.getParentFile().getParentFile();
             dir = FileUtil.canonicalize(dir);
-        }
-        catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             throw new IllegalStateException("Could not reliably determine the installation directory", e);
         }
         return dir;
@@ -91,142 +90,112 @@ public class SystemServiceImpl
         return getHudson().getRootDir();
     }
 
-    public XmlFile getConfigFile()
-    {
+    public XmlFile getConfigFile() {
         securityService.checkPermission(Hudson.ADMINISTER);
         // Hudson.getConfigFile() is not public, so we have to duplicate some muck here
         File f = new File(getWorkingDirectory(), "config.xml");
         return new XmlFile(Hudson.XSTREAM, f);
     }
 
-    public String getUrl()
-    {
+    public String getUrl() {
         String url = getHudson().getRootUrl();
 
         if (url == null) {
             log.warn("Underlying Hudson root url is null; using DEFAULT_URL");
             url = DEFAULT_URL;
-        }
-        else if (url.endsWith("/")) {
+        } else if (url.endsWith("/")) {
             url = url.substring(0, url.length() - 1);
         }
 
         return url;
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         return Hudson.getVersion().toString();
     }
 
-    public InitMilestone getInitLevel()
-    {
+    public InitMilestone getInitLevel() {
         return getHudson().getInitLevel();
     }
 
-    public boolean isQuietingDown()
-    {
+    public boolean isQuietingDown() {
         return getHudson().isQuietingDown();
     }
 
-    public boolean isTerminating()
-    {
+    public boolean isTerminating() {
         return getHudson().isTerminating();
     }
 
-    public String getSystemMessage()
-    {
+    public String getSystemMessage() {
         return getHudson().getSystemMessage();
     }
 
-    public void doQuietDown()
-    {
+    public void doQuietDown() {
         //securityService.checkPermission(Hudson.ADMINISTER);
-        try{getHudson().doQuietDown();}catch(final IOException e){}
+        try {
+            getHudson().doQuietDown();
+        } catch (final IOException e) {
+        }
     }
 
-    public void doQuietDown(boolean toggle)
-    {
+    public void doQuietDown(boolean toggle) {
         //securityService.checkPermission(Hudson.ADMINISTER);
-        if (toggle)
-        {
+        if (toggle) {
             log.debug("Quieting down");
             doQuietDown();
-        }
-        else
-        {
+        } else {
             log.debug("Canceling quiet down");
             doCancelQuietDown();
         }
     }
 
-    public void doCancelQuietDown()
-    {
+    public void doCancelQuietDown() {
         //securityService.checkPermission(Hudson.ADMINISTER);
         getHudson().doCancelQuietDown();
     }
 
-    public void doReload()
-    {
+    public void doReload() {
         //securityService.checkPermission(Hudson.ADMINISTER);
         log.debug("Reloading configuration");
-        try
-        {
+        try {
             getHudson().doReload();
-        }
-        catch (IOException ex)
-        {
+        } catch (IOException ex) {
             throw new ServiceRuntimeException("Could not reload.", ex);
         }
     }
 
-    public void doRestart(boolean safely)
-    {
+    public void doRestart(boolean safely) {
         //securityService.checkPermission(Hudson.ADMINISTER);
-        try
-        {
-            if (safely)
-            {
+        try {
+            if (safely) {
                 log.debug("Restarting (safely)");
                 getHudson().safeRestart();
 
-            }
-            else
-            {
+            } else {
                 log.debug("Restarting");
                 getHudson().restart();
             }
-        }
-        catch (RestartNotSupportedException ex)
-        {
+        } catch (RestartNotSupportedException ex) {
             throw new ServiceRuntimeException("Restart not supported", ex);
         }
     }
 
-    public void doRestart()
-    {
+    public void doRestart() {
         //securityService.checkPermission(Hudson.ADMINISTER);
         log.debug("Restarting");
-        try
-        {
+        try {
             getHudson().safeRestart();
-        }
-        catch (RestartNotSupportedException ex)
-        {
+        } catch (RestartNotSupportedException ex) {
             throw new ServiceRuntimeException("Restart not supported", ex);
         }
     }
 
-    public void doRestartSafely()
-    {
+    public void doRestartSafely() {
         //securityService.checkPermission(Hudson.ADMINISTER);
         log.debug("Restarting (safely)");
-        try
-        {
+        try {
             getHudson().restart();
-        }
-        catch (RestartNotSupportedException ex)
-        {
+        } catch (RestartNotSupportedException ex) {
             throw new ServiceRuntimeException("Restart not supported", ex);
         }
     }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -19,21 +19,20 @@ package org.hudsonci.service;
 import hudson.model.AbstractProject;
 
 /**
- * Thrown when an {@link AbstractProject} is needed to perform an operation, but could not be located.
+ * Thrown when an {@link AbstractProject} is needed to perform an operation, but
+ * could not be located.
  *
  * @author plynch
  * @since 2.1.0
  */
 public class ProjectNotFoundException
-    extends NotFoundException
-{
-    public ProjectNotFoundException(String message)
-    {
+        extends NotFoundException {
+
+    public ProjectNotFoundException(String message) {
         super(message);
     }
 
-    public ProjectNotFoundException(String message, Throwable cause)
-    {
+    public ProjectNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 }

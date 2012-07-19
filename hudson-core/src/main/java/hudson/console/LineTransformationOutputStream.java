@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Filtering {@link OutputStream} that buffers text by line, so that the derived class
- * can perform some manipulation based on the contents of the whole line.
+ * Filtering {@link OutputStream} that buffers text by line, so that the derived
+ * class can perform some manipulation based on the contents of the whole line.
  *
  * TODO: Mac is supposed to be CR-only. This class needs to handle that.
  *
@@ -31,40 +31,44 @@ import java.io.OutputStream;
  * @since 1.349
  */
 public abstract class LineTransformationOutputStream extends OutputStream {
+
     private ByteArrayOutputStream2 buf = new ByteArrayOutputStream2();
 
     /**
      * Called for each end of the line.
      *
-     * @param b
-     *      Contents of the whole line, including the EOL code like CR/LF.
-     * @param len
-     *      Specifies the length of the valid contents in 'b'. The rest is garbage.
-     *      This is so that the caller doesn't have to allocate an array of the exact size. 
+     * @param b Contents of the whole line, including the EOL code like CR/LF.
+     * @param len Specifies the length of the valid contents in 'b'. The rest is
+     * garbage. This is so that the caller doesn't have to allocate an array of
+     * the exact size.
      */
     protected abstract void eol(byte[] b, int len) throws IOException;
 
     public void write(int b) throws IOException {
         buf.write(b);
-        if (b==LF) eol();
+        if (b == LF) {
+            eol();
+        }
     }
 
     private void eol() throws IOException {
-        eol(buf.getBuffer(),buf.size());
+        eol(buf.getBuffer(), buf.size());
 
         // reuse the buffer under normal circumstances, but don't let the line buffer grow unbounded
-        if (buf.size()>4096)
+        if (buf.size() > 4096) {
             buf = new ByteArrayOutputStream2();
-        else
+        } else {
             buf.reset();
+        }
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        int end = off+len;
+        int end = off + len;
 
-        for( int i=off; i<end; i++ )
+        for (int i = off; i < end; i++) {
             write(b[i]);
+        }
     }
 
     @Override
@@ -75,14 +79,14 @@ public abstract class LineTransformationOutputStream extends OutputStream {
     /**
      * Forces the EOL behavior.
      *
-     * Useful if the caller wants to make sure the buffered content is all processed, but without
-     * actually neither flushing nor closing the stream.
+     * Useful if the caller wants to make sure the buffered content is all
+     * processed, but without actually neither flushing nor closing the stream.
      */
     public void forceEol() throws IOException {
-        if (buf.size()>0) {
+        if (buf.size() > 0) {
             /*
-                because LargeText cuts output at the line end boundary, this is
-                possible only for the very end of the console output, if the output ends without NL.
+             because LargeText cuts output at the line end boundary, this is
+             possible only for the very end of the console output, if the output ends without NL.
              */
             eol();
         }
@@ -90,17 +94,16 @@ public abstract class LineTransformationOutputStream extends OutputStream {
 
     protected String trimEOL(String line) {
         int slen = line.length();
-        while (slen>0) {
-            char ch = line.charAt(slen-1);
-            if (ch=='\r' || ch=='\n') {
+        while (slen > 0) {
+            char ch = line.charAt(slen - 1);
+            if (ch == '\r' || ch == '\n') {
                 slen--;
                 continue;
             }
             break;
         }
-        line = line.substring(0,slen);
+        line = line.substring(0, slen);
         return line;
     }
-
     private static final int LF = 0x0A;
 }

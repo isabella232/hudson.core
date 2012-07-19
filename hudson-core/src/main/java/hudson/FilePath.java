@@ -1602,7 +1602,7 @@ public final class FilePath implements Serializable {
                 readFromTar(remote + '/' + fileMask, new File(target.remote),
                         (remoteCompressionType != null ? remoteCompressionType.extract(pipe.getIn())
                         : FilePath.TarCompression.GZIP.extract(pipe.getIn())));
-            } catch (IOException e) {// BuildException or IOException
+            } catch (IOException e) { // BuildException or IOException
                 try {
                     future.get(3, TimeUnit.SECONDS);
                     throw e;    // the remote side completed successfully, so the error must be local
@@ -1678,8 +1678,8 @@ public final class FilePath implements Serializable {
                     IOUtils.copy(t, f);
                     f.setLastModified(te.getModTime().getTime());
                     int mode = te.getMode() & 0777;
-                    if (mode != 0 && !Functions.isWindows()) // be defensive
-                    {
+                    // be defensive
+                    if (mode != 0 && !Functions.isWindows()) {
                         Util.chmod(f, mode);
                     }
                 }
@@ -1754,7 +1754,7 @@ public final class FilePath implements Serializable {
                     // to this: (1) the user gave us aa/bb/cc/dd where cc/dd was correct
                     // and (2) the user gave us cc/dd where aa/bb/cc/dd was correct.
 
-                    {// check the (1) above first
+                    { // check the (1) above first
                         String f = fileMask;
                         while (true) {
                             int idx = findSeparator(f);
@@ -1769,7 +1769,7 @@ public final class FilePath implements Serializable {
                         }
                     }
 
-                    {// check the (2) above next as this is more expensive.
+                    { // check the (2) above next as this is more expensive.
                         // Try prepending "**/" to see if that results in a match
                         FileSet fs = Util.createFileSet(dir, "**/" + fileMask);
                         DirectoryScanner ds = fs.getDirectoryScanner(new Project());
@@ -1801,7 +1801,7 @@ public final class FilePath implements Serializable {
                         }
                     }
 
-                    {// finally, see if we can identify any sub portion that's valid. Otherwise bail out
+                    { // finally, see if we can identify any sub portion that's valid. Otherwise bail out
                         String previous = null;
                         String pattern = fileMask;
 
@@ -1816,7 +1816,7 @@ public final class FilePath implements Serializable {
                             }
 
                             int idx = findSeparator(pattern);
-                            if (idx < 0) {// no more path component left to go back
+                            if (idx < 0) { // no more path component left to go back
                                 if (pattern.equals(fileMask)) {
                                     return Messages.FilePath_validateAntFileMask_doesntMatchAnything(fileMask);
                                 } else {
@@ -1893,8 +1893,8 @@ public final class FilePath implements Serializable {
         }
 
         try {
-            if (!exists()) // no workspace. can't check
-            {
+            // no workspace. can't check
+            if (!exists()) {
                 return FormValidation.ok();
             }
 

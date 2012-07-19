@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -37,12 +37,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class ServletContainerStarter
-    extends ItemListener
-{
+        extends ItemListener {
+
     private static final Logger log = LoggerFactory.getLogger(ServletContainerStarter.class);
-
     // FIXME: Use of ItemListener for server life-cycle bits is a work around
-
     private final ServletContainer servlets;
 
     @Inject
@@ -54,8 +52,7 @@ public class ServletContainerStarter
     public void onLoaded() {
         try {
             servlets.start();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("Failed to start servlet container", e);
         }
     }

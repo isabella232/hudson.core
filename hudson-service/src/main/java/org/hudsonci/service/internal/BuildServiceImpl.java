@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -46,6 +46,7 @@ import com.google.common.base.Preconditions;
 @Named
 @Singleton
 public class BuildServiceImpl extends ServiceSupport implements BuildService {
+
     private final ProjectService projects;
     private final SecurityService security;
 
@@ -87,7 +88,7 @@ public class BuildServiceImpl extends ServiceSupport implements BuildService {
         return getBuild(project, buildNumber);
     }
 
-    public AbstractBuild<?, ?> getBuild(final AbstractProject<?,?> project, final int buildNumber)
+    public AbstractBuild<?, ?> getBuild(final AbstractProject<?, ?> project, final int buildNumber)
             throws BuildNotFoundException {
         AbstractBuild<?, ?> build = findBuild(project, buildNumber);
         if (build == null) {
@@ -104,11 +105,11 @@ public class BuildServiceImpl extends ServiceSupport implements BuildService {
         return project != null ? findBuild(project, buildNumber) : null;
     }
 
-    public AbstractBuild<?,?> findBuild(final AbstractProject<?, ?> project, final int buildNumber) {
+    public AbstractBuild<?, ?> findBuild(final AbstractProject<?, ?> project, final int buildNumber) {
         checkNotNull(project, "project");
         checkBuildNumber(buildNumber);
 
-        AbstractBuild<?,?> build = project.getBuildByNumber(buildNumber);
+        AbstractBuild<?, ?> build = project.getBuildByNumber(buildNumber);
 
         if (build != null) {
             this.security.checkPermission(build, Item.READ);
@@ -117,7 +118,7 @@ public class BuildServiceImpl extends ServiceSupport implements BuildService {
         return build;
     }
 
-    public void stopBuild(final AbstractProject<?, ?> project, final int buildNumber){
+    public void stopBuild(final AbstractProject<?, ?> project, final int buildNumber) {
         AbstractBuild<?, ?> build = getBuild(project, buildNumber);
         log.debug("Stopping build: {} #{}", project.getName(), buildNumber);
         try {
@@ -129,5 +130,4 @@ public class BuildServiceImpl extends ServiceSupport implements BuildService {
             throw new ServiceRuntimeException("Stop failed for " + project.getName() + " #" + buildNumber, e);
         }
     }
-
 }

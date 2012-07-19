@@ -42,14 +42,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class ReadyDetector
-    extends Thread
-{
+        extends Thread {
+
     private static final Logger log = LoggerFactory.getLogger(ReadyDetector.class);
-
     private final EventPublisher publisher;
-
     private final Hudson hudson;
-
     private final WebAppController controller;
 
     @Inject
@@ -66,12 +63,10 @@ public class ReadyDetector
                 publisher.publish(new ReadyEvent(hudson));
                 log.info("Hudson is ready.");
                 break;
-            }
-            else {
+            } else {
                 try {
                     Thread.sleep(500);
-                }
-                catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                     log.warn("Interrupted while waiting for initialization; ignoring", e);
                 }
             }
@@ -113,8 +108,7 @@ public class ReadyDetector
             Field field = filter.getClass().getDeclaredField("filter");
             field.setAccessible(true);
             return (Filter) field.get(filter);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new Error("Failed to access HudsonFilter.filter delegate", e);
         }
     }

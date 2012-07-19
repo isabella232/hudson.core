@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -26,8 +26,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
  * @since 2.1.0
  */
-public abstract class XReference<T>
-{
+public abstract class XReference<T> {
+
     protected transient Holder<T> holder;
 
     public XReference(final T value) {
@@ -43,7 +43,7 @@ public abstract class XReference<T>
             holder = new InstanceHolder<T>(value);
         }
     }
-    
+
     public T get() {
         if (holder != null) {
             return holder.get();
@@ -65,16 +65,16 @@ public abstract class XReference<T>
 
     @Override
     public String toString() {
-        return getClass().getName() + "{" +
-            "holder=" + holder +
-        '}';
+        return getClass().getName() + "{"
+                + "holder=" + holder
+                + '}';
     }
 
     /**
      * Provides delegation for instance access.
      */
-    public static interface Holder<T>
-    {
+    public static interface Holder<T> {
+
         T get();
     }
 
@@ -82,8 +82,8 @@ public abstract class XReference<T>
      * Holds on to a specific instance.
      */
     public static class InstanceHolder<T>
-        implements Holder<T>
-    {
+            implements Holder<T> {
+
         protected final T instance;
 
         protected InstanceHolder(final T instance) {
@@ -96,9 +96,9 @@ public abstract class XReference<T>
 
         @Override
         public String toString() {
-            return "InstanceHolder{" +
-                "instance=" + instance +
-                '}';
+            return "InstanceHolder{"
+                    + "instance=" + instance
+                    + '}';
         }
     }
 }

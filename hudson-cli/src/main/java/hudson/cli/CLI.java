@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -43,48 +43,51 @@ import java.io.BufferedOutputStream;
 
 /**
  * CLI entry point to Hudson.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public class CLI {
+
     private final ExecutorService pool;
     private final Channel channel;
     private final CliEntryPoint entryPoint;
     private final boolean ownsPool;
 
     public CLI(URL hudson) throws IOException, InterruptedException {
-        this(hudson,null);
+        this(hudson, null);
     }
 
     public CLI(URL hudson, ExecutorService exec) throws IOException, InterruptedException {
         String url = hudson.toExternalForm();
-        if(!url.endsWith("/"))  url+='/';
+        if (!url.endsWith("/")) {
+            url += '/';
+        }
 
-        ownsPool = exec==null;
-        pool = exec!=null ? exec : Executors.newCachedThreadPool();
+        ownsPool = exec == null;
+        pool = exec != null ? exec : Executors.newCachedThreadPool();
 
         int clip = getCliTcpPort(url);
-        if(clip>=0) {
+        if (clip >= 0) {
             // connect via CLI port
             String host = new URL(url).getHost();
-            LOGGER.fine("Trying to connect directly via TCP/IP to port "+clip+" of "+host);
-            Socket s = new Socket(host,clip);
+            LOGGER.fine("Trying to connect directly via TCP/IP to port " + clip + " of " + host);
+            Socket s = new Socket(host, clip);
             DataOutputStream dos = new DataOutputStream(s.getOutputStream());
             dos.writeUTF("Protocol:CLI-connect");
 
-            channel = new Channel("CLI connection to "+hudson, pool,
+            channel = new Channel("CLI connection to " + hudson, pool,
                     new BufferedInputStream(new SocketInputStream(s)),
                     new BufferedOutputStream(new SocketOutputStream(s)));
         } else {
             // connect via HTTP
-            LOGGER.fine("Trying to connect to "+url+" via HTTP");
-            url+="cli";
+            LOGGER.fine("Trying to connect to " + url + " via HTTP");
+            url += "cli";
             hudson = new URL(url);
 
             FullDuplexHttpStream con = new FullDuplexHttpStream(hudson);
-            channel = new Channel("Chunked connection to "+hudson,
-                    pool,con.getInputStream(),con.getOutputStream());
-            new PingThread(channel,30*1000) {
+            channel = new Channel("Chunked connection to " + hudson,
+                    pool, con.getInputStream(), con.getOutputStream());
+            new PingThread(channel, 30 * 1000) {
                 protected void onDead() {
                     // noop. the point of ping is to keep the connection alive
                     // as most HTTP servers have a rather short read time out
@@ -93,10 +96,11 @@ public class CLI {
         }
 
         // execute the command
-        entryPoint = (CliEntryPoint)channel.waitForRemoteProperty(CliEntryPoint.class.getName());
+        entryPoint = (CliEntryPoint) channel.waitForRemoteProperty(CliEntryPoint.class.getName());
 
-        if(entryPoint.protocolVersion()!=CliEntryPoint.VERSION)
+        if (entryPoint.protocolVersion() != CliEntryPoint.VERSION) {
             throw new IOException(Messages.CLI_VersionMismatch());
+        }
     }
 
     /**
@@ -107,29 +111,32 @@ public class CLI {
         try {
             head.connect();
         } catch (IOException e) {
-            throw (IOException)new IOException("Failed to connect to "+url).initCause(e);
+            throw (IOException) new IOException("Failed to connect to " + url).initCause(e);
         }
         String p = head.getHeaderField("X-Hudson-CLI-Port");
-        if(p==null) return -1;
+        if (p == null) {
+            return -1;
+        }
         return Integer.parseInt(p);
     }
 
     public void close() throws IOException, InterruptedException {
         channel.close();
         channel.join();
-        if(ownsPool)
+        if (ownsPool) {
             pool.shutdown();
+        }
     }
 
     public int execute(List<String> args, InputStream stdin, OutputStream stdout, OutputStream stderr) {
-        return entryPoint.main(args,Locale.getDefault(),
+        return entryPoint.main(args, Locale.getDefault(),
                 new RemoteInputStream(stdin),
                 new RemoteOutputStream(stdout),
                 new RemoteOutputStream(stderr));
     }
 
     public int execute(List<String> args) {
-        return execute(args,System.in,System.out,System.err);
+        return execute(args, System.in, System.out, System.err);
     }
 
     public int execute(String... args) {
@@ -148,24 +155,24 @@ public class CLI {
 
         String url = System.getenv("HUDSON_URL");
 
-        while(!args.isEmpty()) {
+        while (!args.isEmpty()) {
             String head = args.get(0);
-            if(head.equals("-s") && args.size()>=2) {
+            if (head.equals("-s") && args.size() >= 2) {
                 url = args.get(1);
-                args = args.subList(2,args.size());
+                args = args.subList(2, args.size());
                 continue;
             }
             break;
         }
-        
-        if(url==null) {
+
+        if (url == null) {
             printUsageAndExit(Messages.CLI_NoURL());
             return;
         }
 
-        if(args.isEmpty())
+        if (args.isEmpty()) {
             args = Arrays.asList("help"); // default to help
-
+        }
         CLI cli = new CLI(new URL(url));
         try {
             // execute the command
@@ -178,10 +185,11 @@ public class CLI {
     }
 
     private static void printUsageAndExit(String msg) {
-        if(msg!=null)   System.out.println(msg);
+        if (msg != null) {
+            System.out.println(msg);
+        }
         System.err.println(Messages.CLI_Usage());
         System.exit(-1);
     }
-
     private static final Logger LOGGER = Logger.getLogger(CLI.class.getName());
 }

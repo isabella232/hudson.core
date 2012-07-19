@@ -323,7 +323,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             super(h);
         }
 
-        public CloudList() {// needed for XStream deserialization
+        // needed for XStream deserialization
+        public CloudList() { 
         }
 
         public Cloud getByName(String name) {
@@ -592,7 +593,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
             updateComputerList();
 
-            {// master is online now
+            // master is online now
+            {
                 Computer c = toComputer();
                 if (c != null) {
                     for (ComputerListener cl : ComputerListener.all()) {
@@ -1085,7 +1087,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * we won't upset {@link Executor}s running in it.
      */
     private void updateComputerList() throws IOException {
-        synchronized (updateComputerLock) {// just so that we don't have two code updating computer list at the same time
+        // just so that we don't have two code updating computer list at the same time
+        synchronized (updateComputerLock) {
             Map<String, Computer> byName = new HashMap<String, Computer>();
             for (Computer c : computers.values()) {
                 if (c.getNode() == null) {
@@ -1585,8 +1588,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             throw new IllegalArgumentException();
         }
         ArrayList<Node> nl = new ArrayList<Node>(this.slaves);
-        if (!nl.contains(n)) // defensive check
-        {
+        // defensive check
+        if (!nl.contains(n)) {
             nl.add(n);
         }
         setNodes(nl);
@@ -1714,7 +1717,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     @Override
     public SearchIndexBuilder makeSearchIndex() {
-        return super.makeSearchIndex().add("configure", "config", "configure").add("manage").add("log").add(getPrimaryView().makeSearchIndex()).add(new CollectionSearchIndex() {// for computers
+        return super.makeSearchIndex().add("configure", "config", "configure").add("manage").add("log").add(getPrimaryView().makeSearchIndex()).add(new CollectionSearchIndex() { 
+            // for computers
             protected Computer get(String key) {
                 return getComputer(key);
             }
@@ -1722,7 +1726,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             protected Collection<Computer> all() {
                 return computers.values();
             }
-        }).add(new CollectionSearchIndex() {// for users
+        }).add(new CollectionSearchIndex() {
+            // for users
             protected User get(String key) {
                 return User.get(key, false);
             }
@@ -1730,7 +1735,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             protected Collection<User> all() {
                 return User.getAll();
             }
-        }).add(new CollectionSearchIndex() {// for views
+        }).add(new CollectionSearchIndex() {
+            // for views
             protected View get(String key) {
                 return getView(key);
             }
@@ -1747,8 +1753,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     @Exported
     public View getPrimaryView() {
         View v = getView(primaryView);
-        if (v == null) // fallback
-        {
+        // fallback
+        if (v == null) {
             v = views.get(0);
         }
         return v;
@@ -1917,7 +1923,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * requirement.
      * @return Can be an empty list but never null.
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({"unchecked" })
     public <T> ExtensionList<T> getExtensionList(Class<T> extensionType) {
         return extensionLists.get(extensionType);
     }
@@ -1937,7 +1943,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      *
      * @return Can be an empty list but never null.
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({"unchecked" })
     public <T extends Describable<T>, D extends Descriptor<T>> DescriptorExtensionList<T, D> getDescriptorList(Class<T> type) {
         return descriptorLists.get(type);
     }
@@ -2270,9 +2276,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             public void run(Reactor session) throws Exception {
                 rebuildDependencyGraph();
 
-                {// recompute label objects - populates the labels mapping.
-                    for (Node slave : slaves) // Note that not all labels are visible until the slaves have connected.
-                    {
+                // recompute label objects - populates the labels mapping.
+                {
+                    for (Node slave : slaves) {
+                        // Note that not all labels are visible until the slaves have connected.
                         slave.getAssignedLabels();
                     }
                     getAssignedLabels();
@@ -2343,9 +2350,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             pluginManager.stop();
         }
 
-        if (getRootDir().exists()) // if we are aborting because we failed to create HUDSON_HOME,
+        // if we are aborting because we failed to create HUDSON_HOME,
         // don't try to save. Issue #536
-        {
+        if (getRootDir().exists()) {
             getQueue().save();
         }
 
@@ -2634,7 +2641,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * @param name Name of the newly created project.
      * @return Newly created {@link TopLevelItem}.
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({"unchecked" })
     public <T extends TopLevelItem> T copy(T src, String name) throws IOException {
         return itemGroupMixIn.copy(src, name);
     }
@@ -2924,8 +2931,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
         restart();
 
-        if (rsp != null) // null for CLI
-        {
+        // null for CLI
+        if (rsp != null) {
             rsp.sendRedirect2(".");
         }
     }
@@ -2948,8 +2955,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
         safeRestart();
 
-        if (rsp != null) // null for CLI
-        {
+        // null for CLI
+        if (rsp != null)  {
             rsp.sendRedirect2(".");
         }
     }

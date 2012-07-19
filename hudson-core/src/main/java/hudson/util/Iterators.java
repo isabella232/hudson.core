@@ -232,7 +232,7 @@ public class Iterators {
     /**
      * Casts {@link Iterator} by taking advantage of its covariant-ness.
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({"unchecked" })
     public static <T> Iterator<T> cast(Iterator<? extends T> itr) {
         return (Iterator) itr;
     }
@@ -240,7 +240,7 @@ public class Iterators {
     /**
      * Casts {@link Iterable} by taking advantage of its covariant-ness.
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({"unchecked" })
     public static <T> Iterable<T> cast(Iterable<? extends T> itr) {
         return (Iterable) itr;
     }
@@ -248,7 +248,7 @@ public class Iterators {
     /**
      * Returns an {@link Iterator} that only returns items of the given subtype.
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({"unchecked" })
     public static <U, T extends U> Iterator<T> subType(Iterator<U> itr, final Class<T> type) {
         return (Iterator) new FilterIterator<U>(itr) {
             protected boolean filter(U u) {

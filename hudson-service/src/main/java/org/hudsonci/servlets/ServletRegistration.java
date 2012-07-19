@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -27,16 +27,12 @@ import java.util.Map;
  * @since 2.1.0
  */
 public class ServletRegistration
-    implements Cloneable
-{
+        implements Cloneable {
+
     private String name;
-
     private Class<? extends Servlet> servletType;
-
     private Servlet servlet;
-
     private String uriPrefix;
-
     private Map<String, String> parameters;
 
     public String getName() {
@@ -96,27 +92,26 @@ public class ServletRegistration
     public ServletRegistration clone() {
         try {
             return (ServletRegistration) super.clone();
-        }
-        catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw (InternalError) new InternalError().initCause(e);
         }
     }
 
     @Override
     public String toString() {
-        return "ServletRegistration{" +
-            "name='" + name + '\'' +
-            ", servletType=" + servletType +
-            ", servlet=" + servlet +
-            ", uriPrefix='" + uriPrefix + '\'' +
-            ", parameters=" + parameters +
-            '}';
+        return "ServletRegistration{"
+                + "name='" + name + '\''
+                + ", servletType=" + servletType
+                + ", servlet=" + servlet
+                + ", uriPrefix='" + uriPrefix + '\''
+                + ", parameters=" + parameters
+                + '}';
     }
 
-    public static interface Handle
-    {
+    public static interface Handle {
+
         ServletRegistration getRegistration();
-        
+
         void setEnabled(boolean enabled);
 
         boolean isEnabled();

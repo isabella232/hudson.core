@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -39,8 +39,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.1.0
  */
 public abstract class XReferenceConverter
-    extends AbstractReflectionConverter
-{
+        extends AbstractReflectionConverter {
+
     protected HolderType holderType = HolderType.HARD;
 
     public XReferenceConverter(final Mapper mapper, final ReflectionProvider reflection) {
@@ -65,14 +65,13 @@ public abstract class XReferenceConverter
         super.doMarshal(source, writer, context);
 
         // Then delegate the storage of the reference target
-        XReference ref = (XReference)source;
+        XReference ref = (XReference) source;
         Object target = ref.get();
         if (target != null) {
             try {
                 store(ref);
                 ref.holder = createStoredHolder(ref, target);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new ConversionException("Failed to marshal reference: " + ref, e);
             }
         }
@@ -129,8 +128,8 @@ public abstract class XReferenceConverter
      * Support for {@link XReference.Holder} implementations.
      */
     protected abstract class HolderSupport
-        implements XReference.Holder
-    {
+            implements XReference.Holder {
+
         protected final XReference ref;
 
         protected HolderSupport(final XReference ref) {
@@ -140,8 +139,7 @@ public abstract class XReferenceConverter
         protected Object doLoad() {
             try {
                 return load(ref);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new ConversionException("Failed to unmarshal reference: " + ref, e);
             }
         }
@@ -150,13 +148,12 @@ public abstract class XReferenceConverter
     /**
      * Default holder types.
      */
-    public static enum HolderType
-    {
+    public static enum HolderType {
+
         /**
          * Use hard references.
          */
         HARD,
-
         /**
          * Use soft references.
          */
@@ -167,8 +164,8 @@ public abstract class XReferenceConverter
      * Unmarshalling holder with a hard reference.
      */
     protected class UnmarshalHolder
-        extends HolderSupport
-    {
+            extends HolderSupport {
+
         protected Object instance;
 
         protected UnmarshalHolder(final XReference ref) {
@@ -184,9 +181,9 @@ public abstract class XReferenceConverter
 
         @Override
         public String toString() {
-            return "UnmarshalHolder{" +
-                "instance=" + instance +
-                '}';
+            return "UnmarshalHolder{"
+                    + "instance=" + instance
+                    + '}';
         }
     }
 
@@ -195,8 +192,8 @@ public abstract class XReferenceConverter
      */
     @SuppressWarnings({"unchecked"})
     protected class SoftUnmarshalHolder
-        extends HolderSupport
-    {
+            extends HolderSupport {
+
         protected SoftReference instance;
 
         protected SoftUnmarshalHolder(final XReference ref) {
@@ -220,9 +217,9 @@ public abstract class XReferenceConverter
 
         @Override
         public String toString() {
-            return "SoftUnmarshalHolder{" +
-                "instance=" + instance +
-                '}';
+            return "SoftUnmarshalHolder{"
+                    + "instance=" + instance
+                    + '}';
         }
     }
 }

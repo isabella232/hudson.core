@@ -251,11 +251,11 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
         //Convert legacy properties to IProjectProperty logic
         if (null != axes && null == getProperty(AXES_PROPERTY_NAME)) {
             setAxes(axes);
-            axes = null;//Reset to null. No longer needed.
+            axes = null; //Reset to null. No longer needed.
         }
         if (null != combinationFilter && null == getProperty(COMBINATION_FILTER_PROPERTY_NAME)) {
             setCombinationFilter(combinationFilter);
-            combinationFilter = null;//Reset to null. No longer needed.
+            combinationFilter = null; //Reset to null. No longer needed.
         }
         if (null == getProperty(RUN_SEQUENTIALLY_PROPERTY_NAME)) {
             setRunSequentially(runSequentially);
@@ -263,15 +263,15 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
         }
         if (null != touchStoneCombinationFilter && null == getProperty(TOUCH_STONE_COMBINATION_FILTER_PROPERTY_NAME)) {
             setTouchStoneCombinationFilter(touchStoneCombinationFilter);
-            touchStoneCombinationFilter = null;//Reset to null. No longer needed.
+            touchStoneCombinationFilter = null; //Reset to null. No longer needed.
         }
         if (null != touchStoneResultCondition && null == getProperty(TOUCH_STONE_RESULT_CONDITION_PROPERTY_NAME)) {
             setTouchStoneResultCondition(touchStoneResultCondition);
-            touchStoneResultCondition = null;//Reset to null. No longer needed.
+            touchStoneResultCondition = null; //Reset to null. No longer needed.
         }
         if (null != customWorkspace && null == getProperty(CUSTOM_WORKSPACE_PROPERTY_NAME)) {
             setCustomWorkspace(customWorkspace);
-            customWorkspace = null;//Reset to null. No longer needed.
+            customWorkspace = null; //Reset to null. No longer needed.
         }
         save();
         rebuildConfigurations();

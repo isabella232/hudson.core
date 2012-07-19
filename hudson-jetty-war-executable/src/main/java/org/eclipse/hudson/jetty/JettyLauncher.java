@@ -42,9 +42,9 @@ public class JettyLauncher {
 
         String keyStorePath = null;
         String keyStorePassword = null;
-        
+
         String updateServer = null;
-        
+
         boolean disableUpdateCenterSwitch = false;
 
         for (int i = 0; i < args.length; i++) {
@@ -52,32 +52,32 @@ public class JettyLauncher {
                 String portStr = args[i].substring("--httpPort=".length());
                 httpPort = Integer.parseInt(portStr);
             }
-            
+
             if (args[i].startsWith("--httpsPort=")) {
                 String portStr = args[i].substring("--httpsPort=".length());
                 httpsPort = Integer.parseInt(portStr);
             }
-            
+
             if (args[i].startsWith("--httpsKeyStore=")) {
                 keyStorePath = args[i].substring("--httpsKeyStore=".length());
             }
-            
+
             if (args[i].startsWith("--httpsKeyStorePassword=")) {
                 keyStorePassword = args[i].substring("--httpsKeyStorePassword=".length());
             }
-            
+
             if (args[i].startsWith("--prefix=")) {
                 String prefix = args[i].substring("--prefix=".length());
-                if (prefix.startsWith("/")){
+                if (prefix.startsWith("/")) {
                     contextPath = prefix;
-                }else{
+                } else {
                     contextPath = "/" + prefix;
                 }
             }
             if (args[i].startsWith("--updateServer=")) {
                 updateServer = args[i].substring("--updateServer=".length());
             }
-            
+
             if (args[i].startsWith("--disableUpdateCenterSwitch=")) {
                 disableUpdateCenterSwitch = true;
             }
@@ -101,7 +101,7 @@ public class JettyLauncher {
             if (keyStorePath != null) {
                 httpsConnector.setKeystore(keyStorePath);
             }
-            if (keyStorePassword != null){
+            if (keyStorePassword != null) {
                 httpsConnector.setKeyPassword(keyStorePassword);
             }
             connectors.add(httpsConnector);
@@ -123,13 +123,13 @@ public class JettyLauncher {
         // This is used by Windows Service Installer in Hudson Management 
         System.out.println("War - " + warUrl.getPath());
         System.setProperty("executable-war", warUrl.getPath());
-        
-        if (updateServer != null){
-           System.setProperty("updateServer", updateServer); 
+
+        if (updateServer != null) {
+            System.setProperty("updateServer", updateServer);
         }
-        
-        if (disableUpdateCenterSwitch){
-            System.setProperty("hudson.pluginManager.disableUpdateCenterSwitch", "true"); 
+
+        if (disableUpdateCenterSwitch) {
+            System.setProperty("hudson.pluginManager.disableUpdateCenterSwitch", "true");
         }
 
         server.addHandler(context);

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -33,8 +33,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2.1.0
  */
 public abstract class PerformOperation<T extends BuildStep>
-    extends OperationSupport<T>
-{
+        extends OperationSupport<T> {
+
     protected final Launcher launcher;
 
     public PerformOperation(final T owner, final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) {
@@ -50,18 +50,15 @@ public abstract class PerformOperation<T extends BuildStep>
             boolean result = doExecute();
             log.debug("Finished in {}", watch);
             return result;
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             log.debug("Failed after {}", watch);
             onFailure(e);
             throw e;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             log.debug("Failed after {}", watch);
             onFailure(e);
             throw e;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.debug("Failed after {}", watch);
             onFailure(e);
             throw new OperationFailure(e);

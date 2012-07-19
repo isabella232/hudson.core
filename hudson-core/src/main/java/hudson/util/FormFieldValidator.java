@@ -317,7 +317,7 @@ public abstract class FormFieldValidator {
 
         protected void check() throws IOException, ServletException {
             String value = fixEmpty(request.getParameter("value"));
-            if (value == null) {// nothing entered yet
+            if (value == null) { // nothing entered yet
                 ok();
                 return;
             }
@@ -377,7 +377,7 @@ public abstract class FormFieldValidator {
             try {
                 FilePath ws = getBaseDirectory(p);
 
-                if (ws == null || !ws.exists()) {// no workspace. can't check
+                if (ws == null || !ws.exists()) { // no workspace. can't check
                     ok();
                     return;
                 }
@@ -459,12 +459,12 @@ public abstract class FormFieldValidator {
             try {
                 FilePath ws = getBaseDirectory(p);
 
-                if (ws == null) {// can't check
+                if (ws == null) { // can't check
                     ok();
                     return;
                 }
 
-                if (!ws.exists()) {// no workspace. can't check
+                if (!ws.exists()) { // no workspace. can't check
                     ok();
                     return;
                 }
