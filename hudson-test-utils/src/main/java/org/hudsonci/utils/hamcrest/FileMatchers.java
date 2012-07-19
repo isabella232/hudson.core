@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -25,8 +25,7 @@ import org.hamcrest.TypeSafeMatcher;
 
 /**
  * Bulk of implementation copied freely from
- * http://www.time4tea.net/wiki/display/MAIN/Testing+Files+with+Hamcrest
- * <p>
+ * http://www.time4tea.net/wiki/display/MAIN/Testing+Files+with+Hamcrest <p>
  * Converted to pure Hamcrest
  *
  * @author time4tea technology ltd 2007
@@ -67,7 +66,6 @@ public class FileMatchers {
                 description.appendValue(fileTested);
                 description.appendText(" exists");
             }
-
         };
     }
 
@@ -128,7 +126,6 @@ public class FileMatchers {
     // public static Matcher<File> sized(Long size) {
     // return sized(Matchers.equalTo(size));
     // }
-
     public static Matcher<File> sized(final Matcher<Long> size) {
         return new TypeSafeMatcher<File>() {
             File fileTested;
@@ -194,7 +191,6 @@ public class FileMatchers {
     public static Matcher<File> withAbsolutePath(final Matcher<String> path) {
         return new TypeSafeMatcher<File>() {
             // File fileTested;
-
             @Override
             public boolean matchesSafely(File item) {
                 // fileTested = item;

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -27,12 +27,11 @@ import com.google.inject.ImplementedBy;
  * @since 2.1.0
  */
 @ImplementedBy(ScriptServiceImpl.class)
-public interface ScriptService
-{
+public interface ScriptService {
+
     /**
      * Execute a script on the master.
      */
     String execute(String script) throws Exception;
-
     // TODO: Add execution for a specific node
 }

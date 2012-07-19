@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -43,18 +43,17 @@ import java.net.SocketException;
  * @since 2.1.0
  */
 public class OpenServerSocket
-    implements Callable<OpenServerSocket.Acceptor,IOException>
-{
-    private static final Logger log = LoggerFactory.getLogger(OpenServerSocket.class);
+        implements Callable<OpenServerSocket.Acceptor, IOException> {
 
+    private static final Logger log = LoggerFactory.getLogger(OpenServerSocket.class);
     public static final int DEFAULT_SO_TIMEOUT = 30 * 1000;
 
     /**
      * Used to accept a new connection on the remote server socket.
      */
     public interface Acceptor
-        extends Closeable
-    {
+            extends Closeable {
+
         int getPort();
 
         Connection accept(boolean close) throws IOException;
@@ -66,8 +65,8 @@ public class OpenServerSocket
      * Represents the accepted connection.
      */
     public interface Connection
-        extends Closeable
-    {
+            extends Closeable {
+
         InputStream getInput();
 
         OutputStream getOutput();
@@ -83,12 +82,10 @@ public class OpenServerSocket
     }
 
     // TODO: Document behavior on both sides of channel so its easier to comprehend whats going on here
-
     private class AcceptorImpl
-        implements Acceptor, Serializable
-    {
-        private static final long serialVersionUID = 1L;
+            implements Acceptor, Serializable {
 
+        private static final long serialVersionUID = 1L;
         private transient final ServerSocket serverSocket;
 
         public AcceptorImpl() throws IOException {
@@ -130,12 +127,10 @@ public class OpenServerSocket
     }
 
     private class ConnectionImpl
-        implements Connection, Serializable
-    {
+            implements Connection, Serializable {
+
         private static final long serialVersionUID = 1L;
-
         private InputStream input;
-
         private OutputStream output;
 
         public ConnectionImpl(final InputStream input, final OutputStream output) {

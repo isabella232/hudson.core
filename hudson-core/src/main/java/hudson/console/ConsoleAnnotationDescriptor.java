@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -36,6 +36,7 @@ import java.net.URL;
  * @since 1.349
  */
 public abstract class ConsoleAnnotationDescriptor extends Descriptor<ConsoleNote<?>> implements ExtensionPoint {
+
     public ConsoleAnnotationDescriptor(Class<? extends ConsoleNote<?>> clazz) {
         super(clazz);
     }
@@ -51,37 +52,40 @@ public abstract class ConsoleAnnotationDescriptor extends Descriptor<ConsoleNote
     public abstract String getDisplayName();
 
     /**
-     * Returns true if this descriptor has a JavaScript to be inserted on applicable console page.
+     * Returns true if this descriptor has a JavaScript to be inserted on
+     * applicable console page.
      */
     public boolean hasScript() {
-        return hasResource("/script.js") !=null;
+        return hasResource("/script.js") != null;
     }
 
     /**
-     * Returns true if this descriptor has a stylesheet to be inserted on applicable console page.
+     * Returns true if this descriptor has a stylesheet to be inserted on
+     * applicable console page.
      */
     public boolean hasStylesheet() {
-        return hasResource("/style.css") !=null;
+        return hasResource("/style.css") != null;
     }
 
     private URL hasResource(String name) {
-        return clazz.getClassLoader().getResource(clazz.getName().replace('.','/').replace('$','/')+ name);
+        return clazz.getClassLoader().getResource(clazz.getName().replace('.', '/').replace('$', '/') + name);
     }
 
-    @WebMethod(name="script.js")
+    @WebMethod(name = "script.js")
     public void doScriptJs(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         rsp.serveFile(req, hasResource("/script.js"), TimeUnit2.DAYS.toMillis(1));
     }
 
-    @WebMethod(name="style.css")
+    @WebMethod(name = "style.css")
     public void doStyleCss(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         rsp.serveFile(req, hasResource("/style.css"), TimeUnit2.DAYS.toMillis(1));
     }
 
     /**
-     * Returns all the registered {@link ConsoleAnnotationDescriptor} descriptors.
+     * Returns all the registered {@link ConsoleAnnotationDescriptor}
+     * descriptors.
      */
-    public static DescriptorExtensionList<ConsoleNote<?>,ConsoleAnnotationDescriptor> all() {
-        return (DescriptorExtensionList)Hudson.getInstance().getDescriptorList(ConsoleNote.class);
+    public static DescriptorExtensionList<ConsoleNote<?>, ConsoleAnnotationDescriptor> all() {
+        return (DescriptorExtensionList) Hudson.getInstance().getDescriptorList(ConsoleNote.class);
     }
 }

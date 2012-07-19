@@ -1182,8 +1182,8 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
                 streak++;
             }
 
-            if (streak > 5) // the system is quiet for a while
-            {
+            // the system is quiet for a while
+            if (streak > 5) {
                 return;
             }
 

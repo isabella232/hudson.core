@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -50,8 +50,8 @@ import org.kohsuke.stapler.bind.BoundObjectTable;
  * @since 2.1.0
  */
 public class DummyStaplerRequest
-    implements StaplerRequest
-{
+        implements StaplerRequest {
+
     public static final DummyStaplerRequest INSTANCE = new DummyStaplerRequest();
 
     public Stapler getStapler() {

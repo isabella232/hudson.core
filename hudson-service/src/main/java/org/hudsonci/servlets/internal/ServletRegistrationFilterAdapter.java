@@ -39,22 +39,19 @@ import java.util.Iterator;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Wraps a {@link Servlet} as a {@link Filter} for installation via {@link hudson.util.PluginServletFilter}.
+ * Wraps a {@link Servlet} as a {@link Filter} for installation via
+ * {@link hudson.util.PluginServletFilter}.
  *
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
  * @since 2.1.0
  */
 public class ServletRegistrationFilterAdapter
-    implements Filter
-{
+        implements Filter {
+
     private static final Logger log = LoggerFactory.getLogger(ServletRegistrationFilterAdapter.class);
-
     private final ServletRegistration registration;
-
     private final Servlet servlet;
-
     private final String uriPrefix;
-
     private boolean enabled;
 
     public ServletRegistrationFilterAdapter(final ServletRegistration registration) throws Exception {
@@ -96,8 +93,7 @@ public class ServletRegistrationFilterAdapter
     public void init(final FilterConfig config) throws ServletException {
         checkNotNull(config);
 
-        servlet.init(new ServletConfig()
-        {
+        servlet.init(new ServletConfig() {
             public String getServletName() {
                 return registration.getName();
             }
@@ -109,8 +105,7 @@ public class ServletRegistrationFilterAdapter
             public Enumeration getInitParameterNames() {
                 final Iterator<String> iter = registration.getParameters().keySet().iterator();
 
-                return new Enumeration()
-                {
+                return new Enumeration() {
                     public boolean hasMoreElements() {
                         return iter.hasNext();
                     }
@@ -132,21 +127,18 @@ public class ServletRegistrationFilterAdapter
     }
 
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
-        throws IOException, ServletException
-    {
+            throws IOException, ServletException {
         assert chain != null;
 
         if (isEnabled() && request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
             doFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
-        }
-        else {
+        } else {
             chain.doFilter(request, response);
         }
     }
 
     private void doFilter(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain)
-        throws IOException, ServletException
-    {
+            throws IOException, ServletException {
         assert request != null;
         assert response != null;
         assert chain != null;
@@ -158,8 +150,7 @@ public class ServletRegistrationFilterAdapter
 
         if (request.getRequestURI().startsWith(contextPath + uriPrefix)) {
             // Wrap the request to augment the servlet uriPrefix
-            HttpServletRequestWrapper req = new HttpServletRequestWrapper(request)
-            {
+            HttpServletRequestWrapper req = new HttpServletRequestWrapper(request) {
                 @Override
                 public String getServletPath() {
                     return String.format("/%s", uriPrefix);
@@ -167,8 +158,7 @@ public class ServletRegistrationFilterAdapter
             };
 
             servlet.service(req, response);
-        }
-        else {
+        } else {
             chain.doFilter(request, response);
         }
     }

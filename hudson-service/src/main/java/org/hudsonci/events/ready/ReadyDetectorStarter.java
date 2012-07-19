@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -38,10 +38,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 @Priority(Integer.MIN_VALUE) // run last
 public class ReadyDetectorStarter
-    extends ItemListener
-{
-    private static final Logger log = LoggerFactory.getLogger(ReadyDetectorStarter.class);
+        extends ItemListener {
 
+    private static final Logger log = LoggerFactory.getLogger(ReadyDetectorStarter.class);
     // FIXME: Use of ItemListener for server life-cycle bits is a work around
     private final ReadyDetector detector;
 

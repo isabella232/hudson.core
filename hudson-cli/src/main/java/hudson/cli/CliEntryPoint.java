@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -27,11 +27,11 @@ import java.util.Locale;
  * @author Kohsuke Kawaguchi
  */
 public interface CliEntryPoint {
+
     /**
      * Just like the static main method.
      *
-     * @param locale
-     *      Locale of this client.
+     * @param locale Locale of this client.
      */
     int main(List<String> args, Locale locale, InputStream stdin, OutputStream stdout, OutputStream stderr);
 
@@ -41,10 +41,9 @@ public interface CliEntryPoint {
     boolean hasCommand(String name);
 
     /**
-     * Returns {@link #VERSION}, so that the client and the server can detect version incompatibility
-     * gracefully.
+     * Returns {@link #VERSION}, so that the client and the server can detect
+     * version incompatibility gracefully.
      */
     int protocolVersion();
-
     int VERSION = 1;
 }

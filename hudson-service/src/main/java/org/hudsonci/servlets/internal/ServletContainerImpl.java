@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -43,12 +43,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class ServletContainerImpl
-    implements ServletContainer
-{
+        implements ServletContainer {
+
     private static final Logger log = LoggerFactory.getLogger(ServletContainerImpl.class);
-
     private final Map<ServletRegistration, Filter> registrations = new LinkedHashMap<ServletRegistration, Filter>();
-
     private final List<ServletContainerAware> concerned;
 
     @Inject
@@ -70,11 +68,9 @@ public class ServletContainerImpl
             Thread.currentThread().setContextClassLoader(target.getClass().getClassLoader());
             try {
                 target.setServletContainer(this);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 log.error("Exception while exposing servlet container to: " + target, e);
-            }
-            finally {
+            } finally {
                 Thread.currentThread().setContextClassLoader(cl);
             }
         }
@@ -105,10 +101,9 @@ public class ServletContainerImpl
     }
 
     private class HandleImpl
-        implements ServletRegistration.Handle
-    {
-        private final ServletRegistration registration;
+            implements ServletRegistration.Handle {
 
+        private final ServletRegistration registration;
         private final ServletRegistrationFilterAdapter filterAdapter;
 
         private HandleImpl(final ServletRegistration registration, final ServletRegistrationFilterAdapter filterAdapter) {

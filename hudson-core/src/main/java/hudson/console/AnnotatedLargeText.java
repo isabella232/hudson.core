@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -48,23 +48,24 @@ import static java.lang.Math.abs;
 import org.apache.commons.codec.binary.Base64;
 
 /**
- * Extension to {@link LargeText} that handles annotations by {@link ConsoleAnnotator}.
+ * Extension to {@link LargeText} that handles annotations by
+ * {@link ConsoleAnnotator}.
  *
- * <p>
- * In addition to run each line through {@link ConsoleAnnotationOutputStream} for adding markup,
- * this class persists {@link ConsoleAnnotator} into a byte sequence and send it to the client
- * as an HTTP header. The client JavaScript sends it back next time it fetches the following output.
+ * <p> In addition to run each line through
+ * {@link ConsoleAnnotationOutputStream} for adding markup, this class persists
+ * {@link ConsoleAnnotator} into a byte sequence and send it to the client as an
+ * HTTP header. The client JavaScript sends it back next time it fetches the
+ * following output.
  *
- * <p>
- * The serialized {@link ConsoleAnnotator} is encrypted to avoid malicious clients from instantiating
- * arbitrary {@link ConsoleAnnotator}s.
+ * <p> The serialized {@link ConsoleAnnotator} is encrypted to avoid malicious
+ * clients from instantiating arbitrary {@link ConsoleAnnotator}s.
  *
- * @param <T>
- *      Context type.
+ * @param <T> Context type.
  * @author Kohsuke Kawaguchi
  * @since 1.349
  */
 public class AnnotatedLargeText<T> extends LargeText {
+
     /**
      * Can be null.
      */
@@ -81,23 +82,24 @@ public class AnnotatedLargeText<T> extends LargeText {
     }
 
     public void doProgressiveHtml(StaplerRequest req, StaplerResponse rsp) throws IOException {
-        req.setAttribute("html",true);
-        doProgressText(req,rsp);
+        req.setAttribute("html", true);
+        doProgressText(req, rsp);
     }
 
     /**
      * Aliasing what I think was a wrong name in {@link LargeText}
      */
     public void doProgressiveText(StaplerRequest req, StaplerResponse rsp) throws IOException {
-        doProgressText(req,rsp);
+        doProgressText(req, rsp);
     }
 
     /**
-     * For reusing code between text/html and text/plain, we run them both through the same code path
-     * and use this request attribute to differentiate. 
+     * For reusing code between text/html and text/plain, we run them both
+     * through the same code path and use this request attribute to
+     * differentiate.
      */
     private boolean isHtml() {
-        return Stapler.getCurrentRequest().getAttribute("html")!=null;
+        return Stapler.getCurrentRequest().getAttribute("html") != null;
     }
 
     @Override
@@ -106,38 +108,40 @@ public class AnnotatedLargeText<T> extends LargeText {
     }
 
     private ConsoleAnnotator createAnnotator(StaplerRequest req) throws IOException {
-    	ObjectInputStream ois = null;
+        ObjectInputStream ois = null;
         try {
-            String base64 = req!=null ? req.getHeader("X-ConsoleAnnotator") : null;
-            if (base64!=null) {
+            String base64 = req != null ? req.getHeader("X-ConsoleAnnotator") : null;
+            if (base64 != null) {
                 Cipher sym = Secret.getCipher("AES");
                 sym.init(Cipher.DECRYPT_MODE, Hudson.getInstance().getSecretKeyAsAES128());
 
                 ois = new ObjectInputStreamEx(new GZIPInputStream(
-                        new CipherInputStream(new ByteArrayInputStream(Base64.decodeBase64(base64)),sym)),
+                        new CipherInputStream(new ByteArrayInputStream(Base64.decodeBase64(base64)), sym)),
                         Hudson.getInstance().pluginManager.uberClassLoader);
                 long timestamp = ois.readLong();
-                if (TimeUnit2.HOURS.toMillis(1) > abs(System.currentTimeMillis()-timestamp))
-                    // don't deserialize something too old to prevent a replay attack
-                    return (ConsoleAnnotator)ois.readObject();
+                if (TimeUnit2.HOURS.toMillis(1) > abs(System.currentTimeMillis() - timestamp)) // don't deserialize something too old to prevent a replay attack
+                {
+                    return (ConsoleAnnotator) ois.readObject();
+                }
             }
         } catch (GeneralSecurityException e) {
             throw new IOException2(e);
         } catch (ClassNotFoundException e) {
             throw new IOException2(e);
         } finally {
-        	IOUtils.closeQuietly(ois);
+            IOUtils.closeQuietly(ois);
         }
         // start from scratch
-        return ConsoleAnnotator.initial(context==null ? null : context.getClass());
+        return ConsoleAnnotator.initial(context == null ? null : context.getClass());
     }
 
     @Override
     public long writeLogTo(long start, Writer w) throws IOException {
-        if (isHtml())
+        if (isHtml()) {
             return writeHtmlTo(start, w);
-        else
-            return super.writeLogTo(start,w);
+        } else {
+            return super.writeLogTo(start, w);
+        }
     }
 
     @Override
@@ -148,19 +152,20 @@ public class AnnotatedLargeText<T> extends LargeText {
     public long writeHtmlTo(long start, Writer w) throws IOException {
         ConsoleAnnotationOutputStream caw = new ConsoleAnnotationOutputStream(
                 w, createAnnotator(Stapler.getCurrentRequest()), context, charset);
-        long r = super.writeLogTo(start,caw);
+        long r = super.writeLogTo(start, caw);
 
         ObjectOutputStream oos = null;
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Cipher sym = Secret.getCipher("AES");
             sym.init(Cipher.ENCRYPT_MODE, Hudson.getInstance().getSecretKeyAsAES128());
-            oos = new ObjectOutputStream(new GZIPOutputStream(new CipherOutputStream(baos,sym)));
+            oos = new ObjectOutputStream(new GZIPOutputStream(new CipherOutputStream(baos, sym)));
             oos.writeLong(System.currentTimeMillis()); // send timestamp to prevent a replay attack
-            oos.writeObject(caw.getConsoleAnnotator());            
+            oos.writeObject(caw.getConsoleAnnotator());
             StaplerResponse rsp = Stapler.getCurrentResponse();
-            if (rsp!=null)
+            if (rsp != null) {
                 rsp.setHeader("X-ConsoleAnnotator", new String(Base64.encodeBase64(baos.toByteArray())));
+            }
         } catch (GeneralSecurityException e) {
             throw new IOException2(e);
         } finally {
@@ -168,5 +173,4 @@ public class AnnotatedLargeText<T> extends LargeText {
         }
         return r;
     }
-
 }

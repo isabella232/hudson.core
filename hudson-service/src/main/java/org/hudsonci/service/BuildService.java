@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -23,14 +23,12 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 
 /**
- * Operations on {@link AbstractBuild} instances.
- * <p>
- * The intent of these operations is that the build is or already has executed
- * and is available in the system.
- * <p>
- * Note: To schedule builds, see {@link ProjectService#scheduleBuild}. Since
- * scheduled builds have not necessarily been executed, that is intentionally
- * not an operation supported by this interface.
+ * Operations on {@link AbstractBuild} instances. <p> The intent of these
+ * operations is that the build is or already has executed and is available in
+ * the system. <p> Note: To schedule builds, see
+ * {@link ProjectService#scheduleBuild}. Since scheduled builds have not
+ * necessarily been executed, that is intentionally not an operation supported
+ * by this interface.
  *
  * @since 2.1.0
  */
@@ -41,12 +39,10 @@ public interface BuildService {
     // TODO void getConsoleContent(AbstractProject<?, ?> project, int
     // buildNumber);
     // TODO void getTestResults(AbstractProject<?, ?> project, int buildNumber);
-
     /**
      * Delete a build from a project by buildNumber
      *
-     * <p>
-     * The current thread context must have {@link hudson.model.Run#DELETE}
+     * <p> The current thread context must have {@link hudson.model.Run#DELETE}
      * permission to perform this operation.
      *
      * @param project the project to the build belongs to
@@ -62,8 +58,7 @@ public interface BuildService {
     /**
      * Keep or release a build.
      *
-     * <p>
-     * The current thread context must have {@link hudson.model.Run#UPDATE}
+     * <p> The current thread context must have {@link hudson.model.Run#UPDATE}
      * permission to perform this operation.
      *
      * @param project the project to the build belongs to
@@ -80,8 +75,7 @@ public interface BuildService {
     /**
      * Stop or abort a build
      *
-     * <p>
-     * The current thread context must have permission to abort the build.
+     * <p> The current thread context must have permission to abort the build.
      *
      * @param project the project to the build belongs to
      * @param buildNumber the buildNumber to operate on which must be
@@ -134,5 +128,4 @@ public interface BuildService {
      * project
      */
     AbstractBuild getBuild(String projectName, int buildNumber);
-
 }

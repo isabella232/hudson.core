@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -21,12 +21,15 @@ import java.io.SequenceInputStream;
 /**
  * {@link OutputStream} version of {@link SequenceInputStream}.
  *
- * Provides a single {@link OutputStream} view over multiple {@link OutputStream}s (each of the fixed length.) 
+ * Provides a single {@link OutputStream} view over multiple
+ * {@link OutputStream}s (each of the fixed length.)
  *
  * @author Kohsuke Kawaguchi
  */
 abstract class SequenceOutputStream extends OutputStream {
+
     protected static class Block {
+
         final OutputStream out;
         long capacity;
 
@@ -35,7 +38,6 @@ abstract class SequenceOutputStream extends OutputStream {
             this.capacity = capacity;
         }
     }
-
     /**
      * Current block being written.
      */
@@ -47,12 +49,12 @@ abstract class SequenceOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        while(len>0) {
-            int sz = (int)Math.min(len, block.capacity);
-            block.out.write(b,off,sz);
-            block.capacity -=sz;
-            len-=sz;
-            off+=sz;
+        while (len > 0) {
+            int sz = (int) Math.min(len, block.capacity);
+            block.out.write(b, off, sz);
+            block.capacity -= sz;
+            len -= sz;
+            off += sz;
             swapIfNeeded();
         }
     }
@@ -64,9 +66,11 @@ abstract class SequenceOutputStream extends OutputStream {
     }
 
     private void swapIfNeeded() throws IOException {
-        if(block.capacity >0) return;
+        if (block.capacity > 0) {
+            return;
+        }
         block.out.close();
-        block=next(block);
+        block = next(block);
     }
 
     @Override
@@ -77,12 +81,12 @@ abstract class SequenceOutputStream extends OutputStream {
     @Override
     public void close() throws IOException {
         block.out.close();
-        block=null;
+        block = null;
     }
 
     /**
-     * Fetches the next {@link OutputStream} to write to,
-     * along with their capacity.
+     * Fetches the next {@link OutputStream} to write to, along with their
+     * capacity.
      */
     protected abstract Block next(Block current) throws IOException;
 }

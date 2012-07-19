@@ -7,25 +7,25 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
 package org.hudsonci.service;
 
 /**
- * Base class of all service layer {@link RuntimeException}s.
- * <p>
- * Generally the service layer API should only throw unchecked exceptions that extend this base class.
+ * Base class of all service layer {@link RuntimeException}s. <p> Generally the
+ * service layer API should only throw unchecked exceptions that extend this
+ * base class.
  *
  * @since 2.1.0
  */
 public class ServiceRuntimeException
-    extends RuntimeException
-{
+        extends RuntimeException {
+
     public ServiceRuntimeException() {
     }
 

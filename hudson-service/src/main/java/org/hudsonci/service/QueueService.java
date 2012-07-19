@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -28,13 +28,14 @@ import org.hudsonci.service.internal.QueueServiceImpl;
  * @since 2.1.0
  */
 @ImplementedBy(QueueServiceImpl.class)
-public interface QueueService
-{
+public interface QueueService {
+
     /**
      * Get the queue.
      *
      * @return the master {@link Queue}
-     * @throws AccessDeniedException if current context does not have {@link Hudson#ADMINISTER} permission.
+     * @throws AccessDeniedException if current context does not have
+     * {@link Hudson#ADMINISTER} permission.
      */
     Queue getQueue();
 }

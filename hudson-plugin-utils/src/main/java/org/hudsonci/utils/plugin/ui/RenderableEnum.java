@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -25,8 +25,8 @@ import java.io.Serializable;
  * @since 2.1.0
  */
 public class RenderableEnum<E extends Enum<E>>
-    implements Comparable<E>, Serializable
-{
+        implements Comparable<E>, Serializable {
+
     private final E value;
 
     public RenderableEnum(final E value) {
@@ -36,7 +36,6 @@ public class RenderableEnum<E extends Enum<E>>
 
     // These are all getXXX so that jelly can reference them with an explicit method call.
     // ie. ${enum.name} -> getName(), otherwise its gotta be ${enum.name()}.
-
     public String getDisplayName() {
         // TODO: Allow lookup of human/i18n name, look up resource bundle for enum type, then key off enum name
         return value.name();
@@ -50,10 +49,12 @@ public class RenderableEnum<E extends Enum<E>>
         return value.ordinal();
     }
 
+    @Override
     public boolean equals(final Object obj) {
         return value.equals(obj);
     }
 
+    @Override
     public int hashCode() {
         return value.hashCode();
     }
@@ -62,12 +63,12 @@ public class RenderableEnum<E extends Enum<E>>
         return value.compareTo(obj);
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({"unchecked" })
     public static RenderableEnum[] forEnum(final Class<? extends Enum> source) {
         assert source != null;
         Enum[] values = source.getEnumConstants();
         RenderableEnum[] target = new RenderableEnum[values.length];
-        for (int i=0; i<values.length; i++) {
+        for (int i = 0; i < values.length; i++) {
             target[i] = new RenderableEnum(values[i]);
         }
         return target;

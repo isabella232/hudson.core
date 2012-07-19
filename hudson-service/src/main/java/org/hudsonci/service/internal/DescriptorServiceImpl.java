@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -38,6 +38,7 @@ import org.hudsonci.service.DescriptorService;
 @Named
 @Singleton
 public class DescriptorServiceImpl extends ServiceSupport implements DescriptorService {
+
     @Inject
     DescriptorServiceImpl() {
     }
@@ -67,5 +68,4 @@ public class DescriptorServiceImpl extends ServiceSupport implements DescriptorS
         checkNotNull(type, "type");
         return getHudson().getDescriptorList(type);
     }
-
 }

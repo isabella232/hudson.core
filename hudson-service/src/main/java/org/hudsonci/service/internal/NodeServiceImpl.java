@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -107,5 +107,4 @@ public class NodeServiceImpl extends ServiceSupport implements NodeService {
         this.security.checkPermission(node, Permission.READ);
         return node;
     }
-
 }

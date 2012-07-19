@@ -282,7 +282,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     /**
      * Obtains 'this' in a more type safe signature.
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({"unchecked" })
     private RunT _this() {
         return (RunT) this;
     }
@@ -665,7 +665,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         RunT answer;
         while (true) {
             RunT n = r.previousBuildInProgress;
-            if (n == null) {// no field computed yet.
+            if (n == null) { // no field computed yet.
                 n = r.getPreviousBuild();
                 fixUp.add(r);
             }
@@ -1393,11 +1393,11 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                     CheckPoint.MAIN_COMPLETED.report();
                 } catch (ThreadDeath t) {
                     throw t;
-                } catch (AbortException e) {// orderly abortion.
+                } catch (AbortException e) { // orderly abortion.
                     result = Result.FAILURE;
                     listener.error(e.getMessage());
                     LOGGER.log(FINE, "Build " + this + " aborted", e);
-                } catch (RunnerAbortedException e) {// orderly abortion.
+                } catch (RunnerAbortedException e) { // orderly abortion.
                     result = Result.FAILURE;
                     LOGGER.log(FINE, "Build " + this + " aborted", e);
                 } catch (InterruptedException e) {

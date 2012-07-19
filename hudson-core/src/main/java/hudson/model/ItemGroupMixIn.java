@@ -126,7 +126,7 @@ public abstract class ItemGroupMixIn {
             throw new Failure("Query parameter 'name' is required");
         }
 
-        {// check if the name looks good
+        { // check if the name looks good
             Hudson.checkGoodName(name);
             name = name.trim();
             if (parent.getItem(name) != null) {
@@ -191,7 +191,7 @@ public abstract class ItemGroupMixIn {
      * because it doesn't know how to make the newly added item reachable from
      * the parent.
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({"unchecked" })
     public synchronized <T extends TopLevelItem> T copy(T src, String name) throws IOException {
         acl.checkPermission(Job.CREATE);
 

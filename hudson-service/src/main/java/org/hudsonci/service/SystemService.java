@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -28,20 +28,22 @@ import org.hudsonci.service.internal.SystemServiceImpl;
 /**
  * General system access.
  *
- * <p>All operations involving restarting, quiet down, or reloading the system require {@link Hudson#ADMINISTER} permission.
+ * <p>All operations involving restarting, quiet down, or reloading the system
+ * require {@link Hudson#ADMINISTER} permission.
  *
  * @author plynch
  * @since 2.1.0
  */
 @ImplementedBy(SystemServiceImpl.class)
-public interface SystemService
-{
+public interface SystemService {
+
     String DEFAULT_URL = "http://localhost:8082";
 
     /**
      * The installation location.
      *
-     * @throws IllegalStateException when the installation directory cannot be reliably determined
+     * @throws IllegalStateException when the installation directory cannot be
+     * reliably determined
      */
     File getInstallationDirectory();
 
@@ -54,17 +56,20 @@ public interface SystemService
     /**
      * The default location where the server will store log files.
      *
-     * @throws IllegalStateException if the log directory cannot be reliably determined
+     * @throws IllegalStateException if the log directory cannot be reliably
+     * determined
      */
     File getLogDirectory();
 
     /**
      * Return the {@link XmlFile} representation of the system config file
      *
-     * The current thread requires {@link Hudson#ADMINISTER} permission to get the file.
+     * The current thread requires {@link Hudson#ADMINISTER} permission to get
+     * the file.
      *
      * @return XmlFile representation of the system config file,
-     * @throws ServiceRuntimeException if there is an unexpected problem accessing the config file.
+     * @throws ServiceRuntimeException if there is an unexpected problem
+     * accessing the config file.
      */
     XmlFile getConfigFile();
 
@@ -77,7 +82,6 @@ public interface SystemService
     String getSystemMessage();
 
     // FIXME: Drop do* prefix on these methods.  do* is specific to stapler and should be dropped from the service API
-
     boolean isQuietingDown();
 
     void doQuietDown(boolean toggle);

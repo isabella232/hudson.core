@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -29,23 +29,21 @@ import com.google.common.base.Preconditions;
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
  * @since 2.1.0
  */
-public class TestUtil
-{
-    private final Class owningClass;
+public class TestUtil {
 
+    private final Class owningClass;
     /**
      * The base-directory which tests should be run from.
      *
-     * @see #initBaseDir()   This field is initialized from the return of this method on instance construction.
+     * @see #initBaseDir() This field is initialized from the return of this
+     * method on instance construction.
      */
     protected final File baseDir;
-
     /**
      * Instance logger which tests should use to produce tracing information.
      *
-     * <p>
-     * Unless you have a really good reason to, do not change this field from your sub-class.
-     * And if you do, please document why you have done so.
+     * <p> Unless you have a really good reason to, do not change this field
+     * from your sub-class. And if you do, please document why you have done so.
      */
     protected final Logger log;
 
@@ -77,17 +75,19 @@ public class TestUtil
     }
 
     /**
-     * Determine the value of <tt>${basedir}</tt>, which should be the base directory of
-     * the module which the concrete test class is defined in.
+     * Determine the value of <tt>${basedir}</tt>, which should be the base
+     * directory of the module which the concrete test class is defined in.
      *
-     * <p>
-     * If The system property <tt>basedir</tt> is already set, then that value is used,
-     * otherwise we determine the value from the code-source of the containing concrete class
-     * and set the <tt>basedir</tt> system property to that value.
+     * <p> If The system property <tt>basedir</tt> is already set, then that
+     * value is used, otherwise we determine the value from the code-source of
+     * the containing concrete class and set the <tt>basedir</tt> system
+     * property to that value.
      *
-     * @see #baseDir    This field is always initialized to the value which this method returns.
+     * @see #baseDir This field is always initialized to the value which this
+     * method returns.
      *
-     * @return  The base directory of the module which contains the concrete test class.
+     * @return The base directory of the module which contains the concrete test
+     * class.
      */
     protected final File initBaseDir() {
         File dir;
@@ -96,8 +96,7 @@ public class TestUtil
         String tmp = System.getProperty("basedir");
         if (tmp != null) {
             dir = new File(tmp);
-        }
-        else {
+        } else {
             // Find the directory which this class (or really the sub-class of TestSupport) is defined in.
             String path = owningClass.getProtectionDomain().getCodeSource().getLocation().getFile();
 
@@ -116,8 +115,8 @@ public class TestUtil
     /**
      * Resolve the given path to a file rooted to {@link #baseDir}.
      *
-     * @param path  The path to resolve.
-     * @return      The resolved file for the given path.
+     * @param path The path to resolve.
+     * @return The resolved file for the given path.
      */
     public final File resolveFile(final String path) {
         Preconditions.checkNotNull(path);
@@ -127,8 +126,7 @@ public class TestUtil
         // Complain if the file is already absolute... probably an error
         if (file.isAbsolute()) {
             log.warn("Given path is already absolute; nothing to resolve: {}", file);
-        }
-        else {
+        } else {
             file = new File(baseDir, path);
         }
 
@@ -138,8 +136,8 @@ public class TestUtil
     /**
      * Resolve the given path to a path rooted to {@link #baseDir}.
      *
-     * @param path  The path to resolve.
-     * @return      The resolved path for the given path.
+     * @param path The path to resolve.
+     * @return The resolved path for the given path.
      *
      * @see #resolveFile(String)
      */

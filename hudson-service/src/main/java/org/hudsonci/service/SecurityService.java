@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -35,6 +35,7 @@ import com.google.inject.ImplementedBy;
  */
 @ImplementedBy(SecurityServiceImpl.class)
 public interface SecurityService {
+
     /**
      * Check a Permission against {@link hudson.model.Hudson} for the current
      * user.
@@ -47,11 +48,10 @@ public interface SecurityService {
     void checkPermission(Permission permission);
 
     /**
-     * Check a Permission against an {@link AccessControlled} object in the current
-     * security context.
-     * <p>
-     * Recommended to use this instead of checking permission on the object
-     * directly. Consider this method a funnel for access security.
+     * Check a Permission against an {@link AccessControlled} object in the
+     * current security context. <p> Recommended to use this instead of checking
+     * permission on the object directly. Consider this method a funnel for
+     * access security.
      *
      * @param controlled the instance under control
      * @param permission the permission to check on the access controlled object
@@ -60,10 +60,9 @@ public interface SecurityService {
 
     /**
      * Check if a an {@link AccessControlled} instance will allow the current
-     * security context the specified {@link Permission}.
-     * <p>
-     * Recommended to use this instead of checking has permission on the object
-     * directly. Consider this method a funnel for access security.
+     * security context the specified {@link Permission}. <p> Recommended to use
+     * this instead of checking has permission on the object directly. Consider
+     * this method a funnel for access security.
      *
      * @param controlled the instance under control
      * @param permission the permission to check on the access controlled object

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -27,11 +27,11 @@ import org.hudsonci.servlets.internal.ServletContainerImpl;
  * @since 2.1.0
  */
 @ImplementedBy(ServletContainerImpl.class)
-public interface ServletContainer
-{
+public interface ServletContainer {
+
     void start() throws Exception;
 
     void stop() throws Exception;
-    
+
     ServletRegistration.Handle register(ServletRegistration registration) throws Exception;
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -40,9 +40,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class SecurityServiceImpl
-    extends ServiceSupport
-    implements SecurityService
-{
+        extends ServiceSupport
+        implements SecurityService {
+
     @Inject
     SecurityServiceImpl() {
         super();
@@ -73,8 +73,7 @@ public class SecurityServiceImpl
         ctx.setAuthentication(auth);
         try {
             task.run();
-        }
-        finally {
+        } finally {
             ctx.setAuthentication(current);
         }
     }
@@ -87,8 +86,7 @@ public class SecurityServiceImpl
         ctx.setAuthentication(auth);
         try {
             return task.call();
-        }
-        finally {
+        } finally {
             ctx.setAuthentication(current);
         }
     }
@@ -96,8 +94,7 @@ public class SecurityServiceImpl
     public <T> T callAs2(final Authentication auth, final Callable<T> task) {
         try {
             return callAs(auth, task);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             }

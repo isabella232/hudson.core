@@ -61,8 +61,8 @@ public abstract class SU {
      * be shut down.
      */
     public static VirtualChannel start(final TaskListener listener, final String rootUsername, final String rootPassword) throws IOException, InterruptedException {
-        if (File.pathSeparatorChar == ';') // on Windows
-        {
+        // on Windows
+        if (File.pathSeparatorChar == ';') {
             return newLocalChannel();  // TODO: perhaps use RunAs to run as an Administrator?
         }
         String os = Util.fixNull(System.getProperty("os.name"));
@@ -143,7 +143,8 @@ public abstract class SU {
                 throw new IOException(exc);
             }
 
-            if (uid == 0) // already running as root
+            // already running as root
+            if (uid == 0) 
             {
                 return newLocalChannel();
             }

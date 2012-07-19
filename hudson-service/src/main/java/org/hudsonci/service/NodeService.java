@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -32,6 +32,7 @@ import com.google.inject.ImplementedBy;
  */
 @ImplementedBy(NodeServiceImpl.class)
 public interface NodeService {
+
     /**
      * Get the node with the given name.
      *
@@ -71,9 +72,9 @@ public interface NodeService {
     List<Node> getAllNodes();
 
     /**
-     * @returns all {@link Node}s in the system, excluding {@link hudson.model.Hudson}
-     * instance itself which represents the master, that have
-     * {@link hudson.model.Item#READ} permission.
+     * @returns all {@link Node}s in the system, excluding
+     * {@link hudson.model.Hudson} instance itself which represents the master,
+     * that have {@link hudson.model.Item#READ} permission.
      */
     List<Node> getNodes();
 

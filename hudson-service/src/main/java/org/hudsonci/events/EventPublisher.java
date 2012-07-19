@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -29,7 +29,7 @@ import java.util.EventObject;
  * @since 2.1.0
  */
 @ImplementedBy(EventPublisherImpl.class)
-public interface EventPublisher
-{
+public interface EventPublisher {
+
     void publish(EventObject event);
 }

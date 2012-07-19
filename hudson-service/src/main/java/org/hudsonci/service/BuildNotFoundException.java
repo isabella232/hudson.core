@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *     
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -26,6 +26,7 @@ import hudson.model.AbstractBuild;
  * @since 2.1.0
  */
 public class BuildNotFoundException extends NotFoundException {
+
     public BuildNotFoundException(String message) {
         super(message);
     }
