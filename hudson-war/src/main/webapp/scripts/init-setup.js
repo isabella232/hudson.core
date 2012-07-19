@@ -18,13 +18,23 @@ jQuery.noConflict();
         
 var loggedIn = false;
         
-var installableCount = 0;
-var installedCount = 0;
+var installCount = 0;
         
 var finish = false;
 var forProxy = false;
-  
+var forInstall = false;
+var forContinue = false;
 var canContinue = false;
+
+var mandatoryMsg = "The Mandatory Plugins are needed and cannot be deselected. " +
+"Select the featured or recommended plugins and click install " +
+"to download and install the plugins or Finish " +
+"to start Hudson after installing the plugins.";
+               
+var recommendedMsg = "All Mandatory Plugins are installed. " +
+"Select the featured or recommended plugins and click install " +
+"to download and install the plugins or Finish to start Hudson " +
+"after installing the plugins.";
         
 function installPlugin(selected){
     jQuery('#errorMessage').hide();
@@ -41,19 +51,24 @@ function installPlugin(selected){
         success: function(){
             icon.attr('src',imageRoot + '/green-check.jpg');
             jQuery(selected).attr("checked", false);
-            installedCount++;
-            if (installedCount == installableCount){
-                enableButtons();
+            installCount--;
+            if (installCount == 0){
                 if (finish == true){
                     checkFinish();
                 }
+                showInfoMsg();
+                jQuery("#buttonBar").show();
+                jQuery("#installProgress").hide();
             }
+             
         },
-        error: function(){
+        error: function(msg){
             icon.attr('src',imageRoot + '/error.png');
-            installedCount++;
-            if (installedCount == installableCount){
-                enableButtons();
+            showMessage(jQuery('#infoMsg'), msg.responseText, "red");
+            installCount--;
+            if (installCount == 0){
+                jQuery("#buttonBar").show();
+                jQuery("#installProgress").hide();
             }
         },
         statusCode: {
@@ -66,36 +81,18 @@ function installPlugin(selected){
 }
         
         
-function disableButtons(){
-    jQuery('#installButton').attr("disabled", true);
-    jQuery('#finishButton').attr("disabled", true);
-}
-        
-function enableButtons(){
-    var installables = getInstallables();
-    if (installables.length > 0){
-        jQuery('#installButton').removeAttr("disabled");
-    }
-    jQuery('#finishButton').removeAttr("disabled");
-           
+function showInfoMsg(){ 
     if (jQuery('#mandatoryPlugins input[@type=checkbox]:checked').length > 0){
-        jQuery('#mandatoryMsg').show();
-        jQuery('#recommendedMsg').hide();
+        showMessage(jQuery('#infoMsg'), mandatoryMsg, "black");
     }else{
-        jQuery('#mandatoryMsg').hide();
-        jQuery('#recommendedMsg').show();
+        showMessage(jQuery('#infoMsg'), recommendedMsg, "black");
     }
 }
         
 function checkPermissionAndinstallPlugins(){
-    var installables = getInstallables();
-    if (installables.length == 0){
-        if (finish == true){
-            needsAdminLogin = false; 
-        }
-    }
     if (needsAdminLogin == true) {
         if (loggedIn == false){
+            forInstall = true;
             showLoginDialog();
         }else{
             installSelectedPlugins();
@@ -106,13 +103,10 @@ function checkPermissionAndinstallPlugins(){
 }
         
 function installSelectedPlugins(){
+    jQuery("#buttonBar").hide();
+    jQuery("#installProgress").show();
     var installables = getInstallables();
-    installableCount = installables.length;
-    if (installableCount == 0){
-        checkFinish();
-        return;
-    }
-    disableButtons();
+    installCount = installables.length;
     jQuery(installables).each(function(){
         installPlugin(this);
     });
@@ -133,31 +127,46 @@ function getInstallables(){
 }
         
 function showLoginDialog(){
-    jQuery.blockUI({
-        message: jQuery('#loginDialog'),
-        css: { 
-            width: '350px'
-        },
-        title:  'Confirmation'
+    jQuery('#loginMsg').hide();
+    jQuery('#loginDialog').dialog({
+        resizable: false,
+        height:250,
+        width: 350,
+        modal: true,
+        buttons: {
+            'Login': function() {
+                submitLoginForm();
+            },
+            Cancel: function() {
+                jQuery('#loginMsg').hide();
+                jQuery('#j_username').attr({
+                    value:""
+                });
+                jQuery('#j_password').attr({
+                    value:""
+                });
+                jQuery( this ).dialog("close");
+            }
+        }
     });
     jQuery('j_username').focus();
 }
 
 function submitPoxyForm(){
     forProxy = false;
-    jQuery('#proxySuccess').hide();
-    jQuery('#proxyError').hide();
+    showMessage(jQuery("#proxyMsg"), "Configuring proxy ..", "black");;
     var dataString = jQuery("#proxyForm").serialize();
     jQuery.ajax({
         type: 'POST',
         url: "proxyConfigure",
         data: dataString,
         success: function(){
-            jQuery('#proxySuccess').show();
-            enableButtons();
+            var msg = 'Hudson server could successfully connect to the internet';
+            showMessage(jQuery("#proxyMsg"), msg, "green");
         },
         error: function(){
-            jQuery('#proxyError').show();
+            var msg = 'Hudson server still could not connect to the internet. Check the HTTP proxy settings and try again.';
+            showMessage(jQuery("#proxyMsg"), msg, "red");
         },
         statusCode: {
             403: function() {
@@ -170,27 +179,28 @@ function submitPoxyForm(){
 }
         
 function submitLoginForm(){
-    jQuery('#loginMsg').show();
-    jQuery('#loginError').hide();
+    showMessage(jQuery('#loginMsg'), "Logging in ..", "blue");
     var dataString = jQuery("#loginForm").serialize();
     jQuery.ajax({
         type: 'POST',
         url: loginUrl,
         data: dataString,
         success: function(){
-            jQuery.unblockUI();
+            jQuery('#loginDialog').dialog("close");
             loggedIn = true;
             if (forProxy == true){
                 submitPoxyForm();
-            }else{
+            }
+            if (forInstall == true){
                 checkPermissionAndinstallPlugins();
+            }
+            if (forContinue == true){
+                doContinue("continue");
             }
             jQuery('#loginNeededMsg').hide();
         },
         error: function(msg){
-            jQuery('#loginError').text(msg.responseText);
-            jQuery('#loginError').show();
-            jQuery('#loginMsg').hide();
+            showMessage(jQuery('#loginMsg'), msg.responseText, "red");
         },
         dataType: "html"
     }); 
@@ -232,6 +242,12 @@ function doContinue(url){
     }); 
 }
 
+function showMessage(widget, msg, color){
+    widget.text(msg);
+    widget.css("color",color);
+    widget.show();
+}
+
 jQuery(document).ready(function() {
         
     var images = [
@@ -258,8 +274,8 @@ jQuery(document).ready(function() {
 
     jQuery('#loginButton').button();
     jQuery('#loginButton').click(function() {
-        submitLoginForm();
-    });
+         
+        });
             
     jQuery('#cancelButton').button();
     jQuery('#cancelButton').click(function() {
@@ -277,37 +293,50 @@ jQuery(document).ready(function() {
         
     jQuery('#installButton').button();   
     jQuery('#installButton').click(function() {
-        installableCount = 0;
-        installedCount = 0;
-        checkPermissionAndinstallPlugins();
+        if (getInstallables().length > 0){
+            checkPermissionAndinstallPlugins();
+        }
     });
             
 
     jQuery('#finishButton').button();
     jQuery('#finishButton').click(function() {
-        installableCount = 0;
-        installedCount = 0;
-        checkPermissionAndinstallPlugins();
-        finish = true;
+        if (getInstallables().length > 0){
+            finish = true;
+            checkPermissionAndinstallPlugins();
+        }else{
+            checkFinish(); 
+        }
     });
+    
+    jQuery('#proxyUser').hide();
+    jQuery('#proxyPassword').hide();
             
+    
     jQuery('#proxyAuth').click(function() {
         refreshProxyUser();
     });
             
     if (proxyNeeded == true){
-        jQuery('#proxyButton').click(function() {
+        var proxySubmitButton = jQuery('#proxySubmitButton');
+        proxySubmitButton.button();
+        proxySubmitButton.click(function() {
             submitPoxyForm();
         });
     }else{
         jQuery('#proxySetup').hide();
     }
     
+    if (needsAdminLogin == true){
+        jQuery('#loginNeededMsg').show();
+    }
+     
     jQuery('#continueButton').button();
     jQuery('#continueButton').click(function() {
         canContinue = true;
         if (securitySet == true) {
             if (loggedIn == false){
+                forContinue = true;
                 showLoginDialog();
             } else {
                 doContinue("continue");
@@ -330,7 +359,4 @@ jQuery(document).ready(function() {
     }
             
     refreshProxyUser();
-            
-    enableButtons();
-
 });

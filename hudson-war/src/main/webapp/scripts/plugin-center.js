@@ -113,18 +113,10 @@ jQuery(document).ready(function() {
         value: 0
     });
     progressbar.height(5);
-    
-    jQuery('#proxyUser').show();
-    jQuery('#proxyPassword').show();
-            
+       
+    refreshProxyUser();
     jQuery('#proxyAuth').click(function() {
-        if (jQuery('#proxyAuth').is(':checked')){
-            jQuery('#proxyUser').show();
-            jQuery('#proxyPassword').show();
-        }else{
-            jQuery('#proxyUser').hide();
-            jQuery('#proxyPassword').hide();
-        }
+        refreshProxyUser();
     });
         
     var proxySubmitButton = jQuery('#proxySubmitButton');
@@ -172,9 +164,18 @@ jQuery(document).ready(function() {
             'searchDescription' : searchDescription
         }
         );
-    });
-             
+    });      
 });
+
+function refreshProxyUser(){
+    if (jQuery('#proxyAuth').is(':checked')){
+        jQuery('#proxyUser').show();
+        jQuery('#proxyPassword').show();
+    }else{
+        jQuery('#proxyUser').hide();
+        jQuery('#proxyPassword').hide();
+    }
+}
 
 function getPluginsToInstall(){
     var installables = [];
@@ -395,8 +396,7 @@ function showMessage(infoTxt, msg, error){
 
 function submitPoxyForm(){
     forProxy = false;
-    jQuery('#proxySuccess').hide();
-    jQuery('#proxyError').hide();
+    showMessage(jQuery("#proxyMsg"), "Configuring proxy ..", "black");
     var dataString = jQuery("#proxyForm").serialize();
     jQuery.ajax({
         type: 'POST',

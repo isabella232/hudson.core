@@ -72,6 +72,7 @@
                                                     <td class="column3" style="white-space:nowrap">
                                                         ${p.version}
                                                     </td>
+                                                    <td class="column4"></td>
                                                 </tr>
                                             </j:forEach>
                                             <j:forEach var="p" items="${it.updatableMandatoryPlugins}">
@@ -155,6 +156,7 @@
                                                     <td class="column3" style="white-space:nowrap">
                                                         ${p.version}
                                                     </td>
+                                                    <td class="column4"></td>
                                                 </tr>
                                             </j:forEach>
                                             <j:forEach var="p" items="${it.updatableFeaturedPlugins}">
@@ -255,6 +257,7 @@
                                                     <td class="column3" style="white-space:nowrap">
                                                         ${p.version}
                                                     </td>
+                                                    <td class="column4"></td>
                                                 </tr>
                                             </j:forEach>
                                             <j:forEach var="p" items="${it.updatableRecommendedPlugins}">
@@ -317,7 +320,7 @@
                                         </table>
                                     </div>
                                 </div>
-                            </li>
+                            </li> 
                     
                             <li id="proxySetup">
                                 <h3>
@@ -330,93 +333,55 @@
                                     <div class="items-container">
                                              
                                         <form id="proxyForm">
-                                            <table cellpadding="10">
-                                                <tr>
-                                                    <td> 
-                                                        Proxy Server
-                                                    </td>
-
-                                                    <td>
-                                                        <input name="proxy.server" type="text" value="${it.proxyConfig.name}" size="50"/>
-                                                    </td>
-
-                                                </tr>
-
-                                                <tr>
-                                                    <td> 
-                                                        Proxy Port
-                                                    </td> 
-                                                    <td>
-                                                        <input name="proxy.port" type="text" value="${it.proxyConfig.port}" size="6"/>
-                                                    </td>
-
-                                                </tr>
-                                                <tr> 
-                                                    <td> 
-                                                        No Proxy for
-                                                    </td>
-                                                    <td>
-                                                        <input name="proxy.noProxyFor" type="text" size="50" value="${it.proxyConfig.noProxyFor}"/>
-                                                    </td>
-
-                                                </tr>
-                                                <tr> 
-                                                    <td colspan="2">
-                                                        <input id="proxyAuth" name="proxy.authNeeded" type="checkbox" checked="${it.proxyConfig.authNeeded}"/>
-                                                        <span>Proxy Needs Authorization</span>
-                                                    </td>
-                                                </tr>
-
-                                                <tr id="proxyUser"> 
-                                                    <td> 
-                                                        Username
-                                                    </td>
-                                                    <td>
-                                                        <input name="proxy.userName" type="text" size="20" value="${it.proxyConfig.userName}"/>
-                                                    </td>
-
-                                                </tr>
-                                                <tr id="proxyPassword"> 
-                                                    <td> 
-                                                        Password
-                                                    </td>
-                                                    <td>
-                                                        <input name="proxy.password" type="password" size="20" value="${it.proxyConfig.password}"/>
-                                                    </td>
-
-                                                </tr>
-                                            </table>
-                                         
-                                            <div id="proxyError">
-                                                ${% Hudson server still could not connect to the internet. Check the HTTP proxy settings and try again}
-                                            </div>
-                                            <div id="proxySuccess">
-                                                ${%Hudson server could successfully connect to the internet}
-                                            </div>
-                                 
+                                            <label for="proxy.server">Proxy Server</label>
+                                                <input type="text" name="proxy.server" value="${it.proxyConfig.name}" />
+                                                <br/>
+                                    
+                                                <label for="proxy.port">Proxy Port</label>
+                                                <input type="text" name="proxy.port" value="${it.proxyConfig.port}" />
+                                                <br/>
+                                    
+                                                <label for="proxy.noProxyFor">No Proxy for</label>
+                                                <input type="text" name="proxy.noProxyFor" value="${it.proxyConfig.noProxyFor}" /> 
+                                                <br/>
+                                    
+                                                <input style="width: 10px;" id="proxyAuth" name="proxy.authNeeded" type="checkbox" checked="${it.proxyConfig.authNeeded}"/>
+                                                Proxy Needs Authorization
+                                                <br/>
+                                     
+                                                <span id="proxyUser">
+                                                    <label for="proxy.userName">Username</label>
+                                                    <input name="proxy.userName" type="text" size="20" value="${it.proxyConfig.userName}"/>
+                                                </span>
+                                                <br/>
+                                    
+                                                <span id="proxyPassword">
+                                                    <label for="proxy.password">Password</label>
+                                                    <input name="proxy.password" type="password" value="${it.proxyConfig.password}"/>
+                                                </span>
+                                                <br/>
+                                    
+                                                <div style="margin-left: 500px;"> 
+                                                    <input style="width: 150px;" type="button" id="proxySubmitButton" value="${%Test and Setup}" />
+                                                </div>
+                                                <br style="clear:both"/>
+                                                <span id="proxyMsg">
+                                                    <!-- Proxy operation message injected here -->
+                                                </span>
                                         </form>    
-                                        <div style="float: right; padding:10px"> 
-                                            <input type="button" id="proxyButton" value="${%Test and Setup}" />
-                                        </div>
-                                        <br style="clear:both"/>
                                     </div>
                                 </div>
                             </li>
                     
                         </ul>
                         <div>
-                            <span id="mandatoryMsg">
-                                The Mandatory Plugins are needed and cannot be deselected. 
-                                Select the featured or recommended plugins and click install to download and install the plugins or Finish
-                                to start Hudson after installing the plugins.  
+                            <span id="infoMsg">
+                                 <!-- Message injectd here-->
                             </span> 
-                        
-                            <span id="recommendedMsg">
-                                All Mandatory Plugins are installed. 
-                                Select the featured or recommended plugins and click install to download and install the plugins or Finish
-                                to start Hudson after installing the plugins.
-                            </span>
-                         
+                            <p id="loginNeededMsg">
+                                    Note: You must 
+                                    <a id="loginLink" href="#" onClick="showLoginDialog(); return false;">login</a> as administrator to install the plugins.
+                            </p>
                             <div>
                                 <ul id="buttonBar">
                                     <li>
@@ -426,7 +391,12 @@
                                         <input type="button" id="installButton" value="${%Install}" />
                                     </li>
                                 </ul>
+                                <div id="installProgress"> 
+                                    <span>Installing .. </span>
+                                    <img src="${imagesURL}/progressbar.gif" style="margin-bottom: -10px; margin-left: 5px;"/>
+                                </div>
                             </div>
+                             
                             <div>
                                 <span id="instalMandatoryMsg">
                                     All Mandatory Plugins must be installed first. 
@@ -437,55 +407,21 @@
                 </div>
             </div>
     
-            <div id="loginDialog" style="display:none; cursor: default">
-                <j:set var="submitFrom" value="${from}" />
-                <div style="margin: 2em;">
-        <!-- login form -->
-                    <form id="loginForm"  style="text-size:smaller">
-                        <table cellspacing="10">
-                            <tr>
-                                <td colspan="2">${%Admin access required to install the plugins. Login as admin.}</td>
-                            </tr>
-                            <tr>
-                                <td>${%User}:</td>
-                                <td>
-                                    <input type="text" name="j_username" id="j_username" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td >${%Password}:</td>
-                                <td>
-                                    <input  type="password" name="j_password" id="j_password"/>
-                                </td>
-                            </tr>
-                            <j:if test="${app.security.name()=='SECURED'}">
-                    <!-- remember me service only available for Spring Security -->
-                                <tr>
-                                    <td align="right">
-                                        <input style="width:10px" id="remember_me" type="checkbox" name="remember_me" />
-                                    </td>
-                                    <td>
-                                        <label for="remember_me">${%Remember me on this computer}</label>
-                                    </td>
-                                </tr>
-                            </j:if>
-                        </table>
-                        <input type="hidden" name="from" value="${submitFrom}" />
-                        <input style="width:75px" type="button" id="loginButton" value="${%Login}" />
-                        <input style="margin-left:10px; width:75px" type="button" id="cancelButton" value="${%Cancel}" />
+           <div id="loginDialog" style="display:none; cursor: default">
+                <span>${%Admin access required to install the plugins. Login as admin.}</span>
 
-                    </form>
+                <form id="loginForm"  style="text-size:smaller">
+                    <label for="j_username">${%User}</label>
+                    <input type="text" name="j_username" id="j_username" />
+                    <br/>
+                    <label for="j_password">${%Password}</label>
+                    <input  type="password" name="j_password" id="j_password"/>
+                </form>
 
-                    <div id="loginError">
-                        ${%Invalid login information. Please try again.}
-                    </div>
-
-                    <div id="loginMsg">
-                        ${%Logging in...}
-                    </div>
-        
+                <div id="loginMsg">
+                        <!-- Message ijected here -->
                 </div>
             </div>
         </body>
-    </html>         
+    </html>     
 </j:jelly>
