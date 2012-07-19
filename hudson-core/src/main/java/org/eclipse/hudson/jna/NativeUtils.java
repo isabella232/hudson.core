@@ -50,28 +50,28 @@ public class NativeUtils implements Serializable {
     }
 
     private NativeUtils() {
-      try{
-        List<NativeUnixSupport> nativeUnixSupports = getAvailableNativeUnixSupports();
-        if (nativeUnixSupports.size() > 0) {
-            nativeUnixSupport = nativeUnixSupports.get(0);
-        }
+        try {
+            List<NativeUnixSupport> nativeUnixSupports = getAvailableNativeUnixSupports();
+            if (nativeUnixSupports.size() > 0) {
+                nativeUnixSupport = nativeUnixSupports.get(0);
+            }
 
-        List<NativeWindowsSupport> nativeWindowsSupports = getAvailableNativeWindowSupports();
-        if (nativeWindowsSupports.size() > 0) {
-            nativeWindowsSupport = nativeWindowsSupports.get(0);
-        }
+            List<NativeWindowsSupport> nativeWindowsSupports = getAvailableNativeWindowSupports();
+            if (nativeWindowsSupports.size() > 0) {
+                nativeWindowsSupport = nativeWindowsSupports.get(0);
+            }
 
-        List<NativeMacSupport> nativeMacSupports = getAvailableNativeMacSupports();
-        if (nativeMacSupports.size() > 0) {
-            nativeMacSupport = nativeMacSupports.get(0);
+            List<NativeMacSupport> nativeMacSupports = getAvailableNativeMacSupports();
+            if (nativeMacSupports.size() > 0) {
+                nativeMacSupport = nativeMacSupports.get(0);
+            }
+            List<NativeZfsSupport> nativeZfsSupports = getAvailableNativeZfsSupports();
+            if (nativeZfsSupports.size() > 0) {
+                nativeZfsSupport = nativeZfsSupports.get(0);
+            }
+        } catch (Exception exc) {
+            logger.info("Error getting Native Support Extensions", exc);
         }
-        List<NativeZfsSupport> nativeZfsSupports = getAvailableNativeZfsSupports();
-        if (nativeZfsSupports.size() > 0) {
-            nativeZfsSupport = nativeZfsSupports.get(0);
-        }
-      }catch (Exception exc){
-          logger.info("Error getting Native Support Extensions", exc);
-      }
 
     }
 

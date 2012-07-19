@@ -27,7 +27,7 @@ import java.util.Set;
  *
  * @author Nikita Levyankov
  */
-public interface ICascadingJob<T extends Job<?,?>> extends IJob<T> {
+public interface ICascadingJob<T extends Job<?, ?>> extends IJob<T> {
 
     /**
      * Returns cascading project name.
@@ -64,7 +64,8 @@ public interface ICascadingJob<T extends Job<?,?>> extends IJob<T> {
      * Returns job property by specified key.
      *
      * @param key key.
-     * @return {@link org.eclipse.hudson.api.model.IProjectProperty} instance or null.
+     * @return {@link org.eclipse.hudson.api.model.IProjectProperty} instance or
+     * null.
      */
     IProjectProperty getProperty(String key);
 
@@ -134,8 +135,9 @@ public interface ICascadingJob<T extends Job<?,?>> extends IJob<T> {
     Set<String> getCascadingChildrenNames();
 
     /**
-     * Renames cascading project name. For the properties processing and children links updating
-     * please use {@link #setCascadingProjectName} instead.
+     * Renames cascading project name. For the properties processing and
+     * children links updating please use {@link #setCascadingProjectName}
+     * instead.
      *
      * @param cascadingProjectName new project name.
      */

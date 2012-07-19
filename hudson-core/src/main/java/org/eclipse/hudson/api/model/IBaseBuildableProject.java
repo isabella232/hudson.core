@@ -32,6 +32,7 @@ import java.util.Map;
  * @author Nikita Levyankov
  */
 public interface IBaseBuildableProject extends IAbstractProject {
+
     /**
      * @return list of project {@link hudson.tasks.Builder}
      */
@@ -54,7 +55,8 @@ public interface IBaseBuildableProject extends IAbstractProject {
     Publisher getPublisher(Descriptor<Publisher> descriptor);
 
     /**
-     * Adds a new {@link hudson.tasks.BuildStep} to this {@link IBaseBuildableProject} and saves the configuration.
+     * Adds a new {@link hudson.tasks.BuildStep} to this
+     * {@link IBaseBuildableProject} and saves the configuration.
      *
      * @param publisher publisher.
      * @throws java.io.IOException exception.

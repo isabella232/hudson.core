@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Winston Prakash
- *      
+ *
  *******************************************************************************/ 
 
 package org.eclipse.hudson.security.captcha;
@@ -23,33 +23,32 @@ import hudson.model.Hudson;
 import java.io.IOException;
 import java.io.OutputStream;
 
-
 /**
- * Extension point for adding Captcha Support to User Registration Page {@link CaptchaSupport}.
+ * Extension point for adding Captcha Support to User Registration Page
+ * {@link CaptchaSupport}.
  *
- * <p>
- * This object can have an optional <tt>config.jelly</tt> to configure the Captcha Support
- * <p>
- * A default constructor is needed to create CaptchaSupport in
- * the default configuration.
+ * <p> This object can have an optional <tt>config.jelly</tt> to configure the
+ * Captcha Support <p> A default constructor is needed to create CaptchaSupport
+ * in the default configuration.
  *
  * @author Winston Prakash
  * @since 3.0.0
  * @see CaptchaSupportDescriptor
  */
 public abstract class CaptchaSupport extends AbstractDescribableImpl<CaptchaSupport> implements ExtensionPoint {
+
     /**
      * Returns all the registered {@link CaptchaSupport} descriptors.
      */
     public static DescriptorExtensionList<CaptchaSupport, Descriptor<CaptchaSupport>> all() {
         return Hudson.getInstance().<CaptchaSupport, Descriptor<CaptchaSupport>>getDescriptorList(CaptchaSupport.class);
     }
-    
-    abstract public  boolean validateCaptcha(String id, String text); 
-    
+
+    abstract public boolean validateCaptcha(String id, String text);
+
     abstract public void generateImage(String id, OutputStream ios) throws IOException;
 
     public CaptchaSupportDescriptor getDescriptor() {
-        return (CaptchaSupportDescriptor)super.getDescriptor();
+        return (CaptchaSupportDescriptor) super.getDescriptor();
     }
 }

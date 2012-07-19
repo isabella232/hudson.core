@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Winston Prakash
- *      
+ *
  *******************************************************************************/ 
 
 package org.eclipse.hudson.jna;
@@ -27,17 +27,16 @@ import java.util.List;
 /**
  * Extension point for adding Native Access Support to ZFS FileSystem
  *
- * <p>
- * This object can have an optional <tt>config.jelly</tt> to configure the Native Access Support
- * <p>
- * A default constructor is needed to create NativeAccessSupport in the default configuration.
+ * <p> This object can have an optional <tt>config.jelly</tt> to configure the
+ * Native Access Support <p> A default constructor is needed to create
+ * NativeAccessSupport in the default configuration.
  *
  * @author Winston Prakash
  * @since 3.0.0
  * @see NativeAccessSupportDescriptor
  */
 public abstract class NativeZfsSupport extends AbstractDescribableImpl<NativeZfsSupport> implements ExtensionPoint,
-    Serializable {
+        Serializable {
 
     /**
      * Returns all the registered {@link NativeAccessSupport} descriptors.
@@ -53,6 +52,7 @@ public abstract class NativeZfsSupport extends AbstractDescribableImpl<NativeZfs
 
     /**
      * Check if this Extension has Support for specific native Operation
+     *
      * @param nativeFunc Native Operation
      * @return true if supported
      */
@@ -60,44 +60,50 @@ public abstract class NativeZfsSupport extends AbstractDescribableImpl<NativeZfs
 
     /**
      * Fetch the list of mounted ZFS roots
+     *
      * @return
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     abstract public List<NativeZfsFileSystem> getZfsRoots() throws NativeAccessException;
 
     /**
      * Find the ZFS File System by its mount point
+     *
      * @return
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     abstract public NativeZfsFileSystem getZfsByMountPoint(File mountPoint) throws NativeAccessException;
 
-    /** 
+    /**
      * Create ZFS File System corresponding to the mount name
+     *
      * @param mountPoint
      * @return ZFS File System if created successfully
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     abstract public NativeZfsFileSystem createZfs(String mountName) throws NativeAccessException;
 
-     /** 
-     * Open the target ZFS File System 
+    /**
+     * Open the target ZFS File System
+     *
      * @param mountPoint
      * @return ZFS File System if opened successfully
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
     abstract public NativeZfsFileSystem openZfs(String target) throws NativeAccessException;
 
     /**
      * Check if the named ZFS exists
+     *
      * @param zfsName
      * @return
-     * @throws hudson.util.jna.Native.NativeExecutionException 
+     * @throws hudson.util.jna.Native.NativeExecutionException
      */
-    abstract public  boolean zfsExists(String zfsName)  throws NativeAccessException;
+    abstract public boolean zfsExists(String zfsName) throws NativeAccessException;
 
     /**
      * Get the error associated with the last Operation
+     *
      * @return String error message
      */
     abstract public String getLastError();

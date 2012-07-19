@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *  Kohsuke Kawaguchi, Winston Prakash, Jean-Baptiste Quenot, Tom Huybrechts
- *     
+ *
  *******************************************************************************/ 
 
 package org.eclipse.hudson;
@@ -54,16 +54,16 @@ import org.slf4j.LoggerFactory;
 /**
  * Entry point when Hudson is used as a webapp.
  *
- * @author Kohsuke Kawaguchi, Winston Prakash 
+ * @author Kohsuke Kawaguchi, Winston Prakash
  */
 public final class HudsonServletContextListener implements ServletContextListener {
-    
+
     private Logger logger = LoggerFactory.getLogger(InitialSetup.class);
-    
     private final RingBufferLogHandler handler = new RingBufferLogHandler();
 
     /**
-     * Creates the sole instance of {@link Hudson} and register it to the {@link ServletContext}.
+     * Creates the sole instance of {@link Hudson} and register it to the
+     * {@link ServletContext}.
      */
     @Override
     public void contextInitialized(ServletContextEvent event) {
@@ -75,16 +75,14 @@ public final class HudsonServletContextListener implements ServletContextListene
             try {
                 // Attempt to set the context
                 controller.setContext(servletContext);
-            }
-            catch (IllegalStateException e) {
+            } catch (IllegalStateException e) {
                 // context already set ignore
             }
 
             // Setup the default install strategy if not already configured
             try {
                 controller.setInstallStrategy(new DefaultInstallStrategy());
-            }
-            catch (IllegalStateException e) {
+            } catch (IllegalStateException e) {
                 // strategy already set ignore
             }
 
@@ -92,12 +90,14 @@ public final class HudsonServletContextListener implements ServletContextListene
             LocaleProvider.setProvider(new LocaleProvider() {
                 @Override
                 public Locale get() {
-                    Locale locale=null;
+                    Locale locale = null;
                     StaplerRequest req = Stapler.getCurrentRequest();
-                    if(req!=null)
+                    if (req != null) {
                         locale = req.getLocale();
-                    if(locale==null)
+                    }
+                    if (locale == null) {
                         locale = Locale.getDefault();
+                    }
                     return locale;
                 }
             });
@@ -106,8 +106,8 @@ public final class HudsonServletContextListener implements ServletContextListene
             JVM jvm;
             try {
                 jvm = new JVM();
-                new URLClassLoader(new URL[0],getClass().getClassLoader());
-            } catch(SecurityException e) {
+                new URLClassLoader(new URL[0], getClass().getClassLoader());
+            } catch (SecurityException e) {
                 controller.install(new InsufficientPermissionDetected(e));
                 return;
             }
@@ -124,8 +124,7 @@ public final class HudsonServletContextListener implements ServletContextListene
             File dir = getHomeDir(event);
             try {
                 dir = dir.getCanonicalFile();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 dir = dir.getAbsoluteFile();
             }
             final File home = dir;
@@ -134,14 +133,14 @@ public final class HudsonServletContextListener implements ServletContextListene
             logger.info("Home directory: " + home);
 
             // check that home exists (as mkdirs could have failed silently), otherwise throw a meaningful error
-            if (! home.exists()) {
+            if (!home.exists()) {
                 controller.install(new NoHomeDir(home));
                 return;
             }
-            
-        
+
+
             // make sure that we are using XStream in the "enhanced" (JVM-specific) mode
-            if(jvm.bestReflectionProvider().getClass()==PureJavaReflectionProvider.class) {
+            if (jvm.bestReflectionProvider().getClass() == PureJavaReflectionProvider.class) {
                 // nope
                 controller.install(new IncompatibleVMDetected());
                 return;
@@ -149,7 +148,7 @@ public final class HudsonServletContextListener implements ServletContextListene
 
             // make sure this is servlet 2.4 container or above
             try {
-                ServletResponse.class.getMethod("setCharacterEncoding",String.class);
+                ServletResponse.class.getMethod("setCharacterEncoding", String.class);
             } catch (NoSuchMethodException e) {
                 controller.install(new IncompatibleServletVersionDetected(ServletResponse.class));
                 return;
@@ -164,7 +163,7 @@ public final class HudsonServletContextListener implements ServletContextListene
             }
 
             //make sure AWT is functioning. Needed for Graphing framework to work properly
-            if(ChartUtil.awtProblemCause!=null) {
+            if (ChartUtil.awtProblemCause != null) {
                 controller.install(new AWTProblem(ChartUtil.awtProblemCause));
                 return;
             }
@@ -187,21 +186,21 @@ public final class HudsonServletContextListener implements ServletContextListene
                 // if this works we are all happy
             } catch (TransformerFactoryConfigurationError x) {
                 // no it didn't.
-                logger.warn("XSLT not configured correctly. Hudson will try to fix this. See http://issues.apache.org/bugzilla/show_bug.cgi?id=40895 for more details",x);
-                System.setProperty(TransformerFactory.class.getName(),"com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
+                logger.warn("XSLT not configured correctly. Hudson will try to fix this. See http://issues.apache.org/bugzilla/show_bug.cgi?id=40895 for more details", x);
+                System.setProperty(TransformerFactory.class.getName(), "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
                 try {
                     TransformerFactory.newInstance();
                     logger.info("XSLT is set to the JAXP RI in JRE");
-                } catch(TransformerFactoryConfigurationError y) {
+                } catch (TransformerFactoryConfigurationError y) {
                     logger.error("Failed to correct the problem.");
                 }
             }
 
             installExpressionFactory(event);
-            
+
             // Do the initial setup (if needed) before actually starting Hudson
-            
-             try {
+
+            try {
                 // Create the Security Manager temporarily. Since the plugins are not loaded yet
                 // all permissions may not be loaded. The Security manager will reload when Hudson
                 // fully starts later
@@ -210,10 +209,10 @@ public final class HudsonServletContextListener implements ServletContextListene
                 controller.install(new SecurityFailedToInit(ex));
                 return;
             }
-             
+
             // Copy the bundled update-center.jso file to the local cached file
             copyUpdateCenterJson(servletContext, home);
-                    
+
             InitialSetup initSetup = new InitialSetup(home, servletContext);
             if (initSetup.needsInitSetup()) {
                 logger.info("Initial setup required. Please go to the Hudson Dashboard and complete the setup");
@@ -226,13 +225,13 @@ public final class HudsonServletContextListener implements ServletContextListene
                 initSetup.invokeHudson();
             }
 
-        }catch (Exception exc) {
-            logger.error( "Failed to initialize Hudson", exc);
-        }catch (Error e) {
-            logger.error( "Failed to initialize Hudson",e);
+        } catch (Exception exc) {
+            logger.error("Failed to initialize Hudson", exc);
+        } catch (Error e) {
+            logger.error("Failed to initialize Hudson", e);
         }
     }
-    
+
     protected void copyUpdateCenterJson(ServletContext servletContext, File hudsonHomeDir) throws IOException {
         URL updateCenterJsonUrl = servletContext.getResource("/WEB-INF/update-center.json");
         if (updateCenterJsonUrl != null) {
@@ -258,7 +257,7 @@ public final class HudsonServletContextListener implements ServletContextListene
         JellyFacet.setExpressionFactory(event, new ExpressionFactory2());
     }
 
-	/**
+    /**
      * Installs log handler to monitor all Hudson logs.
      */
     private void installLogger() {
@@ -269,8 +268,8 @@ public final class HudsonServletContextListener implements ServletContextListene
     /**
      * Determines the home directory for Hudson.
      *
-     * People makes configuration mistakes, so we are trying to be nice
-     * with those by doing {@link String#trim()}.
+     * People makes configuration mistakes, so we are trying to be nice with
+     * those by doing {@link String#trim()}.
      */
     private File getHomeDir(ServletContextEvent event) {
         // check JNDI for the home directory first
@@ -278,50 +277,55 @@ public final class HudsonServletContextListener implements ServletContextListene
             InitialContext iniCtxt = new InitialContext();
             Context env = (Context) iniCtxt.lookup("java:comp/env");
             String value = (String) env.lookup("HUDSON_HOME");
-            if(value!=null && value.trim().length()>0)
+            if (value != null && value.trim().length() > 0) {
                 return new File(value.trim());
+            }
             // look at one more place. See issue #1314 
             value = (String) iniCtxt.lookup("HUDSON_HOME");
-            if(value!=null && value.trim().length()>0)
+            if (value != null && value.trim().length() > 0) {
                 return new File(value.trim());
+            }
         } catch (NamingException e) {
             // ignore
         }
 
         // finally check the system property
         String sysProp = System.getProperty("HUDSON_HOME");
-        if(sysProp!=null)
+        if (sysProp != null) {
             return new File(sysProp.trim());
-        
+        }
+
         // look at the env var next
         String env = EnvVars.masterEnvVars.get("HUDSON_HOME");
-        if(env!=null)
+        if (env != null) {
             return new File(env.trim()).getAbsoluteFile();
+        }
 
         // otherwise pick a place by ourselves
 
         String root = event.getServletContext().getRealPath("/WEB-INF/workspace");
-        if(root!=null) {
+        if (root != null) {
             File ws = new File(root.trim());
-            if(ws.exists())
-                // Hudson <1.42 used to prefer this before ~/.hudson, so
-                // check the existence and if it's there, use it.
-                // otherwise if this is a new installation, prefer ~/.hudson
+            if (ws.exists()) // Hudson <1.42 used to prefer this before ~/.hudson, so
+            // check the existence and if it's there, use it.
+            // otherwise if this is a new installation, prefer ~/.hudson
+            {
                 return ws;
+            }
         }
 
         // if for some reason we can't put it within the webapp, use home directory.
-        return new File(new File(System.getProperty("user.home")),".hudson");
+        return new File(new File(System.getProperty("user.home")), ".hudson");
     }
 
     public void contextDestroyed(ServletContextEvent event) {
         Hudson instance = Hudson.getInstance();
-        if(instance!=null)
+        if (instance != null) {
             instance.cleanUp();
+        }
 
         // Logger is in the system classloader, so if we don't do this
         // the whole web app will never be undepoyed.
         java.util.logging.Logger.getLogger("hudson").removeHandler(handler);
     }
-
 }

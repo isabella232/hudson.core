@@ -28,6 +28,7 @@ import org.eclipse.hudson.api.model.ICascadingJob;
  * @author Nikita Levyankov
  */
 public class DescribableListProjectProperty extends BaseProjectProperty<DescribableList> {
+
     public DescribableListProjectProperty(ICascadingJob job) {
         super(job);
     }
@@ -64,5 +65,3 @@ public class DescribableListProjectProperty extends BaseProjectProperty<Describa
         return null != result ? result : getDefaultValue();
     }
 }
-
-

@@ -40,8 +40,8 @@ final public class InitialSetupLogin {
     public HudsonSecurityManager getHudsonSecurityManager() {
         return hudsonSecurityManager;
     }
-    
-    public boolean canFinish(){
+
+    public boolean canFinish() {
         return initialSetup.canFinish();
     }
 

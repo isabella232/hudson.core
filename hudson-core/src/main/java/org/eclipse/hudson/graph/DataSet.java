@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Winston Prakash
- *     
+ *
  *
  *******************************************************************************/
 package org.eclipse.hudson.graph;
@@ -21,14 +21,11 @@ import java.util.List;
 /**
  * Builds {@link CategoryDataset}.
  *
- * <p>
- * This code works around an issue in {@link DefaultCategoryDataset} where
+ * <p> This code works around an issue in {@link DefaultCategoryDataset} where
  * order of addition changes the way they are drawn.
  *
- * @param <Row>
- *      Names that identify different graphs drawn in the same chart.
- * @param <Column>
- *      X-axis.
+ * @param <Row> Names that identify different graphs drawn in the same chart.
+ * @param <Column> X-axis.
  */
 public final class DataSet<Row extends Comparable, Column extends Comparable> {
 

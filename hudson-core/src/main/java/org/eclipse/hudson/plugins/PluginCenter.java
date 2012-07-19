@@ -59,7 +59,6 @@ final public class PluginCenter {
     List<PluginInstallationJob> installationsJobs = new CopyOnWriteArrayList<PluginInstallationJob>();
     private ExecutorService installerService = Executors.newSingleThreadExecutor(
             new DaemonThreadFactory(new ThreadFactory() {
-
         @Override
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r);

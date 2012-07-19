@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Winston Prakash
- *      
+ *
  *******************************************************************************/ 
 
 package org.eclipse.hudson.jna;
@@ -19,12 +19,12 @@ import java.io.File;
 
 /**
  * Data Structure and operation defining a ZFS file Systems
- * 
+ *
  * @author Winston Prakash
  * @since 3.0.0
  */
-public interface NativeZfsFileSystem{
-    
+public interface NativeZfsFileSystem {
+
     public static final int MS_RDONLY = 1;
     public static final int MS_FSS = 2;
     public static final int MS_DATA = 4;
@@ -36,7 +36,7 @@ public interface NativeZfsFileSystem{
     public static final int MS_GLOBAL = 512;
     public static final int MS_FORCE = 1024;
     public static final int MS_NOMNTTAB = 2048;
-    
+
     public String getName();
 
     public void setMountPoint(File dir);
@@ -44,7 +44,7 @@ public interface NativeZfsFileSystem{
     public void mount();
 
     public void unmount();
-    
+
     public void unmount(int flag);
 
     public void setProperty(String string, String string0);

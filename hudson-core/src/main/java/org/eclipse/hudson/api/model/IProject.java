@@ -23,5 +23,4 @@ package org.eclipse.hudson.api.model;
  * @author Nikita Levyankov
  */
 public interface IProject extends IBaseBuildableProject {
-
 }

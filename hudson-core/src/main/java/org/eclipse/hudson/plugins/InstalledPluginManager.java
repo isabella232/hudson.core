@@ -65,7 +65,6 @@ public final class InstalledPluginManager {
 
     public void loadInstalledPlugins() {
         File[] hpiArchives = pluginsDir.listFiles(new FilenameFilter() {
-
             @Override
             public boolean accept(File dir, String name) {
                 return name.endsWith("hpi");
@@ -137,7 +136,7 @@ public final class InstalledPluginManager {
                 FileUtils.deleteQuietly(disabledMarker);
             }
             if (!enable && !disabledMarker.exists()) {
-                FileUtils.touch(disabledMarker);;
+                FileUtils.touch(disabledMarker);
             }
         }
 

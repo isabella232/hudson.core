@@ -14,6 +14,7 @@
  *******************************************************************************/
 
 package org.eclipse.hudson.model.project.property;
+
 import hudson.model.Result;
 import org.eclipse.hudson.api.model.ICascadingJob;
 

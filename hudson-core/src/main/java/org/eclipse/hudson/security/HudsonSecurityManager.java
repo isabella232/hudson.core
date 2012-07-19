@@ -64,9 +64,8 @@ import org.xml.sax.SAXException;
  * @since 3.0.0
  */
 public class HudsonSecurityManager implements Saveable {
-    
-    private transient final String securityConfigFileName = "hudson-security.xml";
 
+    private transient final String securityConfigFileName = "hudson-security.xml";
     /**
      * Used to load/save Security configuration.
      */
@@ -143,15 +142,15 @@ public class HudsonSecurityManager implements Saveable {
 
         load();
     }
-    
+
     /**
      * Get the directory where hudson stores the User configuration
-     * @return 
+     *
+     * @return
      */
     public File getHudsonHome() {
         return hudsonHome;
     }
-
 
     /**
      * Gets the markup formatter used in the system.
@@ -189,11 +188,10 @@ public class HudsonSecurityManager implements Saveable {
     public boolean hasPermission(Permission p) {
         return getACL().hasPermission(p);
     }
-    
+
     /**
-     * Returns a secret key that survives across container start/stop.
-     * <p>
-     * This value is useful for implementing some of the security features.
+     * Returns a secret key that survives across container start/stop. <p> This
+     * value is useful for implementing some of the security features.
      */
     public String getSecretKey() {
         return secretKey;
@@ -201,6 +199,7 @@ public class HudsonSecurityManager implements Saveable {
 
     /**
      * Gets {@linkplain #getSecretKey() the secret key} as a key for AES-128.
+     *
      * @since 1.308
      */
     public SecretKey getSecretKeyAsAES128() {
@@ -312,7 +311,7 @@ public class HudsonSecurityManager implements Saveable {
 
                 if (security.has("markupFormatter")) {
                     markupFormatter = req.bindJSON(MarkupFormatter.class, security.getJSONObject("markupFormatter"));
-                }  
+                }
             } else {
                 useSecurity = null;
                 setSecurityRealm(SecurityRealm.NO_AUTHENTICATION);
@@ -365,9 +364,9 @@ public class HudsonSecurityManager implements Saveable {
         try {
             if (config.exists()) {
                 config.unmarshal(this);
-            }else{
+            } else {
                 // Compatibility. Hudson 2.x stores Security config in the Global Config file.
-                if (extractSecurityConfig()){
+                if (extractSecurityConfig()) {
                     config.unmarshal(this);
                 }
             }
@@ -428,13 +427,13 @@ public class HudsonSecurityManager implements Saveable {
         }
         return a;
     }
-    
+
     private boolean extractSecurityConfig() {
         try {
 
             File globalConfigFile = new File(hudsonHome, "config.xml");
-            
-            if (!globalConfigFile.exists()){
+
+            if (!globalConfigFile.exists()) {
                 return false;
             }
 

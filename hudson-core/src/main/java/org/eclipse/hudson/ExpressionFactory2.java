@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -29,16 +29,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * {@link ExpressionFactory} so that security exception aborts the page rendering.
+ * {@link ExpressionFactory} so that security exception aborts the page
+ * rendering.
  *
  * @author Kohsuke Kawaguchi
-*/
+ */
 public final class ExpressionFactory2 implements ExpressionFactory {
+
     public Expression createExpression(String text) throws JellyException {
         try {
             return new JexlExpression(
-                org.apache.commons.jexl.ExpressionFactory.createExpression(text)
-            );
+                    org.apache.commons.jexl.ExpressionFactory.createExpression(text));
         } catch (Exception e) {
             throw new JellyException("Unable to create expression: " + text, e);
         }
@@ -61,7 +62,9 @@ public final class ExpressionFactory2 implements ExpressionFactory {
      */
     static final class JexlExpression extends ExpressionSupport {
 
-        /** The Jexl expression object */
+        /**
+         * The Jexl expression object
+         */
         private org.apache.commons.jexl.Expression expression;
 
         public JexlExpression(org.apache.commons.jexl.Expression expression) {
@@ -82,39 +85,38 @@ public final class ExpressionFactory2 implements ExpressionFactory {
         public Object evaluate(JellyContext context) {
             try {
                 CURRENT_CONTEXT.set(context);
-                JexlContext jexlContext = new JellyJexlContext( context );
+                JexlContext jexlContext = new JellyJexlContext(context);
                 return expression.evaluate(jexlContext);
             } catch (SpringSecurityException e) {
                 // let the security exception pass through
                 throw e;
             } catch (Exception e) {
-                LOGGER.log(Level.WARNING,"Caught exception evaluating: " + expression + ". Reason: " + e, e);
+                LOGGER.log(Level.WARNING, "Caught exception evaluating: " + expression + ". Reason: " + e, e);
                 return null;
             } finally {
                 CURRENT_CONTEXT.set(null);
             }
         }
-
         private static final Logger LOGGER = Logger.getLogger(JexlExpression.class.getName());
     }
 
     static final class JellyJexlContext implements JexlContext {
+
         private Map vars;
 
         JellyJexlContext(JellyContext context) {
-            this.vars = new JellyMap( context );
+            this.vars = new JellyMap(context);
         }
 
         public void setVars(Map vars) {
             this.vars.clear();
-            this.vars.putAll( vars );
+            this.vars.putAll(vars);
         }
 
         public Map getVars() {
             return this.vars;
         }
     }
-
 
     static final class JellyMap implements Map {
 
@@ -125,7 +127,7 @@ public final class ExpressionFactory2 implements ExpressionFactory {
         }
 
         public Object get(Object key) {
-            return context.getVariable( (String) key );
+            return context.getVariable((String) key);
         }
 
         public void clear() {
@@ -133,7 +135,7 @@ public final class ExpressionFactory2 implements ExpressionFactory {
         }
 
         public boolean containsKey(Object key) {
-            return ( get( key ) != null );
+            return (get(key) != null);
         }
 
         public boolean containsValue(Object value) {
@@ -172,10 +174,9 @@ public final class ExpressionFactory2 implements ExpressionFactory {
             return null;
         }
     }
-
     /**
-     * When called from within the JEXL expression evaluation,
-     * retains the current {@link JellyContext}.
+     * When called from within the JEXL expression evaluation, retains the
+     * current {@link JellyContext}.
      *
      * @see Functions#getCurrentJellyContext()
      */
