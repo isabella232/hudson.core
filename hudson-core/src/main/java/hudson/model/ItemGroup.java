@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -27,15 +27,16 @@ import java.io.File;
  * @see ItemGroupMixIn
  */
 public interface ItemGroup<T extends Item> extends PersistenceRoot, ModelObject {
+
     /**
      * Gets the full name of this {@link ItemGroup}.
      *
-     * @see Item#getFullName() 
+     * @see Item#getFullName()
      */
     String getFullName();
 
     /**
-     * @see Item#getFullDisplayName() 
+     * @see Item#getFullDisplayName()
      */
     String getFullDisplayName();
 
@@ -45,14 +46,14 @@ public interface ItemGroup<T extends Item> extends PersistenceRoot, ModelObject 
     Collection<T> getItems();
 
     /**
-     * Returns the path relative to the context root,
-     * like "foo/bar/zot/". Note no leading slash but trailing slash.
+     * Returns the path relative to the context root, like "foo/bar/zot/". Note
+     * no leading slash but trailing slash.
      */
     String getUrl();
 
     /**
-     * Gets the URL token that prefixes the URLs for child {@link Item}s.
-     * Like "job", "item", etc.
+     * Gets the URL token that prefixes the URLs for child {@link Item}s. Like
+     * "job", "item", etc.
      */
     String getUrlChildPrefix();
 

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -35,14 +35,17 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
- * Builds up a {@link TestSuite} for performing static syntax checks on Jelly scripts.
+ * Builds up a {@link TestSuite} for performing static syntax checks on Jelly
+ * scripts.
  *
  * @author Kohsuke Kawaguchi
  */
 public class JellyTestSuiteBuilder {
+
     /**
-     * Given a jar file or a class file directory, recursively search all the Jelly files and build a {@link TestSuite}
-     * that performs static syntax checks.
+     * Given a jar file or a class file directory, recursively search all the
+     * Jelly files and build a {@link TestSuite} that performs static syntax
+     * checks.
      */
     public static TestSuite build(File res) throws Exception {
         TestSuite ts = new JellyTestSuite();
@@ -50,17 +53,19 @@ public class JellyTestSuiteBuilder {
         final JellyClassLoaderTearOff jct = new MetaClassLoader(JellyTestSuiteBuilder.class.getClassLoader()).loadTearOff(JellyClassLoaderTearOff.class);
 
         if (res.isDirectory()) {
-            for (final File jelly : (Collection <File>)FileUtils.listFiles(res,new String[]{"jelly"},true))
+            for (final File jelly : (Collection<File>) FileUtils.listFiles(res, new String[]{"jelly"}, true)) {
                 ts.addTest(new JellyCheck(jelly.toURI().toURL(), jct));
+            }
         }
         if (res.getName().endsWith(".jar")) {
             String jarUrl = res.toURI().toURL().toExternalForm();
             JarFile jf = new JarFile(res);
             Enumeration<JarEntry> e = jf.entries();
             while (e.hasMoreElements()) {
-                JarEntry ent =  e.nextElement();
-                if (ent.getName().endsWith(".jelly"))
-                    ts.addTest(new JellyCheck(new URL("jar:"+jarUrl+"!/"+ent.getName()), jct));
+                JarEntry ent = e.nextElement();
+                if (ent.getName().endsWith(".jelly")) {
+                    ts.addTest(new JellyCheck(new URL("jar:" + jarUrl + "!/" + ent.getName()), jct));
+                }
             }
             jf.close();
         }
@@ -68,6 +73,7 @@ public class JellyTestSuiteBuilder {
     }
 
     private static class JellyCheck extends TestCase {
+
         private final URL jelly;
         private final JellyClassLoaderTearOff jct;
 
@@ -86,14 +92,16 @@ public class JellyTestSuiteBuilder {
         }
 
         /**
-         * Makes sure that &lt;label for=...> is not used inside config.jelly nor global.jelly
+         * Makes sure that &lt;label for=...> is not used inside config.jelly
+         * nor global.jelly
          */
         private void checkLabelFor(Document dom) {
             if (isConfigJelly() || isGlobalJelly()) {
-                if (!dom.selectNodes("//label[@for]").isEmpty())
-                    throw new AssertionError("<label for=...> shouldn't be used because it doesn't work " +
-                            "when the configuration item is repeated. Use <label class=\"attach-previous\"> " +
-                            "to have your label attach to the previous DOM node instead.");
+                if (!dom.selectNodes("//label[@for]").isEmpty()) {
+                    throw new AssertionError("<label for=...> shouldn't be used because it doesn't work "
+                            + "when the configuration item is repeated. Use <label class=\"attach-previous\"> "
+                            + "to have your label attach to the previous DOM node instead.");
+                }
             }
         }
 
@@ -107,10 +115,13 @@ public class JellyTestSuiteBuilder {
     }
 
     /**
-     * Execute all the Jelly tests in a servlet request handling context. To do so, we reuse HudsonTestCase
+     * Execute all the Jelly tests in a servlet request handling context. To do
+     * so, we reuse HudsonTestCase
      */
     private static final class JellyTestSuite extends GroupedTest {
-        HudsonTestCase h = new HudsonTestCase("Jelly test wrapper") {};
+
+        HudsonTestCase h = new HudsonTestCase("Jelly test wrapper") {
+        };
 
         @Override
         protected void setUp() throws Exception {

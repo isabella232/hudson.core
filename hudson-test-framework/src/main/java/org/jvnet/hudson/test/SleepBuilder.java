@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -27,10 +27,11 @@ import java.io.IOException;
 
 /**
  * {@link Builder} that just sleeps for the specified amount of milli-seconds.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public class SleepBuilder extends Builder {
+
     public final long time;
 
     public SleepBuilder(long time) {
@@ -38,13 +39,14 @@ public class SleepBuilder extends Builder {
     }
 
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        listener.getLogger().println("Sleeping "+time+"ms");
+        listener.getLogger().println("Sleeping " + time + "ms");
         Thread.sleep(time);
         return true;
     }
 
     @Extension
     public static final class DescriptorImpl extends Descriptor<Builder> {
+
         public String getDisplayName() {
             return "Sleep";
         }

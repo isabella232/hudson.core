@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -34,7 +34,7 @@ import java.io.IOException;
  * @author Kohsuke Kawaguchi
  */
 public class UnstableBuilder extends Builder {
-    
+
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         listener.getLogger().println("Simulating an unstable build");
         build.setResult(Result.UNSTABLE);
@@ -43,9 +43,11 @@ public class UnstableBuilder extends Builder {
 
     @Extension
     public static final class DescriptorImpl extends Descriptor<Builder> {
+
         public String getDisplayName() {
             return "Make build unstable";
         }
+
         public UnstableBuilder newInstance(StaplerRequest req, JSONObject data) {
             return new UnstableBuilder();
         }

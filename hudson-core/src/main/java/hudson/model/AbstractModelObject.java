@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -35,40 +35,41 @@ import hudson.search.SearchIndex;
 
 /**
  * {@link ModelObject} with some convenience methods.
- * 
+ *
  * @author Kohsuke Kawaguchi
  * @author Nikita Levyankov
  */
 public abstract class AbstractModelObject implements SearchableModelObject {
+
     /**
      * Displays the error in a page.
      */
     protected final void sendError(Exception e, StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
-        sendError(e.getMessage(),req,rsp);
+        sendError(e.getMessage(), req, rsp);
     }
 
     protected final void sendError(Exception e) throws ServletException, IOException {
-        sendError(e,Stapler.getCurrentRequest(),Stapler.getCurrentResponse());
+        sendError(e, Stapler.getCurrentRequest(), Stapler.getCurrentResponse());
     }
 
     protected final void sendError(String message, StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
-        req.setAttribute("message",message);
-        rsp.forward(this,"error",req);
+        req.setAttribute("message", message);
+        rsp.forward(this, "error", req);
     }
 
     /**
-     * @param pre
-     *      If true, the message is put in a PRE tag.
+     * @param pre If true, the message is put in a PRE tag.
      */
     protected final void sendError(String message, StaplerRequest req, StaplerResponse rsp, boolean pre) throws ServletException, IOException {
-        req.setAttribute("message",message);
-        if(pre)
-            req.setAttribute("pre",true);
-        rsp.forward(this,"error",req);
+        req.setAttribute("message", message);
+        if (pre) {
+            req.setAttribute("pre", true);
+        }
+        rsp.forward(this, "error", req);
     }
 
     protected final void sendError(String message) throws ServletException, IOException {
-        sendError(message,Stapler.getCurrentRequest(),Stapler.getCurrentResponse());
+        sendError(message, Stapler.getCurrentRequest(), Stapler.getCurrentResponse());
     }
 
     /**
@@ -76,22 +77,25 @@ public abstract class AbstractModelObject implements SearchableModelObject {
      */
     protected final void requirePOST() throws ServletException {
         StaplerRequest req = Stapler.getCurrentRequest();
-        if (req==null)  return; // invoked outside the context of servlet
+        if (req == null) {
+            return; // invoked outside the context of servlet
+        }
         String method = req.getMethod();
-        if(!method.equalsIgnoreCase("POST"))
-            throw new ServletException("Must be POST, Can't be "+method);
+        if (!method.equalsIgnoreCase("POST")) {
+            throw new ServletException("Must be POST, Can't be " + method);
+        }
     }
 
     /**
-     * Checks jndi,environment, hudson environment and system properties for specified key.
-     * Property is checked in direct order:
-     * <ol>
-     * <li>JNDI ({@link InitialContext#lookup(String)})</li>
-     * <li>Hudson environment ({@link EnvVars#masterEnvVars})</li>
-     * <li>System properties ({@link System#getProperty(String)})</li>
-     * </ol>
+     * Checks jndi,environment, hudson environment and system properties for
+     * specified key. Property is checked in direct order: <ol> <li>JNDI
+     * ({@link InitialContext#lookup(String)})</li> <li>Hudson environment
+     * ({@link EnvVars#masterEnvVars})</li> <li>System properties
+     * ({@link System#getProperty(String)})</li> </ol>
+     *
      * @param key - the name of the configured property.
-     * @return the string value of the configured property, or null if there is no property with that key.
+     * @return the string value of the configured property, or null if there is
+     * no property with that key.
      */
     protected String getConfiguredHudsonProperty(String key) {
         if (StringUtils.isNotBlank(key)) {

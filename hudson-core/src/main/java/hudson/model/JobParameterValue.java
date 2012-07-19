@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -23,6 +23,7 @@ import java.util.Locale;
 
 public class JobParameterValue extends ParameterValue {
     //TODO: review and check whether we can do it private
+
     public final Job job;
 
     @DataBoundConstructor
@@ -39,9 +40,9 @@ public class JobParameterValue extends ParameterValue {
      * Exposes the name/value as an environment variable.
      */
     @Override
-    public void buildEnvVars(AbstractBuild<?,?> build, EnvVars env) {
+    public void buildEnvVars(AbstractBuild<?, ?> build, EnvVars env) {
         // TODO: check with Tom if this is really what he had in mind
-        env.put(name,job.toString());
-        env.put(name.toUpperCase(Locale.ENGLISH),job.toString()); // backward compatibility pre 1.345
+        env.put(name, job.toString());
+        env.put(name.toUpperCase(Locale.ENGLISH), job.toString()); // backward compatibility pre 1.345
     }
 }

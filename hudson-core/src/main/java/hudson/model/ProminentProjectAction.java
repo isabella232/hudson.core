@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -21,12 +21,12 @@ import hudson.tasks.BuildWrapper;
 import hudson.triggers.Trigger;
 
 /**
- * Marker interface for {@link Action}s that should be displayed
- * at the top of the project page.
+ * Marker interface for {@link Action}s that should be displayed at the top of
+ * the project page.
  *
  * {@link #getIconFileName()}, {@link #getUrlName()}, {@link #getDisplayName()}
- * are used to create a large, more visible icon in the top page to draw
- * users' attention.
+ * are used to create a large, more visible icon in the top page to draw users'
+ * attention.
  *
  * @see BuildStep#getProjectActions(AbstractProject)
  * @see BuildWrapper#getProjectActions(AbstractProject)

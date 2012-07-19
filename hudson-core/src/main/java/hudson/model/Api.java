@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Seiji Sogabe
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -41,14 +41,14 @@ import java.util.List;
 /**
  * Used to expose remote access API for ".../api/"
  *
- * <p>
- * If the parent object has a <tt>_api.jelly</tt> view, it will be included
+ * <p> If the parent object has a <tt>_api.jelly</tt> view, it will be included
  * in the api index page.
  *
  * @author Kohsuke Kawaguchi
  * @see Exported
  */
 public class Api extends AbstractModelObject {
+
     /**
      * Model object to be exposed as XML/JSON/etc.
      */
@@ -68,22 +68,21 @@ public class Api extends AbstractModelObject {
     }
 
     public Object getBean() {
-            return bean;
+        return bean;
     }
-
 
     /**
      * Exposes the bean as XML.
      */
     public void doXml(StaplerRequest req, StaplerResponse rsp,
-                      @QueryParameter String xpath,
-                      @QueryParameter String wrapper,
-                      @QueryParameter int depth) throws IOException, ServletException {
+            @QueryParameter String xpath,
+            @QueryParameter String wrapper,
+            @QueryParameter int depth) throws IOException, ServletException {
         String[] excludes = req.getParameterValues("exclude");
 
-        if(xpath==null && excludes==null) {
+        if (xpath == null && excludes == null) {
             // serve the whole thing
-            rsp.serveExposedBean(req,bean,Flavor.XML);
+            rsp.serveExposedBean(req, bean, Flavor.XML);
             return;
         }
 
@@ -91,7 +90,7 @@ public class Api extends AbstractModelObject {
 
         // first write to String
         Model p = MODEL_BUILDER.get(bean.getClass());
-        p.writeTo(bean,depth,Flavor.XML.createDataWriter(bean,sw));
+        p.writeTo(bean, depth, Flavor.XML.createDataWriter(bean, sw));
 
         // apply XPath
         Object result;
@@ -99,28 +98,29 @@ public class Api extends AbstractModelObject {
             Document dom = new SAXReader().read(new StringReader(sw.toString()));
 
             // apply exclusions
-            if (excludes!=null) {
+            if (excludes != null) {
                 for (String exclude : excludes) {
-                    List<org.dom4j.Node> list = (List<org.dom4j.Node>)dom.selectNodes(exclude);
+                    List<org.dom4j.Node> list = (List<org.dom4j.Node>) dom.selectNodes(exclude);
                     for (org.dom4j.Node n : list) {
                         Element parent = n.getParent();
-                        if(parent!=null)
+                        if (parent != null) {
                             parent.remove(n);
+                        }
                     }
                 }
             }
-            
-            if(xpath==null) {
-            	result = dom;
+
+            if (xpath == null) {
+                result = dom;
             } else {
                 List list = dom.selectNodes(xpath);
-                if (wrapper!=null) {
+                if (wrapper != null) {
                     Element root = DocumentFactory.getInstance().createElement(wrapper);
                     for (Object o : list) {
                         if (o instanceof String) {
                             root.addText(o.toString());
                         } else {
-                            root.add(((org.dom4j.Node)o).detach());
+                            root.add(((org.dom4j.Node) o).detach());
                         }
                     }
                     result = root;
@@ -130,7 +130,7 @@ public class Api extends AbstractModelObject {
                     return;
                 } else if (list.size() > 1) {
                     rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    rsp.getWriter().print(Messages.Api_MultipleMatch(xpath,list.size()));
+                    rsp.getWriter().print(Messages.Api_MultipleMatch(xpath, list.size()));
                     return;
                 } else {
                     result = list.get(0);
@@ -143,13 +143,13 @@ public class Api extends AbstractModelObject {
 
         OutputStream o = rsp.getCompressedOutputStream(req);
         try {
-            if(result instanceof CharacterData) {
+            if (result instanceof CharacterData) {
                 rsp.setContentType("text/plain;charset=UTF-8");
-                o.write(((CharacterData)result).getText().getBytes("UTF-8"));
+                o.write(((CharacterData) result).getText().getBytes("UTF-8"));
                 return;
             }
 
-            if(result instanceof String || result instanceof Number || result instanceof Boolean) {
+            if (result instanceof String || result instanceof Number || result instanceof Boolean) {
                 rsp.setContentType("text/plain;charset=UTF-8");
                 o.write(result.toString().getBytes("UTF-8"));
                 return;
@@ -177,8 +177,7 @@ public class Api extends AbstractModelObject {
      * Exposes the bean as JSON.
      */
     public void doJson(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
-        rsp.serveExposedBean(req,bean, Flavor.JSON);
+        rsp.serveExposedBean(req, bean, Flavor.JSON);
     }
-
     private static final ModelBuilder MODEL_BUILDER = new ModelBuilder();
 }

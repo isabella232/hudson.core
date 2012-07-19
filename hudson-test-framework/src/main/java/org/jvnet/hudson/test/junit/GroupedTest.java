@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -20,17 +20,18 @@ import junit.framework.TestSuite;
 import junit.framework.TestResult;
 
 /**
- * {@link TestSuite} that requires some set up and tear down for executing nested tests.
+ * {@link TestSuite} that requires some set up and tear down for executing
+ * nested tests.
  *
- * <p>
- * The failure in the set up or tear down will be reported as a failure.
+ * <p> The failure in the set up or tear down will be reported as a failure.
  *
  * @author Kohsuke Kawaguchi
  */
 public class GroupedTest extends TestSuite {
+
     @Override
     public int countTestCases() {
-        return super.countTestCases()+1;
+        return super.countTestCases() + 1;
     }
 
     @Override
@@ -43,10 +44,10 @@ public class GroupedTest extends TestSuite {
                 tearDown();
             }
             // everything went smoothly. report a successful test to make the ends meet
-            runTest(new FailedTest(getClass(),null),result);
+            runTest(new FailedTest(getClass(), null), result);
         } catch (Throwable e) {
             // something went wrong
-            runTest(new FailedTest(getClass(),e),result);
+            runTest(new FailedTest(getClass(), e), result);
         }
     }
 
@@ -59,6 +60,7 @@ public class GroupedTest extends TestSuite {
 
     protected void setUp() throws Exception {
     }
+
     protected void tearDown() throws Exception {
     }
 }

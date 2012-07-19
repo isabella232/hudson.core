@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Michael B. Donohue
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -31,47 +31,48 @@ import java.util.Map;
 
 @ExportedBean
 public class CauseAction implements FoldableAction, RunAction {
+
     /**
      * @deprecated since 2009-02-28
      */
     @Deprecated
     // there can be multiple causes, so this is deprecated
     private transient Cause cause;
-	
     private List<Cause> causes = new ArrayList<Cause>();
 
-	@Exported(visibility=2)
-	public List<Cause> getCauses() {
-		return causes;
-	}
-		
-	public CauseAction(Cause c) {
-		this.causes.add(c);
-	}
-	
-	public CauseAction(CauseAction ca) {
-		this.causes.addAll(ca.causes);
-	}
-	
-	public String getDisplayName() {
-		return "Cause";
-	}
+    @Exported(visibility = 2)
+    public List<Cause> getCauses() {
+        return causes;
+    }
 
-	public String getIconFileName() {
-		// no icon
-		return null;
-	}
+    public CauseAction(Cause c) {
+        this.causes.add(c);
+    }
 
-	public String getUrlName() {
-		return "cause";
-	}
+    public CauseAction(CauseAction ca) {
+        this.causes.addAll(ca.causes);
+    }
+
+    public String getDisplayName() {
+        return "Cause";
+    }
+
+    public String getIconFileName() {
+        // no icon
+        return null;
+    }
+
+    public String getUrlName() {
+        return "cause";
+    }
 
     /**
      * Get list of causes with duplicates combined into counters.
+     *
      * @return Map of Cause to number of occurrences of that Cause
      */
-    public Map<Cause,Integer> getCauseCounts() {
-        Map<Cause,Integer> result = new LinkedHashMap<Cause,Integer>();
+    public Map<Cause, Integer> getCauseCounts() {
+        Map<Cause, Integer> result = new LinkedHashMap<Cause, Integer>();
         for (Cause c : causes) {
             Integer i = result.get(c);
             result.put(c, i == null ? 1 : i.intValue() + 1);
@@ -80,11 +81,12 @@ public class CauseAction implements FoldableAction, RunAction {
     }
 
     /**
-     * @deprecated as of 1.288
-     *      but left here for backward compatibility.
+     * @deprecated as of 1.288 but left here for backward compatibility.
      */
     public String getShortDescription() {
-        if(causes.isEmpty())    return "N/A";
+        if (causes.isEmpty()) {
+            return "N/A";
+        }
         return causes.get(0).getShortDescription();
     }
 
@@ -110,7 +112,7 @@ public class CauseAction implements FoldableAction, RunAction {
 
     public void foldIntoExisting(hudson.model.Queue.Item item, Task owner, List<Action> otherActions) {
         CauseAction existing = item.getAction(CauseAction.class);
-        if (existing!=null) {
+        if (existing != null) {
             existing.causes.addAll(this.causes);
             return;
         }
@@ -119,11 +121,18 @@ public class CauseAction implements FoldableAction, RunAction {
     }
 
     public static class ConverterImpl extends XStream2.PassthruConverter<CauseAction> {
-        public ConverterImpl(XStream2 xstream) { super(xstream); }
-        @Override protected void callback(CauseAction ca, UnmarshallingContext context) {
+
+        public ConverterImpl(XStream2 xstream) {
+            super(xstream);
+        }
+
+        @Override
+        protected void callback(CauseAction ca, UnmarshallingContext context) {
             // if we are being read in from an older version
             if (ca.cause != null) {
-                if (ca.causes == null) ca.causes = new ArrayList<Cause>();
+                if (ca.causes == null) {
+                    ca.causes = new ArrayList<Cause>();
+                }
                 ca.causes.add(ca.cause);
                 OldDataMonitor.report(context, "1.288");
             }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Stephen Connolly, Thomas J. Black
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Stephen Connolly, Thomas J. Black
+ *
  *
  *******************************************************************************/ 
 
@@ -44,14 +44,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Serves as the top of {@link Computer}s in the URL hierarchy.
- * <p>
- * Getter methods are prefixed with '_' to avoid collision with computer names.
+ * Serves as the top of {@link Computer}s in the URL hierarchy. <p> Getter
+ * methods are prefixed with '_' to avoid collision with computer names.
  *
  * @author Kohsuke Kawaguchi
  */
 @ExportedBean
 public final class ComputerSet extends AbstractModelObject {
+
     /**
      * This is the owner that persists {@link #monitors}.
      */
@@ -61,9 +61,7 @@ public final class ComputerSet extends AbstractModelObject {
             SaveableListener.fireOnChange(this, getConfigFile());
         }
     };
-
-    private static final DescribableList<NodeMonitor,Descriptor<NodeMonitor>> monitors
-            = new DescribableList<NodeMonitor, Descriptor<NodeMonitor>>(MONITORS_OWNER);
+    private static final DescribableList<NodeMonitor, Descriptor<NodeMonitor>> monitors = new DescribableList<NodeMonitor, Descriptor<NodeMonitor>>(MONITORS_OWNER);
 
     @Exported
     public String getDisplayName() {
@@ -71,14 +69,13 @@ public final class ComputerSet extends AbstractModelObject {
     }
 
     /**
-     * @deprecated as of 1.301
-     *      Use {@link #getMonitors()}.
+     * @deprecated as of 1.301 Use {@link #getMonitors()}.
      */
     public static List<NodeMonitor> get_monitors() {
         return monitors.toList();
     }
 
-    @Exported(name="computer",inline=true)
+    @Exported(name = "computer", inline = true)
     public Computer[] get_all() {
         return Hudson.getInstance().getComputers();
     }
@@ -86,22 +83,24 @@ public final class ComputerSet extends AbstractModelObject {
     /**
      * Exposing {@link NodeMonitor#all()} for Jelly binding.
      */
-    public DescriptorExtensionList<NodeMonitor,Descriptor<NodeMonitor>> getNodeMonitorDescriptors() {
+    public DescriptorExtensionList<NodeMonitor, Descriptor<NodeMonitor>> getNodeMonitorDescriptors() {
         return NodeMonitor.all();
     }
 
-    public static DescribableList<NodeMonitor,Descriptor<NodeMonitor>> getMonitors() {
+    public static DescribableList<NodeMonitor, Descriptor<NodeMonitor>> getMonitors() {
         return monitors;
     }
 
     /**
-     * Returns a subset pf {@link #getMonitors()} that are {@linkplain NodeMonitor#isIgnored() not ignored}.
+     * Returns a subset pf {@link #getMonitors()} that are
+     * {@linkplain NodeMonitor#isIgnored() not ignored}.
      */
-    public static Map<Descriptor<NodeMonitor>,NodeMonitor> getNonIgnoredMonitors() {
-        Map<Descriptor<NodeMonitor>,NodeMonitor> r = new HashMap<Descriptor<NodeMonitor>, NodeMonitor>();
+    public static Map<Descriptor<NodeMonitor>, NodeMonitor> getNonIgnoredMonitors() {
+        Map<Descriptor<NodeMonitor>, NodeMonitor> r = new HashMap<Descriptor<NodeMonitor>, NodeMonitor>();
         for (NodeMonitor m : monitors) {
-            if(!m.isIgnored())
-                r.put(m.getDescriptor(),m);
+            if (!m.isIgnored()) {
+                r.put(m.getDescriptor(), m);
+            }
         }
         return r;
     }
@@ -124,41 +123,46 @@ public final class ComputerSet extends AbstractModelObject {
     }
 
     /**
-     * Number of total {@link Executor}s that belong to this label that are functioning.
-     * <p>
-     * This excludes executors that belong to offline nodes.
+     * Number of total {@link Executor}s that belong to this label that are
+     * functioning. <p> This excludes executors that belong to offline nodes.
      */
     @Exported
     public int getTotalExecutors() {
-        int r=0;
+        int r = 0;
         for (Computer c : get_all()) {
-            if(c.isOnline())
+            if (c.isOnline()) {
                 r += c.countExecutors();
+            }
         }
         return r;
     }
 
     /**
-     * Number of busy {@link Executor}s that are carrying out some work right now.
+     * Number of busy {@link Executor}s that are carrying out some work right
+     * now.
      */
     @Exported
     public int getBusyExecutors() {
-        int r=0;
+        int r = 0;
         for (Computer c : get_all()) {
-            if(c.isOnline())
+            if (c.isOnline()) {
                 r += c.countBusy();
+            }
         }
         return r;
     }
 
     /**
-     * {@code getTotalExecutors()-getBusyExecutors()}, plus executors that are being brought online.
+     * {@code getTotalExecutors()-getBusyExecutors()}, plus executors that are
+     * being brought online.
      */
     public int getIdleExecutors() {
-        int r=0;
-        for (Computer c : get_all())
-            if(c.isOnline() || c.isConnecting())
+        int r = 0;
+        for (Computer c : get_all()) {
+            if (c.isOnline() || c.isConnecting()) {
                 r += c.countIdle();
+            }
+        }
         return r;
     }
 
@@ -173,9 +177,10 @@ public final class ComputerSet extends AbstractModelObject {
     public void do_launchAll(StaplerRequest req, StaplerResponse rsp) throws IOException {
         Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
 
-        for(Computer c : get_all()) {
-            if(c.isLaunchSupported())
+        for (Computer c : get_all()) {
+            if (c.isLaunchSupported()) {
                 c.connect(true);
+            }
         }
         rsp.sendRedirect(".");
     }
@@ -183,11 +188,12 @@ public final class ComputerSet extends AbstractModelObject {
     /**
      * Triggers the schedule update now.
      *
-     * TODO: ajax on the client side to wait until the update completion might be nice.
+     * TODO: ajax on the client side to wait until the update completion might
+     * be nice.
      */
-    public void doUpdateNow( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
+    public void doUpdateNow(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
-        
+
         for (NodeMonitor nodeMonitor : NodeMonitor.getAll()) {
             Thread t = nodeMonitor.triggerUpdate();
             t.setName(nodeMonitor.getColumnCaption());
@@ -198,53 +204,54 @@ public final class ComputerSet extends AbstractModelObject {
     /**
      * First check point in creating a new slave.
      */
-    public synchronized void doCreateItem( StaplerRequest req, StaplerResponse rsp,
-                                           @QueryParameter String name, @QueryParameter String mode,
-                                           @QueryParameter String from ) throws IOException, ServletException {
+    public synchronized void doCreateItem(StaplerRequest req, StaplerResponse rsp,
+            @QueryParameter String name, @QueryParameter String mode,
+            @QueryParameter String from) throws IOException, ServletException {
         final Hudson app = Hudson.getInstance();
         app.checkPermission(Hudson.ADMINISTER);  // TODO: new permission?
 
-        if(mode!=null && mode.equals("copy")) {
+        if (mode != null && mode.equals("copy")) {
             name = checkName(name);
 
             Node src = app.getNode(from);
-            if(src==null) {
+            if (src == null) {
                 rsp.setStatus(SC_BAD_REQUEST);
-                if(Util.fixEmpty(from)==null)
-                    sendError(Messages.ComputerSet_SpecifySlaveToCopy(),req,rsp);
-                else
-                    sendError(Messages.ComputerSet_NoSuchSlave(from),req,rsp);
+                if (Util.fixEmpty(from) == null) {
+                    sendError(Messages.ComputerSet_SpecifySlaveToCopy(), req, rsp);
+                } else {
+                    sendError(Messages.ComputerSet_NoSuchSlave(from), req, rsp);
+                }
                 return;
             }
 
             // copy through XStream
             String xml = Hudson.XSTREAM.toXML(src);
-            Node result = (Node)Hudson.XSTREAM.fromXML(xml);
+            Node result = (Node) Hudson.XSTREAM.fromXML(xml);
             result.setNodeName(name);
             result.holdOffLaunchUntilSave = true;
 
             app.addNode(result);
 
             // send the browser to the config page
-            rsp.sendRedirect2(result.getNodeName()+"/configure");
+            rsp.sendRedirect2(result.getNodeName() + "/configure");
         } else {
             // proceed to step 2
-            if(mode==null) {
+            if (mode == null) {
                 rsp.sendError(SC_BAD_REQUEST);
                 return;
             }
 
             NodeDescriptor d = NodeDescriptor.all().find(mode);
-            d.handleNewNodePage(this,name,req,rsp);
+            d.handleNewNodePage(this, name, req, rsp);
         }
     }
 
     /**
      * Really creates a new slave.
      */
-    public synchronized void doDoCreateItem( StaplerRequest req, StaplerResponse rsp,
-                                           @QueryParameter String name,
-                                           @QueryParameter String type ) throws IOException, ServletException, FormException {
+    public synchronized void doDoCreateItem(StaplerRequest req, StaplerResponse rsp,
+            @QueryParameter String name,
+            @QueryParameter String type) throws IOException, ServletException, FormException {
         final Hudson app = Hudson.getInstance();
         app.checkPermission(Hudson.ADMINISTER);  // TODO: new permission?
         checkName(name);
@@ -258,17 +265,20 @@ public final class ComputerSet extends AbstractModelObject {
 
     /**
      * Makes sure that the given name is good as a slave name.
+     *
      * @return trimmed name if valid; throws ParseException if not
      */
     public String checkName(String name) throws Failure {
-        if(name==null)
+        if (name == null) {
             throw new Failure("Query parameter 'name' is required");
+        }
 
         name = name.trim();
         Hudson.checkGoodName(name);
 
-        if(Hudson.getInstance().getNode(name)!=null)
+        if (Hudson.getInstance().getNode(name) != null) {
             throw new Failure(Messages.ComputerSet_SlaveAlreadyExists(name));
+        }
 
         // looks good
         return name;
@@ -280,9 +290,10 @@ public final class ComputerSet extends AbstractModelObject {
     public FormValidation doCheckName(@QueryParameter String value) throws IOException, ServletException {
         Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
 
-        if(Util.fixEmpty(value)==null)
+        if (Util.fixEmpty(value) == null) {
             return FormValidation.ok();
-        
+        }
+
         try {
             checkName(value);
             return FormValidation.ok();
@@ -294,19 +305,21 @@ public final class ComputerSet extends AbstractModelObject {
     /**
      * Accepts submission from the configuration page.
      */
-    public synchronized void doConfigSubmit( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException, FormException {
+    public synchronized void doConfigSubmit(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, FormException {
         BulkChange bc = new BulkChange(MONITORS_OWNER);
         try {
             Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
-            monitors.rebuild(req,req.getSubmittedForm(),getNodeMonitorDescriptors());
+            monitors.rebuild(req, req.getSubmittedForm(), getNodeMonitorDescriptors());
 
             // add in the rest of instances are ignored instances
-            for (Descriptor<NodeMonitor> d : NodeMonitor.all())
-                if(monitors.get(d)==null) {
+            for (Descriptor<NodeMonitor> d : NodeMonitor.all()) {
+                if (monitors.get(d) == null) {
                     NodeMonitor i = createDefaultInstance(d, true);
-                    if(i!=null)
+                    if (i != null) {
                         monitors.add(i);
+                    }
                 }
+            }
             rsp.sendRedirect2(".");
         } finally {
             bc.commit();
@@ -317,7 +330,7 @@ public final class ComputerSet extends AbstractModelObject {
      * {@link NodeMonitor}s are persisted in this file.
      */
     private static XmlFile getConfigFile() {
-        return new XmlFile(new File(Hudson.getInstance().getRootDir(),"nodeMonitors.xml"));
+        return new XmlFile(new File(Hudson.getInstance().getRootDir(), "nodeMonitors.xml"));
     }
 
     public Api getApi() {
@@ -327,33 +340,34 @@ public final class ComputerSet extends AbstractModelObject {
     /**
      * Just to force the execution of the static initializer.
      */
-    public static void initialize() {}
-
+    public static void initialize() {
+    }
     private static final Logger LOGGER = Logger.getLogger(ComputerSet.class.getName());
 
     static {
         try {
-            DescribableList<NodeMonitor,Descriptor<NodeMonitor>> r
-                    = new DescribableList<NodeMonitor, Descriptor<NodeMonitor>>(Saveable.NOOP);
+            DescribableList<NodeMonitor, Descriptor<NodeMonitor>> r = new DescribableList<NodeMonitor, Descriptor<NodeMonitor>>(Saveable.NOOP);
 
             // load persisted monitors
             XmlFile xf = getConfigFile();
-            if(xf.exists()) {
-                DescribableList<NodeMonitor,Descriptor<NodeMonitor>> persisted =
-                        (DescribableList<NodeMonitor,Descriptor<NodeMonitor>>) xf.read();
+            if (xf.exists()) {
+                DescribableList<NodeMonitor, Descriptor<NodeMonitor>> persisted =
+                        (DescribableList<NodeMonitor, Descriptor<NodeMonitor>>) xf.read();
                 r.replaceBy(persisted.toList());
             }
 
             // if we have any new monitors, let's add them
-            for (Descriptor<NodeMonitor> d : NodeMonitor.all())
-                if(r.get(d)==null) {
-                    NodeMonitor i = createDefaultInstance(d,false);
-                    if(i!=null)
+            for (Descriptor<NodeMonitor> d : NodeMonitor.all()) {
+                if (r.get(d) == null) {
+                    NodeMonitor i = createDefaultInstance(d, false);
+                    if (i != null) {
                         r.add(i);
+                    }
                 }
+            }
             monitors.replaceBy(r.toList());
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Failed to instanciate NodeMonitors",e);
+            LOGGER.log(Level.WARNING, "Failed to instanciate NodeMonitors", e);
         }
     }
 
@@ -363,9 +377,9 @@ public final class ComputerSet extends AbstractModelObject {
             nm.setIgnored(ignored);
             return nm;
         } catch (InstantiationException e) {
-            LOGGER.log(Level.SEVERE, "Failed to instanciate "+d.clazz,e);
+            LOGGER.log(Level.SEVERE, "Failed to instanciate " + d.clazz, e);
         } catch (IllegalAccessException e) {
-            LOGGER.log(Level.SEVERE, "Failed to instanciate "+d.clazz,e);
+            LOGGER.log(Level.SEVERE, "Failed to instanciate " + d.clazz, e);
         }
         return null;
     }

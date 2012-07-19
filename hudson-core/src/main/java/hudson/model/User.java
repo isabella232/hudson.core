@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *  Kohsuke Kawaguchi, Winston Prakash, Erik Ramfelt, Tom Huybrechts
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -59,23 +59,19 @@ import org.eclipse.hudson.security.HudsonSecurityManager;
 /**
  * Represents a user.
  *
- * <p>
- * In Hudson, {@link User} objects are created in on-demand basis;
- * for example, when a build is performed, its change log is computed
- * and as a result commits from users who Hudson has never seen may be discovered.
- * When this happens, new {@link User} object is created.
+ * <p> In Hudson, {@link User} objects are created in on-demand basis; for
+ * example, when a build is performed, its change log is computed and as a
+ * result commits from users who Hudson has never seen may be discovered. When
+ * this happens, new {@link User} object is created.
  *
- * <p>
- * If the persisted record for an user exists, the information is loaded at
+ * <p> If the persisted record for an user exists, the information is loaded at
  * that point, but if there's no such record, a fresh instance is created from
  * thin air (this is where {@link UserPropertyDescriptor#newInstance(User)} is
  * called to provide initial {@link UserProperty} objects.
  *
- * <p>
- * Such newly created {@link User} objects will be simply GC-ed without
- * ever leaving the persisted record, unless {@link User#save()} method
- * is explicitly invoked (perhaps as a result of a browser submitting a
- * configuration.)
+ * <p> Such newly created {@link User} objects will be simply GC-ed without ever
+ * leaving the persisted record, unless {@link User#save()} method is explicitly
+ * invoked (perhaps as a result of a browser submitting a configuration.)
  *
  *
  * @author Kohsuke Kawaguchi
@@ -84,17 +80,13 @@ import org.eclipse.hudson.security.HudsonSecurityManager;
 public class User extends AbstractModelObject implements AccessControlled, Saveable, Comparable<User> {
 
     private transient final String id;
-
     private volatile String fullName;
-
     private volatile String description;
-
     /**
      * List of {@link UserProperty}s configured for this project.
      */
     @CopyOnWrite
     private volatile List<UserProperty> properties = new ArrayList<UserProperty>();
-
 
     private User(String id, String fullName) {
         this.id = id;
@@ -114,18 +106,20 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
 
         XmlFile config = getConfigFile();
         try {
-            if(config.exists())
+            if (config.exists()) {
                 config.unmarshal(this);
+            }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to load "+config,e);
+            LOGGER.log(Level.SEVERE, "Failed to load " + config, e);
         }
 
         // remove nulls that have failed to load
         for (Iterator<UserProperty> itr = properties.iterator(); itr.hasNext();) {
-            if(itr.next()==null)
-                itr.remove();            
+            if (itr.next() == null) {
+                itr.remove();
+            }
         }
-        
+
         // In case Hudson is not yet initialized (i.e Hudson Security is used
         // outside of Hudson Model (Ex. Initial Setup), don't load the extended
         // properties
@@ -152,29 +146,28 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     }
 
     public String getUrl() {
-        return "user/"+Util.rawEncode(id);
+        return "user/" + Util.rawEncode(id);
     }
 
     public String getSearchUrl() {
-        return "/user/"+Util.rawEncode(id);
+        return "/user/" + Util.rawEncode(id);
     }
 
     /**
      * The URL of the user page.
      */
-    @Exported(visibility=999)
+    @Exported(visibility = 999)
     public String getAbsoluteUrl() {
-        return Hudson.getInstance().getRootUrl()+getUrl();
+        return Hudson.getInstance().getRootUrl() + getUrl();
     }
 
     /**
-     * Gets the human readable name of this user.
-     * This is configurable by the user.
+     * Gets the human readable name of this user. This is configurable by the
+     * user.
      *
-     * @return
-     *      never null.
+     * @return never null.
      */
-    @Exported(visibility=999)
+    @Exported(visibility = 999)
     public String getFullName() {
         return fullName;
     }
@@ -183,7 +176,9 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
      * Sets the human readable name of thie user.
      */
     public void setFullName(String name) {
-        if(Util.fixEmptyAndTrim(name)==null)    name=id;
+        if (Util.fixEmptyAndTrim(name) == null) {
+            name = id;
+        }
         this.fullName = name;
     }
 
@@ -195,7 +190,7 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     /**
      * Gets the user properties configured for this user.
      */
-    public Map<Descriptor<UserProperty>,UserProperty> getProperties() {
+    public Map<Descriptor<UserProperty>, UserProperty> getProperties() {
         return Descriptor.toMap(properties);
     }
 
@@ -205,8 +200,9 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     public synchronized void addProperty(UserProperty p) throws IOException {
         UserProperty old = getProperty(p.getClass());
         List<UserProperty> ps = new ArrayList<UserProperty>(properties);
-        if(old!=null)
+        if (old != null) {
             ps.remove(old);
+        }
         ps.add(p);
         p.setUser(this);
         properties = ps;
@@ -216,18 +212,19 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     /**
      * List of all {@link UserProperty}s exposed primarily for the remoting API.
      */
-    @Exported(name="property",inline=true)
+    @Exported(name = "property", inline = true)
     public List<UserProperty> getAllProperties() {
         return Collections.unmodifiableList(properties);
     }
-    
+
     /**
      * Gets the specific property, or null.
      */
     public <T extends UserProperty> T getProperty(Class<T> clazz) {
         for (UserProperty p : properties) {
-            if(clazz.isInstance(p))
+            if (clazz.isInstance(p)) {
                 return clazz.cast(p);
+            }
         }
         return null;
     }
@@ -235,19 +232,18 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     /**
      * Accepts the new description.
      */
-    public synchronized void doSubmitDescription( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
+    public synchronized void doSubmitDescription(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         checkPermission(Hudson.ADMINISTER);
 
         description = req.getParameter("description");
         save();
-        
+
         rsp.sendRedirect(".");  // go to the top page
     }
 
     /**
-     * Gets the fallback "unknown" user instance.
-     * <p>
-     * This is used to avoid null {@link User} instance.
+     * Gets the fallback "unknown" user instance. <p> This is used to avoid null
+     * {@link User} instance.
      */
     public static User getUnknown() {
         return get("unknown");
@@ -256,18 +252,20 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     /**
      * Gets the {@link User} object by its id or full name.
      *
-     * @param create
-     *      If true, this method will never return null for valid input
-     *      (by creating a new {@link User} object if none exists.)
-     *      If false, this method will return null if {@link User} object
-     *      with the given name doesn't exist.
+     * @param create If true, this method will never return null for valid input
+     * (by creating a new {@link User} object if none exists.) If false, this
+     * method will return null if {@link User} object with the given name
+     * doesn't exist.
      */
     public static User get(String idOrFullName, boolean create) {
-        if(idOrFullName==null)
+        if (idOrFullName == null) {
             return null;
-        String id = idOrFullName.replace('\\', '_').replace('/', '_').replace('<','_')
-                                .replace('>','_');  // 4 replace() still faster than regex
-        if (Functions.isWindows()) id = id.replace(':','_');
+        }
+        String id = idOrFullName.replace('\\', '_').replace('/', '_').replace('<', '_')
+                .replace('>', '_');  // 4 replace() still faster than regex
+        if (Functions.isWindows()) {
+            id = id.replace(':', '_');
+        }
 
         synchronized (byName) {
             User u = byName.get(id);
@@ -285,40 +283,44 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
      * Gets the {@link User} object by its id or full name.
      */
     public static User get(String idOrFullName) {
-        return get(idOrFullName,true);
+        return get(idOrFullName, true);
     }
 
     /**
-     * Gets the {@link User} object representing the currently logged-in user, or null
-     * if the current user is anonymous.
+     * Gets the {@link User} object representing the currently logged-in user,
+     * or null if the current user is anonymous.
+     *
      * @since 1.172
      */
     public static User current() {
         Authentication a = HudsonSecurityManager.getAuthentication();
-        if(a instanceof AnonymousAuthenticationToken)
+        if (a instanceof AnonymousAuthenticationToken) {
             return null;
+        }
         return get(a.getName());
     }
-
     private static volatile long lastScanned;
 
     /**
      * Gets all the users.
      */
     public static Collection<User> getAll() {
-        if(System.currentTimeMillis() -lastScanned>10000) {
+        if (System.currentTimeMillis() - lastScanned > 10000) {
             // occasionally scan the file system to check new users
             // whether we should do this only once at start up or not is debatable.
             // set this right away to avoid another thread from doing the same thing while we do this.
             // having two threads doing the work won't cause race condition, but it's waste of time.
             lastScanned = System.currentTimeMillis();
 
-            File[] subdirs = getRootDir().listFiles((FileFilter)DirectoryFileFilter.INSTANCE);
-            if(subdirs==null)       return Collections.emptyList(); // shall never happen
-
-            for (File subdir : subdirs)
-                if(new File(subdir,"config.xml").exists())
+            File[] subdirs = getRootDir().listFiles((FileFilter) DirectoryFileFilter.INSTANCE);
+            if (subdirs == null) {
+                return Collections.emptyList(); // shall never happen
+            }
+            for (File subdir : subdirs) {
+                if (new File(subdir, "config.xml").exists()) {
                     User.get(subdir.getName());
+                }
+            }
 
             lastScanned = System.currentTimeMillis();
         }
@@ -334,8 +336,9 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     public static void reload() {
         // iterate over an array to be concurrency-safe
         Collection<User> values = byName.values();
-        for( User u : values.toArray(new User[values.size()]) )
+        for (User u : values.toArray(new User[values.size()])) {
             u.load();
+        }
     }
 
     /**
@@ -353,33 +356,40 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     }
 
     /**
-     * Gets the list of {@link Build}s that include changes by this user,
-     * by the timestamp order.
-     * 
+     * Gets the list of {@link Build}s that include changes by this user, by the
+     * timestamp order.
+     *
      * TODO: do we need some index for this?
      */
     public RunList getBuilds() {
         List<AbstractBuild> r = new ArrayList<AbstractBuild>();
-        for (AbstractProject<?,?> p : Hudson.getInstance().getAllItems(AbstractProject.class))
-            for (AbstractBuild<?,?> b : p.getBuilds())
-                if(b.hasParticipant(this))
+        for (AbstractProject<?, ?> p : Hudson.getInstance().getAllItems(AbstractProject.class)) {
+            for (AbstractBuild<?, ?> b : p.getBuilds()) {
+                if (b.hasParticipant(this)) {
                     r.add(b);
+                }
+            }
+        }
         return RunList.fromRuns(r);
     }
 
     /**
      * Gets all the {@link AbstractProject}s that this user has committed to.
+     *
      * @since 1.191
      */
-    public Set<AbstractProject<?,?>> getProjects() {
-        Set<AbstractProject<?,?>> r = new HashSet<AbstractProject<?,?>>();
-        for (AbstractProject<?,?> p : Hudson.getInstance().getAllItems(AbstractProject.class))
-            if(p.hasParticipant(this))
+    public Set<AbstractProject<?, ?>> getProjects() {
+        Set<AbstractProject<?, ?>> r = new HashSet<AbstractProject<?, ?>>();
+        for (AbstractProject<?, ?> p : Hudson.getInstance().getAllItems(AbstractProject.class)) {
+            if (p.hasParticipant(this)) {
                 r.add(p);
+            }
+        }
         return r;
     }
 
-    public @Override String toString() {
+    public @Override
+    String toString() {
         return fullName;
     }
 
@@ -387,7 +397,7 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
      * The file we save our configuration.
      */
     protected final XmlFile getConfigFile() {
-        return new XmlFile(XSTREAM,new File(getRootDir(),id +"/config.xml"));
+        return new XmlFile(XSTREAM, new File(getRootDir(), id + "/config.xml"));
     }
 
     /**
@@ -401,7 +411,9 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
      * Save the settings to a file.
      */
     public synchronized void save() throws IOException {
-        if(BulkChange.contains(this))   return;
+        if (BulkChange.contains(this)) {
+            return;
+        }
         getConfigFile().write(this);
         SaveableListener.fireOnChange(this, getConfigFile());
     }
@@ -409,8 +421,7 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     /**
      * Deletes the data directory and removes this user from Hudson.
      *
-     * @throws IOException
-     *      if we fail to delete.
+     * @throws IOException if we fail to delete.
      */
     public synchronized void delete() throws IOException {
         synchronized (byName) {
@@ -429,7 +440,7 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     /**
      * Accepts submission from the configuration page.
      */
-    public void doConfigSubmit( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException, FormException {
+    public void doConfigSubmit(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, FormException {
         checkPermission(Hudson.ADMINISTER);
 
         fullName = req.getParameter("fullName");
@@ -443,7 +454,7 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
             UserProperty p = getProperty(d.clazz);
 
             JSONObject o = json.optJSONObject("userProperty" + (i++));
-            if (o!=null) {
+            if (o != null) {
                 if (p != null) {
                     p = p.reconfigure(req, o);
                 } else {
@@ -488,9 +499,13 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     public void doRssLatest(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         final List<Run> lastBuilds = new ArrayList<Run>();
         for (final TopLevelItem item : Hudson.getInstance().getItems()) {
-            if (!(item instanceof Job)) continue;
+            if (!(item instanceof Job)) {
+                continue;
+            }
             for (Run r = ((Job) item).getLastBuild(); r != null; r = r.getPreviousBuild()) {
-                if (!(r instanceof AbstractBuild)) continue;
+                if (!(r instanceof AbstractBuild)) {
+                    continue;
+                }
                 final AbstractBuild b = (AbstractBuild) r;
                 if (b.hasParticipant(this)) {
                     lastBuilds.add(b);
@@ -503,24 +518,21 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
 
     private void rss(StaplerRequest req, StaplerResponse rsp, String suffix, RunList runs, FeedAdapter adapter)
             throws IOException, ServletException {
-        RSS.forwardToRss(getDisplayName()+ suffix, getUrl(), runs.newBuilds(), adapter, req, rsp);
+        RSS.forwardToRss(getDisplayName() + suffix, getUrl(), runs.newBuilds(), adapter, req, rsp);
     }
-
     /**
-     * Keyed by {@link User#id}. This map is used to ensure
-     * singleton-per-id semantics of {@link User} objects.
+     * Keyed by {@link User#id}. This map is used to ensure singleton-per-id
+     * semantics of {@link User} objects.
      */
-    private static final Map<String,User> byName = new TreeMap<String,User>(String.CASE_INSENSITIVE_ORDER);
-
+    private static final Map<String, User> byName = new TreeMap<String, User>(String.CASE_INSENSITIVE_ORDER);
     /**
      * Used to load/save user configuration.
      */
     private static final XStream XSTREAM = new XStream2();
-
     private static final Logger LOGGER = Logger.getLogger(User.class.getName());
 
     static {
-        XSTREAM.alias("user",User.class);
+        XSTREAM.alias("user", User.class);
     }
 
     public ACL getACL() {
@@ -543,7 +555,8 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     }
 
     /**
-     * With ADMINISTER permission, can delete users with persisted data but can't delete self.
+     * With ADMINISTER permission, can delete users with persisted data but
+     * can't delete self.
      */
     public boolean canDelete() {
         return hasPermission(Hudson.ADMINISTER) && !id.equals(HudsonSecurityManager.getAuthentication().getName())
@@ -551,11 +564,12 @@ public class User extends AbstractModelObject implements AccessControlled, Savea
     }
 
     public Object getDynamic(String token) {
-        for (UserProperty property: getProperties().values()) {
+        for (UserProperty property : getProperties().values()) {
             if (property instanceof Action) {
-                Action a= (Action) property;
-            if(a.getUrlName().equals(token) || a.getUrlName().equals('/'+token))
-                return a;
+                Action a = (Action) property;
+                if (a.getUrlName().equals(token) || a.getUrlName().equals('/' + token)) {
+                    return a;
+                }
             }
         }
         return null;

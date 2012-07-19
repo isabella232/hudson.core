@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -22,13 +22,16 @@ package hudson.model;
  * @author Kohsuke Kawaguchi
  */
 public interface RunAction extends Action {
+
     /**
-     * Called after the build is loaded and the object is added to the build list.
+     * Called after the build is loaded and the object is added to the build
+     * list.
      */
     void onLoad();
 
     /**
      * Called when the action is aded to the {@link Run} object.
+     *
      * @since 1.376
      */
     void onAttached(Run r);

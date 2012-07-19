@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -39,6 +39,7 @@ import java.util.logging.Logger;
  */
 @Extension
 public class TestExtensionLoader extends ExtensionFinder {
+
     @Override
     public <T> Collection<ExtensionComponent<T>> find(Class<T> type, Hudson hudson) {
         TestEnvironment env = TestEnvironment.get();
@@ -46,39 +47,43 @@ public class TestExtensionLoader extends ExtensionFinder {
         List<ExtensionComponent<T>> result = new ArrayList<ExtensionComponent<T>>();
 
         ClassLoader cl = hudson.getPluginManager().uberClassLoader;
-        for (IndexItem<TestExtension,Object> item : Index.load(TestExtension.class, Object.class, cl)) {
+        for (IndexItem<TestExtension, Object> item : Index.load(TestExtension.class, Object.class, cl)) {
             try {
                 AnnotatedElement e = item.element();
                 Class<?> extType;
                 if (e instanceof Class) {
                     extType = (Class) e;
-                    if (!isActive(env, extType)) continue;
-                } else
-                if (e instanceof Field) {
+                    if (!isActive(env, extType)) {
+                        continue;
+                    }
+                } else if (e instanceof Field) {
                     Field f = (Field) e;
-                    if (!f.getDeclaringClass().isInstance(env.testCase))
+                    if (!f.getDeclaringClass().isInstance(env.testCase)) {
                         continue;      // not executing the enclosing test
+                    }
                     extType = f.getType();
-                } else
-                if (e instanceof Method) {
+                } else if (e instanceof Method) {
                     Method m = (Method) e;
-                    if (!m.getDeclaringClass().isInstance(env.testCase))
+                    if (!m.getDeclaringClass().isInstance(env.testCase)) {
                         continue;      // not executing the enclosing test
+                    }
                     extType = m.getReturnType();
-                } else
+                } else {
                     throw new AssertionError();
+                }
 
                 String testName = item.annotation().value();
-                if (testName.length()>0 && !env.testCase.getName().equals(testName))
+                if (testName.length() > 0 && !env.testCase.getName().equals(testName)) {
                     continue;   // doesn't apply to this test
-
-                if(type.isAssignableFrom(extType)) {
+                }
+                if (type.isAssignableFrom(extType)) {
                     Object instance = item.instance();
-                    if(instance!=null)
+                    if (instance != null) {
                         result.add(new ExtensionComponent<T>(type.cast(instance)));
+                    }
                 }
             } catch (InstantiationException e) {
-                LOGGER.log(Level.WARNING, "Failed to load "+item.className(),e);
+                LOGGER.log(Level.WARNING, "Failed to load " + item.className(), e);
             }
         }
 
@@ -86,11 +91,12 @@ public class TestExtensionLoader extends ExtensionFinder {
     }
 
     private boolean isActive(TestEnvironment env, Class<?> extType) {
-        for (Class<?> outer = extType; outer!=null; outer=outer.getEnclosingClass())
-            if (outer.isInstance(env.testCase))
+        for (Class<?> outer = extType; outer != null; outer = outer.getEnclosingClass()) {
+            if (outer.isInstance(env.testCase)) {
                 return true;      // enclosed
+            }
+        }
         return false;
     }
-
     private static final Logger LOGGER = Logger.getLogger(TestExtensionLoader.class.getName());
 }

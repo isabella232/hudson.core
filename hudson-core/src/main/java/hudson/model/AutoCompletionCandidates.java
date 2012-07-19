@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -29,13 +29,13 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Data representation of the auto-completion candidates.
- * <p>
- * This object should be returned from your doAutoCompleteXYZ methods.
+ * Data representation of the auto-completion candidates. <p> This object should
+ * be returned from your doAutoCompleteXYZ methods.
  *
  * @author Kohsuke Kawaguchi
  */
 public class AutoCompletionCandidates implements HttpResponse {
+
     private final List<String> values = new ArrayList<String>();
 
     public AutoCompletionCandidates add(String v) {
@@ -53,6 +53,6 @@ public class AutoCompletionCandidates implements HttpResponse {
         for (String value : values) {
             r.suggestions.add(new hudson.search.Search.Item(value));
         }
-        rsp.serveExposedBean(req,r, Flavor.JSON);
+        rsp.serveExposedBean(req, r, Flavor.JSON);
     }
 }

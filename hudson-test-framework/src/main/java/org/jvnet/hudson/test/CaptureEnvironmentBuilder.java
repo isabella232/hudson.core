@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -34,20 +34,21 @@ import java.io.IOException;
  * @author Kohsuke Kawaguchi
  */
 public class CaptureEnvironmentBuilder extends Builder {
-	
+
     private EnvVars envVars;
 
-	public EnvVars getEnvVars() {
-		return envVars;
-	}
+    public EnvVars getEnvVars() {
+        return envVars;
+    }
 
-	public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-    	envVars = build.getEnvironment(listener);
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+        envVars = build.getEnvironment(listener);
         return true;
     }
 
     @Extension
     public static final class DescriptorImpl extends Descriptor<Builder> {
+
         public Builder newInstance(StaplerRequest req, JSONObject data) {
             throw new UnsupportedOperationException();
         }

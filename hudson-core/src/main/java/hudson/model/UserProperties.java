@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -23,13 +23,15 @@ import java.util.List;
 
 /**
  * List of all installed {@link UserProperty} types.
+ *
  * @author Kohsuke Kawaguchi
  * @deprecated as of 1.286
  */
 public class UserProperties {
+
     /**
-     * @deprecated as of 1.286
-     *      Use {@link UserProperty#all()} for read access and {@link Extension} for auto-registration.
+     * @deprecated as of 1.286 Use {@link UserProperty#all()} for read access
+     * and {@link Extension} for auto-registration.
      */
-    public static final List<UserPropertyDescriptor> LIST = (List)new DescriptorList<UserProperty>(UserProperty.class);
+    public static final List<UserPropertyDescriptor> LIST = (List) new DescriptorList<UserProperty>(UserProperty.class);
 }

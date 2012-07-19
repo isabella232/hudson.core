@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -35,6 +35,7 @@ import hudson.Extension;
  * @since 1.269
  */
 public class AllView extends View {
+
     @DataBoundConstructor
     public AllView(String name) {
         super(name);
@@ -44,7 +45,7 @@ public class AllView extends View {
         this(name);
         this.owner = owner;
     }
-    
+
     @Override
     public String getDescription() {
         return Hudson.getInstance().getDescription();
@@ -72,7 +73,7 @@ public class AllView extends View {
     }
 
     @Override
-    public synchronized void doSubmitDescription( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
+    public synchronized void doSubmitDescription(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         checkPermission(Hudson.ADMINISTER);
 
         Hudson.getInstance().setSystemMessage(req.getParameter("description"));
@@ -96,11 +97,14 @@ public class AllView extends View {
 
     @Extension
     public static final class DescriptorImpl extends ViewDescriptor {
+
         @Override
         public boolean isInstantiable() {
-            for (View v : Stapler.getCurrentRequest().findAncestorObject(ViewGroup.class).getViews())
-                if(v instanceof AllView)
+            for (View v : Stapler.getCurrentRequest().findAncestorObject(ViewGroup.class).getViews()) {
+                if (v instanceof AllView) {
                     return false;
+                }
+            }
             return true;
         }
 

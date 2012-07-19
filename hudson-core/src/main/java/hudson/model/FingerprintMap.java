@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -28,63 +28,63 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Cache of {@link Fingerprint}s.
  *
- * <p>
- * This implementation makes sure that no two {@link Fingerprint} objects
- * lie around for the same hash code, and that unused {@link Fingerprint}
- * will be adequately GC-ed to prevent memory leak.
+ * <p> This implementation makes sure that no two {@link Fingerprint} objects
+ * lie around for the same hash code, and that unused {@link Fingerprint} will
+ * be adequately GC-ed to prevent memory leak.
  *
  * @author Kohsuke Kawaguchi
- * @see Hudson#getFingerprintMap() 
+ * @see Hudson#getFingerprintMap()
  */
-public final class FingerprintMap extends KeyedDataStorage<Fingerprint,FingerprintParams> {
+public final class FingerprintMap extends KeyedDataStorage<Fingerprint, FingerprintParams> {
 
     /**
-     * @deprecated since 2007-03-26.
-     *      Some old version of Hudson incorrectly serialized this information to the disk.
-     *      So we need this field to be here for such configuration to be read correctly.
-     *      This field is otherwise no longer in use.
+     * @deprecated since 2007-03-26. Some old version of Hudson incorrectly
+     * serialized this information to the disk. So we need this field to be here
+     * for such configuration to be read correctly. This field is otherwise no
+     * longer in use.
      */
-    private transient ConcurrentHashMap<String,Object> core = new ConcurrentHashMap<String,Object>();
+    private transient ConcurrentHashMap<String, Object> core = new ConcurrentHashMap<String, Object>();
 
     /**
      * Returns true if there's some data in the fingerprint database.
      */
     public boolean isReady() {
-        return new File(Hudson.getInstance().getRootDir(),"fingerprints").exists();
+        return new File(Hudson.getInstance().getRootDir(), "fingerprints").exists();
     }
 
     /**
-     * @param build
-     *      set to non-null if {@link Fingerprint} to be created (if so)
-     *      will have this build as the owner. Otherwise null, to indicate
-     *      an owner-less build.
+     * @param build set to non-null if {@link Fingerprint} to be created (if so)
+     * will have this build as the owner. Otherwise null, to indicate an
+     * owner-less build.
      */
     public Fingerprint getOrCreate(AbstractBuild build, String fileName, byte[] md5sum) throws IOException {
-        return getOrCreate(build,fileName, Util.toHexString(md5sum));
+        return getOrCreate(build, fileName, Util.toHexString(md5sum));
     }
 
     public Fingerprint getOrCreate(AbstractBuild build, String fileName, String md5sum) throws IOException {
-        return super.getOrCreate(md5sum, new FingerprintParams(build,fileName));
+        return super.getOrCreate(md5sum, new FingerprintParams(build, fileName));
     }
 
     public Fingerprint getOrCreate(Run build, String fileName, String md5sum) throws IOException {
-        return super.getOrCreate(md5sum, new FingerprintParams(build,fileName));
+        return super.getOrCreate(md5sum, new FingerprintParams(build, fileName));
     }
 
     @Override
     protected Fingerprint get(String md5sum, boolean createIfNotExist, FingerprintParams createParams) throws IOException {
         // sanity check
-        if(md5sum.length()!=32)
+        if (md5sum.length() != 32) {
             return null;    // illegal input
+        }
         md5sum = md5sum.toLowerCase(Locale.ENGLISH);
 
-        return super.get(md5sum,createIfNotExist,createParams);
+        return super.get(md5sum, createIfNotExist, createParams);
     }
 
     private byte[] toByteArray(String md5sum) {
         byte[] data = new byte[16];
-        for( int i=0; i<md5sum.length(); i+=2 )
-            data[i/2] = (byte)Integer.parseInt(md5sum.substring(i,i+2),16);
+        for (int i = 0; i < md5sum.length(); i += 2) {
+            data[i / 2] = (byte) Integer.parseInt(md5sum.substring(i, i + 2), 16);
+        }
         return data;
     }
 
@@ -97,12 +97,15 @@ public final class FingerprintMap extends KeyedDataStorage<Fingerprint,Fingerpri
     }
 
     private Object readResolve() {
-        if (core != null) OldDataMonitor.report(Hudson.getInstance(), "1.91");
+        if (core != null) {
+            OldDataMonitor.report(Hudson.getInstance(), "1.91");
+        }
         return this;
     }
 }
 
 class FingerprintParams {
+
     /**
      * Null if the build isn't claiming to be the owner.
      */
@@ -113,6 +116,6 @@ class FingerprintParams {
         this.build = build;
         this.fileName = fileName;
 
-        assert fileName!=null;
+        assert fileName != null;
     }
 }

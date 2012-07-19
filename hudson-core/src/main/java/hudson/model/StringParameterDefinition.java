@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi, Luca Domenico Milanesio, Seiji Sogabe, Tom Huybrechts
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi, Luca Domenico Milanesio, Seiji Sogabe, Tom Huybrechts
+ *
  *
  *******************************************************************************/ 
 
@@ -47,7 +47,7 @@ public class StringParameterDefinition extends SimpleParameterDefinition {
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
     }
-    
+
     @Override
     public StringParameterValue getDefaultParameterValue() {
         StringParameterValue v = new StringParameterValue(getName(), defaultValue, getDescription());
@@ -56,6 +56,7 @@ public class StringParameterDefinition extends SimpleParameterDefinition {
 
     @Extension
     public static class DescriptorImpl extends ParameterDescriptor {
+
         @Override
         public String getDisplayName() {
             return Messages.StringParameterDefinition_DisplayName();
@@ -81,15 +82,15 @@ public class StringParameterDefinition extends SimpleParameterDefinition {
     @Override
     public boolean equals(Object o) {
         return super.equals(o) && new EqualsBuilder()
-            .append(getDefaultValue(), ((StringParameterDefinition) o).getDefaultValue())
-            .isEquals();
+                .append(getDefaultValue(), ((StringParameterDefinition) o).getDefaultValue())
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-            .appendSuper(super.hashCode())
-            .append(getDefaultValue())
-            .toHashCode();
+                .appendSuper(super.hashCode())
+                .append(getDefaultValue())
+                .toHashCode();
     }
 }

@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -27,13 +27,14 @@ import java.io.IOException;
  * @see MockFakeLauncher
  */
 public interface FakeLauncher {
+
     /**
      * Called whenever a {@link PretendSlave} is asked to fork a new process.
      *
-     * <p>
-     * The callee can inspect the {@link ProcStarter} object to determine what process is being launched,
-     * and if necessary, fake a process launch by either returning a valid {@link Proc} object, or let
-     * the normal process launch happen by returning null.
+     * <p> The callee can inspect the {@link ProcStarter} object to determine
+     * what process is being launched, and if necessary, fake a process launch
+     * by either returning a valid {@link Proc} object, or let the normal
+     * process launch happen by returning null.
      */
     Proc onLaunch(ProcStarter p) throws IOException;
 
@@ -41,6 +42,7 @@ public interface FakeLauncher {
      * Fake {@link Proc} implementation that represents a completed process.
      */
     public class FinishedProc extends Proc {
+
         public final int exitCode;
 
         public FinishedProc(int exitCode) {

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Winston Prakash, Seiji Sogabe
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -63,52 +63,47 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 
-
 /**
  * Controls update center capability.
  *
- * <p>
- * The main job of this class is to keep track of the latest update center metadata file, and perform installations.
- * Much of the UI about choosing plugins to install is done in {@link PluginManager}.
- * <p>
- * The update center can be configured to contact alternate servers for updates
- * and plugins, and to use alternate strategies for downloading, installing
- * and updating components. See the Javadocs for {@link UpdateCenterConfiguration}
- * for more information.
- * 
+ * <p> The main job of this class is to keep track of the latest update center
+ * metadata file, and perform installations. Much of the UI about choosing
+ * plugins to install is done in {@link PluginManager}. <p> The update center
+ * can be configured to contact alternate servers for updates and plugins, and
+ * to use alternate strategies for downloading, installing and updating
+ * components. See the Javadocs for {@link UpdateCenterConfiguration} for more
+ * information.
+ *
  * @author Kohsuke Kawaguchi
  * @since 1.220
  */
 public class UpdateCenter extends AbstractModelObject implements Saveable {
-    
+
     /**
      * {@link ExecutorService} that performs installation.
      */
     private final ExecutorService installerService = Executors.newSingleThreadExecutor(
-        new DaemonThreadFactory(new ThreadFactory() {
-            public Thread newThread(Runnable r) {
-                Thread t = new Thread(r);
-                t.setName("Update center installer thread");
-                return t;
-            }
-        }));
-
+            new DaemonThreadFactory(new ThreadFactory() {
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(r);
+            t.setName("Update center installer thread");
+            return t;
+        }
+    }));
     /**
-     * List of created {@link UpdateCenterJob}s. Access needs to be synchronized.
+     * List of created {@link UpdateCenterJob}s. Access needs to be
+     * synchronized.
      */
     private final Vector<UpdateCenterJob> jobs = new Vector<UpdateCenterJob>();
-
     /**
-     * {@link UpdateSite}s from which we've already installed a plugin at least once.
-     * This is used to skip network tests.
+     * {@link UpdateSite}s from which we've already installed a plugin at least
+     * once. This is used to skip network tests.
      */
     private final Set<UpdateSite> sourcesUsed = new HashSet<UpdateSite>();
-
     /**
      * List of {@link UpdateSite}s to be used.
      */
     private final PersistedList<UpdateSite> sites = new PersistedList<UpdateSite>(this);
-
     /**
      * Update center configuration data
      */
@@ -120,23 +115,23 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
 
     /**
      * Configures update center to get plugins/updates from alternate servers,
-     * and optionally using alternate strategies for downloading, installing
-     * and upgrading.
+     * and optionally using alternate strategies for downloading, installing and
+     * upgrading.
      *
      * @param config Configuration data
      * @see UpdateCenterConfiguration
      */
     public void configure(UpdateCenterConfiguration config) {
-        if (config!=null) {
+        if (config != null) {
             this.config = config;
         }
     }
 
     /**
-     * Returns the list of {@link UpdateCenterJob} representing scheduled installation attempts.
+     * Returns the list of {@link UpdateCenterJob} representing scheduled
+     * installation attempts.
      *
-     * @return
-     *      can be empty but never null. Oldest entries first.
+     * @return can be empty but never null. Oldest entries first.
      */
     public List<UpdateCenterJob> getJobs() {
         synchronized (jobs) {
@@ -146,69 +141,77 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
 
     /**
      * Returns latest install/upgrade job for the given plugin.
+     *
      * @return InstallationJob or null if not found
      */
     public InstallationJob getJob(Plugin plugin) {
         List<UpdateCenterJob> jobList = getJobs();
         Collections.reverse(jobList);
-        for (UpdateCenterJob job : jobList)
+        for (UpdateCenterJob job : jobList) {
             if (job instanceof InstallationJob) {
-                InstallationJob ij = (InstallationJob)job;
-                if (ij.plugin.name.equals(plugin.name) && ij.plugin.sourceId.equals(plugin.sourceId))
+                InstallationJob ij = (InstallationJob) job;
+                if (ij.plugin.name.equals(plugin.name) && ij.plugin.sourceId.equals(plugin.sourceId)) {
                     return ij;
+                }
             }
+        }
         return null;
     }
 
     /**
      * Returns latest Hudson upgrade job.
+     *
      * @return HudsonUpgradeJob or null if not found
      */
     public HudsonUpgradeJob getHudsonJob() {
         List<UpdateCenterJob> jobList = getJobs();
         Collections.reverse(jobList);
-        for (UpdateCenterJob job : jobList)
-            if (job instanceof HudsonUpgradeJob)
-                return (HudsonUpgradeJob)job;
+        for (UpdateCenterJob job : jobList) {
+            if (job instanceof HudsonUpgradeJob) {
+                return (HudsonUpgradeJob) job;
+            }
+        }
         return null;
     }
 
     /**
-     * Returns the list of {@link UpdateSite}s to be used.
-     * This is a live list, whose change will be persisted automatically.
+     * Returns the list of {@link UpdateSite}s to be used. This is a live list,
+     * whose change will be persisted automatically.
      *
-     * @return
-     *      can be empty but never null.
+     * @return can be empty but never null.
      */
     public PersistedList<UpdateSite> getSites() {
         return sites;
     }
 
     public UpdateSite getSite(String id) {
-        for (UpdateSite site : sites)
-            if (site.getId().equals(id))
+        for (UpdateSite site : sites) {
+            if (site.getId().equals(id)) {
                 return site;
+            }
+        }
         return null;
     }
 
     /**
-     * Gets the string representing how long ago the data was obtained.
-     * Will be the newest of all {@link UpdateSite}s.
+     * Gets the string representing how long ago the data was obtained. Will be
+     * the newest of all {@link UpdateSite}s.
      */
     public String getLastUpdatedString() {
         long newestTs = -1;
         for (UpdateSite s : sites) {
-            if (s.getDataTimestamp()>newestTs) {
+            if (s.getDataTimestamp() > newestTs) {
                 newestTs = s.getDataTimestamp();
             }
         }
-        if(newestTs<0)     return "N/A";
-        return Util.getPastTimeString(System.currentTimeMillis()-newestTs);
+        if (newestTs < 0) {
+            return "N/A";
+        }
+        return Util.getPastTimeString(System.currentTimeMillis() - newestTs);
     }
 
     /**
-     * Gets {@link UpdateSite} by its ID.
-     * Used to bind them to URL.
+     * Gets {@link UpdateSite} by its ID. Used to bind them to URL.
      */
     public UpdateSite getById(String id) {
         for (UpdateSite s : sites) {
@@ -220,16 +223,17 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
     }
 
     /**
-     * Gets the {@link UpdateSite} from which we receive updates for <tt>hudson.war</tt>.
+     * Gets the {@link UpdateSite} from which we receive updates for
+     * <tt>hudson.war</tt>.
      *
-     * @return
-     *      null if no such update center is provided.
+     * @return null if no such update center is provided.
      */
     public UpdateSite getCoreSource() {
         for (UpdateSite s : sites) {
             Data data = s.getData();
-            if (data!=null && data.core!=null)
+            if (data != null && data.core != null) {
                 return s;
+            }
         }
         return null;
     }
@@ -237,21 +241,24 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
     /**
      * Gets the default base URL.
      *
-     * @deprecated
-     *      TODO: revisit tool update mechanism, as that should be de-centralized, too. In the mean time,
-     *      please try not to use this method, and instead ping us to get this part completed.
+     * @deprecated TODO: revisit tool update mechanism, as that should be
+     * de-centralized, too. In the mean time, please try not to use this method,
+     * and instead ping us to get this part completed.
      */
     public String getDefaultBaseUrl() {
         return config.getUpdateServer();
     }
 
     /**
-     * Gets the plugin with the given name from the first {@link UpdateSite} to contain it.
+     * Gets the plugin with the given name from the first {@link UpdateSite} to
+     * contain it.
      */
     public Plugin getPlugin(String artifactId) {
         for (UpdateSite s : sites) {
             Plugin p = s.getPlugin(artifactId);
-            if (p!=null) return p;
+            if (p != null) {
+                return p;
+            }
         }
         return null;
     }
@@ -263,7 +270,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
         requirePOST();
         Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
         HudsonUpgradeJob job = new HudsonUpgradeJob(getCoreSource(), HudsonSecurityManager.getAuthentication());
-        if(!Lifecycle.get().canRewriteHudsonWar()) {
+        if (!Lifecycle.get().canRewriteHudsonWar()) {
             sendError("Hudson upgrade not supported in this running mode");
             return;
         }
@@ -286,7 +293,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
     public void doDowngrade(StaplerResponse rsp) throws IOException, ServletException {
         requirePOST();
         Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
-        if(!isDowngradable()) {
+        if (!isDowngradable()) {
             sendError("Hudson downgrade is not possible, probably backup does not exist");
             return;
         }
@@ -298,24 +305,25 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
     }
 
     /**
-     * Returns String with version of backup .war file,
-     * if the file does not exists returns null
+     * Returns String with version of backup .war file, if the file does not
+     * exists returns null
      */
-    public String getBackupVersion()
-    {
+    public String getBackupVersion() {
         try {
             JarFile backupWar = new JarFile(new File(Lifecycle.get().getHudsonWar().getParentFile(), "hudson.war.bak"));
             return backupWar.getManifest().getMainAttributes().getValue("Hudson-Version");
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Failed to read backup version ", e);
-            return null;}
+            return null;
+        }
 
     }
 
     /*package*/ synchronized Future<UpdateCenterJob> addJob(UpdateCenterJob job) {
         // the first job is always the connectivity check
-        if (sourcesUsed.add(job.site))
+        if (sourcesUsed.add(job.site)) {
             new ConnectionCheckJob(job.site).submit();
+        }
         return job.submit();
     }
 
@@ -331,12 +339,14 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
      * Saves the configuration info to the disk.
      */
     public synchronized void save() {
-        if(BulkChange.contains(this))   return;
+        if (BulkChange.contains(this)) {
+            return;
+        }
         try {
             getConfigFile().write(sites);
             SaveableListener.fireOnChange(this, getConfigFile());
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Failed to save "+getConfigFile(),e);
+            LOGGER.log(Level.WARNING, "Failed to save " + getConfigFile(), e);
         }
     }
 
@@ -346,11 +356,11 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
     public synchronized void load() throws IOException {
         UpdateSite defaultSite = new UpdateSite("default", config.getUpdateCenterUrl());
         XmlFile file = getConfigFile();
-        if(file.exists()) {
+        if (file.exists()) {
             try {
-                sites.replaceBy(((PersistedList)file.unmarshal(sites)).toList());
+                sites.replaceBy(((PersistedList) file.unmarshal(sites)).toList());
             } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Failed to load "+file, e);
+                LOGGER.log(Level.WARNING, "Failed to load " + file, e);
             }
             for (UpdateSite site : sites) {
                 // replace the legacy site with the new site
@@ -370,8 +380,8 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
     }
 
     private XmlFile getConfigFile() {
-        return new XmlFile(XSTREAM,new File(Hudson.getInstance().root,
-                                    UpdateCenter.class.getName()+".xml"));
+        return new XmlFile(XSTREAM, new File(Hudson.getInstance().root,
+                UpdateCenter.class.getName() + ".xml"));
     }
 
     public List<Plugin> getAvailables() {
@@ -385,26 +395,30 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
     }
 
     /**
-     * Returns a list of plugins that should be shown in the "available" tab, grouped by category.
-     * A plugin with multiple categories will appear multiple times in the list.
+     * Returns a list of plugins that should be shown in the "available" tab,
+     * grouped by category. A plugin with multiple categories will appear
+     * multiple times in the list.
      */
     public PluginEntry[] getCategorizedAvailables() {
         TreeSet<PluginEntry> entries = new TreeSet<PluginEntry>();
         for (Plugin p : getAvailables()) {
-            if (p.categories==null || p.categories.length==0)
+            if (p.categories == null || p.categories.length == 0) {
                 entries.add(new PluginEntry(p, getCategoryDisplayName(null)));
-            else
-                for (String c : p.categories)
+            } else {
+                for (String c : p.categories) {
                     entries.add(new PluginEntry(p, getCategoryDisplayName(c)));
+                }
+            }
         }
         return entries.toArray(new PluginEntry[entries.size()]);
     }
 
     private static String getCategoryDisplayName(String category) {
-        if (category==null)
+        if (category == null) {
             return Messages.UpdateCenter_PluginCategory_misc();
+        }
         try {
-            return (String)Messages.class.getMethod(
+            return (String) Messages.class.getMethod(
                     "UpdateCenter_PluginCategory_" + category.replace('-', '_')).invoke(null);
         } catch (Exception ex) {
             return Messages.UpdateCenter_PluginCategory_unrecognized(category);
@@ -421,57 +435,58 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
         return plugins;
     }
 
-
     /**
      * {@link AdministrativeMonitor} that checks if there's Hudson update.
      */
     @Extension
     public static final class CoreUpdateMonitor extends AdministrativeMonitor {
+
         public boolean isActivated() {
             Data data = getData();
-            return data!=null && data.hasCoreUpdates();
+            return data != null && data.hasCoreUpdates();
         }
 
         public Data getData() {
             UpdateSite cs = Hudson.getInstance().getUpdateCenter().getCoreSource();
-            if (cs!=null)   return cs.getData();
+            if (cs != null) {
+                return cs.getData();
+            }
             return null;
         }
     }
 
-
     /**
      * Strategy object for controlling the update center's behaviors.
      *
-     * <p>
-     * Until 1.333, this extension point used to control the configuration of
-     * where to get updates (hence the name of this class), but with the introduction
-     * of multiple update center sites capability, that functionality is achieved by
-     * simply installing another {@link UpdateSite}.
+     * <p> Until 1.333, this extension point used to control the configuration
+     * of where to get updates (hence the name of this class), but with the
+     * introduction of multiple update center sites capability, that
+     * functionality is achieved by simply installing another
+     * {@link UpdateSite}.
      *
-     * <p>
-     * See {@link UpdateSite} for how to manipulate them programmatically.
+     * <p> See {@link UpdateSite} for how to manipulate them programmatically.
      *
      * @since 1.266
      */
     @SuppressWarnings({"UnusedDeclaration"})
     public static class UpdateCenterConfiguration implements ExtensionPoint {
-        
+
         private final String updateServer = System.getProperty("updateServer", "http://hudson-ci.org/");
-        
+
         /**
-         * Creates default update center configuration - uses settings for global update center.
+         * Creates default update center configuration - uses settings for
+         * global update center.
          */
         public UpdateCenterConfiguration() {
         }
 
         /**
-         * Check network connectivity by trying to establish a connection to
-         * the host in connectionCheckUrl.
+         * Check network connectivity by trying to establish a connection to the
+         * host in connectionCheckUrl.
          *
          * @param job The connection checker that is invoking this strategy.
          * @param connectionCheckUrl A string containing the URL of a domain
-         *          that is assumed to be always available.
+         * that is assumed to be always available.
          * @throws IOException if a connection can't be established
          */
         public void checkConnection(ConnectionCheckJob job, String connectionCheckUrl) throws IOException {
@@ -482,8 +497,10 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
          * Check connection to update center server.
          *
          * @param job The connection checker that is invoking this strategy.
-         * @param updateCenterUrl A sting containing the URL of the update center host.
-         * @throws IOException if a connection to the update center server can't be established.
+         * @param updateCenterUrl A sting containing the URL of the update
+         * center host.
+         * @throws IOException if a connection to the update center server can't
+         * be established.
          */
         public void checkUpdateCenter(ConnectionCheckJob job, String updateCenterUrl) throws IOException {
             testConnection(new URL(updateCenterUrl + "?uctest"));
@@ -492,8 +509,9 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
         /**
          * Validate the URL of the resource before downloading it.
          *
-         * @param job The download job that is invoking this strategy. This job is
-         *          responsible for managing the status of the download and installation.
+         * @param job The download job that is invoking this strategy. This job
+         * is responsible for managing the status of the download and
+         * installation.
          * @param src The location of the resource on the network
          * @throws IOException if the validation fails
          */
@@ -504,8 +522,9 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
          * Validate the resource after it has been downloaded, before it is
          * installed. The default implementation does nothing.
          *
-         * @param job The download job that is invoking this strategy. This job is
-         *          responsible for managing the status of the download and installation.
+         * @param job The download job that is invoking this strategy. This job
+         * is responsible for managing the status of the download and
+         * installation.
          * @param src The location of the downloaded resource.
          * @throws IOException if the validation fails.
          */
@@ -516,55 +535,57 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
          * Download a plugin or core upgrade in preparation for installing it
          * into its final location. Implementations will normally download the
          * resource into a temporary location and hand off a reference to this
-         * location to the install or upgrade strategy to move into the final location.
+         * location to the install or upgrade strategy to move into the final
+         * location.
          *
-         * @param job The download job that is invoking this strategy. This job is
-         *          responsible for managing the status of the download and installation.
+         * @param job The download job that is invoking this strategy. This job
+         * is responsible for managing the status of the download and
+         * installation.
          * @param src The URL to the resource to be downloaded.
          * @return A File object that describes the downloaded resource.
          * @throws IOException if there were problems downloading the resource.
          * @see DownloadJob
          */
         public File download(DownloadJob job, URL src) throws IOException {
-            URLConnection con = connect(job,src);
+            URLConnection con = connect(job, src);
             int total = con.getContentLength();
-            
+
             byte[] buf = new byte[8192];
             int len;
 
             File dst = job.getDestination();
-            File tmp = new File(dst.getPath()+".tmp");
+            File tmp = new File(dst.getPath() + ".tmp");
             OutputStream out = null;
             CountingInputStream in = null;
-            
-            LOGGER.info("Downloading "+job.getName());
+
+            LOGGER.info("Downloading " + job.getName());
             try {
                 in = new CountingInputStream(con.getInputStream());
                 out = new FileOutputStream(tmp);
-                while((len=in.read(buf))>=0) {
-                    out.write(buf,0,len);
-                    job.status = job.new Installing(total==-1 ? -1 : in.getCount()*100/total);
+                while ((len = in.read(buf)) >= 0) {
+                    out.write(buf, 0, len);
+                    job.status = job.new Installing(total == -1 ? -1 : in.getCount() * 100 / total);
                 }
             } catch (IOException e) {
-                throw new IOException2("Failed to load "+src+" to "+tmp,e);
+                throw new IOException2("Failed to load " + src + " to " + tmp, e);
             } finally {
                 IOUtils.closeQuietly(in);
                 IOUtils.closeQuietly(out);
             }
 
-            if (total!=-1 && total!=tmp.length()) {
+            if (total != -1 && total != tmp.length()) {
                 // don't know exactly how this happens, but report like
                 // http://www.ashlux.com/wordpress/2009/08/14/hudson-and-the-sonar-plugin-fail-maveninstallation-nosuchmethoderror/
                 // indicates that this kind of inconsistency can happen. So let's be defensive
-                throw new IOException("Inconsistent file length: expected "+total+" but only got "+tmp.length());
+                throw new IOException("Inconsistent file length: expected " + total + " but only got " + tmp.length());
             }
 
             return tmp;
         }
 
         /**
-         * Connects to the given URL for downloading the binary. Useful for tweaking
-         * how the connection gets established.
+         * Connects to the given URL for downloading the binary. Useful for
+         * tweaking how the connection gets established.
          */
         protected URLConnection connect(DownloadJob job, URL src) throws IOException {
             return ProxyConfiguration.open(src);
@@ -599,32 +620,31 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
         /**
          * Returns an "always up" server for Internet connectivity testing.
          *
-         * @deprecated as of 1.333
-         *      With the introduction of multiple update center capability, this information
-         *      is now a part of the <tt>update-center.json</tt> file. See
-         *      <tt>http://hudson-ci.org/update-center.json</tt> as an example.
+         * @deprecated as of 1.333 With the introduction of multiple update
+         * center capability, this information is now a part of the
+         * <tt>update-center.json</tt> file. See
+         * <tt>http://hudson-ci.org/update-center.json</tt> as an example.
          */
         public String getConnectionCheckUrl() {
             return "http://www.google.com";
         }
-           
+
         /**
          * Get the Update Server name
+         *
          * @return Name of the update server set to this configuration
          */
         String getUpdateServer() {
             return updateServer;
         }
-        
+
         /**
-         * Returns the URL of the server that hosts the update-center.json
-         * file.
+         * Returns the URL of the server that hosts the update-center.json file.
          *
-         * @deprecated as of 1.333
-         *      With the introduction of multiple update center capability, this information
-         *      is now moved to {@link UpdateSite}.
-         * @return
-         *      Absolute URL that ends with '/'.
+         * @deprecated as of 1.333 With the introduction of multiple update
+         * center capability, this information is now moved to
+         * {@link UpdateSite}.
+         * @return Absolute URL that ends with '/'.
          */
         public String getUpdateCenterUrl() {
             return updateServer + "update-center3/update-center.json";
@@ -633,22 +653,22 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
         /**
          * Returns the URL of the server that hosts plugins and core updates.
          *
-         * @deprecated as of 1.333
-         *      <tt>update-center.json</tt> is now signed, so we don't have to further make sure that
-         *      we aren't downloading from anywhere unsecure.
+         * @deprecated as of 1.333 <tt>update-center.json</tt> is now signed, so
+         * we don't have to further make sure that we aren't downloading from
+         * anywhere unsecure.
          */
         public String getPluginRepositoryBaseUrl() {
             return "http://hudson-ci.org/";
         }
 
-
         private void testConnection(URL url) throws IOException {
             try {
-                Util.copyStreamAndClose(ProxyConfiguration.open(url).getInputStream(),new NullOutputStream());
+                Util.copyStreamAndClose(ProxyConfiguration.open(url).getInputStream(), new NullOutputStream());
             } catch (SSLHandshakeException e) {
-                if (e.getMessage().contains("PKIX path building failed"))
-                   // fix up this illegible error message from JDK
-                    throw new IOException2("Failed to validate the SSL certificate of "+url,e);
+                if (e.getMessage().contains("PKIX path building failed")) // fix up this illegible error message from JDK
+                {
+                    throw new IOException2("Failed to validate the SSL certificate of " + url, e);
+                }
             }
         }
     }
@@ -659,6 +679,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
      * This object will have the <tt>row.jelly</tt> which renders the job on UI.
      */
     public abstract class UpdateCenterJob implements Runnable {
+
         /**
          * Which {@link UpdateSite} does this belong to?
          */
@@ -674,8 +695,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
         }
 
         /**
-         * @deprecated as of 1.326
-         *      Use {@link #submit()} instead.
+         * @deprecated as of 1.326 Use {@link #submit()} instead.
          */
         public void schedule() {
             submit();
@@ -683,13 +703,13 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
 
         /**
          * Schedules this job for an execution
-         * @return
-         *      {@link Future} to keeps track of the status of the execution.
+         *
+         * @return {@link Future} to keeps track of the status of the execution.
          */
         public Future<UpdateCenterJob> submit() {
-            LOGGER.fine("Scheduling "+this+" to installerService");
+            LOGGER.fine("Scheduling " + this + " to installerService");
             jobs.add(this);
-            return installerService.submit(this,this);
+            return installerService.submit(this, this);
         }
     }
 
@@ -697,7 +717,8 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
      * Tests the internet connectivity.
      */
     public final class ConnectionCheckJob extends UpdateCenterJob {
-        private final Vector<String> statuses= new Vector<String>();
+
+        private final Vector<String> statuses = new Vector<String>();
 
         public ConnectionCheckJob(UpdateSite site) {
             super(site);
@@ -707,12 +728,12 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
             LOGGER.fine("Doing a connectivity check");
             try {
                 String connectionCheckUrl = site.getConnectionCheckUrl();
-                if (connectionCheckUrl!=null) {
+                if (connectionCheckUrl != null) {
                     statuses.add(Messages.UpdateCenter_Status_CheckingInternet());
                     try {
                         config.checkConnection(this, connectionCheckUrl);
                     } catch (IOException e) {
-                        if(e.getMessage().contains("Connection timed out")) {
+                        if (e.getMessage().contains("Connection timed out")) {
                             // Google can't be down, so this is probably a proxy issue
                             statuses.add(Messages.UpdateCenter_Status_ConnectionFailed(connectionCheckUrl));
                             return;
@@ -733,7 +754,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
         }
 
         private void addStatus(UnknownHostException e) {
-            statuses.add("<pre>"+ Functions.xmlEscape(Functions.printThrowable(e))+"</pre>");
+            statuses.add("<pre>" + Functions.xmlEscape(Functions.printThrowable(e)) + "</pre>");
         }
 
         public String[] getStatuses() {
@@ -747,6 +768,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
      * Base class for a job that downloads a file from the Hudson project.
      */
     public abstract class DownloadJob extends UpdateCenterJob {
+
         /**
          * Unique ID that identifies this job.
          */
@@ -774,15 +796,12 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
          * Called when the whole thing went successfully.
          */
         protected abstract void onSuccess();
-
-
         private Authentication authentication;
 
         /**
          * Get the user that initiated this job
          */
-        public Authentication getUser()
-        {
+        public Authentication getUser() {
             return this.authentication;
         }
 
@@ -801,15 +820,15 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
 
         public void run() {
             try {
-                LOGGER.info("Starting the installation of "+getName()+" on behalf of "+getUser().getName());
+                LOGGER.info("Starting the installation of " + getName() + " on behalf of " + getUser().getName());
 
                 _run();
 
-                LOGGER.info("Installation successful: "+getName());
+                LOGGER.info("Installation successful: " + getName());
                 status = new Success();
                 onSuccess();
             } catch (Throwable e) {
-                LOGGER.log(Level.SEVERE, "Failed to install "+getName(),e);
+                LOGGER.log(Level.SEVERE, "Failed to install " + getName(), e);
                 status = new Failure(e);
             }
         }
@@ -827,26 +846,26 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
         }
 
         /**
-         * Called when the download is completed to overwrite
-         * the old file with the new file.
+         * Called when the download is completed to overwrite the old file with
+         * the new file.
          */
         protected void replace(File dst, File src) throws IOException {
-            File bak = Util.changeExtension(dst,".bak");
+            File bak = Util.changeExtension(dst, ".bak");
             bak.delete();
             dst.renameTo(bak);
             dst.delete(); // any failure up to here is no big deal
-            if(!src.renameTo(dst)) {
-                throw new IOException("Failed to rename "+src+" to "+dst);
+            if (!src.renameTo(dst)) {
+                throw new IOException("Failed to rename " + src + " to " + dst);
             }
         }
 
         /**
-         * Indicates the status or the result of a plugin installation.
-         * <p>
+         * Indicates the status or the result of a plugin installation. <p>
          * Instances of this class is immutable.
          */
         public abstract class InstallationStatus {
             //TODO: review and check whether we can do it private
+
             public final int id = iota.incrementAndGet();
 
             public int getId() {
@@ -863,6 +882,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
          */
         public class Failure extends InstallationStatus {
             //TODO: review and check whether we can do it private
+
             public final Throwable problem;
 
             public Failure(Throwable problem) {
@@ -882,7 +902,9 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
          * Indicates that the plugin was successfully installed.
          */
         public class Success extends InstallationStatus {
-            @Override public boolean isSuccess() {
+
+            @Override
+            public boolean isSuccess() {
                 return true;
             }
         }
@@ -897,6 +919,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
          * Installation of a plugin is in progress.
          */
         public class Installing extends InstallationStatus {
+
             /**
              * % completed download, or -1 if the percentage is not known.
              */
@@ -917,12 +940,12 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
      * Represents the state of the installation activity of one plugin.
      */
     public final class InstallationJob extends DownloadJob {
+
         /**
          * What plugin are we trying to install?
          */
         //TODO: review and check whether we can do it private
         public final Plugin plugin;
-
         private final PluginManager pm = Hudson.getInstance().getPluginManager();
 
         public InstallationJob(Plugin plugin, UpdateSite site, Authentication auth) {
@@ -953,13 +976,14 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
 
             // if this is a bundled plugin, make sure it won't get overwritten
             PluginWrapper pw = plugin.getInstalled();
-            if (pw!=null && pw.isBundled())
+            if (pw != null && pw.isBundled()) {
                 try {
                     HudsonSecurityManager.grantFullControl();
                     pw.doPin();
                 } finally {
                     HudsonSecurityManager.resetFullControl();
                 }
+            }
         }
 
         protected void onSuccess() {
@@ -968,7 +992,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
 
         @Override
         public String toString() {
-            return super.toString()+"[plugin="+plugin.title+"]";
+            return super.toString() + "[plugin=" + plugin.title + "]";
         }
     }
 
@@ -976,12 +1000,12 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
      * Represents the state of the downgrading activity of plugin.
      */
     public final class PluginDowngradeJob extends DownloadJob {
+
         /**
          * What plugin are we trying to install?
          */
         //TODO: review and check whether we can do it private
         public final Plugin plugin;
-
         private final PluginManager pm = Hudson.getInstance().getPluginManager();
 
         public PluginDowngradeJob(Plugin plugin, UpdateSite site, Authentication auth) {
@@ -998,8 +1022,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
             return new File(baseDir, plugin.name + ".hpi");
         }
 
-        protected File getBackup()
-        {
+        protected File getBackup() {
             File baseDir = pm.rootDir;
             return new File(baseDir, plugin.name + ".bak");
         }
@@ -1015,15 +1038,15 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
         @Override
         public void run() {
             try {
-                LOGGER.info("Starting the downgrade of "+getName()+" on behalf of "+getUser().getName());
+                LOGGER.info("Starting the downgrade of " + getName() + " on behalf of " + getUser().getName());
 
                 _run();
 
-                LOGGER.info("Downgrade successful: "+getName());
+                LOGGER.info("Downgrade successful: " + getName());
                 status = new Success();
                 onSuccess();
             } catch (Throwable e) {
-                LOGGER.log(Level.SEVERE, "Failed to downgrade "+getName(),e);
+                LOGGER.log(Level.SEVERE, "Failed to downgrade " + getName(), e);
                 status = new Failure(e);
             }
         }
@@ -1037,14 +1060,13 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
         }
 
         /**
-         * Called to overwrite
-         * current version with backup file
+         * Called to overwrite current version with backup file
          */
         @Override
         protected void replace(File dst, File backup) throws IOException {
             dst.delete(); // any failure up to here is no big deal
-            if(!backup.renameTo(dst)) {
-                throw new IOException("Failed to rename "+backup+" to "+dst);
+            if (!backup.renameTo(dst)) {
+                throw new IOException("Failed to rename " + backup + " to " + dst);
             }
         }
 
@@ -1054,7 +1076,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
 
         @Override
         public String toString() {
-            return super.toString()+"[plugin="+plugin.title+"]";
+            return super.toString() + "[plugin=" + plugin.title + "]";
         }
     }
 
@@ -1062,6 +1084,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
      * Represents the state of the upgrade activity of Hudson core.
      */
     public final class HudsonUpgradeJob extends DownloadJob {
+
         public HudsonUpgradeJob(UpdateSite site, Authentication auth) {
             super(site, auth);
         }
@@ -1089,6 +1112,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
     }
 
     public final class HudsonDowngradeJob extends DownloadJob {
+
         public HudsonDowngradeJob(UpdateSite site, Authentication auth) {
             super(site, auth);
         }
@@ -1104,21 +1128,23 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
         public String getName() {
             return "hudson.war";
         }
+
         protected void onSuccess() {
             status = new Success();
         }
+
         @Override
         public void run() {
             try {
-                LOGGER.info("Starting the downgrade of "+getName()+" on behalf of "+getUser().getName());
+                LOGGER.info("Starting the downgrade of " + getName() + " on behalf of " + getUser().getName());
 
                 _run();
 
-                LOGGER.info("Downgrading successful: "+getName());
+                LOGGER.info("Downgrading successful: " + getName());
                 status = new Success();
                 onSuccess();
             } catch (Throwable e) {
-                LOGGER.log(Level.SEVERE, "Failed to downgrade "+getName(),e);
+                LOGGER.log(Level.SEVERE, "Failed to downgrade " + getName(), e);
                 status = new Failure(e);
             }
         }
@@ -1140,9 +1166,14 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
 
     public static final class PluginEntry implements Comparable<PluginEntry> {
         //TODO: review and check whether we can do it private
+
         public Plugin plugin;
         public String category;
-        private PluginEntry(Plugin p, String c) { plugin = p; category = c; }
+
+        private PluginEntry(Plugin p, String c) {
+            plugin = p;
+            category = c;
+        }
 
         public Plugin getPlugin() {
             return plugin;
@@ -1154,7 +1185,9 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
 
         public int compareTo(PluginEntry o) {
             int r = category.compareTo(o.category);
-            if (r==0) r = plugin.name.compareToIgnoreCase(o.plugin.name);
+            if (r == 0) {
+                r = plugin.name.compareToIgnoreCase(o.plugin.name);
+            }
             return r;
         }
     }
@@ -1164,6 +1197,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
      */
     @Extension
     public static class PageDecoratorImpl extends PageDecorator {
+
         public PageDecoratorImpl() {
             super(PageDecoratorImpl.class);
         }
@@ -1172,30 +1206,26 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
     /**
      * Initializes the update center.
      *
-     * This has to wait until after all plugins load, to let custom UpdateCenterConfiguration take effect first.
+     * This has to wait until after all plugins load, to let custom
+     * UpdateCenterConfiguration take effect first.
      */
-    @Initializer(after=PLUGINS_STARTED)
+    @Initializer(after = PLUGINS_STARTED)
     public static void init(Hudson h) throws IOException {
         h.getUpdateCenter().load();
     }
-
     /**
      * Sequence number generator.
      */
     private static final AtomicInteger iota = new AtomicInteger();
-
     private static final Logger LOGGER = Logger.getLogger(UpdateCenter.class.getName());
-
     /**
-     * @deprecated as of 1.333
-     *      Use {@link UpdateSite#neverUpdate}
+     * @deprecated as of 1.333 Use {@link UpdateSite#neverUpdate}
      */
-    public static boolean neverUpdate = Boolean.getBoolean(UpdateCenter.class.getName()+".never");
-
+    public static boolean neverUpdate = Boolean.getBoolean(UpdateCenter.class.getName() + ".never");
     public static final XStream2 XSTREAM = new XStream2();
 
     static {
-        XSTREAM.alias("site",UpdateSite.class);
-        XSTREAM.alias("sites",PersistedList.class);
+        XSTREAM.alias("site", UpdateSite.class);
+        XSTREAM.alias("sites", PersistedList.class);
     }
 }

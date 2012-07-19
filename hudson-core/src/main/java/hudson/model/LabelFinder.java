@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Stephen Connolly
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -26,15 +26,15 @@ import java.util.Collection;
 /**
  * Automatically adds labels to {@link Node}s.
  *
- * <p>
- * To register your implementation, put {@link Extension} on your derived types.
+ * <p> To register your implementation, put {@link Extension} on your derived
+ * types.
  *
  * @author Stephen Connolly
- * @since 1.323
- *      Signature of this class changed in 1.323, after making sure that no
- *      plugin in the Subversion repository is using this.
+ * @since 1.323 Signature of this class changed in 1.323, after making sure that
+ * no plugin in the Subversion repository is using this.
  */
 public abstract class LabelFinder implements ExtensionPoint {
+
     /**
      * Returns all the registered {@link LabelFinder}s.
      */
@@ -45,10 +45,8 @@ public abstract class LabelFinder implements ExtensionPoint {
     /**
      * Find the labels that the node supports.
      *
-     * @param node
-     *      The node that receives labels. Never null.
-     * @return
-     *      A set of labels for the node. Can be empty but never null.
+     * @param node The node that receives labels. Never null.
+     * @return A set of labels for the node. Can be empty but never null.
      */
     public abstract Collection<LabelAtom> findLabels(Node node);
 }

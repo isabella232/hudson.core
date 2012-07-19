@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Winston Prakash
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -26,15 +26,16 @@ import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.springframework.security.AccessDeniedException;
 
 /**
- * Authorization token to allow projects to trigger themselves under the secured environment.
+ * Authorization token to allow projects to trigger themselves under the secured
+ * environment.
  *
  * @author Kohsuke Kawaguchi
  * @see BuildableItem
- * @deprecated 2008-07-20
- *      Use {@link ACL} and {@link AbstractProject#BUILD}. This code is only here
- *      for the backward compatibility.
+ * @deprecated 2008-07-20 Use {@link ACL} and {@link AbstractProject#BUILD}.
+ * This code is only here for the backward compatibility.
  */
 public final class BuildAuthorizationToken {
+
     private final String token;
 
     public BuildAuthorizationToken(String token) {
@@ -44,24 +45,27 @@ public final class BuildAuthorizationToken {
     public static BuildAuthorizationToken create(StaplerRequest req) {
         if (req.getParameter("pseudoRemoteTrigger") != null) {
             String token = Util.fixEmpty(req.getParameter("authToken"));
-            if(token!=null)
+            if (token != null) {
                 return new BuildAuthorizationToken(token);
+            }
         }
-        
+
         return null;
     }
 
     public static void checkPermission(AbstractProject project, BuildAuthorizationToken token, StaplerRequest req, StaplerResponse rsp) throws IOException {
-        if (!HudsonSecurityEntitiesHolder.getHudsonSecurityManager().isUseSecurity())
+        if (!HudsonSecurityEntitiesHolder.getHudsonSecurityManager().isUseSecurity()) {
             return;    // everyone is authorized
-
-        if(token!=null && token.token != null) {
+        }
+        if (token != null && token.token != null) {
             //check the provided token
             String providedToken = req.getParameter("token");
-            if (providedToken != null && providedToken.equals(token.token))
+            if (providedToken != null && providedToken.equals(token.token)) {
                 return;
-            if (providedToken != null)
+            }
+            if (providedToken != null) {
                 throw new AccessDeniedException(Messages.BuildAuthorizationToken_InvalidTokenProvided());
+            }
         }
 
         project.checkPermission(AbstractProject.BUILD);
@@ -72,8 +76,9 @@ public final class BuildAuthorizationToken {
     }
 
     public static final class ConverterImpl extends AbstractSingleValueConverter {
+
         public boolean canConvert(Class type) {
-            return type== BuildAuthorizationToken.class;
+            return type == BuildAuthorizationToken.class;
         }
 
         public Object fromString(String str) {
@@ -82,7 +87,7 @@ public final class BuildAuthorizationToken {
 
         @Override
         public String toString(Object obj) {
-            return ((BuildAuthorizationToken)obj).token;
+            return ((BuildAuthorizationToken) obj).token;
         }
     }
 }

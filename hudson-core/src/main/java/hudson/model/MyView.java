@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Winston Prakash, Seiji Sogabe, Tom Huybrechts
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -32,12 +32,14 @@ import hudson.Extension;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
- * {@link View} that only contains projects for which the current user has access to.
+ * {@link View} that only contains projects for which the current user has
+ * access to.
  *
  * @since 1.220
  * @author Tom Huybrechts
  */
 public class MyView extends View {
+
     @DataBoundConstructor
     public MyView(String name) {
         super(name);
@@ -87,9 +89,10 @@ public class MyView extends View {
 
     @Extension
     public static final class DescriptorImpl extends ViewDescriptor {
+
         /**
-         * If the security is not enabled, there's no point in having
-         * this type of views.
+         * If the security is not enabled, there's no point in having this type
+         * of views.
          */
         @Override
         public boolean isInstantiable() {

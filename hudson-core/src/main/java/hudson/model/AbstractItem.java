@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *  Kohsuke Kawaguchi, Winston Prakash,  Daniel Dyer, Tom Huybrechts
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -64,16 +64,15 @@ import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 // Java doesn't let multiple inheritance.
 @ExportedBean
 public abstract class AbstractItem extends Actionable implements Item, HttpDeletable, AccessControlled, DescriptorByNameOwner {
+
     /**
      * Project name.
      */
     protected /*final*/ transient String name;
-
     /**
      * Project description. Can be HTML.
      */
     protected volatile String description;
-
     private transient ItemGroup parent;
 
     protected AbstractItem(ItemGroup parent, String name) {
@@ -85,14 +84,14 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
         // noop
     }
 
-    @Exported(visibility=999)
+    @Exported(visibility = 999)
     public String getName() {
         return name;
     }
 
     /**
-     * Get the term used in the UI to represent this kind of
-     * {@link Item}. Must start with a capital letter.
+     * Get the term used in the UI to represent this kind of {@link Item}. Must
+     * start with a capital letter.
      */
     public String getPronoun() {
         return Messages.AbstractItem_Pronoun();
@@ -108,7 +107,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     }
 
     public ItemGroup getParent() {
-        assert parent!=null;
+        assert parent != null;
         return parent;
     }
 
@@ -129,16 +128,16 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     }
 
     /**
-     * Just update {@link #name} without performing the rename operation,
-     * which would involve copying files and etc.
+     * Just update {@link #name} without performing the rename operation, which
+     * would involve copying files and etc.
      */
     protected void doSetName(String name) {
         this.name = name;
     }
 
     /**
-     * Ad additional action which should be performed before the item will be renamed.
-     * It's possible to add some logic in the subclasses.
+     * Ad additional action which should be performed before the item will be
+     * renamed. It's possible to add some logic in the subclasses.
      *
      * @param oldName old item name.
      * @param newName new item name.
@@ -148,9 +147,8 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     }
 
     /**
-     * Renames this item.
-     * Not all the Items need to support this operation, but if you decide to do so,
-     * you can use this method.
+     * Renames this item. Not all the Items need to support this operation, but
+     * if you decide to do so, you can use this method.
      */
     protected void renameTo(String newName) throws IOException {
         // always synchronize from bigger objects first
@@ -158,24 +156,27 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
         synchronized (parent) {
             synchronized (this) {
                 // sanity check
-                if (newName == null)
+                if (newName == null) {
                     throw new IllegalArgumentException("New name is not given");
+                }
 
                 // noop?
-                if (this.name.equals(newName))
+                if (this.name.equals(newName)) {
                     return;
+                }
 
                 Item existing = parent.getItem(newName);
-                if (existing != null && existing!=this)
-                    // the look up is case insensitive, so we need "existing!=this"
-                    // to allow people to rename "Foo" to "foo", for example.
-                    // see http://www.nabble.com/error-on-renaming-project-tt18061629.html
+                if (existing != null && existing != this) // the look up is case insensitive, so we need "existing!=this"
+                // to allow people to rename "Foo" to "foo", for example.
+                // see http://www.nabble.com/error-on-renaming-project-tt18061629.html
+                {
                     throw new IllegalArgumentException("Job " + newName
                             + " already exists");
+                }
 
                 String oldName = this.name;
 
-                performBeforeItemRenaming(oldName,newName);
+                performBeforeItemRenaming(oldName, newName);
 
                 File oldRoot = this.getRootDir();
 
@@ -205,8 +206,9 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
                         }
                     }
 
-                    if (interrupted)
+                    if (interrupted) {
                         Thread.currentThread().interrupt();
+                    }
 
                     if (!renamed) {
                         // failed to rename. it must be that some lengthy
@@ -226,7 +228,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
                         cp.setOverwrite(true);
                         cp.setPreserveLastModified(true);
                         cp.setFailOnError(false); // keep going even if
-                                                    // there's an error
+                        // there's an error
                         cp.execute();
 
                         // try to delete as much as possible
@@ -241,21 +243,23 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
                     success = true;
                 } finally {
                     // if failed, back out the rename.
-                    if (!success)
+                    if (!success) {
                         doSetName(oldName);
+                    }
                 }
 
                 callOnRenamed(newName, parent, oldName);
 
-                for (ItemListener l : ItemListener.all())
+                for (ItemListener l : ItemListener.all()) {
                     l.onRenamed(this, oldName, newName);
+                }
             }
         }
     }
 
     /**
-     * A pointless function to work around what appears to be a HotSpot problem. See HUDSON-5756 and bug 6933067
-     * on BugParade for more details.
+     * A pointless function to work around what appears to be a HotSpot problem.
+     * See HUDSON-5756 and bug 6933067 on BugParade for more details.
      */
     private void callOnRenamed(String newName, ItemGroup parent, String oldName) throws IOException {
         try {
@@ -272,19 +276,25 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
 
     public final String getFullName() {
         String n = getParent().getFullName();
-        if(n.length()==0)   return getName();
-        else                return n+'/'+getName();
+        if (n.length() == 0) {
+            return getName();
+        } else {
+            return n + '/' + getName();
+        }
     }
 
     public final String getFullDisplayName() {
         String n = getParent().getFullDisplayName();
-        if(n.length()==0)   return getDisplayName();
-        else                return n+" \u00BB "+getDisplayName();
+        if (n.length() == 0) {
+            return getDisplayName();
+        } else {
+            return n + " \u00BB " + getDisplayName();
+        }
     }
 
     /**
-     * Called right after when a {@link Item} is loaded from disk.
-     * This is an opporunity to do a post load processing.
+     * Called right after when a {@link Item} is loaded from disk. This is an
+     * opporunity to do a post load processing.
      */
     public void onLoad(ItemGroup<? extends Item> parent, String name) throws IOException {
         this.parent = parent;
@@ -292,10 +302,9 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     }
 
     /**
-     * When a {@link Item} is copied from existing one,
-     * the files are first copied on the file system,
-     * then it will be loaded, then this method will be invoked
-     * to perform any implementation-specific work.
+     * When a {@link Item} is copied from existing one, the files are first
+     * copied on the file system, then it will be loaded, then this method will
+     * be invoked to perform any implementation-specific work.
      */
     public void onCopiedFrom(Item src) {
     }
@@ -304,31 +313,32 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
         // try to stick to the current view if possible
         StaplerRequest req = Stapler.getCurrentRequest();
         if (req != null) {
-            String seed = Functions.getNearestAncestorUrl(req,this);
-            if(seed!=null) {
+            String seed = Functions.getNearestAncestorUrl(req, this);
+            if (seed != null) {
                 // trim off the context path portion and leading '/', but add trailing '/'
-                return seed.substring(req.getContextPath().length()+1)+'/';
+                return seed.substring(req.getContextPath().length() + 1) + '/';
             }
         }
 
         // otherwise compute the path normally
-        return getParent().getUrl()+getShortUrl();
+        return getParent().getUrl() + getShortUrl();
     }
 
     public String getShortUrl() {
-        return getParent().getUrlChildPrefix()+'/'+Util.rawEncode(getName())+'/';
+        return getParent().getUrlChildPrefix() + '/' + Util.rawEncode(getName()) + '/';
     }
 
     public String getSearchUrl() {
         return getShortUrl();
     }
 
-    @Exported(visibility=999,name="url")
+    @Exported(visibility = 999, name = "url")
     public final String getAbsoluteUrl() {
         StaplerRequest request = Stapler.getCurrentRequest();
-        if(request==null)
+        if (request == null) {
             throw new IllegalStateException("Not processing a HTTP request");
-        return Util.encode(Hudson.getInstance().getRootUrl()+getUrl());
+        }
+        return Util.encode(Hudson.getInstance().getRootUrl() + getUrl());
     }
 
     /**
@@ -363,7 +373,9 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
      * Save the settings to a file.
      */
     public synchronized void save() throws IOException {
-        if(BulkChange.contains(this))   return;
+        if (BulkChange.contains(this)) {
+            return;
+        }
         getConfigFile().write(this);
         SaveableListener.fireOnChange(this, getConfigFile());
     }
@@ -379,7 +391,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     /**
      * Accepts the new description.
      */
-    public synchronized void doSubmitDescription( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
+    public synchronized void doSubmitDescription(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         checkPermission(CONFIGURE);
 
         setDescription(req.getParameter("description"));
@@ -389,17 +401,19 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     /**
      * Deletes this item.
      */
-    @CLIMethod(name="delete-job")
-    public void doDoDelete( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException, InterruptedException {
+    @CLIMethod(name = "delete-job")
+    public void doDoDelete(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, InterruptedException {
         requirePOST();
         delete();
         if (rsp != null) // null for CLI
-            rsp.sendRedirect2(req.getContextPath()+"/"+getParent().getUrl());
+        {
+            rsp.sendRedirect2(req.getContextPath() + "/" + getParent().getUrl());
+        }
     }
 
-    public void delete( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
+    public void delete(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         try {
-            doDoDelete(req,rsp);
+            doDoDelete(req, rsp);
         } catch (InterruptedException e) {
             // TODO: allow this in Stapler
             throw new ServletException(e);
@@ -423,8 +437,8 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     }
 
     /**
-     * A pointless function to work around what appears to be a HotSpot problem. See HUDSON-5756 and bug 6933067
-     * on BugParade for more details.
+     * A pointless function to work around what appears to be a HotSpot problem.
+     * See HUDSON-5756 and bug 6933067 on BugParade for more details.
      */
     private void invokeOnDeleted() throws IOException {
         getParent().onDeleted(this);
@@ -487,7 +501,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     }
 
     public String toString() {
-        return getClass().getSimpleName()+'['+getFullName()+']';
+        return getClass().getSimpleName() + '[' + getFullName() + ']';
     }
 
     /**
@@ -495,13 +509,13 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
      */
     @CLIResolver
     public static AbstractItem resolveForCLI(
-            @Argument(required=true,metaVar="NAME",usage="Job name") String name) throws CmdLineException {
+            @Argument(required = true, metaVar = "NAME", usage = "Job name") String name) throws CmdLineException {
         AbstractItem item = Hudson.getInstance().getItemByFullName(name, AbstractItem.class);
-        if (item==null){
-            if (AbstractProject.findNearest(name) != null){
-                throw new CmdLineException(null,Messages.AbstractItem_NoSuchJobExists2(name, AbstractProject.findNearest(name).getFullName()));
-            }else{
-                throw new CmdLineException(null,Messages.AbstractItem_NoSuchJobExists(name));
+        if (item == null) {
+            if (AbstractProject.findNearest(name) != null) {
+                throw new CmdLineException(null, Messages.AbstractItem_NoSuchJobExists2(name, AbstractProject.findNearest(name).getFullName()));
+            } else {
+                throw new CmdLineException(null, Messages.AbstractItem_NoSuchJobExists(name));
             }
         }
         return item;

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -34,7 +34,7 @@ import java.io.IOException;
  * @author Kohsuke Kawaguchi
  */
 public class FailureBuilder extends Builder {
-    
+
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         listener.getLogger().println("Simulating a failure");
         build.setResult(Result.FAILURE);
@@ -43,9 +43,11 @@ public class FailureBuilder extends Builder {
 
     @Extension
     public static final class DescriptorImpl extends Descriptor<Builder> {
+
         public String getDisplayName() {
             return "Always fail";
         }
+
         public FailureBuilder newInstance(StaplerRequest req, JSONObject data) {
             return new FailureBuilder();
         }

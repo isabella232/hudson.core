@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *  Kohsuke Kawaguchi, Winston Prakash, Seiji Sogabe, Andrew Bayer
- *     
+ *
  *******************************************************************************/ 
 
 package hudson.model;
@@ -61,41 +61,38 @@ import net.sf.json.JSONArray;
 import org.apache.commons.codec.binary.Base64;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 
-
 /**
- * Source of the update center information, like "http://hudson-ci.org/update-center3/update-center.json"
+ * Source of the update center information, like
+ * "http://hudson-ci.org/update-center3/update-center.json"
  *
- * <p>
- * Hudson can have multiple {@link UpdateSite}s registered in the system, so that it can pick up plugins
- * from different locations.
+ * <p> Hudson can have multiple {@link UpdateSite}s registered in the system, so
+ * that it can pick up plugins from different locations.
  *
  * @author Andrew Bayer
  * @author Kohsuke Kawaguchi
  * @since 1.333
  */
 public class UpdateSite {
+
     /**
      * What's the time stamp of data file?
      */
     private transient long dataTimestamp = -1;
-
     /**
      * When was the last time we asked a browser to check the data for us?
      *
-     * <p>
-     * There's normally some delay between when we send HTML that includes the check code,
-     * until we get the data back, so this variable is used to avoid asking too many browseres
-     * all at once.
+     * <p> There's normally some delay between when we send HTML that includes
+     * the check code, until we get the data back, so this variable is used to
+     * avoid asking too many browseres all at once.
      */
     private transient volatile long lastAttempt = -1;
-
     /**
      * ID string for this update source.
      */
     private final String id;
-
     /**
-     * Path to <tt>update-center.json</tt>, like <tt>http://hudson-ci.org/update-center3/update-center.json</tt>.
+     * Path to <tt>update-center.json</tt>, like
+     * <tt>http://hudson-ci.org/update-center3/update-center.json</tt>.
      */
     private final String url;
 
@@ -124,23 +121,25 @@ public class UpdateSite {
     }
 
     /**
-     * This is the endpoint that receives the update center data file from the browser.
+     * This is the endpoint that receives the update center data file from the
+     * browser.
      */
     public void doPostBack(StaplerRequest req, StaplerResponse rsp) throws IOException, GeneralSecurityException {
         dataTimestamp = System.currentTimeMillis();
-        String json = IOUtils.toString(req.getInputStream(),"UTF-8");
+        String json = IOUtils.toString(req.getInputStream(), "UTF-8");
         JSONObject o = JSONObject.fromObject(json);
 
         int v = o.getInt("updateCenterVersion");
-        if(v !=1) {
-            LOGGER.warning("Unrecognized update center version: "+v);
+        if (v != 1) {
+            LOGGER.warning("Unrecognized update center version: " + v);
             return;
         }
 
-        if (signatureCheck)
+        if (signatureCheck) {
             verifySignature(o);
+        }
 
-        LOGGER.info("Obtained the latest update center data file for UpdateSource "+ id);
+        LOGGER.info("Obtained the latest update center data file for UpdateSource " + id);
         getDataFile().write(json);
         rsp.setContentType("text/plain");  // So browser won't try to parse response
     }
@@ -169,15 +168,17 @@ public class UpdateSite {
             Set<TrustAnchor> anchors = CertificateUtil.getDefaultRootCAs();
             ServletContext context = Hudson.getInstance().servletContext;
             for (String cert : (Set<String>) context.getResourcePaths("/WEB-INF/update-center-rootCAs")) {
-                if (cert.endsWith(".txt"))  continue;       // skip text files that are meant to be documentation
-                anchors.add(new TrustAnchor((X509Certificate)cf.generateCertificate(context.getResourceAsStream(cert)),null));
+                if (cert.endsWith(".txt")) {
+                    continue;       // skip text files that are meant to be documentation
+                }
+                anchors.add(new TrustAnchor((X509Certificate) cf.generateCertificate(context.getResourceAsStream(cert)), null));
             }
             CertificateUtil.validatePath(certs);
         }
 
         // this is for computing a digest to check sanity
         MessageDigest sha1 = MessageDigest.getInstance("SHA1");
-        DigestOutputStream dos = new DigestOutputStream(new NullOutputStream(),sha1);
+        DigestOutputStream dos = new DigestOutputStream(new NullOutputStream(), sha1);
 
         // this is for computing a signature
         Signature sig = Signature.getInstance("SHA1withRSA");
@@ -191,7 +192,7 @@ public class UpdateSite {
         String computedDigest = new String(Base64.encodeBase64(sha1.digest()));
         String providedDigest = signature.getString("digest");
         if (!computedDigest.equalsIgnoreCase(providedDigest)) {
-            LOGGER.severe("Digest mismatch: "+computedDigest+" vs "+providedDigest);
+            LOGGER.severe("Digest mismatch: " + computedDigest + " vs " + providedDigest);
             return false;
         }
 
@@ -207,27 +208,32 @@ public class UpdateSite {
      * Returns true if it's time for us to check for new version.
      */
     public boolean isDue() {
-        if(neverUpdate)     return false;
-        if(dataTimestamp==-1)
+        if (neverUpdate) {
+            return false;
+        }
+        if (dataTimestamp == -1) {
             dataTimestamp = getDataFile().file.lastModified();
+        }
         long now = System.currentTimeMillis();
         boolean due = now - dataTimestamp > DAY && now - lastAttempt > 15000;
-        if(due)     lastAttempt = now;
+        if (due) {
+            lastAttempt = now;
+        }
         return due;
     }
 
     /**
      * Loads the update center data, if any.
      *
-     * @return  null if no data is available.
+     * @return null if no data is available.
      */
     public Data getData() {
         TextFile df = getDataFile();
-        if(df.exists()) {
+        if (df.exists()) {
             try {
                 return new Data(JSONObject.fromObject(df.read()));
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE,"Failed to parse "+df,e);
+                LOGGER.log(Level.SEVERE, "Failed to parse " + df, e);
                 df.delete(); // if we keep this file, it will cause repeated failures
                 return null;
             }
@@ -235,7 +241,7 @@ public class UpdateSite {
             return null;
         }
     }
-    
+
     /**
      * Returns a list of plugins that should be shown in the "available" tab.
      * These are "all plugins - installed plugins".
@@ -243,10 +249,13 @@ public class UpdateSite {
     public List<Plugin> getAvailables() {
         List<Plugin> r = new ArrayList<Plugin>();
         Data data = getData();
-        if(data==null)     return Collections.emptyList();
+        if (data == null) {
+            return Collections.emptyList();
+        }
         for (Plugin p : data.plugins.values()) {
-            if(p.getInstalled()==null)
+            if (p.getInstalled() == null) {
                 r.add(p);
+            }
         }
         return r;
     }
@@ -254,24 +263,28 @@ public class UpdateSite {
     /**
      * Gets the information about a specific plugin.
      *
-     * @param artifactId
-     *      The short name of the plugin. Corresponds to {@link PluginWrapper#getShortName()}.
+     * @param artifactId The short name of the plugin. Corresponds to
+     * {@link PluginWrapper#getShortName()}.
      *
-     * @return
-     *      null if no such information is found.
+     * @return null if no such information is found.
      */
     public Plugin getPlugin(String artifactId) {
         Data dt = getData();
-        if(dt==null)    return null;
+        if (dt == null) {
+            return null;
+        }
         return dt.plugins.get(artifactId);
     }
 
     /**
-     * Returns an "always up" server for Internet connectivity testing, or null if we are going to skip the test.
+     * Returns an "always up" server for Internet connectivity testing, or null
+     * if we are going to skip the test.
      */
     public String getConnectionCheckUrl() {
         Data dt = getData();
-        if(dt==null)    return "http://www.google.com/";
+        if (dt == null) {
+            return "http://www.google.com/";
+        }
         return dt.connectionCheckUrl;
     }
 
@@ -280,48 +293,52 @@ public class UpdateSite {
      */
     private TextFile getDataFile() {
         return new TextFile(new File(Hudson.getInstance().getRootDir(),
-                                     "updates/" + getId()+".json"));
+                "updates/" + getId() + ".json"));
     }
-    
+
     /**
      * Returns the list of plugins that are updates to currently installed ones.
      *
-     * @return
-     *      can be empty but never null.
+     * @return can be empty but never null.
      */
     public List<Plugin> getUpdates() {
         Data data = getData();
-        if(data==null)      return Collections.emptyList(); // fail to determine
-        
+        if (data == null) {
+            return Collections.emptyList(); // fail to determine
+        }
         List<Plugin> r = new ArrayList<Plugin>();
         for (PluginWrapper pw : Hudson.getInstance().getPluginManager().getPlugins()) {
             Plugin p = pw.getUpdateInfo();
-            if(p!=null) r.add(p);
+            if (p != null) {
+                r.add(p);
+            }
         }
-        
+
         return r;
     }
-    
+
     /**
      * Does any of the plugin has updates?
      */
     public boolean hasUpdates() {
         Data data = getData();
-        if(data==null)      return false;
-        
+        if (data == null) {
+            return false;
+        }
+
         for (PluginWrapper pw : Hudson.getInstance().getPluginManager().getPlugins()) {
-            if(!pw.isBundled() && pw.getUpdateInfo()!=null)
-                // do not advertize updates to bundled plugins, since we generally want users to get them
-                // as a part of hudson.war updates. This also avoids unnecessary pinning of plugins. 
+            if (!pw.isBundled() && pw.getUpdateInfo() != null) // do not advertize updates to bundled plugins, since we generally want users to get them
+            // as a part of hudson.war updates. This also avoids unnecessary pinning of plugins. 
+            {
                 return true;
+            }
         }
         return false;
     }
-    
-    
+
     /**
-     * Exposed to get rid of hardcoding of the URL that serves up update-center.json
-     * in Javascript.
+     * Exposed to get rid of hardcoding of the URL that serves up
+     * update-center.json in Javascript.
      */
     public String getUrl() {
         return url;
@@ -338,12 +355,12 @@ public class UpdateSite {
      * In-memory representation of the update center data.
      */
     public final class Data {
+
         /**
          * The {@link UpdateSite} ID.
          */
         //TODO: review and check whether we can do it private
         public final String sourceId;
-
         /**
          * The latest hudson.war.
          */
@@ -353,31 +370,30 @@ public class UpdateSite {
          * Plugins in the repository, keyed by their artifact IDs.
          */
         //TODO: review and check whether we can do it private
-        public final Map<String,Plugin> plugins = new TreeMap<String,Plugin>(String.CASE_INSENSITIVE_ORDER);
-
+        public final Map<String, Plugin> plugins = new TreeMap<String, Plugin>(String.CASE_INSENSITIVE_ORDER);
         /**
-         * If this is non-null, Hudson is going to check the connectivity to this URL to make sure
-         * the network connection is up. Null to skip the check.
+         * If this is non-null, Hudson is going to check the connectivity to
+         * this URL to make sure the network connection is up. Null to skip the
+         * check.
          */
         //TODO: review and check whether we can do it private
         public final String connectionCheckUrl;
 
         Data(JSONObject o) {
-            this.sourceId = (String)o.get("id");
+            this.sourceId = (String) o.get("id");
             if (sourceId.equals("default")) {
                 core = new Entry(sourceId, o.getJSONObject("core"));
-            }
-            else {
+            } else {
                 core = null;
             }
-            for(Map.Entry<String,JSONObject> e : (Set<Map.Entry<String,JSONObject>>)o.getJSONObject("plugins").entrySet()) {
-                Plugin  plugin = new Plugin(sourceId, e.getValue());
+            for (Map.Entry<String, JSONObject> e : (Set<Map.Entry<String, JSONObject>>) o.getJSONObject("plugins").entrySet()) {
+                Plugin plugin = new Plugin(sourceId, e.getValue());
                 if (!"disabled".equals(plugin.type)) {
                     plugins.put(e.getKey(), plugin);
                 }
             }
 
-            connectionCheckUrl = (String)o.get("connectionCheckUrl");
+            connectionCheckUrl = (String) o.get("connectionCheckUrl");
         }
 
         public String getSourceId() {
@@ -412,11 +428,11 @@ public class UpdateSite {
     }
 
     public static class Entry {
+
         /**
          * {@link UpdateSite} ID.
          */
         public final String sourceId;
-
         /**
          * Artifact ID.
          */
@@ -438,13 +454,14 @@ public class UpdateSite {
         }
 
         /**
-         * Checks if the specified "current version" is older than the version of this entry.
+         * Checks if the specified "current version" is older than the version
+         * of this entry.
          *
-         * @param currentVersion
-         *      The string that represents the version number to be compared.
-         * @return
-         *      true if the version listed in this entry is newer.
-         *      false otherwise, including the situation where the strings couldn't be parsed as version numbers.
+         * @param currentVersion The string that represents the version number
+         * to be compared.
+         * @return true if the version listed in this entry is newer. false
+         * otherwise, including the situation where the strings couldn't be
+         * parsed as version numbers.
          */
         public boolean isNewerThan(String currentVersion) {
             try {
@@ -454,20 +471,19 @@ public class UpdateSite {
                 return false;
             }
         }
-
     }
 
     public final class Plugin extends Entry {
+
         /**
          * Optional URL to the Wiki page that discusses this plugin.
          */
         public final String wiki;
         /**
-         * Human readable title of the plugin, taken from Wiki page.
-         * Can be null.
+         * Human readable title of the plugin, taken from Wiki page. Can be
+         * null.
          *
-         * <p>
-         * beware of XSS vulnerability since this data comes from Wiki
+         * <p> beware of XSS vulnerability since this data comes from Wiki
          */
         public final String title;
         /**
@@ -475,7 +491,8 @@ public class UpdateSite {
          */
         public final String excerpt;
         /**
-         * Optional version # from which this plugin release is configuration-compatible.
+         * Optional version # from which this plugin release is
+         * configuration-compatible.
          */
         public final String compatibleSinceVersion;
         /**
@@ -483,51 +500,49 @@ public class UpdateSite {
          */
         public final String requiredCore;
         /**
-         * Categories for grouping plugins, taken from labels assigned to wiki page.
-         * Can be null.
+         * Categories for grouping plugins, taken from labels assigned to wiki
+         * page. Can be null.
          */
         public final String[] categories;
-        
         public String type;
-
         /**
          * Dependencies of this plugin.
          */
-        public final Map<String,String> dependencies = new HashMap<String,String>();
-        
+        public final Map<String, String> dependencies = new HashMap<String, String>();
+
         @DataBoundConstructor
         public Plugin(String sourceId, JSONObject o) {
             super(sourceId, o);
-            
-            this.type = get(o,"type");
-           
+
+            this.type = get(o, "type");
+
             if ((type == null) || "".equals(type)) {
                 type = "others";
             }
-            
-            this.wiki = get(o,"wiki");
-            this.title = get(o,"title");
-            this.excerpt = get(o,"excerpt");
-            this.compatibleSinceVersion = get(o,"compatibleSinceVersion");
-            this.requiredCore = get(o,"requiredCore");
+
+            this.wiki = get(o, "wiki");
+            this.title = get(o, "title");
+            this.excerpt = get(o, "excerpt");
+            this.compatibleSinceVersion = get(o, "compatibleSinceVersion");
+            this.requiredCore = get(o, "requiredCore");
             JSONArray labelsJsonArray = o.getJSONArray("labels");
             this.categories = o.has("labels") ? (String[]) labelsJsonArray.toArray(new String[labelsJsonArray.size()]) : null;
-            for(Object jo : o.getJSONArray("dependencies")) {
+            for (Object jo : o.getJSONArray("dependencies")) {
                 JSONObject depObj = (JSONObject) jo;
                 // Make sure there's a name attribute, that that name isn't maven-plugin - we ignore that one -
                 // and that the optional value isn't true.
-                if (get(depObj,"name")!=null
-                    && !get(depObj,"name").equals("maven-plugin")
-                    && get(depObj,"optional").equals("false")) {
-                    dependencies.put(get(depObj,"name"), get(depObj,"version"));
+                if (get(depObj, "name") != null
+                        && !get(depObj, "name").equals("maven-plugin")
+                        && get(depObj, "optional").equals("false")) {
+                    dependencies.put(get(depObj, "name"), get(depObj, "version"));
                 }
-                
+
             }
 
         }
 
         private String get(JSONObject o, String prop) {
-            if(o.has(prop)) {
+            if (o.has(prop)) {
                 String value = o.getString(prop);
                 if (!"null".equals(value) && !"\"null\"".equals(value)) {
                     return value;
@@ -537,13 +552,15 @@ public class UpdateSite {
         }
 
         public String getDisplayName() {
-            if(title!=null) return title;
+            if (title != null) {
+                return title;
+            }
             return name;
         }
 
         /**
-         * If some version of this plugin is currently installed, return {@link PluginWrapper}.
-         * Otherwise null.
+         * If some version of this plugin is currently installed, return
+         * {@link PluginWrapper}. Otherwise null.
          */
         public PluginWrapper getInstalled() {
             PluginManager pm = Hudson.getInstance().getPluginManager();
@@ -551,10 +568,12 @@ public class UpdateSite {
         }
 
         /**
-         * If the plugin is already installed, and the new version of the plugin has a "compatibleSinceVersion"
-         * value (i.e., it's only directly compatible with that version or later), this will check to
-         * see if the installed version is older than the compatible-since version. If it is older, it'll return false.
-         * If it's not older, or it's not installed, or it's installed but there's no compatibleSinceVersion
+         * If the plugin is already installed, and the new version of the plugin
+         * has a "compatibleSinceVersion" value (i.e., it's only directly
+         * compatible with that version or later), this will check to see if the
+         * installed version is older than the compatible-since version. If it
+         * is older, it'll return false. If it's not older, or it's not
+         * installed, or it's installed but there's no compatibleSinceVersion
          * specified, it'll return true.
          */
         public boolean isCompatibleWithInstalledVersion() {
@@ -571,22 +590,22 @@ public class UpdateSite {
         }
 
         /**
-         * Returns a list of dependent plugins which need to be installed or upgraded for this plugin to work.
+         * Returns a list of dependent plugins which need to be installed or
+         * upgraded for this plugin to work.
          */
         public List<Plugin> getNeededDependencies() {
             List<Plugin> deps = new ArrayList<Plugin>();
 
-            for(Map.Entry<String,String> e : dependencies.entrySet()) {
+            for (Map.Entry<String, String> e : dependencies.entrySet()) {
                 Plugin depPlugin = Hudson.getInstance().getUpdateCenter().getPlugin(e.getKey());
                 VersionNumber requiredVersion = new VersionNumber(e.getValue());
-                
+
                 // Is the plugin installed already? If not, add it.
                 PluginWrapper current = depPlugin.getInstalled();
 
-                if (current ==null) {
+                if (current == null) {
                     deps.add(depPlugin);
-                }
-                // If the dependency plugin is installed, is the version we depend on newer than
+                } // If the dependency plugin is installed, is the version we depend on newer than
                 // what's installed? If so, upgrade.
                 else if (current.isOlderThan(requiredVersion)) {
                     deps.add(depPlugin);
@@ -595,19 +614,18 @@ public class UpdateSite {
 
             return deps;
         }
-        
+
         public boolean isForNewerHudson() {
             try {
-                return requiredCore!=null && new VersionNumber(requiredCore).isNewerThan(
-                  new VersionNumber(Hudson.VERSION.replaceFirst("SHOT *\\(private.*\\)", "SHOT")));
+                return requiredCore != null && new VersionNumber(requiredCore).isNewerThan(
+                        new VersionNumber(Hudson.VERSION.replaceFirst("SHOT *\\(private.*\\)", "SHOT")));
             } catch (NumberFormatException nfe) {
                 return true;  // If unable to parse version
             }
         }
 
         /**
-         * @deprecated as of 1.326
-         *      Use {@link #deploy()}.
+         * @deprecated as of 1.326 Use {@link #deploy()}.
          */
         public void install() {
             deploy();
@@ -616,9 +634,8 @@ public class UpdateSite {
         /**
          * Schedules the installation of this plugin.
          *
-         * <p>
-         * This is mainly intended to be called from the UI. The actual installation work happens
-         * asynchronously in another thread.
+         * <p> This is mainly intended to be called from the UI. The actual
+         * installation work happens asynchronously in another thread.
          */
         public Future<UpdateCenterJob> deploy() {
             Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
@@ -638,6 +655,7 @@ public class UpdateSite {
             UpdateCenter uc = Hudson.getInstance().getUpdateCenter();
             return uc.addJob(uc.new PluginDowngradeJob(this, UpdateSite.this, HudsonSecurityManager.getAuthentication()));
         }
+
         /**
          * Making the installation web bound.
          */
@@ -654,16 +672,12 @@ public class UpdateSite {
             rsp.sendRedirect2("../..");
         }
     }
-
     private static final long DAY = DAYS.toMillis(1);
-
     private static final Logger LOGGER = Logger.getLogger(UpdateSite.class.getName());
-
     // The name uses UpdateCenter for compatibility reason.
-    public static boolean neverUpdate = Boolean.getBoolean(UpdateCenter.class.getName()+".never");
-
+    public static boolean neverUpdate = Boolean.getBoolean(UpdateCenter.class.getName() + ".never");
     /**
      * Off by default until we know this is reasonably working.
      */
-    public static boolean signatureCheck = Boolean.getBoolean(UpdateCenter.class.getName()+".signatureCheck");
+    public static boolean signatureCheck = Boolean.getBoolean(UpdateCenter.class.getName() + ".signatureCheck");
 }

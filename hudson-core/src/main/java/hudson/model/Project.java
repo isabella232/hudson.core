@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi, Jorg Heymans, Stephen Connolly, Tom Huybrechts, Anton Kozak, Nikita Levyankov
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -31,14 +31,14 @@ import java.util.Set;
  *
  * @author Kohsuke Kawaguchi
  */
-public abstract class Project<P extends Project<P,B>,B extends Build<P,B>>
-    extends BaseBuildableProject<P, B>
-    implements SCMedItem, Saveable, ProjectWithMaven, BuildableItemWithBuildWrappers, IProject {
+public abstract class Project<P extends Project<P, B>, B extends Build<P, B>>
+        extends BaseBuildableProject<P, B>
+        implements SCMedItem, Saveable, ProjectWithMaven, BuildableItemWithBuildWrappers, IProject {
 
     /**
      * Creates a new project.
      */
-    public Project(ItemGroup parent,String name) {
+    public Project(ItemGroup parent, String name) {
         super(parent, name);
     }
 
@@ -52,7 +52,7 @@ public abstract class Project<P extends Project<P,B>,B extends Build<P,B>>
 
         activities.addAll(super.getResourceActivities());
         activities.addAll(Util.filter(getBuildersList(), ResourceActivity.class));
-        activities.addAll(Util.filter(getPublishersList(),ResourceActivity.class));
+        activities.addAll(Util.filter(getPublishersList(), ResourceActivity.class));
         activities.addAll(Util.filter(getBuildWrappersList(), ResourceActivity.class));
 
         return activities;
@@ -60,24 +60,26 @@ public abstract class Project<P extends Project<P,B>,B extends Build<P,B>>
 
     @Override
     public boolean isFingerprintConfigured() {
-        return getPublishersList().get(Fingerprinter.class)!=null;
+        return getPublishersList().get(Fingerprinter.class) != null;
     }
 
     public MavenInstallation inferMavenInstallation() {
         Maven m = getBuildersList().get(Maven.class);
-        if (m!=null)    return m.getMaven();
+        if (m != null) {
+            return m.getMaven();
+        }
         return null;
     }
-
     /**
-     * @deprecated since 2006-11-05.
-     *      Left for legacy config file compatibility
+     * @deprecated since 2006-11-05. Left for legacy config file compatibility
      */
     @Deprecated
     private transient String slave;
 
     private Object readResolve() {
-        if (slave != null) OldDataMonitor.report(this, "1.60");
+        if (slave != null) {
+            OldDataMonitor.report(this, "1.60");
+        }
         return this;
     }
 }

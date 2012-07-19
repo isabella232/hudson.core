@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -20,17 +20,18 @@ import hudson.model.Queue.FlyweightTask;
 import hudson.model.queue.WorkUnit;
 
 /**
- * {@link Executor} that's temporarily added to carry out tasks that doesn't consume
- * regular executors, like a matrix project parent build.
+ * {@link Executor} that's temporarily added to carry out tasks that doesn't
+ * consume regular executors, like a matrix project parent build.
  *
  * @author Kohsuke Kawaguchi
  * @see FlyweightTask
  */
 public class OneOffExecutor extends Executor {
+
     private WorkUnit work;
 
     public OneOffExecutor(Computer owner, WorkUnit work) {
-        super(owner,-1);
+        super(owner, -1);
         this.work = work;
     }
 
@@ -42,14 +43,13 @@ public class OneOffExecutor extends Executor {
     protected boolean shouldRun() {
         // TODO: consulting super.shouldRun() here means we'll lose the work if it gets scheduled
         // when super.shouldRun() returns false.
-        return super.shouldRun() && work !=null;
+        return super.shouldRun() && work != null;
     }
-
 
     @Override
     protected WorkUnit grabJob() throws InterruptedException {
         WorkUnit r = super.grabJob();
-        assert r==work;
+        assert r == work;
         work = null;
         return r;
     }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -41,22 +41,19 @@ import javax.servlet.ServletException;
 /**
  * {@link ParameterValue} for {@link FileParameterDefinition}.
  *
- * <h2>Persistence</h2>
- * <p>
- * {@link DiskFileItem} is persistable via serialization,
- * (although the data may get very large in XML) so this object
+ * <h2>Persistence</h2> <p> {@link DiskFileItem} is persistable via
+ * serialization, (although the data may get very large in XML) so this object
  * as a whole is persistable.
  *
  * @author Kohsuke Kawaguchi
  */
 public class FileParameterValue extends ParameterValue {
-    private FileItem file;
 
+    private FileItem file;
     /**
      * The name of the originally uploaded file.
      */
     private final String originalFileName;
-
     private String location;
 
     @DataBoundConstructor
@@ -91,55 +88,61 @@ public class FileParameterValue extends ParameterValue {
     }
 
     @Override
-    public BuildWrapper createBuildWrapper(AbstractBuild<?,?> build) {
+    public BuildWrapper createBuildWrapper(AbstractBuild<?, ?> build) {
         return new BuildWrapper() {
             @Override
             public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-            	if (!StringUtils.isEmpty(file.getName())) {
-            	    listener.getLogger().println("Copying file to "+location);
+                if (!StringUtils.isEmpty(file.getName())) {
+                    listener.getLogger().println("Copying file to " + location);
                     FilePath locationFilePath = build.getWorkspace().child(location);
                     locationFilePath.getParent().mkdirs();
-            	    locationFilePath.copyFrom(file);
-            	    file = null;
+                    locationFilePath.copyFrom(file);
+                    file = null;
                     locationFilePath.copyTo(new FilePath(getLocationUnderBuild(build)));
-            	}
-                return new Environment() {};
+                }
+                return new Environment() {
+                };
             }
         };
     }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result
-				+ ((location == null) ? 0 : location.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result
+                + ((location == null) ? 0 : location.hashCode());
+        return result;
+    }
 
-	/**
-	 * In practice this will always be false, since location should be unique.
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		FileParameterValue other = (FileParameterValue) obj;
-		if (location == null) {
-			if (other.location != null)
-				return false;
-		} else if (!location.equals(other.location))
-			return false;
-		return true;
-	}
+    /**
+     * In practice this will always be false, since location should be unique.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        FileParameterValue other = (FileParameterValue) obj;
+        if (location == null) {
+            if (other.location != null) {
+                return false;
+            }
+        } else if (!location.equals(other.location)) {
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public String getShortDescription() {
-    	return "(FileParameterValue) " + getName() + "='" + originalFileName + "'";
+        return "(FileParameterValue) " + getName() + "='" + originalFileName + "'";
     }
 
     /**
@@ -152,7 +155,7 @@ public class FileParameterValue extends ParameterValue {
      */
     public void doDynamic(StaplerRequest request, StaplerResponse response) throws ServletException, IOException {
         if (("/" + originalFileName).equals(request.getRestOfPath())) {
-            AbstractBuild build = (AbstractBuild)request.findAncestor(AbstractBuild.class).getObject();
+            AbstractBuild build = (AbstractBuild) request.findAncestor(AbstractBuild.class).getObject();
             File fileParameter = getLocationUnderBuild(build);
             if (fileParameter.isFile()) {
                 response.serveFile(request, fileParameter.toURI().toURL());
@@ -174,6 +177,7 @@ public class FileParameterValue extends ParameterValue {
      * Default implementation from {@link File}.
      */
     public static final class FileItemImpl implements FileItem {
+
         private final File file;
 
         public FileItemImpl(File file) {

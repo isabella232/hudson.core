@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -34,29 +34,26 @@ import java.util.logging.Logger;
  * @since 1.301
  */
 public abstract class LoadBalancer /*implements ExtensionPoint*/ {
+
     /**
      * Chooses the executor(s) to carry out the build for the given task.
      *
-     * <p>
-     * This method is invoked from different threads, but the execution is serialized by the caller.
-     * The thread that invokes this method always holds a lock to {@link Queue}, so queue contents
-     * can be safely introspected from this method, if that information is necessary to make
+     * <p> This method is invoked from different threads, but the execution is
+     * serialized by the caller. The thread that invokes this method always
+     * holds a lock to {@link Queue}, so queue contents can be safely
+     * introspected from this method, if that information is necessary to make
      * decisions.
-     * 
-     * @param  task
-     *      The task whose execution is being considered. Never null.
-     * @param worksheet
-     *      The work sheet that represents the matching that needs to be made.
-     *      The job of this method is to determine which work units on this worksheet
-     *      are executed on which executors (also on this worksheet.)
      *
-     * @return
-     *      Build up the mapping by using the given worksheet and return it.
-     *      Return null if you don't want the task to be executed right now,
-     *      in which case this method will be called some time later with the same task.
+     * @param task The task whose execution is being considered. Never null.
+     * @param worksheet The work sheet that represents the matching that needs
+     * to be made. The job of this method is to determine which work units on
+     * this worksheet are executed on which executors (also on this worksheet.)
+     *
+     * @return Build up the mapping by using the given worksheet and return it.
+     * Return null if you don't want the task to be executed right now, in which
+     * case this method will be called some time later with the same task.
      */
     public abstract Mapping map(Task task, MappingWorksheet worksheet);
-
     /**
      * Uses a consistent hash for scheduling.
      */
@@ -65,62 +62,64 @@ public abstract class LoadBalancer /*implements ExtensionPoint*/ {
         public Mapping map(Task task, MappingWorksheet ws) {
             // build consistent hash for each work chunk
             List<ConsistentHash<ExecutorChunk>> hashes = new ArrayList<ConsistentHash<ExecutorChunk>>(ws.works.size());
-            for (int i=0; i<ws.works.size(); i++) {
+            for (int i = 0; i < ws.works.size(); i++) {
                 ConsistentHash<ExecutorChunk> hash = new ConsistentHash<ExecutorChunk>(new Hash<ExecutorChunk>() {
                     public String hash(ExecutorChunk node) {
                         return node.getName();
                     }
                 });
-                for (ExecutorChunk ec : ws.works(i).applicableExecutorChunks())
-                    hash.add(ec,ec.size()*100);
+                for (ExecutorChunk ec : ws.works(i).applicableExecutorChunks()) {
+                    hash.add(ec, ec.size() * 100);
+                }
 
                 hashes.add(hash);
             }
 
             // do a greedy assignment
             Mapping m = ws.new Mapping();
-            assert m.size()==ws.works.size();   // just so that you the reader of the source code don't get confused with the for loop index
+            assert m.size() == ws.works.size();   // just so that you the reader of the source code don't get confused with the for loop index
 
-            if (assignGreedily(m,task,hashes,0)) {
+            if (assignGreedily(m, task, hashes, 0)) {
                 assert m.isCompletelyValid();
                 return m;
-            } else
+            } else {
                 return null;
+            }
         }
 
         private boolean assignGreedily(Mapping m, Task task, List<ConsistentHash<ExecutorChunk>> hashes, int i) {
-            if (i==hashes.size())   return true;    // fully assigned
-
-            String key = task.getFullDisplayName() + (i>0 ? String.valueOf(i) : "");
+            if (i == hashes.size()) {
+                return true;    // fully assigned
+            }
+            String key = task.getFullDisplayName() + (i > 0 ? String.valueOf(i) : "");
 
             for (ExecutorChunk ec : hashes.get(i).list(key)) {
                 // let's attempt this assignment
-                m.assign(i,ec);
+                m.assign(i, ec);
 
-                if (m.isPartiallyValid() && assignGreedily(m,task,hashes,i+1))
+                if (m.isPartiallyValid() && assignGreedily(m, task, hashes, i + 1)) {
                     return true;    // successful greedily allocation
-
+                }
                 // otherwise 'ec' wasn't a good fit for us. try next.
             }
 
             // every attempt failed
-            m.assign(i,null);
+            m.assign(i, null);
             return false;
         }
     };
-
     /**
      * Traditional implementation of this.
      *
-     * @deprecated as of 1.377
-     *      The only implementation in the core now is the one based on consistent hash.
+     * @deprecated as of 1.377 The only implementation in the core now is the
+     * one based on consistent hash.
      */
     public static final LoadBalancer DEFAULT = CONSISTENT_HASH;
 
-
     /**
-     * Wraps this {@link LoadBalancer} into a decorator that tests the basic sanity of the implementation.
-     * Only override this if you find some of the checks excessive, but beware that it's like driving without a seat belt.
+     * Wraps this {@link LoadBalancer} into a decorator that tests the basic
+     * sanity of the implementation. Only override this if you find some of the
+     * checks excessive, but beware that it's like driving without a seat belt.
      */
     protected LoadBalancer sanitize() {
         final LoadBalancer base = this;
@@ -142,9 +141,7 @@ public abstract class LoadBalancer /*implements ExtensionPoint*/ {
             protected LoadBalancer sanitize() {
                 return this;
             }
-
             private final Logger LOGGER = Logger.getLogger(LoadBalancer.class.getName());
         };
     }
-
 }

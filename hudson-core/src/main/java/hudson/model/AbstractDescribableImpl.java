@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *        
+ *
  *
  *******************************************************************************/ 
 
@@ -22,6 +22,7 @@ package hudson.model;
  * @author Kohsuke Kawaguchi
  */
 public abstract class AbstractDescribableImpl<T extends AbstractDescribableImpl<T>> implements Describable<T> {
+
     public Descriptor<T> getDescriptor() {
         return Hudson.getInstance().getDescriptorOrDie(getClass());
     }

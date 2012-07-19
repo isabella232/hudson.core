@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -36,7 +36,7 @@ public final class RSS {
     /**
      * Parses trackback ping.
      */
-    public static void doTrackback( Object it, StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
+    public static void doTrackback(Object it, StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
 
         String url = req.getParameter("url");
 
@@ -44,8 +44,8 @@ public final class RSS {
         rsp.setContentType("application/xml; charset=UTF-8");
         PrintWriter pw = rsp.getWriter();
         pw.println("<response>");
-        pw.println("<error>"+(url!=null?0:1)+"</error>");
-        if(url==null) {
+        pw.println("<error>" + (url != null ? 0 : 1) + "</error>");
+        if (url == null) {
             pw.println("<message>url must be specified</message>");
         }
         pw.println("</response>");
@@ -55,26 +55,25 @@ public final class RSS {
     /**
      * Sends the RSS feed to the client.
      *
-     * @param title
-     *      Title of the feed.
-     * @param url
-     *      URL of the model object that owns this feed. Relative to the context root.
-     * @param entries
-     *      Entries to be listed in the RSS feed.
-     * @param adapter
-     *      Controls how to render entries to RSS.
+     * @param title Title of the feed.
+     * @param url URL of the model object that owns this feed. Relative to the
+     * context root.
+     * @param entries Entries to be listed in the RSS feed.
+     * @param adapter Controls how to render entries to RSS.
      */
     public static <E> void forwardToRss(String title, String url, Collection<? extends E> entries, FeedAdapter<E> adapter, StaplerRequest req, HttpServletResponse rsp) throws IOException, ServletException {
-        req.setAttribute("adapter",adapter);
-        req.setAttribute("title",title);
-        req.setAttribute("url",url);
-        req.setAttribute("entries",entries);
+        req.setAttribute("adapter", adapter);
+        req.setAttribute("title", title);
+        req.setAttribute("url", url);
+        req.setAttribute("entries", entries);
         req.setAttribute("rootURL", Hudson.getInstance().getRootUrl());
 
         String flavor = req.getParameter("flavor");
-        if(flavor==null)    flavor="atom";
+        if (flavor == null) {
+            flavor = "atom";
+        }
         flavor = flavor.replace('/', '_'); // Don't allow path to any jelly
 
-        req.getView(Hudson.getInstance(),"/hudson/"+flavor+".jelly").forward(req,rsp);
+        req.getView(Hudson.getInstance(), "/hudson/" + flavor + ".jelly").forward(req, rsp);
     }
 }

@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -27,11 +27,12 @@ import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Works like {@link Extension} except used for inserting extensions during unit tests.
+ * Works like {@link Extension} except used for inserting extensions during unit
+ * tests.
  *
- * <p>
- * This annotation must be used on a method/field of a test case class, or an nested type of the test case.
- * The extensions are activated only when the outer test class is being run.
+ * <p> This annotation must be used on a method/field of a test case class, or
+ * an nested type of the test case. The extensions are activated only when the
+ * outer test class is being run.
  *
  * @author Kohsuke Kawaguchi
  * @see TestExtensionLoader
@@ -41,9 +42,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, FIELD, METHOD})
 @Documented
 public @interface TestExtension {
+
     /**
-     * To make this extension only active for one test case, specify the test method name.
-     * Otherwise, leave it unspecified and it'll apply to all the test methods defined in the same class.
+     * To make this extension only active for one test case, specify the test
+     * method name. Otherwise, leave it unspecified and it'll apply to all the
+     * test methods defined in the same class.
      *
      * <h2>Example</h2>
      * <pre>

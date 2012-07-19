@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
-*
-*    Kohsuke Kawaguchi
- *     
+ * Contributors:
+ * 
+ *    Kohsuke Kawaguchi
+ *
  *
  *******************************************************************************/ 
 
@@ -26,13 +26,13 @@ import hudson.model.Hudson;
 /**
  * Kills off {@link ServletContextListener}s loaded from web.xml.
  *
- * <p>
- * This is so that the harness can create the {@link Hudson} object.
- * with the home directory of our choice.
+ * <p> This is so that the harness can create the {@link Hudson} object. with
+ * the home directory of our choice.
  *
  * @author Kohsuke Kawaguchi
  */
 final class NoListenerConfiguration implements Configuration {
+
     private WebAppContext context;
 
     public void setWebAppContext(WebAppContext context) {

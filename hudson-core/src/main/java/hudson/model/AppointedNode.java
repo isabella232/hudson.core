@@ -29,16 +29,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class AppointedNode implements Serializable {
 
     /**
-     * If this project is configured to be only built on a certain label,
-     * this value will be set to that label.
+     * If this project is configured to be only built on a certain label, this
+     * value will be set to that label.
      */
     private String nodeName;
-
     /**
      * Node list dropdown or textfield.
      */
     private Boolean advancedAffinityChooser;
-
     /**
      * True if this project can be built on any node.
      */
@@ -84,8 +82,8 @@ public class AppointedNode implements Serializable {
     }
 
     /**
-     * Sets true if the node configured with advanced label expression
-     * and false if with combobox.
+     * Sets true if the node configured with advanced label expression and false
+     * if with combobox.
      *
      * @param advancedAffinityChooser boolean.
      */
@@ -94,8 +92,8 @@ public class AppointedNode implements Serializable {
     }
 
     /**
-     * If this project is configured to be always built on this node,
-     * return that {@link Node}. Otherwise null.
+     * If this project is configured to be always built on this node, return
+     * that {@link Node}. Otherwise null.
      *
      * @return assigned label
      */
@@ -110,7 +108,8 @@ public class AppointedNode implements Serializable {
     }
 
     /**
-     * Gets the textual representation of the assigned label as it was entered by the user.
+     * Gets the textual representation of the assigned label as it was entered
+     * by the user.
      *
      * @return assigned label as string
      */
@@ -142,7 +141,6 @@ public class AppointedNode implements Serializable {
         }
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -153,16 +151,16 @@ public class AppointedNode implements Serializable {
         }
         AppointedNode that = (AppointedNode) o;
         return new EqualsBuilder()
-            .append(advancedAffinityChooser, that.advancedAffinityChooser)
-            .append(nodeName, that.nodeName)
-            .isEquals();
+                .append(advancedAffinityChooser, that.advancedAffinityChooser)
+                .append(nodeName, that.nodeName)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-            .append(advancedAffinityChooser)
-            .append(nodeName)
-            .toHashCode();
+                .append(advancedAffinityChooser)
+                .append(nodeName)
+                .toHashCode();
     }
 }

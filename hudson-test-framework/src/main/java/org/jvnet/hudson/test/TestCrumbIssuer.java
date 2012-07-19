@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *      
+ *
  *
  *******************************************************************************/ 
 
@@ -27,26 +27,25 @@ import hudson.security.csrf.CrumbIssuerDescriptor;
 
 /**
  * A crumb issuer that issues a constant crumb value. Used for unit testing.
+ *
  * @author dty
  */
-public class TestCrumbIssuer extends CrumbIssuer
-{
+public class TestCrumbIssuer extends CrumbIssuer {
+
     @Override
-    protected String issueCrumb( ServletRequest request, String salt )
-    {
+    protected String issueCrumb(ServletRequest request, String salt) {
         return "test";
     }
 
     @Override
-    public boolean validateCrumb( ServletRequest request, String salt, String crumb )
-    {
+    public boolean validateCrumb(ServletRequest request, String salt, String crumb) {
         return "test".equals(crumb);
     }
 
     @Extension
     public static final class DescriptorImpl extends CrumbIssuerDescriptor<TestCrumbIssuer> implements ModelObject {
-        public DescriptorImpl()
-        {
+
+        public DescriptorImpl() {
             super(null, null);
             load();
         }
@@ -55,10 +54,9 @@ public class TestCrumbIssuer extends CrumbIssuer
         public String getDisplayName() {
             return "Test Crumb";
         }
-        
+
         public TestCrumbIssuer newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             return new TestCrumbIssuer();
         }
     }
-
 }

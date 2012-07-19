@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *        
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -32,18 +32,17 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
- * Builds a {@link Channel} on top of two HTTP streams (one used for each direction.)
+ * Builds a {@link Channel} on top of two HTTP streams (one used for each
+ * direction.)
  *
  * @author Kohsuke Kawaguchi
  */
 abstract class FullDuplexHttpChannel {
+
     private Channel channel;
-
     private InputStream upload;
-
     private final UUID uuid;
     private final boolean restricted;
-
     private boolean completed;
 
     public FullDuplexHttpChannel(UUID uuid, boolean restricted) throws IOException {
@@ -54,8 +53,7 @@ abstract class FullDuplexHttpChannel {
     /**
      * This is where we send the data to the client.
      *
-     * <p>
-     * If this connection is lost, we'll abort the channel.
+     * <p> If this connection is lost, we'll abort the channel.
      */
     public synchronized void download(StaplerRequest req, StaplerResponse rsp) throws InterruptedException, IOException {
         rsp.setStatus(HttpServletResponse.SC_OK);
@@ -64,15 +62,18 @@ abstract class FullDuplexHttpChannel {
         // this is created first, and this controls the lifespan of the channel
         rsp.addHeader("Transfer-Encoding", "chunked");
         OutputStream out = rsp.getOutputStream();
-        if (DIY_CHUNKING) out = new ChunkedOutputStream(out);
+        if (DIY_CHUNKING) {
+            out = new ChunkedOutputStream(out);
+        }
 
         // send something out so that the client will see the HTTP headers
         out.write("Starting HTTP duplex channel".getBytes());
         out.flush();
 
         // wait until we have the other channel
-        while(upload==null)
+        while (upload == null) {
             wait();
+        }
 
         try {
             channel = new Channel("HTTP full-duplex channel " + uuid,
@@ -98,7 +99,7 @@ abstract class FullDuplexHttpChannel {
             ping.interrupt();
         } finally {
             // publish that we are done
-            completed=true;
+            completed = true;
             notify();
         }
     }
@@ -111,23 +112,24 @@ abstract class FullDuplexHttpChannel {
     public synchronized void upload(StaplerRequest req, StaplerResponse rsp) throws InterruptedException, IOException {
         rsp.setStatus(HttpServletResponse.SC_OK);
         InputStream in = req.getInputStream();
-        if(DIY_CHUNKING)    in = new ChunkedInputStream(in);
+        if (DIY_CHUNKING) {
+            in = new ChunkedInputStream(in);
+        }
 
         // publish the upload channel
         upload = in;
         notify();
 
         // wait until we are done
-        while (!completed)
+        while (!completed) {
             wait();
+        }
     }
 
     public Channel getChannel() {
         return channel;
     }
-
     private static final Logger LOGGER = Logger.getLogger(FullDuplexHttpChannel.class.getName());
-
     /**
      * Set to true if the servlet container doesn't support chunked encoding.
      */

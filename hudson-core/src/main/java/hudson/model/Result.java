@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
  *    Kohsuke Kawaguchi
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -36,39 +36,36 @@ import java.util.List;
  * @author Kohsuke Kawaguchi
  */
 public final class Result implements Serializable, CustomExportedBean {
+
     /**
      * The build had no errors.
      */
-    public static final Result SUCCESS = new Result("SUCCESS",BallColor.BLUE,0);
+    public static final Result SUCCESS = new Result("SUCCESS", BallColor.BLUE, 0);
     /**
-     * The build had some errors but they were not fatal.
-     * For example, some tests failed.
+     * The build had some errors but they were not fatal. For example, some
+     * tests failed.
      */
-    public static final Result UNSTABLE = new Result("UNSTABLE",BallColor.YELLOW,1);
+    public static final Result UNSTABLE = new Result("UNSTABLE", BallColor.YELLOW, 1);
     /**
      * The build had a fatal error.
      */
-    public static final Result FAILURE = new Result("FAILURE",BallColor.RED,2);
+    public static final Result FAILURE = new Result("FAILURE", BallColor.RED, 2);
     /**
-     * The module was not built.
-     * <p>
-     * This status code is used in a multi-stage build (like maven2)
-     * where a problem in earlier stage prevented later stages from building.
+     * The module was not built. <p> This status code is used in a multi-stage
+     * build (like maven2) where a problem in earlier stage prevented later
+     * stages from building.
      */
-    public static final Result NOT_BUILT = new Result("NOT_BUILT",BallColor.GREY,3);
+    public static final Result NOT_BUILT = new Result("NOT_BUILT", BallColor.GREY, 3);
     /**
      * The build was manually aborted.
      */
-    public static final Result ABORTED = new Result("ABORTED",BallColor.ABORTED,4);
-
+    public static final Result ABORTED = new Result("ABORTED", BallColor.ABORTED, 4);
     private final String name;
-
     /**
      * Bigger numbers are worse.
      */
     //TODO: review and check whether we can do it private
     public final int ordinal;
-
     /**
      * Default ball color for this status.
      */
@@ -89,15 +86,15 @@ public final class Result implements Serializable, CustomExportedBean {
         return color;
     }
 
-
     /**
      * Combines two {@link Result}s and returns the worse one.
      */
     public Result combine(Result that) {
-        if(this.ordinal < that.ordinal)
+        if (this.ordinal < that.ordinal) {
             return that;
-        else
+        } else {
             return this;
+        }
     }
 
     public boolean isWorseThan(Result that) {
@@ -116,7 +113,6 @@ public final class Result implements Serializable, CustomExportedBean {
         return this.ordinal <= that.ordinal;
     }
 
-
     @Override
     public String toString() {
         return name;
@@ -125,36 +121,38 @@ public final class Result implements Serializable, CustomExportedBean {
     public String toExportedObject() {
         return name;
     }
-    
+
     public static Result fromString(String s) {
-        for (Result r : all)
-            if (s.equalsIgnoreCase(r.name))
+        for (Result r : all) {
+            if (s.equalsIgnoreCase(r.name)) {
                 return r;
+            }
+        }
         return FAILURE;
     }
 
     private static List<String> getNames() {
         List<String> l = new ArrayList<String>();
-        for (Result r : all)
+        for (Result r : all) {
             l.add(r.name);
+        }
         return l;
     }
 
     // Maintain each Result as a singleton deserialized (like build result from a slave node)
     private Object readResolve() {
-        for (Result r : all)
-            if (ordinal==r.ordinal)
+        for (Result r : all) {
+            if (ordinal == r.ordinal) {
                 return r;
+            }
+        }
         return FAILURE;
     }
-
     private static final long serialVersionUID = 1L;
-
-    private static final Result[] all = new Result[] {SUCCESS,UNSTABLE,FAILURE,NOT_BUILT,ABORTED};
-
-    public static final SingleValueConverter conv = new AbstractSingleValueConverter () {
+    private static final Result[] all = new Result[]{SUCCESS, UNSTABLE, FAILURE, NOT_BUILT, ABORTED};
+    public static final SingleValueConverter conv = new AbstractSingleValueConverter() {
         public boolean canConvert(Class clazz) {
-            return clazz==Result.class;
+            return clazz == Result.class;
         }
 
         public Object fromString(String s) {
@@ -164,6 +162,7 @@ public final class Result implements Serializable, CustomExportedBean {
 
     @OptionHandlerExtension
     public static final class OptionHandlerImpl extends OptionHandler<Result> {
+
         public OptionHandlerImpl(CmdLineParser parser, OptionDef option, Setter<? super Result> setter) {
             super(parser, option, setter);
         }
@@ -172,9 +171,10 @@ public final class Result implements Serializable, CustomExportedBean {
         public int parseArguments(Parameters params) throws CmdLineException {
             String param = params.getParameter(0);
             Result v = fromString(param.replace('-', '_'));
-            if (v==null)
-                throw new CmdLineException(owner,"No such status '"+param+"'. Did you mean "+
-                        EditDistance.findNearest(param.replace('-', '_').toUpperCase(), getNames()));
+            if (v == null) {
+                throw new CmdLineException(owner, "No such status '" + param + "'. Did you mean "
+                        + EditDistance.findNearest(param.replace('-', '_').toUpperCase(), getNames()));
+            }
             setter.addValue(v);
             return 1;
         }
@@ -184,7 +184,6 @@ public final class Result implements Serializable, CustomExportedBean {
             return "STATUS";
         }
     }
-
 
     /**
      * @inheritDoc

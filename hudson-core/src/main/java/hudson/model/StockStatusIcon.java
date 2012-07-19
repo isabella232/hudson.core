@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     
+ *
  *
  *******************************************************************************/ 
 
@@ -25,14 +25,14 @@ import org.kohsuke.stapler.Stapler;
  * @since 1.390.
  */
 public final class StockStatusIcon extends AbstractStatusIcon {
+
     private final Localizable description;
     private final String image;
 
     /**
-     * @param image
-     *      Short file name like "folder.png" that points to a stock icon in Hudson.
-     * @param description
-     *      Used as {@link #getDescription()}.
+     * @param image Short file name like "folder.png" that points to a stock
+     * icon in Hudson.
+     * @param description Used as {@link #getDescription()}.
      */
     public StockStatusIcon(String image, Localizable description) {
         this.image = image;
@@ -40,7 +40,7 @@ public final class StockStatusIcon extends AbstractStatusIcon {
     }
 
     public String getImageOf(String size) {
-        return Stapler.getCurrentRequest().getContextPath()+Hudson.RESOURCE_PATH+"/images/"+size+'/'+image;
+        return Stapler.getCurrentRequest().getContextPath() + Hudson.RESOURCE_PATH + "/images/" + size + '/' + image;
     }
 
     public String getDescription() {

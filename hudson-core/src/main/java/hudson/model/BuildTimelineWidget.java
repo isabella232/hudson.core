@@ -7,10 +7,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: 
+ * Contributors:
  *
- *   
- *       
+ *
+ *
  *
  *******************************************************************************/ 
 
@@ -38,15 +38,13 @@ import org.kohsuke.stapler.QueryParameter;
 /**
  * UI widget for showing the SMILE timeline control.
  *
- * <p>
- * Return this from your "getTimeline" method.
+ * <p> Return this from your "getTimeline" method.
  *
  * @author Kohsuke Kawaguchi, Winston Prakash
  * @since 1.372
  */
 public class BuildTimelineWidget {
 
-     
     protected final RunList<?> builds;
 
     public BuildTimelineWidget(RunList<?> builds) {
@@ -88,7 +86,7 @@ public class BuildTimelineWidget {
         }
         return result;
     }
-    
+
     /**
      * List of {@link Event} that the timeline component will display.
      */
@@ -101,11 +99,10 @@ public class BuildTimelineWidget {
             // Date needs to be converted into iso-8601 date format.
             JsonConfig config = new JsonConfig();
             config.registerJsonValueProcessor(Date.class, new JsonValueProcessor() {
-
                 public synchronized Object processArrayValue(Object value, JsonConfig jsonConfig) {
-                    if (value != null){
-                       DateFormat dateFormat = new SimpleDateFormat("MMM dd yyyy HH:mm:ss 'GMT'Z", Functions.getClientLocale());
-                       return dateFormat.format(value);
+                    if (value != null) {
+                        DateFormat dateFormat = new SimpleDateFormat("MMM dd yyyy HH:mm:ss 'GMT'Z", Functions.getClientLocale());
+                        return dateFormat.format(value);
                     }
                     return null;
                 }
@@ -123,28 +120,28 @@ public class BuildTimelineWidget {
     }
 
     /**
-     * Event data to be rendered on timeline.
-     * See http://code.google.com/p/simile-widgets/wiki/Timeline_EventSources
-    
-     * <p>
-     * This is bound to JSON and sent to the client-side JavaScript.
+     * Event data to be rendered on timeline. See
+     * http://code.google.com/p/simile-widgets/wiki/Timeline_EventSources
+     *
+     * <p> This is bound to JSON and sent to the client-side JavaScript.
      */
     public static class Event {
         //TODO: review and check whether we can do it private
-        public Date start;
 
+        public Date start;
         public Date end;
         public String title, description;
         /**
-         * If true, the event occurs over a time duration. No icon. The event will be
-         * drawn as a dark blue tape. The tape color is set with the color attribute.
-         * Default color is #58A0DC
+         * If true, the event occurs over a time duration. No icon. The event
+         * will be drawn as a dark blue tape. The tape color is set with the
+         * color attribute. Default color is #58A0DC
          *
-         * If false (default), the event is focused on a specific "instant" (shown with the icon).
-         * The event will be drawn as a blue dot icon (default) with a pale blue tape.
-         * The tape is the default color (or color attribute color), with opacity
-         * set to 20. To change the opacity, change the theme's instant: {impreciseOpacity: 20}
-         * value. Maximum 100.
+         * If false (default), the event is focused on a specific "instant"
+         * (shown with the icon). The event will be drawn as a blue dot icon
+         * (default) with a pale blue tape. The tape is the default color (or
+         * color attribute color), with opacity set to 20. To change the
+         * opacity, change the theme's instant: {impreciseOpacity: 20} value.
+         * Maximum 100.
          */
         public Boolean durationEvent;
         /**
@@ -152,9 +149,9 @@ public class BuildTimelineWidget {
          */
         public String link;
         /**
-         * Color of the text and tape (duration events) to display in the timeline.
-         * If the event has durationEvent = false, then the bar's opacity will
-         * be applied (default 20%). See durationEvent, above.
+         * Color of the text and tape (duration events) to display in the
+         * timeline. If the event has durationEvent = false, then the bar's
+         * opacity will be applied (default 20%). See durationEvent, above.
          */
         public String color;
         /**
