@@ -67,7 +67,7 @@ jQuery(document).ready(function() {
         var pluginsToUpdate = getPluginsToUpdate();
         updateCount = pluginsToUpdate.length;
         jQuery(pluginsToUpdate).each(function(){
-            installPlugin(this);
+            updatePlugin(this);
         });
     });
 

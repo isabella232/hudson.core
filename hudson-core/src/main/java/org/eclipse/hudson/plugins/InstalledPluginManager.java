@@ -140,9 +140,13 @@ public final class InstalledPluginManager {
             }
         }
 
-        public boolean isDowngrdable() {
+        public boolean isDowngrdable() throws IOException {
             File backupFile = Util.changeExtension(hpiArchive, ".bak");
-            return backupFile.exists();
+            if (backupFile.exists()){
+                InstalledPluginInfo bakPluginInfo = new InstalledPluginInfo(backupFile);
+                return !bakPluginInfo.version.trim().equals(version);
+            }
+            return false;
         }
         
         public String getBackupVersion() throws IOException{
