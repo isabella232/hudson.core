@@ -47,7 +47,7 @@ jQuery(document).ready(function() {
     
     var installButton = jQuery('#installButton');
     installButton.button();
-    installButton.click(function() {
+    installButton.unbind("click").click(function() {
         jQuery(this).hide();
         jQuery('#installProgress').show();
         jQuery("#pluginInstallMsg").hide();
@@ -60,7 +60,7 @@ jQuery(document).ready(function() {
      
     var updateButton = jQuery('#updateButton');
     updateButton.button();
-    updateButton.click(function() {
+    updateButton.unbind("click").click(function() {
         jQuery(this).hide();
         jQuery('#updateProgress').show();
         jQuery("#pluginUpdateMsg").hide();
