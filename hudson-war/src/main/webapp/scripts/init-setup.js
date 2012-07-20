@@ -293,7 +293,7 @@ jQuery(document).ready(function() {
     });
         
     jQuery('#installButton').button();   
-    jQuery('#installButton').click(function() {
+    jQuery('#installButton').unbind("click").click(function() {
         if (getInstallables().length > 0){
             checkPermissionAndinstallPlugins();
         }
@@ -301,7 +301,7 @@ jQuery(document).ready(function() {
             
 
     jQuery('#finishButton').button();
-    jQuery('#finishButton').click(function() {
+    jQuery('#finishButton').unbind("click").click(function() {
         if (getInstallables().length > 0){
             finish = true;
             checkPermissionAndinstallPlugins();
