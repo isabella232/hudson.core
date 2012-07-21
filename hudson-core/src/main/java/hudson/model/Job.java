@@ -1776,6 +1776,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             data.add(duration, "min",
                     new TimeTrendChartLabel(run));
         }
+        
+        // We want to display the build result from older to latest
+        data.reverseOrder();
         graph.setYAxisLabel(Messages.Job_minutes());
         graph.setData(data);
 

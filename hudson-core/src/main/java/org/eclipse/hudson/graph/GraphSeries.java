@@ -148,4 +148,13 @@ public class GraphSeries<E> {
     public void setValueLabelDisplayed(boolean valueLabelDisplayed) {
         this.valueLabelDisplayed = valueLabelDisplayed;
     }
+    
+    public void reverseOrder(){
+        List<E> reversedData = new ArrayList<E>();
+        
+        for (int i = 0;  i < seriesData.size(); i++){
+            reversedData.add(seriesData.get(seriesData.size() - i -1));
+        }
+        seriesData = reversedData;
+    }
 }

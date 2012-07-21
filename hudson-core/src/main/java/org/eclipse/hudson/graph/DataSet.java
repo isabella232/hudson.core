@@ -67,18 +67,25 @@ public final class DataSet<Row extends Comparable, Column extends Comparable> {
     }
 
     public GraphSeries getXSeries() {
-        return xSeries;
+        return graphXSeries;
     }
 
     public void setXSeries(GraphSeries<String> series) {
-        xSeries = series;
+        graphXSeries = series;
     }
 
     public List<GraphSeries<Number>> getYSeries() {
-        return ySeries;
+        return graphYSeriesList;
     }
 
     public void addYSeries(GraphSeries<Number> series) {
-        ySeries.add(series);
+        graphYSeriesList.add(series);
+    }
+    
+    public void reverseOrder(){
+         graphXSeries.reverseOrder();
+         for (GraphSeries<Number> grpahYSeries : graphYSeriesList) {
+             grpahYSeries.reverseOrder();
+         }
     }
 }

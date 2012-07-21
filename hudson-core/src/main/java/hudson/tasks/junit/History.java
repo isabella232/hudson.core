@@ -195,6 +195,10 @@ public class History {
             data.add(o.getFailCount(), "1Failed", new HistoryChartLabel(o));
             data.add(o.getSkipCount(), "0Skipped", new HistoryChartLabel(o));
         }
+        
+        // We want to display the build result from older to latest
+        data.reverseOrder();
+        
         return data;
     }
 
