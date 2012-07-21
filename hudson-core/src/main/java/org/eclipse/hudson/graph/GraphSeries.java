@@ -36,26 +36,26 @@ public class GraphSeries<E> {
      */
     private String caption;
     /**
-     * Base URL to construct full URL for data Click on Graph
+     * Base URL to construct full URL for seriesData Click on Graph
      */
     private String baseURL;
     /**
-     * The series data
+     * The series seriesData
      */
-    private List<E> data = new ArrayList<E>();
+    private List<E> seriesData = new ArrayList<E>();
     /**
-     * Should the label displayed inside the data point display area useful in
+     * Should the label displayed inside the seriesData point display area useful in
      * Bar, Area
      */
-    private boolean labelInside = true;
+    private boolean labelInside = false;
     /**
      * How this series should be displayed - BAR, AREA, LINE etc
      */
-    private int type = TYPE_BAR;
+    private int type = TYPE_AREA;
     /**
      * Should the value label be displayed
      */
-    private boolean valueLabelDisplayed = true;
+    private boolean valueLabelDisplayed = false;
     /**
      * Should this chart series be stacked over previous series
      */
@@ -66,11 +66,11 @@ public class GraphSeries<E> {
     }
 
     public GraphSeries(int type, String caption, Color color) {
-        this(type, caption, color, true, true);
+        this(type, caption, color, false, false);
     }
 
     public GraphSeries(int type, String caption, Color color, boolean valueLabelDisplayed) {
-        this(type, caption, color, valueLabelDisplayed, true);
+        this(type, caption, color, valueLabelDisplayed, false);
     }
 
     public GraphSeries(int type, String caption, Color color, boolean valueLabelDisplayed, boolean labelInside) {
@@ -90,11 +90,11 @@ public class GraphSeries<E> {
     }
 
     public List<E> getData() {
-        return data;
+        return seriesData;
     }
 
     public void setData(List<E> data) {
-        this.data = data;
+        this.seriesData = data;
     }
 
     public String getBaseURL() {
@@ -122,7 +122,7 @@ public class GraphSeries<E> {
     }
 
     public void add(E element) {
-        data.add(element);
+        seriesData.add(element);
     }
 
     public boolean isStacked() {

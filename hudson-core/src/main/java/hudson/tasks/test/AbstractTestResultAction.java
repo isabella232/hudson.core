@@ -263,27 +263,27 @@ public abstract class AbstractTestResultAction<T extends AbstractTestResultActio
     private DataSet getGraphDataSet(StaplerRequest req) {
         boolean failureOnly = Boolean.valueOf(req.getParameter("failureOnly"));
 
-        DataSet<String, ChartLabel> dsb = new DataSet<String, ChartLabel>();
+        DataSet<String, ChartLabel> testResultDataSet = new DataSet<String, ChartLabel>();
 
 
         GraphSeries<String> xSeries = new GraphSeries<String>("Build No.");
-        dsb.setXSeries(xSeries);
+        testResultDataSet.setXSeries(xSeries);
 
-        GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Failed", ColorPalette.RED);
+        GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Failed", ColorPalette.RED);
         ySeriesFailed.setBaseURL(getRelPath(req));
 
-        GraphSeries<Number> ySeriesSkipped = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Skipped", ColorPalette.YELLOW);
+        GraphSeries<Number> ySeriesSkipped = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Skipped", ColorPalette.YELLOW);
         ySeriesSkipped.setBaseURL(getRelPath(req));
 
-        GraphSeries<Number> ySeriesPassed = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Passed", ColorPalette.BLUE);
+        GraphSeries<Number> ySeriesPassed = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Passed", ColorPalette.BLUE);
         ySeriesPassed.setBaseURL(getRelPath(req));
 
         if (!failureOnly) {
-            dsb.addYSeries(ySeriesFailed);
-            dsb.addYSeries(ySeriesSkipped);
-            dsb.addYSeries(ySeriesPassed);
+            testResultDataSet.addYSeries(ySeriesFailed);
+            testResultDataSet.addYSeries(ySeriesSkipped);
+            testResultDataSet.addYSeries(ySeriesPassed);
         } else {
-            dsb.addYSeries(ySeriesFailed);
+            testResultDataSet.addYSeries(ySeriesFailed);
         }
 
         for (AbstractTestResultAction<?> a = this; a != null; a = a.getPreviousResult(AbstractTestResultAction.class)) {
@@ -291,19 +291,23 @@ public abstract class AbstractTestResultAction<T extends AbstractTestResultActio
             ySeriesFailed.add((double) a.getFailCount());
 
             // For backward compatibility with JFreechart
-            dsb.add((double) a.getFailCount(), "failed", new TestResultChartLabel(req, a.owner));
+            testResultDataSet.add((double) a.getFailCount(), "failed", new TestResultChartLabel(req, a.owner));
 
             if (!failureOnly) {
                 ySeriesSkipped.add((double) a.getSkipCount());
                 ySeriesPassed.add((double) (a.getTotalCount() - a.getFailCount() - a.getSkipCount()));
 
                 // For backward compatibility with JFreechart
-                dsb.add((double) a.getSkipCount(), "skipped", new TestResultChartLabel(req, a.owner));
-                dsb.add((double) a.getTotalCount() - a.getFailCount() - a.getSkipCount(), "total", new TestResultChartLabel(req, a.owner));
+                testResultDataSet.add((double) a.getSkipCount(), "skipped", new TestResultChartLabel(req, a.owner));
+                testResultDataSet.add((double) a.getTotalCount() - a.getFailCount() - a.getSkipCount(), "total", new TestResultChartLabel(req, a.owner));
             }
         }
+        
+        // We want to display the build result from older to latest
+        testResultDataSet.reverseOrder();
+        
 
-        return dsb;
+        return testResultDataSet;
     }
 
     // For backward compatibility with JFreechart

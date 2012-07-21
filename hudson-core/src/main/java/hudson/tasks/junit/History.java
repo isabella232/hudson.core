@@ -90,15 +90,15 @@ public class History {
         GraphSeries<String> xSeries = new GraphSeries<String>("Build No.");
         data.setXSeries(xSeries);
 
-        GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Some Failed", ColorPalette.RED, true, false);
+        GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Some Failed", ColorPalette.RED, false, false);
         //ySeriesFailed.setBaseURL(getRelPath(req));
         data.addYSeries(ySeriesFailed);
 
-        GraphSeries<Number> ySeriesSkipped = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Some Skipped", ColorPalette.YELLOW, true, false);
+        GraphSeries<Number> ySeriesSkipped = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Some Skipped", ColorPalette.YELLOW, false, false);
         //ySeriesSkipped.setBaseURL(getRelPath(req));
         data.addYSeries(ySeriesSkipped);
 
-        GraphSeries<Number> ySeriesPassed = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Passed", ColorPalette.BLUE, true, false);
+        GraphSeries<Number> ySeriesPassed = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Passed", ColorPalette.BLUE, false, false);
         //ySeriesPassed.setBaseURL(getRelPath(req));
         data.addYSeries(ySeriesPassed);
 
@@ -143,6 +143,7 @@ public class History {
                 }
             });
         }
+        data.reverseOrder();
         return data;
     }
 

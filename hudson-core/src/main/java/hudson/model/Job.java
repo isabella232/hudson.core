@@ -1727,19 +1727,19 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         GraphSeries<String> xSeries = new GraphSeries<String>("Build No.");
         data.setXSeries(xSeries);
 
-        GraphSeries<Number> ySeriesAborted = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Aborted", ColorPalette.GREY, true, false);
+        GraphSeries<Number> ySeriesAborted = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Aborted", ColorPalette.GREY, false, false);
         //ySeriesFailed.setBaseURL(getRelPath(req)); 
         data.addYSeries(ySeriesAborted);
 
-        GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Failed", ColorPalette.RED, true, false);
+        GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Failed", ColorPalette.RED, false, false);
         //ySeriesFailed.setBaseURL(getRelPath(req)); 
         data.addYSeries(ySeriesFailed);
 
-        GraphSeries<Number> ySeriesUnstable = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Unstable", ColorPalette.YELLOW, true, false);
+        GraphSeries<Number> ySeriesUnstable = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Unstable", ColorPalette.YELLOW, false, false);
         //ySeriesSkipped.setBaseURL(getRelPath(req));
         data.addYSeries(ySeriesUnstable);
 
-        GraphSeries<Number> ySeriesSuccessful = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Successful", ColorPalette.BLUE, true, false);
+        GraphSeries<Number> ySeriesSuccessful = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Successful", ColorPalette.BLUE, false, false);
         //ySeriesTotal.setBaseURL(getRelPath(req));
         data.addYSeries(ySeriesSuccessful);
 

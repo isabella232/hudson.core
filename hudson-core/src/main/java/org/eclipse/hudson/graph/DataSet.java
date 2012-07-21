@@ -33,8 +33,8 @@ public final class DataSet<Row extends Comparable, Column extends Comparable> {
     private List<Row> rows = new ArrayList<Row>();
     private List<Column> columns = new ArrayList<Column>();
     //Included to set data as series definition (to be used by graphing support like BIRT Chart)
-    private GraphSeries<String> xSeries;
-    private List<GraphSeries<Number>> ySeries = new ArrayList<GraphSeries<Number>>();
+    private GraphSeries<String> graphXSeries;
+    private List<GraphSeries<Number>> graphYSeriesList = new ArrayList<GraphSeries<Number>>();
 
     public void add(Number value, Row rowKey, Column columnKey) {
         values.add(value);
