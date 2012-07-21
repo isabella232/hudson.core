@@ -29,6 +29,9 @@ import org.jvnet.tiger_types.Types;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Receives notifications about builds.
  *
@@ -136,7 +139,13 @@ public abstract class RunListener<R extends Run> implements ExtensionPoint {
     public static void fireCompleted(Run r, TaskListener listener) {
         for (RunListener l : all()) {
             if (l.targetType.isInstance(r)) {
-                l.onCompleted(r, listener);
+                // See issue https://bugs.eclipse.org/bugs/show_bug.cgi?id=384786
+                // Gaurd against any failures from listeners 
+                try {
+                    l.onCompleted(r, listener);
+                } catch (Exception exc) {
+                    logger.warn("Exception from Runlistener.onCompleted", exc);
+                }
             }
         }
     }
@@ -147,7 +156,13 @@ public abstract class RunListener<R extends Run> implements ExtensionPoint {
     public static void fireStarted(Run r, TaskListener listener) {
         for (RunListener l : all()) {
             if (l.targetType.isInstance(r)) {
-                l.onStarted(r, listener);
+                // See issue https://bugs.eclipse.org/bugs/show_bug.cgi?id=384786
+                // Gaurd against any failures from listeners 
+                try {
+                    l.onStarted(r, listener);
+                } catch (Exception exc) {
+                    logger.warn("Exception from Runlistener.fireStarted", exc);
+                }
             }
         }
     }
@@ -158,7 +173,13 @@ public abstract class RunListener<R extends Run> implements ExtensionPoint {
     public static void fireFinalized(Run r) {
         for (RunListener l : all()) {
             if (l.targetType.isInstance(r)) {
-                l.onFinalized(r);
+                // See issue https://bugs.eclipse.org/bugs/show_bug.cgi?id=384786
+                // Gaurd against any failures from listeners 
+                try {
+                    l.onFinalized(r);
+                } catch (Exception exc) {
+                    logger.warn("Exception from Runlistener.fireFinalized", exc);
+                }
             }
         }
     }
@@ -169,7 +190,13 @@ public abstract class RunListener<R extends Run> implements ExtensionPoint {
     public static void fireDeleted(Run r) {
         for (RunListener l : all()) {
             if (l.targetType.isInstance(r)) {
-                l.onDeleted(r);
+                // See issue https://bugs.eclipse.org/bugs/show_bug.cgi?id=384786
+                // Gaurd against any failures from listeners 
+                try {
+                    l.onDeleted(r);
+                } catch (Exception exc) {
+                    logger.warn("Exception from Runlistener.fireDeleted", exc);
+                }
             }
         }
     }
@@ -180,4 +207,6 @@ public abstract class RunListener<R extends Run> implements ExtensionPoint {
     public static ExtensionList<RunListener> all() {
         return Hudson.getInstance().getExtensionList(RunListener.class);
     }
+    
+    static  Logger logger = LoggerFactory.getLogger(RunListener.class);
 }
