@@ -1048,6 +1048,7 @@ public class Util {
             // try simple delete first (whether exists() or not, as it may be symlink pointing
             // to non-existent target), but fallback to "rm -rf" to delete non-empty dir.
             File symlinkFile = new File(baseDir, symlinkPath);
+            File targetPathFile = new File(baseDir, symlinkPath);
             if (!symlinkFile.delete() && symlinkFile.exists()) // ignore a failure.
             {
                 new LocalProc(new String[]{"rm", "-rf", symlinkPath}, new String[0], listener.getLogger(), baseDir).join();
@@ -1056,7 +1057,7 @@ public class Util {
             boolean success = false;
 
             try {
-                success = NativeUtils.getInstance().createSymlink(targetPath, baseDir);
+                success = NativeUtils.getInstance().createSymlink(targetPathFile.getCanonicalPath(), symlinkFile);
             } catch (NativeAccessException ex) {
                 errmsg = "Native function mod failed" + NativeUtils.getInstance().getLastUnixError();
             }
