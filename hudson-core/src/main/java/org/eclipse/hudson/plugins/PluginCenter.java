@@ -111,7 +111,7 @@ final public class PluginCenter {
         Set<String> availablePluginNames = updateSiteManager.getAvailablePluginNames();
         for (String pluginName : availablePluginNames) {
             AvailablePluginInfo availablePlugin = updateSiteManager.getAvailablePlugin(pluginName);
-            if (installedPluginNames.contains(pluginName)) {
+            if (!UpdateSiteManager.MANDATORY.equals(availablePlugin.getType()) && installedPluginNames.contains(pluginName)) {
                 installedPlugins.add(availablePlugin);
             }
         }
