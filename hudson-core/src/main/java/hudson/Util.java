@@ -1058,8 +1058,8 @@ public class Util {
 
             try {
                 success = NativeUtils.getInstance().createSymlink(targetPathFile.getCanonicalPath(), symlinkFile);
-            } catch (NativeAccessException ex) {
-                errmsg = "Native function mod failed" + NativeUtils.getInstance().getLastUnixError();
+            } catch (NativeAccessException exc) {
+                errmsg = "Failed to create Symlink using Native Access. " + NativeUtils.getInstance().getLastUnixError();
             }
             if (!success) { // escape hatch, until we know that the above works well.
                 success = new LocalProc(new String[]{
