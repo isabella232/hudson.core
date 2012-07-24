@@ -215,7 +215,7 @@ public final class HudsonServletContextListener implements ServletContextListene
 
             InitialSetup initSetup = new InitialSetup(home, servletContext);
             if (initSetup.needsInitSetup()) {
-                logger.info("Initial setup required. Please go to the Hudson Dashboard and complete the setup");
+                logger.info("\n\n\n================>\n\nInitial setup required. Please go to the Hudson Dashboard and complete the setup.\n\n<================\n\n\n");
                 if (HudsonSecurityEntitiesHolder.getHudsonSecurityManager().isUseSecurity()) {
                     controller.install(new InitialSetupLogin(initSetup));
                 } else {
