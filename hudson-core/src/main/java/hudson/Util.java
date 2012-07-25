@@ -1059,7 +1059,7 @@ public class Util {
             try {
                 success = NativeUtils.getInstance().createSymlink(targetPathFile.getCanonicalPath(), symlinkFile);
             } catch (NativeAccessException exc) {
-                errmsg = "Failed to create Symlink using Native Access. " + NativeUtils.getInstance().getLastUnixError();
+                errmsg = "Failed to create Symlink using Native Access. " + exc.getLocalizedMessage();
             }
             if (!success) { // escape hatch, until we know that the above works well.
                 success = new LocalProc(new String[]{
