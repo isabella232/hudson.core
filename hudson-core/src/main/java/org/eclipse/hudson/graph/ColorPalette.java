@@ -14,7 +14,7 @@
  *
  *******************************************************************************/ 
 
-package hudson.util;
+package org.eclipse.hudson.graph;
 
 import java.awt.Color;
 import java.util.List;
