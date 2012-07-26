@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.concurrent.*;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.hudson.WebAppController;
 import org.eclipse.hudson.plugins.InstalledPluginManager;
 import org.eclipse.hudson.plugins.InstalledPluginManager.InstalledPluginInfo;
@@ -66,7 +67,6 @@ final public class InitialSetup {
 
     private Logger logger = LoggerFactory.getLogger(InitialSetup.class);
     private File pluginsDir;
-    private URL initPluginsJsonUrl;
     private ServletContext servletContext;
     private UpdateSiteManager updateSiteManager;
     private InstalledPluginManager installedPluginManager;
@@ -92,6 +92,7 @@ final public class InitialSetup {
     private HudsonSecurityManager hudsonSecurityManager;
     private XmlFile initSetupFile;
     private File hudsonHomeDir;
+    private boolean proxyNeeded = false;
 
     public InitialSetup(File homeDir, ServletContext context) throws MalformedURLException, IOException {
         hudsonHomeDir = homeDir;
@@ -102,6 +103,7 @@ final public class InitialSetup {
         updateSiteManager = new UpdateSiteManager("default", hudsonHomeDir, proxyConfig);
         installedPluginManager = new InstalledPluginManager(pluginsDir);
         initSetupFile = new XmlFile(new File(homeDir, "initSetup.xml"));
+        refreshUpdateCenterMetadataCache();
         check();
     }
 
@@ -193,14 +195,7 @@ final public class InitialSetup {
     }
 
     public boolean isProxyNeeded() {
-        try {
-            // Try opening a URL and see if the proxy works fine
-            proxyConfig.openUrl(new URL("http://www.google.com"));
-        } catch (IOException ex) {
-            logger.debug(ex.getLocalizedMessage());
-            return true;
-        }
-        return false;
+        return proxyNeeded;
     }
 
     public HttpResponse doinstallPlugin(@QueryParameter String pluginName) {
@@ -443,5 +438,37 @@ final public class InitialSetup {
         }
 
         return deps;
+    }
+    
+    protected void refreshUpdateCenterMetadataCache() throws IOException {
+        
+        try{
+            updateSiteManager.refreshFromUpdateSite();
+            return;
+        }catch(Exception exc){
+            proxyNeeded = true;
+            logger.info("Could not fetch update center metadata from " + updateSiteManager.getUpdateSiteUrl() + ". Using bundled update center metadata.");
+        }
+                
+                
+        URL updateCenterJsonUrl = servletContext.getResource("/WEB-INF/update-center.json");
+        if (updateCenterJsonUrl != null) {
+            long lastModified = updateCenterJsonUrl.openConnection().getLastModified();
+            File localCacheFile = new File(hudsonHomeDir, "updates/default.json");
+
+            if (!localCacheFile.exists() || (localCacheFile.lastModified() < lastModified)) {
+                String jsonStr = org.apache.commons.io.IOUtils.toString(updateCenterJsonUrl.openStream());
+                jsonStr = jsonStr.trim();
+                if (jsonStr.startsWith("updateCenter.post(")) {
+                    jsonStr = jsonStr.substring("updateCenter.post(".length());
+                }
+                if (jsonStr.endsWith(");")) {
+                    jsonStr = jsonStr.substring(0, jsonStr.lastIndexOf(");"));
+                }
+                FileUtils.writeStringToFile(localCacheFile, jsonStr);
+                localCacheFile.setLastModified(lastModified);
+                updateSiteManager.refresh();
+            }
+        }
     }
 }

@@ -51,9 +51,7 @@ public final class UpdateSiteManager {
     public UpdateSiteManager(String id, File homeDir, ProxyConfiguration proxyConfig) throws IOException {
         hudsonHomeDir = homeDir;
         this.proxyConfig = proxyConfig;
-        if (getLocalCacheFile().exists()) {
-            availablePluginInfos = parseJson(getLocalCacheFile().readTrim());
-        }
+        refresh();
     }
 
     public String getId() {
@@ -184,6 +182,12 @@ public final class UpdateSiteManager {
                     "UpdateCenter_PluginCategory_" + category.replace('-', '_')).invoke(null);
         } catch (Exception ex) {
             return Messages.UpdateCenter_PluginCategory_unrecognized(category);
+        }
+    }
+    
+    public void refresh() throws IOException{
+        if (getLocalCacheFile().exists()) {
+            availablePluginInfos = parseJson(getLocalCacheFile().readTrim());
         }
     }
 
