@@ -19,14 +19,10 @@ import hudson.model.AbstractBuild;
 import hudson.model.Hudson;
 import hudson.tasks.test.TestObject;
 import hudson.tasks.test.TestResult;
-import hudson.util.ColorPalette;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.hudson.graph.ChartLabel;
-import org.eclipse.hudson.graph.DataSet;
-import org.eclipse.hudson.graph.Graph;
-import org.eclipse.hudson.graph.GraphSeries;
+import org.eclipse.hudson.graph.*;
 
 import org.kohsuke.stapler.Stapler;
 

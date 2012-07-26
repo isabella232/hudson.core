@@ -41,7 +41,6 @@ import hudson.search.SearchItem;
 import hudson.search.SearchItems;
 import hudson.security.*;
 import hudson.tasks.LogRotator;
-import hudson.util.ColorPalette;
 import hudson.util.CopyOnWriteList;
 
 import hudson.util.IOException2;
@@ -88,10 +87,7 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
 
 import static javax.servlet.http.HttpServletResponse.*;
-import org.eclipse.hudson.graph.ChartLabel;
-import org.eclipse.hudson.graph.DataSet;
-import org.eclipse.hudson.graph.Graph;
-import org.eclipse.hudson.graph.GraphSeries;
+import org.eclipse.hudson.graph.*;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**

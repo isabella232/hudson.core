@@ -16,7 +16,7 @@
 
 package hudson.model;
 
-import hudson.util.ColorPalette;
+import org.eclipse.hudson.graph.ColorPalette;
 import org.eclipse.hudson.graph.MultiStageTimeSeries;
 import org.eclipse.hudson.graph.MultiStageTimeSeries.TimeScale;
 import org.eclipse.hudson.graph.MultiStageTimeSeries.TrendChart;

@@ -16,7 +16,7 @@
 
 package hudson.model;
 
-import hudson.util.ColorPalette;
+import org.eclipse.hudson.graph.ColorPalette;
 import org.jvnet.localizer.LocaleProvider;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.stapler.Stapler;

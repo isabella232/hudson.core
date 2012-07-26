@@ -18,7 +18,6 @@ package hudson.diagnosis;
 import hudson.util.TimeUnit2;
 import hudson.Extension;
 import hudson.model.PeriodicWork;
-import hudson.util.ColorPalette;
 
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
@@ -27,6 +26,7 @@ import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
+import org.eclipse.hudson.graph.ColorPalette;
 import org.eclipse.hudson.graph.MultiStageTimeSeries;
 import org.eclipse.hudson.graph.MultiStageTimeSeries.TimeScale;
 import org.eclipse.hudson.graph.MultiStageTimeSeries.TrendChart;

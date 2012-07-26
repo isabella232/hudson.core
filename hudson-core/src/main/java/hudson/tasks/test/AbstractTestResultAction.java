@@ -33,12 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.hudson.graph.Graph;
-import org.eclipse.hudson.graph.ChartLabel;
-import org.eclipse.hudson.graph.ChartUtil;
+import org.eclipse.hudson.graph.*;
 import org.eclipse.hudson.graph.ChartUtil.NumberOnlyBuildLabel;
-import org.eclipse.hudson.graph.DataSet;
-import org.eclipse.hudson.graph.GraphSeries;
 
 /**
  * Common base class for recording test result.

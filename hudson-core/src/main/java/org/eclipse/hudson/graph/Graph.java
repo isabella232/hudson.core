@@ -15,7 +15,6 @@
 package org.eclipse.hudson.graph;
 
 import hudson.model.Descriptor.FormException;
-import hudson.util.ColorPalette;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.HeadlessException;

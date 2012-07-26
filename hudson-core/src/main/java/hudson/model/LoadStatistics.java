@@ -17,13 +17,13 @@
 package hudson.model;
 
 import hudson.Extension;
-import hudson.util.ColorPalette;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.export.ExportedBean;
 import org.kohsuke.stapler.export.Exported;
 
 import java.io.IOException;
 import java.util.List;
+import org.eclipse.hudson.graph.ColorPalette;
 import org.eclipse.hudson.graph.MultiStageTimeSeries;
 import org.eclipse.hudson.graph.MultiStageTimeSeries.TimeScale;
 import org.eclipse.hudson.graph.MultiStageTimeSeries.TrendChart;
