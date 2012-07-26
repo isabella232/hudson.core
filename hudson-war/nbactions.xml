@@ -9,9 +9,8 @@
 #
 # Contributors: 
 #
-#    Kohsuke Kawaguchi
+#   Winston Prakash
 #        
-#
 #************************************************************************** --> 
 
 
@@ -20,18 +19,21 @@ Ensures that NetBeans knows which goals to run when Run Project is selected.
 -->
 <actions>
     <action>
-        <actionName>run</actionName>
-        <goals>
-            <goal>hudson-dev:run</goal>
-        </goals>
-    </action>
-    <action>
         <actionName>debug</actionName>
         <goals>
-            <goal>hudson-dev:run</goal>
+            <goal>jetty:stop</goal>
+            <goal>jetty:run</goal>
         </goals>
         <properties>
             <jpda.listen>maven</jpda.listen>
+            <netbeans.deploy.debugmode>true</netbeans.deploy.debugmode>
         </properties>
+    </action>
+    <action>
+        <actionName>run</actionName>
+        <goals>
+            <goal>jetty:stop</goal>
+            <goal>jetty:run</goal>
+        </goals>
     </action>
 </actions>
