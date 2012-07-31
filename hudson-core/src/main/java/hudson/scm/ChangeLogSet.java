@@ -166,6 +166,16 @@ public abstract class ChangeLogSet<T extends ChangeLogSet.Entry> implements Iter
         public String getMsgEscaped() {
             return Util.escape(getMsg());
         }
+        
+        /**
+         * Return a form of commit identification either an ID, name or identity.
+         * 
+         * @return String A commit ID.
+         */
+        @Exported
+        public String getCommitId() {
+        	return null;
+        }
 
         /**
          * {@inheritDoc}
