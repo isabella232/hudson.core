@@ -9,7 +9,7 @@
  *
  * Contributors:
  *
- *    Kohsuke Kawaguchi, Daniel Dyer, Stephen Connolly, Nikita Levyankov, Anton Kozak
+ *    Kohsuke Kawaguchi, Winston Prakash, Daniel Dyer, Stephen Connolly, Nikita Levyankov, Anton Kozak
  *
  *******************************************************************************/
 
@@ -686,7 +686,7 @@ table.parameters > tbody:hover {
     border-bottom-color: #d4bde6;
 }
 
-/* ========================= build history ========================= */
+/* ========================= Job Queue pane ========================= */
 
 #buildQueue{
     border: 1px solid #d4bde6;
@@ -717,6 +717,36 @@ table.parameters > tbody:hover {
     text-decoration: underline;
 }
 
+/* ========================= Executor Status pane ========================= */
+
+#executors{
+    margin-top: 10px;
+    border: 1px solid #d4bde6;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+#executorsTbl{
+    margin: 0px;
+    border: none;
+}
+
+#executors div.header {
+    border: none;
+    background-color: #E2D7E7;
+    font-weight: bold;
+    padding: 5px;
+}
+
+#executors td.pane {
+    border: none;
+}
+
+#executors th.pane {
+    margin-top: 3px;
+    border: none;
+    background-color: #f3edf6;
+}
 
 /* ========================= build history ========================= */
 #buildHistory .healthReport {
