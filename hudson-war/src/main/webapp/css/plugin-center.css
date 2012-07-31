@@ -14,10 +14,6 @@
  * ******************************************************************************  
  */
 
-body {
-    margin-top: 10px;   
-}
-
 body, form, input, p, textarea, select{
     font-size: 12px;
 }
@@ -107,25 +103,25 @@ p {
     padding-left: 0px;
     background: transparent;
     border-width: 0px 0px 1px 0px;
-    border-color:#863566;
+    border-color:#d4bde6;
     -moz-border-radius: 0px;
     -webkit-border-radius: 0px;
     border-radius: 0px;
 }
 
 #outerTabs .ui-tabs-nav li {
-    border-color:#863566;
+    border-color:#d4bde6;
 }
 
 #outerTabs .ui-tabs-panel {
     /*background: url(images/ui-bg_highlight-hard_100_f5f3e5_1x100.png) repeat-x scroll 50% top #f5f3e5;*/
     border-width: 0px 1px 1px 1px;
-    border-color:#863566;
+    border-color:#d4bde6;
 }
 
 #innerTabs .ui-tabs-panel {
     border-width: 2px 0px 0px 0px;
-    border-top-color:#863566;
+    border-top-color:#d4bde6;
 }
 
 #innerTabs {
@@ -310,9 +306,9 @@ ul.setup .tabBody {
 }
 
 .category-head{
-    background-color: #F6F6F6;
-    border: 1px solid #CCCCCC;
-    border-radius: 4px 4px 4px 4px;
+    background-color: #f9f9f9;
+    border: 1px solid #eadef2;
+    border-radius: 3px;
     color: #863566;
     cursor: pointer;
     margin-bottom: 1px;
