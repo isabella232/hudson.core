@@ -296,6 +296,13 @@
                     </connectors>
                     -->
                     
+                    <connectors>
+                        <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
+                            <port>${port}</port>
+                            <maxIdleTime>60000</maxIdleTime>
+                        </connector>
+                    </connectors>
+                    
                     <stopPort>9966</stopPort> 
                     <stopKey>jetty-stop</stopKey>
                         <!--

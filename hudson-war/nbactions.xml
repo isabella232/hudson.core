@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- **************************************************************************
 #
 # Copyright (c) 2004-2009 Oracle Corporation.
@@ -11,10 +12,7 @@
 #
 #   Winston Prakash
 #        
-#************************************************************************** --> 
-
-
-<!--
+#************************************************************************** --><!--
 Ensures that NetBeans knows which goals to run when Run Project is selected.
 -->
 <actions>
@@ -27,6 +25,7 @@ Ensures that NetBeans knows which goals to run when Run Project is selected.
         <properties>
             <jpda.listen>maven</jpda.listen>
             <netbeans.deploy.debugmode>true</netbeans.deploy.debugmode>
+            <Env.MAVEN_OPTS>-Xmx1024m</Env.MAVEN_OPTS>
         </properties>
     </action>
     <action>
@@ -35,5 +34,8 @@ Ensures that NetBeans knows which goals to run when Run Project is selected.
             <goal>jetty:stop</goal>
             <goal>jetty:run</goal>
         </goals>
+        <properties>
+            <Env.MAVEN_OPTS>-Xmx1024m</Env.MAVEN_OPTS>
+        </properties>
     </action>
 </actions>

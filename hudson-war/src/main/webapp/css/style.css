@@ -14,104 +14,104 @@
  *******************************************************************************/
 
 body {
-  margin: 0;
-  padding: 0;
-  background: white;
+    margin: 0;
+    padding: 0;
+    background: white;
 }
 
 body, table, form, input, td, th, p, textarea, select
 {
-  font-family: Verdana, Helvetica, sans serif;
-  font-size: 11px;
+    font-family: Verdana, Helvetica, sans serif;
+    font-size: 11px;
 }
 
 FORM {
-  margin: 0;
+    margin: 0;
 }
 
 td {
-  vertical-align: top;
+    vertical-align: top;
 }
 
 dt {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .fixed-width {
-  font-family: Courier, monospace;
+    font-family: Courier, monospace;
 }
 
 .center {
-  text-align: center;
+    text-align: center;
 }
 
 .middle-align td, td.middle-align {
-  vertical-align: middle;
+    vertical-align: middle;
 }
 
 .center-align td, td.center-align {
-  text-align: center;
+    text-align: center;
 }
 
 .no-wrap td, td.no-wrap {
-  white-space: nowrap;
+    white-space: nowrap;
 }
 
 #main-table {
-  height: 90%;
-  padding: 0;
-  border-collapse: collapse;
+    height: 90%;
+    padding: 0;
+    border-collapse: collapse;
 }
 
 #top-panel {
-  margin-bottom: 3pt;
-  height: 34px;
-  background: url(../images/topbar.png) repeat-x;
+    margin-bottom: 3pt;
+    height: 34px;
+    background: url(../images/topbar.png) repeat-x;
 }
 #top-panel a {
-  text-decoration: none;
+    text-decoration: none;
 }
 
 #left-top-nav {
-  text-align: left;
-  padding-left: 25px;
-  padding-bottom: 4px;
-  color: white;
+    text-align: left;
+    padding-left: 25px;
+    padding-bottom: 4px;
+    color: white;
 }
 
 #left-top-nav a, #right-top-nav a {
-  color: white;
+    color: white;
 }
 
 #right-top-nav {
-  text-align: right;
-  padding-right: 15px;
+    text-align: right;
+    padding-right: 15px;
 }
 
 #top-nav .a {
-  color: white;
+    color: white;
 }
 
 
 #main-panel {
-  padding-right: 10px;
+    padding-right: 10px;
 }
 
 #side-panel {
-  padding: 4px;
-  width: 220px;
+    padding: 4px;
+    width: 220px;
 }
 
 #footer {
-  text-align: right;
-  font-size: 8pt;
-  margin-top: 10em;
-  padding: 10px;
-  border-top: 1px solid #bbb;
+    text-align: right;
+    font-size: 8pt;
+    margin-top: 10em;
+    padding: 10px;
+    border-top: 1px solid #bbb;
 }
 
 #tasks {
-  padding: 4px;
+    padding: 4px;
 }
 
 .skiplink {
@@ -132,90 +132,90 @@ dt {
 }
 
 a:link {
-  text-decoration: underline;
-  color: #204A87;
+    text-decoration: underline;
+    color: #204A87;
 }
 
 a:link {
-  text-decoration: underline;
-  color: #204A87;
+    text-decoration: underline;
+    color: #204A87;
 }
 
 a:visited {
-  text-decoration: underline;
-  color: #5c3566;
+    text-decoration: underline;
+    color: #5c3566;
 }
 
 a.lowkey:link {
-  text-decoration: none;
-  color: inherit;
+    text-decoration: none;
+    color: inherit;
 }
 
 a.lowkey:hover {
-  text-decoration: underline;
-  color: inherit;
+    text-decoration: underline;
+    color: inherit;
 }
 
 a.lowkey:visited {
-  text-decoration: none;
-  color: inherit;
+    text-decoration: none;
+    color: inherit;
 }
 
 /* tip - anchors of class info */
 a.tip {
-  position:relative;
-  z-index:24;
-  text-decoration: underline;
+    position:relative;
+    z-index:24;
+    text-decoration: underline;
 }
 
 a.tip:hover {
-  z-index:25;
+    z-index:25;
 }
 
 a.tip span {
-  display: none
+    display: none
 }
 
 a.tip:hover span {
-  display:block;
-  position:absolute;
-  top:2em;
-  left:2em;
-  width:400px;
-  border:1px solid #bbbbbb;
-  background-color:#fffff0;
-  color:#000;
-  text-align: left
+    display:block;
+    position:absolute;
+    top:2em;
+    left:2em;
+    width:400px;
+    border:1px solid #bbbbbb;
+    background-color:#fffff0;
+    color:#000;
+    text-align: left
 }
 
 img {
-  vertical-align: middle;
-  border: 0;
+    vertical-align: middle;
+    border: 0;
 }
 
 table.tab {
-  border-collapse: collapse;
+    border-collapse: collapse;
 }
 
 td.selected_tab {
-  vertical-align: middle;
-  border: 1px #090 solid;
-  background: #ffffff;
+    vertical-align: middle;
+    border: 1px #090 solid;
+    background: #ffffff;
 }
 
 td.tab_filler {
-  background: #ffffff;
-  border-bottom: 1px #090 solid;
+    background: #ffffff;
+    border-bottom: 1px #090 solid;
 }
 
 td.tab {
-  vertical-align: middle;
-  border: 1px #090 solid;
-  background: #f0f0f0;
+    vertical-align: middle;
+    border: 1px #090 solid;
+    background: #f0f0f0;
 }
 
 .dashboard td {
-  padding: 4px 4px 4px 4px;
+    padding: 4px 4px 4px 4px;
 }
 
 pre {/* see http://users.tkk.fi/tkarvine/pre-wrap-css3-mozilla-opera-ie.html */
@@ -228,112 +228,112 @@ pre {/* see http://users.tkk.fi/tkarvine/pre-wrap-css3-mozilla-opera-ie.html */
 }
 
 pre.console {
-  overflow: auto;
+    overflow: auto;
 }
 
 .setting-leftspace {
-  width: 2em;
+    width: 2em;
 }
 
 .setting-name {
-  white-space: nowrap;
+    white-space: nowrap;
 }
 
 .setting-main {
-  width: 100%; /* try to make this column as big as possible. */
+    width: 100%; /* try to make this column as big as possible. */
 }
 .setting-help {
-  width: 16px;
+    width: 16px;
 }
 
 .setting-input {
-  width: 100%;
+    width: 100%;
 }
 
 .setting-description {
-  font-size: 0.8em;
-  margin-top: 0;
-  padding-top: 0;
+    font-size: 0.8em;
+    margin-top: 0;
+    padding-top: 0;
 }
 
 /* div that looks like a hyperlink */
 .pseudoLink {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .advancedLink {
-  text-align: right;
+    text-align: right;
 }
 
 .advancedBody {
-  display: none;
+    display: none;
 }
 
 .scm_info {
-  width: 480px;
+    width: 480px;
 }
 
 .build-row {
-  padding: 3px 4px 3px 4px;
+    padding: 3px 4px 3px 4px;
 }
 
 .build-keep {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .task-header {
-  display: block;
-  border-bottom: 1px #090 solid;
-  font-weight: bold;
-  font-size: 12pt;
+    display: block;
+    border-bottom: 1px #090 solid;
+    font-weight: bold;
+    font-size: 12pt;
 }
 
 .task {
-  white-space: nowrap;
+    white-space: nowrap;
 }
 
 .subtasks {
-  padding-left: 1em;
+    padding-left: 1em;
 }
 
 .main-table {
 }
 
 div.dashboard {
-  width: 100%;
-  clear:both;
+    width: 100%;
+    clear:both;
 }
 
 .pane  {
-  color: #5c3566;
-  margin-top: 4px;
-  white-space: nowrap;
+    color: #5c3566;
+    margin-top: 4px;
+    white-space: nowrap;
 }
 .pane td {
-  padding: 4px 4px 3px 4px;
+    padding: 4px 4px 3px 4px;
 }
 
 table.pane {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px #A583B9 solid;
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px #A583B9 solid;
 }
 
 td.pane {
-  border: 1px #A583B9 solid;
-  padding: 3px 4px 3px 4px;
-  vertical-align: middle;
+    border: 1px #A583B9 solid;
+    padding: 3px 4px 3px 4px;
+    vertical-align: middle;
 }
 
 td.pane-header {
-  border: 1px #A583B9 solid;
-  background-color: #E2D7E7;
-  font-weight: bold;
+    border: 1px #A583B9 solid;
+    background-color: #E2D7E7;
+    font-weight: bold;
 }
 
 th.pane {
-  border: 1px #A583B9 solid;
-  font-weight: bold;
+    border: 1px #A583B9 solid;
+    font-weight: bold;
 }
 
 .bigtable{
@@ -341,94 +341,94 @@ th.pane {
 }
 
 .bigtable tr {
-  border: 1px solid #A583B9;
-  padding: 3px 4px 3px 4px;
+    border: 1px solid #A583B9;
+    padding: 3px 4px 3px 4px;
 }
 
 .bigtable tr:hover {
-  background-color: #EEEDED;
+    background-color: #fbf7fc;
 }
 
 .bigtable th {
-  font-weight: bold;
-  border: none;
-  background-color: #E2D7E7;
-  padding: 3px 4px 3px 4px;
+    font-weight: bold;
+    border: none;
+    background-color: #E2D7E7;
+    padding: 3px 4px 3px 4px;
 }
 
 .bigtable td {
-  vertical-align: middle;
-  padding: 3px 4px 3px 4px;
+    vertical-align: middle;
+    padding: 3px 4px 3px 4px;
 }
 
 .smallfont {
-  font-size: 9px;
+    font-size: 9px;
 }
 
 #foldertab {
-  padding: 4px 0;
-  margin-left: 0;
-  border-bottom: 1px solid #090;
-  font: bold 12px Verdana, sans-serif;
+    padding: 4px 0;
+    margin-left: 0;
+    border-bottom: 1px solid #090;
+    font: bold 12px Verdana, sans-serif;
 }
 
 #foldertab li {
-  list-style: none;
-  margin: 0;
-  display: inline;
+    list-style: none;
+    margin: 0;
+    display: inline;
 }
 
 #foldertab li a {
-  padding: 4px 0.5em;
-  margin-left: 3px;
-  border: 1px solid #090;
-  border-bottom: none;
-  background: #090;
-  text-decoration: none;
+    padding: 4px 0.5em;
+    margin-left: 3px;
+    border: 1px solid #090;
+    border-bottom: none;
+    background: #090;
+    text-decoration: none;
 }
 
 #foldertab li a:link { color: white; }
 #foldertab li a:visited { color: white; }
 
 #foldertab li a:hover {
-  color: white;
-  background: #6c0;
-  border-color: #6c0;
+    color: white;
+    background: #6c0;
+    border-color: #6c0;
 }
 
 #foldertab li a#current {
-  background: white;
-  border-bottom: 1px solid white;
-  color: black;
+    background: white;
+    border-bottom: 1px solid white;
+    color: black;
 }
 
 .changeset-message {
-  border: 1px solid #ccb;
-  background: #eed;
-  padding: 4px;
-  white-space: normal;
+    border: 1px solid #ccb;
+    background: #eed;
+    padding: 4px;
+    white-space: normal;
 }
 
 .disabledJob {
-  color: gray;
+    color: gray;
 }
 
 .spinner {
-  padding-left: 32px;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-  background-image: url("../images/spinner.gif");
-  background-repeat: no-repeat;
-  background-position: left;
+    padding-left: 32px;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    background-image: url("../images/spinner.gif");
+    background-repeat: no-repeat;
+    background-position: left;
 }
 
 .spinner-right {
-  padding-right: 32px;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-  background-image: url("../images/spinner.gif");
-  background-repeat: no-repeat;
-  background-position: right;
+    padding-right: 32px;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    background-image: url("../images/spinner.gif");
+    background-repeat: no-repeat;
+    background-position: right;
 }
 
 #login-field {
@@ -438,15 +438,15 @@ th.pane {
 }
 
 #login-field SPAN {
-  white-space:nowrap;
-  color: white;
+    white-space:nowrap;
+    color: white;
 }
 
 #login-field A {
     /*
       link inside login field should be always white.
       If I set this to inherit, it won't work in IE7
-     */
+    */
     color: white;
 }
 
@@ -517,87 +517,87 @@ div.behavior-loading {
 /* ====================== help ===================================== */
 
 .help {
-  display: none;  /* hidden until loaded */
-  border: solid #bbb 1px;
-  background-color: #f0f0f0;
-  padding: 1em;
-  margin-bottom: 1em;
+    display: none;  /* hidden until loaded */
+    border: solid #bbb 1px;
+    background-color: #f0f0f0;
+    padding: 1em;
+    margin-bottom: 1em;
 }
 
 .help-area {
-  /* this marker class is used by JavaScript to locate the area to display help text. */
+    /* this marker class is used by JavaScript to locate the area to display help text. */
 }
 
 
 /* ====================== project view tab bar ===================================== */
 #viewList {
-  color: #5c3566;
-  border: none;
-  margin-bottom: 0px;
-  width: 100%;
-  white-space: nowrap;
+    color: #5c3566;
+    border: none;
+    margin-bottom: 0px;
+    width: 100%;
+    white-space: nowrap;
 }
 #viewList td {
-  padding: 0px;
+    padding: 0px;
 }
 #viewList td.inactive {
-  border: solid 1px #A583B9;
-  border-bottom-color: #bbb;
+    border: solid 1px #A583B9;
+    border-bottom-color: #bbb;
 }
 #viewList td.inactive:hover {
-  background-color: #A583B9;
+    background-color: #A583B9;
 }
 #viewList td.inactive a {
-  text-decoration: none;
-  color: #444
+    text-decoration: none;
+    color: #444
 }
 #viewList td.noleft {
-  border-left: none;
+    border-left: none;
 }
 #viewList td.noright {
-  border-right: none;
+    border-right: none;
 }
 #viewList td.active {
-  border: solid 1px #A583B9;
-  padding: 0.5em;
-  border-bottom: none;
-  vertical-align:middle;
-  background-color: #EADFEF;
-  font-weight: bold;
-  white-space: nowrap;
+    border: solid 1px #A583B9;
+    padding: 0.5em;
+    border-bottom: none;
+    vertical-align:middle;
+    background-color: #EADFEF;
+    font-weight: bold;
+    white-space: nowrap;
 }
 #viewList td.filler {
-  border: none;
-  border-bottom: solid 1px #A583B9;
-  width: 100%;
-  text-align: right;
+    border: none;
+    border-bottom: solid 1px #A583B9;
+    width: 100%;
+    text-align: right;
 }
 #viewList a {
-  display: block;
-  padding: 0.5em;
-  white-space: nowrap;
+    display: block;
+    padding: 0.5em;
+    white-space: nowrap;
 }
 
 #projectstatus th {
-  text-align: left;
+    text-align: left;
 }
 
 /* ============================ parameters form ========================== */
 
 table.parameters {
-  border-collapse: collapse;
+    border-collapse: collapse;
 }
 
 table.parameters > tbody > tr:first-child > td {
-  padding-top: 4px;
+    padding-top: 4px;
 }
 
 table.parameters .setting-description {
-  padding-bottom: 4px;
+    padding-bottom: 4px;
 }
 
 table.parameters > tbody:hover {
-  background-color: #f0f0f0;
+    background-color: #f0f0f0;
 }
 
 /* ============================ health report hover ========================== */
@@ -621,11 +621,37 @@ table.parameters > tbody:hover {
     border: 1px solid #bbb;
     margin-left: 32px; /* move it across a bit */
     z-index: 26;
+    padding-right: 5px;
+    padding-left: 5px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border-radius:5px;
 }
 
 .healthReport div.healthReportDetails table {
     border-collapse: collapse;
     width: 450px; /* fix IE bug with width */
+    border-right-style: none;
+    border-left-style: none;
+    border-bottom-style: none;
+    border-top-style: none;
+}
+
+.healthReport div.healthReportDetails tr {
+    border-right-style: none;
+    border-left-style: none;
+    border-bottom-style: none;
+    border-top-style: none;
+}
+
+.healthReport div.healthReportDetails th {
+    font-weight: bold;
+    border: none;
+    background-color: #f8f4fa;
+    padding: 3px 4px 3px 4px;
+    border-bottom-style: solid;
+    border-bottom-width: thin;
+    border-bottom-color: #d4bde6;
 }
 
 /* ========================= build history ========================= */
@@ -645,90 +671,90 @@ table.parameters > tbody:hover {
 
 /* ========================= editable combobox style ========================= */
 .comboBoxList {
-  border: 1px solid #000;
-  overflow: visible;
-  color: MenuText;
-  background-color: Menu;
+    border: 1px solid #000;
+    overflow: visible;
+    color: MenuText;
+    background-color: Menu;
 }
 .comboBoxSelectedItem {
-  background-color: Highlight;
-  color: HighlightText;
+    background-color: Highlight;
+    color: HighlightText;
 }
 .combobox-values {
-  display: none;
+    display: none;
 }
 
 
 /* ========================= directory tree ========================= */
 .parentPath {
-  font-size: 1.2em;
-  font-weight: bold;
+    font-size: 1.2em;
+    font-weight: bold;
 }
 
 .dirTree li {
-  list-style: none;
+    list-style: none;
 }
 
 .dirTree .rootIcon {
-  margin-right: 1em;
+    margin-right: 1em;
 }
 
 TABLE.fileList {
-  margin-left: 2em;
-  padding: 0;
+    margin-left: 2em;
+    padding: 0;
 }
 
 TABLE.fileList TD {
-  padding: 0;
+    padding: 0;
 }
 
 TABLE.fileList TD.fileSize {
-  padding-left: 2em;
-  text-align: right;
-  color: #888;
+    padding-left: 2em;
+    text-align: right;
+    color: #888;
 }
 
 
 
 /* ========================= test result ========================= */
 .result-passed {
-  color: #3465a4;
+    color: #3465a4;
 }
 
 .result-skipped {
-  color: #ddbb00;
+    color: #ddbb00;
 }
 
 .result-fixed {
-  color: #3465a4;
-  font-weight: bold;
+    color: #3465a4;
+    font-weight: bold;
 }
 
 .result-failed {
-  color: #ef2929;
+    color: #ef2929;
 }
 
 .result-regression {
-  color: #ef2929;
-  font-weight: bold;
+    color: #ef2929;
+    font-weight: bold;
 }
 .test-trend-caption {
-  text-align: center;
-  font-size: 1.2em;
-  font-weight: bold;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
 }
 
 
 
 /* ========================= sortable table ========================= */
 table.sortable a.sortheader {
-  text-decoration: none;
-  color: #5c3566;
-  display: block;
+    text-decoration: none;
+    color: #5c3566;
+    display: block;
 }
 table.sortable span.sortarrow {
-  color: black;
-  text-decoration: none;
+    color: black;
+    text-decoration: none;
 }
 
 
@@ -736,17 +762,17 @@ table.sortable span.sortarrow {
 
 /* ========================= fingerprint ========================= */
 .md5sum {
-  text-align: right;
+    text-align: right;
 }
 
 .fingerprint-summary-header {
-  font-size: 1.2em;
-  vertical-align: middle;
+    font-size: 1.2em;
+    vertical-align: middle;
 }
 
 TABLE.fingerprint-in-build TD {
-  padding-left: 1em;
-  padding-right: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
 }
 
 
@@ -754,16 +780,16 @@ TABLE.fingerprint-in-build TD {
 
 /* ========================= plugin manager ========================= */
 #plugins {
-  margin-top: 0;
-  border-top: none;
+    margin-top: 0;
+    border-top: none;
 }
 
 #pluginsAdv tr:hover {
-  background-color: inherit;
+    background-color: inherit;
 }
 
 #plugins tr.already-upgraded {
-  background-color: #e8eeee;
+    background-color: #e8eeee;
 }
 
 
@@ -811,74 +837,74 @@ DIV.to-be-removed { display: none; }
 
 /* ========================= Yahoo UI style adjustments ========================= */
 .ygtvlabel, .ygtvlabel:link, .ygtvlabel:visited, .ygtvlabel:hover {
-	color: inherit;
+    color: inherit;
 }
 
 DIV.yahooTree td {
-  vertical-align: middle;
+    vertical-align: middle;
 }
 
 .yui-tt {
-  border: 1px solid black !important;
-  background-color: #FFFFFF !important;
-  padding: 2px !important;
-  font-family: inherit !important;
-  color: inherit !important;
+    border: 1px solid black !important;
+    background-color: #FFFFFF !important;
+    padding: 2px !important;
+    font-family: inherit !important;
+    color: inherit !important;
 }
 
 .yui-skin-sam .yui-tt .bd {
-  border: none !important;
-  background-color: #FFF !important;
+    border: none !important;
+    background-color: #FFF !important;
 }
 /* ========================= search box at the top-right of the page ========================= */
 #search-box {
-  background: white url(../images/16x16/search.png) no-repeat 2px center;
-  padding-left: 20px;
-  padding-top: 5px;
-  width: 15em;
-  position: static; 
+    background: white url(../images/16x16/search.png) no-repeat 2px center;
+    padding-left: 20px;
+    padding-top: 5px;
+    width: 15em;
+    position: static; 
 }
 
 #search-box.defaulted {
-  color: gray;
+    color: gray;
 }
 
 #search-box-completion {
-  text-align: left;
-  width:25em;
-  position: absolute;
-  z-index: 999;
+    text-align: left;
+    width:25em;
+    position: absolute;
+    z-index: 999;
 }
 
 #search-box-completion .yui-ac-content {
-  border: 1px solid black;
-  width:25em;
-  background-color: white;
-  overflow: hidden;
+    border: 1px solid black;
+    width:25em;
+    background-color: white;
+    overflow: hidden;
 }
 
 #search-box-completion UL {
-  padding: 0 0;
-  width: 100%;
-  margin: 0 0;
-  list-style: none;
+    padding: 0 0;
+    width: 100%;
+    margin: 0 0;
+    list-style: none;
 }
 #search-box-completion LI {
-  padding-left:20px;
-  white-space:nowrap;
+    padding-left:20px;
+    white-space:nowrap;
 }
 #search-box-completion LI.yui-ac-highlight {
-  background: #729FCF;
+    background: #729FCF;
 }
 #search-box-minWidth {
-  position:absolute;
-  visibility: hidden;
-  width:15em;
+    position:absolute;
+    visibility: hidden;
+    width:15em;
 }
 
 #search-box-sizer {
-  position:absolute;
-  visibility: hidden;
+    position:absolute;
+    visibility: hidden;
 }
 
 
@@ -896,7 +922,7 @@ DIV.textarea-handle {
     cursor: s-resize;
 }
 TEXTAREA.rich-editor {
-  visibility: hidden;
+    visibility: hidden;
 }
 
 /* ========================= hover notification ========================= */
@@ -936,11 +962,11 @@ TEXTAREA.rich-editor {
 /* ========================= progress bar ========================= */
 
 table.progress-bar {
-  border-collapse: collapse;
-  border: 1px solid #3465a4;
-  height: 6px;
-  width: 100px;
-  clear: none;
+    border-collapse: collapse;
+    border: 1px solid #3465a4;
+    height: 6px;
+    width: 100px;
+    clear: none;
 }
 
 table.progress-bar tr.unknown {
@@ -948,22 +974,22 @@ table.progress-bar tr.unknown {
 }
 
 td.progress-bar-done {
-  background-color: #3465a4;
+    background-color: #3465a4;
 }
 
 td.progress-bar-left {
-  background-color: #ffffff;
+    background-color: #ffffff;
 }
 
 table.progress-bar.red {
-  border: 1px solid #cc0000;
+    border: 1px solid #cc0000;
 }
 
 table.progress-bar.red tr.unknown {
     background-image:url(../images/progress-unknown-red.gif);
 }
 table.progress-bar.red td.progress-bar-done {
-  background-color: #cc0000;
+    background-color: #cc0000;
 }
 
 /* ========================= YUI dialog ========================= */
