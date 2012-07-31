@@ -136,11 +136,6 @@ a:link {
     color: #204A87;
 }
 
-a:link {
-    text-decoration: underline;
-    color: #204A87;
-}
-
 a:visited {
     text-decoration: underline;
     color: #5c3566;
@@ -690,6 +685,38 @@ table.parameters > tbody:hover {
     border-bottom-width: thin;
     border-bottom-color: #d4bde6;
 }
+
+/* ========================= build history ========================= */
+
+#buildQueue{
+    border: 1px solid #d4bde6;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+#buildQueueTbl{
+    margin: 0px;
+    border: none;
+}
+
+#buildQueue td.pane-header {
+    border: none;
+}
+
+#buildQueue td.pane {
+    border: none;
+}
+
+#buildQueueTbl a.cancelAll:link {
+    color: #962c3c;
+    text-decoration: underline;
+}
+
+#buildQueueTbl a.cancelAll:visited{
+    color: #962c3c;
+    text-decoration: underline;
+}
+
 
 /* ========================= build history ========================= */
 #buildHistory .healthReport {
