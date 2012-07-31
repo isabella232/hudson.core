@@ -749,6 +749,31 @@ table.parameters > tbody:hover {
 }
 
 /* ========================= build history ========================= */
+
+#buildHistory{
+    border: 1px solid #d4bde6;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+#buildHistoryTbl{
+    margin: 0px;
+    border: none;
+}
+
+#buildHistory td.pane-header {
+    border: none;
+}
+
+#buildHistory td.pane {
+    border: none;
+}
+
+#buildHistory .build-rss {
+    padding: 3px 4px 3px 4px;
+    background-color: #e6deee;
+}
+
 #buildHistory .healthReport {
     display: inline;
     margin-right: 1em;
