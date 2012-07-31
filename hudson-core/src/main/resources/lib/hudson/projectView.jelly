@@ -18,60 +18,64 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:x="jelly:xml" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  <st:documentation>
-    Renders a list of jobs and their key information.
+    <st:documentation>
+        Renders a list of jobs and their key information.
 
-    <st:attribute name="jobs" use="required" trim="Collection">
-      Items to disable.
-    </st:attribute>
-    <st:attribute name="jobBaseUrl" type="String">
-      The base URL of all job links. Normally ${rootURL}/
-    </st:attribute>
-    <st:attribute name="showViewTabs" use="optional" type="boolean">
-      If the caller rendered a view tabes, set this attribute so that CSS is adjusted accordingly.
-    </st:attribute>
-    <st:attribute name="views" type="Collection&lt;View>">
-      If non-null, render nested views.
-    </st:attribute>
-    <st:attribute name="indenter" type="hudson.Indenter">
-      Optional Indenter instance used to indent items.
-    </st:attribute>
-    <st:attribute name="columnExtensions" type="Collection&lt;hudson.views.ListViewColumn>">
-      List view columns to render. If omitted, the default ones from ListView.getDefaultColumns() are used.
-    </st:attribute>
-  </st:documentation>
+        <st:attribute name="jobs" use="required" trim="Collection">
+            Items to disable.
+        </st:attribute>
+        <st:attribute name="jobBaseUrl" type="String">
+            The base URL of all job links. Normally ${rootURL}/
+        </st:attribute>
+        <st:attribute name="showViewTabs" use="optional" type="boolean">
+            If the caller rendered a view tabes, set this attribute so that CSS is adjusted accordingly.
+        </st:attribute>
+        <st:attribute name="views" type="Collection&lt;View>">
+            If non-null, render nested views.
+        </st:attribute>
+        <st:attribute name="indenter" type="hudson.Indenter">
+            Optional Indenter instance used to indent items.
+        </st:attribute>
+        <st:attribute name="columnExtensions" type="Collection&lt;hudson.views.ListViewColumn>">
+            List view columns to render. If omitted, the default ones from ListView.getDefaultColumns() are used.
+        </st:attribute>
+    </st:documentation>
 
-  <t:setIconSize/>
-  <div class="dashboard">
+    <t:setIconSize/>
+    <div class="dashboard">
 
-    <j:if test="${columnExtensions==null}">
-        <j:invokeStatic var="columnExtensions" className="hudson.model.ListView" method="getDefaultColumns"/>
-    </j:if>
+        <j:if test="${columnExtensions==null}">
+            <j:invokeStatic var="columnExtensions" className="hudson.model.ListView" method="getDefaultColumns"/>
+        </j:if>
     
-    <j:if test="${!empty(jobs) or !empty(attrs.views)}">
-      <!-- the caller can inject a tab bar here -->
-      <d:invokeBody/>
-      <!-- project list -->
-      <table id="projectstatus" class="sortable pane bigtable"
-             style="${showViewTabs!=null?'margin-top:0px; border-top: none;':null}">
-        <tr style="border-top: 0px;">
-          <j:forEach var="col" items="${columnExtensions}">
-             <st:include page="columnHeader.jelly" it="${col}" />
-          </j:forEach>
-          <th>
-            <st:nbsp/>
-          </th>
-        </tr>
+        <j:if test="${!empty(jobs) or !empty(attrs.views)}">
+            <!-- the caller can inject a tab bar here -->
+            <d:invokeBody/>
+            <!-- project list -->
+            <div id="projectStatusDiv">
+                <table id="projectstatus" class="sortable pane bigtable"
+                       style="margin:0px; border: 0px">
+                    <tr style="border-bottom: 1px solid #e5d8ed;">
+                        <j:forEach var="col" items="${columnExtensions}">
+                            <st:include page="columnHeader.jelly" it="${col}" />
+                        </j:forEach>
+                        <th>
+                            <st:nbsp/>
+                        </th>
+                    </tr>
 
-        <j:forEach var="v" items="${attrs.views}">
-          <t:projectViewNested />
-        </j:forEach>
+                    <j:forEach var="v" items="${attrs.views}">
+                        <t:projectViewNested />
+                    </j:forEach>
 
-        <j:forEach var="job" items="${jobs}">
-          <t:projectViewRow />
-        </j:forEach>
-      </table>
-      <t:iconSize><t:rssBar/></t:iconSize>
-    </j:if>
-  </div>
+                    <j:forEach var="job" items="${jobs}">
+                        <t:projectViewRow />
+                    </j:forEach>
+                </table>
+            </div>
+            <t:iconSize>
+                <t:rssBar/>
+            </t:iconSize>
+        </j:if>
+    </div>
 </j:jelly>

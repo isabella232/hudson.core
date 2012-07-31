@@ -553,18 +553,24 @@ div.behavior-loading {
 }
 #viewList td.noleft {
     border-left: none;
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
 }
 #viewList td.noright {
     border-right: none;
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
 }
 #viewList td.active {
     border: solid 1px #A583B9;
     padding: 0.5em;
     border-bottom: none;
     vertical-align:middle;
-    background-color: #EADFEF;
+    background-color: #E2D7E7;
     font-weight: bold;
     white-space: nowrap;
+    border-top-left-radius:  4px;
+    border-top-right-radius: 4px;
 }
 #viewList td.filler {
     border: none;
@@ -580,7 +586,38 @@ div.behavior-loading {
 
 #projectstatus th {
     text-align: left;
+    background-color: #f7f1fb;
 }
+
+#projectStatusDiv{
+    background-color: #fffdfb;
+    border-right-width: 1px;
+    border-left-width: 1px;
+    border-bottom-width: 1px;
+    border-right-color: #ae92c1;
+    border-left-color: #ae92c1;
+    border-bottom-color: #ae92c1;
+    padding-right: 5px;
+    padding-left: 5px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border-right-style: solid;
+    border-left-style: solid;
+    border-bottom-style: solid;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+#projectstatus .bigtable{
+    color: #5c3566;
+}
+
+#projectstatus tr {
+    border: none;
+    border-bottom: 1px dotted #d5cada;
+    padding: 3px 4px 3px 4px;
+}
+
 
 /* ============================ parameters form ========================== */
 
