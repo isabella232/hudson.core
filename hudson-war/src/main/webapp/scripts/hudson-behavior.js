@@ -10,7 +10,7 @@
  *
  * Contributors: 
  *
- *    Kohsuke Kawaguchi,
+ *    Kohsuke Kawaguchi, Winston Prakash
  *    Daniel Dyer, Yahoo! Inc., Alan Harder, InfraDNA, Inc.
  *
  *******************************************************************************/ 
@@ -28,7 +28,49 @@
 
 jQuery.noConflict();
 
-
+jQuery(document).ready(function() {
+    jQuery('input.optionalBlockCheckbox').each(function() {
+        if (jQuery(this).is(":checked")){
+            var radioBlockDiv = jQuery(this).siblings('div.optionalBlockDiv');
+            if (jQuery(radioBlockDiv).children('table').children().length > 0){
+                jQuery(radioBlockDiv).show();
+            } 
+        }
+        jQuery(this).click(function ( e ) {
+            if (jQuery(this).is(":checked")){
+                var optionalBlockDiv = jQuery(this).siblings('div.optionalBlockDiv');
+                if (jQuery(optionalBlockDiv).children('table').children().length > 0){
+                    jQuery(optionalBlockDiv).show('slow');
+                } 
+            }else{
+                jQuery(this).siblings('div.optionalBlockDiv').hide('slow');
+            }
+        });
+    }); 
+    
+    jQuery('input.radioBlock').each(function() {
+        if (jQuery(this).is(":checked")){
+            var radioBlockDiv = jQuery(this).siblings('div.radioBlockDiv');
+            if (jQuery(radioBlockDiv).children('table').children().length > 0){
+                jQuery(radioBlockDiv).show();
+            } 
+        }
+        jQuery(this).click(function ( e ) {
+            if (jQuery(this).is(":checked")){
+                var radioBlockDiv = jQuery(this).siblings('div.radioBlockDiv');
+                if (jQuery(radioBlockDiv).children('table').children().length > 0){
+                    jQuery(radioBlockDiv).show('slow');
+                } 
+                jQuery(this).closest('table').find(':radio').each(function() {
+                    if (!jQuery(this).is(":checked")){
+                        jQuery(this).siblings('div.radioBlockDiv').hide('slow');
+                    }
+                });
+            }
+        });
+    }); 
+});
+ 
 // create a new object whose prototype is the given object
 function object(o) {
     function F() {}
@@ -125,7 +167,7 @@ var FormChecker = {
             onComplete : function(x) {
                 var i;
                 next.target.innerHTML = x.status==200 ? x.responseText
-                    : '<a href="" onclick="document.getElementById(\'valerr' + (i=iota++)
+                : '<a href="" onclick="document.getElementById(\'valerr' + (i=iota++)
                     + '\').style.display=\'block\';return false">ERROR</a><div id="valerr'
                     + i + '" style="display:none">' + x.responseText + '</div>';
                 Behaviour.applySubtree(next.target);
@@ -282,7 +324,7 @@ function findNext(src,filter) {
 
 function findFormItem(src,name,directionF) {
     var name2 = "_."+name; // handles <textbox field="..." /> notation silently
-    return directionF(src,function(e){ return (e.tagName=="INPUT" || e.tagName=="TEXTAREA" || e.tagName=="SELECT") && (e.name==name || e.name==name2); });
+    return directionF(src,function(e){return (e.tagName=="INPUT" || e.tagName=="TEXTAREA" || e.tagName=="SELECT") && (e.name==name || e.name==name2);});
 }
 
 /**
@@ -344,7 +386,7 @@ function registerValidator(e) {
 
     var url = e.targetUrl();
     try {
-      FormChecker.delayedCheck(url, method, e.targetElement);
+        FormChecker.delayedCheck(url, method, e.targetElement);
     } catch (x) {
         // this happens if the checkUrl refers to a non-existing element.
         // don't let this kill off the entire JavaScript
@@ -364,7 +406,7 @@ function registerValidator(e) {
     }
     var oldOnchange = e.onchange;
     if(typeof oldOnchange=="function") {
-        e.onchange = function() { checker.call(this); oldOnchange.call(this); }
+        e.onchange = function() {checker.call(this);oldOnchange.call(this);}
     } else
         e.onchange = checker;
     e.onblur = checker;
@@ -428,8 +470,8 @@ var hudsonRules = {
         tooltip = new YAHOO.widget.Tooltip("tt", {context:[], zindex:999});
     },
 
-// do the ones that extract innerHTML so that they can get their original HTML before
-// other behavior rules change them (like YUI buttons.)
+    // do the ones that extract innerHTML so that they can get their original HTML before
+    // other behavior rules change them (like YUI buttons.)
 
     "DIV.hetero-list-container" : function(e) {
         if(isInsideRemovable(e))    return;
@@ -437,7 +479,7 @@ var hudsonRules = {
         // components for the add button
         var menu = document.createElement("SELECT");
         var btns = findElementsBySelector(e,"INPUT.hetero-list-add"),
-            btn = btns[btns.length-1]; // In case nested content also uses hetero-list
+        btn = btns[btns.length-1]; // In case nested content also uses hetero-list
         YAHOO.util.Dom.insertAfter(menu,btn);
 
         var prototypes = e.lastChild;
@@ -446,7 +488,7 @@ var hudsonRules = {
         var insertionPoint = prototypes.previousSibling;    // this is where the new item is inserted.
 
         // extract templates
-        var templates = []; var i=0;
+        var templates = [];var i=0;
         for(var n=prototypes.firstChild;n!=null;n=n.nextSibling,i++) {
             var name = n.getAttribute("name");
             var tooltip = n.getAttribute("tooltip");
@@ -457,7 +499,7 @@ var hudsonRules = {
 
         var withDragDrop = initContainerDD(e);
 
-        var menuButton = new YAHOO.widget.Button(btn, { type: "menu", menu: menu });
+        var menuButton = new YAHOO.widget.Button(btn, {type: "menu", menu: menu});
         menuButton.getMenu().clickEvent.subscribe(function(type,args,value) {
             var t = templates[parseInt(args[1].value)]; // where this args[1] comes is a real mystery
 
@@ -547,7 +589,7 @@ var hudsonRules = {
         e = null; // avoid memory leak
     },
 
-// scripting for having default value in the input field
+    // scripting for having default value in the input field
     "INPUT.has-default-text" : function(e) {
         var defaultValue = e.value;
         Element.addClassName(e, "defaulted");
@@ -566,7 +608,7 @@ var hudsonRules = {
         e = null; // avoid memory leak
     },
 
-// <label> that doesn't use ID, so that it can be copied in <repeatable>
+    // <label> that doesn't use ID, so that it can be copied in <repeatable>
     "LABEL.attach-previous" : function(e) {
         e.onclick = function() {
             var e = this.previousSibling;
@@ -581,17 +623,17 @@ var hudsonRules = {
         e = null;
     },
 
-// form fields that are validated via AJAX call to the server
-// elements with this class should have two attributes 'checkUrl' that evaluates to the server URL.
+    // form fields that are validated via AJAX call to the server
+    // elements with this class should have two attributes 'checkUrl' that evaluates to the server URL.
     "INPUT.validated" : registerValidator,
     "SELECT.validated" : registerValidator,
     "TEXTAREA.validated" : registerValidator,
 
-// validate required form values
-    "INPUT.required" : function(e) { registerRegexpValidator(e,/./,"Field is required"); },
+    // validate required form values
+    "INPUT.required" : function(e) {registerRegexpValidator(e,/./,"Field is required");},
 
-// validate form values to be a number
-    "INPUT.number" : function(e) { registerRegexpValidator(e,/^(\d+|)$/,"Not a number"); },
+    // validate form values to be a number
+    "INPUT.number" : function(e) {registerRegexpValidator(e,/^(\d+|)$/,"Not a number");},
     "INPUT.positive-number" : function(e) {
         registerRegexpValidator(e,/^(\d*[1-9]\d*|)$/,"Not a positive number");
     },
@@ -647,22 +689,22 @@ var hudsonRules = {
         e = null; // avoid memory leak
     },
 
-// deferred client-side clickable map.
-// this is useful where the generation of <map> element is time consuming
+    // deferred client-side clickable map.
+    // this is useful where the generation of <map> element is time consuming
     "IMG[lazymap]" : function(e) {
         new Ajax.Request(
-            e.getAttribute("lazymap"),
-            {
-                method : 'get',
-                onSuccess : function(x) {
-                    var div = document.createElement("div");
-                    document.body.appendChild(div);
-                    div.innerHTML = x.responseText;
-                    var id = "map" + (iota++);
-                    div.firstChild.setAttribute("name", id);
-                    e.setAttribute("usemap", "#" + id);
-                }
-            });
+        e.getAttribute("lazymap"),
+        {
+            method : 'get',
+            onSuccess : function(x) {
+                var div = document.createElement("div");
+                document.body.appendChild(div);
+                div.innerHTML = x.responseText;
+                var id = "map" + (iota++);
+                div.firstChild.setAttribute("name", id);
+                e.setAttribute("usemap", "#" + id);
+            }
+        });
     },
 
     // button to add a new repeatable block
@@ -712,7 +754,7 @@ var hudsonRules = {
             textarea.style.opacity = 0.5;
             document.onmousemove = function(ev) {
                 ev = Event.getEvent(ev);
-                function max(a,b) { if(a<b) return b; else return a; }
+                function max(a,b) {if(a<b) return b; else return a;}
                 textarea.style.height = max(32, offset + Event.getPageY(ev)) + 'px';
                 return false;
             };
@@ -740,9 +782,9 @@ var hudsonRules = {
 
         var oldOnsubmit = form.onsubmit;
         if (typeof oldOnsubmit == "function") {
-            form.onsubmit = function() { return buildFormTree(this) && oldOnsubmit.call(this); }
+            form.onsubmit = function() {return buildFormTree(this) && oldOnsubmit.call(this);}
         } else {
-            form.onsubmit = function() { return buildFormTree(this); };
+            form.onsubmit = function() {return buildFormTree(this);};
         }
 
         form = null; // memory leak prevention
@@ -888,7 +930,7 @@ var hudsonRules = {
 
         // install event handlers to update visibility.
         // needs to use onclick and onchange for Safari compatibility
-        r.onclick = r.onchange = function() { g.updateButtons(); };
+        r.onclick = r.onchange = function() {g.updateButtons();};
     },
 
     // editableComboBox.jelly
@@ -911,12 +953,12 @@ var hudsonRules = {
 
         e.subForms = [];
         var start = findFollowingTR(e, 'dropdownList-container').firstChild.nextSibling, end;
-        do { start = start.firstChild; } while (start && start.tagName != 'TR');
+        do {start = start.firstChild;} while (start && start.tagName != 'TR');
         if (start && !Element.hasClassName(start,'dropdownList-start'))
             start = findFollowingTR(start, 'dropdownList-start');
         while (start != null) {
             end = findFollowingTR(start, 'dropdownList-end');
-            e.subForms.push({ 'start': start, 'end': end });
+            e.subForms.push({'start': start, 'end': end});
             start = findFollowingTR(end, 'dropdownList-start');
         }
 
@@ -987,30 +1029,30 @@ var hudsonRules = {
     },
 
     ".button-with-dropdown" : function (e) {
-        new YAHOO.widget.Button(e, { type: "menu", menu: e.nextSibling });
+        new YAHOO.widget.Button(e, {type: "menu", menu: e.nextSibling});
     }
 };
 
 function applyTooltip(e,text) {
-        // copied from YAHOO.widget.Tooltip.prototype.configContext to efficiently add a new element
-        // event registration via YAHOO.util.Event.addListener leaks memory, so do it by ourselves here
-        e.onmouseover = function(ev) {
-            var delay = this.getAttribute("nodismiss")!=null ? 99999999 : 5000;
-            tooltip.cfg.setProperty("autodismissdelay",delay);
-            return tooltip.onContextMouseOver.call(this,YAHOO.util.Event.getEvent(ev),tooltip);
-        }
-        e.onmousemove = function(ev) { return tooltip.onContextMouseMove.call(this,YAHOO.util.Event.getEvent(ev),tooltip); }
-        e.onmouseout  = function(ev) { return tooltip.onContextMouseOut .call(this,YAHOO.util.Event.getEvent(ev),tooltip); }
-        e.title = text;
-        e = null; // avoid memory leak
+    // copied from YAHOO.widget.Tooltip.prototype.configContext to efficiently add a new element
+    // event registration via YAHOO.util.Event.addListener leaks memory, so do it by ourselves here
+    e.onmouseover = function(ev) {
+        var delay = this.getAttribute("nodismiss")!=null ? 99999999 : 5000;
+        tooltip.cfg.setProperty("autodismissdelay",delay);
+        return tooltip.onContextMouseOver.call(this,YAHOO.util.Event.getEvent(ev),tooltip);
+    }
+    e.onmousemove = function(ev) {return tooltip.onContextMouseMove.call(this,YAHOO.util.Event.getEvent(ev),tooltip);}
+    e.onmouseout  = function(ev) {return tooltip.onContextMouseOut .call(this,YAHOO.util.Event.getEvent(ev),tooltip);}
+    e.title = text;
+    e = null; // avoid memory leak
 }
 
 var Path = {
-  tail : function(p) {
-      var idx = p.lastIndexOf("/");
-      if (idx<0)    return p;
-      return p.substring(idx+1);
-  }
+    tail : function(p) {
+        var idx = p.lastIndexOf("/");
+        if (idx<0)    return p;
+        return p.substring(idx+1);
+    }
 };
 
 /**
@@ -1035,7 +1077,7 @@ function refillOnChange(e,onChange) {
                 if (window.YUI!=null)      YUI.log("Unable to find a nearby control of the name "+name,"warn")
                 return;
             }
-            try { c.addEventListener("change",h,false); } catch (ex) { c.attachEvent("change",h); }
+            try {c.addEventListener("change",h,false);} catch (ex) {c.attachEvent("change",h);}
             deps.push({name:Path.tail(name),control:c});
         });
     }
@@ -1056,15 +1098,15 @@ function replaceDescription() {
     var d = document.getElementById("description");
     d.firstChild.nextSibling.innerHTML = "<div class='spinner-right'>loading...</div>";
     new Ajax.Request(
-        "./descriptionForm",
-        {
-          onComplete : function(x) {
+    "./descriptionForm",
+    {
+        onComplete : function(x) {
             d.innerHTML = x.responseText;
             Behaviour.applySubtree(d);
             d.getElementsByTagName("TEXTAREA")[0].focus();
-          }
         }
-    );
+    }
+);
     return false;
 }
 
@@ -1280,7 +1322,7 @@ function refreshPart(id,url) {
     Perform URL encode.
     Taken from http://www.cresc.co.jp/tech/java/URLencoding/JavaScript_URLEncoding.htm
     @deprecated Use standard javascript method "encodeURIComponent" instead
-*/
+ */
 function encode(str){
     var s, u;
     var s0 = "";                // encoded str
@@ -1298,17 +1340,17 @@ function encode(str){
                     s = "0"+u.toString(16);
                     s0 += "%"+ s.substr(s.length-2);
                 } else
-                if (u > 0x1fffff){     // quaternary byte format (extended)
-                    s0 += "%" + (0xF0 + ((u & 0x1c0000) >> 18)).toString(16);
-                    s0 += "%" + (0x80 + ((u & 0x3f000) >> 12)).toString(16);
-                    s0 += "%" + (0x80 + ((u & 0xfc0) >> 6)).toString(16);
-                    s0 += "%" + (0x80 + (u & 0x3f)).toString(16);
-                } else
-                if (u > 0x7ff){        // triple byte format
-                    s0 += "%" + (0xe0 + ((u & 0xf000) >> 12)).toString(16);
-                    s0 += "%" + (0x80 + ((u & 0xfc0) >> 6)).toString(16);
-                    s0 += "%" + (0x80 + (u & 0x3f)).toString(16);
-                } else {                      // double byte format
+                    if (u > 0x1fffff){     // quaternary byte format (extended)
+                        s0 += "%" + (0xF0 + ((u & 0x1c0000) >> 18)).toString(16);
+                        s0 += "%" + (0x80 + ((u & 0x3f000) >> 12)).toString(16);
+                        s0 += "%" + (0x80 + ((u & 0xfc0) >> 6)).toString(16);
+                        s0 += "%" + (0x80 + (u & 0x3f)).toString(16);
+                    } else
+                    if (u > 0x7ff){        // triple byte format
+                        s0 += "%" + (0xe0 + ((u & 0xf000) >> 12)).toString(16);
+                        s0 += "%" + (0x80 + ((u & 0xfc0) >> 6)).toString(16);
+                        s0 += "%" + (0x80 + (u & 0x3f)).toString(16);
+                    } else {                      // double byte format
                     s0 += "%" + (0xc0 + ((u & 0x7c0) >> 6)).toString(16);
                     s0 += "%" + (0x80 + (u & 0x3f)).toString(16);
                 }
@@ -1412,9 +1454,9 @@ var repeatableSupport = {
         if(children.length==0) {
             // noop
         } else
-        if(children.length==1) {
-            children[0].addClassName("repeated-chunk first last only");
-        } else {
+            if(children.length==1) {
+                children[0].addClassName("repeated-chunk first last only");
+            } else {
             Element.removeClassName(children[0], "last only");
             children[0].addClassName("repeated-chunk first");
             for(var i=1; i<children.length-1; i++)
@@ -1559,8 +1601,8 @@ function updateListBox(listBox,url,config) {
     },
     config.onFailure = function(rsp) {
         // deleting values can result in the data loss, so let's not do that
-//        var l = $(listBox);
-//        l.options[0] = null;
+        //        var l = $(listBox);
+        //        l.options[0] = null;
     }
 
     new Ajax.Request(url, config);
@@ -1568,11 +1610,11 @@ function updateListBox(listBox,url,config) {
 
 // get the cascaded computed style value. 'a' is the style name like 'backgroundColor'
 function getStyle(e,a){
-  if(document.defaultView && document.defaultView.getComputedStyle)
-    return document.defaultView.getComputedStyle(e,null).getPropertyValue(a.replace(/([A-Z])/g, "-$1"));
-  if(e.currentStyle)
-    return e.currentStyle[a];
-  return null;
+    if(document.defaultView && document.defaultView.getComputedStyle)
+        return document.defaultView.getComputedStyle(e,null).getPropertyValue(a.replace(/([A-Z])/g, "-$1"));
+    if(e.currentStyle)
+        return e.currentStyle[a];
+    return null;
 };
 
 // set up logic behind the search box
@@ -1603,13 +1645,13 @@ function createSearchBox(searchURL) {
 
     // update positions and sizes of the components relevant to search
     function updatePos() {
-        function max(a,b) { if(a>b) return a; else return b; }
+        function max(a,b) {if(a>b) return a; else return b;}
 
         sizer.innerHTML = box.value;
         var w = max(sizer.offsetWidth,minW.offsetWidth);
         box.style.width =
-        comp.style.width = 
-        comp.firstChild.style.width = (w+60)+"px";
+            comp.style.width = 
+            comp.firstChild.style.width = (w+60)+"px";
 
         var pos = YAHOO.util.Dom.getXY(box);
         pos[1] += YAHOO.util.Dom.get(box).offsetHeight + 2;
@@ -1740,283 +1782,283 @@ function buildFormTree(form) {
             var type = e.getAttribute("type");
             if(type==null)  type="";
             switch(type.toLowerCase()) {
-            case "button":
-            case "submit":
-                break;
-            case "checkbox":
-                p = findParent(e);
-                var checked = xor(e.checked,Element.hasClassName(e,"negative"));
-                if(!e.groupingNode) {
-                    v = e.getAttribute("json");
-                    if (v) {
-                        // if the special attribute is present, we'll either set the value or not. useful for an array of checkboxes
-                        // we can't use @value because IE6 sets the value to be "on" if it's left unspecified.
-                        if (checked)
-                            addProperty(p, e.name, v);
-                    } else {// otherwise it'll bind to boolean
-                        addProperty(p, e.name, checked);
-                    }
-                } else {
-                    if(checked)
-                        addProperty(p, e.name, e.formDom = {});
-                }
-                break;
-            case "file":
-                // to support structured form submission with file uploads,
-                // rename form field names to unique ones, and leave this name mapping information
-                // in JSON. this behavior is backward incompatible, so only do
-                // this when
-                p = findParent(e);
-                if(e.getAttribute("jsonAware")!=null) {
-                    var on = e.getAttribute("originalName");
-                    if(on!=null) {
-                        addProperty(p,on,e.name);
-                    } else {
-                        var uniqName = "file"+(iota++);
-                        addProperty(p,e.name,uniqName);
-                        e.setAttribute("originalName",e.name);
-                        e.name = uniqName;
-                    }
-                }
-                // switch to multipart/form-data to support file submission
-                // @enctype is the standard, but IE needs @encoding.
-                form.enctype = form.encoding = "multipart/form-data";
-                break;
-            case "radio":
-                if(!e.checked)  break;
-                while (e.name.substring(0,8)=='removeme')
-                    e.name = e.name.substring(e.name.indexOf('_',8)+1);
-                if(e.groupingNode) {
-                    p = findParent(e);
-                    addProperty(p, e.name, e.formDom = { value: e.value });
+                case "button":
+                case "submit":
                     break;
-                }
+                case "checkbox":
+                    p = findParent(e);
+                    var checked = xor(e.checked,Element.hasClassName(e,"negative"));
+                    if(!e.groupingNode) {
+                        v = e.getAttribute("json");
+                        if (v) {
+                            // if the special attribute is present, we'll either set the value or not. useful for an array of checkboxes
+                            // we can't use @value because IE6 sets the value to be "on" if it's left unspecified.
+                            if (checked)
+                                addProperty(p, e.name, v);
+                        } else {// otherwise it'll bind to boolean
+                            addProperty(p, e.name, checked);
+                        }
+                    } else {
+                        if(checked)
+                            addProperty(p, e.name, e.formDom = {});
+                    }
+                    break;
+                case "file":
+                    // to support structured form submission with file uploads,
+                    // rename form field names to unique ones, and leave this name mapping information
+                    // in JSON. this behavior is backward incompatible, so only do
+                    // this when
+                    p = findParent(e);
+                    if(e.getAttribute("jsonAware")!=null) {
+                        var on = e.getAttribute("originalName");
+                        if(on!=null) {
+                            addProperty(p,on,e.name);
+                        } else {
+                            var uniqName = "file"+(iota++);
+                            addProperty(p,e.name,uniqName);
+                            e.setAttribute("originalName",e.name);
+                            e.name = uniqName;
+                        }
+                    }
+                    // switch to multipart/form-data to support file submission
+                    // @enctype is the standard, but IE needs @encoding.
+                    form.enctype = form.encoding = "multipart/form-data";
+                    break;
+                case "radio":
+                    if(!e.checked)  break;
+                    while (e.name.substring(0,8)=='removeme')
+                        e.name = e.name.substring(e.name.indexOf('_',8)+1);
+                    if(e.groupingNode) {
+                        p = findParent(e);
+                        addProperty(p, e.name, e.formDom = {value: e.value});
+                        break;
+                    }
 
                 // otherwise fall through
             default:
                 p = findParent(e);
                 addProperty(p, e.name, e.value);
                 break;
-            }
         }
-
-        jsonElement.value = Object.toJSON(form.formDom);
-
-        // clean up
-        for( i=0; i<doms.length; i++ )
-            doms[i].formDom = null;
-
-        return true;
-    } catch(e) {
-        alert(e+'\n(form not submitted)');
-        return false;
     }
+
+    jsonElement.value = Object.toJSON(form.formDom);
+
+    // clean up
+    for( i=0; i<doms.length; i++ )
+        doms[i].formDom = null;
+
+    return true;
+} catch(e) {
+    alert(e+'\n(form not submitted)');
+    return false;
+}
 }
 
 // this used to be in prototype.js but it must have been removed somewhere between 1.4.0 to 1.5.1
 String.prototype.trim = function() {
-    var temp = this;
-    var obj = /^(\s*)([\W\w]*)(\b\s*$)/;
-    if (obj.test(temp))
-        temp = temp.replace(obj, '$2');
-    obj = /  /g;
-    while (temp.match(obj))
-        temp = temp.replace(obj, " ");
-    return temp;
+var temp = this;
+var obj = /^(\s*)([\W\w]*)(\b\s*$)/;
+if (obj.test(temp))
+    temp = temp.replace(obj, '$2');
+obj = /  /g;
+while (temp.match(obj))
+    temp = temp.replace(obj, " ");
+return temp;
 }
 
 
 
 var hoverNotification = (function() {
-    var msgBox;
-    var body;
+var msgBox;
+var body;
 
-    // animation effect that automatically hide the message box
-    var effect = function(overlay, dur) {
-        var o = YAHOO.widget.ContainerEffect.FADE(overlay, dur);
-        o.animateInCompleteEvent.subscribe(function() {
-            window.setTimeout(function() {
-                msgBox.hide()
-            }, 1500);
-        });
-        return o;
-    }
+// animation effect that automatically hide the message box
+var effect = function(overlay, dur) {
+    var o = YAHOO.widget.ContainerEffect.FADE(overlay, dur);
+    o.animateInCompleteEvent.subscribe(function() {
+        window.setTimeout(function() {
+            msgBox.hide()
+        }, 1500);
+    });
+    return o;
+}
 
-    function init() {
-        if(msgBox!=null)  return;   // already initialized
+function init() {
+    if(msgBox!=null)  return;   // already initialized
 
-        var div = document.createElement("DIV");
-        document.body.appendChild(div);
-        div.innerHTML = "<div id=hoverNotification><div class=bd></div></div>";
-        body = $('hoverNotification');
+    var div = document.createElement("DIV");
+    document.body.appendChild(div);
+    div.innerHTML = "<div id=hoverNotification><div class=bd></div></div>";
+    body = $('hoverNotification');
         
-        msgBox = new YAHOO.widget.Overlay(body, {
-          visible:false,
-          width:"10em",
-          zIndex:1000,
-          effect:{
+    msgBox = new YAHOO.widget.Overlay(body, {
+        visible:false,
+        width:"10em",
+        zIndex:1000,
+        effect:{
             effect:effect,
             duration:0.25
-          }
-        });
-        msgBox.render();
-    }
+        }
+    });
+    msgBox.render();
+}
 
-    return function(title,anchor) {
-        init();
-        body.innerHTML = title;
-        var xy = YAHOO.util.Dom.getXY(anchor);
-        xy[0] += 48;
-        xy[1] += anchor.offsetHeight;
-        msgBox.cfg.setProperty("xy",xy);
-        msgBox.show();
-    };
+return function(title,anchor) {
+    init();
+    body.innerHTML = title;
+    var xy = YAHOO.util.Dom.getXY(anchor);
+    xy[0] += 48;
+    xy[1] += anchor.offsetHeight;
+    msgBox.cfg.setProperty("xy",xy);
+    msgBox.show();
+};
 })();
 
 /*
     Drag&Drop implementation for heterogeneous/repeatable lists.
- */
+*/
 function initContainerDD(e) {
-    if (!Element.hasClassName(e,"with-drag-drop")) return false;
+if (!Element.hasClassName(e,"with-drag-drop")) return false;
 
-    for (e=e.firstChild; e!=null; e=e.nextSibling) {
-        if (Element.hasClassName(e,"repeated-chunk"))
-            prepareDD(e);
-    }
-    return true;
+for (e=e.firstChild; e!=null; e=e.nextSibling) {
+    if (Element.hasClassName(e,"repeated-chunk"))
+        prepareDD(e);
+}
+return true;
 }
 function prepareDD(e) {
-    var h = e;
-    // locate a handle
-    while (h!=null && !Element.hasClassName(h,"dd-handle"))
-        h = h.firstChild ? h.firstChild : h.nextSibling;
-    if (h!=null) {
-        var dd = new DragDrop(e);
-        dd.setHandleElId(h);
-    }
+var h = e;
+// locate a handle
+while (h!=null && !Element.hasClassName(h,"dd-handle"))
+    h = h.firstChild ? h.firstChild : h.nextSibling;
+if (h!=null) {
+    var dd = new DragDrop(e);
+    dd.setHandleElId(h);
+}
 }
 
 var DragDrop = function(id, sGroup, config) {
-    DragDrop.superclass.constructor.apply(this, arguments);
+DragDrop.superclass.constructor.apply(this, arguments);
 };
 
 (function() {
-    var Dom = YAHOO.util.Dom;
-    var Event = YAHOO.util.Event;
-    var DDM = YAHOO.util.DragDropMgr;
+var Dom = YAHOO.util.Dom;
+var Event = YAHOO.util.Event;
+var DDM = YAHOO.util.DragDropMgr;
 
-    YAHOO.extend(DragDrop, YAHOO.util.DDProxy, {
-        startDrag: function(x, y) {
-            var el = this.getEl();
+YAHOO.extend(DragDrop, YAHOO.util.DDProxy, {
+    startDrag: function(x, y) {
+        var el = this.getEl();
 
-            this.resetConstraints();
-            this.setXConstraint(0,0);    // D&D is for Y-axis only
+        this.resetConstraints();
+        this.setXConstraint(0,0);    // D&D is for Y-axis only
 
-            // set Y constraint to be within the container
-            var totalHeight = el.parentNode.offsetHeight;
-            var blockHeight = el.offsetHeight;
-            this.setYConstraint(el.offsetTop, totalHeight-blockHeight-el.offsetTop);
+        // set Y constraint to be within the container
+        var totalHeight = el.parentNode.offsetHeight;
+        var blockHeight = el.offsetHeight;
+        this.setYConstraint(el.offsetTop, totalHeight-blockHeight-el.offsetTop);
 
-            el.style.visibility = "hidden";
+        el.style.visibility = "hidden";
 
+        this.goingUp = false;
+        this.lastY = 0;
+    },
+
+    endDrag: function(e) {
+        var srcEl = this.getEl();
+        var proxy = this.getDragEl();
+
+        // Show the proxy element and animate it to the src element's location
+        Dom.setStyle(proxy, "visibility", "");
+        var a = new YAHOO.util.Motion(
+        proxy, {
+            points: {
+                to: Dom.getXY(srcEl)
+            }
+        },
+        0.2,
+        YAHOO.util.Easing.easeOut
+    )
+        var proxyid = proxy.id;
+        var thisid = this.id;
+
+        // Hide the proxy and show the source element when finished with the animation
+        a.onComplete.subscribe(function() {
+            Dom.setStyle(proxyid, "visibility", "hidden");
+            Dom.setStyle(thisid, "visibility", "");
+        });
+        a.animate();
+    },
+
+    onDrag: function(e) {
+
+        // Keep track of the direction of the drag for use during onDragOver
+        var y = Event.getPageY(e);
+
+        if (y < this.lastY) {
+            this.goingUp = true;
+        } else if (y > this.lastY) {
             this.goingUp = false;
-            this.lastY = 0;
-        },
-
-        endDrag: function(e) {
-            var srcEl = this.getEl();
-            var proxy = this.getDragEl();
-
-            // Show the proxy element and animate it to the src element's location
-            Dom.setStyle(proxy, "visibility", "");
-            var a = new YAHOO.util.Motion(
-                proxy, {
-                    points: {
-                        to: Dom.getXY(srcEl)
-                    }
-                },
-                0.2,
-                YAHOO.util.Easing.easeOut
-            )
-            var proxyid = proxy.id;
-            var thisid = this.id;
-
-            // Hide the proxy and show the source element when finished with the animation
-            a.onComplete.subscribe(function() {
-                    Dom.setStyle(proxyid, "visibility", "hidden");
-                    Dom.setStyle(thisid, "visibility", "");
-                });
-            a.animate();
-        },
-
-        onDrag: function(e) {
-
-            // Keep track of the direction of the drag for use during onDragOver
-            var y = Event.getPageY(e);
-
-            if (y < this.lastY) {
-                this.goingUp = true;
-            } else if (y > this.lastY) {
-                this.goingUp = false;
-            }
-
-            this.lastY = y;
-        },
-
-        onDragOver: function(e, id) {
-            var srcEl = this.getEl();
-            var destEl = Dom.get(id);
-
-            // We are only concerned with list items, we ignore the dragover
-            // notifications for the list.
-            if (destEl.nodeName == "DIV" && Dom.hasClass(destEl,"repeated-chunk")
-                    // Nested lists.. ensure we don't drag out of this list or into a nested one:
-                    && destEl.parentNode==srcEl.parentNode) {
-                var p = destEl.parentNode;
-
-                // if going up, insert above the target element
-                p.insertBefore(srcEl, this.goingUp?destEl:destEl.nextSibling);
-
-                DDM.refreshCache();
-            }
         }
-    });
+
+        this.lastY = y;
+    },
+
+    onDragOver: function(e, id) {
+        var srcEl = this.getEl();
+        var destEl = Dom.get(id);
+
+        // We are only concerned with list items, we ignore the dragover
+        // notifications for the list.
+        if (destEl.nodeName == "DIV" && Dom.hasClass(destEl,"repeated-chunk")
+        // Nested lists.. ensure we don't drag out of this list or into a nested one:
+            && destEl.parentNode==srcEl.parentNode) {
+            var p = destEl.parentNode;
+
+            // if going up, insert above the target element
+            p.insertBefore(srcEl, this.goingUp?destEl:destEl.nextSibling);
+
+            DDM.refreshCache();
+        }
+    }
+});
 })();
 
 function loadScript(href) {
-    var s = document.createElement("script");
-    s.setAttribute("src",href);
-    document.getElementsByTagName("HEAD")[0].appendChild(s);
+var s = document.createElement("script");
+s.setAttribute("src",href);
+document.getElementsByTagName("HEAD")[0].appendChild(s);
 }
 
 var downloadService = {
-    continuations: {},
+continuations: {},
 
-    download : function(id,url,info, postBack,completionHandler) {
-        this.continuations[id] = {postBack:postBack,completionHandler:completionHandler};
-        loadScript(url+"?"+Hash.toQueryString(info));
-    },
+download : function(id,url,info, postBack,completionHandler) {
+    this.continuations[id] = {postBack:postBack,completionHandler:completionHandler};
+    loadScript(url+"?"+Hash.toQueryString(info));
+},
 
-    post : function(id,data) {
-        if (data==undefined) {
-            // default to id in data
-            data = id;
-            id = data.id;
-        }
-        var o = this.continuations[id];
-        // send the payload back in the body. We used to send this in as a form submission, but that hits the form size check in Jetty.
-        new Ajax.Request(o.postBack, {
-            contentType:"application/json",
-            encoding:"UTF-8",
-            postBody:Object.toJSON(data),
-            onSuccess: function() {
-                if(o.completionHandler!=null)
-                    o.completionHandler();
-                else if(downloadService.completionHandler!=null)
-                    downloadService.completionHandler();
-            }
-        });
+post : function(id,data) {
+    if (data==undefined) {
+        // default to id in data
+        data = id;
+        id = data.id;
     }
+    var o = this.continuations[id];
+    // send the payload back in the body. We used to send this in as a form submission, but that hits the form size check in Jetty.
+    new Ajax.Request(o.postBack, {
+        contentType:"application/json",
+        encoding:"UTF-8",
+        postBody:Object.toJSON(data),
+        onSuccess: function() {
+            if(o.completionHandler!=null)
+                o.completionHandler();
+            else if(downloadService.completionHandler!=null)
+                downloadService.completionHandler();
+        }
+    });
+}
 };
 
 // update center service. to remain compatible with earlier version of Hudson, aliased.
@@ -2029,83 +2071,83 @@ redirects to a page once the page is ready.
         Specifies the URL to redirect the user.
 */
 function applySafeRedirector(url) {
-    var i=0;
-    new PeriodicalExecuter(function() {
-      i = (i+1)%4;
-      var s = "";
-      var j=0;
-      for( j=0; j<i; j++ )
+var i=0;
+new PeriodicalExecuter(function() {
+    i = (i+1)%4;
+    var s = "";
+    var j=0;
+    for( j=0; j<i; j++ )
         s+='.';
-      // put the rest of dots as hidden so that the layout doesn't change
-      // depending on the # of dots.
-      s+="<span style='visibility:hidden'>";
-      for( ; j<4; j++ )
+    // put the rest of dots as hidden so that the layout doesn't change
+    // depending on the # of dots.
+    s+="<span style='visibility:hidden'>";
+    for( ; j<4; j++ )
         s+='.';
-      s+="</span>";
-      $('progress').innerHTML = s;
-    },1);
+    s+="</span>";
+    $('progress').innerHTML = s;
+},1);
 
-    window.setTimeout(function() {
-      var statusChecker = arguments.callee;
-        new Ajax.Request(url, {
-            method: "get",
-            onFailure: function(rsp) {
-                if(rsp.status==503) {
-                  // redirect as long as we are still loading
-                  window.setTimeout(statusChecker,5000);
-                } else {
-                  window.location.replace(url);
-                }
-            },
-            onSuccess: function(rsp) {
-                if(rsp.status!=200) {
-                    // if connection fails, somehow Prototype thinks it's a success
-                    window.setTimeout(statusChecker,5000);
-                } else {
-                    window.location.replace(url);
-                }
+window.setTimeout(function() {
+    var statusChecker = arguments.callee;
+    new Ajax.Request(url, {
+        method: "get",
+        onFailure: function(rsp) {
+            if(rsp.status==503) {
+                // redirect as long as we are still loading
+                window.setTimeout(statusChecker,5000);
+            } else {
+                window.location.replace(url);
             }
-        });
-    }, 5000);
+        },
+        onSuccess: function(rsp) {
+            if(rsp.status!=200) {
+                // if connection fails, somehow Prototype thinks it's a success
+                window.setTimeout(statusChecker,5000);
+            } else {
+                window.location.replace(url);
+            }
+        }
+    });
+}, 5000);
 }
 
 // logic behind <f:validateButton />
 function validateButton(checkUrl,paramList,button) {
-  button = button._button;
+button = button._button;
 
-  var parameters = {};
+var parameters = {};
 
-  paramList.split(',').each(function(name) {
-      var p = findPreviousFormItem(button,name);
-      if(p!=null) {
+paramList.split(',').each(function(name) {
+    var p = findPreviousFormItem(button,name);
+    if(p!=null) {
         if(p.type=="checkbox")  parameters[name] = p.checked;
         else                    parameters[name] = p.value;
-      }
-  });
+    }
+});
 
-  var spinner = Element.up(button,"DIV").nextSibling;
-  var target = spinner.nextSibling;
-  spinner.style.display="block";
+var spinner = Element.up(button,"DIV").nextSibling;
+var target = spinner.nextSibling;
+spinner.style.display="block";
 
-  new Ajax.Request(checkUrl, {
-      parameters: parameters,
-      onComplete: function(rsp) {
-          spinner.style.display="none";
-          var i;
-          target.innerHTML = rsp.status==200 ? rsp.responseText
-                : '<a href="" onclick="document.getElementById(\'valerr' + (i=iota++)
-                + '\').style.display=\'block\';return false">ERROR</a><div id="valerr'
-                + i + '" style="display:none">' + rsp.responseText + '</div>';
-          Behaviour.applySubtree(target);
-          var s = rsp.getResponseHeader("script");
-          if(s!=null)
+new Ajax.Request(checkUrl, {
+    parameters: parameters,
+    onComplete: function(rsp) {
+        spinner.style.display="none";
+        var i;
+        target.innerHTML = rsp.status==200 ? rsp.responseText
+        : '<a href="" onclick="document.getElementById(\'valerr' + (i=iota++)
+            + '\').style.display=\'block\';return false">ERROR</a><div id="valerr'
+            + i + '" style="display:none">' + rsp.responseText + '</div>';
+        Behaviour.applySubtree(target);
+        var s = rsp.getResponseHeader("script");
+        if(s!=null)
             try {
-              eval(s);
+                eval(s);
             } catch(e) {
-              window.alert("failed to evaluate "+s+"\n"+e.message);
-            }
-      }
-  });
+            window.alert("failed to evaluate "+s+"\n"+e.message);
+        }
+    }
+});
 }
 
 // create a combobox.
@@ -2115,34 +2157,34 @@ function validateButton(checkUrl,paramList,button) {
 // @param valueFunction
 //      Function that returns all the candidates as an array
 function createComboBox(idOrField,valueFunction) {
-    var candidates = valueFunction();
-    var creator = function() {
-        if (typeof idOrField == "string")
-          idOrField = document.getElementById(idOrField);
-        if (!idOrField) return;
-        new ComboBox(idOrField, function(value /*, comboBox*/) {
-          var items = new Array();
-          if (value.length > 0) { // if no value, we'll not provide anything
+var candidates = valueFunction();
+var creator = function() {
+    if (typeof idOrField == "string")
+        idOrField = document.getElementById(idOrField);
+    if (!idOrField) return;
+    new ComboBox(idOrField, function(value /*, comboBox*/) {
+        var items = new Array();
+        if (value.length > 0) { // if no value, we'll not provide anything
             value = value.toLowerCase();
             for (var i = 0; i<candidates.length; i++) {
-              if (candidates[i].toLowerCase().indexOf(value) >= 0) {
-                items.push(candidates[i]);
-                if(items.length>20)
-                  break; // 20 items in the list should be enough
-              }
+                if (candidates[i].toLowerCase().indexOf(value) >= 0) {
+                    items.push(candidates[i]);
+                    if(items.length>20)
+                        break; // 20 items in the list should be enough
+                }
             }
-          }
-          return items; // equiv to: comboBox.setItems(items);
-        });
-    };
-    // If an ID given, create when page has loaded (backward compatibility); otherwise now.
-    if (typeof idOrField == "string") Behaviour.addLoadEvent(creator); else creator();
+        }
+        return items; // equiv to: comboBox.setItems(items);
+    });
+};
+// If an ID given, create when page has loaded (backward compatibility); otherwise now.
+if (typeof idOrField == "string") Behaviour.addLoadEvent(creator); else creator();
 }
 
 
 if (isRunAsTest) {
-    // during the unit test, make Ajax errors fatal
-    Ajax.Request.prototype.dispatchException = function(e) {
-        throw e;
-    }
+// during the unit test, make Ajax errors fatal
+Ajax.Request.prototype.dispatchException = function(e) {
+    throw e;
+}
 }
