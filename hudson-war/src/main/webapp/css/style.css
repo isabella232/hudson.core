@@ -1281,3 +1281,24 @@ table.configure > td {
     display: none;
     padding:10px;
 }
+
+.ui-button.ui-widget{
+     height: 20px;
+}
+
+.ui-button.ui-widget .ui-button-text{
+    /*line-height: 60%;*/
+    font-size: 11px;
+}
+
+.ui-button-text-only .ui-button-text {
+    padding: 1px 5px 5px 5px;
+}
+
+input.ui-button {
+    padding: 1px 5px 5px 5px;
+}
+
+button.ui-button {
+    padding: 1px 5px 5px 5px;
+}

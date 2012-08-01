@@ -86,7 +86,7 @@ jQuery(document).ready(function() {
             }
             jQuery('#dialog-confirm').dialog({
                 resizable: false,
-                height:150,
+                height:170,
                 width: 350,
                 modal: true,
                 title: title,
@@ -113,7 +113,7 @@ jQuery(document).ready(function() {
              
             jQuery('#dialog-confirm').dialog({
                 resizable: false,
-                height:150,
+                height:170,
                 width: 350,
                 modal: true,
                 title: title,
@@ -140,7 +140,7 @@ jQuery(document).ready(function() {
              
             jQuery('#dialog-confirm').dialog({
                 resizable: false,
-                height:150,
+                height:170,
                 width: 350,
                 modal: true,
                 title: title,

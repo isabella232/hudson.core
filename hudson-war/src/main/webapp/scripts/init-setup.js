@@ -280,7 +280,6 @@ jQuery(document).ready(function() {
             
     jQuery('#cancelButton').button();
     jQuery('#cancelButton').click(function() {
-        jQuery.unblockUI();
         jQuery('#j_username').attr({
             value:""
         });

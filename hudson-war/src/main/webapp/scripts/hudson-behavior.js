@@ -69,6 +69,10 @@ jQuery(document).ready(function() {
             }
         });
     }); 
+    
+    jQuery(':button').each(function() {
+        jQuery(this).button();
+    });
 });
  
 // create a new object whose prototype is the given object
@@ -441,21 +445,33 @@ function registerRegexpValidator(e,regexp,message) {
  * @param onclick
  *      onclick handler
  */
-function makeButton(e,onclick) {
-    var h = e.onclick;
-    var clsName = e.className;
-    var n = e.name;
-    var btn = new YAHOO.widget.Button(e,{});
-    if(onclick!=null)
-        btn.addListener("click",onclick);
-    if(h!=null)
-        btn.addListener("click",h);
-    var be = btn.get("element");
-    Element.addClassName(be,clsName);
-    if(n!=null) // copy the name
-        be.setAttribute("name",n);
-    return btn;
+
+function makeButton(e, onclick) {
+    jQuery(e).button();
+    if(onclick != null){
+        jQuery(e).click(onclick);
+    }
+    jQuery(e).removeClass('yui-button');
+    
+//    var h = e.onclick;
+//    var clsName = e.className;
+//    var n = e.name;
+//    var btn = new YAHOO.widget.Button(e,{});
+    
+//    if(onclick != null){
+//        btn.addListener("click", onclick);
+//    }
+//    if(h != null){
+//        btn.addListener("click",h);
+//    }
+//    var be = btn.get("element");
+//    Element.addClassName(be, clsName);
+//    if(n!=null){ // copy the name
+//        be.setAttribute("name",n);
+//    }
+//    return btn;
 }
+
 
 /*
     If we are inside 'to-be-removed' class, some HTML altering behaviors interact badly, because
@@ -575,7 +591,7 @@ var hudsonRules = {
                 tr.parentNode.insertBefore(row, tr.nextSibling);
             }
         });
-        e = null; // avoid memory leak
+        //e = null; // avoid memory leak
     },
 
     "INPUT.expandButton" : function(e) {
@@ -586,7 +602,7 @@ var hudsonRules = {
             link.style.display = "none";
             link.nextSibling.style.display="block";
         });
-        e = null; // avoid memory leak
+        //e = null; // avoid memory leak
     },
 
     // scripting for having default value in the input field
@@ -712,14 +728,14 @@ var hudsonRules = {
         makeButton(e,function(e) {
             repeatableSupport.onAdd(e.target);
         });
-        e = null; // avoid memory leak
+        //e = null; // avoid memory leak
     },
 
     "INPUT.repeatable-delete" : function(e) {
         makeButton(e,function(e) {
             repeatableSupport.onDelete(e.target);
         });
-        e = null; // avoid memory leak
+        //e = null; // avoid memory leak
     },
 
     // resizable text area
