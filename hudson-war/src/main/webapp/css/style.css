@@ -107,7 +107,12 @@ dt {
     font-size: 8pt;
     margin-top: 10em;
     padding: 10px;
-    border-top: 1px solid #bbb;
+    border-top: 1px solid #d4bde6;
+    color: #a58fb5;
+}
+
+#footer a {
+    color: #a58fb5;
 }
 
 #tasks {
@@ -544,7 +549,6 @@ div.behavior-loading {
 }
 #viewList td.inactive a {
     text-decoration: none;
-    color: #444
 }
 #viewList td.noleft {
     border-left: none;

@@ -288,7 +288,7 @@
                     <table width="100%">
                         <tr>
                             <td id="footer">
-                                <span style="padding-right:2em; color:gray">
+                                <span style="padding-right:2em;">
                             ${%Page generated}:
                                     <i:formatDate value="${h.getCurrentTime()}" type="both" dateStyle="medium" timeStyle="medium"/>
                                 </span>
