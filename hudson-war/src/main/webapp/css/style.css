@@ -19,6 +19,10 @@ body {
     background: white;
 }
 
+h1{
+    color: #7b5495;
+}
+
 body, table, form, input, td, th, p, textarea, select
 {
     font-family: Verdana, Helvetica, sans serif;
@@ -1255,4 +1259,25 @@ table.configure > td {
 #loginMsg {
     color: black;
     display: none;
+}
+
+.config-section{
+    font-weight:bold; 
+    border-bottom: 1px solid #d4bde6;; 
+    margin-bottom:0.2em; 
+    margin-top:0.8em;
+    margin-bottom:0.8em;
+    color: #824f9f;
+    background-color: #f8f7f9;
+    padding: 2px
+}
+
+.optionalBlockDiv{
+    display: none;
+    padding:10px;
+}
+
+.radioBlockDiv{
+    display: none;
+    padding:10px;
 }

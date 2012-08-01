@@ -9,9 +9,8 @@
 #
 # Contributors: 
 #
-#    Kohsuke Kawaguchi, id:cactusman, Nikita Levyankov, Anton Kozak
+#    Kohsuke Kawaguchi, Winston Prakash, id:cactusman, Nikita Levyankov, Anton Kozak
 #        
-#
 #************************************************************************** --> 
 
 
@@ -29,6 +28,8 @@
         <j:set var="descriptor" value="${it.descriptor}" />
         <j:set var="instance" value="${it}" />
 
+        <h1> Job Configrations </h1>
+        
         <j:if test="${it.isNameEditable()}">
           <f:entry title="${%name(it.pronoun)}">
             <f:textbox name="name" value="${it.name}" />

@@ -11,7 +11,6 @@
 #
 #    Kohsuke Kawaguchi, Anton Kozak
 #        
-#
 #************************************************************************** --> 
 
 
@@ -41,7 +40,7 @@
                         </a>
                     </div>
                 </j:if>
-                <div style="font-weight:bold; border-bottom: 1px solid black; margin-bottom:0.2em; margin-top:0.4em">
+                <div class="config-section">
                     ${title}
                 </div>
             </f:block>
