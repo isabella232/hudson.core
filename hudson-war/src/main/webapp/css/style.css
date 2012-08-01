@@ -1277,6 +1277,10 @@ table.configure > td {
     padding:10px;
 }
 
+.sectionBlockDiv{
+    padding:10px;
+}
+
 .radioBlockDiv{
     display: none;
     padding:10px;
