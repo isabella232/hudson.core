@@ -29,6 +29,11 @@
 jQuery.noConflict();
 
 jQuery(document).ready(function() {
+    
+    jQuery(':button').each(function() {
+        jQuery(this).button();
+    });
+    
     jQuery('input.optionalBlockCheckbox').each(function() {
         if (jQuery(this).is(":checked")){
             var radioBlockDiv = jQuery(this).siblings('div.optionalBlockDiv');
@@ -40,10 +45,10 @@ jQuery(document).ready(function() {
             if (jQuery(this).is(":checked")){
                 var optionalBlockDiv = jQuery(this).siblings('div.optionalBlockDiv');
                 if (jQuery(optionalBlockDiv).children('table').children().length > 0){
-                    jQuery(optionalBlockDiv).show('slow');
+                    jQuery(optionalBlockDiv).slideDown('slow').show('slow');
                 } 
             }else{
-                jQuery(this).siblings('div.optionalBlockDiv').hide('slow');
+                jQuery(this).siblings('div.optionalBlockDiv').slideUp('slow').hide('slow');
             }
         });
     }); 
@@ -59,20 +64,40 @@ jQuery(document).ready(function() {
             if (jQuery(this).is(":checked")){
                 var radioBlockDiv = jQuery(this).siblings('div.radioBlockDiv');
                 if (jQuery(radioBlockDiv).children('table').children().length > 0){
-                    jQuery(radioBlockDiv).show('slow');
+                    jQuery(radioBlockDiv).slideDown('slow').show('slow');
                 } 
                 jQuery(this).closest('table').find(':radio').each(function() {
                     if (!jQuery(this).is(":checked")){
-                        jQuery(this).siblings('div.radioBlockDiv').hide('slow');
+                        jQuery(this).siblings('div.radioBlockDiv').slideUp('slow').hide('slow');
                     }
                 });
             }
         });
     }); 
     
-    jQuery(':button').each(function() {
-        jQuery(this).button();
+    jQuery('A.help-button').each(function() {
+        jQuery(this).click(function ( e ) {
+            var helpTr = findFollowingTR(this, "help-area");
+            var helpDiv = jQuery(helpTr).find('div.help');
+            if (jQuery(helpDiv).is(':visible')){
+                jQuery(helpDiv).hide('fast');
+            }else{
+                jQuery(helpDiv).show();
+                jQuery.ajax({
+                    type: 'GET',
+                    url: jQuery(this).attr("helpURL"),
+                    success: function(data){
+                        jQuery(helpDiv).html(data);
+                    },
+                    error: function(err){
+                        jQuery(helpDiv).html("<b>ERROR</b>: Failed to load help file: " + err.statusText);
+                    }
+                }); 
+            }
+            return false;
+        });
     });
+    
 });
  
 // create a new object whose prototype is the given object
@@ -676,33 +701,6 @@ var hudsonRules = {
             Dom.setXY(container, [Dom.getX(textbox), Dom.getY(textbox) + textbox.offsetHeight] );
             return true;
         }
-    },
-
-    "A.help-button" : function(e) {
-        e.onclick = function() {
-            var tr = findFollowingTR(this, "help-area");
-            var div = tr.firstChild.nextSibling.firstChild;
-
-            if (div.style.display != "block") {
-                div.style.display = "block";
-                // make it visible
-                new Ajax.Request(this.getAttribute("helpURL"), {
-                    method : 'get',
-                    onSuccess : function(x) {
-                        div.innerHTML = x.responseText;
-                    },
-                    onFailure : function(x) {
-                        div.innerHTML = "<b>ERROR</b>: Failed to load help file: " + x.statusText;
-                    }
-                });
-            } else {
-                div.style.display = "none";
-            }
-
-            return false;
-        };
-        e.tabIndex = 9999; // make help link unnavigable from keyboard
-        e = null; // avoid memory leak
     },
 
     // deferred client-side clickable map.

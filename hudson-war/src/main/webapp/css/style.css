@@ -29,6 +29,11 @@ body, table, form, input, td, th, p, textarea, select
     font-size: 11px;
 }
 
+input, textarea{
+    border: thin solid #B192C0;
+}
+
+
 FORM {
     margin: 0;
 }
@@ -522,10 +527,12 @@ div.behavior-loading {
 
 .help {
     display: none;  /* hidden until loaded */
-    border: solid #bbb 1px;
-    background-color: #f0f0f0;
+    border: 1px solid #d7a9e8;
+    background-color: #f5f0f9;
     padding: 1em;
+    margin-left: 15px;
     margin-bottom: 1em;
+    border-radius: 3px;
 }
 
 .help-area {
@@ -1272,6 +1279,8 @@ table.configure > td {
     padding: 2px
 }
 
+/* ============== Block of Regions shown or hidden dynamically ============== */
+
 .optionalBlockDiv{
     display: none;
     padding:10px;
@@ -1286,12 +1295,17 @@ table.configure > td {
     padding:10px;
 }
 
+.advancedBodyDiv{
+    display: none;
+}
+
+/* ================== jQuery UI button adjustments ========================== */
+
 .ui-button.ui-widget{
      height: 20px;
 }
 
 .ui-button.ui-widget .ui-button-text{
-    /*line-height: 60%;*/
     font-size: 11px;
 }
 
