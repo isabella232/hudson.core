@@ -31,14 +31,13 @@ import hudson.util.HudsonIsLoading;
 import hudson.util.VersionNumber;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.hudson.WebAppController;
@@ -49,9 +48,7 @@ import org.eclipse.hudson.plugins.UpdateSiteManager;
 import org.eclipse.hudson.plugins.UpdateSiteManager.AvailablePluginInfo;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
-import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.HttpResponses;
-import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,6 +90,7 @@ final public class InitialSetup {
     private XmlFile initSetupFile;
     private File hudsonHomeDir;
     private boolean proxyNeeded = false;
+    private List<PluginInstallationJob> installationsJobs = new CopyOnWriteArrayList<PluginInstallationJob>();
 
     public InitialSetup(File homeDir, ServletContext context) throws MalformedURLException, IOException {
         hudsonHomeDir = homeDir;
@@ -107,15 +105,6 @@ final public class InitialSetup {
         check();
     }
 
-    // For testing
-//    InitialSetup(File dir, URL pluginsJsonUrl) throws MalformedURLException, IOException {
-//        pluginsDir = dir;
-//        initPluginsJsonUrl = pluginsJsonUrl;
-//        proxyConfig = new ProxyConfiguration(dir);
-//        updateSiteManager = new UpdateSiteManager(initPluginsJsonUrl);
-//        installedPluginManager = new InstalledPluginManager(pluginsDir);
-//        check();
-//    }
     public boolean needsInitSetup() {
         if (!initSetupFile.exists()) {
             return (installableMandatoryPlugins.size() > 0) || (updatableMandatoryPlugins.size() > 0)
@@ -184,7 +173,7 @@ final public class InitialSetup {
 
     // For test purpose
     Future<PluginInstallationJob> install(AvailablePluginInfo plugin) {
-        return install(plugin, true);
+        return install(plugin, false);
     }
 
     public Future<PluginInstallationJob> install(AvailablePluginInfo plugin, boolean useProxy) {
@@ -203,16 +192,28 @@ final public class InitialSetup {
             return HttpResponses.forbidden();
         }
         AvailablePluginInfo plugin = updateSiteManager.getAvailablePlugin(pluginName);
-        Future<PluginInstallationJob> installJob = install(plugin, false);
         try {
-            PluginInstallationJob job = installJob.get();
-            if (!job.getStatus()) {
-                return HttpResponses.error(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, job.getErrorMsg());
+            PluginInstallationJob installJob = null;
+            // If the plugin is already being installed, don't schedule another. Make the search thread safe
+            List<PluginInstallationJob> jobs = Collections.synchronizedList(installationsJobs);
+            synchronized (jobs) {
+                for (PluginInstallationJob job : jobs) {
+                    if (job.getName().equals(pluginName)) {
+                        installJob = job;
+                    }
+                }
             }
-        } catch (InterruptedException ex) {
-            return HttpResponses.error(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
-        } catch (ExecutionException ex) {
-            return HttpResponses.error(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+            // No previous install of the plugn, create new
+            if (installJob == null) {
+                boolean useProxy = proxyConfig.name != null;
+                Future<PluginInstallationJob> newJob = install(plugin, useProxy);
+                installJob = newJob.get();
+            }
+            if (!installJob.getStatus()) {
+                return new ErrorHttpResponse("Plugin " + pluginName + " could not be installed. " + installJob.getErrorMsg());
+            }
+        } catch (Exception ex) {
+            return new ErrorHttpResponse("Plugin " + pluginName + " could not be installed. " + ex.getLocalizedMessage());
         }
         reCheck();
         return HttpResponses.ok();
@@ -239,14 +240,14 @@ final public class InitialSetup {
             proxyConfig.openUrl(new URL("http://www.google.com"));
 
         } catch (IOException ex) {
-            return HttpResponses.error(HttpServletResponse.SC_BAD_REQUEST, ex);
+            return new ErrorHttpResponse(ex.getLocalizedMessage());
         }
         return HttpResponses.ok();
     }
 
     public HttpResponse doCheckFinish() {
         if (!canFinish()) {
-            return HttpResponses.error(HttpServletResponse.SC_BAD_REQUEST, "Mandatory Plugins need to be installed first");
+            return new ErrorHttpResponse("Mandatory Plugins need to be installed first");
         } else {
             try {
                 initSetupFile.write("Hudson 3.0 Initial Setup Done");
@@ -301,6 +302,24 @@ final public class InitialSetup {
         reCheck();
         return (getInstallableMandatoryPlugins().size() == 0) && (getUpdatableMandatoryPlugins().size() == 0);
     }
+    
+    private static class ErrorHttpResponse implements HttpResponse {
+
+        private String message;
+
+        ErrorHttpResponse(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public void generateResponse(StaplerRequest sr, StaplerResponse rsp, Object o) throws IOException, ServletException {
+            rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            rsp.setContentType("text/plain;charset=UTF-8");
+            PrintWriter w = new PrintWriter(rsp.getWriter());
+            w.println(message);
+            w.close();
+        }
+    }
 
     private boolean setProxy(String server, String port, String noProxyFor,
             String userName, String password, String authNeeded) throws IOException {
@@ -326,13 +345,14 @@ final public class InitialSetup {
         } else {
             proxyConfig.getXmlFile().delete();
             proxyConfig.name = null;
-            return true;
+            return false;
         }
     }
 
     private Future<PluginInstallationJob> submitInstallationJob(AvailablePluginInfo plugin, boolean useProxy) {
-        PluginInstallationJob job = new PluginInstallationJob(plugin, pluginsDir, useProxy);
-        return installerService.submit(job, job);
+        PluginInstallationJob newJob = new PluginInstallationJob(plugin, pluginsDir, useProxy);
+        installationsJobs.add(newJob);
+        return installerService.submit(newJob, newJob);
     }
 
     private boolean isNewerThan(String availableVersion, String installedVersion) {

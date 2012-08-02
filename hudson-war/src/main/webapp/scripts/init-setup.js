@@ -103,13 +103,15 @@ function checkPermissionAndinstallPlugins(){
 }
         
 function installSelectedPlugins(){
-    jQuery("#buttonBar").hide();
-    jQuery("#installProgress").show();
     var installables = getInstallables();
     installCount = installables.length;
-    jQuery(installables).each(function(){
-        installPlugin(this);
-    });
+    if (installCount > 0){
+        jQuery("#buttonBar").hide();
+        jQuery("#installProgress").show();
+        jQuery(installables).each(function(){
+            installPlugin(this);
+        });
+    }
 }
         
 function getInstallables(){

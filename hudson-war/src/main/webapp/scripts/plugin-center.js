@@ -48,27 +48,31 @@ jQuery(document).ready(function() {
     var installButton = jQuery('#installButton');
     installButton.button();
     installButton.unbind("click").click(function() {
-        jQuery(this).hide();
-        jQuery('#installProgress').show();
-        jQuery("#pluginInstallMsg").hide();
         var pluginsToInstall = getPluginsToInstall();
         installCount = pluginsToInstall.length;
-        jQuery(pluginsToInstall).each(function(){
-            installPlugin(this);
-        });
+        if (installCount > 0){
+            jQuery(this).hide();
+            jQuery('#installProgress').show();
+            jQuery("#pluginInstallMsg").hide();
+            jQuery(pluginsToInstall).each(function(){
+                installPlugin(this);
+            });
+        }
     });
      
     var updateButton = jQuery('#updateButton');
     updateButton.button();
     updateButton.unbind("click").click(function() {
-        jQuery(this).hide();
-        jQuery('#updateProgress').show();
-        jQuery("#pluginUpdateMsg").hide();
         var pluginsToUpdate = getPluginsToUpdate();
         updateCount = pluginsToUpdate.length;
-        jQuery(pluginsToUpdate).each(function(){
-            updatePlugin(this);
-        });
+        if (updateCount > 0){
+            jQuery(this).hide();
+            jQuery('#updateProgress').show();
+            jQuery("#pluginUpdateMsg").hide();
+            jQuery(pluginsToUpdate).each(function(){
+                updatePlugin(this);
+            });
+        }
     });
 
     jQuery('#installedTab button.enable').each(function(){

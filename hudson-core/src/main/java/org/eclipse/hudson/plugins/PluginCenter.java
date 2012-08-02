@@ -56,7 +56,7 @@ final public class PluginCenter {
     private UpdateSiteManager updateSiteManager;
     private InstalledPluginManager installedPluginManager;
     private ProxyConfiguration proxyConfig;
-    List<PluginInstallationJob> installationsJobs = new CopyOnWriteArrayList<PluginInstallationJob>();
+    private List<PluginInstallationJob> installationsJobs = new CopyOnWriteArrayList<PluginInstallationJob>();
     private ExecutorService installerService = Executors.newSingleThreadExecutor(
             new DaemonThreadFactory(new ThreadFactory() {
         @Override
@@ -167,8 +167,8 @@ final public class PluginCenter {
 
     public boolean isProxyNeeded() {
         try {
-            // Try opening a URL and see if the proxy works fine
-            proxyConfig.openUrl(new URL("http://www.google.com"));
+            // Try opening the URL and see if the proxy works fine
+            proxyConfig.openUrl(new URL("http://www.hudson-ci.org/"));
         } catch (IOException ex) {
             logger.debug(ex.getLocalizedMessage());
             return true;
@@ -203,7 +203,8 @@ final public class PluginCenter {
                 }
                 // No previous install of the plugn, create new
                 if (installJob == null) {
-                    Future<PluginInstallationJob> newJob = install(plugin, false);
+                    boolean useProxy = proxyConfig.name != null;
+                    Future<PluginInstallationJob> newJob = install(plugin, useProxy);
                     installJob = newJob.get();
                 }
                 if (!installJob.getStatus()) {
