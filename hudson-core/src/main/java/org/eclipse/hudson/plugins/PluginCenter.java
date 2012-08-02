@@ -374,7 +374,7 @@ final public class PluginCenter {
         } else {
             proxyConfig.getXmlFile().delete();
             proxyConfig.name = null;
-            return true;
+            return false;
         }
     }
 
