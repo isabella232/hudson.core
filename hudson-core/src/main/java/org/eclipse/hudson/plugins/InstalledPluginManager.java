@@ -122,7 +122,7 @@ public final class InstalledPluginManager {
             if (version == null) {
                 version = manifest.getMainAttributes().getValue("Implementation-Version");
             }
-
+            jarfile.close();
         }
 
         public boolean isEnabled() {
