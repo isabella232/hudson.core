@@ -38,14 +38,14 @@ public final class PluginInstallationJob implements Runnable {
     private Logger logger = LoggerFactory.getLogger(PluginInstallationJob.class);
     private final AvailablePluginInfo plugin;
     private File pluginsDir;
-    private boolean useProxy = true;
     private boolean success;
     private String errorMsg;
+    private ProxyConfiguration proxyConfig;
 
-    public PluginInstallationJob(AvailablePluginInfo plugin, File dir, boolean useProxy) {
+    public PluginInstallationJob(AvailablePluginInfo plugin, File dir, ProxyConfiguration proxyConfig) {
         this.plugin = plugin;
         pluginsDir = dir;
-        this.useProxy = useProxy;
+        this.proxyConfig = proxyConfig;
     }
 
     public String getName() {
@@ -96,8 +96,8 @@ public final class PluginInstallationJob implements Runnable {
 
     private File download(URL src) throws IOException {
         URLConnection con;
-        if (useProxy) {
-            con = ProxyConfiguration.open(src);
+        if ((proxyConfig != null) && (proxyConfig.name != null)) {
+            con = proxyConfig.openUrl(src);
         } else {
             con = src.openConnection();
         }

@@ -19,6 +19,7 @@ package org.eclipse.hudson.plugins;
 import hudson.ProxyConfiguration;
 import hudson.Util;
 import hudson.markup.MarkupFormatter;
+import hudson.model.Hudson;
 import hudson.security.Permission;
 import hudson.util.DaemonThreadFactory;
 import hudson.util.VersionNumber;
@@ -153,16 +154,11 @@ final public class PluginCenter {
         return installedPluginManager.getInstalledPlugin(plugin.getName());
     }
 
-    // For test purpose
-    Future<PluginInstallationJob> install(AvailablePluginInfo plugin) {
-        return install(plugin, true);
-    }
-
-    public Future<PluginInstallationJob> install(AvailablePluginInfo plugin, boolean useProxy) {
+    public Future<PluginInstallationJob> install(AvailablePluginInfo plugin) {
         for (AvailablePluginInfo dep : getNeededDependencies(plugin)) {
-            install(dep, useProxy);
+            install(dep);
         }
-        return submitInstallationJob(plugin, useProxy);
+        return submitInstallationJob(plugin);
     }
 
     public boolean isProxyNeeded() {
@@ -203,8 +199,7 @@ final public class PluginCenter {
                 }
                 // No previous install of the plugn, create new
                 if (installJob == null) {
-                    boolean useProxy = proxyConfig.name != null;
-                    Future<PluginInstallationJob> newJob = install(plugin, useProxy);
+                    Future<PluginInstallationJob> newJob = install(plugin);
                     installJob = newJob.get();
                 }
                 if (!installJob.getStatus()) {
@@ -342,7 +337,7 @@ final public class PluginCenter {
                 proxyConfig.save();
             }
             // Try opening a URL and see if the proxy works fine
-            proxyConfig.openUrl(new URL("http://www.google.com"));
+            proxyConfig.openUrl(new URL("http://www.hudson-ci.org/"));
 
         } catch (IOException ex) {
             return HttpResponses.error(HttpServletResponse.SC_BAD_REQUEST, ex);
@@ -388,7 +383,7 @@ final public class PluginCenter {
             updateSiteManager.setUpdateSiteUrl(siteUrl);
             // Ok a valid update site URL set it to the plugin manager. 
             // For now let Plugin Manager periodically update the local cache.
-            //Hudson.getInstance().getPluginManager().doSiteConfigure(site);
+            Hudson.getInstance().getPluginManager().doSiteConfigure(siteUrl);
 
         } catch (IOException ex) {
             return new ErrorHttpResponse("Update Site Could not be set. " + ex.getLocalizedMessage());
@@ -418,8 +413,8 @@ final public class PluginCenter {
         return HttpResponses.ok();
     }
 
-    private Future<PluginInstallationJob> submitInstallationJob(AvailablePluginInfo plugin, boolean useProxy) {
-        PluginInstallationJob newJob = new PluginInstallationJob(plugin, pluginsDir, useProxy);
+    private Future<PluginInstallationJob> submitInstallationJob(AvailablePluginInfo plugin) {
+        PluginInstallationJob newJob = new PluginInstallationJob(plugin, pluginsDir, proxyConfig);
         installationsJobs.add(newJob);
         return installerService.submit(newJob, newJob);
     }
@@ -460,7 +455,6 @@ final public class PluginCenter {
     }
 
     public String getLastUpdatedString() {
-        return "17 Minutes";
-        //return Hudson.getInstance().getUpdateCenter().getLastUpdatedString();
+        return Hudson.getInstance().getUpdateCenter().getLastUpdatedString();
     }
 }

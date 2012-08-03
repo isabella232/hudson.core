@@ -171,16 +171,11 @@ final public class InitialSetup {
         return installedPluginManager.getInstalledPlugin(plugin.getName());
     }
 
-    // For test purpose
-    Future<PluginInstallationJob> install(AvailablePluginInfo plugin) {
-        return install(plugin, false);
-    }
-
-    public Future<PluginInstallationJob> install(AvailablePluginInfo plugin, boolean useProxy) {
+    public Future<PluginInstallationJob> install(AvailablePluginInfo plugin) {
         for (AvailablePluginInfo dep : getNeededDependencies(plugin)) {
-            install(dep, useProxy);
+            install(dep);
         }
-        return submitInstallationJob(plugin, useProxy);
+        return submitInstallationJob(plugin);
     }
 
     public boolean isProxyNeeded() {
@@ -205,8 +200,7 @@ final public class InitialSetup {
             }
             // No previous install of the plugn, create new
             if (installJob == null) {
-                boolean useProxy = proxyConfig.name != null;
-                Future<PluginInstallationJob> newJob = install(plugin, useProxy);
+                Future<PluginInstallationJob> newJob = install(plugin);
                 installJob = newJob.get();
             }
             if (!installJob.getStatus()) {
@@ -349,8 +343,8 @@ final public class InitialSetup {
         }
     }
 
-    private Future<PluginInstallationJob> submitInstallationJob(AvailablePluginInfo plugin, boolean useProxy) {
-        PluginInstallationJob newJob = new PluginInstallationJob(plugin, pluginsDir, useProxy);
+    private Future<PluginInstallationJob> submitInstallationJob(AvailablePluginInfo plugin) {
+        PluginInstallationJob newJob = new PluginInstallationJob(plugin, pluginsDir, proxyConfig);
         installationsJobs.add(newJob);
         return installerService.submit(newJob, newJob);
     }
