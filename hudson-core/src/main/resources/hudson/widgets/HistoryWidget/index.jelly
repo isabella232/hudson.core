@@ -28,8 +28,8 @@
             <t:buildHealth job="${it.owner}" iconSize="16x16" link="${it.baseUrl}/lastBuild"/>
         </j:if>
     </j:parse>
-    <div id="buildHistory">
-        <l:pane width="3" title="${h.runScript(paneTitle)}${it.displayName}" id="buildHistoryTbl">
+    <div id="buildHistoryDiv">
+        <l:pane width="3" title="${h.runScript(paneTitle)}${it.displayName}" id="buildHistory">
 
             <!-- build history -->
             <st:include page="entries.jelly" />

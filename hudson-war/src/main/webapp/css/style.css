@@ -775,13 +775,13 @@ table.parameters > tbody:hover {
 
 /* ========================= build history ========================= */
 
-#buildHistory{
+#buildHistoryDiv{
     border: 1px solid #d4bde6;
     border-radius: 4px;
     padding: 2px;
 }
 
-#buildHistoryTbl{
+#buildHistory{
     margin: 0px;
     border: none;
 }
