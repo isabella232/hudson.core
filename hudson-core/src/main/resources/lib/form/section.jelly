@@ -43,13 +43,9 @@
                 <div class="config-section">
                     ${title}
                 </div>
-                <div class="sectionBlockDiv">
-                    <table width="100%">
-                        <d:invokeBody />
-                    </table>
-                </div>
             </f:block>
         </j:if>
+        <d:invokeBody />
     </f:rowSet>
 </j:jelly>
 
