@@ -45,10 +45,10 @@ jQuery(document).ready(function() {
             if (jQuery(this).is(":checked")){
                 var optionalBlockDiv = jQuery(this).siblings('div.optionalBlockDiv');
                 if (jQuery(optionalBlockDiv).children('table').children().length > 0){
-                    jQuery(optionalBlockDiv).slideDown('slow').show('slow');
+                    jQuery(optionalBlockDiv).show('fast');
                 } 
             }else{
-                jQuery(this).siblings('div.optionalBlockDiv').slideUp('slow').hide('slow');
+                jQuery(this).siblings('div.optionalBlockDiv').hide('fast');
             }
         });
     }); 
@@ -64,11 +64,11 @@ jQuery(document).ready(function() {
             if (jQuery(this).is(":checked")){
                 var radioBlockDiv = jQuery(this).siblings('div.radioBlockDiv');
                 if (jQuery(radioBlockDiv).children('table').children().length > 0){
-                    jQuery(radioBlockDiv).slideDown('slow').show('slow');
+                    jQuery(radioBlockDiv).show('fast');
                 } 
                 jQuery(this).closest('table').find(':radio').each(function() {
                     if (!jQuery(this).is(":checked")){
-                        jQuery(this).siblings('div.radioBlockDiv').slideUp('slow').hide('slow');
+                        jQuery(this).siblings('div.radioBlockDiv').hide('fast');
                     }
                 });
             }

@@ -29,10 +29,6 @@ body, table, form, input, td, th, p, textarea, select
     font-size: 11px;
 }
 
-input, textarea{
-    border: thin solid #B192C0;
-}
-
 
 FORM {
     margin: 0;
