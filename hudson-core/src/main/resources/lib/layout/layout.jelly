@@ -45,6 +45,7 @@
     </st:documentation>
     <st:header name="Expires" value="0" />
     <st:header name="X-Hudson-Theme" value="default" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <st:contentType value="text/html;charset=UTF-8" />
     <!-- The path starts with a "/" character but does not end with a "/" character. -->
     <j:set var="rootURL" value="${request.contextPath}" />
@@ -62,7 +63,6 @@
     <j:set var="imagesURL"  value="${rootURL}${h.resourcePath}/images" />
     <j:set var="cssURL"  value="${rootURL}${h.resourcePath}/css" />
     <j:set var="scriptsURL"  value="${rootURL}${h.resourcePath}/scripts" />
-    
     <html>
         <head>
             ${h.checkPermission(it,permission)}
@@ -262,7 +262,7 @@
                         
                         <div style=" height:100%"> 
                             <img src="${imagesURL}/top-left-round.png" style="float:left"/>
-                            <div style="margin-left:25; height:25; background-image:url(${imagesURL}/spacer.png); background-repeat:repeat-x" /> 
+                            <div id="main-panel-rounded-corner-spacer"/> 
                             <div id="main-panel-container" style=" background-color:#FFFFFF; padding-left: 10px; height:100%">
                                 <table width="95%" height="100%" border="0">
                                     <tr>

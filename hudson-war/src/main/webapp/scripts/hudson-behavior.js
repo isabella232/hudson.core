@@ -45,10 +45,10 @@ jQuery(document).ready(function() {
             if (jQuery(this).is(":checked")){
                 var optionalBlockDiv = jQuery(this).siblings('div.optionalBlockDiv');
                 if (jQuery(optionalBlockDiv).children('table').children().length > 0){
-                    jQuery(optionalBlockDiv).show('fast');
+                    jQuery(optionalBlockDiv).show();
                 } 
             }else{
-                jQuery(this).siblings('div.optionalBlockDiv').hide('fast');
+                jQuery(this).siblings('div.optionalBlockDiv').hide();
             }
         });
     }); 
@@ -64,11 +64,11 @@ jQuery(document).ready(function() {
             if (jQuery(this).is(":checked")){
                 var radioBlockDiv = jQuery(this).siblings('div.radioBlockDiv');
                 if (jQuery(radioBlockDiv).children('table').children().length > 0){
-                    jQuery(radioBlockDiv).show('fast');
+                    jQuery(radioBlockDiv).show();
                 } 
                 jQuery(this).closest('table').find(':radio').each(function() {
                     if (!jQuery(this).is(":checked")){
-                        jQuery(this).siblings('div.radioBlockDiv').hide('fast');
+                        jQuery(this).siblings('div.radioBlockDiv').hide();
                     }
                 });
             }

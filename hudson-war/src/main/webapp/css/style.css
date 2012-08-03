@@ -97,6 +97,18 @@ dt {
     color: white;
 }
 
+#main-panel-rounded-corner{
+  width:25px; 
+  height:25px; 
+  background-image:url(images/spacer.png); 
+  float:left;
+}
+#main-panel-rounded-corner-spacer{
+  margin-left:25px; 
+  height:25px; 
+  background-image:url(images/spacer.png); 
+  background-repeat:repeat-x
+}
 
 #main-panel {
     padding-right: 10px;
