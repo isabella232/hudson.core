@@ -312,10 +312,10 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         // result can only get worse
         if (result == null) {
             result = r;
-            LOGGER.log(FINE, toString() + " : result is set to " + r, new Exception());
+            LOGGER.log(FINE, toString() + " : result is set to " + r);
         } else {
             if (r.isWorseThan(result)) {
-                LOGGER.log(FINE, toString() + " : result is set to " + r, new Exception());
+                LOGGER.log(FINE, toString() + " : result is set to " + r);
                 result = r;
             }
         }
