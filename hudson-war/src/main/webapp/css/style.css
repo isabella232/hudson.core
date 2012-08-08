@@ -604,11 +604,6 @@ div.behavior-loading {
 
 /* ============================ Projct Status Table ========================== */
 
-#projectstatus th {
-    text-align: left;
-    background-color: #f7f1fb;
-}
-
 #projectStatusDiv{
     background-color: #fffdfb;
     border-right-width: 1px;
@@ -638,12 +633,13 @@ div.behavior-loading {
     padding: 3px 4px 3px 4px;
 }
 
-/* ============================ Projct Status Table ========================== */
-
-#nodeStatus th {
+#projectstatus th {
     text-align: left;
     background-color: #f7f1fb;
 }
+
+
+/* ============================ Projct Status Table ========================== */
 
 #nodeStatusDiv{
     background-color: #fffdfb;
@@ -659,6 +655,11 @@ div.behavior-loading {
     width: 100%;
 }
 
+#nodeStatus th {
+    text-align: left;
+    background-color: #f7f1fb;
+}
+
 #nodeStatus tr {
     border: none;
     border-bottom: 1px dotted #d4bde6;
@@ -670,6 +671,47 @@ div.behavior-loading {
     vertical-align: middle;
 }
 
+/* ============================ Builds Status Table ========================== */
+
+#buildStatusDiv{
+    background-color: #fffdfb;
+    border: 1px solid #d4bde6;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+#buildStatus{
+    color: #5c3566;
+    border: none;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#buildStatus th {
+    text-align: left;
+    background-color: #f7f1fb;
+}
+
+#buildStatus tr {
+    border: none;
+    border-bottom: 1px dotted #d4bde6;
+    padding: 3px 4px 3px 4px;
+}
+
+#buildStatus td{
+    padding: 3px 4px;
+    vertical-align: middle;
+}
+
+/* ============================ System Information Table ========================== */
+
+.propertyTable td{
+    white-space: normal;
+}
+
+#systemInfo td{
+    white-space: normal;
+}
 
 /* ============================ parameters form ========================== */
 

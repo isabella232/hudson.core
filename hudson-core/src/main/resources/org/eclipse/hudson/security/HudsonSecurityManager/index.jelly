@@ -21,8 +21,10 @@
     <l:layout norefresh="true" permission="${it.ADMINISTER}">
         <st:include it="${app.primaryView}" page="sidepanel.jelly" xmlns:st="jelly:stapler" />
         <l:main-panel>
-            <div class="behavior-loading">${%LOADING}</div>
-            <div><h1>Configure Security</h1></div>
+            <h1> 
+                <img width="48" height="48" src="/images/48x48/secure.png" alt="" style="margin-right:10px"/>
+                ${%Configure Security}
+            </h1>
             <f:form method="post" name="config" action="configSubmit">
       
                 <f:optionalBlock name="use_security" title="${%Enable security}"

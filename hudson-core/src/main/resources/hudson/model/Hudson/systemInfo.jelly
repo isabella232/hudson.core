@@ -28,7 +28,7 @@
         <h1>${%Environment Variables}</h1>
         <t:propertyTable items="${h.envVars}" />
         <h1>${%Plugins}</h1>
-        <table class="pane sortable bigtable">
+        <table id="systemInfo" class="pane sortable bigtable">
           <j:choose>
             <j:when test="${empty(app.pluginManager.plugins) and empty(app.pluginManager.failedPlugins)}">
               <tr><td>

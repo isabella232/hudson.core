@@ -28,7 +28,7 @@
       <st:include page="control.jelly" it="${it.timeline}" />
       <div style="height:2em"/><!-- spacer -->
 
-      <div>
+      <div style="margin-bottom: 5px;">
           <a href="cc.xml">${%Export as plain XML}</a>
       </div>
       <!-- set @jobBaseUrl="" so that links to jobs will be under this view. -->
