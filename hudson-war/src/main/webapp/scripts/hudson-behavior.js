@@ -33,6 +33,14 @@ jQuery(document).ready(function() {
     jQuery(':button').each(function() {
         jQuery(this).button();
     });
+    
+    // Remove the floating box if it has no children
+    
+    jQuery('div.floatingBox').each(function() {
+        if (jQuery(this).children().length == 0){
+            jQuery(this).remove();
+        }
+    });
     /*
     jQuery('input.optionalBlockCheckbox').each(function() {
         if (jQuery(this).is(":checked")){

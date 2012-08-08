@@ -27,6 +27,10 @@
   <l:layout norefresh="true" permission="${app.ADMINISTER}">
     <st:include page="sidepanel.jelly" />
     <l:main-panel>
+       <h1>
+          <img width="48" height="48" src="/images/48x48/computer.png" alt="" style="margin: 2px;"/>
+          ${%New Node}
+      </h1>
       <j:invokeStatic var="slaves" className="hudson.slaves.NodeDescriptor" method="allInstantiable" />
       <n:form nameTitle="${%Node name}" copyTitle="${%Copy Existing Node}" copyNames="${it._slaveNames}"
               descriptors="${slaves}" checkUrl="computer/checkName" xmlns:n="/lib/hudson/newFromList" />

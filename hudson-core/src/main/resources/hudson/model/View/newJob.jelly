@@ -24,6 +24,12 @@
   <l:layout norefresh="true" permission="${permission}" title="${%New Job}">
     <st:include page="sidepanel.jelly" />
     <l:main-panel>
+        
+      <h1>
+        <img width="48" height="48" src="/images/48x48/package.png" alt="" style="margin: 2px;"/>
+        ${%New Job}
+      </h1>
+      
       <j:invokeStatic var="jobs" className="hudson.model.Items" method="all" />
       <n:form nameTitle="${%Job name}" copyTitle="${%Copy existing job}" copyNames="${app.topLevelItemNames}"
               descriptors="${jobs}" checkUrl="checkJobName" xmlns:n="/lib/hudson/newFromList" />

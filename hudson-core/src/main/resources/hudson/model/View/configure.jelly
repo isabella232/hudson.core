@@ -26,6 +26,11 @@
       <!-- to make the form field binding work -->
       <j:set var="instance" value="${it}" />
       <j:set var="descriptor" value="${it.descriptor}" />
+      
+      <h1>
+         <img width="48" height="48" src="/images/48x48/setting.png" alt="" style="margin-right:10px"/>
+         ${%View Configurations}
+      </h1>
 
       <f:form method="post" action="configSubmit" name="viewConfig">
         <f:entry title="${%Name}">

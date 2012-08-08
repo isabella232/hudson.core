@@ -24,6 +24,12 @@
     <st:include page="sidepanel.jelly" />
 
     <l:main-panel>
+        
+      <h1>
+          <img width="48" height="48" src="/images/48x48/folder.png" alt="" style="margin: 2px;"/>
+          ${%New View}
+      </h1>
+      
       <f:form method="post" action="createView" name="createView">
         <f:entry title="${%View name}">
           <f:textbox id="name" name="name" checkUrl="'${rootURL}/viewExistsCheck?value='+encodeURIComponent(this.value)"

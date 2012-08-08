@@ -28,7 +28,10 @@
       <j:set var="instance" value="${it}" />
       <j:set var="descriptor" value="${instance.descriptor}" />
       
-      <h1> System Configrations </h1>
+      <h1> 
+        <img width="48" height="48" src="/images/48x48/setting.png" alt="" style="margin-right:10px"/>
+        System Configurations 
+      </h1>
 
       <f:entry title="${%Home directory}" help="/help/system-config/homeDirectory.html">
         ${it.rootDir}

@@ -30,6 +30,10 @@
     </style>
   </l:header>
   <l:main-panel>
+    <h1>
+        <img width="48" height="48" src="/images/48x48/network.png" alt="" style="margin-right:10px"/>
+        ${%Node Status}
+    </h1>
     <j:set var="monitors" value="${it._monitors}"/>
     <j:set var="tableWidth" value="${3}"/>
     <table id="computers" class="sortable pane bigtable">

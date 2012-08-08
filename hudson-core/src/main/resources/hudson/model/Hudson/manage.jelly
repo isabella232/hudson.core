@@ -36,7 +36,10 @@
 
         <st:include page="sidepanel.jelly" />
         <l:main-panel>
-            <h1>${%Manage Hudson}</h1>
+            <h1>
+                <img width="48" height="48" src="/images/48x48/setting.png" alt="" style="margin-right:10px"/>
+                ${%Manage Hudson}
+            </h1>
             <j:if test="${it.checkURIEncodingEnabled}">
                 <script>
                     var url='checkURIEncoding';

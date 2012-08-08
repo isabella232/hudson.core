@@ -19,7 +19,7 @@ body {
     background: white;
 }
 
-h1{
+h1, h2{
     color: #7b5495;
 }
 
@@ -148,9 +148,9 @@ dt {
     text-align: center;
     margin-left: 2em;
     margin-right: 2em;
-    margin-bottom: 0.5em;
-    padding: 0.5em;
-    -moz-border-radius: 0.5em;
+    margin-bottom: 5px;
+    padding: 5px;
+    border-radius: 4px;
 }
 
 a:link {
@@ -227,7 +227,7 @@ td.tab_filler {
 
 td.tab {
     vertical-align: middle;
-    border: 1px #090 solid;
+    border: 1px solid #d4bde6;
     background: #f0f0f0;
 }
 
@@ -333,23 +333,23 @@ div.dashboard {
 table.pane {
     width: 100%;
     border-collapse: collapse;
-    border: 1px #A583B9 solid;
+    border: 1px solid #d4bde6;
 }
 
 td.pane {
-    border: 1px #A583B9 solid;
+    border: 1px solid #d4bde6;
     padding: 3px 4px 3px 4px;
     vertical-align: middle;
 }
 
 td.pane-header {
-    border: 1px #A583B9 solid;
+    border: 1px solid #d4bde6;
     background-color: #E2D7E7;
     font-weight: bold;
 }
 
 th.pane {
-    border: 1px #A583B9 solid;
+    border: 1px solid #d4bde6;
     font-weight: bold;
 }
 
@@ -358,7 +358,7 @@ th.pane {
 }
 
 .bigtable tr {
-    border: 1px solid #A583B9;
+    border: 1px solid #d4bde6;
     padding: 3px 4px 3px 4px;
 }
 
@@ -398,7 +398,7 @@ th.pane {
 #foldertab li a {
     padding: 4px 0.5em;
     margin-left: 3px;
-    border: 1px solid #090;
+    border: 1px solid #d4bde6;
     border-bottom: none;
     background: #090;
     text-decoration: none;
@@ -420,7 +420,7 @@ th.pane {
 }
 
 .changeset-message {
-    border: 1px solid #ccb;
+    border: 1px solid #d4bde6;
     background: #eed;
     padding: 4px;
     white-space: normal;
@@ -535,12 +535,12 @@ div.behavior-loading {
 
 .help {
     display: none;  /* hidden until loaded */
-    border: 1px solid #d7a9e8;
+    border: 1px solid #d4bde6;
     background-color: #f5f0f9;
     padding: 1em;
     margin-left: 15px;
     margin-bottom: 1em;
-    border-radius: 3px;
+    border-radius: 4px;
 }
 
 .help-area {
@@ -634,7 +634,7 @@ div.behavior-loading {
 
 #projectstatus tr {
     border: none;
-    border-bottom: 1px dotted #d5cada;
+    border-bottom: 1px dotted #d4bde6;
     padding: 3px 4px 3px 4px;
 }
 
@@ -675,14 +675,14 @@ table.parameters > tbody:hover {
     display: block;
     position: absolute;
     background-color: #ffe;
-    border: 1px solid #bbb;
+    border: 1px solid #d4bde6;
     margin-left: 32px; /* move it across a bit */
     z-index: 26;
     padding-right: 5px;
     padding-left: 5px;
     padding-bottom: 5px;
     padding-top: 5px;
-    border-radius:5px;
+    border-radius: 4px;
 }
 
 .healthReport div.healthReportDetails table {
@@ -815,13 +815,13 @@ table.parameters > tbody:hover {
 
 /* ========================= editable combobox style ========================= */
 .comboBoxList {
-    border: 1px solid #000;
+    border: 1px solid #d4bde6;
     overflow: visible;
     color: MenuText;
     background-color: Menu;
 }
 .comboBoxSelectedItem {
-    background-color: Highlight;
+    background-color: #f3edf6;
     color: HighlightText;
 }
 .combobox-values {
@@ -882,10 +882,12 @@ TABLE.fileList TD.fileSize {
     color: #ef2929;
     font-weight: bold;
 }
+
 .test-trend-caption {
     text-align: center;
     font-size: 1.2em;
     font-weight: bold;
+    color: #7b5495;
 }
 
 
@@ -989,7 +991,7 @@ DIV.yahooTree td {
 }
 
 .yui-tt {
-    border: 1px solid black !important;
+    border: 1px solid #d4bde6 !important;
     background-color: #FFFFFF !important;
     padding: 2px !important;
     font-family: inherit !important;
@@ -1021,7 +1023,7 @@ DIV.yahooTree td {
 }
 
 #search-box-completion .yui-ac-content {
-    border: 1px solid black;
+    border: 1px solid #d4bde6;
     width:25em;
     background-color: white;
     overflow: hidden;
@@ -1061,7 +1063,7 @@ DIV.textarea-handle {
     height: 5px;
     font-size: 0;
     background: #EEE url(../images/textarea-handle.gif) no-repeat 50% 1px;
-    border: 1px solid #BABDB6;
+    border: 1px solid #d4bde6;
     border-top: none;
     cursor: s-resize;
 }
@@ -1074,7 +1076,7 @@ TEXTAREA.rich-editor {
 #hoverNotification {
     visibility:hidden;
     background-color: white;
-    border: 1px solid black;
+    border: 1px solid #d4bde6;
     padding: 0.5em;
 }
 
@@ -1107,7 +1109,7 @@ TEXTAREA.rich-editor {
 
 table.progress-bar {
     border-collapse: collapse;
-    border: 1px solid #3465a4;
+    border: 1px solid #d4bde6;
     height: 6px;
     width: 100px;
     clear: none;
@@ -1236,7 +1238,7 @@ table.configure > td {
 .jobDescription:hover div.jobDescriptionDetails, .jobDescription.hover div.jobDescriptionDetails {
     display: block;
     position: absolute;
-    border: 1px solid #bbb;
+    border: 1px solid #d4bde6;
     background-color: white;
     margin-left: 32px;
     z-index: 26;
@@ -1244,6 +1246,26 @@ table.configure > td {
 .jobDescription div.jobDescriptionDetails table {
     border-collapse: collapse;
     width: 450px;
+}
+
+#description{
+    margin: 5px;
+    padding: 5px;
+}
+
+
+.floatingBox{
+    border: 1px solid #d4bde6;
+    border-radius: 4px;
+    padding: 5px;
+    margin: 5px;
+}
+/* -------------------- graph ------------------- */
+
+div.graph{
+    padding: 5px; 
+    border: 1px solid #d4bde6; 
+    border-radius: 4px;
 }
 
 /* --- Slaves Nodes/labels ---*/
@@ -1256,9 +1278,18 @@ table.configure > td {
 
 /* ========== Timeline ================== */
 
-.timeline{
-    height:250px; 
-    border: solid 1px #A583B9;
+.timeline {
+    border: 1px solid #d4bde6;
+    border-radius: 4px;
+    height: 250px;
+}
+
+.timeline-band-1 .timeline-ether-bg {
+    background-color: #e8d7f5!important;
+}
+
+.timeline-band-0 .timeline-ether-bg {
+    background-color: #f5edf6!important;
 }
 
 /* === Login Dialog ==== */
@@ -1328,3 +1359,4 @@ input.ui-button {
 button.ui-button {
     padding: 1px 5px 5px 5px;
 }
+

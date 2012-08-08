@@ -28,6 +28,9 @@
     <l:layout title="${it.class.name=='hudson.model.AllView' ? '%Dashboard' : it.viewName}">
         <st:include page="sidepanel.jelly" />
         <l:main-panel>
+            <h1>
+              ${%Project Status}
+            </h1>
             <div id="view-message">
                 <t:editableDescription permission="${app.ADMINISTER}"/>
             </div>

@@ -28,7 +28,9 @@
          that may depend on the 'a' variable.
       -->
       <j:set var="action" value="${a}" />
-      <st:include page="floatingBox.jelly" from="${a}" optional="true" />
+      <div class="floatingBox">
+         <st:include page="floatingBox.jelly" from="${a}" optional="true" />
+      </div>
     </j:forEach>
   </div>
 </j:jelly>

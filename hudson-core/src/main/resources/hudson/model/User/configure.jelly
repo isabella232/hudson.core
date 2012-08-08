@@ -23,6 +23,12 @@
   <l:layout norefresh="true" permission="${app.ADMINISTER}" title="${%title(it.fullName)}">
     <st:include page="sidepanel.jelly" />
     <l:main-panel>
+      
+      <h1>
+         <img width="48" height="48" src="/images/48x48/setting.png" alt="" style="margin-right:10px"/>
+         ${%User Configurations}
+      </h1>
+      
       <f:form method="post" action="configSubmit" name="config">
         <f:entry title="${%Your name}" help="/help/user/fullName.html">
           <f:textbox name="fullName" value="${it.fullName}" />

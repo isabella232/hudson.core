@@ -27,7 +27,10 @@
         <j:set var="descriptor" value="${it.descriptor}" />
         <j:set var="instance" value="${it}" />
 
-        <h1> Job Configrations </h1>
+        <h1>
+           <img width="48" height="48" src="/images/48x48/setting.png" alt="" style="margin-right:10px"/>
+           ${%Job Configurations}
+        </h1>
         
         <j:if test="${it.isNameEditable()}">
           <f:entry title="${%name(it.pronoun)}">
