@@ -80,6 +80,8 @@ import org.eclipse.hudson.model.project.property.ExternalProjectProperty;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
+
+import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerOverridable;
 import org.kohsuke.stapler.StaplerRequest;
@@ -1719,24 +1721,26 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         Graph graph = new Graph(getLastBuild().getTimestamp(), 500, 400);
 
         DataSet<String, ChartLabel> data = new DataSet<String, ChartLabel>();
+        
+        StaplerRequest req = Stapler.getCurrentRequest();
 
         GraphSeries<String> xSeries = new GraphSeries<String>("Build No.");
         data.setXSeries(xSeries);
 
         GraphSeries<Number> ySeriesAborted = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Aborted", ColorPalette.GREY, false, false);
-        //ySeriesFailed.setBaseURL(getRelPath(req)); 
+        ySeriesAborted.setBaseURL(getRelPath(req) + "/${buildNo}"); 
         data.addYSeries(ySeriesAborted);
 
         GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Failed", ColorPalette.RED, false, false);
-        //ySeriesFailed.setBaseURL(getRelPath(req)); 
+        ySeriesFailed.setBaseURL(getRelPath(req) + "/${buildNo}"); 
         data.addYSeries(ySeriesFailed);
 
         GraphSeries<Number> ySeriesUnstable = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Unstable", ColorPalette.YELLOW, false, false);
-        //ySeriesSkipped.setBaseURL(getRelPath(req));
+        ySeriesUnstable.setBaseURL(getRelPath(req) + "/${buildNo}");
         data.addYSeries(ySeriesUnstable);
 
         GraphSeries<Number> ySeriesSuccessful = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Successful", ColorPalette.BLUE, false, false);
-        //ySeriesTotal.setBaseURL(getRelPath(req));
+        ySeriesSuccessful.setBaseURL(getRelPath(req) + "/${buildNo}");
         data.addYSeries(ySeriesSuccessful);
 
         for (Run run : getBuilds()) {
@@ -1846,5 +1850,12 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         public String getToolTip(int row, int column) {
             return run.getDisplayName() + " : " + run.getDurationString();
         }
+    }
+    private String getRelPath(StaplerRequest req) {
+        String relPath = req.getParameter("rel");
+        if (relPath == null) {
+            return "";
+        }
+        return relPath;
     }
 }

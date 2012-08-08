@@ -25,6 +25,7 @@ import java.util.List;
 import org.eclipse.hudson.graph.*;
 
 import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * History of {@link hudson.tasks.test.TestObject} over time.
@@ -86,16 +87,18 @@ public class History {
         GraphSeries<String> xSeries = new GraphSeries<String>("Build No.");
         data.setXSeries(xSeries);
 
+        StaplerRequest req = Stapler.getCurrentRequest();
+        
         GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Some Failed", ColorPalette.RED, false, false);
-        //ySeriesFailed.setBaseURL(getRelPath(req));
+        ySeriesFailed.setBaseURL(getRelPath(req) + "/${buildNo}");
         data.addYSeries(ySeriesFailed);
 
         GraphSeries<Number> ySeriesSkipped = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Some Skipped", ColorPalette.YELLOW, false, false);
-        //ySeriesSkipped.setBaseURL(getRelPath(req));
+        ySeriesSkipped.setBaseURL(getRelPath(req) + "/${buildNo}");
         data.addYSeries(ySeriesSkipped);
 
         GraphSeries<Number> ySeriesPassed = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Passed", ColorPalette.BLUE, false, false);
-        //ySeriesPassed.setBaseURL(getRelPath(req));
+        ySeriesPassed.setBaseURL(getRelPath(req) + "/${buildNo}");
         data.addYSeries(ySeriesPassed);
 
         List<TestResult> list;
@@ -158,17 +161,19 @@ public class History {
 
         GraphSeries<String> xSeries = new GraphSeries<String>("Build No.");
         data.setXSeries(xSeries);
+        
+        StaplerRequest req = Stapler.getCurrentRequest();
 
         GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Failed", ColorPalette.RED);
-        //ySeriesFailed.setBaseURL(getRelPath(req)); 
+        ySeriesFailed.setBaseURL(getRelPath(req) + "/${buildNo}");
         data.addYSeries(ySeriesFailed);
 
         GraphSeries<Number> ySeriesSkipped = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Skipped", ColorPalette.YELLOW);
-        //ySeriesSkipped.setBaseURL(getRelPath(req));
+        ySeriesSkipped.setBaseURL(getRelPath(req) + "/${buildNo}");
         data.addYSeries(ySeriesSkipped);
 
         GraphSeries<Number> ySeriesPassed = new GraphSeries<Number>(GraphSeries.TYPE_BAR, "Passed", ColorPalette.BLUE);
-        //ySeriesPassed.setBaseURL(getRelPath(req));
+        ySeriesPassed.setBaseURL(getRelPath(req) + "/${buildNo}");
         data.addYSeries(ySeriesPassed);
 
         List<TestResult> list;
@@ -262,5 +267,13 @@ public class History {
         public String getToolTip(int row, int column) {
             return o.getOwner().getDisplayName() + " : " + o.getDurationString();
         }
+    }
+    
+    private String getRelPath(StaplerRequest req) {
+        String relPath = req.getParameter("rel");
+        if (relPath == null) {
+            return "";
+        }
+        return relPath;
     }
 }

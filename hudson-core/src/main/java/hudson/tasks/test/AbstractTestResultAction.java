@@ -266,13 +266,13 @@ public abstract class AbstractTestResultAction<T extends AbstractTestResultActio
         testResultDataSet.setXSeries(xSeries);
 
         GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Failed", ColorPalette.RED);
-        ySeriesFailed.setBaseURL(getRelPath(req));
+        ySeriesFailed.setBaseURL(getRelPath(req) + "/${buildNo}/testReport");
 
         GraphSeries<Number> ySeriesSkipped = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Skipped", ColorPalette.YELLOW);
-        ySeriesSkipped.setBaseURL(getRelPath(req));
+        ySeriesSkipped.setBaseURL(getRelPath(req) + "/${buildNo}/testReport");
 
         GraphSeries<Number> ySeriesPassed = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Passed", ColorPalette.BLUE);
-        ySeriesPassed.setBaseURL(getRelPath(req));
+        ySeriesPassed.setBaseURL(getRelPath(req) + "/${buildNo}/testReport");
 
         if (!failureOnly) {
             testResultDataSet.addYSeries(ySeriesFailed);
