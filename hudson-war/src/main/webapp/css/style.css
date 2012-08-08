@@ -638,6 +638,38 @@ div.behavior-loading {
     padding: 3px 4px 3px 4px;
 }
 
+/* ============================ Projct Status Table ========================== */
+
+#nodeStatus th {
+    text-align: left;
+    background-color: #f7f1fb;
+}
+
+#nodeStatusDiv{
+    background-color: #fffdfb;
+    border: 1px solid #d4bde6;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+#nodeStatus{
+    color: #5c3566;
+    border: none;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#nodeStatus tr {
+    border: none;
+    border-bottom: 1px dotted #d4bde6;
+    padding: 3px 4px 3px 4px;
+}
+
+#nodeStatus td{
+    padding: 3px 4px;
+    vertical-align: middle;
+}
+
 
 /* ============================ parameters form ========================== */
 
