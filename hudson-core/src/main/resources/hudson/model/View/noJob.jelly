@@ -23,7 +23,7 @@
             text-align: center;
             border-width: 0px 1px 1px;
             border-style: none solid solid;
-            border-color: #BBBBBB;
+            border-color: #D4BDE6;
         }
     </style>
 <div id="noJobDiv">

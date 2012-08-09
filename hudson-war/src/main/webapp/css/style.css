@@ -199,7 +199,7 @@ a.tip:hover span {
     top:2em;
     left:2em;
     width:400px;
-    border:1px solid #bbbbbb;
+    border:1px solid #D4BDE6;
     background-color:#fffff0;
     color:#000;
     text-align: left
@@ -561,7 +561,7 @@ div.behavior-loading {
 }
 #viewList td.inactive {
     border: solid 1px #d4bde6;
-    border-bottom-color: #bbb;
+    border-bottom-color: #D4BDE6;
 }
 #viewList td.inactive:hover {
     background-color: #d4bde6;
