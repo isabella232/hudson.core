@@ -27,7 +27,7 @@
       <d:invokeBody />
     </tr>
     <tr>
-      <td style="border: none; border-bottom: 1px solid #bbb;"><st:nbsp/></td>
+      <td style="border: none; border-bottom: 1px solid #D4BDE6;"><st:nbsp/></td>
       <j:set var="tabIndex" value="0" />
       <j:set var="tabPass" value="pass2" />
       <d:invokeBody />
