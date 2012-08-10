@@ -111,8 +111,6 @@
             <script src="${scriptsURL}/jquery-1.6.4.min.js" type="text/javascript"></script>
             <script src="${scriptsURL}/jquery-ui-1.8.18.min.js" type="text/javascript"></script>
             <link href="${cssURL}/jquery-ui-1.8.18.css" type="text/css" rel="stylesheet" />
-            
-            <script src="${resURL}/scripts/jquery.blockUI-2.39.js" type="text/javascript"></script>
 
             <!-- Hudson internal Javascripts and CSS -->
             <script src="${scriptsURL}/hudson-behavior.js?${h.version}" type="text/javascript"></script>

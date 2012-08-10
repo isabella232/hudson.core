@@ -21,49 +21,51 @@
         #loginForm input {
             width: 150px;
         }
+        #loginMsg {
+            text-align:center;
+            font-weight:bold;
+            color: black;
+            display: none;
+        }
+
+        #loginForm  label{
+            float: left;
+            width: 100px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        #loginForm  input{
+            width: 200px;
+            margin-bottom: 5px;
+            margin-top: 10px;
+        }
+        
     </style>
     <div style="margin: 2em;">
         <!-- login form -->
         <form id="loginForm"  style="text-size:smaller">
-            <table >
-                <tr>
-                    <td>${%User}:</td>
-                    <td>
-                        <input type="text" name="j_username" id="j_username" />
-                    </td>
-                </tr>
-                <tr>
-                    <td >${%Password}:</td>
-                    <td>
-                        <input  type="password" name="j_password" id="j_password"/>
-                    </td>
-                </tr>
-                <j:if test="${app.security.name()=='SECURED'}">
-                    <!-- remember me service only available for Spring Security -->
-                    <tr>
-                        <td align="right">
-                            <input style="width:10px" id="remember_me" type="checkbox" name="remember_me" />
-                        </td>
-                        <td>
-                            <label for="remember_me">${%Remember me on this computer}</label>
-                        </td>
-                    </tr>
-                </j:if>
-            </table>
+            <label for="j_username">${%User}</label>
+            <input type="text" name="j_username" id="j_username" />
+            <br/>
+            <label for="j_password">${%Password}</label>
+            <input  type="password" name="j_password" id="j_password"/>
+            
             <input type="hidden" name="from" value="${submitFrom}" />
-            <input style="width:75px" type="button" id="loginButton" value="${%Login}" />
-            <input style="margin-left:10px; width:75px" type="button" id="cancelButton" value="${%Cancel}" />
-
+            
+            <j:if test="${app.security.name()=='SECURED'}">
+                <br/>
+                <!-- remember me service only available for Spring Security -->
+                <input style="width: 10px;" id="remember_me" type="checkbox" name="remember_me"/>
+                ${%Remember me on this computer}
+                <br/>    
+            </j:if>
+             
         </form>
 
-        <div id="loginError">
-            ${%Invalid login information. Please try again.}
-        </div>
-
         <div id="loginMsg">
-            ${%Logging in...}
+            <!-- Message ijected here -->
         </div>
-        
 
         <j:forEach var="fls" items="${app.getFederatedLoginServices()}">
             <div>
@@ -73,7 +75,7 @@
 
         <j:if test="${app.securityRealm.allowsSignup()}">
             <div style="margin-top:2em">
-            ${%signUp(rootURL)}
+                ${%signUp(rootURL)}
             </div>
         </j:if>
     </div>

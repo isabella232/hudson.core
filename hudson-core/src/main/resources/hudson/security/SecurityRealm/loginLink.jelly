@@ -30,62 +30,69 @@
     <script type="text/javascript">
         
         function showLoginDialog(){
-            jQuery.blockUI({
-              message: jQuery('#loginDialog'),
-              css: { 
-                width: '350px'
-              },
-              title:  'Confirmation'
+            jQuery('#loginMsg').hide();
+            jQuery('#loginDialog').dialog({
+                resizable: false,
+                height: 300,
+                width: 400,
+                modal: true,
+                buttons: {
+                    'Login': function() {
+                        submitLoginForm();
+                    },
+                    Cancel: function() {
+                        jQuery('#loginMsg').hide();
+                        jQuery('#j_username').attr({
+                            value:""
+                        });
+                        jQuery('#j_password').attr({
+                            value:""
+                        });
+                        jQuery( this ).dialog("close");
+                        return false;
+                    }
+                }
             });
             jQuery('j_username').focus();
         }
-
-        function submitForm(){
-            jQuery('#loginMsg').show();
-            jQuery('#loginError').hide();
+        
+        function submitLoginForm(){
+            showMessage(jQuery('#loginMsg'), "Logging in ..", "blue");
             var dataString = jQuery("#loginForm").serialize();
             jQuery.ajax({
-              type: 'POST',
-              url: "${rootURL}/${app.securityRealm.authenticationGatewayUrl}",
-              data: dataString,
-              success: function(){
-                window.location.href="${h.jsStringEscape(from)}";
-              },
-              error: function(){
-                jQuery('#loginError').show();
-                jQuery('#loginMsg').hide();
-              },
-              dataType: "html"
+                type: 'POST',
+                url: "${rootURL}/${app.securityRealm.authenticationGatewayUrl}",
+                data: dataString,
+                success: function(){
+                    jQuery('#loginDialog').dialog("close");
+                    window.location.href="${h.jsStringEscape(from)}";
+                },
+                error: function(){
+                    var msg = 'Failed to login. Check your credentials and try again.';
+                    showMessage(jQuery('#loginMsg'), msg, "red");
+                },
+                dataType: "html"
             }); 
+        }
+        
+        function showMessage(widget, msg, color){
+            widget.text(msg);
+            widget.css("color",color);
+            widget.show();
         }
 
         jQuery(document).ready(function() {
         
             jQuery('#j_username').keypress(function(e){
               if(e.which == 13){
-                submitForm();
+                submitLoginForm();
               }
             });
             
             jQuery('#j_password').keypress(function(e){
               if(e.which == 13){
-                submitForm();
+                submitLoginForm();
               }
-            });
-
-
-            jQuery('#loginButton').click(function() {
-                 submitForm();
-            });
-            
-
-            jQuery('#cancelButton').click(function() {
-                jQuery.unblockUI();
-                jQuery('#j_username').attr({value:""});
-                jQuery('#j_password').attr({value:""});
-                jQuery('#loginError').hide();
-                jQuery('#loginMsg').hide();
-                return false;
             });
 
         });
@@ -108,7 +115,7 @@
         </j:otherwise>
     </j:choose>
 
-    <div id="loginDialog" style="display:none; cursor: default">
+    <div id="loginDialog" title="Login" style="display:none; cursor: default">
         <j:set var="submitFrom" value="${from}" />
         <st:include page="loginDialog.jelly" />
     </div>

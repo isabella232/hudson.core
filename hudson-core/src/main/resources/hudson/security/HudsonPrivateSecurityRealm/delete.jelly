@@ -17,19 +17,57 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core">
 
-    <script src="${resURL}/scripts/popup-dialog.js" type="text/javascript"/>
+    <script type="text/javascript">
+        
+        function onDeleteClick() {
+           showMessage(jQuery('#deleteMsg'), "${%Are you sure about deleting the user?}", "black");
+           jQuery('#confirmationDialog').dialog({
+                height: 150,
+                resizable: false,
+                width: 350,
+                modal: true,
+                buttons: {
+                    'Delete': function() {
+                        showMessage(jQuery('#deleteMsg'), "Deleting ..", "blue");
+                        jQuery.ajax({
+                            type: 'POST',
+                            url: "${user.url}/doDelete",
+                            success: function(){
+                               window.location.href="${rootURL}/securityRealm";
+                               setTimeout(function() {
+                                    jQuery('#confirmationDialog').dialog('close');
+                               }, 2000);
+                            },
+                            error: function(){
+                                var msg = 'Failed to delete the user';
+                                showMessage(jQuery('#deleteMsg'), msg, "red");
+                            },
+                            dataType: "html"
+                        });
+                    },
+                    Cancel: function() {
+                        jQuery( this ).dialog("close");
+                    }
+                }
+            }); 
+        }
+        
+        function showMessage(widget, msg, color){
+            widget.text(msg);
+            widget.css("color",color);
+            widget.show();
+        }
+        
+    </script>
 
-    <a href="${user.url}/delete" onclick="onLinkClick('question'); return false;">
+    <a href="${user.url}/delete" onclick="onDeleteClick(); return false;">
         <img src="${imagesURL}/24x24/edit-delete.png" alt="Delete"/>
     </a>
-
-    <div id="question" style="display:none; cursor: default">
-        <div>
-            <form method="post" action="${user.url}/doDelete" name="delete">
-                <h4>${%Are you sure about deleting the user from Hudson?}</h4>
-                <input type="submit" class="yes" value="${%Yes}"/>
-                <input type="button" class="no" value="${%No}"/>
-            </form>
+    
+    <div id="confirmationDialog" style="display:none">
+        <div id="deleteMsg" style="display:none">
         </div>
     </div>
+
+     
 </j:jelly>

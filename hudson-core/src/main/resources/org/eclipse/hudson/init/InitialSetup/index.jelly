@@ -14,7 +14,6 @@
             <link href="${cssURL}/jquery-ui-1.8.18.css" type="text/css" rel="stylesheet" />
             <script src="${scriptsURL}/jquery-1.6.4.min.js" type="text/javascript"></script>
             <script src="${scriptsURL}/jquery-ui-1.8.18.min.js" type="text/javascript"></script>
-            <script src="${scriptsURL}/jquery.blockUI-2.39.js" type="text/javascript"></script>
     
             <script type="text/javascript"> 
                 var imageRoot = '${imagesURL}'; 
@@ -407,7 +406,7 @@
                 </div>
             </div>
     
-           <div id="loginDialog" style="display:none; cursor: default">
+           <div id="loginDialog" title="Login" style="display:none; cursor: default">
                 <span>${%Admin access required to install the plugins. Login as admin.}</span>
 
                 <form id="loginForm"  style="text-size:smaller">

@@ -16,15 +16,21 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
     <script type="text/javascript">
+        
          function onDeleteClick() {
+            showMessage(jQuery('#deleteMsg'), "Checking if the job can be deleted ..", "blue");
+            jQuery('#confirmationDialog').dialog({
+                resizable: false,
+                height:150,
+                width: 350,
+                modal: true
+            });   
+        
             jQuery.ajax({
                 url: "${rootURL}/${it.url}api/json",
                 dataType: 'json',
                 cache: false,
                 success: function(data) {
-                    jQuery('#confirmDialog').show();
-                    jQuery('#buildInProgressDialog').hide();
-                    jQuery('#cascadingChildrenPresentDiald').hide();
                     var cascadingChildren = data.cascadingChildrenNames;
                     if (cascadingChildren.length != 0) {
                         var jobList = jQuery("#jobList");
@@ -33,9 +39,18 @@
                         for (var i = 0; i &lt; cascadingChildren.length; i++) {
                             jobList.append("<li>" + cascadingChildren[i] + "</li>");
                         }
-                        jQuery('#confirmDialog').hide();
-                        jQuery('#buildInProgressDialog').hide();
-                        jQuery('#cascadingChildrenPresentDiald').show();
+                        jQuery('#confirmationDialog').dialog({
+                            height: 150 + cascadingChildren.length * 20,
+                            resizable: false,
+                            width: 350,
+                            modal: true,
+                            buttons: {
+                               Cancel: function() {
+                                    jQuery( this ).dialog("close");
+                               }
+                            }
+                        });   
+                        showMessage(jQuery('#deleteMsg'), "${%cannotDeleteBecauseOfChildrenMsg}", "red");
                     } else{
                         if(data.lastBuild.length != 0){
                            var lastBuildUrl = data.lastBuild.url + "api/json";
@@ -45,36 +60,77 @@
                                cache: false,
                                success: function(buildData) {
                                    if(buildData.building){
-                                      jQuery('#confirmDialog').hide();
-                                      jQuery('#cascadingChildrenPresentDiald').hide();
-                                      jQuery('#buildInProgressDialog').show();
+                                       showMessage(jQuery('#deleteMsg'), "${%cannotDeleteBecauseBuildInProgressMsg}", "red");
+                                       jQuery('#confirmationDialog').dialog({
+                                            height: 150,
+                                            resizable: false,
+                                            width: 350,
+                                            modal: true,
+                                            buttons: {
+                                               Cancel: function() {
+                                                    jQuery( this ).dialog("close");
+                                               }
+                                            }
+                                        });  
+                                   }else{
+                                      showConfirmationDialog();
                                    }
                                }
                            });
+                        }else{
+                            showConfirmationDialog();
                         }
                     }
                 }
+                
             });
-            onLinkClick("question");
+        }
+        
+        function showConfirmationDialog() {
+           showMessage(jQuery('#deleteMsg'), "${%Are you sure about deleting the job?}", "black");
+           jQuery('#confirmationDialog').dialog({
+                height: 150,
+                resizable: false,
+                width: 350,
+                modal: true,
+                buttons: {
+                    'Delete': function() {
+                        showMessage(jQuery('#deleteMsg'), "Deleting ..", "blue");
+                        jQuery.ajax({
+                            type: 'POST',
+                            url: "doDelete",
+                            success: deletingJob,
+                            error: function(){
+                                var msg = 'Failed to delete the job';
+                                showMessage(jQuery('#deleteMsg'), msg, "red");
+                            },
+                            dataType: "html"
+                        });
+                    },
+                    Cancel: function() {
+                        jQuery( this ).dialog("close");
+                    }
+                }
+            }); 
+        }
+        
+        function deletingJob() {
+            window.location.href="/";
+            setTimeout(function() {
+                jQuery('#confirmationDialog').dialog('close');
+            }, 2000);
+        }
+        
+        function showMessage(widget, msg, color){
+            widget.text(msg);
+            widget.css("color",color);
+            widget.show();
         }
     </script>
-    <div>
-        <form method="post" action="doDelete" id="deleteForm">
-            <div id="confirmDialog">
-                <h4>${%deleteMsg}</h4>
-                <input type="submit" class="yes" value="${%Yes}"/>
-                <input type="button" class="no" value="${%No}"/>
-            </div>
-            <div id="cascadingChildrenPresentDiald" class="deleteJobDialog" style="display:none">
-                <h4>${%cannotDeleteBecauseOfChildrenMsg}</h4>
-                <ul id="jobList">
-                </ul>
-                <input type="button" class="no" value="${%Ok}" />
-            </div>
-            <div id="buildInProgressDialog" class="deleteJobDialog" style="display:none">
-                <h4>${%cannotDeleteBecauseBuildInProgressMsg}</h4>
-                <input type="button" class="no" value="${%Ok}" />
-            </div>
-        </form>
+    <div id="confirmationDialog" style="display:none">
+        <div id="deleteMsg" style="display:none">
+        </div>
+        <ul id="jobList">
+        </ul>
     </div>
 </j:jelly>

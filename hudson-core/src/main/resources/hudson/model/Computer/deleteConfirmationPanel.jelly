@@ -22,26 +22,53 @@
                 var array = new Array();
                 array[0] = "${%Stopping all jobs. Deleting slave...}";
                 jQuery("#deleteMsg").html(array[type]);
-                onLinkClick("deleteMsg");
                 setTimeout(function() {
-                    jQuery.unblockUI({
-                        onUnblock: function() {
-                            window.location.href="..";
-                        }
-                    });
+                    jQuery('#confirmationDialog').dialog('close');
+                    window.location.href="..";
                 }, 2000);
             } else {
                 window.location.href="..";
             }
         }
+        
+        function showConfirmationDialog(){
+            jQuery('#deleteMsg').hide();
+            jQuery('#confirmationDialog').dialog({
+                resizable: false,
+                height:250,
+                width: 350,
+                modal: true,
+                buttons: {
+                    'Delete': function() {
+        
+                        submitDeleteForm();
+                    },
+                    Cancel: function() {
+                        jQuery( this ).dialog("close");
+                    }
+                }
+            });
+            jQuery('j_username').focus();
+        }
+        
+        function showMessage(widget, msg, color){
+            widget.text(msg);
+            widget.css("color",color);
+            widget.show();
+        }
 
         function submitDeleteForm() {
+            showMessage(jQuery('#deleteMsg'), "Deleting ..", "blue");
             var dataString = jQuery("#deleteForm").serialize();
             jQuery.ajax({
                 type: 'POST',
                 url: "${rootURL}/${it.url}deleteWithParam",
                 data: dataString,
                 success: deletingSlave,
+                error: function(){
+                    var msg = 'Failed to delete the slave';
+                    showMessage(jQuery('#deleteMsg'), msg, "red");
+                },
                 dataType: "html"
             });
         }
@@ -64,22 +91,11 @@
                     }
                 }
             })
-            onLinkClick("question");
+            showConfirmationDialog();
         }
-
-        jQuery(document).ready(function() {
-            jQuery('#confirm').unbind('click').click(function() {
-                 submitDeleteForm();
-            });
-
-            jQuery('#cancel').click(function() {
-                jQuery.unblockUI();
-                return false;
-            });
-        });
     </script>
 
-    <div>
+    <div id="confirmationDialog" title="Confirmation" style="display:none; cursor: default">
         <form id="deleteForm">
            <h4>${%Are you sure about deleting the slave?}</h4>
            <div id="slaveStatus" class="deleteSlaveDialog" style="display:none">
@@ -90,13 +106,9 @@
                    <input id="stopMode" type="radio" value="0" name="deleteMode">${%Force stop the jobs}</input>
                </div>
            </div>
-            <div>
-               <input type="button" id="confirm" value="${%Confirm}" />
-               <input type="button" id="cancel" value="${%Cancel}" />
-           </div>
         </form>
+        <div id="deleteMsg" style="display:none">
+        </div>
     </div>
 
-    <div id="deleteMsg" style="display:none">
-    </div>
 </j:jelly>
