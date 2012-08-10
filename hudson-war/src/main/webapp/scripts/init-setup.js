@@ -125,6 +125,9 @@ function getInstallables(){
     jQuery('#recommendedPlugins input[@type=checkbox]:checked').each(function(){
         installables.push(this);
     });
+    jQuery('#updatablePlugins input[@type=checkbox]:checked').each(function(){
+        installables.push(this);
+    });
     return installables;
 }
         

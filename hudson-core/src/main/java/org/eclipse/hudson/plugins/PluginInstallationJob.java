@@ -56,10 +56,12 @@ public final class PluginInstallationJob implements Runnable {
     public void run() {
         URL src;
         try {
+            logger.info("Installing the plugin " + getName());
             src = getDownloadURL();
             File dst = getDestination();
             File tmp = download(src);
             replace(dst, tmp);
+            logger.info(getName() + " installation successful");
         } catch (Exception exc) {
             logger.error(getName() + " installation unsuccessful", exc);
             success = false;

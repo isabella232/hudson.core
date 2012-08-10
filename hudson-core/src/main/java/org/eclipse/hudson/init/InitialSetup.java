@@ -170,6 +170,22 @@ final public class InitialSetup {
     public InstalledPluginInfo getInstalled(AvailablePluginInfo plugin) {
         return installedPluginManager.getInstalledPlugin(plugin.getName());
     }
+    
+    public List<AvailablePluginInfo> getUpdatablePlugins() {
+        List<AvailablePluginInfo> updatablePlugins = new ArrayList<AvailablePluginInfo>();
+        Set<String> installedPluginNames = installedPluginManager.getInstalledPluginNames();
+        Set<String> availablePluginNames = updateSiteManager.getAvailablePluginNames();
+        for (String pluginName : availablePluginNames) {
+            AvailablePluginInfo availablePlugin = updateSiteManager.getAvailablePlugin(pluginName);
+            if (installedPluginNames.contains(pluginName)) {
+                InstalledPluginInfo installedPlugin = installedPluginManager.getInstalledPlugin(pluginName);
+                if (isNewerThan(availablePlugin.getVersion(), installedPlugin.getVersion())) {
+                    updatablePlugins.add(availablePlugin);
+                }
+            }
+        }
+        return updatablePlugins;
+    }
 
     public Future<PluginInstallationJob> install(AvailablePluginInfo plugin) {
         for (AvailablePluginInfo dep : getNeededDependencies(plugin)) {

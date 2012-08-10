@@ -41,12 +41,13 @@
                             </h1>
                         </span>
                         <ul id="installList" class="setup">
+                            
                             <li class="mandatory">
                                 <h3>
                                     Mandatory Plugins
                                 </h3>
                                 <p class="description">
-                                    These plugins need to be installed for Hudson to work properly.
+                                    These plugins must be installed for Hudson to work properly.
                                 </p>
                                 <div class="body">
                                     <div class="items-container">
@@ -98,6 +99,7 @@
                                                     </td>
                                                 </tr>
                                             </j:forEach>
+                                          
                                             <j:forEach var="p" items="${it.installedMandatoryPlugins}">
                                                 <tr>
                                                     <td class="column1">
@@ -121,10 +123,63 @@
                                                     </td>
                                                 </tr>
                                             </j:forEach>
+                                            
                                         </table>
                                     </div>
                                 </div>
                             </li>
+                            
+                            <li class="updates">
+                                <h3>
+                                    Plugin Updates
+                                </h3>
+                                <p class="description">
+                                    Updates are available for the following plugins. We recommend to update the plugins for this version of Hudson.
+                                </p>
+                                <div class="body">
+                                    <div class="items-container">
+                                        
+                                        <table width="100%" border="0" id="updatablePlugins" cellpadding="10">
+                                            <j:forEach var="p" items="${it.updatablePlugins}">
+                                                <tr>
+                                                    <td class="column1">
+                                                        <j:if test="${it.getInstalled(p).isDisabled()}">
+                                                            <input type="checkbox" value="${p.name}"/>
+                                                        </j:if>
+                                                        <j:if test="${!it.getInstalled(p).isDisabled()}">
+                                                            <input type="checkbox" checked="true"  value="${p.name}"/>
+                                                        </j:if>
+                                                 
+                                                        <img id="${p.name}" style="display:none;"/>
+                                                    </td>
+                                                    <td class="column2">
+                                                        <div>
+                                                            <a href="${p.wikiUrl}" target="_blank">
+                                                                ${p.displayName}
+                                                            </a>
+                                                        </div>
+                                                        <div class="excerpt" style="padding-top: 5px;">
+                                                            <j:out value="${it.markupFormatter.translate(p.description)}" />
+                                                        </div>
+                                                    </td>
+                                                    <td class="column3" style="white-space:nowrap">
+                                                        ${p.version}
+                                                    </td>
+                                                    <td class="column4" style="white-space:nowrap">
+                                                        <j:if test="${it.getInstalled(p).isDisabled()}">
+                                                            ${it.getInstalled(p).version} (Disabled)
+                                                        </j:if>
+                                                        <j:if test="${!it.getInstalled(p).isDisabled()}">
+                                                            ${it.getInstalled(p).version} (Installed)
+                                                        </j:if>
+                                                    </td>
+                                                </tr>
+                                            </j:forEach>                
+                                        </table>
+                                    </div>
+                                </div>
+                            </li>
+                            
                             <li class="featured">
                                 <h3>
                                     Featured Plugins
@@ -156,69 +211,6 @@
                                                         ${p.version}
                                                     </td>
                                                     <td class="column4"></td>
-                                                </tr>
-                                            </j:forEach>
-                                            <j:forEach var="p" items="${it.updatableFeaturedPlugins}">
-                                                <tr>
-                                                    <td class="column1">
-                                                        <j:if test="${it.getInstalled(p).isDisabled()}">
-                                                            <input type="checkbox"  checked="true" value="${p.name}"/>
-                                                        </j:if>
-                                                        <j:if test="${!it.getInstalled(p).isDisabled()}">
-                                                            <input type="checkbox" checked="true"  value="${p.name}"/>
-                                                        </j:if>
-                                                 
-                                                        <img id="${p.name}" style="display:none;"/>
-                                                    </td>
-                                                    <td class="column2">
-                                                        <div>
-                                                            <a href="${p.wikiUrl}" target="_blank">
-                                                                ${p.displayName}
-                                                            </a>
-                                                        </div>
-                                                        <div class="excerpt" style="padding-top: 5px;">
-                                                            <j:out value="${it.markupFormatter.translate(p.description)}" />
-                                                        </div>
-                                                    </td>
-                                                    <td class="column3" style="white-space:nowrap">
-                                                        ${p.version}
-                                                    </td>
-                                                    <td class="column4" style="white-space:nowrap">
-                                                        <j:if test="${it.getInstalled(p).isDisabled()}">
-                                                            ${it.getInstalled(p).version} (Disabled)
-                                                        </j:if>
-                                                        <j:if test="${!it.getInstalled(p).isDisabled()}">
-                                                            ${it.getInstalled(p).version} (Installed)
-                                                        </j:if>
-                                                    </td>
-                                                </tr>
-                                            </j:forEach>
-                                            <j:forEach var="p" items="${it.installedFeaturedPlugins}">
-                                                <tr>
-                                                    <td class="column1">
-                                                        <img src="${imagesURL}/green-check.jpg"/>
-                                                    </td>
-                                                    <td class="column2">
-                                                        <div>
-                                                            <a href="${p.wikiUrl}" target="_blank" style="color:gray">
-                                                                ${p.displayName}
-                                                            </a>
-                                                        </div>
-                                                        <div class="excerpt" style="padding-top: 5px;">
-                                                            <j:out value="${it.markupFormatter.translate(p.description)}" />
-                                                        </div>
-                                                    </td>
-                                                    <td class="column3" style="white-space:nowrap; color:gray">
-                                                        No update available
-                                                    </td>
-                                                    <td class="column4" style="white-space:nowrap; color:gray">
-                                                        <j:if test="${it.getInstalled(p).isDisabled()}">
-                                                            ${it.getInstalled(p).version} (Disabled)
-                                                        </j:if>
-                                                        <j:if test="${!it.getInstalled(p).isDisabled()}">
-                                                            ${it.getInstalled(p).version} (Installed)
-                                                        </j:if>
-                                                    </td>
                                                 </tr>
                                             </j:forEach>
                                         </table>
@@ -259,63 +251,7 @@
                                                     <td class="column4"></td>
                                                 </tr>
                                             </j:forEach>
-                                            <j:forEach var="p" items="${it.updatableRecommendedPlugins}">
-                                                <tr>
-                                                    <td class="column1">
-                                                        <input type="checkbox"  checked="true" value="${p.name}"/>
-                                                        <img id="${p.name}" style="display:none;"/>
-                                                    </td>
-                                                    <td class="column2">
-                                                        <div>
-                                                            <a href="${p.wikiUrl}" target="_blank">
-                                                                ${p.displayName}
-                                                            </a>
-                                                        </div>
-                                                        <div class="excerpt" style="padding-top: 5px;">
-                                                            <j:out value="${it.markupFormatter.translate(p.description)}" />
-                                                        </div>
-                                                    </td>
-                                                    <td class="column3" style="white-space:nowrap">
-                                                        ${p.version}
-                                                    </td>
-                                                    <td class="column4" style="white-space:nowrap">
-                                                        <j:if test="${it.getInstalled(p).isDisabled()}">
-                                                            ${it.getInstalled(p).version} (Disabled)
-                                                        </j:if>
-                                                        <j:if test="${!it.getInstalled(p).isDisabled()}">
-                                                            ${it.getInstalled(p).version} (Installed)
-                                                        </j:if>
-                                                    </td>
-                                                </tr>
-                                            </j:forEach>
-                                            <j:forEach var="p" items="${it.installedRecommendedPlugins}">
-                                                <tr>
-                                                    <td class="column1">
-                                                        <img src="${imagesURL}/green-check.jpg"/>
-                                                    </td>
-                                                    <td class="column2">
-                                                        <div>
-                                                            <a href="${p.wikiUrl}" target="_blank" style="color:gray">
-                                                                ${p.displayName}
-                                                            </a>
-                                                        </div>
-                                                        <div class="excerpt" style="padding-top: 5px;">
-                                                            <j:out value="${it.markupFormatter.translate(p.description)}" />
-                                                        </div>
-                                                    </td>
-                                                    <td class="column3" style="white-space:nowrap; color:gray">
-                                                        No update available
-                                                    </td>
-                                                    <td class="column4" style="white-space:nowrap; color:gray">
-                                                        <j:if test="${it.getInstalled(p).isDisabled()}">
-                                                            ${it.getInstalled(p).version} (Disabled)
-                                                        </j:if>
-                                                        <j:if test="${!it.getInstalled(p).isDisabled()}">
-                                                            ${it.getInstalled(p).version} (Installed)
-                                                        </j:if>
-                                                    </td>
-                                                </tr>
-                                            </j:forEach>
+                                             
                                         </table>
                                     </div>
                                 </div>
