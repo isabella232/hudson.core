@@ -50,7 +50,7 @@
           </j:otherwise>
         </j:choose>
         <jar href="${rootURL}jnlpJars/remoting.jar"/>
-        <property name="hudson.showWindowsServiceInstallLink" value="true" />
+        <property name="hudson.showWindowsServiceInstallLink" value="false" />
       </resources>
 
       <application-desc main-class="hudson.remoting.jnlp.Main">
