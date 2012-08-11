@@ -547,6 +547,14 @@ div.behavior-loading {
     /* this marker class is used by JavaScript to locate the area to display help text. */
 }
 
+#jdkInstallInfo{
+    border: 1px solid #d4bde6;
+    background-color: #f5f0f9;
+    padding: 1em;
+    margin-left: 15px;
+    margin-bottom: 1em;
+    border-radius: 4px;
+}
 
 /* ====================== project view tab bar ===================================== */
 #viewList {

@@ -16,12 +16,18 @@
 
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+  <!--Until http://issues.hudson-ci.org/browse/HUDSON-9016 is solved do not allow to install directly from Oracle/Sun website-->
   <!-- XXX t:label? -->
-  <f:entry title="${%Version}" field="id">
+  
+  <f:entry  field="id">
+<!-- 
+   <f:entry title="${%Version}" field="id">
     <j:choose>
       <j:set var="jdks" value="${descriptor.installableJDKs}"/>
       <j:when test="${empty(jdks)}">
+-->
         <!-- if JDK list is not available, fall back to text box -->
+<!--        
         <f:textbox />
       </j:when>
       <j:otherwise>
@@ -39,5 +45,13 @@
   </f:entry>
   <f:entry title="" field="acceptLicense">
     <f:checkbox title="${%I agree to the Java SE Development Kit License Agreement}"/>
+  -->
+    
+    <div id="jdkInstallInfo">
+        JDK automatic installation from Oracle Website is temporarily disabled. 
+        See <a href="http://issues.hudson-ci.org/browse/HUDSON-9016" target="_blank"> http://issues.hudson-ci.org/browse/HUDSON-9016 </a> for details. 
+        <br/> <br/> Install JDK via other automatic methods or install JDK manually and specify valid JAVA_HOME.
+    </div>
   </f:entry>
+     
 </j:jelly>
