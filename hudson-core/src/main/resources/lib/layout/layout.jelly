@@ -79,10 +79,14 @@
             <script src="${scriptsURL}/ext-prototype.js" type="text/javascript"></script>
             <script src="${scriptsURL}/behavior.js" type="text/javascript"></script>
             <script src="${scriptsURL}/sortable.js" type="text/javascript"></script>
-
+          
             <!-- YUI related javascris and CSS. TODO: move completely to jQuery and jQuery UI-->
+   
             <!-- To use the debug version of YUI, set the system property 'debug.YUI' to true -->
+            <!--
+            Never un-comment on this. We don't bundle any of the YUI debug JS
             <j:set var="yuiSuffix" value="${h.yuiSuffix}" />
+            -->
             <l:yui module="yahoo" />
             <l:yui module="dom" />
             <l:yui module="event" />
