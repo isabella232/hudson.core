@@ -87,6 +87,7 @@
             Never un-comment on this. We don't bundle any of the YUI debug JS
             <j:set var="yuiSuffix" value="${h.yuiSuffix}" />
             -->
+            <j:set var="yuiSuffix" value="min" />
             <l:yui module="yahoo" />
             <l:yui module="dom" />
             <l:yui module="event" />
