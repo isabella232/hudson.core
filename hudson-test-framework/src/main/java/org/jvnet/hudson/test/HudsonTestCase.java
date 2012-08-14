@@ -964,7 +964,12 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
      * YUI in Hudson.
      */
     public HtmlPage submit(HtmlForm form) throws Exception {
-        return (HtmlPage) form.submit((HtmlButton) last(form.getHtmlElementsByTagName("button")));
+        HtmlButton button = (HtmlButton) last(form.getHtmlElementsByTagName("button"));
+        if (button != null){
+            return (HtmlPage) form.submit(button);
+        }else{
+            return (HtmlPage) form.submit();
+        }
     }
 
     /**
@@ -986,6 +991,14 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
                 // the preparation work needed to pass along the name of the button that
                 // triggered a submission (more concretely, m_oSubmitTrigger is not set.)
                 ((HtmlButton) e).click();
+                return (HtmlPage) form.submit((HtmlButton) e);
+            }
+        }
+        
+        for (HtmlElement e : form.getHtmlElementsByTagName("input")) {
+            HtmlElement p = (HtmlElement) e.getParentNode().getParentNode();
+            if (p.getAttribute("name").equals(name)) {
+                ((HtmlInput) e).click();
                 return (HtmlPage) form.submit((HtmlButton) e);
             }
         }
