@@ -964,10 +964,11 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
      * YUI in Hudson.
      */
     public HtmlPage submit(HtmlForm form) throws Exception {
-        HtmlButton button = (HtmlButton) last(form.getHtmlElementsByTagName("button"));
-        if (button != null){
+        List<HtmlButton> buttons = form.getHtmlElementsByTagName("button");
+        if ((buttons != null) && (buttons.size() > 0)) {
+            HtmlButton button = (HtmlButton) last(form.getHtmlElementsByTagName("button"));
             return (HtmlPage) form.submit(button);
-        }else{
+        } else {
             return (HtmlPage) form.submit();
         }
     }
