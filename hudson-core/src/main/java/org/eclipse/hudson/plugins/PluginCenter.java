@@ -112,7 +112,7 @@ final public class PluginCenter {
         Set<String> availablePluginNames = updateSiteManager.getAvailablePluginNames();
         for (String pluginName : availablePluginNames) {
             AvailablePluginInfo availablePlugin = updateSiteManager.getAvailablePlugin(pluginName);
-            if (!UpdateSiteManager.MANDATORY.equals(availablePlugin.getType()) && installedPluginNames.contains(pluginName)) {
+            if (installedPluginNames.contains(pluginName)) {
                 installedPlugins.add(availablePlugin);
             }
         }
@@ -133,6 +133,10 @@ final public class PluginCenter {
             }
         }
         return updatablePlugins;
+    }
+    
+    public boolean isMandatory(AvailablePluginInfo availablePlugin) {
+        return UpdateSiteManager.MANDATORY.equals(availablePlugin.getType());
     }
 
     public boolean isInstalled(AvailablePluginInfo availablePlugin) {
