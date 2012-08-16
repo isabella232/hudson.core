@@ -8,11 +8,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * 
+ *
  *    Kohsuke Kawaguchi, Tom Huybrechts
  *
  *
- *******************************************************************************/ 
+ *******************************************************************************/
 
 package hudson.model;
 
@@ -94,17 +94,19 @@ public final class RunMap<R extends Run<?, R>> extends AbstractMap<Integer, R> i
         R r = m.put(key, value);
         SortedMap<Integer, R> head = m.headMap(key);
         if (!head.isEmpty()) {
-            R prev = m.get(head.lastKey());
-            value.previousBuild = prev.previousBuild;
-            value.nextBuild = prev;
-            if (value.previousBuild != null) {
-                value.previousBuild.nextBuild = value;
+        	if(m.containsKey(head.lastKey())) {
+				R prev = m.get(head.lastKey());
+				value.previousBuild = prev.previousBuild;
+				value.nextBuild = prev;
+				if (containsValue(value.previousBuild)) {
+					value.previousBuild.nextBuild = value;
+				}
+				prev.previousBuild = value;
             }
-            prev.previousBuild = value;
         } else {
             value.previousBuild = first;
             value.nextBuild = null;
-            if (first != null) {
+            if (containsValue(first)) {
                 first.nextBuild = value;
             }
         }
