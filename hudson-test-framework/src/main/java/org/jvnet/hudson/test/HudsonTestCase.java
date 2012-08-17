@@ -997,10 +997,9 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
         }
         
         for (HtmlElement e : form.getHtmlElementsByTagName("input")) {
-            HtmlElement p = (HtmlElement) e.getParentNode().getParentNode();
-            if (p.getAttribute("name").equals(name)) {
+            if (e.getAttribute("name").equals(name)) {
                 ((HtmlInput) e).click();
-                return (HtmlPage) form.submit((HtmlButton) e);
+                return (HtmlPage) form.submit((HtmlInput) e);
             }
         }
         throw new AssertionError("No such submit button with the name " + name);
@@ -1016,6 +1015,16 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
                 return (HtmlButton) b;
             }
         }
+        return null;
+    }
+    
+    protected HtmlInput getInputByName(HtmlForm f, String name) {
+        for (HtmlElement b : f.getHtmlElementsByTagName("button")) {
+            if (b.getAttribute("name").equals(name)) {
+                return (HtmlInput) b;
+            }
+        }
+         
         return null;
     }
 

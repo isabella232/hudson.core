@@ -2163,7 +2163,7 @@ function applySafeRedirector(url) {
  
 // logic behind <f:validateButton />
 function validateButton(checkUrl,paramList,button) {
-  button = button._button;
+  //button = button._button;
  
   var parameters = {};
  
