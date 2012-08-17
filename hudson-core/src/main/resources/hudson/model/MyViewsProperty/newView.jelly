@@ -34,8 +34,7 @@
       
       <f:form method="post" action="createView" name="createView">
         <f:entry title="${%View name}">
-          <f:textbox id="name" name="name" checkUrl="'${rootURL}/${it.url}/viewExistsCheck?value='+encodeURIComponent(this.value)+'&amp;exists=false'"
-                     onchange="updateOk(this.form)" onkeyup="updateOk(this.form)" />
+          <f:textbox id="name" name="name" checkUrl="'${rootURL}/${it.url}/viewExistsCheck?value='+encodeURIComponent(this.value)+'&amp;exists=false'" />
           <script>
             $('name').focus();
           </script>
@@ -46,7 +45,7 @@
           <j:if test="${d.isInstantiable()}">
             <f:block>
               <j:set var="id" value="${h.generateId()}"/>
-              <input type="radio" name="mode" value="${d.clazz.name}" onchange="updateOk(this.form)" onclick="updateOk(this.form)" id="${id}" />
+              <input type="radio" name="mode" value="${d.clazz.name}" id="${id}" />
               <st:nbsp/>
               <label for="${id}"><b>${d.displayName}</b></label>
             </f:block>
@@ -60,24 +59,9 @@
           <input type="submit" name="Submit" value="OK" id="ok" style="margin-left:5em" />
         </f:block>
       </f:form>
-      <script><![CDATA[
-        var okButton = makeButton($('ok'),null);
-
-        function updateOk(form) {
-          function state() {
-            if($('name').value.length==0)   return true;
-            var radio = form.elements['mode'];
-            if(radio.checked) return false;  // if there's only one radiobutton
-            for(i=0;i<radio.length;i++)
-              if(radio[i].checked)
-                return false;
-            return true;
-          }
-
-          okButton.set('disabled',state(),false);
-        }
-        updateOk(okButton.getForm());
-      ]]></script>
+      <script> 
+         jQuery("form input:radio").first().attr('checked', true);
+      </script>
     </l:main-panel>
   </l:layout>
 </j:jelly>

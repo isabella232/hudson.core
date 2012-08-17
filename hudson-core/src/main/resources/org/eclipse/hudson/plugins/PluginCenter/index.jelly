@@ -10,7 +10,7 @@
         <link href="${cssURL}/plugin-center.css" type="text/css" rel="stylesheet" />
         <script src="${scriptsURL}/plugin-center.js" type="text/javascript"></script>
         
-        <st:include it="${app.primaryView}" page="sidepanel.jelly" xmlns:st="jelly:stapler" />
+        <st:include page="sidepanel.jelly" />
         <l:main-panel>       
             <div id="container">
                 <span style="width:100%; text-align:center">
