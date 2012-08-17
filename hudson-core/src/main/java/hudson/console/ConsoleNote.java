@@ -180,9 +180,9 @@ public abstract class ConsoleNote<T> implements Serializable, Describable<Consol
             buf2.write(PREAMBLE);
             dos.writeInt(buf.size());
             buf.writeTo(dos);
-            buf2.write(POSTAMBLE);
         } finally {
             IOUtils.closeQuietly(dos);
+            buf2.write(POSTAMBLE);
         }
         return buf2;
     }
