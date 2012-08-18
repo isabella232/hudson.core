@@ -9,6 +9,12 @@ options { ASTLabelType=Label; }
   import hudson.model.Label;
 }
 
+@parser::members {
+  protected Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow) throws RecognitionException {
+    throw new MismatchedTokenException(ttype, input);
+  }
+}
+
 @lexer::header {
   package hudson.model.labels;
   import hudson.model.Label;
@@ -31,7 +37,7 @@ returns [Label l]
 
 term3
 returns [Label l]
-  : t=term4 ( OR r=term4 {l=t.or(r);} )?  { l=t; }
+  : t=term4 ( OR r=term4 {t=t.or(r);} )?  { l=t; }
   ;
 
 term4
