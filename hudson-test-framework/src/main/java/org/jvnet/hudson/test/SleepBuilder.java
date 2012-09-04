@@ -9,7 +9,7 @@
  *
  * Contributors:
  * 
- *    Kohsuke Kawaguchi
+ *    Kohsuke Kawaguchi, Steven Christou
  *
  *
  *******************************************************************************/ 
@@ -25,6 +25,8 @@ import hudson.tasks.Builder;
 
 import java.io.IOException;
 
+import org.kohsuke.stapler.DataBoundConstructor;
+
 /**
  * {@link Builder} that just sleeps for the specified amount of milli-seconds.
  *
@@ -34,6 +36,7 @@ public class SleepBuilder extends Builder {
 
     public final long time;
 
+    @DataBoundConstructor
     public SleepBuilder(long time) {
         this.time = time;
     }
