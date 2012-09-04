@@ -52,7 +52,7 @@
                         });   
                         showMessage(jQuery('#deleteMsg'), "${%cannotDeleteBecauseOfChildrenMsg}", "red");
                     } else{
-                        if(data.lastBuild.length != 0){
+                        if ((data.lastBuild != null) &amp;&amp; (data.lastBuild.length != 0)){
                            var lastBuildUrl = data.lastBuild.url + "api/json";
                            jQuery.ajax({
                                url: lastBuildUrl,
