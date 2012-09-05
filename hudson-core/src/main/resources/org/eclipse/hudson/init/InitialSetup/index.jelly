@@ -128,134 +128,141 @@
                                     </div>
                                 </div>
                             </li>
-                            
-                            <li class="updates">
-                                <h3>
-                                    Plugin Updates
-                                </h3>
-                                <p class="description">
-                                    Updates are available for the following plugins. We recommend to update the plugins for this version of Hudson.
-                                </p>
-                                <div class="body">
-                                    <div class="items-container">
+                            <j:if test="${it.updatablePlugins.size() > 0}">
+                                <li class="updates">
+                                    <h3>
+                                        Plugin Updates
+                                    </h3>
+                                    <p class="description">
+                                        Updates are available for the following plugins. If you are upgrading from previous version of Hudson, we highly recommend to update the plugins for this version of Hudson.
+                                    </p>
+                                    <div class="body">
+                                        <div class="items-container">
                                         
-                                        <table width="100%" border="0" id="updatablePlugins" cellpadding="10">
-                                            <j:forEach var="p" items="${it.updatablePlugins}">
-                                                <tr>
-                                                    <td class="column1">
-                                                        <j:if test="${it.getInstalled(p).isDisabled()}">
-                                                            <input type="checkbox" value="${p.name}"/>
-                                                        </j:if>
-                                                        <j:if test="${!it.getInstalled(p).isDisabled()}">
-                                                            <input type="checkbox" checked="true"  value="${p.name}"/>
-                                                        </j:if>
+                                            <table width="100%" border="0" id="updatablePlugins" cellpadding="10">
+                                                <j:forEach var="p" items="${it.updatablePlugins}">
+                                                    <tr>
+                                                        <td class="column1">
+                                                            <j:if test="${it.getInstalled(p).isDisabled()}">
+                                                                <input type="checkbox" value="${p.name}"/>
+                                                            </j:if>
+                                                            <j:if test="${!it.getInstalled(p).isDisabled()}">
+                                                                <input type="checkbox" checked="true"  value="${p.name}"/>
+                                                            </j:if>
                                                  
-                                                        <img id="${p.name}" style="display:none;"/>
-                                                    </td>
-                                                    <td class="column2">
-                                                        <div>
-                                                            <a href="${p.wikiUrl}" target="_blank">
-                                                                ${p.displayName}
-                                                            </a>
-                                                        </div>
-                                                        <div class="excerpt" style="padding-top: 5px;">
-                                                            <j:out value="${it.markupFormatter.translate(p.description)}" />
-                                                        </div>
-                                                    </td>
-                                                    <td class="column3" style="white-space:nowrap">
-                                                        ${p.version}
-                                                    </td>
-                                                    <td class="column4" style="white-space:nowrap">
-                                                        <j:if test="${it.getInstalled(p).isDisabled()}">
-                                                            ${it.getInstalled(p).version} (Disabled)
-                                                        </j:if>
-                                                        <j:if test="${!it.getInstalled(p).isDisabled()}">
-                                                            ${it.getInstalled(p).version} (Installed)
-                                                        </j:if>
-                                                    </td>
-                                                </tr>
-                                            </j:forEach>                
-                                        </table>
+                                                            <img id="${p.name}" style="display:none;"/>
+                                                        </td>
+                                                        <td class="column2">
+                                                            <div>
+                                                                <a href="${p.wikiUrl}" target="_blank">
+                                                                    ${p.displayName}
+                                                                </a>
+                                                            </div>
+                                                            <div class="excerpt" style="padding-top: 5px;">
+                                                                <j:out value="${it.markupFormatter.translate(p.description)}" />
+                                                            </div>
+                                                        </td>
+                                                        <td class="column3" style="white-space:nowrap">
+                                                            ${p.version}
+                                                        </td>
+                                                        <td class="column4" style="white-space:nowrap">
+                                                            <j:if test="${it.getInstalled(p).isDisabled()}">
+                                                                ${it.getInstalled(p).version} (Disabled)
+                                                            </j:if>
+                                                            <j:if test="${!it.getInstalled(p).isDisabled()}">
+                                                                ${it.getInstalled(p).version} (Installed)
+                                                            </j:if>
+                                                        </td>
+                                                    </tr>
+                                                </j:forEach>                
+                                            </table>
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
+                                </li>
+                            </j:if>
                             
-                            <li class="featured">
-                                <h3>
-                                    Featured Plugins
-                                </h3>
-                                <p class="description">
-                                    Following are featured plugins. They are tested and certified by Hudson QA team.
-                                </p>
-                                <div class="body">
-                                    <div class="items-container">
+                            <j:if test="${it.installableFeaturedPlugins.size() > 0}">
+                            
+                                <li class="featured">
+                                    <h3>
+                                        Featured Plugins
+                                    </h3>
+                                    <p class="description">
+                                        Following are featured plugins. They are tested and certified by Hudson QA team.
+                                    </p>
+                                    <div class="body">
+                                        <div class="items-container">
                                         
-                                        <table width="100%" border="0" id="featuredPlugins" cellpadding="10">
-                                            <j:forEach var="p" items="${it.installableFeaturedPlugins}">
-                                                <tr>
-                                                    <td class="column1">
-                                                        <input type="checkbox" value="${p.name}"/>
-                                                        <img id="${p.name}" style="display:none;"/>
-                                                    </td>
-                                                    <td class="column2">
-                                                        <div>
-                                                            <a href="${p.wikiUrl}" target="_blank">
-                                                                ${p.displayName}
-                                                            </a>
-                                                        </div>
-                                                        <div class="excerpt" style="padding-top: 5px;">
-                                                            <j:out value="${it.markupFormatter.translate(p.description)}" />
-                                                        </div>
-                                                    </td>
-                                                    <td class="column3" style="white-space:nowrap">
-                                                        ${p.version}
-                                                    </td>
-                                                    <td class="column4"></td>
-                                                </tr>
-                                            </j:forEach>
-                                        </table>
+                                            <table width="100%" border="0" id="featuredPlugins" cellpadding="10">
+                                                <j:forEach var="p" items="${it.installableFeaturedPlugins}">
+                                                    <tr>
+                                                        <td class="column1">
+                                                            <input type="checkbox" value="${p.name}"/>
+                                                            <img id="${p.name}" style="display:none;"/>
+                                                        </td>
+                                                        <td class="column2">
+                                                            <div>
+                                                                <a href="${p.wikiUrl}" target="_blank">
+                                                                    ${p.displayName}
+                                                                </a>
+                                                            </div>
+                                                            <div class="excerpt" style="padding-top: 5px;">
+                                                                <j:out value="${it.markupFormatter.translate(p.description)}" />
+                                                            </div>
+                                                        </td>
+                                                        <td class="column3" style="white-space:nowrap">
+                                                            ${p.version}
+                                                        </td>
+                                                        <td class="column4"></td>
+                                                    </tr>
+                                                </j:forEach>
+                                            </table>
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
+                                </li>
+                            
+                            </j:if>
                     
-                            <li class="recommended">
-                                <h3>
-                                    Recommended Plugins
-                                </h3>
-                                <p class="description">
-                                    Following plugins are recommended. They are maintained by Hudson community developers and widely used.
-                                </p>
-                                <div class="body">
-                                    <div class="items-container">
+                            <j:if test="${it.installableRecommendedPlugins.size() > 0}">
+                                <li class="recommended">
+                                    <h3>
+                                        Recommended Plugins
+                                    </h3>
+                                    <p class="description">
+                                        Following plugins are recommended. They are maintained by Hudson community developers and widely used.
+                                    </p>
+                                    <div class="body">
+                                        <div class="items-container">
                                         
-                                        <table width="100%" border="0" id="recommendedPlugins" cellpadding="10">
-                                            <j:forEach var="p" items="${it.installableRecommendedPlugins}">
-                                                <tr>
-                                                    <td class="column1">
-                                                        <input type="checkbox" value="${p.name}"/>
-                                                        <img id="${p.name}" style="display:none;"/>
-                                                    </td>
-                                                    <td class="column2">
-                                                        <div>
-                                                            <a href="${p.wikiUrl}" target="_blank">
-                                                                ${p.displayName}
-                                                            </a>
-                                                        </div>
-                                                        <div class="excerpt" style="padding-top: 5px;">
-                                                            <j:out value="${it.markupFormatter.translate(p.description)}" />
-                                                        </div>
-                                                    </td>
-                                                    <td class="column3" style="white-space:nowrap">
-                                                        ${p.version}
-                                                    </td>
-                                                    <td class="column4"></td>
-                                                </tr>
-                                            </j:forEach>
+                                            <table width="100%" border="0" id="recommendedPlugins" cellpadding="10">
+                                                <j:forEach var="p" items="${it.installableRecommendedPlugins}">
+                                                    <tr>
+                                                        <td class="column1">
+                                                            <input type="checkbox" value="${p.name}"/>
+                                                            <img id="${p.name}" style="display:none;"/>
+                                                        </td>
+                                                        <td class="column2">
+                                                            <div>
+                                                                <a href="${p.wikiUrl}" target="_blank">
+                                                                    ${p.displayName}
+                                                                </a>
+                                                            </div>
+                                                            <div class="excerpt" style="padding-top: 5px;">
+                                                                <j:out value="${it.markupFormatter.translate(p.description)}" />
+                                                            </div>
+                                                        </td>
+                                                        <td class="column3" style="white-space:nowrap">
+                                                            ${p.version}
+                                                        </td>
+                                                        <td class="column4"></td>
+                                                    </tr>
+                                                </j:forEach>
                                              
-                                        </table>
+                                            </table>
+                                        </div>
                                     </div>
-                                </div>
-                            </li> 
+                                </li> 
+                            </j:if>
                     
                             <li id="proxySetup">
                                 <h3>
@@ -269,40 +276,40 @@
                                              
                                         <form id="proxyForm">
                                             <label for="proxy.server">Proxy Server</label>
-                                                <input type="text" name="proxy.server" value="${it.proxyConfig.name}" />
-                                                <br/>
+                                            <input type="text" name="proxy.server" value="${it.proxyConfig.name}" />
+                                            <br/>
                                     
-                                                <label for="proxy.port">Proxy Port</label>
-                                                <input type="text" name="proxy.port" value="${it.proxyConfig.port}" />
-                                                <br/>
+                                            <label for="proxy.port">Proxy Port</label>
+                                            <input type="text" name="proxy.port" value="${it.proxyConfig.port}" />
+                                            <br/>
                                     
-                                                <label for="proxy.noProxyFor">No Proxy for</label>
-                                                <input type="text" name="proxy.noProxyFor" value="${it.proxyConfig.noProxyFor}" /> 
-                                                <br/>
+                                            <label for="proxy.noProxyFor">No Proxy for</label>
+                                            <input type="text" name="proxy.noProxyFor" value="${it.proxyConfig.noProxyFor}" /> 
+                                            <br/>
                                     
-                                                <input style="width: 10px;" id="proxyAuth" name="proxy.authNeeded" type="checkbox" checked="${it.proxyConfig.authNeeded}"/>
-                                                Proxy Needs Authorization
-                                                <br/>
+                                            <input style="width: 10px;" id="proxyAuth" name="proxy.authNeeded" type="checkbox" checked="${it.proxyConfig.authNeeded}"/>
+                                            Proxy Needs Authorization
+                                            <br/>
                                      
-                                                <span id="proxyUser">
-                                                    <label for="proxy.userName">Username</label>
-                                                    <input name="proxy.userName" type="text" size="20" value="${it.proxyConfig.userName}"/>
-                                                </span>
-                                                <br/>
+                                            <span id="proxyUser">
+                                                <label for="proxy.userName">Username</label>
+                                                <input name="proxy.userName" type="text" size="20" value="${it.proxyConfig.userName}"/>
+                                            </span>
+                                            <br/>
                                     
-                                                <span id="proxyPassword">
-                                                    <label for="proxy.password">Password</label>
-                                                    <input name="proxy.password" type="password" value="${it.proxyConfig.password}"/>
-                                                </span>
-                                                <br/>
+                                            <span id="proxyPassword">
+                                                <label for="proxy.password">Password</label>
+                                                <input name="proxy.password" type="password" value="${it.proxyConfig.password}"/>
+                                            </span>
+                                            <br/>
                                     
-                                                <div style="margin-left: 500px;"> 
-                                                    <input style="width: 150px;" type="button" id="proxySubmitButton" value="${%Test and Setup}" />
-                                                </div>
-                                                <br style="clear:both"/>
-                                                <span id="proxyMsg">
-                                                    <!-- Proxy operation message injected here -->
-                                                </span>
+                                            <div style="margin-left: 500px;"> 
+                                                <input style="width: 150px;" type="button" id="proxySubmitButton" value="${%Test and Setup}" />
+                                            </div>
+                                            <br style="clear:both"/>
+                                            <span id="proxyMsg">
+                                                <!-- Proxy operation message injected here -->
+                                            </span>
                                         </form>    
                                     </div>
                                 </div>
@@ -311,11 +318,11 @@
                         </ul>
                         <div>
                             <span id="infoMsg">
-                                 <!-- Message injectd here-->
+                                <!-- Message injectd here-->
                             </span> 
                             <p id="loginNeededMsg">
-                                    Note: You must 
-                                    <a id="loginLink" href="#" onClick="showLoginDialog(); return false;">login</a> as administrator to install the plugins.
+                                Note: You must 
+                                <a id="loginLink" href="#" onClick="showLoginDialog(); return false;">login</a> as administrator to install the plugins.
                             </p>
                             <div>
                                 <ul id="buttonBar">
@@ -342,7 +349,7 @@
                 </div>
             </div>
     
-           <div id="loginDialog" title="Login" style="display:none; cursor: default">
+            <div id="loginDialog" title="Login" style="display:none; cursor: default">
                 <span>${%Admin access required to install the plugins. Login as admin.}</span>
 
                 <form id="loginForm"  style="text-size:smaller">
@@ -354,7 +361,7 @@
                 </form>
 
                 <div id="loginMsg">
-                        <!-- Message ijected here -->
+                    <!-- Message ijected here -->
                 </div>
             </div>
         </body>
