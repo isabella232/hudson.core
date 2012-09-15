@@ -27,7 +27,7 @@
   <j:if test="${it.due}">
     <script>
       Behaviour.addLoadEvent(function() {
-        loadScript("http://hudson-ci.org/usage-stats.js?${it.statData}");
+        loadScript("http://www.hudson-ci.org/PluginCentral3/usageStats/submit?${it.statData}");
       });
     </script>
   </j:if>
