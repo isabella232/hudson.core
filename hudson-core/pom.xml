@@ -365,12 +365,6 @@
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>ant-launcher</artifactId>
-                    <groupId>org.apache.ant</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
