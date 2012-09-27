@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.eclipse.hudson</groupId>
         <artifactId>hudson-parent</artifactId>
-        <version> 3.0.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
   
@@ -134,25 +134,81 @@
                                 </artifactItem>
                                 
                                 <artifactItem>
-                                    <groupId>org.mortbay.jetty</groupId>
-                                    <artifactId>jetty</artifactId>
-                                    <version>6.1.26</version>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-server</artifactId>
+                                    <version>${jetty.server.version}</version>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/libs</outputDirectory>
                                     <destFileName>jetty.jar</destFileName>
                                 </artifactItem>
+                                <dependency>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-webapp</artifactId>
+                                    <version>${jetty.server.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>jetty-web-app.jar</destFileName>
+                                </dependency>
                                 <artifactItem>
-                                    <groupId>org.mortbay.jetty</groupId>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-continuation</artifactId>
+                                    <version>${jetty.server.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>jetty-continuation.jar</destFileName>
+                                </artifactItem>
+                                <dependency>
+                                    <groupId>org.eclipse.jetty</groupId>
                                     <artifactId>jetty-util</artifactId>
-                                    <version>6.1.26</version>
+                                    <version>${jetty.server.version}</version>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/libs</outputDirectory>
                                     <destFileName>jetty-util.jar</destFileName>
+                                </dependency>
+                                <dependency>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-http</artifactId>
+                                    <version>${jetty.server.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>jetty-http.jar</destFileName>
+                                </dependency>
+                                <dependency>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-io</artifactId>
+                                    <version>${jetty.server.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>jetty-io.jar</destFileName>
+                                </dependency>
+                                <dependency>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-security</artifactId>
+                                    <version>${jetty.server.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>jetty-security.jar</destFileName>
+                                </dependency>
+                                <dependency>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-xml</artifactId>
+                                    <version>${jetty.server.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>jetty-xml.jar</destFileName>
+                                </dependency>
+                                <artifactItem>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-servlet</artifactId>
+                                    <version>${jetty.server.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>target/generated-resources/libs</outputDirectory>
+                                    <destFileName>jetty-servlet.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mortbay.jetty</groupId>
-                                    <artifactId>servlet-api</artifactId>
-                                    <version>2.5-20081211</version>
+                                    <groupId>org.eclipse.jetty.orbit</groupId>
+                                    <artifactId>javax.servlet</artifactId>
+                                    <version>${jetty.javax.serverlet.version}</version>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/libs</outputDirectory>
                                     <destFileName>jetty-servlet-api.jar</destFileName>
@@ -289,13 +345,6 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <configuration>
                     <contextPath>${contextPath}</contextPath>
-                    <!--
-                    <connectors>
-                        <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-                            <port>${port}</port>
-                        </connector>
-                    </connectors>
-                    -->
                     
                     <connectors>
                         <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">

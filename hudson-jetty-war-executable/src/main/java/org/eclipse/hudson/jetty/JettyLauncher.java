@@ -20,11 +20,13 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.security.SslSocketConnector;
-import org.mortbay.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.LoginService;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ssl.SslSocketConnector;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 /**
  * Jetty Utility to launch the Jetty Server
@@ -119,6 +121,9 @@ public class JettyLauncher {
         context.setDescriptor(warUrl.toExternalForm() + "/WEB-INF/web.xml");
         context.setServer(server);
         context.setWar(warUrl.toExternalForm());
+        
+        LoginService loginService =  new HashLoginService("defaultLoginService");
+        context.getSecurityHandler().setLoginService(loginService);
 
         // This is used by Windows Service Installer in Hudson Management 
         System.out.println("War - " + warUrl.getPath());
@@ -132,7 +137,7 @@ public class JettyLauncher {
             System.setProperty("hudson.pluginManager.disableUpdateCenterSwitch", "true");
         }
 
-        server.addHandler(context);
+        server.setHandler(context);
         server.setStopAtShutdown(true);
 
         server.start();
