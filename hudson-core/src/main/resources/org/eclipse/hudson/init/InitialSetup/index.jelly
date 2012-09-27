@@ -229,7 +229,8 @@
                                         Recommended Plugins
                                     </h3>
                                     <p class="description">
-                                        Following plugins are recommended. They are maintained by Hudson community developers and widely used.
+                                        Following plugins are recommended. They are maintained by Hudson community developers and widely used. 
+                                        These plugins are verified by Hudson team to work properly in the current version of Hudson.
                                     </p>
                                     <div class="body">
                                         <div class="items-container">
