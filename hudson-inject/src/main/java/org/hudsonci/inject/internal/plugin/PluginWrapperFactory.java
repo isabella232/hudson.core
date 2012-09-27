@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.jar.Attributes;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import hudson.PluginFirstClassLoader;
 
 /**
  * Provides {@link PluginWrapper} creation facilities.
@@ -62,6 +63,16 @@ public class PluginWrapperFactory
                 List<URL> urls = new ArrayList<URL>(files.size());
                 for (File file : files) {
                     urls.add(file.toURI().toURL());
+                }
+                if (atts != null) {
+                    String usePluginFirstClassLoader = atts.getValue("PluginFirstClassLoader");
+                    if (Boolean.valueOf(usePluginFirstClassLoader)) {
+                        PluginFirstClassLoader pluginFirstParent = new PluginFirstClassLoader();
+                        pluginFirstParent.setParentFirst(false);
+                        pluginFirstParent.setParent(parent);
+                        pluginFirstParent.addPathFiles(files);
+                        return new PluginClassLoader(urls, pluginFirstParent);
+                    }
                 }
                 return new PluginClassLoader(urls, parent);
             }
