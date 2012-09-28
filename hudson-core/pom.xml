@@ -493,7 +493,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.hudsonci.stapler</groupId>
+            <groupId>org.jvnet.hudson</groupId>
             <artifactId>commons-jelly-tags-define</artifactId>
             <version>${commons-jelly-tags-define.version}</version>
             <exclusions>

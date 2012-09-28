@@ -218,7 +218,7 @@
         <commons-jelly.version>1.1-hudson-20120704</commons-jelly.version>
         <commons-jelly-tags-fmt.version>1.0</commons-jelly-tags-fmt.version>
         <commons-jelly-tags-xml.version>1.1-hudson-20120704</commons-jelly-tags-xml.version>
-        <commons-jelly-tags-define.version>1.0.1-hudson-20120704</commons-jelly-tags-define.version>
+        <commons-jelly-tags-define.version>1.0.1-hudson-20071021</commons-jelly-tags-define.version>
         <commons-jexl.version>2.0.1</commons-jexl.version>
         <commons-logging.version>1.1.1</commons-logging.version>
         <commons-collections.version>3.2</commons-collections.version>
