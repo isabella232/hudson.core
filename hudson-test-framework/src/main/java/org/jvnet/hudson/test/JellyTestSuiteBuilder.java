@@ -33,6 +33,10 @@ import java.util.Enumeration;
 import java.util.concurrent.Callable;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.hudsonci.xpath.XPath;
+import org.hudsonci.xpath.XPathException;
 
 /**
  * Builds up a {@link TestSuite} for performing static syntax checks on Jelly
@@ -97,11 +101,15 @@ public class JellyTestSuiteBuilder {
          */
         private void checkLabelFor(Document dom) {
             if (isConfigJelly() || isGlobalJelly()) {
-                if (!dom.selectNodes("//label[@for]").isEmpty()) {
+              try {
+                if (!new XPath("//label[@for]").selectNodes(dom).isEmpty()) {
                     throw new AssertionError("<label for=...> shouldn't be used because it doesn't work "
                             + "when the configuration item is repeated. Use <label class=\"attach-previous\"> "
                             + "to have your label attach to the previous DOM node instead.");
                 }
+              } catch (XPathException ex) {
+                throw new AssertionError("XPathException evaluating \"//label[@for]\"");
+              }
             }
         }
 

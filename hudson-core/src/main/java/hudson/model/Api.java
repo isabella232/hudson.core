@@ -24,6 +24,7 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.hudsonci.xpath.XPath;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -37,6 +38,7 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
+import org.hudsonci.xpath.XPathException;
 
 /**
  * Used to expose remote access API for ".../api/"
@@ -100,7 +102,7 @@ public class Api extends AbstractModelObject {
             // apply exclusions
             if (excludes != null) {
                 for (String exclude : excludes) {
-                    List<org.dom4j.Node> list = (List<org.dom4j.Node>) dom.selectNodes(exclude);
+                    List<org.dom4j.Node> list = (List<org.dom4j.Node>) new XPath(exclude).selectNodes(dom);
                     for (org.dom4j.Node n : list) {
                         Element parent = n.getParent();
                         if (parent != null) {
@@ -113,7 +115,7 @@ public class Api extends AbstractModelObject {
             if (xpath == null) {
                 result = dom;
             } else {
-                List list = dom.selectNodes(xpath);
+                List list = new XPath(xpath).selectNodes(dom);
                 if (wrapper != null) {
                     Element root = DocumentFactory.getInstance().createElement(wrapper);
                     for (Object o : list) {
@@ -137,6 +139,8 @@ public class Api extends AbstractModelObject {
                 }
             }
 
+        } catch (XPathException e) {
+            throw new IOException2(e);
         } catch (DocumentException e) {
             throw new IOException2(e);
         }

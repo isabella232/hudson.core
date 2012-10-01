@@ -440,7 +440,16 @@
                 <groupId>dom4j</groupId>
                 <artifactId>dom4j</artifactId>
               </exclusion>
+              <exclusion>
+                <groupId>org.hudsonci.xpath</groupId>
+                <artifactId>xpath-service</artifactId>
+              </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.hudsonci.xpath</groupId>
+          <artifactId>xpath-service</artifactId>
+          <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>commons-jelly</groupId>
