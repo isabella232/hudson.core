@@ -63,6 +63,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.json.JSONObject;
+import org.hudsonci.xpath.XPath;
+import org.hudsonci.xpath.XPathException;
 
 /**
  * Install JDKs from java.sun.com.
@@ -347,7 +349,7 @@ public class JDKInstaller extends ToolInstaller {
             Document dom = domReader.read(tidy.parseDOM(con.getInputStream(), null));
 
             form = null;
-            for (Element e : (List<Element>) dom.selectNodes("//form")) {
+            for (Element e : (List<Element>) new XPath("//form").selectNodes(dom)) {
                 String action = e.attributeValue("action");
                 LOGGER.fine("Found form:" + action);
                 if (action.contains("ViewFilteredProducts")) {
@@ -355,6 +357,8 @@ public class JDKInstaller extends ToolInstaller {
                     break;
                 }
             }
+        } catch (XPathException e) {
+            throw new IOException2("Failed to access (xpath) " + url, e);
         } catch (IOException e) {
             throw new IOException2("Failed to access " + url, e);
         }
@@ -405,7 +409,7 @@ public class JDKInstaller extends ToolInstaller {
             }
 
             // the rest
-            for (Element e : (List<Element>) form.selectNodes(".//input")) {
+            for (Element e : (List<Element>) new XPath(".//input").selectNodes(form)) {
                 os.print('&');
                 os.print(e.attributeValue("name"));
                 os.print('=');
@@ -417,6 +421,8 @@ public class JDKInstaller extends ToolInstaller {
                 }
             }
             return con;
+        } catch (XPathException e) {
+            throw new IOException2("Failed to access (xpath) " + url, e);
         } catch (IOException e) {
             throw new IOException2("Failed to access " + url, e);
         } finally {
