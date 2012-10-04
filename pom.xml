@@ -120,7 +120,7 @@
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
         <build.number />
         
-        <maven-hpi-plugin.version>3.0.0-M2</maven-hpi-plugin.version>
+        <maven-hpi-plugin.version>3.0.0-RC3</maven-hpi-plugin.version>
         <stapler.version>3.0.0-M2</stapler.version>
         <maven-stapler-plugin.version>3.0.1</maven-stapler-plugin.version>
 
