@@ -207,6 +207,7 @@ final public class PluginCenter {
                     installJob = newJob.get();
                 }
                 if (!installJob.getStatus()) {
+                    installationsJobs.remove(installJob);
                     return new ErrorHttpResponse("Plugin " + pluginName + " could not be installed. " + installJob.getErrorMsg());
                 }
             } catch (Exception ex) {

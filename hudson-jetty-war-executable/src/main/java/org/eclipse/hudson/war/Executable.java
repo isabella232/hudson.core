@@ -35,8 +35,15 @@ public class Executable {
 
     private final String[] jettyJars = {
         "libs/jetty.jar",
+        "libs/jetty-web-app.jar",
+        "libs/jetty-continuation.jar",
         "libs/jetty-util.jar",
+        "libs/jetty-http.jar",
+        "libs/jetty-io.jar",
+        "libs/jetty-security.jar",
+        "libs/jetty-servlet.jar",
         "libs/jetty-servlet-api.jar",
+        "libs/jetty-xml.jar",
         "libs/hudson-jetty-war-executable.jar"
     };
     private List<String> arguments;
