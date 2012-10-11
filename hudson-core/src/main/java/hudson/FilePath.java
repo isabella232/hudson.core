@@ -408,7 +408,6 @@ public final class FilePath implements Serializable {
                 try {
                     scanner.scan(f, a);
                 } finally {
-                	IOUtils.closeQuietly(out);
                     IOUtils.closeQuietly(a);
                 }
                 return a.countEntries();
