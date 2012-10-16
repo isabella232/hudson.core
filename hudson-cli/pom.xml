@@ -65,7 +65,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.eclipse.hudson.main</groupId>
+      <groupId>org.eclipse.hudson</groupId>
       <artifactId>hudson-remoting</artifactId>
       <version>${hudson-remoting.version}</version>
     </dependency>
