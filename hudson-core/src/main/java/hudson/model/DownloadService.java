@@ -119,7 +119,7 @@ public class DownloadService extends PageDecorator {
          *
          * @param url URL relative to {@link UpdateCenter#getUrl()}. So if this
          * string is "foo.json", the ultimate URL will be something like
-         * "https://hudson.java.net/foo.json"
+         * "https://hudson-ci.org/update-center3/foo.json"
          *
          * For security and privacy reasons, we don't allow the retrieval from
          * random locations.
@@ -153,7 +153,7 @@ public class DownloadService extends PageDecorator {
          * URL to download.
          */
         public String getUrl() {
-            return Hudson.getInstance().getUpdateCenter().getDefaultBaseUrl() + "updates/" + url;
+            return Hudson.getInstance().getUpdateCenter().getDefaultBaseUrl() + url;
         }
 
         /**

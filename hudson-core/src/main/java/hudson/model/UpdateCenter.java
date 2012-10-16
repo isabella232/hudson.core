@@ -471,7 +471,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
     @SuppressWarnings({"UnusedDeclaration"})
     public static class UpdateCenterConfiguration implements ExtensionPoint {
 
-        private final String updateServer = System.getProperty("updateServer", "http://hudson-ci.org/");
+        private final String updateServer = System.getProperty("updateServer", "http://hudson-ci.org/update-center3/");
 
         /**
          * Creates default update center configuration - uses settings for
@@ -647,7 +647,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
          * @return Absolute URL that ends with '/'.
          */
         public String getUpdateCenterUrl() {
-            return updateServer + "update-center3/update-center.json";
+            return updateServer + "update-center.json";
         }
 
         /**
