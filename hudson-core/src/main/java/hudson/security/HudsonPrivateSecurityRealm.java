@@ -75,7 +75,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
     /**
      * If true, captcha will be enabled.
      */
-    private final boolean enableCaptcha;
+    private boolean enableCaptcha;
     /**
      * If true, user will be notified of Hudson account creation.
      */
@@ -94,14 +94,18 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
      */
     @Deprecated
     public HudsonPrivateSecurityRealm(boolean allowsSignup, boolean enableCaptcha) {
-        this(allowsSignup, true, null, false);
+        this(allowsSignup, enableCaptcha, null, false);
     }
 
     @DataBoundConstructor
     public HudsonPrivateSecurityRealm(boolean allowsSignup, boolean enableCaptcha, CaptchaSupport captchaSupport, boolean notifyUser) {
         this.disableSignup = !allowsSignup;
         this.enableCaptcha = enableCaptcha;
-        setCaptchaSupport(captchaSupport);
+        if (captchaSupport != null){
+            setCaptchaSupport(captchaSupport);
+        }else{
+            this.enableCaptcha = false;
+        }
         this.notifyUser = notifyUser;
 
         if (!allowsSignup && !hasSomeUser()) {
