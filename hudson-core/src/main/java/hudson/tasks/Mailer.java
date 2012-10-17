@@ -142,7 +142,7 @@ public class Mailer extends Notifier {
         /**
          * Hudson's own URL, to put into the e-mail.
          */
-        private String hudsonUrl = "http://localhost:8080/";
+        private String hudsonUrl;
         /**
          * If non-null, use SMTP-AUTH with these information.
          */
