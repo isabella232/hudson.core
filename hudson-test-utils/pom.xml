@@ -18,12 +18,12 @@
   <parent>
     <groupId>org.eclipse.hudson</groupId>
     <artifactId>hudson-parent</artifactId>
-    <version> 3.0.0-SNAPSHOT</version>
+    <version> 3.0.0-RC4</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>hudson-test-utils</artifactId>
-  <version>3.0.0-SNAPSHOT</version>
+  <version>3.0.0-RC4</version>
   <name>Hudson :: Test Utilities</name>
 
   <description>
