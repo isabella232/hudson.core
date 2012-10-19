@@ -345,7 +345,9 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>${jetty.server.version}</version>
                 <configuration>
-                    <contextPath>${contextPath}</contextPath>
+                    <webAppConfig>
+                          <contextPath>${contextPath}</contextPath>
+                    </webAppConfig>
                     
                     <connectors>
                         <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">

@@ -31,7 +31,7 @@
         </l:header>
         <l:main-panel>
             <h1>
-                <img width="48" height="48" src="/images/48x48/network.png" alt="" style="margin-right:10px"/>
+                <img width="48" height="48" src="${imagesURL}/48x48/network.png" alt="" style="margin-right:10px"/>
                 ${%Nodes Status}
             </h1>
             <j:set var="monitors" value="${it._monitors}"/>

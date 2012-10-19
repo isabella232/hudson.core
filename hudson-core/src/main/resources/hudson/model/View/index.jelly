@@ -29,6 +29,7 @@
         <st:include page="sidepanel.jelly" />
         <l:main-panel>
             <h1>
+              <img width="48" height="48" src="${imagesURL}/48x48/job.png" alt="" style="margin-right:10px"/>
               ${%Jobs Status}
             </h1>
             <div id="view-message">

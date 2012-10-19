@@ -29,7 +29,7 @@
       <j:set var="descriptor" value="${instance.descriptor}" />
       
       <h1> 
-        <img width="48" height="48" src="/images/48x48/setting.png" alt="" style="margin-right:10px"/>
+        <img width="48" height="48" src="${imagesURL}/48x48/setting.png" alt="" style="margin-right:10px"/>
         ${%System Configurations}
       </h1>
 

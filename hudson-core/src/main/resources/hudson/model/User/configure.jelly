@@ -25,7 +25,7 @@
     <l:main-panel>
       
       <h1>
-         <img width="48" height="48" src="/images/48x48/setting.png" alt="" style="margin-right:10px"/>
+         <img width="48" height="48" src="${imagesURL}/48x48/setting.png" alt="" style="margin-right:10px"/>
          ${%User Configurations}
       </h1>
       

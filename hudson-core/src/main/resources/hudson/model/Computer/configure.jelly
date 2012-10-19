@@ -25,8 +25,8 @@
     <st:include page="sidepanel.jelly"/>
     <l:main-panel>
       <h1> 
-        <img width="48" height="48" src="/images/48x48/setting.png" alt="" style="margin-right:10px"/>
-        Node Configurations 
+        <img width="48" height="48" src="${imagesURL}/48x48/setting.png" alt="" style="margin-right:10px"/>
+        ${%Node Configurations}
       </h1>
       <f:form method="post" action="configSubmit" name="config">
         <j:set var="instance" value="${it.node}" />
