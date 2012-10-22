@@ -115,7 +115,7 @@
         }
         
         function deletingJob() {
-            window.location.href="/";
+            window.location.href="${rootURL}";
             setTimeout(function() {
                 jQuery('#confirmationDialog').dialog('close');
             }, 2000);
