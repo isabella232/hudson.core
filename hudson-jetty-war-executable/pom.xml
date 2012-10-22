@@ -19,12 +19,12 @@
     <parent>
         <groupId>org.eclipse.hudson</groupId>
         <artifactId>hudson-parent</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0-RC4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>hudson-jetty-war-executable</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0-RC4</version>
     <packaging>jar</packaging>
 
     <name>Hudson :: jetty-war-executable</name>
