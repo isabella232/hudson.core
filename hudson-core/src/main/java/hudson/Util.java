@@ -1088,7 +1088,7 @@ public class Util {
             try {
                 NativeUtils.getInstance().chmod(f, mask);
             } catch (NativeAccessException exc) {
-                LOGGER.log(Level.WARNING, "Native function chmod failed ({0}). Using Ant''s chmod task instead.", NativeUtils.getInstance().getLastUnixError());
+                LOGGER.log(Level.WARNING, "Native function chmod failed. Using Ant''s chmod task instead.");
                 _chmodAnt(f, mask);
             }
         } else {
@@ -1124,7 +1124,7 @@ public class Util {
         try {
             return NativeUtils.getInstance().resolveSymlink(link);
         } catch (NativeAccessException exc) {
-            listener.getLogger().print("Native function resolveSymlink failed " + NativeUtils.getInstance().getLastUnixError());
+            listener.getLogger().print("Native function resolveSymlink failed ");
         }
 
 

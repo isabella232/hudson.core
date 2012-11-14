@@ -1160,7 +1160,7 @@ public final class FilePath implements Serializable {
                 try {
                     mode = NativeUtils.getInstance().mode(f);
                 } catch (NativeAccessException ex) {
-                    LOGGER.log(Level.WARNING, "Native function mod failed ({0})", NativeUtils.getInstance().getLastUnixError());
+                    LOGGER.log(Level.WARNING, "Native function mod failed.");
                 }
                 return mode;
             }

@@ -109,10 +109,13 @@ final public class PluginCenter {
     public List<AvailablePluginInfo> getInstalledPlugins() {
         List<AvailablePluginInfo> installedPlugins = new ArrayList<AvailablePluginInfo>();
         Set<String> installedPluginNames = installedPluginManager.getInstalledPluginNames();
-        Set<String> availablePluginNames = updateSiteManager.getAvailablePluginNames();
-        for (String pluginName : availablePluginNames) {
+        for (String pluginName : installedPluginNames) {
             AvailablePluginInfo availablePlugin = updateSiteManager.getAvailablePlugin(pluginName);
-            if (installedPluginNames.contains(pluginName)) {
+            if (availablePlugin != null) {
+                installedPlugins.add(availablePlugin);
+            } else {
+                InstalledPluginInfo installedPluginInfo = installedPluginManager.getInstalledPlugin(pluginName);
+                availablePlugin = updateSiteManager.createAvailablePluginInfo(installedPluginInfo.getShortName(), installedPluginInfo.getVersion(), installedPluginInfo.getLongName(), installedPluginInfo.getWikiUrl());
                 installedPlugins.add(availablePlugin);
             }
         }

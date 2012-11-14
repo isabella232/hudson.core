@@ -209,6 +209,10 @@ public final class UpdateSiteManager {
         return pluginInfos;
 
     }
+    
+    AvailablePluginInfo createAvailablePluginInfo(String name, String version, String displayName, String wikiUrl){
+        return new AvailablePluginInfo(name, version, displayName, wikiUrl);
+    }
 
     public final class AvailablePluginInfo implements Comparable<AvailablePluginInfo> {
 
@@ -217,7 +221,7 @@ public final class UpdateSiteManager {
         private String downloadUrl;
         private String wikiUrl;
         private String displayName;
-        private String description;
+        private String description = "";
         private String type;
         private List<String> categories = new ArrayList<String>();
         private String requiredCore;
@@ -226,6 +230,13 @@ public final class UpdateSiteManager {
 
         public AvailablePluginInfo(JSONObject jsonObject) {
             parseJsonObject(jsonObject);
+        }
+        
+        public AvailablePluginInfo(String name, String version, String displayName, String wikiUrl){
+            this.name = name;
+            this.version = version;
+            this.displayName = displayName;
+            this.wikiUrl = wikiUrl;
         }
 
         public String getDisplayName() {
