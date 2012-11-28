@@ -137,10 +137,6 @@ final public class PluginCenter {
         }
         return updatablePlugins;
     }
-    
-    public boolean isMandatory(AvailablePluginInfo availablePlugin) {
-        return UpdateSiteManager.MANDATORY.equals(availablePlugin.getType());
-    }
 
     public boolean isInstalled(AvailablePluginInfo availablePlugin) {
         Set<String> installedPluginNames = installedPluginManager.getInstalledPluginNames();

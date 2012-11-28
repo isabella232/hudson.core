@@ -1,3 +1,18 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2012 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#  Winston Prakash
+#        
+#************************************************************************** --> 
+
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define">
     
@@ -42,21 +57,21 @@
                         </span>
                         <ul id="installList" class="setup">
                             
-                            <li class="mandatory">
+                            <li class="compatibility">
                                 <h3>
-                                    Mandatory Plugins
+                                    Core Compatibility Plugins
                                 </h3>
                                 <p class="description">
-                                    These plugins must be installed for Hudson to work properly.
+                                    These core plugins provide key extensions to Hudson to ensure maximum compatibility with a wide range of 3rd party plugins and Operating Systems function. Although these plugins are not required we <em>strongly</em> recommend that you install them to ensure maximum compatibility with the existing range of 3rd party Hudson plugins.
                                 </p>
                                 <div class="body">
                                     <div class="items-container">
                                         
-                                        <table width="100%" border="0" id="mandatoryPlugins" cellpadding="10">
-                                            <j:forEach var="p" items="${it.installableMandatoryPlugins}">
+                                        <table width="100%" border="0" id="compatibilityPlugins" cellpadding="10">
+                                            <j:forEach var="p" items="${it.installableCompatibilityPlugins}">
                                                 <tr>
                                                     <td class="column1">
-                                                        <input type="checkbox" disabled="disabled" checked="true" value="${p.name}"/>
+                                                        <input type="checkbox" checked="true" value="${p.name}"/>
                                                         <img id="${p.name}"  style="display:none;"/>
                                                     </td>
                                                     <td class="column2">
@@ -75,10 +90,10 @@
                                                     <td class="column4"></td>
                                                 </tr>
                                             </j:forEach>
-                                            <j:forEach var="p" items="${it.updatableMandatoryPlugins}">
+                                            <j:forEach var="p" items="${it.updatableCompatibilityPlugins}">
                                                 <tr>
                                                     <td class="column1">
-                                                        <input type="checkbox" disabled="disabled" checked="true" value="${p.name}"/>
+                                                        <input type="checkbox" checked="true" value="${p.name}"/>
                                                         <img id="${p.name}" style="display:none;"/>
                                                     </td>
                                                     <td class="column2">
@@ -100,7 +115,7 @@
                                                 </tr>
                                             </j:forEach>
                                           
-                                            <j:forEach var="p" items="${it.installedMandatoryPlugins}">
+                                            <j:forEach var="p" items="${it.installedCompatibilityPlugins}">
                                                 <tr>
                                                     <td class="column1">
                                                         <img src="${imagesURL}/green-check.jpg" alt=""/>
@@ -319,7 +334,7 @@
                         </ul>
                         <div>
                             <span id="infoMsg">
-                                <!-- Message injectd here-->
+                                Select the plugins and click Install to download and install the selected plugins or click Finish to start Hudson after installing the selected plugins.
                             </span> 
                             <p id="loginNeededMsg">
                                 Note: You must 
@@ -338,12 +353,6 @@
                                     <span>Installing .. </span>
                                     <img src="${imagesURL}/progressbar.gif" style="margin-bottom: -10px; margin-left: 5px;"/>
                                 </div>
-                            </div>
-                             
-                            <div>
-                                <span id="instalMandatoryMsg">
-                                    All Mandatory Plugins must be installed first. 
-                                </span>
                             </div>
                         </div>
                     </div>

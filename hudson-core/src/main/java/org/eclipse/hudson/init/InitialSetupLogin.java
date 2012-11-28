@@ -41,12 +41,8 @@ final public class InitialSetupLogin {
         return hudsonSecurityManager;
     }
 
-    public boolean canFinish() {
-        return initialSetup.canFinish();
-    }
-
     public HttpResponse doFinish() {
-        return initialSetup.doCheckFinish();
+        return initialSetup.doFinish();
     }
 
     public HttpResponse doContinue() {
@@ -55,5 +51,8 @@ final public class InitialSetupLogin {
         }
         initialSetup.getServletContext().setAttribute("app", initialSetup);
         return HttpResponses.ok();
+    }
+    public boolean needsAdminLogin() {
+        return !hudsonSecurityManager.hasPermission(Permission.HUDSON_ADMINISTER);
     }
 }

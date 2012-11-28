@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Provides support for initial setup during first run. Gives opportunity to
  * Hudson Admin to - Install mandatory, featured and recommended plugins -
- * Update mandatory, featured and recommended plugins suitable for current
+ * Update compatiblity, featured and recommended plugins suitable for current
  * Hudson - Provide Authentication if needed - Setup proxy if required
  *
  * @author Winston Prakash
@@ -73,9 +73,9 @@ final public class InitialSetup {
     private List<AvailablePluginInfo> installedFeaturedPlugins = new ArrayList<AvailablePluginInfo>();
     private List<AvailablePluginInfo> installableFeaturedPlugins = new ArrayList<AvailablePluginInfo>();
     private List<AvailablePluginInfo> updatableFeaturedPlugins = new ArrayList<AvailablePluginInfo>();
-    private List<AvailablePluginInfo> installedMandatoryPlugins = new ArrayList<AvailablePluginInfo>();
-    private List<AvailablePluginInfo> installableMandatoryPlugins = new ArrayList<AvailablePluginInfo>();
-    private List<AvailablePluginInfo> updatableMandatoryPlugins = new ArrayList<AvailablePluginInfo>();
+    private List<AvailablePluginInfo> installedCompatibilityPlugins = new ArrayList<AvailablePluginInfo>();
+    private List<AvailablePluginInfo> installableCompatibilityPlugins = new ArrayList<AvailablePluginInfo>();
+    private List<AvailablePluginInfo> updatableCompatibilityPlugins = new ArrayList<AvailablePluginInfo>();
     private ProxyConfiguration proxyConfig;
     private ExecutorService installerService = Executors.newSingleThreadExecutor(
             new DaemonThreadFactory(new ThreadFactory() {
@@ -106,12 +106,10 @@ final public class InitialSetup {
     }
 
     public boolean needsInitSetup() {
-        if (!initSetupFile.exists()) {
-            return (installableMandatoryPlugins.size() > 0) || (updatableMandatoryPlugins.size() > 0)
-                    || (installableFeaturedPlugins.size() > 0) || (updatableFeaturedPlugins.size() > 0)
-                    || (installableRecommendedPlugins.size() > 0) || (updatableRecommendedPlugins.size() > 0);
+        if (initSetupFile.exists() || Boolean.getBoolean("skipInitSetup")) {
+            return false;
         } else {
-            return !canFinish();
+            return true;
         }
     }
 
@@ -155,22 +153,22 @@ final public class InitialSetup {
         return updatableFeaturedPlugins;
     }
 
-    public List<AvailablePluginInfo> getInstallableMandatoryPlugins() {
-        return installableMandatoryPlugins;
+    public List<AvailablePluginInfo> getInstallableCompatibilityPlugins() {
+        return installableCompatibilityPlugins;
     }
 
-    public List<AvailablePluginInfo> getInstalledMandatoryPlugins() {
-        return installedMandatoryPlugins;
+    public List<AvailablePluginInfo> getInstalledCompatibilityPlugins() {
+        return installedCompatibilityPlugins;
     }
 
-    public List<AvailablePluginInfo> getUpdatableMandatoryPlugins() {
-        return updatableMandatoryPlugins;
+    public List<AvailablePluginInfo> getUpdatableCompatibilityPlugins() {
+        return updatableCompatibilityPlugins;
     }
 
     public InstalledPluginInfo getInstalled(AvailablePluginInfo plugin) {
         return installedPluginManager.getInstalledPlugin(plugin.getName());
     }
-    
+
     public List<AvailablePluginInfo> getUpdatablePlugins() {
         List<AvailablePluginInfo> updatablePlugins = new ArrayList<AvailablePluginInfo>();
         Set<String> installedPluginNames = installedPluginManager.getInstalledPluginNames();
@@ -255,19 +253,15 @@ final public class InitialSetup {
         return HttpResponses.ok();
     }
 
-    public HttpResponse doCheckFinish() {
-        if (!canFinish()) {
-            return new ErrorHttpResponse("Mandatory Plugins need to be installed first");
-        } else {
-            try {
-                initSetupFile.write("Hudson 3.0 Initial Setup Done");
-            } catch (IOException ex) {
-                logger.error(ex.getLocalizedMessage());
-            }
-            invokeHudson();
-
-            return HttpResponses.ok();
+    public HttpResponse doFinish() {
+        try {
+            initSetupFile.write("Hudson 3.0 Initial Setup Done");
+        } catch (IOException ex) {
+            logger.error(ex.getLocalizedMessage());
         }
+        invokeHudson();
+
+        return HttpResponses.ok();
     }
 
     public void invokeHudson() {
@@ -308,11 +302,6 @@ final public class InitialSetup {
         }.start();
     }
 
-    public boolean canFinish() {
-        reCheck();
-        return (getInstallableMandatoryPlugins().size() == 0) && (getUpdatableMandatoryPlugins().size() == 0);
-    }
-    
     private static class ErrorHttpResponse implements HttpResponse {
 
         private String message;
@@ -381,9 +370,9 @@ final public class InitialSetup {
         installedFeaturedPlugins.clear();
         installableFeaturedPlugins.clear();
         updatableFeaturedPlugins.clear();
-        installableMandatoryPlugins.clear();
-        installedMandatoryPlugins.clear();
-        updatableMandatoryPlugins.clear();
+        installableCompatibilityPlugins.clear();
+        installedCompatibilityPlugins.clear();
+        updatableCompatibilityPlugins.clear();
         installedPluginManager.loadInstalledPlugins();
         check();
     }
@@ -399,14 +388,14 @@ final public class InitialSetup {
             if (installedPluginNames.contains(pluginName)) {
                 //Installed
                 InstalledPluginInfo installedPlugin = installedPluginManager.getInstalledPlugin(pluginName);
-                if (availablePlugin.getType().equals(UpdateSiteManager.MANDATORY)) {
-                    //Installed Mandatory Plugin
+                if (availablePlugin.getType().equals(UpdateSiteManager.COMPATIBILITY)) {
+                    //Installed Compatibility Plugin
                     if (isNewerThan(availablePlugin.getVersion(), installedPlugin.getVersion())) {
-                        //Updatabale Mandatory Plugin update needed
-                        updatableMandatoryPlugins.add(availablePlugin);
+                        //Updatabale Compatibility Plugin update needed
+                        updatableCompatibilityPlugins.add(availablePlugin);
                     } else {
-                        //Installed Mandatory Plugin. No updates available
-                        installedMandatoryPlugins.add(availablePlugin);
+                        //Installed Compatibility Plugin. No updates available
+                        installedCompatibilityPlugins.add(availablePlugin);
                     }
                 } else if (availablePlugin.getType().equals(UpdateSiteManager.FEATURED)) {
                     if (isNewerThan(availablePlugin.getVersion(), installedPlugin.getVersion())) {
@@ -428,9 +417,9 @@ final public class InitialSetup {
 
             } else {
                 //Not installed
-                if (availablePlugin.getType().equals(UpdateSiteManager.MANDATORY)) {
+                if (availablePlugin.getType().equals(UpdateSiteManager.COMPATIBILITY)) {
                     //Mandatory Plugin. Need to be installed
-                    installableMandatoryPlugins.add(availablePlugin);
+                    installableCompatibilityPlugins.add(availablePlugin);
                 }
                 if (availablePlugin.getType().equals(UpdateSiteManager.FEATURED)) {
                     //Featured Plugin. Available for installation
@@ -469,18 +458,18 @@ final public class InitialSetup {
 
         return deps;
     }
-    
+
     protected void refreshUpdateCenterMetadataCache() throws IOException {
-        
-        try{
+
+        try {
             updateSiteManager.refreshFromUpdateSite();
             return;
-        }catch(Exception exc){
+        } catch (Exception exc) {
             proxyNeeded = true;
             logger.info("Could not fetch update center metadata from " + updateSiteManager.getUpdateSiteUrl() + ". Using bundled update center metadata.");
         }
-                
-                
+
+
         URL updateCenterJsonUrl = servletContext.getResource("/WEB-INF/update-center.json");
         if (updateCenterJsonUrl != null) {
             long lastModified = updateCenterJsonUrl.openConnection().getLastModified();

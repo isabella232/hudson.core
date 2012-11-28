@@ -24,18 +24,7 @@ var finish = false;
 var forProxy = false;
 var forInstall = false;
 var forContinue = false;
-var canContinue = false;
-
-var mandatoryMsg = "The Mandatory Plugins are needed and cannot be deselected. " +
-"Select the featured or recommended plugins and click install " +
-"to download and install the plugins or Finish " +
-"to start Hudson after installing the plugins.";
-               
-var recommendedMsg = "All Mandatory Plugins are installed. " +
-"Select the featured or recommended plugins and click install " +
-"to download and install the plugins or Finish to start Hudson " +
-"after installing the plugins.";
-        
+                   
 function installPlugin(selected){
     jQuery('#errorMessage').hide();
     jQuery(selected).hide();
@@ -54,9 +43,8 @@ function installPlugin(selected){
             installCount--;
             if (installCount == 0){
                 if (finish == true){
-                    checkFinish();
+                    doFinish();
                 }
-                showInfoMsg();
                 jQuery("#buttonBar").show();
                 jQuery("#installProgress").hide();
             }
@@ -79,15 +67,7 @@ function installPlugin(selected){
         dataType: "html"
     }); 
 }
-        
-        
-function showInfoMsg(){ 
-    if (jQuery('#mandatoryPlugins input[@type=checkbox]:checked').length > 0){
-        showMessage(jQuery('#infoMsg'), mandatoryMsg, "black");
-    }else{
-        showMessage(jQuery('#infoMsg'), recommendedMsg, "black");
-    }
-}
+    
         
 function checkPermissionAndinstallPlugins(){
     if (needsAdminLogin == true) {
@@ -116,7 +96,7 @@ function installSelectedPlugins(){
         
 function getInstallables(){
     var installables = [];
-    jQuery('#mandatoryPlugins input[@type=checkbox]:checked').each(function(){
+    jQuery('#compatibilityPlugins input[@type=checkbox]:checked').each(function(){
         installables.push(this);
     });
     jQuery('#featuredPlugins input[@type=checkbox]:checked').each(function(){
@@ -212,16 +192,17 @@ function submitLoginForm(){
     }); 
 }
         
-function checkFinish(){
+function doFinish(){
              
     jQuery.ajax({
         type: 'GET',
-        url: "checkFinish",
+        url: "finish",
         success: function(){
             window.location.href=".";
         },
         error: function(){
-            jQuery('#instalMandatoryMsg').show();
+            icon.attr('src',imageRoot + '/error.png');
+            showMessage(jQuery('#infoMsg'), msg.responseText, "red");
         },
         dataType: "html"
     }); 
@@ -310,7 +291,7 @@ jQuery(document).ready(function() {
             finish = true;
             checkPermissionAndinstallPlugins();
         }else{
-            checkFinish(); 
+            doFinish(); 
         }
     });
     
@@ -338,7 +319,6 @@ jQuery(document).ready(function() {
      
     jQuery('#continueButton').button();
     jQuery('#continueButton').click(function() {
-        canContinue = true;
         if (securitySet == true) {
             if (loggedIn == false){
                 forContinue = true;
@@ -346,6 +326,8 @@ jQuery(document).ready(function() {
             } else {
                 doContinue("continue");
             }
+        }else{
+            doContinue("continue");
         }
     });
     
@@ -354,14 +336,8 @@ jQuery(document).ready(function() {
         doContinue("finish")
     });
             
-    if (canFinish == true){
-        jQuery('#fpFinishButton').show();
-        jQuery('#fpRecommendedMsg').show();
-        jQuery('#fpMandatoryMsg').hide();
-    }else{
-        jQuery('#fpMandatoryMsg').show();
-        jQuery('#fpFinishButton').hide();
-    }
+    jQuery('#fpFinishButton').show();
+    jQuery('#fpInstallMsg').show();
             
     refreshProxyUser();
 });

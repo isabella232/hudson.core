@@ -48,6 +48,7 @@ public class JettyLauncher {
         String updateServer = null;
 
         boolean disableUpdateCenterSwitch = false;
+        boolean skipInitSetup = false;
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("--httpPort=")) {
@@ -80,8 +81,12 @@ public class JettyLauncher {
                 updateServer = args[i].substring("--updateServer=".length());
             }
 
-            if (args[i].startsWith("--disableUpdateCenterSwitch=")) {
+            if (args[i].startsWith("--disableUpdateCenterSwitch")) {
                 disableUpdateCenterSwitch = true;
+            }
+            
+            if (args[i].startsWith("--skipInitSetup")) {
+                skipInitSetup = true;
             }
         }
 
@@ -135,6 +140,10 @@ public class JettyLauncher {
 
         if (disableUpdateCenterSwitch) {
             System.setProperty("hudson.pluginManager.disableUpdateCenterSwitch", "true");
+        }
+        
+        if (skipInitSetup) {
+            System.setProperty("skipInitSetup", "true");
         }
 
         server.setHandler(context);

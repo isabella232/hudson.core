@@ -1,3 +1,18 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2012 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#  Winston Prakash
+#        
+#************************************************************************** --> 
+
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
     
@@ -367,33 +382,26 @@
                                                         ${it.getInstalled(p).version}  
                                                     </td>
                                                     <td class="column4">
-                                                        <j:if test="${!it.isMandatory(p)}">
-                                                            <span style="font-size:10px" class="actionsColumn">
-                                                                <j:if test="${it.getInstalled(p).isEnabled()}">
-                                                                    <button class="enable" value="${p.name}">Disable</button>
-                                                                </j:if> 
+                                                        <span style="font-size:10px" class="actionsColumn">
+                                                            <j:if test="${it.getInstalled(p).isEnabled()}">
+                                                                <button class="enable" value="${p.name}">Disable</button>
+                                                            </j:if> 
                                                       
-                                                                <j:if test="${!it.getInstalled(p).isEnabled()}">
-                                                                    <button class="enable" value="${p.name}">Enable</button>
-                                                                </j:if>
-                                                                <j:if test="${it.getInstalled(p).isDowngrdable()}">
-                                                                    <button class="downgrade" style="margin-top: 3px; margin-bottom: 3px;" value="${p.name}" >Downgrade to ${it.getInstalled(p).backupVersion} </button>
-                                                                </j:if>
-                                                                <j:if test="${it.getInstalled(p).isPinned()}">
-                                                                    <span>
-                                                                        <button class="unpin" style="margin-right: 3px;" value="${p.name}">Unpin</button>
-                                                                        <a href="http://wiki.hudson-ci.org/display/HUDSON/Pinned+Plugins" target="_blank"> 
-                                                                            <img src="${imagesURL}/16x16/help.png"/>
-                                                                        </a>
-                                                                    </span>
-                                                                </j:if>
-                                                            </span>
-                                                        </j:if>
-                                                        <j:if test="${it.isMandatory(p)}">
-                                                            <span style="font-size:10px" class="actionsColumn">
-                                                                Mandatory Plugin
-                                                            </span>
-                                                        </j:if>
+                                                            <j:if test="${!it.getInstalled(p).isEnabled()}">
+                                                                <button class="enable" value="${p.name}">Enable</button>
+                                                            </j:if>
+                                                            <j:if test="${it.getInstalled(p).isDowngrdable()}">
+                                                                <button class="downgrade" style="margin-top: 3px; margin-bottom: 3px;" value="${p.name}" >Downgrade to ${it.getInstalled(p).backupVersion} </button>
+                                                            </j:if>
+                                                            <j:if test="${it.getInstalled(p).isPinned()}">
+                                                                <span>
+                                                                    <button class="unpin" style="margin-right: 3px;" value="${p.name}">Unpin</button>
+                                                                    <a href="http://wiki.hudson-ci.org/display/HUDSON/Pinned+Plugins" target="_blank"> 
+                                                                        <img src="${imagesURL}/16x16/help.png"/>
+                                                                    </a>
+                                                                </span>
+                                                            </j:if>
+                                                        </span>
                                                     </td>
                                                 </tr>
                                             </j:forEach>

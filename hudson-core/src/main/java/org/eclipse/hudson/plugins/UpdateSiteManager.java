@@ -38,7 +38,7 @@ import org.apache.commons.io.IOUtils;
  */
 public final class UpdateSiteManager {
 
-    public static final String MANDATORY = "mandatory";
+    public static final String COMPATIBILITY = "compatibility";
     public static final String FEATURED = "featured";
     public static final String RECOMMENDED = "recommended";
     private Map<String, AvailablePluginInfo> availablePluginInfos = new TreeMap<String, AvailablePluginInfo>(String.CASE_INSENSITIVE_ORDER);
