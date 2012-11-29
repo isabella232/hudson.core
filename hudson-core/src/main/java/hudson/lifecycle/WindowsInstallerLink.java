@@ -103,10 +103,14 @@ public class WindowsInstallerLink extends ManagementLink {
                 sendError(".NET Framework 2.0 or later is required for this feature", req, rsp);
             }
         } catch (NativeAccessException exc) {
-            StringWriter stWriter = new StringWriter();
-            PrintWriter writer = new PrintWriter(stWriter);
-            exc.printStackTrace(writer);
-            sendError("Native function isDotNetInstalled() failed. " + stWriter.toString(), req, rsp);
+            if (exc.getMessage().contains("Native Windows Support plugin not installed")) {
+                sendError("Java Native Access support plugin is not installed. It is required to create Windows Service", req, rsp);
+            } else {
+                StringWriter stWriter = new StringWriter();
+                PrintWriter writer = new PrintWriter(stWriter);
+                exc.printStackTrace(writer);
+                sendError("Native Windows function isDotNetInstalled() failed. " + stWriter.toString(), req, rsp);
+            }
         }
 
 
