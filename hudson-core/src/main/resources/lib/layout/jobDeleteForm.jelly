@@ -115,7 +115,12 @@
         }
         
         function deletingJob() {
-            window.location.href="${rootURL}";
+            var gotoUrl = "${rootURL}";
+            if (gotoUrl === ""){
+              window.location.href="/";
+            }else{
+              window.location.href = gotoUrl;
+            }
             setTimeout(function() {
                 jQuery('#confirmationDialog').dialog('close');
             }, 2000);
