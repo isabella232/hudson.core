@@ -106,10 +106,19 @@ final public class InitialSetup {
     }
 
     public boolean needsInitSetup() {
-        if (initSetupFile.exists() || Boolean.getBoolean("skipInitSetup")) {
+        if (initSetupFile.exists()) {
             return false;
         } else {
-            return true;
+            if (Boolean.getBoolean("skipInitSetup")) {
+                try {
+                    initSetupFile.write("Hudson 3.0 Initial Setup Done");
+                } catch (IOException ex) {
+                    logger.error(ex.getLocalizedMessage());
+                }
+                return false;
+            } else {
+                return true;
+            }
         }
     }
 
