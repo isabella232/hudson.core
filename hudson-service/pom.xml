@@ -19,12 +19,12 @@
   <parent>
     <groupId>org.eclipse.hudson</groupId>
     <artifactId>hudson-parent</artifactId>
-    <version> 3.0.0-SNAPSHOT</version>
+    <version> 3.0.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>hudson-service</artifactId>
-  <version>3.0.0-SNAPSHOT</version>
+  <version>3.0.0</version>
   <name>Hudson :: Service</name>
 
   <dependencies>
