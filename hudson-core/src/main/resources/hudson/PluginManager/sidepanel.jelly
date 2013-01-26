@@ -23,7 +23,7 @@
   <l:header />
   <l:side-panel>
     <l:tasks>
-      <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Dashboard}" />
+      <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Main Dashboard}" />
       <j:if test="${!empty(app.updateCenter.jobs)}">
         <l:task icon="images/32x32/plugin.png" href="${rootURL}/updateCenter/" title="${%Update Center}" />
       </j:if>

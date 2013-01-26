@@ -25,7 +25,7 @@
 	</l:header>
 	<l:side-panel>
 	  <l:tasks>
-	    <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Dashboard}" />
+	    <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Main Dashboard}" />
 	    <l:task icon="images/24x24/search.png" href="." title="${%Status}" />
 	    <l:isAdmin>
 	      <l:taskWithDialog icon="images/24x24/edit-delete.png" dialogPanel="deleteConfirmationPanel.jelly" href="delete" title="${%Delete Job}" onclick="onDeleteClick(); return false;"/>

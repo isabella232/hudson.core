@@ -27,8 +27,12 @@
 
             <l:main-panel>
                 <table style="padding-left: 2em;"  >
-                    <h1>${%Script Console}</h1>
-                        <h4>No script support plugins installed.</h4>
+                    <h1>
+                       <img width="48" height="48" src="${imagesURL}/48x48/notepad.png" alt="" style="margin-right:10px"/>
+                       ${%Script Console}
+                    </h1>
+                    <br/>
+                    <h4>No script support plugins installed.</h4>
                 </table>
             </l:main-panel>
         </l:layout>

@@ -16,7 +16,7 @@
 
 
 <!--
-  This view is used to render the project change list like /job/<jobname>/changes
+  This view is used to render the job change list like /job/<jobname>/changes
 
   While this default implementation can work with any SCM,
   subclass may provide diffent implementation to present implementation-specific

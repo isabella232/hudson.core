@@ -28,11 +28,11 @@
         ${%For this feature to work, the following conditions need to be met:}
       </p>
       <ol>
-        <li>${%The upstream project records the fingerprints of its build artifacts}</li>
-        <li>${%The downstream project records the fingerprints of the upstream files it uses}</li>
+        <li>${%The upstream job records the fingerprints of its build artifacts}</li>
+        <li>${%The downstream job records the fingerprints of the upstream files it uses}</li>
       </ol>
       <p>
-        ${%This allows Hudson to correlate two projects.}
+        ${%This allows Hudson to correlate two jobs.}
       </p>
       <p>
         ${%Upstream note}

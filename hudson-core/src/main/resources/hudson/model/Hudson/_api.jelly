@@ -21,7 +21,7 @@
   <p>
     To create a new job, post <tt>config.xml</tt> to <a href="../createItem">this URL</a> with
     query parameter <tt>name=<i>JOBNAME</i></tt>. You'll get 200 status code if the creation is successful,
-    or 4xx/5xx code if it fails. <tt>config.xml</tt> is the format Hudson uses to store the project
+    or 4xx/5xx code if it fails. <tt>config.xml</tt> is the format Hudson uses to store the job
     in the file system, so you can see examples of them in <tt>${app.rootDir}</tt>.
   </p>
 

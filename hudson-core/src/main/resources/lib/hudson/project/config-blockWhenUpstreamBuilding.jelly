@@ -22,7 +22,7 @@
          value="${cu.getBooleanProjectProperty(it, it.BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME)}"/>
   <j:set var="blockBuildWhenUpstreamBuilding" value="${blockBuildWhenUpstreamBuildingProperty.getValue()}"/>
   <f:optionalBlock name="blockBuildWhenUpstreamBuilding"
-		   title="${%Block build when upstream project is building}"
+		   title="${%Block build when upstream job is building}"
 		   help="/help/project-config/block-upstream-building.html"
 		   checked="${blockBuildWhenUpstreamBuilding}"
        resetUrl="${jobUrl}/resetProjectProperty?propertyName=${it.BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME}"

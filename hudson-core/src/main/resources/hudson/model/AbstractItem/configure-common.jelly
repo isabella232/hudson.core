@@ -16,7 +16,7 @@
 
 
 <!--
-  Parts of the configuration that applies to Project and MavenModuleSet.
+  Parts of the configuration that applies to Job and MavenModuleSet.
 -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
@@ -36,7 +36,7 @@
     <j:if test="${jdks.size() gt 1}">
         <!-- if there's only one JDK configured, always use that. -->
         <f:entry title="JDK"
-                 description="${%JDK to be used for this project}"
+                 description="${%JDK to be used for this Job}"
                  isPropertyOverridden="${cu.getStringProjectProperty(it, it.JDK_PROPERTY_NAME).isOverridden()}">
             <select class="setting-input validated" name="jdk"
                     checkUrl="'${rootURL}/defaultJDKCheck?value='+this.value">
@@ -52,7 +52,7 @@
     <j:set var="nodeChooserProperty" value="${cu.getBaseProjectProperty(it, it.APPOINTED_NODE_PROPERTY_NAME)}"/>
     <j:set var="isNodeOverridden" value="${nodeChooserProperty.isOverridden()}" />
     <j:if test="${app.labels.size() gt 1 || app.clouds.size() gt 0 || (it.assignedLabel!=null and it.assignedLabel!=app.selfLabel)}">
-        <f:optionalBlock name="${it.APPOINTED_NODE_PROPERTY_NAME}" title="${%Restrict where this project can be run}"
+        <f:optionalBlock name="${it.APPOINTED_NODE_PROPERTY_NAME}" title="${%Restrict where this job can be run}"
                          checked="${it.assignedLabel!=null}"
                          isPropertyOverridden="${isNodeOverridden}"
                          resetUrl="${jobUrl}/resetProjectProperty?propertyName=${it.APPOINTED_NODE_PROPERTY_NAME}"
@@ -83,7 +83,7 @@
         </f:optionalBlock>
     </j:if>
 
-    <f:section title="${%Advanced Project Options configure-common}">
+    <f:section title="${%Advanced Job Options configure-common}">
         <f:advanced>
             <p:config-quietPeriod/>
             <p:config-retryCount/>

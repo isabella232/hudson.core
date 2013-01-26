@@ -25,19 +25,19 @@
       <j:choose>
         <j:when test="${it.lastBuild==null}">
           <p>
-            ${%A project won't have any workspace until at least one build is performed.}
+            ${%A job won't have any workspace until at least one build is performed.}
           </p>
         </j:when>
         <j:otherwise>
           <p>
-            ${%There's no workspace for this project. Possible reasons are:}
+            ${%There's no workspace for this job. Possible reasons are:}
           </p>
           <ol>
             <li>
-              ${%The project was renamed recently and no build was done under the new name.}
+              ${%The job was renamed recently and no build was done under the new name.}
             </li>
             <li>
-              ${%The slave this project has run on for the last time was removed.}
+              ${%The slave this job has run on for the last time was removed.}
             </li>
             <li>
               ${%li3(it.workspace.local)}

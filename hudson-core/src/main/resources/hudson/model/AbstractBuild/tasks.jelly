@@ -20,7 +20,7 @@
 -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-      <l:task icon="images/24x24/up.png" href="${it.upUrl}" title="${%Back to Project}" />
+      <l:task icon="images/24x24/up.png" href="${it.upUrl}" title="${%Back to Job Dashboard}" />
       <l:task icon="images/24x24/search.png" href="${buildUrl.baseUrl}/" title="${%Status}" />
       <l:task icon="images/24x24/notepad.png" href="${buildUrl.baseUrl}/changes" title="${%Changes}" />
       <j:if test="${it.project.buildable}">

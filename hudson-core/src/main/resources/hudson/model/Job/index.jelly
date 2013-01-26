@@ -28,7 +28,7 @@
               <j:when test="${it.disabled}">
                 <div class="warning">
                   <form method="post" action="enable">
-                    ${%This project is currently disabled}
+                    ${%This job is currently disabled}
                     <l:hasPermission permission="${it.CONFIGURE}">
                       <f:submit value="${%Enable}" />
                     </l:hasPermission>
@@ -39,7 +39,7 @@
                  <div style="padding:5px" align="right">
                   <form method="post" action="disable">
                     <l:hasPermission permission="${it.CONFIGURE}">
-                      <f:submit value="${%Disable Project}" />
+                      <f:submit value="${%Disable job}" />
                     </l:hasPermission>
                   </form>
                   </div>

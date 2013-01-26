@@ -37,7 +37,7 @@
         </j:forEach>
       </div>
 
-      <h2>${%Projects}</h2>
+      <h2>${%Jobs}</h2>
       <j:set var="jobs" value="${it.tiedJobs}" />
       <j:choose>
         <j:when test="${empty(jobs)}">

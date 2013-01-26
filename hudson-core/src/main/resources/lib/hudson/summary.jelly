@@ -18,7 +18,7 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <st:documentation>
-    Displays a link with a large icon. Used in the project top page.
+    Displays a link with a large icon. Used in the job top page.
 
     <st:attribute name="icon" use="required">
       link to the icon image. relative paths will be resolved against images/48x48,

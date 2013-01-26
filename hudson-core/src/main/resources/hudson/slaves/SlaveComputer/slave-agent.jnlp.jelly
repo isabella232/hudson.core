@@ -31,7 +31,7 @@
 
       <information>
         <title>Slave Agent for ${it.displayName}</title>
-        <vendor>Hudson project</vendor>
+        <vendor>Hudson job</vendor>
         <homepage href="https://hudson-ci.org/"/>
       </information>
 

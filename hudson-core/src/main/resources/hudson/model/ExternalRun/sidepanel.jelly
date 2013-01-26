@@ -23,7 +23,7 @@
   <l:header title="${it.fullDisplayName}" />
   <l:side-panel>
     <l:tasks>
-      <l:task icon="images/24x24/up.png" href="${rootURL}/${it.parent.url}" title="${%Back to Job}" />
+      <l:task icon="images/24x24/up.png" href="${rootURL}/${it.parent.url}" title="${%Back to Job Dashboard}" />
       <l:task icon="images/24x24/terminal.png" href="." title="${%Console Output}" />
       <j:if test="${(!h.isArtifactsPermissionEnabled() or h.isArtifactsPermissionEnabled() and h.hasPermission(it,attrs.permission)) and it.hasArtifacts}">
         <l:task icon="images/24x24/package.png" href="artifacts-index" title="${%Artifacts}" />

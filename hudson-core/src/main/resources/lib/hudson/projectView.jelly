@@ -51,7 +51,7 @@
         <j:if test="${!empty(jobs) or !empty(attrs.views)}">
             <!-- the caller can inject a tab bar here -->
             <d:invokeBody/>
-            <!-- project list -->
+            <!-- Job list -->
             <div id="projectStatusDiv">
                 <table id="projectstatus" class="sortable pane bigtable"
                        style="margin:0px; border: 0px">

@@ -16,25 +16,25 @@
 
 
 <!--
-  Displays two projects side by side and show their relationship
+  Displays two jobs side by side and show their relationship
 -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <l:layout norefresh="true">
     <st:include page="sidepanel.jelly" />
     <l:main-panel>
-      <h1><img src="${imagesURL}/48x48/search.png" alt=""/>${%Project Relationship}</h1>
+      <h1><img src="${imagesURL}/48x48/search.png" alt=""/>${%Job Relationship}</h1>
       <form action="projectRelationship" method="get">
         <table width="100%">
           <tr>
             <j:set var="names" value="${app.jobNames}" />
             <td style="text-align:right;">
-              ${%upstream project}:
+              ${%upstream job}:
               <f:editableComboBox id="lhs" name="lhs" value="${request.getParameter('lhs')}" items="${names}" />
             </td>
             <td style="width:32px; text-align:center;"><img src="${imagesURL}/24x24/next.png" alt="->"/></td>
             <td>
-              ${%downstream project}:
+              ${%downstream job}:
               <f:editableComboBox id="rhs" name="rhs" value="${request.getParameter('rhs')}" items="${names}" />
             </td>
           </tr>
@@ -52,19 +52,19 @@
             <j:choose>
               <j:when test="${jl==null}">
                 <tr><td colspan="3" class="error">
-                  No such project '${request.getParameter('lhs')}'
+                  No such job '${request.getParameter('lhs')}'
                 </td></tr>
               </j:when>
               <j:when test="${jr==null}">
                 <tr><td colspan="3" class="error">
-                  No such project '${request.getParameter('rhs')}'
+                  No such job '${request.getParameter('rhs')}'
                 </td></tr>
               </j:when>
               <j:otherwise>
                 <j:set var="relation" value="${jl.getRelationship(jr)}"/>
                 <j:if test="${empty(relation)}">
                   <tr><td colspan="3" class="error">
-                    ${%There are no fingerprint records that connect these two projects.}
+                    ${%There are no fingerprint records that connect these two jobs.}
                   </td></tr>
                 </j:if>
                 <j:forEach var="e" items="${relation}">

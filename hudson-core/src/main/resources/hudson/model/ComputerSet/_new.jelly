@@ -24,6 +24,10 @@
   <l:layout norefresh="true" permission="${app.ADMINISTER}">
     <st:include page="sidepanel.jelly"/>
     <l:main-panel>
+      <h1>
+         <img width="48" height="48" src="${imagesURL}/48x48/setting.png" alt="" style="margin-right:10px"/>
+         ${%Node Configurations}
+      </h1>
       <f:form method="post" action="doCreateItem">
         <f:entry title="${%Name}" help="/help/system-config/master-slave/name.html">
           <f:textbox name="name" value="${request.getParameter('name')}" clazz="required" checkMessage="${%Name is mandatory}"/>

@@ -16,7 +16,7 @@
 
 
 <!--
-  Display upstream/downstream projects
+  Display upstream/downstream jobs
 -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:local="local">
@@ -47,6 +47,6 @@
     </d:tag>
   </d:taglib>
 
-  <local:list title="${%Upstream Projects}" items="${it.upstreamProjects}" up="true" />
-  <local:list title="${%Downstream Projects}" items="${it.downstreamProjects}" up="false" />
+  <local:list title="${%Upstream Jobs}" items="${it.upstreamProjects}" up="true" />
+  <local:list title="${%Downstream Jobs}" items="${it.downstreamProjects}" up="false" />
 </j:jelly>

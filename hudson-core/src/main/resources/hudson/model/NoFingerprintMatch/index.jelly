@@ -22,7 +22,7 @@
     <l:header title="${%No matching record found}" />
     <l:side-panel>
       <l:tasks>
-        <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Dashboard}" />
+        <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Main Dashboard}" />
       </l:tasks>
     </l:side-panel>
     <l:main-panel>

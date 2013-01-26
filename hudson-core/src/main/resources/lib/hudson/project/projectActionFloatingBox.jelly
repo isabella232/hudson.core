@@ -16,7 +16,7 @@
 
 
 <!--
-  Used in the index page to show floating boxes contributed from project actions.
+  Used in the index page to show floating boxes contributed from job actions.
 -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">

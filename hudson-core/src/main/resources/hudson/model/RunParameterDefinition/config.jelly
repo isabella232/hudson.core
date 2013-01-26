@@ -22,7 +22,7 @@
 	<f:entry title="${%Name}" help="/help/parameter/name.html">
 		<f:textbox name="parameter.name" value="${instance.name}" />
 	</f:entry>
-	<f:entry title="${%Project}" help="/help/parameter/run-project.html">
+	<f:entry title="${%Job}" help="/help/parameter/run-project.html">
         <select name="parameter.projectName">
           <j:forEach var="project" items="${app.items}">
             <f:option selected="${instance.project==project}">${project.displayName}</f:option>

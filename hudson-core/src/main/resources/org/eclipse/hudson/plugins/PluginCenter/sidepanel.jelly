@@ -22,7 +22,7 @@
   <l:header />
   <l:side-panel>
     <l:tasks>
-      <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Dashboard}" />
+      <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Main Dashboard}" />
        
       <l:task icon="images/24x24/new-package.png" href="${rootURL}/${it.viewUrl}newJob" title="${%New Job}" permission="${it.itemCreatePermission}" it="${app}" />
       <l:task icon="images/24x24/setting.png" href="${rootURL}/manage" title="${%Manage Hudson}" permission="${app.ADMINISTER}" it="${app}" />
@@ -34,16 +34,16 @@
           <l:task icon="images/24x24/user.png" href="${rootURL}/${it.viewUrl}people/" title="${%People}" />
         </j:when>
       </j:choose>
-      <l:task icon="images/24x24/notepad.png" href="${rootURL}/${it.url}builds" title="${%Build History}"/>
+      <l:task icon="images/24x24/graph.png" href="${rootURL}/${it.url}builds" title="${%Build History}"/>
       <j:if test="${it.isEditable()}">
         <!-- /configure URL on Hudson object is overloaded with Hudson's system config, so always use the explicit name. -->
-        <l:task icon="images/24x24/gear.png" href="${rootURL}/${it.viewUrl}configure" title="${%Edit View}" permission="${it.CONFIGURE}" />
+        <l:task icon="images/24x24/gear.png" href="${rootURL}/${it.viewUrl}configure" title="${%Configure View}" permission="${it.CONFIGURE}" />
       </j:if>
       <j:if test="${it.owner.canDelete(it)}">
         <l:taskWithDialog icon="images/24x24/edit-delete.png" dialogPanel="deleteConfirmationPanel.jelly" href="delete" title="${%Delete View}" permission="${it.DELETE}" />
       </j:if>
       <j:if test="${app.fingerprintMap.ready}">
-        <l:task icon="images/24x24/search.png" href="${rootURL}/projectRelationship" title="${%Project Relationship}" />
+        <l:task icon="images/24x24/search.png" href="${rootURL}/projectRelationship" title="${%Job Relationship}" />
         <l:task icon="images/24x24/fingerprint.png" href="${rootURL}/fingerprintCheck" title="${%Check File Fingerprint}" />
       </j:if>
 

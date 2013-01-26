@@ -24,7 +24,7 @@
   <p:config-disableBuild/>
   <j:set var="jobUrl" value="${h.getNearestAncestorUrl(request,it)}"/>
 
-  <f:section title="${%Advanced Project Options}">
+  <f:section title="${%Advanced Job Options}">
     <f:advanced>
       <p:config-quietPeriod />
       <p:config-retryCount />

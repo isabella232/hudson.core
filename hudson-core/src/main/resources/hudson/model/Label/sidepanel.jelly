@@ -23,7 +23,7 @@
   <l:header title="Label ${it.displayName}" />
   <l:side-panel>
     <l:tasks>
-      <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Dashboard}" />
+      <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Main Dashboard}" />
       <l:task icon="images/24x24/computer.png" href="." title="${%Overview}" />
       <l:task icon="images/24x24/monitor.png" href="load-statistics" title="${%Load Statistics}" />
       <st:include page="actions.jelly" />

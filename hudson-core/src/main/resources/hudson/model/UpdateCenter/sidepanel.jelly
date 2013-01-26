@@ -23,7 +23,7 @@
   <l:header />
   <l:side-panel>
     <l:tasks>
-      <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Dashboard}" />
+      <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Main Dashboard}" />
       <l:isAdmin>
         <l:task icon="images/32x32/plugin.png" href="${rootURL}/pluginManager/" title="${%Manage Plugins}" />
       </l:isAdmin>
