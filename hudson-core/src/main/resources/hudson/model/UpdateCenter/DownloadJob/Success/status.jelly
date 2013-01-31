@@ -9,13 +9,18 @@
 #
 # Contributors: 
 #
-#    Kohsuke Kawaguchi
+#    Kohsuke Kawaguchi, Winston Prakash
 #        
-#
 #************************************************************************** --> 
 
 
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  <img src="${imagesURL}/24x24/blue.png" alt=""/> ${%Success}
+  <j:if test="${app.useBlueBall()}">
+      <img src="${imagesURL}/24x24/blue.png" alt=""/>
+  </j:if>
+  <j:if test="${!app.useBlueBall()}">
+      <img src="${imagesURL}/24x24/green.png" alt=""/>
+  </j:if> 
+  ${%Success}
 </j:jelly>

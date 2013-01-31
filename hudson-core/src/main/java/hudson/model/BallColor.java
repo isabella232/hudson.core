@@ -9,7 +9,7 @@
  *
  * Contributors:
  * 
- *    Kohsuke Kawaguchi, Simon Wiest
+ *    Kohsuke Kawaguchi, Winston Prakash, Simon Wiest
  *
  *
  *******************************************************************************/ 
@@ -48,6 +48,8 @@ public enum BallColor implements StatusIcon {
     RED_ANIME("red_anime", Messages._BallColor_InProgress(), ColorPalette.RED),
     YELLOW("yellow", Messages._BallColor_Unstable(), ColorPalette.YELLOW),
     YELLOW_ANIME("yellow_anime", Messages._BallColor_InProgress(), ColorPalette.YELLOW),
+    GREEN("green", Messages._BallColor_Success(), ColorPalette.GREEN),
+    GREEN_ANIME("green_anime", Messages._BallColor_InProgress(), ColorPalette.GREEN),
     BLUE("blue", Messages._BallColor_Success(), ColorPalette.BLUE),
     BLUE_ANIME("blue_anime", Messages._BallColor_InProgress(), ColorPalette.BLUE),
     // for historical reasons they are called grey.
@@ -61,6 +63,8 @@ public enum BallColor implements StatusIcon {
     private final String image;
     private final Color baseColor;
 
+    // Historically Hudson was using blue ball instead of green
+    // If user sets the option to use blue then blue ball is used instead of green
     BallColor(String image, Localizable description, Color baseColor) {
         this.baseColor = baseColor;
         // name() is not usable in the constructor, so I have to repeat the name twice
@@ -73,11 +77,21 @@ public enum BallColor implements StatusIcon {
      * String like "red.png" that represents the file name of the image.
      */
     public String getImage() {
-        return image;
+        if (Hudson.getInstance().useBlueBall()) {
+            return image.replaceAll("green", "blue");
+        } else {
+            return image;
+        }
     }
 
+    @Override
     public String getImageOf(String size) {
-        return Stapler.getCurrentRequest().getContextPath() + Hudson.RESOURCE_PATH + "/images/" + size + '/' + image;
+        if (Hudson.getInstance().useBlueBall()) {
+            String blueImage = image.replaceAll("green", "blue");
+            return Stapler.getCurrentRequest().getContextPath() + Hudson.RESOURCE_PATH + "/images/" + size + '/' + blueImage;
+        } else {
+            return Stapler.getCurrentRequest().getContextPath() + Hudson.RESOURCE_PATH + "/images/" + size + '/' + image;
+        }
     }
 
     /**
@@ -85,6 +99,7 @@ public enum BallColor implements StatusIcon {
      *
      * @alt.
      */
+    @Override
     public String getDescription() {
         return description.toString(LocaleProvider.getLocale());
     }

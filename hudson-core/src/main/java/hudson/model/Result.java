@@ -33,14 +33,14 @@ import java.util.List;
 /**
  * The build outcome.
  *
- * @author Kohsuke Kawaguchi
+ * @author Kohsuke Kawaguchi, Winston Prakash
  */
-public final class Result implements Serializable, CustomExportedBean {
+public class Result implements Serializable, CustomExportedBean {
 
     /**
      * The build had no errors.
      */
-    public static final Result SUCCESS = new Result("SUCCESS", BallColor.BLUE, 0);
+    public static final Result SUCCESS = new Result("SUCCESS", BallColor.GREEN, 0);
     /**
      * The build had some errors but they were not fatal. For example, some
      * tests failed.

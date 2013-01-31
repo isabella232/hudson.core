@@ -111,6 +111,10 @@
       <f:optionalBlock name="usageStatisticsCollected" checked="${it.usageStatisticsCollected}"
                        title="${%statsBlurb}"
                        help="/help/system-config/usage-statistics.html" />
+      
+      <f:optionalBlock name="useBlueBall" checked="${it.useBlueBall()}"
+                       title="${%useBlueBallBlurb}"
+                       help="/help/system-config/use-blue-ball.html" />
 
         <f:descriptorList title="${%Global properties}"
                           name="globalNodeProperties"

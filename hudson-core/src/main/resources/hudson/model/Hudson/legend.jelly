@@ -9,9 +9,8 @@
 #
 # Contributors: 
 #
-#    Kohsuke Kawaguchi, Seiji Sogabe,
+#    Kohsuke Kawaguchi, Winston Prakash, Seiji Sogabe,
 #        
-#
 #************************************************************************** --> 
 
 
@@ -31,11 +30,21 @@
           ${%grey_anime}
         </td></tr>
         <tr><td>
-          <img src="images/48x48/blue.png" alt=""/>
-          ${%blue}
+            <j:if test="${app.useBlueBall()}">
+                <img src="${imagesURL}/48x48/blue.png" alt=""/>
+            </j:if>
+            <j:if test="${!app.useBlueBall()}">
+                <img src="${imagesURL}/48x48/green.png" alt=""/>
+            </j:if>
+            ${%blue}
         </td></tr>
         <tr><td>
-          <img src="images/48x48/blue_anime.gif" alt=""/>
+          <j:if test="${app.useBlueBall()}">
+                <img src="${imagesURL}/48x48/blue_anime.gif" alt=""/>
+            </j:if>
+            <j:if test="${!app.useBlueBall()}">
+                <img src="${imagesURL}/48x48/green_anime.gif" alt=""/>
+            </j:if> 
           ${%blue_anime}
         </td></tr>
         <tr><td>

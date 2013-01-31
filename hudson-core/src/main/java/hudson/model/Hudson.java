@@ -451,6 +451,12 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Widgets on Hudson.
      */
     private transient final List<Widget> widgets = getExtensionList(Widget.class);
+    
+    /**
+     * Use Blue ball instead of the default green ball
+     */
+    private Boolean useBlueBall = false;
+
     /**
      * {@link AdjunctManager}
      */
@@ -2388,6 +2394,14 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         }
         return null;
     }
+    
+    /**
+     * Should Hudson use blue ball instead of default green ball for success
+     * @return 
+     */
+    public boolean useBlueBall() {
+        return useBlueBall.booleanValue();
+    }
 
 //
 //
@@ -2425,6 +2439,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
             primaryView = json.has("primaryView") ? json.getString("primaryView") : getViews().iterator().next().getViewName();
 
+            useBlueBall = json.has("useBlueBall") ? true : false;
+            
             noUsageStatistics = json.has("usageStatisticsCollected") ? null : true;
 
             {

@@ -9,9 +9,8 @@
 #
 # Contributors: 
 #
-#    Kohsuke Kawaguchi
+#    Kohsuke Kawaguchi, Winston Prakash
 #        
-#
 #************************************************************************** --> 
 
 
@@ -28,7 +27,13 @@
       <j:choose>
         <j:when test="${it.alive}">
           <h1>
-            <img src="${imagesURL}/48x48/blue.png" width="48" height="48" alt=""/>
+              <j:if test="${app.useBlueBall()}">
+                <img src="${imagesURL}/48x48/blue.png" width="48" height="48" alt=""/>
+            </j:if>
+            <j:if test="${!app.useBlueBall()}">
+                <img src="${imagesURL}/48x48/green.png" width="48" height="48" alt=""/>
+            </j:if>
+             
             ${%Thread is still alive}
           </h1>
         </j:when>
