@@ -108,7 +108,8 @@ public class Executable {
                 + "   --httpsKeyStorePassword=<value>  Password for the SSL KeyStore file\n\n"
                 + "   --updateServer=<your server>     Specify your own update server (eg http://updates.mycompany.com/).\n"
                 + "                                    For details see http://wiki.hudson-ci.org/Alternate+Update+Server\n\n"
-                + "   --disableUpdateCenterSwitch      Disable the ability to specify alternate Update Center URL via Plugin Manager Advanced tab\n\n";
+                + "   --disableUpdateCenterSwitch      Disable the ability to specify alternate Update Center URL via Plugin Manager Advanced tab\n\n"
+                + "   --skipInitSetup                  Skip the initial setup screen and start Hudson directly";
         
         System.out.println(usageStr);
         System.exit(0);
