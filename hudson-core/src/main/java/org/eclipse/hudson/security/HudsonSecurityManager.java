@@ -360,6 +360,7 @@ public class HudsonSecurityManager implements Saveable {
      */
     private void load() {
 
+        logger.info("Loading Security ..");
         XmlFile config = getConfigFile();
         try {
             if (config.exists()) {
