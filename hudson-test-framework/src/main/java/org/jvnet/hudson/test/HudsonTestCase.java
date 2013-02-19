@@ -1273,7 +1273,6 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
         if (!e.hasMoreElements()) {
             return; // nope
         }
-        final URL hpl = e.nextElement();
 
         recipes.add(new Runner() {
             @Override
