@@ -555,7 +555,7 @@
                                 <schemaDirectory>src/main/schema</schemaDirectory>
                                 <plugins>
                                     <plugin>
-                                        <groupId>${project.groupId}</groupId>
+                                        <groupId>org.eclipse.hudson</groupId>
                                         <artifactId>hudson-jaxb-xjc</artifactId>
                                     </plugin>
                                 </plugins>
@@ -863,73 +863,73 @@
 
             <!-- INTERNAL -->
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-test-utils</artifactId>
-                <version>${project.version}</version>
+                <version>3.0.1-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-utils</artifactId>
-                <version>${project.version}</version>
+                <version>3.0.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-core</artifactId>
-                <version>${project.version}</version>
+                <version>3.0.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-inject</artifactId>
-                <version>${project.version}</version>
+                <version>3.0.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-inject</artifactId>
                 <classifier>tests</classifier>
-                <version>${project.version}</version>
+                <version>3.0.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-service</artifactId>
-                <version>${project.version}</version>
+                <version>3.0.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-plugin-utils</artifactId>
-                <version>${project.version}</version>
+                <version>3.0.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-cli</artifactId>
-                <version>${project.version}</version>
+                <version>3.0.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-cli</artifactId>
                 <classifier>jar-with-dependencies</classifier>
-                <version>${project.version}</version>
+                <version>3.0.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-war</artifactId>
                 <type>war</type>
-                <version>${project.version}</version>
+                <version>3.0.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-test-framework</artifactId>
-                <version>${project.version}</version>
+                <version>3.0.1-SNAPSHOT</version>
             </dependency>
 
         </dependencies>

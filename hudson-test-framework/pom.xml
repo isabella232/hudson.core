@@ -18,12 +18,12 @@
     <parent>
         <groupId>org.eclipse.hudson</groupId>
         <artifactId>hudson-parent</artifactId>
-        <version> 3.0.1-SNAPSHOT</version>
+        <version>3.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>hudson-test-framework</artifactId>
-  <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.1-SNAPSHOT</version>
     <name>Hudson :: Test Framework</name>
     <description>
         Contains common classes for testing.
@@ -43,9 +43,9 @@
                 put hudson.war in the classpath. we can't pull in the war artifact directly
                 because Maven excludes all wars from classpath automatically. so we need a jar artifact.
             -->
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.eclipse.hudson</groupId>
             <artifactId>hudson-war</artifactId>
-            <version>${project.version}</version>
+            <version>3.0.1-SNAPSHOT</version>
             <classifier>war-for-test</classifier>
             <exclusions>
                 <exclusion>
@@ -104,17 +104,17 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.eclipse.hudson</groupId>
             <artifactId>hudson-core</artifactId>
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.eclipse.hudson</groupId>
             <artifactId>hudson-inject</artifactId>
             <classifier>tests</classifier>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.eclipse.hudson</groupId>
             <artifactId>hudson-inject</artifactId>
         </dependency>
         <dependency>
