@@ -51,19 +51,19 @@
       <groupId>org.eclipse.hudson</groupId>
       <artifactId>hudson-war</artifactId>
       <type>war</type>
-      <version>${project.parent.version}</version>
+      <version>3.0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.hudson</groupId>
       <artifactId>hudson-core</artifactId>
-      <version>${project.parent.version}</version>
+      <version>3.0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.hudson</groupId>
       <artifactId>hudson-test-framework</artifactId>
-      <version>${project.parent.version}</version>
+      <version>3.0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
