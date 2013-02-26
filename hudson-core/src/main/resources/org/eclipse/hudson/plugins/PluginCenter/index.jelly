@@ -303,7 +303,7 @@
                                 <ul class="setup">
                                     <li>
                                         <p class="description">
-                                            Following plugins are available for install. If you have trouble using any of these plugins contact Hudson developer community mailing list at dev@hudson.java.net. 
+                                            Following plugins are available for install. If you have trouble using any of these plugins contact Hudson developer community mailing list at hudson-dev@eclipse.org. 
                                             Select the plugins and click install to download and install the plugins.
                                             Hudson restart required after install.
                                         </p>
