@@ -66,8 +66,13 @@
     <html>
         <head>
             ${h.checkPermission(it,permission)}
+            
+            <j:set var="titleSuffix" value=" [Hudson]"/>
+            <j:if test="${!empty(app.instanceTag)}"> 
+            	<j:set var="titleSuffix" value=" [Hudson - ${app.instanceTag}]"/>
+            </j:if>
 
-            <title>${h.appendIfNotNull(title, ' [Hudson]', 'Hudson')}</title>
+            <title>${h.appendIfNotNull(title, titleSuffix, 'Hudson')}</title>
             
             <link rel="shortcut icon" href="${resURL}/favicon.ico" type="image/vnd.microsoft.icon" />
 
@@ -179,7 +184,7 @@
                                         <table cellpadding="2" cellspacing="3" width="100%" border="0">
                                             <tr>
                                                 <td class="instanceTagHeader">
-                                                  <!-- For future use --> 
+                                                  ${app.instanceTag}
                                                 </td>
                                                 <td style="vertical-align: middle; text-align: right; padding-right: 1em;">
                                                 <!-- search box -->
@@ -305,7 +310,9 @@
                         </tr>
                         <tr>
                             <td d="footer-left-panel" class="footer">
-                              <!-- For future use --> 
+                                <j:if test="${!empty(app.instanceTag)}">
+                                  ${%instance}: <em>${app.instanceTag}</em>
+                                </j:if>
                             </td>
                             <td id="footer-center-panel" class="footer">
                               <j:out value="${app.privacyMessage}"/>
