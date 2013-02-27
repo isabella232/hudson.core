@@ -178,7 +178,9 @@
                                     <td colspan="2">
                                         <table cellpadding="2" cellspacing="3" width="100%" border="0">
                                             <tr>
-                                             
+                                                <td style="vertical-align: middle; text-align: center;">
+                                                  Hudson Dev 1
+                                                </td>
                                                 <td style="vertical-align: middle; text-align: right; padding-right: 1em;">
                                                 <!-- search box -->
                                                     <j:set var="searchURL" value="${h.searchURL}"/>
