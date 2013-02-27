@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2012 Oracle Corporation.
+ * Copyright (c) 2004-2013 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -10,7 +10,7 @@
  * Contributors:
  *
  *  Kohsuke Kawaguchi, Winston Prakash, Nikita Levyankov, Erik Ramfelt, Koichi Fujikawa, 
- *  Seiji Sogabe, Stephen Connolly, Tom Huybrechts, Alan Harder
+ *  Seiji Sogabe, Stephen Connolly, Tom Huybrechts, Alan Harder, Duncan Mills
  *
  *******************************************************************************/ 
 
@@ -257,6 +257,14 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Message displayed in the top page.
      */
     private String systemMessage;
+    
+    /**
+     * Optional privacy message to be printed at the base of each page, this can be used for
+     * CopyRight, Confidentiality information and so forth
+     * Introduced Hudson 3.0.1
+     */
+     private String privacyMessage;
+    
     private static transient final String HUDSON_WORKSPACES_PROPERTY_KEY = "HUDSON_WORKSPACES";
     /**
      * Workspace root dir which could be configured by setting HUDSON_WORKSPACES
@@ -1073,6 +1081,21 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     public void setSystemMessage(String message) throws IOException {
         this.systemMessage = message;
+        save();
+    }
+    
+    /**
+     * Get the Privacy Message
+     */
+    public String getPrivacyMessage() {
+        return privacyMessage;
+    }
+    
+    /**
+     * Sets the privacy message.
+     */
+    public void setPrivacyMessage(String message) throws IOException {
+        this.privacyMessage = message;
         save();
     }
 
@@ -2501,6 +2524,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             scmCheckoutRetryCount = json.getInt("retry_count");
 
             systemMessage = Util.nullify(req.getParameter("system_message"));
+            
+            privacyMessage = json.optString("privacy_message","");
 
             jdks.clear();
             jdks.addAll(req.bindJSONToList(JDK.class, json.get("jdks")));

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2012 Oracle Corporation.
+ * Copyright (c) 2004-2013 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,8 @@
  *
  * Contributors:
  *
- *    Kohsuke Kawaguchi, Winston Prakash, Daniel Dyer, Stephen Connolly, Nikita Levyankov, Anton Kozak
+ *    Kohsuke Kawaguchi, Winston Prakash, Daniel Dyer, Stephen Connolly, 
+ *    Nikita Levyankov, Anton Kozak, Duncan Mills
  *
  *******************************************************************************/
 
@@ -119,18 +120,25 @@ dt {
     width: 220px;
 }
 
-#footer {
-    text-align: right;
+
+.footer {
     font-size: 8pt;
     margin-top: 10em;
     padding: 10px;
     border-top: 1px solid #d4bde6;
     color: #a58fb5;
+    text-align: left;
 }
 
-#footer a {
+.footer a {
     color: #a58fb5;
 }
+
+#footer-right-panel {
+   text-align: right;
+}
+
+
 
 #tasks {
     padding: 4px;
