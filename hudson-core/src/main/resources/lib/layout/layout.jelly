@@ -178,8 +178,8 @@
                                     <td colspan="2">
                                         <table cellpadding="2" cellspacing="3" width="100%" border="0">
                                             <tr>
-                                                <td style="vertical-align: middle; text-align: center;">
-                                                  Hudson Dev 1
+                                                <td class="instanceTagHeader">
+                                                  <!-- For future use --> 
                                                 </td>
                                                 <td style="vertical-align: middle; text-align: right; padding-right: 1em;">
                                                 <!-- search box -->
@@ -298,8 +298,16 @@
             
                 <tr>
                     <table width="100%">
+                        <tr class="poweredByBand">
+                             <td class="poweredByText" colspan="3">
+                               ${%poweredBy}
+                             </td>
+                        </tr>
                         <tr>
-                            <td class="footer">
+                            <td d="footer-left-panel" class="footer">
+                              <!-- For future use --> 
+                            </td>
+                            <td id="footer-center-panel" class="footer">
                               <j:out value="${app.privacyMessage}"/>
                             </td>
                             <td id="footer-right-panel" class="footer">
@@ -307,7 +315,7 @@
                             ${%Page generated}:
                                     <i:formatDate value="${h.getCurrentTime()}" type="both" dateStyle="medium" timeStyle="medium"/>
                                 </span>
-                                <a href="http://hudson-ci.org/">Hudson ver. ${h.version}</a>
+                                <a href="http://hudson-ci.org/">Hudson: ${h.version}</a>
                             </td>
                         </tr>
                     </table>
