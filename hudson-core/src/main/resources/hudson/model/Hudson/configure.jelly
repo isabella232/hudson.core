@@ -37,6 +37,9 @@
       <f:entry title="${%Home directory}" help="/help/system-config/homeDirectory.html">
         ${it.rootDir}
       </f:entry>
+      <f:entry title="${%Instance Tag}" help="/help/system-config/instanceTag.html">
+        <f:textbox name="instance_tag" value="${it.instanceTag}" />
+      </f:entry> 
       <f:entry title="${%System Message}" help="/help/system-config/systemMessage.html">
         <f:textarea name="system_message" value="${it.systemMessage}" />
       </f:entry>

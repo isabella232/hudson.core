@@ -262,7 +262,13 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * CopyRight, Confidentiality information and so forth
      * Introduced Hudson 3.0.1
      */
-     private String privacyMessage;
+    private String privacyMessage;
+     
+    /**
+     * Optional identifier for the instance to be printed on each page
+     * Introduced Hudson 3.0.1
+     */
+    private String instanceTag;     
     
     private static transient final String HUDSON_WORKSPACES_PROPERTY_KEY = "HUDSON_WORKSPACES";
     /**
@@ -1090,6 +1096,21 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         this.privacyMessage = message;
         save();
     }
+    
+    /**
+     * Get the Instance identifier
+     */
+    public String getInstanceTag() {
+        return instanceTag;
+    }
+    
+    /**
+     * Sets the Instance Identifier.
+     */
+    public void setInstanceTag(String name) throws IOException {
+        this.instanceTag = name;
+        save();
+    }    
 
     public FederatedLoginService getFederatedLoginService(String name) {
         for (FederatedLoginService fls : FederatedLoginService.all()) {
@@ -2508,6 +2529,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             quietPeriod = json.getInt("quiet_period");
 
             scmCheckoutRetryCount = json.getInt("retry_count");
+            
+            instanceTag = json.optString("instance_tag","");
 
             systemMessage = Util.nullify(req.getParameter("system_message"));
             
