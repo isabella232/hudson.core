@@ -1,6 +1,6 @@
 <!-- **************************************************************************
 #
-# Copyright  (c) 2004-2009 Oracle Corporation.
+# Copyright  (c) 2004-2013 Oracle Corporation.
 #
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
 #
 # Contributors: 
 #
-#    Kohsuke Kawaguchi, Simon Wiest, Tom Huybrechts
+#    Kohsuke Kawaguchi, Simon Wiest, Tom Huybrechts, Duncan Mills
 #        
 #
 #************************************************************************** --> 
@@ -17,23 +17,39 @@
 
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-  <h2>Fetch/Update config.xml</h2>
+  <h2>Example API calls for a Job</h2>
+  <h3>Fetch/Update config.xml</h3>
   <p>
-    To programmatically obtain <tt>config.xml</tt>, hit <a href="../config.xml">this URL</a>.
+    To programmatically obtain <tt>config.xml</tt>, use <tt>http://your_server/job/your_job_name/<b>config.xml</b></tt>,    
+    (<a href="../config.xml">try it now!</a>).<br/>
     You can also POST an updated <tt>config.xml</tt> to the same URL to programmatically
-    update the configuration of a job.  Similarly, <a href="../description">this URL</a>
-    can be used to get and set just the job description.  POST form data with a
-    "description" parameter to set the description.
+    update the configuration of a job.<br/>
+    Similarly, <tt>http://your_server/job/your_job_name/<b>description</b></tt> can be used to 
+    get and set just the job description (<a href="../description">try it now!</a>).<br/>
+    <strong>POST</strong> form data with a "description" parameter to set the description.
   </p>
 
-  <h2>Perform a build</h2>
+  <h3>Perform a build</h3>
   <p>
-    To programmatically schedule a new build, post to <a href="../build">this URL</a>. 
-    If the build has parameters, post to <a href="../buildWithParameters">this URL</a> and provide the parameters as form data.
+    To programmatically schedule a new build, <strong>POST</strong> or <strong>GET</strong> 
+    to <tt>http://your_server/job/your_job_name/<b>build</b></tt>  (<a href="../build">try it now!</a>).<br/> 
+    If the build has parameters, <strong>POST</strong> to 
+    <tt>http://your_server/job/your_job_name/<b>buildWithParameters</b></tt> 
+    (<a href="../buildWithParameters">copy url</a>) and provide the 
+    parameters as form data.
   </p>
+  <h3>Schedule SCM Poll</h3>
   <p>
-    To programmatically schedule SCM polling, post to <a href="../polling">this URL</a>.
+    To programmatically schedule SCM polling, <strong>POST</strong> to 
+    <tt>http://your_server/job/your_job_name/<b>polling</b></tt>  (<a href="../polling">copy url</a>).
   </p>
+  <h3>Delete a job</h3>
+  <p>
+    To programmatically delete this job, do HTTP <strong>POST</strong> (<u>not GET</u>)
+    to <tt>http://your_server/job/your_job_name/<b>doDelete</b></tt>  (<a href="../doDelete">copy url</a>). 
+  </p>
+
+  <h3>Dealing with Security</h3>
   <p>
     If security is enabled, the recommended method is to provide the username/password of an
     account with build permission in the request.  Tools such as <tt>curl</tt> and <tt>wget</tt>
@@ -42,8 +58,4 @@
     or polling can be triggered by including a parameter called <i>token</i> in the request.
   </p>
 
-  <h2>Delete a job</h2>
-  <p>
-    To programmatically delete this job, do HTTP POST to <a href="../doDelete">this URL</a>. 
-  </p>
 </j:jelly>

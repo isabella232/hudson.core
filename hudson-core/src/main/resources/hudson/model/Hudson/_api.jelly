@@ -1,6 +1,6 @@
 <!-- **************************************************************************
 #
-# Copyright  (c) 2004-2009 Oracle Corporation.
+# Copyright  (c) 2004-2013 Oracle Corporation.
 #
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
 #
 # Contributors: 
 #
-#    Kohsuke Kawaguchi
+#    Kohsuke Kawaguchi, Duncan Mills
 #        
 #
 #************************************************************************** --> 
@@ -17,37 +17,45 @@
 
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-  <h2>Create Job</h2>
+  <h2>Example API calls for a Hudson Server</h2>
+  <h3>Create Job</h3>
   <p>
-    To create a new job, post <tt>config.xml</tt> to <a href="../createItem">this URL</a> with
-    query parameter <tt>name=<i>JOBNAME</i></tt>. You'll get 200 status code if the creation is successful,
+    To create a new job, <strong>POST </strong>  <tt>config.xml</tt> to <tt>http://your_server/<b>createItem</b></tt> (<a href="../createItem">copy url</a>) with
+    query parameter <tt>name=<i>JOBNAME</i></tt>.<br/>
+    You'll get 200 status code if the creation is successful,
     or 4xx/5xx code if it fails. <tt>config.xml</tt> is the format Hudson uses to store the job
     in the file system, so you can see examples of them in <tt>${app.rootDir}</tt>.
   </p>
 
-  <h2>Copy Job</h2>
+  <h3>Copy Job</h3>
   <p>
-    To copy a job, send a POST request to <a href="../createItem">this URL</a> with
-    three query parameters <tt>name=<i>NEWJOBNAME</i>&amp;mode=copy&amp;from=<i>FROMJOBNAME</i></tt>
+    To copy a job, send a <strong>POST</strong> request to <tt>http://your_server/<b>createItem</b></tt> with
+    three query parameters:<br/>
+     <tt>name=<i>NEWJOBNAME</i>&amp;mode=copy&amp;from=<i>FROMJOBNAME</i></tt>
   </p>
 
-  <h2>Build Queue</h2>
+  <h3>Build Queue</h3>
   <p>
-    Build queue has <a href="../queue/api/">its own separate API</a>.
+    Build queue has its own separate API: <tt>http://your_server/<b>queue/api/</b>[xml|json]</tt> 
+     (<a href="../queue/api/xml">try it now!</a>).
   </p>
   
-  <h2>Load Statistics</h2>
+  <h3>Load Statistics</h3>
   <p>
-    Overall load statistics of Hudson has <a href="../overallLoad/api/">its own separate API</a>.
+    Overall load statistics of Hudson has its own separate API 
+    <tt>http://your_server/<b>overallLoad/api/</b>[xml|json]</tt> <a href="../overallLoad/api/xml">(try it now!)</a>.
   </p>
 
-  <h2>Restarting Hudson</h2>
+  <h3>Restarting Hudson</h3>
   <p>
-    Hudson will enter into the "quiet down" mode by sending a request to <a href="../quietDown">this URL</a>.
-    You can cancel this mode by sending a request to <a href="../cancelQuietDown">this URL</a>. On environments
-    where Hudson can restart itself (such as when Hudson is installed as a Windows service), POSTing to
-    <a href="../restart">this URL</a> will start the restart sequence, or
-    <a href="../safeRestart">this URL</a> to restart once no jobs are running.
+    Hudson will enter into the "quiet down" mode by sending a <strong>GET</strong> request
+    to <tt>http://your_server/<b>quietDown</b></tt> (<a href="../quietDown">do it now</a>).
+    You can cancel this mode by sending a request to <tt>http://your_server/<b>cancelQuietDown</b></tt> 
+     (<a href="../cancelQuietDown">do it now</a>).<br/> 
+    On environments where Hudson can restart itself (such as when Hudson is installed as 
+    a Windows service), <strong>POST</strong>ing to <tt>http://your_server/<b>restart</b></tt> 
+     (<a href="../restart">copy url</a>) will start the restart sequence, or <tt>http://your_server/<b>safeRestart</b></tt>
+     (<a href="../safeRestart">copy url</a>) to restart once no jobs are running.<br/>
     All these URLs need the admin privilege to the system.
   </p>
 </j:jelly>
