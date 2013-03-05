@@ -18,12 +18,12 @@
     <parent>
         <groupId>org.eclipse.hudson</groupId>
         <artifactId>hudson-parent</artifactId>
-        <version> 3.0.1-SNAPSHOT</version>
+        <version> 3.0.1-M1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>hudson-core</artifactId>
-  <version>3.0.1-SNAPSHOT</version>
+  <version>3.0.1-M1</version>
     <name>Hudson :: Core</name>
     <description>
         Contains the core Hudson code and view files to render HTML.
