@@ -502,6 +502,10 @@ public class Mailer extends Notifier {
                 if (StringUtils.isNumeric(smtpPort)) {
                     port = Integer.parseInt(smtpPort);
                 }
+                // See https://bugs.eclipse.org/bugs/show_bug.cgi?id=399631
+                if (smtpAuthPassword != null && smtpAuthPassword.trim().length() == 0) {
+                    smtpAuthPassword = null;
+                }
                 t.connect(smtpServer, port, smtpAuthUserName, smtpAuthPassword);
                 msg.saveChanges();
                 t.sendMessage(msg, msg.getAllRecipients());
