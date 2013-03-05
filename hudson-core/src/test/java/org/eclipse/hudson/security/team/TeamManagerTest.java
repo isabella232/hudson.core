@@ -13,6 +13,7 @@ package org.eclipse.hudson.security.team;
 import java.io.File;
 import java.io.IOException;
 import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -27,22 +28,14 @@ import org.junit.Test;
  */
 public class TeamManagerTest {
 
-    String testFileName = "teams-test.xml";
-    File homeDir = new File(new File(System.getProperty("user.home")), ".hudson");
-    File teamsStore = new File(homeDir, "teams-test.xml");
+    String teamsFileName = "teams.xml";
+    File homeDir = FileUtils.getTempDirectory();
+    File teamsStore = new File(homeDir, teamsFileName);
     private TeamManager teamManager;
-
-    public TeamManagerTest() {
-
-        if (teamsStore.exists()) {
-            teamsStore.delete();
-        }
-        teamManager = new TeamManager(homeDir);
-        teamManager.setUseBulkSaveFlag(false);
-    }
 
     @BeforeClass
     public static void setUpClass() {
+        
     }
 
     @AfterClass
@@ -51,6 +44,11 @@ public class TeamManagerTest {
 
     @Before
     public void setUp() {
+        if (teamsStore.exists()) {
+            teamsStore.delete();
+        }
+        teamManager = new TeamManager(homeDir);
+        teamManager.setUseBulkSaveFlag(false);
     }
 
     @After
