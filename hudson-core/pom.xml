@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.eclipse.hudson</groupId>
         <artifactId>hudson-parent</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version> 3.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -75,6 +75,7 @@
             <plugin>
                 <groupId>org.hudsonci.stapler</groupId>
                 <artifactId>maven-stapler-plugin</artifactId>
+                <version>${maven-stapler-plugin.version}</version>
                 <configuration>
                     <fork>${staplerFork}</fork>
                     <!-- the source code is big enough now that otherwise it fails with OutOfMemoryError -->
@@ -177,17 +178,6 @@
                 <version>3.2</version>
                 <configuration>
                     <reportPlugins>
-                        <plugin>
-                            <!-- generate Jelly tag lib documentation -->
-                            <groupId>org.hudsonci.stapler</groupId>
-                            <artifactId>maven-stapler-plugin</artifactId>
-                            <version>${maven-stapler-plugin.version}</version>
-                            <configuration>
-                                <patterns>
-                                    <pattern>/lib/.*</pattern>
-                                </patterns>
-                            </configuration>
-                        </plugin>
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -302,11 +292,9 @@
         </profile>
         <profile>
             <id>pmd</id>
-            <!--
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            -->
             <build>
                 <plugins>
                     <plugin>
@@ -773,6 +761,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>1.6.1</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -782,4 +771,27 @@
         </dependency>
     </dependencies>
 
+    <reporting>
+        <plugins>
+            <plugin>
+                <!-- generate Jelly tag lib documentation -->
+                <groupId>org.hudsonci.stapler</groupId>
+                <artifactId>maven-stapler-plugin</artifactId>
+                <version>${maven-stapler-plugin.version}</version>
+                <configuration>
+                    <patterns>
+                        <pattern>/lib/.*</pattern>
+                    </patterns>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- skip slow dependency analysis -->
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${maven-project-info-reports-plugin.version}</version>
+                <configuration>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>
