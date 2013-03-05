@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Collection;
 import java.util.AbstractCollection;
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -116,11 +117,15 @@ public class ResourceController {
      * given activity, or null if it's not blocked (and thus the given activity
      * can be executed immediately.)
      */
-    public synchronized ResourceActivity getBlockingActivity(ResourceActivity activity) {
+    public ResourceActivity getBlockingActivity(ResourceActivity activity) {
         ResourceList res = activity.getResourceList();
-        for (ResourceActivity a : inProgress) {
-            if (res.isCollidingWith(a.getResourceList())) {
-                return a;
+        Set<ResourceActivity> syncInProgress = Collections.synchronizedSet(inProgress);
+        // Synchronize only the block (see 395879)
+        synchronized (syncInProgress) {
+            for (ResourceActivity a : syncInProgress) {
+                if (res.isCollidingWith(a.getResourceList())) {
+                    return a;
+                }
             }
         }
         return null;
