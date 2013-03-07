@@ -1748,7 +1748,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 continue;
             }
             double duration = run.getDuration() / (1000 * 60);
-            xSeries.add(run.getDisplayName());
+            xSeries.add("#" + String.valueOf(run.number));
             Result res = run.getResult();
             if (res == Result.FAILURE) {
                 ySeriesFailed.add(duration);

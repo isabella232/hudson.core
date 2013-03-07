@@ -111,7 +111,7 @@ public class History {
         }
 
         for (hudson.tasks.test.TestResult o : list) {
-            xSeries.add(o.getOwner().getDisplayName());
+            xSeries.add("#" + String.valueOf(o.getOwner().number));
 
             double duration = o.getDuration() / 60;
             if (o.getFailCount() > 0) {
