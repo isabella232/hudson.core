@@ -107,7 +107,7 @@
         <jetty.server.version>8.1.7.v20120910</jetty.server.version>
         <jetty.javax.serverlet.version>3.0.0.v201112011016</jetty.javax.serverlet.version>
         
-        <maven-hpi-plugin.version>3.0.0</maven-hpi-plugin.version>
+        <maven-hpi-plugin.version>3.0.1</maven-hpi-plugin.version>
         <stapler.version>3.0.0</stapler.version>
         <maven-stapler-plugin.version>3.0.1</maven-stapler-plugin.version>
 
