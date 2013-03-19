@@ -1368,6 +1368,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         RunT i = getLastBuild();
         while (totalCount < 5 && i != null) {
             switch (i.getIconColor()) {
+                case GREEN:
                 case BLUE:
                 case YELLOW:
                     // failCount stays the same
