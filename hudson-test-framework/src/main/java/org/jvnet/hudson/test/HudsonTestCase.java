@@ -143,8 +143,10 @@ import hudson.slaves.ComputerListener;
 import java.util.concurrent.CountDownLatch;
 
 import hudson.maven.MavenEmbedder;
+import hudson.maven.MavenRequest;
 import hudson.security.*;
 import hudson.util.SecurityFailedToInit;
+import java.nio.charset.Charset;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.eclipse.hudson.HudsonServletContextListener;
@@ -1298,7 +1300,8 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
 
                     String dependencies = m.getMainAttributes().getValue("Plugin-Dependencies");
                     if (dependencies != null) {
-                        MavenEmbedder embedder = new MavenEmbedder(getClass().getClassLoader(), null);
+                        MavenRequest mavenRequest = MavenUtil.createMavenRequest(new StreamTaskListener(System.out,Charset.defaultCharset()));
+                        MavenEmbedder embedder = new MavenEmbedder(getClass().getClassLoader(), mavenRequest);
                         for (String dep : dependencies.split(",")) {
                             String[] tokens = dep.split(":");
                             String artifactId = tokens[0];
@@ -1307,7 +1310,7 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
                             // need to search multiple group IDs
                             // TODO: extend manifest to include groupID:artifactID:version
                             Exception resolutionError = null;
-                            for (String groupId : new String[]{"org.jvnet.hudson.plugins", "org.jvnet.hudson.main"}) {
+                            for (String groupId : new String[]{"org.hudsonci.plugins", "org.jvnet.hudson.plugins", "org.jvnet.hudson.main"}) {
 
                                 // first try to find it on the classpath.
                                 // this takes advantage of Maven POM located in POM
@@ -1320,7 +1323,7 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
                                     Artifact a;
                                     a = embedder.createArtifact(groupId, artifactId, version, "compile"/*doesn't matter*/, "hpi");
                                     try {
-                                        embedder.resolve(a, Arrays.asList(embedder.createRepository("http://maven.glassfish.org/content/groups/public/", "repo")), embedder.getLocalRepository());
+                                        embedder.resolve(a, Arrays.asList(embedder.createRepository("https://oss.sonatype.org/content/repositories/releases/", "repo")), embedder.getLocalRepository());
                                         dependencyJar = a.getFile();
                                     } catch (AbstractArtifactResolutionException x) {
                                         // could be a wrong groupId
