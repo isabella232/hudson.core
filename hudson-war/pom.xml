@@ -18,12 +18,12 @@
     <parent>
         <groupId>org.eclipse.hudson</groupId>
         <artifactId>hudson-parent</artifactId>
-        <version>3.0.1-b2</version>
+        <version>3.0.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
   
     <artifactId>hudson-war</artifactId>
-  <version>3.0.1-b2</version>
+  <version>3.0.2-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Hudson :: War</name>
 
