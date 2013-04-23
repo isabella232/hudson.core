@@ -137,12 +137,15 @@ public class WindowsSlaveInstaller implements Callable<Void, RuntimeException>, 
             if (r != JOptionPane.OK_OPTION) {
                 return;
             }
-
-            if (!NativeUtils.getInstance().isDotNetInstalled(2, 0)) {
-                JOptionPane.showMessageDialog(dialog, Messages.WindowsSlaveInstaller_DotNetRequired(),
-                        Messages.WindowsInstallerLink_DisplayName(), ERROR_MESSAGE);
-                return;
-            }
+ 
+            // Fix: Bug 382490 - Installing JNLP Slave as windows service fails
+            // JNA support plugin is not available when this called. This messgae
+            // is now displayed along with the confirmation dialog
+//            if (!NativeUtils.getInstance().isDotNetInstalled(2, 0)) {
+//                JOptionPane.showMessageDialog(dialog, Messages.WindowsSlaveInstaller_DotNetRequired(),
+//                        Messages.WindowsInstallerLink_DisplayName(), ERROR_MESSAGE);
+//                return;
+//            }
 
             final File dir = new File(rootDir);
             if (!dir.exists()) {
