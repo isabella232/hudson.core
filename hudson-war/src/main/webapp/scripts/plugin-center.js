@@ -307,7 +307,7 @@ function installPlugin(selected){
                 jQuery('#installButton').show();
             }
         },
-        error: function(){
+        error: function(msg){
             jQuery(".install_img_" + jQuery(selected).val()).each(function(){
                 jQuery(this).show();
                 jQuery(this).attr('src', imageRoot + '/error.png');
@@ -355,7 +355,7 @@ function updatePlugin(selected){
                 jQuery('#updateButton').show();
             }
         },
-        error: function(){
+        error: function(msg){
             jQuery(".update_img_" + jQuery(selected).val()).each(function(){
                 jQuery(this).show();
                 jQuery(this).attr('src', imageRoot + '/error.png');

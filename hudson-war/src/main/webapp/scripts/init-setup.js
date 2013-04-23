@@ -200,7 +200,7 @@ function doFinish(){
         success: function(){
             window.location.href=".";
         },
-        error: function(){
+        error: function(msg){
             icon.attr('src',imageRoot + '/error.png');
             showMessage(jQuery('#infoMsg'), msg.responseText, "red");
         },
