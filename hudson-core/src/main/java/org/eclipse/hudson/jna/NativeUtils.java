@@ -41,13 +41,7 @@ public class NativeUtils implements Serializable {
     private NativeMacSupport nativeMacSupport;
     private static Logger logger = LoggerFactory.getLogger(NativeUtils.class);
 
-    /**
-     * Delay Instance creation until NativeUtils.getInstance() is called
-     */
-    private static class SingletonHolder {
-
-        public static final NativeUtils INSTANCE = new NativeUtils();
-    }
+   public static final NativeUtils INSTANCE = new NativeUtils();
 
     private NativeUtils() {
         try {
@@ -132,7 +126,7 @@ public class NativeUtils implements Serializable {
     }
 
     public static NativeUtils getInstance() {
-        return SingletonHolder.INSTANCE;
+        return INSTANCE;
     }
 
     /**
