@@ -768,7 +768,8 @@ public abstract class Launcher {
 
         @Override
         public void kill(final Map<String, String> modelEnvVars) throws IOException, InterruptedException {
-            getChannel().call(new KillTask(modelEnvVars, NativeUtils.getInstance()));
+            final NativeUtils  nativeUtils = NativeUtils.getInstance();
+            getChannel().call(new KillTask(modelEnvVars, nativeUtils));
         }
 
         private static final class KillTask implements Callable<Void, RuntimeException> {

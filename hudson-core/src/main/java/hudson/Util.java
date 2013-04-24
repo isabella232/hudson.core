@@ -1076,17 +1076,24 @@ public class Util {
             e.printStackTrace(log);
         }
     }
+    
+    public static void chmod(File f, int mask, boolean tryNative) {
+        chmod(f, mask, tryNative, NativeUtils.getInstance());
+    }
 
     /**
      * Run chmod natively if we can, otherwise fall back to Ant.
      */
-    public static void chmod(File f, int mask, boolean tryNative) {
+    public static void chmod(File f, int mask, boolean tryNative, NativeUtils nativeUtils) {
         if (Functions.isWindows()) {
             return; // noop
         }
+        if (nativeUtils == null){
+            tryNative = false;
+        }
         if (tryNative) {
             try {
-                NativeUtils.getInstance().chmod(f, mask);
+                nativeUtils.chmod(f, mask);
             } catch (NativeAccessException exc) {
                 LOGGER.log(Level.WARNING, "Native function chmod failed. Using Ant''s chmod task instead.");
                 _chmodAnt(f, mask);
