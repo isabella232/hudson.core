@@ -283,7 +283,7 @@ public abstract class AbstractTestResultAction<T extends AbstractTestResultActio
         }
 
         for (AbstractTestResultAction<?> a = this; a != null; a = a.getPreviousResult(AbstractTestResultAction.class)) {
-            xSeries.add(a.owner.getDisplayName());
+            xSeries.add("#" + String.valueOf(a.owner.number));
             ySeriesFailed.add((double) a.getFailCount());
 
             // For backward compatibility with JFreechart

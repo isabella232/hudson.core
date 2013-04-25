@@ -452,9 +452,10 @@ public final class FilePath implements Serializable {
      * @see #untarFrom(InputStream, TarCompression)
      */
     public void untar(final FilePath target, final TarCompression compression) throws IOException, InterruptedException {
+        final NativeUtils nativeUtils = NativeUtils.getInstance();
         target.act(new FileCallable<Void>() {
             public Void invoke(File dir, VirtualChannel channel) throws IOException {
-                readFromTar(FilePath.this.getName(), dir, compression.extract(FilePath.this.read()));
+                readFromTar(FilePath.this.getName(), dir, compression.extract(FilePath.this.read()), nativeUtils);
                 return null;
             }
             private static final long serialVersionUID = 1L;
@@ -589,9 +590,10 @@ public final class FilePath implements Serializable {
     public void untarFrom(InputStream _in, final TarCompression compression) throws IOException, InterruptedException {
         try {
             final InputStream in = new RemoteInputStream(_in);
+            final NativeUtils nativeUtils = NativeUtils.getInstance();
             act(new FileCallable<Void>() {
                 public Void invoke(File dir, VirtualChannel channel) throws IOException {
-                    readFromTar("input stream", dir, compression.extract(in));
+                    readFromTar("input stream", dir, compression.extract(in), nativeUtils);
                     return null;
                 }
                 private static final long serialVersionUID = 1L;
@@ -1560,13 +1562,13 @@ public final class FilePath implements Serializable {
         } else if (this.channel == null) {
             // local -> remote copy
             final Pipe pipe = Pipe.createLocalToRemote();
-
+            final NativeUtils nativeUtils = NativeUtils.getInstance();
             Future<Void> future = target.actAsync(new FileCallable<Void>() {
                 public Void invoke(File f, VirtualChannel channel) throws IOException {
                     try {
                         readFromTar(remote + '/' + fileMask, f, (remoteCompressionType != null
                                 ? remoteCompressionType.extract(pipe.getIn())
-                                : FilePath.TarCompression.GZIP.extract(pipe.getIn())));
+                                : FilePath.TarCompression.GZIP.extract(pipe.getIn())), nativeUtils);
                         return null;
                     } finally {
                         pipe.getIn().close();
@@ -1597,10 +1599,11 @@ public final class FilePath implements Serializable {
                 }
             });
             try {
+                final NativeUtils nativeUtils = NativeUtils.getInstance();
                 //it's possible to get NPE if on slave works old process
                 readFromTar(remote + '/' + fileMask, new File(target.remote),
                         (remoteCompressionType != null ? remoteCompressionType.extract(pipe.getIn())
-                        : FilePath.TarCompression.GZIP.extract(pipe.getIn())));
+                        : FilePath.TarCompression.GZIP.extract(pipe.getIn())), nativeUtils);
             } catch (IOException e) { // BuildException or IOException
                 try {
                     future.get(3, TimeUnit.SECONDS);
@@ -1660,7 +1663,7 @@ public final class FilePath implements Serializable {
     /**
      * Reads from a tar stream and stores obtained files to the base dir.
      */
-    private static void readFromTar(String name, File baseDir, InputStream in) throws IOException {
+    private static void readFromTar(String name, File baseDir, InputStream in, NativeUtils nativeUtils) throws IOException {
         TarInputStream t = new TarInputStream(in);
         try {
             TarEntry te;
@@ -1679,7 +1682,7 @@ public final class FilePath implements Serializable {
                     int mode = te.getMode() & 0777;
                     // be defensive
                     if (mode != 0 && !Functions.isWindows()) {
-                        Util.chmod(f, mode);
+                        Util.chmod(f, mode, true, nativeUtils);
                     }
                 }
             }

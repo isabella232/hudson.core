@@ -309,19 +309,25 @@
                              </td>
                         </tr>
                         <tr>
-                            <td d="footer-left-panel" class="footer">
+                            <td id="footer-left-panel" class="footerArea">
                                 <j:if test="${!empty(app.instanceTag)}">
                                   ${%instance}: <em>${app.instanceTag}</em>
                                 </j:if>
                             </td>
-                            <td id="footer-center-panel" class="footer">
+                            <td id="footer-center-panel" class="footerArea">
                               <j:out value="${app.privacyMessage}"/>
                             </td>
-                            <td id="footer-right-panel" class="footer">
-                                <span style="padding-right:2em;">
-                            ${%Page generated}:
-                                    <i:formatDate value="${h.getCurrentTime()}" type="both" dateStyle="medium" timeStyle="medium"/>
-                                </span>
+                            <td id="footer-right-panel" class="footerArea">
+                                ${%Page generated}:
+                                <i:formatDate value="${h.getCurrentTime()}" type="both" dateStyle="medium" timeStyle="medium"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="footerArea"> 
+                                <!-- keep the following div, this ID is used by plugins--> 
+                            	<div id="footer"/>
+                            </td>
+                            <td id="footer-husonversion-panel" class="footerArea">
                                 <a href="http://hudson-ci.org/">Hudson: ${h.version}</a>
                             </td>
                         </tr>

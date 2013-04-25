@@ -1064,12 +1064,26 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
         // replace the old Node object by the new one
         synchronized (app) {
             List<Node> nodes = new ArrayList<Node>(app.getNodes());
-            int i = nodes.indexOf(getNode());
+            Node prevNode = getNode();
+            int i = nodes.indexOf(prevNode);
             if (i < 0) {
                 sendError("This slave appears to be removed while you were editing the configuration", req, rsp);
                 return;
             }
-
+            
+            // Check if the Appointed node of a job is same as node that is renamed, if so modify it
+            // See https://bugs.eclipse.org/bugs/show_bug.cgi?id=401683
+            for (Job job : Hudson.getInstance().getAllItems(Job.class)){
+                if (job instanceof AbstractProject){
+                    AbstractProject project = (AbstractProject) job;
+                    AppointedNode appointedNode = project.getAppointedNode();
+                    if ((appointedNode != null) && prevNode.getNodeName().equals(appointedNode.getNodeName())){
+                        appointedNode.setNodeName(result.getNodeName()); 
+                        job.save();
+                    }
+                }
+            }
+             
             nodes.set(i, result);
             app.setNodes(nodes);
         }

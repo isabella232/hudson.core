@@ -77,7 +77,8 @@ public class SwapSpaceMonitor extends NodeMonitor {
     @Extension
     public static final AbstractNodeMonitorDescriptor<NativeSystemMemory> DESCRIPTOR = new AbstractNodeMonitorDescriptor<NativeSystemMemory>() {
         protected NativeSystemMemory monitor(Computer c) throws IOException, InterruptedException {
-            return c.getChannel().call(new MonitorTask(NativeUtils.getInstance()));
+            final NativeUtils  nativeUtils = NativeUtils.getInstance();
+            return c.getChannel().call(new MonitorTask(nativeUtils));
         }
 
         public String getDisplayName() {

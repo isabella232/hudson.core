@@ -19,12 +19,12 @@
   <parent>
     <groupId>org.eclipse.hudson</groupId>
     <artifactId>hudson-parent</artifactId>
-    <version> 3.0.1-SNAPSHOT</version>
+    <version> 3.0.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>hudson-inject</artifactId>
-  <version>3.0.1-SNAPSHOT</version>
+  <version>3.0.2-SNAPSHOT</version>
   <name>Hudson :: Inject (JSR-330 Strategy)</name>
 
   <description>

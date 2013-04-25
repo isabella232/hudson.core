@@ -18,12 +18,12 @@
     <parent>
         <groupId>org.eclipse.hudson</groupId>
         <artifactId>hudson-parent</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version> 3.0.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>hudson-core</artifactId>
-  <version>3.0.1-SNAPSHOT</version>
+  <version>3.0.2-SNAPSHOT</version>
     <name>Hudson :: Core</name>
     <description>
         Contains the core Hudson code and view files to render HTML.
@@ -75,6 +75,7 @@
             <plugin>
                 <groupId>org.hudsonci.stapler</groupId>
                 <artifactId>maven-stapler-plugin</artifactId>
+                <version>${maven-stapler-plugin.version}</version>
                 <configuration>
                     <fork>${staplerFork}</fork>
                     <!-- the source code is big enough now that otherwise it fails with OutOfMemoryError -->
@@ -773,6 +774,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>1.6.1</version>
             <type>jar</type>
         </dependency>
         <dependency>

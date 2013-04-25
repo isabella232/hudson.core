@@ -51,7 +51,11 @@
                         <label for="sat.disabled">${%Disable}</label>
                     </f:entry>
 
-                    <f:dropdownDescriptorSelector title="${%Markup Formatter}" field="markupFormatter" />
+                    <j:set var="instance" value="${it}" />
+                    <j:invokeStatic var="markupFormatterDescriptors"
+                                    className="hudson.markup.MarkupFormatterDescriptor" method="all" />
+                    <f:dropdownDescriptorSelector title="${%Markup Formatter}" field="markupFormatter"
+                                                  descriptors="${markupFormatterDescriptors}" />
 
                     <f:entry title="${%Access Control}">
                         <table style="width:100%">

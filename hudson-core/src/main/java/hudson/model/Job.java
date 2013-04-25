@@ -108,6 +108,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     private static transient final String HUDSON_BUILDS_PROPERTY_KEY = "HUDSON_BUILDS";
     private static transient final String PROJECT_PROPERTY_KEY_PREFIX = "has";
+    private static transient final String BUILDS_DIRNAME = "builds";
     public static final String PROPERTY_NAME_SEPARATOR = ";";
     public static final String LOG_ROTATOR_PROPERTY_NAME = "logRotator";
     public static final String PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME = "parametersDefinitionProperties";
@@ -506,7 +507,11 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /*package*/ TextFile getNextBuildNumberFile() {
-        return new TextFile(new File(this.getRootDir(), "nextBuildNumber"));
+        File buildsDir = getBuildDir();
+        if (!buildsDir.exists()) {
+            buildsDir.mkdirs();
+        }
+        return new TextFile(new File(buildsDir, "../nextBuildNumber"));
     }
 
     protected boolean isHoldOffBuildUntilSave() {
@@ -1075,9 +1080,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     protected File getBuildDir() {
         String resultDir = getConfiguredHudsonProperty(HUDSON_BUILDS_PROPERTY_KEY);
         if (StringUtils.isNotBlank(resultDir)) {
-            return new File(resultDir + "/" + getSearchName());
+            return new File(resultDir + "/" + getSearchName() +  "/" + BUILDS_DIRNAME);
         } else {
-            return new File(getRootDir(), "builds");
+            return new File(getRootDir(), BUILDS_DIRNAME);
         }
     }
 
@@ -1363,6 +1368,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         RunT i = getLastBuild();
         while (totalCount < 5 && i != null) {
             switch (i.getIconColor()) {
+                case GREEN:
                 case BLUE:
                 case YELLOW:
                     // failCount stays the same
@@ -1748,7 +1754,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 continue;
             }
             double duration = run.getDuration() / (1000 * 60);
-            xSeries.add(run.getDisplayName());
+            xSeries.add("#" + String.valueOf(run.number));
             Result res = run.getResult();
             if (res == Result.FAILURE) {
                 ySeriesFailed.add(duration);

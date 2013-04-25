@@ -50,7 +50,7 @@ import static javax.swing.JOptionPane.*;
  * @author Kohsuke Kawaguchi
  */
 public class WindowsSlaveInstaller implements Callable<Void, RuntimeException>, ActionListener {
-
+     
     /**
      * Root directory of this slave. String, not File because the platform can
      * be different.
@@ -58,7 +58,13 @@ public class WindowsSlaveInstaller implements Callable<Void, RuntimeException>, 
     private final String rootDir;
     private transient Engine engine;
     private transient MainDialog dialog;
+    
+    private NativeUtils nativeUtils = NativeUtils.getInstance();
 
+    public WindowsSlaveInstaller(String rootDir, NativeUtils nativeUtils) {
+        this.rootDir = rootDir;
+    }
+    
     public WindowsSlaveInstaller(String rootDir) {
         this.rootDir = rootDir;
     }
@@ -97,7 +103,7 @@ public class WindowsSlaveInstaller implements Callable<Void, RuntimeException>, 
      * <p> If it fails in a way that indicates the presence of UAC, retry in an
      * UAC compatible manner.
      */
-    static int runElevated(File slaveExe, String command, TaskListener out, File pwd) throws IOException, InterruptedException {
+    static int runElevated(File slaveExe, String command, TaskListener out, File pwd, NativeUtils nativeUtils) throws IOException, InterruptedException {
         try {
             return new LocalLauncher(out).launch().cmds(slaveExe, command).stdout(out).pwd(pwd).join();
         } catch (IOException e) {
@@ -110,7 +116,7 @@ public class WindowsSlaveInstaller implements Callable<Void, RuntimeException>, 
 
         String logFile = "redirect.log";
         try {
-            return NativeUtils.getInstance().windowsExec(slaveExe, command, logFile, pwd);
+            return nativeUtils.windowsExec(slaveExe, command, logFile, pwd);
         } catch (NativeAccessException ex) {
             Logger.getLogger(WindowsSlaveInstaller.class.getName()).log(Level.SEVERE, null, ex);
             return -1;
@@ -137,8 +143,9 @@ public class WindowsSlaveInstaller implements Callable<Void, RuntimeException>, 
             if (r != JOptionPane.OK_OPTION) {
                 return;
             }
-
-            if (!NativeUtils.getInstance().isDotNetInstalled(2, 0)) {
+ 
+            
+            if (!nativeUtils.isDotNetInstalled(2, 0)) {
                 JOptionPane.showMessageDialog(dialog, Messages.WindowsSlaveInstaller_DotNetRequired(),
                         Messages.WindowsInstallerLink_DisplayName(), ERROR_MESSAGE);
                 return;
@@ -172,7 +179,7 @@ public class WindowsSlaveInstaller implements Callable<Void, RuntimeException>, 
             // install as a service
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             StreamTaskListener task = new StreamTaskListener(baos);
-            r = runElevated(slaveExe, "install", task, dir);
+            r = runElevated(slaveExe, "install", task, dir, nativeUtils);
             if (r != 0) {
                 JOptionPane.showMessageDialog(
                         dialog, baos.toString(), "Error", ERROR_MESSAGE);
@@ -191,7 +198,7 @@ public class WindowsSlaveInstaller implements Callable<Void, RuntimeException>, 
                 public void run() {
                     try {
                         StreamTaskListener task = StreamTaskListener.fromStdout();
-                        int r = runElevated(slaveExe, "start", task, dir);
+                        int r = runElevated(slaveExe, "start", task, dir, nativeUtils);
                         task.getLogger().println(r == 0 ? "Successfully started" : "start service failed. Exit code=" + r);
                     } catch (IOException e) {
                         e.printStackTrace();

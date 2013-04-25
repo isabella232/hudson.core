@@ -91,6 +91,7 @@ public class WindowsInstallerLink extends ManagementLink {
      * Performs installation.
      */
     public void doDoInstall(StaplerRequest req, StaplerResponse rsp, @QueryParameter("dir") String _dir) throws IOException, ServletException {
+        NativeUtils nativeUtils = NativeUtils.getInstance();
         if (installationDir != null) {
             // installation already complete
             sendError("Installation is already complete", req, rsp);
@@ -99,7 +100,7 @@ public class WindowsInstallerLink extends ManagementLink {
 
 
         try {
-            if (!NativeUtils.getInstance().isDotNetInstalled(2, 0)) {
+            if (!nativeUtils.isDotNetInstalled(2, 0)) {
                 sendError(".NET Framework 2.0 or later is required for this feature", req, rsp);
             }
         } catch (NativeAccessException exc) {
@@ -136,7 +137,7 @@ public class WindowsInstallerLink extends ManagementLink {
             StreamTaskListener task = new StreamTaskListener(baos);
             task.getLogger().println("Installing a service");
             int r = WindowsSlaveInstaller.runElevated(
-                    new File(dir, "hudson.exe"), "install", task, dir);
+                    new File(dir, "hudson.exe"), "install", task, dir, nativeUtils);
             if (r != 0) {
                 sendError(baos.toString(), req, rsp);
                 return;
@@ -178,6 +179,7 @@ public class WindowsInstallerLink extends ManagementLink {
 
         rsp.forward(this, "_restart", req);
         final File oldRoot = Hudson.getInstance().getRootDir();
+        final NativeUtils nativeUtils = NativeUtils.getInstance();
 
         // initiate an orderly shutdown after we finished serving this request
         new Thread("terminator") {
@@ -208,7 +210,7 @@ public class WindowsInstallerLink extends ManagementLink {
                                 LOGGER.info("Starting a Windows service");
                                 StreamTaskListener task = StreamTaskListener.fromStdout();
                                 int r = WindowsSlaveInstaller.runElevated(
-                                        new File(installationDir, "hudson.exe"), "start", task, installationDir);
+                                        new File(installationDir, "hudson.exe"), "start", task, installationDir, nativeUtils);
                                 task.getLogger().println(r == 0 ? "Successfully started" : "start service failed. Exit code=" + r);
                             } catch (IOException e) {
                                 e.printStackTrace();
