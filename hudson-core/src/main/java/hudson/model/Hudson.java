@@ -162,6 +162,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.BindException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.Collator;
@@ -1841,9 +1842,18 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public String getRootUrl() {
         // for compatibility. the actual data is stored in Mailer
         String url = Mailer.descriptor().getUrl();
-        if (url != null) {
-            return url;
-        }
+		if (url != null) {
+			URL theUrl;
+			try {
+				theUrl = new URL(url);
+			} catch (MalformedURLException e) {
+				return url;
+			}
+			String hostNamePart = theUrl.getProtocol() + "://"
+					+ theUrl.getHost();
+			return hostNamePart + Functions.getRequestRootPath();
+
+		}
 
         StaplerRequest req = Stapler.getCurrentRequest();
         if (req != null) {
