@@ -262,8 +262,8 @@ public class Functions {
         if (l == null) {
             return null;    // there was no Run object
         }
-        String head = f.getPrev().getUrl() + '/';
-        String base = l.getUrl();
+        String head = getAncestorUrl(req, f.getPrev()) + '/';
+        String base = getAncestorUrl(req, l);
 
         String reqUri = req.getOriginalRequestURI();
         // Find "rest" or URI by removing N path components.
@@ -272,7 +272,7 @@ public class Functions {
         // this string is not decoded, Tomcat apparently decodes this string. You see ' '
         // instead of '%20', which is what the browser has sent), latter may occur in some
         // proxy or URL-rewriting setups where extra slashes are inadvertently added.
-        String furl = f.getUrl();
+        String furl = getAncestorUrl(req, f);
         int slashCount = 0;
         // Count components in ancestor URL
         for (int i = furl.indexOf('/'); i >= 0; i = furl.indexOf('/', i + 1)) {
@@ -500,10 +500,21 @@ public class Functions {
         for (int i = list.size() - 1; i >= 0; i--) {
             Ancestor anc = (Ancestor) list.get(i);
             if (anc.getObject() == it) {
-                return anc.getUrl();
+                String ancUrl = anc.getUrl();
+                String reqRootPath = Functions.getRequestRootPath(req);
+                return ancUrl.replaceFirst(req.getContextPath(), reqRootPath);
             }
         }
         return null;
+    }
+    
+    public static String getAncestorUrl(StaplerRequest req, Ancestor anc) {
+        if (anc != null) {
+            String ancUrl = anc.getUrl();
+            String reqRootPath = Functions.getRequestRootPath(req);
+            return ancUrl.replaceFirst(req.getContextPath(), reqRootPath);
+        }
+        return "";
     }
 
     /**
@@ -667,7 +678,7 @@ public class Functions {
         if (req.getLocalPort() != 80) {
             buf.append(':').append(req.getLocalPort());
         }
-        buf.append(req.getContextPath()).append('/');
+        buf.append(getRequestRootPath(req)).append('/');
         return buf.toString();
     }
 
@@ -773,6 +784,27 @@ public class Functions {
         }
         return buf.append(c.getName());
     }
+    
+    public static String getRequestRootPath() {
+        return getRequestRootPath(null);
+    }
+
+    public static String getRequestRootPath(StaplerRequest req) {
+        if (req == null) {
+            req = Stapler.getCurrentRequest();
+        }
+        return getHttpRequestRootPath(req);
+    }
+    
+    private static RequestRootPathProvider requestRootPathProvider = new DefaultRequestRootPathProvider();
+    
+    public static void setRequestRootPathProvider(RequestRootPathProvider requestRootPathProvider) {
+    	Functions.requestRootPathProvider = requestRootPathProvider;
+    }
+
+    public static String getHttpRequestRootPath(HttpServletRequest req) {
+    	return requestRootPathProvider.getRootPath(req);
+    }
 
     /**
      * Computes the path to the icon of the given action from the context path.
@@ -829,7 +861,7 @@ public class Functions {
                     return ancestors.get(view) + '/' + url;
                 } else {
                     // otherwise return a path from the root Hudson
-                    return request.getContextPath() + '/' + p.getUrl();
+                    return getRequestRootPath(request) + '/' + p.getUrl();
                 }
             }
 
@@ -1052,7 +1084,7 @@ public class Functions {
             clazz = ((Descriptor) it).clazz;
         }
 
-        StringBuilder buf = new StringBuilder(Stapler.getCurrentRequest().getContextPath());
+        StringBuilder buf = new StringBuilder(getRequestRootPath());
         buf.append(Hudson.VIEW_RESOURCE_PATH).append('/');
         buf.append(clazz.getName().replace('.', '/').replace('$', '/'));
         buf.append('/').append(path);
@@ -1185,10 +1217,10 @@ public class Functions {
             return urlName; // absolute URL
         }
         if (urlName.startsWith("/")) {
-            return Stapler.getCurrentRequest().getContextPath() + urlName;
+            return getRequestRootPath() + urlName;
         } else // relative URL name
         {
-            return Stapler.getCurrentRequest().getContextPath() + '/' + itUrl + urlName;
+            return getRequestRootPath() + '/' + itUrl + urlName;
         }
     }
 
@@ -1339,7 +1371,7 @@ public class Functions {
      * {@link ConsoleAnnotationDescriptor}s.
      */
     public static String generateConsoleAnnotationScriptAndStylesheet() {
-        String cp = Stapler.getCurrentRequest().getContextPath();
+        String cp = getRequestRootPath();
         StringBuilder buf = new StringBuilder();
         for (ConsoleAnnotatorFactory f : ConsoleAnnotatorFactory.all()) {
             String path = cp + "/extensionList/" + ConsoleAnnotatorFactory.class.getName() + "/" + f.getClass().getName();
