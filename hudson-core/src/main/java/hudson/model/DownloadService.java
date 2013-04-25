@@ -19,12 +19,12 @@ package hudson.model;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
+import hudson.Functions;
 import hudson.Util;
 import hudson.util.IOUtils;
 import hudson.util.QuotedStringTokenizer;
 import hudson.util.TextFile;
 import hudson.util.TimeUnit2;
-import org.kohsuke.stapler.Stapler;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,7 +74,7 @@ public class DownloadService extends PageDecorator {
                             .append(QuotedStringTokenizer.quote(Hudson.VERSION + "-" + Util.getDigestOf(Hudson.getInstance().getSecretKey())))
                             .append('}')
                             .append(',')
-                            .append(QuotedStringTokenizer.quote(Stapler.getCurrentRequest().getContextPath() + '/' + getUrl() + "/byId/" + d.getId() + "/postBack"))
+                            .append(QuotedStringTokenizer.quote(Functions.getRequestRootPath() + '/' + getUrl() + "/byId/" + d.getId() + "/postBack"))
                             .append(',')
                             .append("null);")
                             .append("});")

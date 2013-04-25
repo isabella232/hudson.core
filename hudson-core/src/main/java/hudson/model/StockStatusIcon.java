@@ -14,9 +14,9 @@
 
 package hudson.model;
 
+import hudson.Functions;
 import org.jvnet.localizer.LocaleProvider;
 import org.jvnet.localizer.Localizable;
-import org.kohsuke.stapler.Stapler;
 
 /**
  * {@link StatusIcon} for stock icon in Hudson.
@@ -40,7 +40,7 @@ public final class StockStatusIcon extends AbstractStatusIcon {
     }
 
     public String getImageOf(String size) {
-        return Stapler.getCurrentRequest().getContextPath() + Hudson.RESOURCE_PATH + "/images/" + size + '/' + image;
+        return Functions.getRequestRootPath(null) + Hudson.RESOURCE_PATH + "/images/" + size + '/' + image;
     }
 
     public String getDescription() {

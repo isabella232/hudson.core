@@ -33,8 +33,6 @@ import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.io.IOUtils;
 
-import org.kohsuke.stapler.Stapler;
-
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -1167,7 +1165,7 @@ public class Util {
      */
     public static String wrapToErrorSpan(String s) {
         s = "<span class=error><img src='"
-                + Stapler.getCurrentRequest().getContextPath() + Hudson.RESOURCE_PATH
+                + Functions.getRequestRootPath() + Hudson.RESOURCE_PATH
                 + "/images/none.gif' height=16 width=1>" + s + "</span>";
         return s;
     }

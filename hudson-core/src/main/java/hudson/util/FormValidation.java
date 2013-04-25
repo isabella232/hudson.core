@@ -17,26 +17,24 @@
 package hudson.util;
 
 import hudson.EnvVars;
+import hudson.FilePath;
 import hudson.Functions;
 import hudson.ProxyConfiguration;
 import hudson.Util;
-import hudson.FilePath;
 import static hudson.Util.fixEmpty;
 import hudson.model.Hudson;
-import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.Stapler;
-
-import javax.servlet.ServletException;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Locale;
+import javax.servlet.ServletException;
 import org.apache.commons.codec.binary.Base64;
+import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * Represents the result of the form field validation.
@@ -216,7 +214,7 @@ public abstract class FormValidation extends IOException implements HttpResponse
             public String renderHtml() {
                 // 1x16 spacer needed for IE since it doesn't support min-height
                 return "<div class=" + kind.name().toLowerCase(Locale.ENGLISH) + "><img src='"
-                        + Stapler.getCurrentRequest().getContextPath() + Hudson.RESOURCE_PATH + "/images/none.gif' height=16 width=1>"
+                        + Functions.getRequestRootPath() + Hudson.RESOURCE_PATH + "/images/none.gif' height=16 width=1>"
                         + message + "</div>";
             }
         };

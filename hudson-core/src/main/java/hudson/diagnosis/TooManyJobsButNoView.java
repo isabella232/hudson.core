@@ -19,6 +19,7 @@ package hudson.diagnosis;
 import hudson.model.AdministrativeMonitor;
 import hudson.model.Hudson;
 import hudson.Extension;
+import hudson.Functions;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -48,9 +49,9 @@ public class TooManyJobsButNoView extends AdministrativeMonitor {
     public void doAct(StaplerRequest req, StaplerResponse rsp) throws IOException {
         if (req.hasParameter("no")) {
             disable(true);
-            rsp.sendRedirect(req.getContextPath() + "/manage");
+            rsp.sendRedirect(Functions.getRequestRootPath(req) + "/manage");
         } else {
-            rsp.sendRedirect(req.getContextPath() + "/newView");
+            rsp.sendRedirect(Functions.getRequestRootPath(req) + "/newView");
         }
     }
     public static final int THRESHOLD = 16;

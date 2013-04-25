@@ -16,6 +16,7 @@
 
 package hudson.model;
 
+import hudson.Functions;
 import org.eclipse.hudson.graph.ColorPalette;
 import org.jvnet.localizer.LocaleProvider;
 import org.jvnet.localizer.Localizable;
@@ -88,9 +89,9 @@ public enum BallColor implements StatusIcon {
     public String getImageOf(String size) {
         if (Hudson.getInstance().useBlueBall()) {
             String blueImage = image.replaceAll("green", "blue");
-            return Stapler.getCurrentRequest().getContextPath() + Hudson.RESOURCE_PATH + "/images/" + size + '/' + blueImage;
+            return Functions.getRequestRootPath() + Hudson.RESOURCE_PATH + "/images/" + size + '/' + blueImage;
         } else {
-            return Stapler.getCurrentRequest().getContextPath() + Hudson.RESOURCE_PATH + "/images/" + size + '/' + image;
+            return Functions.getRequestRootPath() + Hudson.RESOURCE_PATH + "/images/" + size + '/' + image;
         }
     }
 

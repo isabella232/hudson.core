@@ -19,6 +19,7 @@ package hudson.security;
 import hudson.mail.BaseMailSender;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import hudson.Extension;
+import hudson.Functions;
 import hudson.Util;
 import hudson.diagnosis.OldDataMonitor;
 import hudson.model.*;
@@ -713,7 +714,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
         public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
             HttpServletRequest req = (HttpServletRequest) request;
 
-            if (req.getRequestURI().equals(req.getContextPath() + "/")) {
+            if (req.getRequestURI().equals(Functions.getHttpRequestRootPath(req) + "/")) {
                 if (needsToCreateFirstUser()) {
                     ((HttpServletResponse) response).sendRedirect("securityRealm/firstUser");
                 } else { // the first user already created. the role of this filter is over.

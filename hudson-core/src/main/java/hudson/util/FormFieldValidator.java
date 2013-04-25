@@ -19,6 +19,7 @@ package hudson.util;
 import static hudson.Util.fixEmpty;
 import hudson.EnvVars;
 import hudson.FilePath;
+import hudson.Functions;
 import hudson.ProxyConfiguration;
 import hudson.Util;
 import hudson.model.AbstractProject;
@@ -221,7 +222,7 @@ public abstract class FormFieldValidator {
             response.setContentType("text/html;charset=UTF-8");
             // 1x16 spacer needed for IE since it doesn't support min-height
             response.getWriter().print("<div class=" + cssClass + "><img src='"
-                    + request.getContextPath() + Hudson.RESOURCE_PATH + "/images/none.gif' height=16 width=1>"
+                    + Functions.getRequestRootPath(request) + Hudson.RESOURCE_PATH + "/images/none.gif' height=16 width=1>"
                     + message + "</div>");
         }
     }

@@ -19,6 +19,7 @@ import hudson.DescriptorExtensionList;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.ExtensionPoint;
+import hudson.Functions;
 import hudson.cli.CLICommand;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
@@ -252,7 +253,7 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
      * @since 1.314
      */
     protected String getPostLogOutUrl(StaplerRequest req, Authentication auth) {
-        return req.getContextPath() + "/";
+        return Functions.getRequestRootPath(req) + "/";
     }
 
     public CaptchaSupport getCaptchaSupport() {
@@ -291,7 +292,7 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
 
         // reset remember-me cookie
         Cookie cookie = new Cookie(TokenBasedRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY, "");
-        cookie.setPath(req.getContextPath().length() > 0 ? req.getContextPath() : "/");
+        cookie.setPath(Functions.getRequestRootPath(req).length() > 0 ? Functions.getRequestRootPath(req) : "/");
         rsp.addCookie(cookie);
 
         rsp.sendRedirect2(getPostLogOutUrl(req, auth));

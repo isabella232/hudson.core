@@ -19,6 +19,7 @@ package hudson.model;
 import hudson.RelativePath;
 import hudson.XmlFile;
 import hudson.BulkChange;
+import hudson.Functions;
 import hudson.Util;
 import static hudson.Util.singleQuote;
 import hudson.diagnosis.OldDataMonitor;
@@ -743,7 +744,7 @@ public abstract class Descriptor<T extends Describable<T>> implements Saveable {
                 // TODO: generalize macro expansion and perhaps even support JEXL
                 rsp.setContentType("text/html;charset=UTF-8");
                 String literal = IOUtils.toString(in, "UTF-8");
-                rsp.getWriter().println(Util.replaceMacro(literal, Collections.singletonMap("rootURL", req.getContextPath())));
+                rsp.getWriter().println(Util.replaceMacro(literal, Collections.singletonMap("rootURL", Functions.getRequestRootPath(req))));
                 in.close();
                 return;
             }

@@ -18,6 +18,7 @@ package org.eclipse.hudson.security;
 
 import com.thoughtworks.xstream.XStream;
 import hudson.BulkChange;
+import hudson.Functions;
 import hudson.Util;
 import hudson.XmlFile;
 import hudson.markup.MarkupFormatter;
@@ -318,7 +319,7 @@ public class HudsonSecurityManager implements Saveable {
                 authorizationStrategy = AuthorizationStrategy.UNSECURED;
             }
 
-            rsp.sendRedirect(req.getContextPath() + '/');  // go to the top page
+            rsp.sendRedirect(Functions.getRequestRootPath(req) + '/');  // go to the top page
 
         } finally {
             bc.commit();

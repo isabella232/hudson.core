@@ -78,7 +78,7 @@ public class BuildTimelineWidget {
             // what to put in the description?
             // e.description = "Longish description of event "+r.getFullDisplayName();
             // e.durationEvent = true;
-            e.link = req.getContextPath() + '/' + r.getUrl();
+            e.link = Functions.getRequestRootPath(req) + '/' + r.getUrl();
             BallColor c = r.getIconColor();
             e.color = String.format("#%06X", c.getBaseColor().darker().getRGB() & 0xFFFFFF);
             e.classname = "event-" + c.noAnime().toString() + " " + (c.isAnimated() ? "animated" : "");

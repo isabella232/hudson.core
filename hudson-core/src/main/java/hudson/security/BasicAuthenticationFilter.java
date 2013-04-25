@@ -16,6 +16,7 @@
 
 package hudson.security;
 
+import hudson.Functions;
 import hudson.util.Scrambler;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -114,7 +115,7 @@ public class BasicAuthenticationFilter implements Filter {
             return;
         }
 
-        path = req.getContextPath() + "/secured" + path;
+        path = Functions.getHttpRequestRootPath(req) + "/secured" + path;
         String q = req.getQueryString();
         if (q != null) {
             path += '?' + q;
@@ -140,7 +141,7 @@ public class BasicAuthenticationFilter implements Filter {
     //    } else {
     //        if(req.getQueryString()!=null)
     //            path += req.getQueryString();
-    //        ((HttpServletResponse)response).sendRedirect(req.getContextPath()+"/secured"+path);
+    //        ((HttpServletResponse)response).sendRedirect(Functions.getRootPath(req)+"/secured"+path);
     //    }
     //}
     public void destroy() {

@@ -172,7 +172,7 @@ public class WindowsInstallerLink extends ManagementLink {
             // if the user reloads the page after Hudson has restarted,
             // it comes back here. In such a case, don't let this restart Hudson.
             // so just send them back to the top page
-            rsp.sendRedirect(req.getContextPath() + "/");
+            rsp.sendRedirect(Functions.getRequestRootPath(req) + "/");
             return;
         }
         Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
