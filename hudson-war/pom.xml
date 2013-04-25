@@ -34,7 +34,7 @@
 
     <properties>
         <HUDSON_HOME>${basedir}/work</HUDSON_HOME>
-        <contextPath>/</contextPath><!-- context path during test -->
+        <contextPath>/hudson</contextPath><!-- context path during test -->
         <port>8080</port><!-- HTTP listener port -->
         <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
     </properties>

@@ -100,7 +100,7 @@
                             type: 'POST',
                             url: "doDelete",
                             success: deletingJob,
-                            error: function(){
+                            error: function(msg){
                                 var msg = 'Failed to delete the job';
                                 showMessage(jQuery('#deleteMsg'), msg, "red");
                             },

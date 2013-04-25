@@ -19,7 +19,8 @@
     <st:header name="Expires" value="0" />
     <st:contentType value="text/html;charset=UTF-8" />
     
-    <j:set var="rootURL" value="${request.contextPath}" />
+    <j:new var="h" className="hudson.Functions" />
+    <j:set var="rootURL" value="${h.getRequestRootPath(request)}" />
     <j:set var="imagesURL"  value="${rootURL}/images" />
     <j:set var="cssURL"  value="${rootURL}/css" />
     <j:set var="scriptsURL"  value="${rootURL}/scripts" />
