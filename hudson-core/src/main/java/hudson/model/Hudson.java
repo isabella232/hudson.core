@@ -205,10 +205,10 @@ import org.eclipse.hudson.plugins.PluginCenter;
 import org.eclipse.hudson.script.ScriptSupport;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.eclipse.hudson.security.team.TeamBasedAuthorizationStrategy;
 import org.eclipse.hudson.security.team.TeamManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.security.AccessDeniedException;
 import org.springframework.security.Authentication;
 import org.springframework.security.ui.AbstractProcessingFilter;
@@ -395,7 +395,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     public transient final PluginManager pluginManager;
     private transient PluginCenter pluginCenter;
-    private transient TeamManager teamManager;
     public transient volatile TcpSlaveAgentListener tcpSlaveAgentListener;
     private transient UDPBroadcastThread udpBroadcastThread;
     private transient DNSMultiCast dnsMultiCast;
@@ -577,8 +576,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             this.pluginManager = pluginManager;
 
             pluginCenter = new PluginCenter(root);
-            
-            teamManager = new TeamManager(root);
 
             // JSON binding needs to be able to see all the classes from all the plugins
             WebApp.get(servletContext).setClassLoader(pluginManager.uberClassLoader);
@@ -778,9 +775,14 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public PluginCenter getPluginCenter() {
         return pluginCenter;
     }
-    
+
     public TeamManager getTeamManager() {
-        return teamManager;
+        AuthorizationStrategy authorizationStrategy = getSecurityManager().getAuthorizationStrategy();
+        if (authorizationStrategy instanceof TeamBasedAuthorizationStrategy){
+            TeamBasedAuthorizationStrategy teamBasedAuthorizationStrategy = (TeamBasedAuthorizationStrategy) authorizationStrategy;
+            return teamBasedAuthorizationStrategy.getTeamManager();
+        }
+        return null;
     }
 
     public HudsonSecurityManager getSecurityManager() {
@@ -1248,9 +1250,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         List<TopLevelItem> viewableItems = new ArrayList<TopLevelItem>();
         for (TopLevelItem item : items.values()) {
             if (item.hasPermission(Item.READ)) {
-                if (teamManager.isCurrentUserHasAccess(item.getName())) {
                     viewableItems.add(item);
-                }
             }
         }
 
@@ -2104,10 +2104,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         if (item == null || !item.hasPermission(Item.READ)) {
             return null;
         }
-        if (!teamManager.isCurrentUserHasAccess(item.getName())) {
-            return null;
-        }
-        
         return item;
     }
 

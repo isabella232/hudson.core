@@ -16,31 +16,22 @@ import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
 import org.junit.After;
-import org.junit.AfterClass;
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  * Test class for TeamManager
- * @author wjprakash
+ *
+ * @author Winston Prakash
  */
 public class TeamManagerTest {
 
-    String teamsFileName = "teams.xml";
-    File homeDir = FileUtils.getTempDirectory();
-    File teamsStore = new File(homeDir, teamsFileName);
+    private File homeDir = FileUtils.getTempDirectory();
+    private File teamsFolder = new File(homeDir, "teams");
+    private final String teamsConfigFileName = "teams.xml";
+    private File teamsStore = new File(teamsFolder, teamsConfigFileName);
     private TeamManager teamManager;
-
-    @BeforeClass
-    public static void setUpClass() {
-        
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
 
     @Before
     public void setUp() {
@@ -53,9 +44,11 @@ public class TeamManagerTest {
 
     @After
     public void tearDown() {
+        if (teamsStore.exists()) {
+            teamsStore.delete();
+        }
     }
 
- 
     /**
      * Test of createTeam method, of class TeamManager.
      */
@@ -113,12 +106,12 @@ public class TeamManagerTest {
         } catch (TeamNotFoundException ex) {
             fail("Team must exist");
         }
-        
+
         Team team = teamManager.findUserTeam("chris");
         Assert.assertTrue(teamName.equals(team.getName()));
     }
-    
-        /**
+
+    /**
      * Test of addJobToUserTeam method, of class TeamManager.
      */
     @Test
@@ -133,14 +126,12 @@ public class TeamManagerTest {
         } catch (TeamNotFoundException ex) {
             fail("Team must exist");
         }
-        
+
         teamManager.addJobToUserTeam("chris", "job1");
         Team team = teamManager.findTeam(teamName);
-        Assert.assertTrue(team.isJobOwner("job1")); 
+        Assert.assertTrue(team.isJobOwner("job1"));
     }
-    
-    
-//
+
     /**
      * Test of findJobOwnerTeam method, of class TeamManager.
      */
@@ -156,7 +147,7 @@ public class TeamManagerTest {
         } catch (TeamNotFoundException ex) {
             fail("Team must exist");
         }
-        
+
         teamManager.addJobToUserTeam("chris", "job1");
         Team team = teamManager.findJobOwnerTeam("job1");
         Assert.assertTrue(teamName.equals(team.getName()));
@@ -182,7 +173,7 @@ public class TeamManagerTest {
         Team jobTeam = teamManager.findJobOwnerTeam("job1");
         Assert.assertTrue(teamName.equals(jobTeam.getName()));
     }
- 
+
     /**
      * Test of removeJob method, of class TeamManager.
      */
@@ -224,9 +215,7 @@ public class TeamManagerTest {
         teamManager.removeJobFromUserTeam("paul", "job1");
         Assert.assertFalse(team.isJobOwner("job1"));
     }
- 
- 
-//
+
     /**
      * Test of renameJobInUserTeam method, of class TeamManager.
      */
@@ -247,7 +236,7 @@ public class TeamManagerTest {
         Assert.assertFalse(team.isJobOwner("job1"));
         Assert.assertTrue(team.isJobOwner("job2"));
     }
-//
+
     /**
      * Test of renameJob method, of class TeamManager.
      */
@@ -269,7 +258,7 @@ public class TeamManagerTest {
         Assert.assertFalse(team.isJobOwner("job1"));
         Assert.assertTrue(teamName.equals(jobTeam.getName()));
     }
-//
+
     /**
      * Test of save method, of class TeamManager.
      */
@@ -293,7 +282,7 @@ public class TeamManagerTest {
             fail("Team must exist");
         }
     }
-//
+
     /**
      * Test of load method, of class TeamManager.
      */

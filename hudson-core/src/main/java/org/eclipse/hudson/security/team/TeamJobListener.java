@@ -11,11 +11,13 @@
 package org.eclipse.hudson.security.team;
 
 import hudson.Extension;
-import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.listeners.ItemListener;
+import hudson.security.AuthorizationStrategy;
 import java.io.IOException;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,14 +31,17 @@ import org.slf4j.LoggerFactory;
 @Extension
 public class TeamJobListener extends ItemListener {
 
-    private transient Logger logger = LoggerFactory.getLogger(TeamAwareSecurityRealm.class);
+    private transient Logger logger = LoggerFactory.getLogger(TeamJobListener.class);
 
     @Override
     public void onCreated(Item item) {
         if (item instanceof Job<?, ?>) {
             Job job = (Job) item;
             try {
-                Hudson.getInstance().getTeamManager().addJobToCurrentUserTeam(job.getName());
+                TeamManager teamManager = getTeamManager();
+                if (teamManager != null) {
+                    teamManager.addJobToCurrentUserTeam(job.getName());
+                }
             } catch (IOException ex) {
                 logger.error("Failed to rename job in current user team", ex);
             }
@@ -47,7 +52,10 @@ public class TeamJobListener extends ItemListener {
     public void onRenamed(Item item, String oldJobName, String newJobName) {
         if (item instanceof Job<?, ?>) {
             try {
-                Hudson.getInstance().getTeamManager().renameJobInCurrentUserTeam(oldJobName, newJobName);
+                TeamManager teamManager = getTeamManager();
+                if (teamManager != null) {
+                    teamManager.renameJobInCurrentUserTeam(oldJobName, newJobName);
+                }
             } catch (IOException ex) {
                 logger.error("Failed to rename job in current user team", ex);
             }
@@ -59,10 +67,23 @@ public class TeamJobListener extends ItemListener {
         if (item instanceof Job<?, ?>) {
             Job job = (Job) item;
             try {
-                Hudson.getInstance().getTeamManager().removeJobFromCurrentUserTeam(job.getName());
+                TeamManager teamManager = getTeamManager();
+                if (teamManager != null) {
+                    teamManager.removeJobFromCurrentUserTeam(job.getName());
+                }
             } catch (IOException ex) {
                 logger.error("Failed to rename job in current user team", ex);
             }
         }
+    }
+
+    private TeamManager getTeamManager() {
+        HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
+        AuthorizationStrategy authorizationStrategy = hudsonSecurityManager.getAuthorizationStrategy();
+        if (authorizationStrategy instanceof TeamBasedAuthorizationStrategy) {
+            TeamBasedAuthorizationStrategy teamBasedAuthorizationStrategy = (TeamBasedAuthorizationStrategy) authorizationStrategy;
+            return teamBasedAuthorizationStrategy.getTeamManager();
+        }
+        return null;
     }
 }

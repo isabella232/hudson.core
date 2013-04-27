@@ -14,14 +14,17 @@ import com.thoughtworks.xstream.XStream;
 import hudson.BulkChange;
 import hudson.XmlFile;
 import hudson.model.Hudson;
+import hudson.model.Job;
 import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
+import hudson.security.ACL;
 import hudson.security.SecurityRealm;
 import hudson.util.XStream2;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,24 +37,55 @@ import org.slf4j.LoggerFactory;
  */
 public final class TeamManager implements Saveable {
 
+    private List<String> sysAdmins = new CopyOnWriteArrayList<String>();
     private List<Team> teams = new CopyOnWriteArrayList<Team>();
-    private transient final String teamsConfigFileName = "teams.xml";
     private static final XStream XSTREAM = new XStream2();
     private transient Logger logger = LoggerFactory.getLogger(TeamManager.class);
     private transient File hudsonHomeDir;
+    private transient File teamsFolder;
+    private transient final String teamsConfigFileName = "teams.xml";
+    private transient Team defaultTeam;
 
-    public TeamManager(File homeDir) {
+    public TeamManager() {
+        this(Hudson.getInstance().getRootDir());
+    }
+
+    // For unit test
+    TeamManager(File homeDir) {
         hudsonHomeDir = homeDir;
+        teamsFolder = new File(hudsonHomeDir, "teams");
         load();
+        ensureDefaultTeam();
+    }
+
+    public void addSysAdmin(String adminName) {
+        sysAdmins.add(adminName);
+    }
+
+    public boolean isSysAdmin(String userName) {
+        boolean isSysAdmin = false;
+        HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
+        SecurityRealm securityRealm = null;
+        if (hudsonSecurityManager != null) {
+            securityRealm = hudsonSecurityManager.getSecurityRealm();
+        }
+        if ((securityRealm != null) && securityRealm instanceof TeamAwareSecurityRealm) {
+            TeamAwareSecurityRealm teamAwareSecurityRealm = (TeamAwareSecurityRealm) securityRealm;
+            isSysAdmin = teamAwareSecurityRealm.isCurrentUserSysAdmin();
+        } else {
+            isSysAdmin = sysAdmins.contains(userName);
+        }
+        return isSysAdmin;
     }
 
     public List<Team> getTeams() {
         return teams;
     }
 
-    public Team createTeam(String teamName) {
+    public Team createTeam(String teamName) throws IOException {
         Team newTeam = new Team(teamName);
         teams.add(newTeam);
+        save();
         return newTeam;
     }
 
@@ -78,9 +112,13 @@ public final class TeamManager implements Saveable {
 
     private Team findCurrentUserTeam() {
         Team team;
-        SecurityRealm securityRelm = Hudson.getInstance().getSecurityManager().getSecurityRealm();
-        if (securityRelm instanceof TeamAwareSecurityRealm) {
-            TeamAwareSecurityRealm teamAwareSecurityRealm = (TeamAwareSecurityRealm) securityRelm;
+        HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
+        SecurityRealm securityRealm = null;
+        if (hudsonSecurityManager != null) {
+            securityRealm = hudsonSecurityManager.getSecurityRealm();
+        }
+        if ((securityRealm != null) && securityRealm instanceof TeamAwareSecurityRealm) {
+            TeamAwareSecurityRealm teamAwareSecurityRealm = (TeamAwareSecurityRealm) securityRealm;
             team = teamAwareSecurityRealm.GetCurrentUserTeam();
         } else {
             String currentUser = HudsonSecurityManager.getAuthentication().getName();
@@ -92,9 +130,9 @@ public final class TeamManager implements Saveable {
     public boolean isCurrentUserHasAccess(String jobName) {
         Team userTeam = findCurrentUserTeam();
         if (userTeam != null) {
-            if (userTeam.isJobOwner(jobName)){
+            if (userTeam.isJobOwner(jobName)) {
                 return true;
-            }else{
+            } else {
                 return isAnonymousJob(jobName);
             }
         } else {
@@ -130,10 +168,20 @@ public final class TeamManager implements Saveable {
     }
 
     public Team findUserTeam(String userName) {
+
         for (Team team : teams) {
             if (team.isMember(userName)) {
                 return team;
             }
+        }
+        HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
+        SecurityRealm securityRealm = null;
+        if (hudsonSecurityManager != null) {
+            securityRealm = hudsonSecurityManager.getSecurityRealm();
+        }
+        if ((securityRealm != null) && securityRealm instanceof TeamAwareSecurityRealm) {
+            TeamAwareSecurityRealm teamAwareSecurityRealm = (TeamAwareSecurityRealm) securityRealm;
+            return teamAwareSecurityRealm.GetCurrentUserTeam();
         }
         return null;
     }
@@ -158,7 +206,7 @@ public final class TeamManager implements Saveable {
 
     public void addJob(Team team, String jobName) throws IOException {
         if (team != null) {
-            team.addJobName(jobName);
+            team.addJob(jobName);
             save();
         }
     }
@@ -173,7 +221,7 @@ public final class TeamManager implements Saveable {
 
     public void removeJob(Team team, String jobName) throws IOException {
         if (team != null) {
-            team.removeJobName(jobName);
+            team.removeJob(jobName);
             save();
         }
     }
@@ -188,7 +236,7 @@ public final class TeamManager implements Saveable {
 
     public void renameJob(Team team, String oldJobName, String newJobName) throws IOException {
         if (team != null) {
-            team.renameJobName(oldJobName, newJobName);
+            team.renameJob(oldJobName, newJobName);
             save();
         }
     }
@@ -197,7 +245,11 @@ public final class TeamManager implements Saveable {
      * The file where the teams settings are saved.
      */
     private XmlFile getConfigFile() {
-        return new XmlFile(XSTREAM, new File(hudsonHomeDir, teamsConfigFileName));
+        if (!teamsFolder.exists()) {
+            teamsFolder.mkdirs();
+        }
+
+        return new XmlFile(XSTREAM, new File(teamsFolder, teamsConfigFileName));
     }
     // This is purely fo unit test. Since Hudson is not fully loaded during
     // test BulkChange saving mode is not available
@@ -224,7 +276,7 @@ public final class TeamManager implements Saveable {
     /**
      * Load the settings from the configuration file
      */
-    public void load() {
+    private void load() {
 
         XmlFile config = getConfigFile();
         try {
@@ -234,6 +286,48 @@ public final class TeamManager implements Saveable {
         } catch (IOException e) {
             logger.error("Failed to load " + config, e);
         }
+    }
+
+    /**
+     * Get an ACL that provides system wide authorization
+     *
+     * @return TeamBasedACL with SYSTEM scope
+     */
+    ACL getRoolACL() {
+        return new TeamBasedACL(this, TeamBasedACL.SCOPE.GLOBAL);
+    }
+
+    /**
+     * Get an ACL that provides job specific authorization
+     *
+     * @return TeamBasedACL with JOB scope
+     */
+    ACL getACL(Job<?, ?> job) {
+        return new TeamBasedACL(this, TeamBasedACL.SCOPE.JOB, job);
+    }
+
+    /**
+     * Get an ACL that provides team specific authorization
+     *
+     * @return TeamBasedACL with JOB scope
+     */
+    ACL getACL(Team team) {
+        return new TeamBasedACL(this, TeamBasedACL.SCOPE.JOB, team);
+    }
+
+    private void ensureDefaultTeam() {
+        try {
+            findTeam(DefaultTeam.DEFAULT_TEAM_NAME);
+        } catch (TeamNotFoundException ex) {
+            logger.info("Default team does not exist. Creating ..");
+            defaultTeam = new DefaultTeam();
+            teams.add(defaultTeam);
+            ((DefaultTeam) defaultTeam).loadExistingJobs(hudsonHomeDir);
+        }
+    }
+
+    Team getDefaultTeam() throws TeamNotFoundException {
+        return findTeam(DefaultTeam.DEFAULT_TEAM_NAME);
     }
 
     public static class TeamNotFoundException extends Exception {
