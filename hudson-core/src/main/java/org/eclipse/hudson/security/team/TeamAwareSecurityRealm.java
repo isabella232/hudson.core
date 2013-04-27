@@ -26,5 +26,11 @@ import hudson.security.SecurityRealm;
 public abstract class TeamAwareSecurityRealm extends SecurityRealm {
     
     public abstract Team GetCurrentUserTeam();
-        
+    
+    public boolean isCurrentUserSysAdmin(){
+        return false;
+    }
+    public boolean isCurrentUserTeamAdmin(){
+        return false;
+    }    
 }
