@@ -11,6 +11,7 @@
 package org.eclipse.hudson.security.team;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * The default team contains the jobs not specific to any team. 
@@ -18,9 +19,9 @@ import java.io.File;
  * @since 3.1.0
  * @author Winston Prakash
  */
-public class DefaultTeam extends Team{
-    static final String DEFAULT_TEAM_NAME = "default";
-    public DefaultTeam() {
+public final class DefaultTeam extends Team{
+    
+    DefaultTeam() {
         super(DEFAULT_TEAM_NAME);
     }
     
@@ -29,9 +30,15 @@ public class DefaultTeam extends Team{
      * default team.
      * @param hudsonHome 
      */
-    void loadExistingJobs(File hudsonHome){
-        // TODO: scan the Hudson home find all the existing jobs that 
-        // don't belong to any team
+    void loadExistingJobs(File rootFolder){
+        List<File> jobRootFolders = getJobsRootFolders(rootFolder);
+        for (File file : jobRootFolders){
+            addJob(file.getName());
+        }
     }
     
+    @Override
+    protected File getJobsFolder(File rootFolder){
+        return new File(rootFolder, "/" + "jobs");
+    }
 }

@@ -91,7 +91,7 @@ public class TeamBasedACL extends SidACL {
             }
         }
         if (scope == SCOPE.JOB) {
-            Team jobTeam = teamManager.findJobOwnerTeam(job.getName());
+            Team jobTeam = teamManager.findJobOwnerTeam(job.getId());
 
             if (jobTeam != null) {
                 if (jobTeam.isMember(userName)) {
@@ -114,7 +114,7 @@ public class TeamBasedACL extends SidACL {
             try {
                 defaultTeam = teamManager.findTeam("default");
 
-                if (defaultTeam.isJobOwner(job.getName())) {
+                if (defaultTeam.isJobOwner(job.getId())) {
                     if (permission.getImpliedBy() == Permission.READ) {
                         return true;
                     } 

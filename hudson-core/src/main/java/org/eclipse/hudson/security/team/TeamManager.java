@@ -312,18 +312,55 @@ public final class TeamManager implements Saveable {
     }
 
     private void ensureDefaultTeam() {
+        defaultTeam = new DefaultTeam();
         try {
-            findTeam(DefaultTeam.DEFAULT_TEAM_NAME);
+            Team team = findTeam(DefaultTeam.DEFAULT_TEAM_NAME);
+            teams.remove(team);
         } catch (TeamNotFoundException ex) {
-            logger.info("Default team does not exist. Creating ..");
-            defaultTeam = new DefaultTeam();
-            teams.add(defaultTeam);
-            ((DefaultTeam) defaultTeam).loadExistingJobs(hudsonHomeDir);
+            // It's ok, we are going to remove it any way
         }
+        defaultTeam.loadExistingJobs(hudsonHomeDir);
+        teams.add(defaultTeam);
     }
 
     Team getDefaultTeam() throws TeamNotFoundException {
         return findTeam(DefaultTeam.DEFAULT_TEAM_NAME);
+    }
+
+    public String getTeamQualifiedJobId(String jobId) {
+        if (defaultTeam.isJobOwner(jobId)){
+            return jobId;
+        }
+                
+        Team team = findCurrentUserTeam();
+        if ((team != null) && !Team.DEFAULT_TEAM_NAME.equals(team.getName())) {
+            jobId = team.getName() + "_" + jobId;
+        }
+        return jobId;
+    }
+
+    public String getJobsFolderName(String jobId) {
+        Team team = findJobOwnerTeam(jobId);
+        // May be just created job
+        if (team == null) {
+            team = findCurrentUserTeam();
+        }
+        if ((team != null) && !Team.DEFAULT_TEAM_NAME.equals(team.getName())) {
+            return TEAMS_FOLDER_NAME + "/" + team.getName() + "/" + Team.JOBS_FOLDER_NAME;
+        }
+        return "jobs";
+    }
+
+    public File[] getJobsRootFolders() {
+        List<File> jobsRootFolders = new ArrayList<File>();
+        for (Team team : teams) {
+            if (Team.DEFAULT_TEAM_NAME.equals(team.getName())) {
+                jobsRootFolders.addAll(team.getJobsRootFolders(hudsonHomeDir));
+            } else {
+                jobsRootFolders.addAll(team.getJobsRootFolders(teamsFolder));
+            }
+        }
+        return jobsRootFolders.toArray(new File[jobsRootFolders.size()]);
     }
 
     public static class TeamNotFoundException extends Exception {
