@@ -11,11 +11,16 @@
 package org.eclipse.hudson.security.team;
 
 import hudson.model.Hudson;
+import hudson.model.Items;
 import hudson.security.ACL;
 import hudson.security.AccessControlled;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.Permission;
 import hudson.security.SecurityRealm;
+import java.io.File;
+import java.io.FileFilter;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
@@ -31,12 +36,14 @@ import org.springframework.security.Authentication;
  */
 public class Team implements AccessControlled {
 
+    public static final String DEFAULT_TEAM_NAME = "default";
     private List<String> admins = new CopyOnWriteArrayList<String>();
     private List<String> members = new CopyOnWriteArrayList<String>();
     private List<String> ownedJobNames = new CopyOnWriteArrayList<String>();
     private String teamName;
+    protected static final String JOBS_FOLDER_NAME = "jobs";
 
-    public Team(String name) {
+    Team(String name) {
         teamName = name;
     }
 
@@ -92,7 +99,9 @@ public class Team implements AccessControlled {
     }
 
     public void addJob(String jobname) {
-        ownedJobNames.add(jobname);
+        if (!ownedJobNames.contains(jobname)) {
+            ownedJobNames.add(jobname);
+        }
     }
 
     public void removeJob(String jobname) {
@@ -106,6 +115,26 @@ public class Team implements AccessControlled {
     void renameJob(String oldJobName, String newJobName) {
         ownedJobNames.remove(oldJobName);
         ownedJobNames.add(newJobName);
+    }
+
+    List<File> getJobsRootFolders(File rootFolder) {
+        File jobsFolder = getJobsFolder(rootFolder);
+        if (jobsFolder.exists()) {
+            File[] jobsRootFolders = jobsFolder.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File child) {
+                    return child.isDirectory() && Items.getConfigFile(child).exists();
+                }
+            });
+            if (jobsRootFolders != null) {
+                return Arrays.asList(jobsRootFolders);
+            }
+        }
+        return Collections.EMPTY_LIST;
+    }
+    
+    protected File getJobsFolder(File rootFolder){
+        return new File(rootFolder, teamName + "/" + JOBS_FOLDER_NAME);
     }
 
     @Override

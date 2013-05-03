@@ -205,6 +205,7 @@ import org.eclipse.hudson.plugins.PluginCenter;
 import org.eclipse.hudson.script.ScriptSupport;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.eclipse.hudson.security.team.Team;
 import org.eclipse.hudson.security.team.TeamBasedAuthorizationStrategy;
 import org.eclipse.hudson.security.team.TeamManager;
 import org.slf4j.Logger;
@@ -395,6 +396,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     public transient final PluginManager pluginManager;
     private transient PluginCenter pluginCenter;
+    private transient TeamManager teamManager;
     public transient volatile TcpSlaveAgentListener tcpSlaveAgentListener;
     private transient UDPBroadcastThread udpBroadcastThread;
     private transient DNSMultiCast dnsMultiCast;
@@ -483,12 +485,21 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     private transient final ItemGroupMixIn itemGroupMixIn = new ItemGroupMixIn(this, this) {
         @Override
         protected void add(TopLevelItem item) {
-            items.put(item.getName(), item);
+            String itemId = item.getName();
+            if (getTeamManager() != null) {
+               itemId = getTeamManager().getTeamQualifiedJobId(itemId);
+            }
+            item.setId(itemId);
+            items.put(itemId, item);
         }
 
         @Override
         protected File getRootDirFor(String name) {
-            return Hudson.this.getRootDirFor(name);
+            String jobId = null;
+            if (getTeamManager() != null) {
+                jobId = getTeamManager().getTeamQualifiedJobId(name);
+            }
+            return Hudson.this.getRootDirFor(jobId, name);
         }
 
         /**
@@ -576,6 +587,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             this.pluginManager = pluginManager;
 
             pluginCenter = new PluginCenter(root);
+
+            teamManager = new TeamManager(root);
 
             // JSON binding needs to be able to see all the classes from all the plugins
             WebApp.get(servletContext).setClassLoader(pluginManager.uberClassLoader);
@@ -776,11 +789,17 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         return pluginCenter;
     }
 
+    /**
+     * TeamManager is returned only if the Team based authorization is set.
+     * @return
+     */
     public TeamManager getTeamManager() {
-        AuthorizationStrategy authorizationStrategy = getSecurityManager().getAuthorizationStrategy();
-        if (authorizationStrategy instanceof TeamBasedAuthorizationStrategy){
-            TeamBasedAuthorizationStrategy teamBasedAuthorizationStrategy = (TeamBasedAuthorizationStrategy) authorizationStrategy;
-            return teamBasedAuthorizationStrategy.getTeamManager();
+        HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
+        if (hudsonSecurityManager != null) {
+            AuthorizationStrategy authorizationStrategy = hudsonSecurityManager.getAuthorizationStrategy();
+            if (authorizationStrategy instanceof TeamBasedAuthorizationStrategy) {
+                return teamManager;
+            }
         }
         return null;
     }
@@ -2099,7 +2118,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      *
      * Note that the look up is case-insensitive.
      */
+    @Override
     public TopLevelItem getItem(String name) {
+        if (getTeamManager() != null){
+               name = getTeamManager().getTeamQualifiedJobId(name);
+        }
         TopLevelItem item = items.get(name);
         if (item == null || !item.hasPermission(Item.READ)) {
             return null;
@@ -2107,12 +2130,13 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         return item;
     }
 
+    @Override
     public File getRootDirFor(TopLevelItem child) {
-        return getRootDirFor(child.getName());
+        return getRootDirFor(child.getId(), child.getName());
     }
 
-    private File getRootDirFor(String name) {
-        return new File(new File(getRootDir(), "jobs"), name);
+    private File getRootDirFor(String jobId, String jobName) {
+        return new File(new File(getRootDir(), Functions.getJobsFolderName(jobId)), jobName);
     }
 
     /**
@@ -2190,8 +2214,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * one.
      */
     public synchronized void putItem(TopLevelItem item) throws IOException, InterruptedException {
-        String name = item.getName();
-        TopLevelItem old = items.get(name);
+
+        String itemId = item.getId();
+
+        TopLevelItem old = items.get(itemId);
         if (old == item) {
             return; // noop
         }
@@ -2199,7 +2225,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         if (old != null) {
             old.delete();
         }
-        items.put(name, item);
+        items.put(itemId, item);
         ItemListener.fireOnCreated(item);
     }
 
@@ -2221,8 +2247,14 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * assumed to be synchronized on Hudson by the caller.
      */
     public void onRenamed(TopLevelItem job, String oldName, String newName) throws IOException {
-        items.remove(oldName);
-        items.put(newName, job);
+        String itemId = job.getId();
+        items.remove(itemId);
+        itemId = newName;
+        if (getTeamManager() != null) {
+            itemId = getTeamManager().getTeamQualifiedJobId(newName);
+        }
+        job.setId(itemId);
+        items.put(itemId, job);
 
         for (View v : views) {
             v.onJobRenamed(job, oldName, newName);
@@ -2238,8 +2270,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         for (ItemListener l : ItemListener.all()) {
             l.onDeleted(item);
         }
+        String itemId = item.getId();
 
-        items.remove(item.getName());
+        items.remove(itemId);
         for (View v : views) {
             v.onJobRenamed(item, item.getName(), null);
         }
@@ -2303,11 +2336,17 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             }
             throw new IOException("Unable to create " + projectsDir + "\nPermission issue? Please create this directory manually.");
         }
-        File[] subdirs = projectsDir.listFiles(new FileFilter() {
-            public boolean accept(File child) {
-                return child.isDirectory() && Items.getConfigFile(child).exists();
-            }
-        });
+        File[] jobsRootDirs;
+
+        if (getTeamManager() != null) {
+            jobsRootDirs = getTeamManager().getJobsRootFolders();
+        } else {
+            jobsRootDirs = projectsDir.listFiles(new FileFilter() {
+                public boolean accept(File child) {
+                    return child.isDirectory() && Items.getConfigFile(child).exists();
+                }
+            });
+        }
 
         TaskGraphBuilder g = new TaskGraphBuilder();
         Handle loadHudson = g.requires(EXTENSIONS_AUGMENTED).attains(JOB_LOADED).add("Loading global config", new Executable() {
@@ -2333,11 +2372,12 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             }
         });
 
-        for (final File subdir : subdirs) {
-            g.requires(loadHudson).attains(JOB_LOADED).notFatal().add("Loading job " + subdir.getName(), new Executable() {
+        for (final File jobRootDir : jobsRootDirs) {
+            g.requires(loadHudson).attains(JOB_LOADED).notFatal().add("Loading job " + jobRootDir.getName(), new Executable() {
                 public void run(Reactor session) throws Exception {
-                    TopLevelItem item = (TopLevelItem) Items.load(Hudson.this, subdir);
-                    items.put(item.getName(), item);
+                    TopLevelItem item = (TopLevelItem) Items.load(Hudson.this, jobRootDir);
+                    String itemId = item.getId();
+                    items.put(itemId, item);
                 }
             });
         }
@@ -2713,7 +2753,14 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     public TopLevelItem reloadProjectFromDisk(File jobDir) throws IOException {
         TopLevelItem item = (TopLevelItem) Items.load(this, jobDir);
-        items.put(item.getName(), item);
+        String itemName = item.getName();
+        if (getTeamManager() != null){
+            Team team = getTeamManager().findJobOwnerTeam(item.getName());
+            if ((team != null) && team.getName().equals(Team.DEFAULT_TEAM_NAME)){
+               itemName = getTeamManager().getTeamQualifiedJobId(itemName);
+            }
+        }
+        items.put(itemName, item);
         rebuildDependencyGraph();
         return item;
     }

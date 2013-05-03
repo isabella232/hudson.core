@@ -64,12 +64,23 @@ public interface Item extends PersistenceRoot, SearchableModelObject, AccessCont
      * Gets all the jobs that this {@link Item} contains as descendants.
      */
     abstract Collection<? extends Job> getAllJobs();
+    
+    
+    /**
+     * A unique string to identify the item
+     *
+     * <p> The id must be unique among other {@link Item}s that belong to the
+     * same parent.</p>
+     * @return id
+     * @since 3.1.0
+     */
+    public String getId();
+    
+    public void setId(String id);
+    
 
     /**
      * Gets the name of the item.
-     *
-     * <p> The name must be unique among other {@link Item}s that belong to the
-     * same parent.
      *
      * <p> This name is also used for directory name, so it cannot contain any
      * character that's not allowed on the file system.

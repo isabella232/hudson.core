@@ -17,10 +17,10 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import hudson.Extension;
 import hudson.model.Descriptor;
+import hudson.model.Hudson;
 import hudson.model.Job;
 import hudson.security.ACL;
 import hudson.security.AuthorizationStrategy;
-import hudson.security.GlobalMatrixAuthorizationStrategy;
 import java.util.Collection;
 import java.util.Collections;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -32,17 +32,12 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @author Winston Prakash
  */
 public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
-
-    private transient final TeamManager teamManager;
+     
 
     @DataBoundConstructor
     public TeamBasedAuthorizationStrategy() {
-        teamManager = new TeamManager();
     }
 
-    public TeamManager getTeamManager() {
-        return teamManager;
-    }
 
     /**
      * Get the root ACL which has grand authority over all model level ACLs
@@ -51,7 +46,7 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
      */
     @Override
     public ACL getRootACL() {
-        return teamManager.getRoolACL();
+        return getTeamManager().getRoolACL();
     }
 
     /**
@@ -62,11 +57,11 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
      */
     @Override
     public ACL getACL(Job<?, ?> job) {
-        return teamManager.getACL(job);
+        return getTeamManager().getACL(job);
     }
 
     public ACL getACL(Team team) {
-        return teamManager.getACL(team);
+        return getTeamManager().getACL(team);
     }
 
     /**
@@ -104,5 +99,9 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
             return new TeamBasedAuthorizationStrategy();
         }
         
+    }
+    
+    private TeamManager getTeamManager(){
+         return Hudson.getInstance().getTeamManager();
     }
 }

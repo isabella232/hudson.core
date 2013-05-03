@@ -18,6 +18,7 @@ package hudson.cli;
 
 import hudson.model.Hudson;
 import hudson.Extension;
+import hudson.Functions;
 import hudson.model.Item;
 import hudson.model.Items;
 import hudson.model.Job;
@@ -25,6 +26,7 @@ import hudson.model.TopLevelItem;
 import hudson.util.IOUtils;
 import java.io.File;
 import java.io.IOException;
+import org.eclipse.hudson.security.team.TeamManager;
 import org.kohsuke.args4j.Argument;
 
 /**
@@ -46,7 +48,10 @@ public class UpdateJobCommand extends CLICommand {
 
     protected int run() throws Exception {
         Hudson h = Hudson.getInstance();
-
+        TeamManager teamManager = Hudson.getInstance().getTeamManager();
+        if (teamManager != null){
+            name = teamManager.getTeamQualifiedJobId(name);
+        }
         TopLevelItem item = h.getItem(name);
 
         if (item == null && !create) {
@@ -60,8 +65,8 @@ public class UpdateJobCommand extends CLICommand {
         } else {
             try {
                 h.checkPermission(Job.CONFIGURE);
-
-                File rootDirOfJob = new File(new File(h.getRootDir(), "jobs"), name);
+                 
+                File rootDirOfJob = new File(new File(h.getRootDir(), Functions.getJobsFolderName(item.getId())), name);
                 // place it as config.xml
                 File configXml = Items.getConfigFile(rootDirOfJob).getFile();
                 IOUtils.copy(stdin, configXml);

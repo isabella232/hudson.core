@@ -22,8 +22,10 @@ import hudson.security.SecurityRealm;
 import hudson.util.XStream2;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.slf4j.Logger;
@@ -44,16 +46,15 @@ public final class TeamManager implements Saveable {
     private transient File hudsonHomeDir;
     private transient File teamsFolder;
     private transient final String teamsConfigFileName = "teams.xml";
-    private transient Team defaultTeam;
+    private transient DefaultTeam defaultTeam;
+    private static final String TEAMS_FOLDER_NAME = "teams";
 
-    public TeamManager() {
-        this(Hudson.getInstance().getRootDir());
-    }
-
-    // For unit test
-    TeamManager(File homeDir) {
+    public TeamManager(File homeDir) {
         hudsonHomeDir = homeDir;
-        teamsFolder = new File(hudsonHomeDir, "teams");
+        teamsFolder = new File(hudsonHomeDir, TEAMS_FOLDER_NAME);
+        if (!teamsFolder.exists()) {
+            teamsFolder.mkdirs();
+        }
         load();
         ensureDefaultTeam();
     }
@@ -63,7 +64,7 @@ public final class TeamManager implements Saveable {
     }
 
     public boolean isSysAdmin(String userName) {
-        boolean isSysAdmin = false;
+        boolean isSysAdmin;
         HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
         SecurityRealm securityRealm = null;
         if (hudsonSecurityManager != null) {
@@ -110,7 +111,7 @@ public final class TeamManager implements Saveable {
         save();
     }
 
-    private Team findCurrentUserTeam() {
+    public Team findCurrentUserTeam() {
         Team team;
         HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
         SecurityRealm securityRealm = null;
@@ -245,10 +246,6 @@ public final class TeamManager implements Saveable {
      * The file where the teams settings are saved.
      */
     private XmlFile getConfigFile() {
-        if (!teamsFolder.exists()) {
-            teamsFolder.mkdirs();
-        }
-
         return new XmlFile(XSTREAM, new File(teamsFolder, teamsConfigFileName));
     }
     // This is purely fo unit test. Since Hudson is not fully loaded during
@@ -276,8 +273,7 @@ public final class TeamManager implements Saveable {
     /**
      * Load the settings from the configuration file
      */
-    private void load() {
-
+    public void load() {
         XmlFile config = getConfigFile();
         try {
             if (config.exists()) {

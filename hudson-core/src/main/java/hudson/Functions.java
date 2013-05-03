@@ -121,6 +121,7 @@ import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
 import org.eclipse.hudson.script.ScriptSupport;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.eclipse.hudson.security.team.TeamManager;
 
 /**
  * Utility functions used in views.
@@ -1519,5 +1520,16 @@ public class Functions {
 
     public static Object rawHtml(Object o) {
         return InternationalizedStringExpression.rawHtml(o);
+    }
+    
+    public static String getJobsFolderName(String jobId) {
+        String jobsFolderName = "jobs";
+        if (jobId != null) {
+            TeamManager teamManager = Hudson.getInstance().getTeamManager();
+            if (teamManager != null) {
+                jobsFolderName = teamManager.getJobsFolderName(jobId);
+            }
+        }
+        return jobsFolderName;
     }
 }

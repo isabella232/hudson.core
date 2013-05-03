@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
+import org.eclipse.hudson.security.team.TeamManager;
 
 /**
  * Clean up old left-over workspaces from slaves.
@@ -76,12 +77,18 @@ public class WorkspaceCleanupThread extends AsyncPeriodicWork {
     }
 
     private void process(Hudson h) throws IOException, InterruptedException {
-        File jobs = new File(h.getRootDir(), "jobs");
-        File[] dirs = jobs.listFiles(DIR_FILTER);
-        if (dirs == null) {
+        File[] jobsRootDirs;
+        TeamManager teamManager = Hudson.getInstance().getTeamManager();
+        if (teamManager != null) {
+            jobsRootDirs = teamManager.getJobsRootFolders();
+        } else {
+            File jobs = new File(h.getRootDir(), "jobs");
+            jobsRootDirs = jobs.listFiles(DIR_FILTER);
+        }
+        if (jobsRootDirs == null) {
             return;
         }
-        for (File dir : dirs) {
+        for (File dir : jobsRootDirs) {
             FilePath ws = new FilePath(new File(dir, "workspace"));
             if (shouldBeDeleted(dir.getName(), ws, h)) {
                 delete(ws);

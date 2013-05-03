@@ -74,6 +74,8 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
      */
     protected volatile String description;
     private transient ItemGroup parent;
+    
+    protected String id;
 
     protected AbstractItem(ItemGroup parent, String name) {
         this.parent = parent;
@@ -82,6 +84,20 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
 
     public void onCreatedFromScratch() {
         // noop
+    }
+
+    @Override
+    public String getId() {
+        if (id != null){
+            return id;
+        } else {
+            return name;
+        }
+    }
+    
+    @Override
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Exported(visibility = 999)
@@ -253,6 +269,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
                 for (ItemListener l : ItemListener.all()) {
                     l.onRenamed(this, oldName, newName);
                 }
+                save();
             }
         }
     }

@@ -198,15 +198,14 @@ public final class HudsonServletContextListener implements ServletContextListene
             installExpressionFactory(event);
 
             // Do the initial setup (if needed) before actually starting Hudson
-
+            
             try {
                 // Create the Security Manager temporarily. Since the plugins are not loaded yet
                 // all permissions may not be loaded. The Security manager will reload when Hudson
                 // fully starts later
                 HudsonSecurityEntitiesHolder.setHudsonSecurityManager(new HudsonSecurityManager(home));
-            } catch (IOException ex) {
-                controller.install(new SecurityFailedToInit(ex));
-                return;
+            } catch (Exception ex) {
+                logger.info("Failed to load some Security information. ", ex.getLocalizedMessage() + ". Contnuing ..");
             }
 
             InitialSetup initSetup = new InitialSetup(home, servletContext);
