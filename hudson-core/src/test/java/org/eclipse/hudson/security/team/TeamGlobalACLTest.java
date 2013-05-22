@@ -14,6 +14,7 @@ import hudson.model.Item;
 import hudson.security.ACL;
 import hudson.security.Permission;
 import java.io.File;
+import java.io.IOException;
 import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -55,7 +56,7 @@ public class TeamGlobalACLTest {
     }
 
     @Test
-    public void testGlobalSysAdminPermission() {
+    public void testGlobalSysAdminPermission() throws IOException {
         //Paul should not get global configure permission before adding as Sysadmin
         Sid sid = new PrincipalSid("Paul");
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.GLOBAL);

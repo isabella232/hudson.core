@@ -1,0 +1,73 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2013 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#  Winston Prakash
+#        
+#************************************************************************** --> 
+
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout">
+    
+    <l:layout norefresh="true" permission="${app.ADMINISTER}">
+        
+        <script type="text/javascript">
+            var imageRoot = '${imagesURL}';
+        </script>
+        
+        <link href="${cssURL}/team-manager.css" type="text/css" rel="stylesheet" />
+        <script src="${scriptsURL}/team-manager.js" type="text/javascript"></script>
+        
+        <st:include page="sidepanel.jelly" />
+        
+        <l:main-panel>      
+             
+            <div id="container">
+                
+                <j:if test="${it.teams.size() == 1}">
+                    <h2>
+                        <img src="${imagesURL}/48x48/warning.png"/>
+                        This Hudson does not have any teams!!
+                    </h2>
+                </j:if>
+               
+                <div id="teamContainer">
+                    <ul class="team">
+                        <j:forEach var="team" items="${it.teams}">
+                            <j:if test='${!team.name.equals("default")}'>
+                                <st:include it="${team}" page="team.jelly"/>
+                            </j:if>
+                        </j:forEach>
+                    </ul> 
+                    <br style="clear:both"/>
+                </div> 
+                <div>
+                    <input type="button" id="createTeamButton" value="Create New Team" />
+                    <span id="createTeamMsg">
+                         <!-- message goes here -->
+                    </span>
+                </div>
+            
+            </div>
+            
+            <div id="dialog-create-team" title="Create New Team">
+                <div>
+                    <label for="teamName">Name:</label> 
+                    <input type="text" name="teamName" id="teamName" size="25"/>
+                    <br/>
+                    <label for="teamDesc">Description:</label> 
+                    <input type="text" name="teamDesc" id="teamDesc" size="50"/>
+                </div>
+            </div>
+            
+        </l:main-panel>
+    </l:layout>
+</j:jelly>            
+            

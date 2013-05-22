@@ -18,16 +18,27 @@ import hudson.model.Job;
 import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
 import hudson.security.ACL;
+import hudson.security.Permission;
 import hudson.security.SecurityRealm;
+import hudson.util.FormValidation;
 import hudson.util.XStream2;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
+import org.eclipse.hudson.plugins.PluginCenter;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.HttpResponses;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +70,15 @@ public final class TeamManager implements Saveable {
         ensureDefaultTeam();
     }
 
-    public void addSysAdmin(String adminName) {
-        sysAdmins.add(adminName);
+    public void addSysAdmin(String adminName) throws IOException {
+        if (!sysAdmins.contains(adminName)) {
+            sysAdmins.add(adminName);
+            save();
+        }
+    }
+
+    public List<String> getSysAdmins() {
+        return sysAdmins;
     }
 
     public boolean isSysAdmin(String userName) {
@@ -83,11 +101,80 @@ public final class TeamManager implements Saveable {
         return teams;
     }
 
-    public Team createTeam(String teamName) throws IOException {
-        Team newTeam = new Team(teamName);
+    public Team createTeam(String teamName, String description) throws IOException, TeamAlreadyExistsException {
+        for (Team team : teams) {
+            if (teamName.equals(team.getName())) {
+                throw new TeamAlreadyExistsException(teamName);
+            }
+        }
+
+        Team newTeam = new Team(teamName, description);
         teams.add(newTeam);
         save();
         return newTeam;
+    }
+
+    public Team createTeam(String teamName) throws IOException, TeamAlreadyExistsException {
+        return createTeam(teamName, teamName);
+    }
+
+    public HttpResponse doCreateTeam(@QueryParameter String name, @QueryParameter String description) throws IOException {
+        if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
+            return HttpResponses.forbidden();
+        }
+        if ((name == null) || "".equals(name.trim())){
+           return new TeamUtils.ErrorHttpResponse("Team name required");
+        }
+        try {
+            Team team = createTeam(name, description);
+            return HttpResponses.forwardToView(team, "team.jelly");
+        } catch (TeamAlreadyExistsException ex) {
+            return new TeamUtils.ErrorHttpResponse(ex.getLocalizedMessage());
+        }
+    }
+    
+    public HttpResponse doAddTeamAdmin(@QueryParameter String teamName, @QueryParameter String teamAdminSid) throws IOException {
+        if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
+            return HttpResponses.forbidden();
+        }
+        
+        Team team;
+        try {
+            team = findTeam(teamName);
+        } catch (TeamNotFoundException ex) {
+            return new TeamUtils.ErrorHttpResponse(teamName + " is not a valis team.");
+        }
+
+        if (!team.getAdmins().contains(teamAdminSid)){
+            team.addAdmin(teamAdminSid);
+            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getDisplayHtml(teamAdminSid));
+        }else {
+            return new TeamUtils.ErrorHttpResponse(teamAdminSid + " is already a team admin.");
+        }
+    }
+    
+    public HttpResponse doAddTeamMember(@QueryParameter String teamName, @QueryParameter String teamMemberSid) throws IOException {
+        if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
+            return HttpResponses.forbidden();
+        }
+        
+        Team team;
+        try {
+            team = findTeam(teamName);
+        } catch (TeamNotFoundException ex) {
+            return new TeamUtils.ErrorHttpResponse(teamName + " is not a valis team.");
+        }
+
+        if (!team.getMembers().contains(teamMemberSid)){
+            team.addMember(teamMemberSid);
+            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getDisplayHtml(teamMemberSid));
+        }else {
+            return new TeamUtils.ErrorHttpResponse(teamMemberSid + " is already a team member.");
+        }
+    }
+    
+    public HttpResponse doCheckSid(@QueryParameter String sid) throws IOException {
+        return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getDisplayHtml(sid));
     }
 
     public void addUser(String teamName, String userName) throws TeamNotFoundException, IOException {
@@ -102,7 +189,7 @@ public final class TeamManager implements Saveable {
                 return team;
             }
         }
-        throw new TeamNotFoundException("Team " + teamName + " does not exist");
+        throw new TeamNotFoundException(teamName);
     }
 
     public void removeTeam(String teamName) throws IOException, TeamNotFoundException {
@@ -328,10 +415,10 @@ public final class TeamManager implements Saveable {
     }
 
     public String getTeamQualifiedJobId(String jobId) {
-        if (defaultTeam.isJobOwner(jobId)){
+        if (defaultTeam.isJobOwner(jobId)) {
             return jobId;
         }
-                
+
         Team team = findCurrentUserTeam();
         if ((team != null) && !Team.DEFAULT_TEAM_NAME.equals(team.getName())) {
             jobId = team.getName() + "_" + jobId;
@@ -365,8 +452,15 @@ public final class TeamManager implements Saveable {
 
     public static class TeamNotFoundException extends Exception {
 
-        public TeamNotFoundException(String message) {
-            super(message);
+        public TeamNotFoundException(String teamName) {
+            super("Team " + teamName + " does not exist.");
+        }
+    }
+
+    public static class TeamAlreadyExistsException extends Exception {
+
+        public TeamAlreadyExistsException(String teamName) {
+            super("Team " + teamName + " already exists.");
         }
     }
 }

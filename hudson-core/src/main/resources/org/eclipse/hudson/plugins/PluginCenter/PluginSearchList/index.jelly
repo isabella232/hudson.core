@@ -19,7 +19,7 @@
     <st:contentType value="text/html;charset=UTF-8" /> 
     
     <j:new var="h" className="hudson.Functions" />
-    <j:set var="rootURL" value="${h.getRequestRootPath(request0}" />
+    <j:set var="rootURL" value="${h.getRequestRootPath(request)}" />
     <j:set var="imagesURL"  value="${rootURL}/images" />
     <div class="tabBody">
         <div class="items-container">    

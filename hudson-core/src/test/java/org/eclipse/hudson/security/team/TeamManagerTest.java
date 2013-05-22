@@ -53,7 +53,7 @@ public class TeamManagerTest {
      * Test of createTeam method, of class TeamManager.
      */
     @Test
-    public void testCreateTeam() throws IOException {
+    public void testCreateTeam() throws IOException, TeamManager.TeamAlreadyExistsException {
         String teamName = "team1";
         teamManager.createTeam(teamName);
         try {
@@ -95,7 +95,7 @@ public class TeamManagerTest {
      * Test of findUserTeam method, of class TeamManager.
      */
     @Test
-    public void testFindUserTeam() throws IOException {
+    public void testFindUserTeam() throws IOException, TeamManager.TeamAlreadyExistsException {
         String teamName = "team1";
         teamManager.createTeam(teamName);
 
@@ -136,7 +136,7 @@ public class TeamManagerTest {
      * Test of findJobOwnerTeam method, of class TeamManager.
      */
     @Test
-    public void testFindJobOwnerTeam() throws IOException {
+    public void testFindJobOwnerTeam() throws IOException, TeamManager.TeamAlreadyExistsException {
         String teamName = "team1";
         teamManager.createTeam(teamName);
 
@@ -227,14 +227,15 @@ public class TeamManagerTest {
         try {
             teamManager.addUser(teamName, "chris");
             teamManager.addUser(teamName, "paul");
-            teamManager.findTeam(teamName);
+            Team team = teamManager.findTeam(teamName);
+            team.addJob("job1");
         } catch (TeamNotFoundException ex) {
             fail("Team must exist");
         }
         teamManager.renameJobInUserTeam("paul", "job1", "job2");
         Team team = teamManager.findTeam(teamName);
-        Assert.assertFalse(team.isJobOwner("job1"));
-        Assert.assertTrue(team.isJobOwner("job2"));
+        Assert.assertFalse(" team1 must not be a owner of job1", team.isJobOwner("job1"));
+        Assert.assertTrue(" team1 must be a job owner of job2", team.isJobOwner("job2"));
     }
 
     /**
@@ -248,7 +249,8 @@ public class TeamManagerTest {
         try {
             teamManager.addUser(teamName, "chris");
             teamManager.addUser(teamName, "paul");
-            teamManager.findTeam(teamName);
+            Team team = teamManager.findTeam(teamName);
+            team.addJob("job1"); 
         } catch (TeamNotFoundException ex) {
             fail("Team must exist");
         }
@@ -287,7 +289,7 @@ public class TeamManagerTest {
      * Test of load method, of class TeamManager.
      */
     @Test
-    public void testLoad() throws IOException {
+    public void testLoad() throws IOException, TeamManager.TeamAlreadyExistsException {
         String teamName = "team1";
         teamManager.createTeam(teamName);
         try {

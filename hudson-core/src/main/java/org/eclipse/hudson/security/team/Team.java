@@ -17,14 +17,19 @@ import hudson.security.AccessControlled;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.Permission;
 import hudson.security.SecurityRealm;
+import hudson.util.FormValidation;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.HttpResponses;
+import org.kohsuke.stapler.QueryParameter;
 import org.springframework.security.AccessDeniedException;
 import org.springframework.security.Authentication;
 
@@ -42,17 +47,44 @@ public class Team implements AccessControlled {
     private List<String> ownedJobNames = new CopyOnWriteArrayList<String>();
     private String teamName;
     protected static final String JOBS_FOLDER_NAME = "jobs";
+    private String description;
 
     Team(String name) {
-        teamName = name;
+        this(name, name);
+    }
+
+    Team(String teamName, String description) {
+        this.teamName = teamName;
+        this.description = description;
     }
 
     public String getName() {
         return teamName;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public void addAdmin(String adminName) {
-        admins.add(adminName);
+        if (!admins.contains(adminName)) {
+            admins.add(adminName);
+        }
+        if (!members.contains(adminName)) {
+            members.add(adminName);
+        }
+    }
+
+    public List<String> getAdmins() {
+        return admins;
+    }
+
+    public List<String> getMembers() {
+        return members;
     }
 
     public boolean isAdmin(String userName) {
@@ -72,7 +104,9 @@ public class Team implements AccessControlled {
     }
 
     public void addMember(String userName) {
-        members.add(userName);
+        if (!members.contains(userName)) {
+            members.add(userName);
+        }
     }
 
     public void removeMember(String userName) {
@@ -113,8 +147,10 @@ public class Team implements AccessControlled {
     }
 
     void renameJob(String oldJobName, String newJobName) {
-        ownedJobNames.remove(oldJobName);
-        ownedJobNames.add(newJobName);
+        if (ownedJobNames.contains(oldJobName)) {
+            ownedJobNames.remove(oldJobName);
+            ownedJobNames.add(newJobName);
+        }
     }
 
     List<File> getJobsRootFolders(File rootFolder) {
@@ -132,8 +168,8 @@ public class Team implements AccessControlled {
         }
         return Collections.EMPTY_LIST;
     }
-    
-    protected File getJobsFolder(File rootFolder){
+
+    protected File getJobsFolder(File rootFolder) {
         return new File(rootFolder, teamName + "/" + JOBS_FOLDER_NAME);
     }
 

@@ -77,6 +77,9 @@
                     ${%Useful when you modified config files directly on disk.}
                 </local:feature>
                 
+                <j:if test="${it.teamManager != null}">
+                    <local:feature icon="user.png" href="teamManager/" title="${%Manage Teams}"/>
+                </j:if>
                 
                 <local:feature icon="plugin.png" href="pluginCenter/" title="${%Manage Plugins}">
                     ${%Add, remove, disable or enable plugins that can extend the functionality of Hudson.}

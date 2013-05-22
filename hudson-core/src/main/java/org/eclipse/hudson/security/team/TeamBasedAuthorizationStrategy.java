@@ -21,9 +21,15 @@ import hudson.model.Hudson;
 import hudson.model.Job;
 import hudson.security.ACL;
 import hudson.security.AuthorizationStrategy;
+import hudson.security.Permission;
+import hudson.util.FormValidation;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.HttpResponses;
+import org.kohsuke.stapler.QueryParameter;
 
 /**
  * Team based authorization strategy
@@ -32,12 +38,10 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @author Winston Prakash
  */
 public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
-     
 
     @DataBoundConstructor
     public TeamBasedAuthorizationStrategy() {
     }
-
 
     /**
      * Get the root ACL which has grand authority over all model level ACLs
@@ -81,6 +85,20 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
         public String getDisplayName() {
             return Messages.TeamBasedAuthorizationStrategy_DisplayName();
         }
+
+        public HttpResponse doAddSysAdmin(@QueryParameter String sysAdminSid) throws IOException {
+            if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
+                return HttpResponses.forbidden();
+            }
+
+            Hudson.getInstance().getTeamManager(this).addSysAdmin(sysAdminSid);
+
+            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getDisplayHtml(sysAdminSid));
+        }
+
+        public HttpResponse doCheckSid(@QueryParameter String sid) throws IOException {
+            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getDisplayHtml(sid));
+        }
     }
 
     public static class ConverterImpl implements Converter {
@@ -98,10 +116,9 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
         public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext uc) {
             return new TeamBasedAuthorizationStrategy();
         }
-        
     }
-    
-    private TeamManager getTeamManager(){
-         return Hudson.getInstance().getTeamManager();
+
+    private TeamManager getTeamManager() {
+        return Hudson.getInstance().getTeamManager();
     }
 }

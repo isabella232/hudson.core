@@ -60,7 +60,7 @@ public class TeamJobACLTest {
     }
 
     @Test
-    public void testJobPermission() throws IOException {
+    public void testJobPermission() throws IOException, TeamManager.TeamAlreadyExistsException {
         String teamName = "team1";
         teamManager.createTeam(teamName);
         FreeStyleProject freeStyleJob = new FreeStyleProjectMock("testJob");

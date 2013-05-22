@@ -1,0 +1,126 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2013 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Winston Prakash
+#        
+#************************************************************************** --> 
+
+
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <style type="text/css">
+        #sysAdminInfo {
+           margin-left: 35px;
+        }
+        #sysAdminAdd  label{
+            float: left;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        #sysAdminAdd  input{
+            margin-bottom: 5px;
+            margin-top: 5px;
+            margin-left: 10px;
+        }
+        #sysAdminNone{
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        jQuery(document).ready(function() {
+        
+            jQuery('#sysAdminAddButton').button();
+            jQuery('#sysAdminAddButton').click(function() {
+               var sysAdminSid = jQuery('#sysAdminSid').val();
+               jQuery.ajax({
+                    type: 'POST',
+                    url: "${rootURL}/descriptor/${descriptor.clazz.name}/addSysAdmin",
+                    data: {
+                        sysAdminSid:sysAdminSid
+                    },
+                    success: function(msg){
+                        jQuery('#sysAdminNone').remove();
+                        var sysAdminItem = '<li>' + msg  + '</li>';
+                        jQuery(sysAdminItem).appendTo(jQuery('#sysAdminList'));
+                    },
+                    error: function(msg){
+                        var errorItem = '<li>' + msg + '(Unknown) </li>';
+                        jQuery(errorItem).appendTo(jQuery('#sysAdminList'));
+                        
+                    },
+                    dataType: "html"
+                });   
+            });
+            
+            
+             
+            jQuery('#sysAdminList li').each(function(){
+                var sysAdminSid = jQuery(this).text();
+                jQuery(this).remove();
+                jQuery.ajax({
+                    type: 'POST',
+                    url: "${rootURL}/descriptor/${descriptor.clazz.name}/checkSid",
+                    data: {
+                        sid:sysAdminSid
+                    },
+                    success: function(msg){
+                        var sysAdminItem = '<li>' + msg  + '</li>';
+                        jQuery(sysAdminItem).appendTo(jQuery('#sysAdminList'));
+                    },
+                    error: function(msg){
+                        var sysAdminItem = '<li>' + msg + '</li>';
+                        jQuery(sysAdminItem).appendTo(jQuery('#sysAdminList'));
+                        
+                    },
+                    dataType: "html"
+                });   
+            });
+             
+        });
+    </script> 
+    <f:block xmlns:local="local">
+        <div id="sysAdminInfo">
+            <p>
+                Team based strategy expects at least one System Administrator 
+                who will have full privilege. If the Security Realm supports group, 
+                then a group can be added and all members of the group will 
+                have full privilege.
+            </p>  
+            <b>
+                Current System Administrators:
+            </b>
+            <ol name="sysAdminList" id="sysAdminList">
+                
+                <j:if test="${(app.teamManager == null) || (app.teamManager.sysAdmins.size() == 0)}">
+                    <li id="sysAdminNone">
+                       None (At least one System Administrator required)
+                    </li>
+                </j:if>
+                
+                 
+                <j:forEach var="sysAdmin" items="${app.teamManager.sysAdmins}">
+                    <li>
+                        ${sysAdmin}
+                    </li>
+                </j:forEach> 
+                
+                
+            </ol>
+            <span id="sysAdminAdd">
+                <label for="sysAdminSid">${%User or Group name to add as System Administrator}:</label>
+                <input size="40" type="text" name="sysAdminSid" id="sysAdminSid" />
+                <input type="button" value="${%Add}" id="sysAdminAddButton"/>
+            </span>
+        </div>
+      
+    </f:block>
+</j:jelly>

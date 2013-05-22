@@ -207,6 +207,7 @@ import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.eclipse.hudson.security.team.Team;
 import org.eclipse.hudson.security.team.TeamBasedAuthorizationStrategy;
+import org.eclipse.hudson.security.team.TeamBasedAuthorizationStrategy.TeamBasedAuthorizationStrategyDescriptor;
 import org.eclipse.hudson.security.team.TeamManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -791,7 +792,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     /**
      * TeamManager is returned only if the Team based authorization is set.
-     * @return
+     * @return TeamManager
+     * @since 3.1.0
      */
     public TeamManager getTeamManager() {
         HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
@@ -802,6 +804,17 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             }
         }
         return null;
+    }
+    
+    /**
+     * TeamManager is returned only if the Team based authorization strategy is set.
+     * However, we need the team manager to set the initial system admin,
+     * before the Team based authorization strategy is set. Only for internal purpose
+     * 
+     * @deprecated use getTeamManager() for general purpose
+     */
+    public TeamManager getTeamManager(TeamBasedAuthorizationStrategyDescriptor authorizationStrategy) {
+       return teamManager;
     }
 
     public HudsonSecurityManager getSecurityManager() {

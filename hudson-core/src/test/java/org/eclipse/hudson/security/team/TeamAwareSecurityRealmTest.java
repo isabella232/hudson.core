@@ -62,7 +62,7 @@ public class TeamAwareSecurityRealmTest {
     }
 
     @Test
-    public void testGlobalSysAdminPermission() throws IOException{
+    public void testGlobalSysAdminPermission() throws IOException, TeamManager.TeamAlreadyExistsException{
         Team newTeam = teamManager.createTeam("team1");
         hudsonSecurityManager.setSecurityRealm(new TeamAwareSecurityRealmImpl(newTeam, false, false));
 
@@ -78,30 +78,28 @@ public class TeamAwareSecurityRealmTest {
     }
 
     @Test
-    public void testJobPermission() throws IOException {
-        String teamName = "team1";
-        Team newTeam = teamManager.createTeam(teamName);
-        hudsonSecurityManager.setSecurityRealm(new TeamAwareSecurityRealmImpl(newTeam, false, false));
+    public void testJobPermission() throws IOException, TeamManager.TeamAlreadyExistsException {
+        Team team1 = teamManager.createTeam("team1");
+        hudsonSecurityManager.setSecurityRealm(new TeamAwareSecurityRealmImpl(team1, false, false));
         FreeStyleProject freeStyleJob = new FreeStyleProjectMock("testJob");
-        newTeam.addJob(freeStyleJob.getName());
+        team1.addJob(freeStyleJob.getName());
 
         //Dummy Sid
         Sid sid = new PrincipalSid("Paul");
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.JOB, freeStyleJob);
         Assert.assertTrue("Current user should have Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
 
-        newTeam = teamManager.createTeam(teamName);
+        Team team2 = teamManager.createTeam("team2");
         freeStyleJob = new FreeStyleProjectMock("testJob2");
-        newTeam.addJob(freeStyleJob.getName());
+        team2.addJob(freeStyleJob.getName());
 
         teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.JOB, freeStyleJob);
         Assert.assertFalse("Current user should not have Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
         Assert.assertFalse("Current user should not have Job READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
-
     }
 
     @Test
-    public void testDefaultJobPermission() throws IOException, TeamManager.TeamNotFoundException {
+    public void testDefaultJobPermission() throws IOException, TeamManager.TeamNotFoundException, TeamManager.TeamAlreadyExistsException {
         String teamName = "team1";
         Team newTeam = teamManager.createTeam(teamName);
         hudsonSecurityManager.setSecurityRealm(new TeamAwareSecurityRealmImpl(newTeam, false, false));
