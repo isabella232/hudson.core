@@ -82,6 +82,20 @@ public final class TeamManager implements Saveable {
         return sysAdmins;
     }
 
+    public boolean isCurrentUserSysAdmin() {
+        String currentUser = HudsonSecurityManager.getAuthentication().getName();
+        return isSysAdmin(currentUser);
+    }
+    
+    public boolean isCurrentUserTeamAdmin() {
+        String currentUser = HudsonSecurityManager.getAuthentication().getName();
+        Team team = findCurrentUserTeam();
+        if (team != null){
+            return team.isAdmin(currentUser);
+        }
+        return false;
+    }
+
     public boolean isSysAdmin(String userName) {
         boolean isSysAdmin;
         HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
@@ -126,8 +140,8 @@ public final class TeamManager implements Saveable {
     }
 
     public HttpResponse doCreateTeam(@QueryParameter String teamName, @QueryParameter String description) throws IOException {
-        if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
-            return HttpResponses.forbidden();
+        if (!isCurrentUserSysAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to create team");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Team name required");
@@ -141,8 +155,8 @@ public final class TeamManager implements Saveable {
     }
 
     public HttpResponse doDeleteTeam(@QueryParameter String teamName) throws IOException {
-        if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
-            return HttpResponses.forbidden();
+        if (!isCurrentUserSysAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to delete team");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Team name required");
@@ -156,8 +170,8 @@ public final class TeamManager implements Saveable {
     }
 
     public HttpResponse doAddTeamAdmin(@QueryParameter String teamName, @QueryParameter String teamAdminSid) throws IOException {
-        if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
-            return HttpResponses.forbidden();
+        if (!this.isCurrentUserTeamAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to add team admin");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Team name required");
@@ -181,8 +195,8 @@ public final class TeamManager implements Saveable {
     }
 
     public HttpResponse doRemoveTeamAdmin(@QueryParameter String teamName, @QueryParameter String teamAdminSid) throws IOException {
-        if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
-            return HttpResponses.forbidden();
+        if (!isCurrentUserTeamAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to remove team admin");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Team name required");
@@ -206,8 +220,8 @@ public final class TeamManager implements Saveable {
     }
 
     public HttpResponse doAddTeamMember(@QueryParameter String teamName, @QueryParameter String teamMemberSid) throws IOException {
-        if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
-            return HttpResponses.forbidden();
+        if (!isCurrentUserTeamAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to add team member");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Team name required");
@@ -231,8 +245,8 @@ public final class TeamManager implements Saveable {
     }
 
     public HttpResponse doRemoveTeamMember(@QueryParameter String teamName, @QueryParameter String teamMemberSid) throws IOException {
-        if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
-            return HttpResponses.forbidden();
+        if (!isCurrentUserTeamAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to remove team member");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Team name required");
@@ -549,8 +563,8 @@ public final class TeamManager implements Saveable {
         }
         teams.add(defaultTeam);
     }
-    
-    private void initializeXstream(){
+
+    private void initializeXstream() {
         xstream.alias("teamManager", TeamManager.class);
         xstream.alias("team", Team.class);
     }

@@ -1,0 +1,71 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2013 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#  Winston Prakash
+#        
+#************************************************************************** --> 
+
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout">
+        
+             
+        <div id="container">
+  
+            <div id="teamContainer">
+                <ul class="team">
+                     <st:include it="${it.findCurrentUserTeam()}" page="team.jelly"/>
+                </ul> 
+                <br style="clear:both"/>
+            </div> 
+        </div>
+            
+        <!-- Template for Admin or member add -->
+        <div style="margin-top: 10px; display: none" id="userTemplate">
+            <li>
+                <input type="hidden" name="hiddenUserName"/>
+                <input type="hidden" name="hiddenTeamName"/>
+                <img name="typeIcon"/> 
+                <span style="margin-left:10px; font-size:13px;">
+                </span>
+                <img  name="deleteIcon" style="margin-left:25px" src="${imagesURL}/16x16/delete.png"/>
+            </li>
+        </div>
+            
+        <!-- Dialog template for adding member -->
+        <div style="margin-top: 10px; display: none" id="dialog-add-user">
+            <div>
+                <label>${%User or Group Name}:</label>
+                <input style="margin-left:5px" size="35" type="text" id="sidName" />
+                <div style="margin-top:10px">
+                    <span id="userAddMsg">
+                        <!-- message goes here -->
+                    </span>
+                </div>
+            </div>
+        </div>
+            
+        <!-- Dialog template for removing user -->
+        <div style="margin-top: 10px; display: none" id="dialog-remove-user">
+            <div>
+                <span>
+                    Do you really want to delete the member from the team?
+                </span>
+                <div style="margin-top:10px">
+                    <span id="userRemoveMsg">
+                        <!-- message goes here -->
+                    </span>
+                </div>
+            </div>
+        </div>
+            
+     
+</j:jelly>            
+            

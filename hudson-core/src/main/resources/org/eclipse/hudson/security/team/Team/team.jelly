@@ -23,7 +23,9 @@
     <j:set var="imagesURL"  value="${rootURL}/images" />
     
     <li>
-        <button style="float:right; color: #C6223A;" value="${it.name}" class="teamDeleteButton">${%Delete Team}</button>
+        <j:if test="${app.teamManager.isCurrentUserSysAdmin()}">
+            <button style="float:right; color: #C6223A;" value="${it.name}" class="teamDeleteButton">${%Delete Team}</button>
+        </j:if>
         <h3>${it.name}</h3>
         <p class="description">
             ${it.description}

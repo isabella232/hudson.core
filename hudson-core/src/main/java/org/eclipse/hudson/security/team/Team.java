@@ -10,6 +10,7 @@
  */
 package org.eclipse.hudson.security.team;
 
+import hudson.model.Hudson;
 import hudson.model.Items;
 import hudson.security.ACL;
 import hudson.security.AccessControlled;
@@ -70,22 +71,28 @@ public class Team implements AccessControlled {
     public void addAdmin(String adminName) throws IOException {
         if (!admins.contains(adminName)) {
             admins.add(adminName);
-            teamManager.save();
+            getTeamManager().save();
         }
     }
 
     public void removeAdmin(String adminName) throws IOException {
         if (admins.contains(adminName)) {
             admins.remove(adminName);
-            teamManager.save();
+            getTeamManager().save();
         }
     }
 
     public List<String> getAdmins() {
         return admins;
     }
+    
+    public boolean isCurrentUserSysAdmin() {
+        String currentUser = HudsonSecurityManager.getAuthentication().getName();
+        return isAdmin(currentUser);
+    }
 
     public boolean isAdmin(String userName) {
+        // Team Manager ACL always assume userName current user
         boolean isAdmin = false;
         HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
         SecurityRealm securityRealm = null;
@@ -114,7 +121,7 @@ public class Team implements AccessControlled {
     public void removeMember(String userName) throws IOException {
         if (members.contains(userName)) {
             members.remove(userName);
-            teamManager.save();
+            getTeamManager().save();
         }
     }
 
@@ -133,21 +140,21 @@ public class Team implements AccessControlled {
                 return false;
             }
         } else {
-            return members.contains(userName);
+            return members.contains(userName) || admins.contains(userName);
         }
     }
 
     public void addJob(String jobname) throws IOException {
         if (!jobs.contains(jobname)) {
             jobs.add(jobname);
-            teamManager.save();
+            getTeamManager().save();
         }
     }
 
     public void removeJob(String jobname) throws IOException {
         if (jobs.contains(jobname)) {
             jobs.remove(jobname);
-            teamManager.save();
+            getTeamManager().save();
         }
     }
 
@@ -159,7 +166,7 @@ public class Team implements AccessControlled {
         if (jobs.contains(oldJobName)) {
             jobs.remove(oldJobName);
             jobs.add(newJobName);
-            teamManager.save();
+            getTeamManager().save();
         }
     }
 
@@ -206,5 +213,14 @@ public class Team implements AccessControlled {
     @Override
     public boolean hasPermission(Permission permission) {
         return getACL().hasPermission(permission);
+    }
+    
+    // When the Team is unmarshalled it would not have Team Manager set
+    private TeamManager getTeamManager() {
+        if (teamManager == null) {
+            return Hudson.getInstance().getTeamManager();
+        } else {
+            return teamManager;
+        }
     }
 }
