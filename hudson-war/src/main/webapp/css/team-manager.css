@@ -126,12 +126,17 @@ ul.team .teamList {
     border-style: solid;
     border-width: 1px;
     margin-left: -5px;
-    margin-top: 0px;
-    padding: 5px 4px;
-    width: 100%;
+    margin-right: -5px;
+    padding: 10px;
 }
 
-#dialog-create-team{
+.memberList{
+    padding: 10px;
+}
+
+
+#dialog-add-user{
+    margin-top: 10px;
     display: none;
 }
 
@@ -147,5 +152,10 @@ ul.team .teamList {
     margin-left: 10px;
 }
 
+.teamMemberAdd{
+    margin-top: 10px;
+}
 
-
+.teamAdminAdd{
+    margin-top: 10px;
+}

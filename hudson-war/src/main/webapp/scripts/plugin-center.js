@@ -20,152 +20,159 @@ var filesToUpload;
 var updateCount;
 var installCount;
 
+var pageInitialized = false;
 jQuery(document).ready(function() {
-    
+
+    //To avoid multiple fire of document.ready
+    if (pageInitialized) {
+        return;
+    }
+    pageInitialized = true;
+
     var images = [
-    imageRoot + '/green-check.jpg',
-    imageRoot + '/progressbar.gif',
-    imageRoot + '/error.png',
-    imageRoot + '/16x16/warning.png'
+        imageRoot + '/green-check.jpg',
+        imageRoot + '/progressbar.gif',
+        imageRoot + '/error.png',
+        imageRoot + '/16x16/warning.png'
     ];
 
     jQuery(images).each(function() {
         jQuery('<img />').attr('src', this);
     });
-    
+
     jQuery("#outerTabs").tabs();
     jQuery("#innerTabs").tabs();
-    
+
     jQuery("#outerTabs tr").hover(
-        function () {
-            jQuery(this).css("background","#EEEDED");
-        }, 
-        function () {
-            jQuery(this).css("background","");
-        }
-        );
-    
+            function() {
+                jQuery(this).css("background", "#EEEDED");
+            },
+            function() {
+                jQuery(this).css("background", "");
+            }
+    );
+
     var installButton = jQuery('#installButton');
     installButton.button();
     installButton.unbind("click").click(function() {
         var pluginsToInstall = getPluginsToInstall();
         installCount = pluginsToInstall.length;
-        if (installCount > 0){
+        if (installCount > 0) {
             jQuery(this).hide();
             jQuery('#installProgress').show();
             jQuery("#pluginInstallMsg").hide();
-            jQuery(pluginsToInstall).each(function(){
+            jQuery(pluginsToInstall).each(function() {
                 installPlugin(this);
             });
         }
     });
-     
+
     var updateButton = jQuery('#updateButton');
     updateButton.button();
     updateButton.unbind("click").click(function() {
         var pluginsToUpdate = getPluginsToUpdate();
         updateCount = pluginsToUpdate.length;
-        if (updateCount > 0){
+        if (updateCount > 0) {
             jQuery(this).hide();
             jQuery('#updateProgress').show();
             jQuery("#pluginUpdateMsg").hide();
-            jQuery(pluginsToUpdate).each(function(){
+            jQuery(pluginsToUpdate).each(function() {
                 updatePlugin(this);
             });
         }
     });
 
-    jQuery('#installedTab button.enable').each(function(){
+    jQuery('#installedTab button.enable').each(function() {
         jQuery(this).button();
-        jQuery(this).click(function(){
+        jQuery(this).click(function() {
             var selected = this;
             var buttonText = jQuery(selected).children('span').text();
             var title = "Disable Plugin?";
-            if (buttonText == "Enable"){
+            if (buttonText == "Enable") {
                 title = "Enable Plugin?";
                 jQuery('#confirmMsg').text("Do you want to enable Plugin - " + jQuery(selected).val() + " ?");
-            }else{
+            } else {
                 title = "Disable Plugin?";
                 jQuery('#confirmMsg').text("Do you want to disable Plugin - " + jQuery(selected).val() + " ?");
             }
             jQuery('#dialog-confirm').dialog({
                 resizable: false,
-                height:170,
+                height: 170,
                 width: 350,
                 modal: true,
                 title: title,
                 buttons: {
                     'Yes': function() {
-                        jQuery( this ).dialog( "close" );
+                        jQuery(this).dialog("close");
                         enablePlugin(selected);
                     },
                     Cancel: function() {
-                        jQuery( this ).dialog( "close" );
+                        jQuery(this).dialog("close");
                     }
                 }
             });
         });
-            
+
     });
-    
-    jQuery('#installedTab button.downgrade').each(function(){
+
+    jQuery('#installedTab button.downgrade').each(function() {
         jQuery(this).button();
-        jQuery(this).click(function(){
+        jQuery(this).click(function() {
             var selected = this;
             var title = "Downgrade Plugin?";
             jQuery('#confirmMsg').text("Do you want to downgrade Plugin - " + jQuery(selected).val() + " ?");
-             
+
             jQuery('#dialog-confirm').dialog({
                 resizable: false,
-                height:170,
+                height: 170,
                 width: 350,
                 modal: true,
                 title: title,
                 buttons: {
                     'Yes': function() {
-                        jQuery( this ).dialog( "close" );
+                        jQuery(this).dialog("close");
                         downgradePlugin(selected);
                     },
                     Cancel: function() {
-                        jQuery( this ).dialog( "close" );
+                        jQuery(this).dialog("close");
                     }
                 }
             });
         });
-            
+
     });
-    
-    jQuery('#installedTab button.unpin').each(function(){
+
+    jQuery('#installedTab button.unpin').each(function() {
         jQuery(this).button();
-        jQuery(this).click(function(){
+        jQuery(this).click(function() {
             var selected = this;
             var title = "Unpin Plugin?";
             jQuery('#confirmMsg').text("Do you want to unpin Plugin - " + jQuery(selected).val() + " ?");
-             
+
             jQuery('#dialog-confirm').dialog({
                 resizable: false,
-                height:170,
+                height: 170,
                 width: 350,
                 modal: true,
                 title: title,
                 buttons: {
                     'Yes': function() {
-                        jQuery( this ).dialog( "close" );
+                        jQuery(this).dialog("close");
                         unpinPlugin(selected);
                     },
                     Cancel: function() {
-                        jQuery( this ).dialog( "close" );
+                        jQuery(this).dialog("close");
                     }
                 }
             });
-        });   
+        });
     });
-    
+
     var fileSelect = jQuery('#fileSelect');
-    fileSelect.change(function(e){
+    fileSelect.change(function(e) {
         filesToUpload = e.target.files;
     });
-    
+
     var uploadButton = jQuery('#uploadButton');
     uploadButton.button();
     uploadButton.click(function() {
@@ -173,80 +180,80 @@ jQuery(document).ready(function() {
             uploadFile(f);
         }
     });
-    
+
     var progressbar = jQuery('#progressbar');
-    
+
     progressbar.progressbar({
         value: 0
     });
     progressbar.height(5);
-       
+
     refreshProxyUser();
     jQuery('#proxyAuth').click(function() {
         refreshProxyUser();
     });
-        
+
     var proxySubmitButton = jQuery('#proxySubmitButton');
     proxySubmitButton.button();
     proxySubmitButton.click(function() {
         submitPoxyForm();
     });
-    
+
     var configureUpdateSiteButton = jQuery('#configureUpdateSiteButton');
     configureUpdateSiteButton.button();
     configureUpdateSiteButton.click(function() {
         configureUpdateSite();
     });
-    
+
     var refreshUpdatesButton = jQuery('#refreshUpdatesButton');
     refreshUpdatesButton.button();
     refreshUpdatesButton.click(function() {
         refreshUpdateCenter();
     });
-    
-     
+
+
     jQuery('.category-head').click(function() {
         jQuery(this).next().toggle();
         var child = jQuery(this).children(":eq(0)");
-        if (jQuery(child).hasClass("ui-icon-collapsed")){
+        if (jQuery(child).hasClass("ui-icon-collapsed")) {
             jQuery(child).removeClass("ui-icon-collapsed");
             jQuery(child).addClass("ui-icon-expanded");
-        }else{
+        } else {
             jQuery(child).addClass("ui-icon-collapsed");
             jQuery(child).removeClass("ui-icon-expanded");
         }
         return false;
     });
-    
-    
+
+
     var pluginSearchButton = jQuery('#pluginSearchButton');
     pluginSearchButton.button();
     pluginSearchButton.click(function() {
         jQuery("#searchPlugins").append("<p>Searching ..</p>")
         var searchStr = jQuery("#pluginSearchText").val();
         var searchDescription = jQuery("#searchDesc").is(':checked');
-        jQuery("#searchContents").load('searchPlugins', 
-        {
-            'searchStr' : searchStr, 
-            'searchDescription' : searchDescription
-        }
+        jQuery("#searchContents").load('searchPlugins',
+                {
+                    'searchStr': searchStr,
+                    'searchDescription': searchDescription
+                }
         );
-    });      
+    });
 });
 
-function refreshProxyUser(){
-    if (jQuery('#proxyAuth').is(':checked')){
+function refreshProxyUser() {
+    if (jQuery('#proxyAuth').is(':checked')) {
         jQuery('#proxyUser').show();
         jQuery('#proxyPassword').show();
-    }else{
+    } else {
         jQuery('#proxyUser').hide();
         jQuery('#proxyPassword').hide();
     }
 }
 
-function getPluginsToInstall(){
+function getPluginsToInstall() {
     var installables = [];
-    jQuery('#availableTab .items-container input[@type=checkbox]:checked').each(function(){
+    jQuery('#availableTab .items-container input[@type=checkbox]:checked').each(function() {
         //Filter out duplicate plugins in different categories
         var pluginName = jQuery(this).val();
         var alreadyAdded = false;
@@ -255,66 +262,66 @@ function getPluginsToInstall(){
                 alreadyAdded = true;
             }
         }
-        if (!alreadyAdded){
+        if (!alreadyAdded) {
             installables.push(this);
         }
     });
     return installables;
 }
 
-function getPluginsToUpdate(){
+function getPluginsToUpdate() {
     var updates = [];
-    jQuery('#updatesTab .items-container input[@type=checkbox]:checked').each(function(){
+    jQuery('#updatesTab .items-container input[@type=checkbox]:checked').each(function() {
         updates.push(this);
     });
     return updates;
 }
 
-function getPluginsToDisable(){
+function getPluginsToDisable() {
     var updates = [];
-    jQuery('#installedTab input[@type=checkbox]:checked').each(function(){
+    jQuery('#installedTab input[@type=checkbox]:checked').each(function() {
         updates.push(this);
     });
     return updates;
 }
 
-function installPlugin(selected){
-    jQuery(".install_img_" + jQuery(selected).val()).each(function(){
+function installPlugin(selected) {
+    jQuery(".install_img_" + jQuery(selected).val()).each(function() {
         jQuery(this).show();
         jQuery(this).attr('src', imageRoot + '/progressbar.gif');
     });
-    
-    jQuery(".install_cb_" + jQuery(selected).val()).each(function(){
+
+    jQuery(".install_cb_" + jQuery(selected).val()).each(function() {
         jQuery(this).hide();
     });
-     
+
     jQuery.ajax({
         type: 'POST',
         url: "installPlugin",
         data: {
-            pluginName:jQuery(selected).val()
+            pluginName: jQuery(selected).val()
         },
-        success: function(){
-            jQuery(".install_img_" + jQuery(selected).val()).each(function(){
+        success: function() {
+            jQuery(".install_img_" + jQuery(selected).val()).each(function() {
                 jQuery(this).show();
                 jQuery(this).attr('src', imageRoot + '/green-check.jpg');
             });
             jQuery(selected).attr("checked", false);
             jQuery('#restart-message').show();
             installCount--;
-            if (installCount == 0){
+            if (installCount == 0) {
                 jQuery('#installProgress').hide();
                 jQuery('#installButton').show();
             }
         },
-        error: function(msg){
-            jQuery(".install_img_" + jQuery(selected).val()).each(function(){
+        error: function(msg) {
+            jQuery(".install_img_" + jQuery(selected).val()).each(function() {
                 jQuery(this).show();
                 jQuery(this).attr('src', imageRoot + '/error.png');
             });
             showMessage(jQuery("#pluginInstallMsg"), msg.responseText, true);
             installCount--;
-            if (installCount == 0){
+            if (installCount == 0) {
                 jQuery('#installProgress').hide();
                 jQuery('#installButton').show();
             }
@@ -325,44 +332,44 @@ function installPlugin(selected){
             }
         },
         dataType: "html"
-    }); 
+    });
 }
 
-function updatePlugin(selected){
-    jQuery(".update_img_" + jQuery(selected).val()).each(function(){
+function updatePlugin(selected) {
+    jQuery(".update_img_" + jQuery(selected).val()).each(function() {
         jQuery(this).show();
         jQuery(this).attr('src', imageRoot + '/progressbar.gif');
     });
-    jQuery(".update_cb_" + jQuery(selected).val()).each(function(){
+    jQuery(".update_cb_" + jQuery(selected).val()).each(function() {
         jQuery(this).hide();
     });
     jQuery.ajax({
         type: 'POST',
         url: "updatePlugin",
         data: {
-            pluginName:jQuery(selected).val()
+            pluginName: jQuery(selected).val()
         },
-        success: function(){
-            jQuery(".update_img_" + jQuery(selected).val()).each(function(){
+        success: function() {
+            jQuery(".update_img_" + jQuery(selected).val()).each(function() {
                 jQuery(this).show();
                 jQuery(this).attr('src', imageRoot + '/green-check.jpg');
             });
             jQuery(selected).attr("checked", false);
             jQuery('#restart-message').show();
             updateCount--;
-            if (updateCount == 0){
+            if (updateCount == 0) {
                 jQuery('#updateProgress').hide();
                 jQuery('#updateButton').show();
             }
         },
-        error: function(msg){
-            jQuery(".update_img_" + jQuery(selected).val()).each(function(){
+        error: function(msg) {
+            jQuery(".update_img_" + jQuery(selected).val()).each(function() {
                 jQuery(this).show();
                 jQuery(this).attr('src', imageRoot + '/error.png');
             });
             showMessage(jQuery("#pluginUpdateMsg"), msg.responseText, true);
             updateCount--;
-            if (updateCount == 0){
+            if (updateCount == 0) {
                 jQuery('#updateProgress').hide();
                 jQuery('#updateButton').show();
             }
@@ -373,44 +380,44 @@ function updatePlugin(selected){
             }
         },
         dataType: "html"
-    }); 
+    });
 }
 
-function enablePlugin(selected){
+function enablePlugin(selected) {
     var enable = false;
-    if (jQuery(selected).text() == "Enable"){
+    if (jQuery(selected).text() == "Enable") {
         enable = true;
     }
-    
-    jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+
+    jQuery(".installed_img_" + jQuery(selected).val()).each(function() {
         jQuery(this).show();
         jQuery(this).attr('src', imageRoot + '/progressbar.gif');
     });
-    
+
     jQuery.ajax({
         type: 'POST',
         url: "enablePlugin",
         data: {
-            pluginName:jQuery(selected).val(),
+            pluginName: jQuery(selected).val(),
             enable: enable
         },
-        success: function(){
-            if (enable){
-                jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+        success: function() {
+            if (enable) {
+                jQuery(".installed_img_" + jQuery(selected).val()).each(function() {
                     jQuery(this).show();
                     jQuery(this).attr('src', imageRoot + '/green-check.jpg');
                 });
                 jQuery(selected).children('span').text('Disable');
-            }else{
-                jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+            } else {
+                jQuery(".installed_img_" + jQuery(selected).val()).each(function() {
                     jQuery(this).attr('src', imageRoot + '/16x16/warning.png');
                 });
                 jQuery(selected).children('span').text('Enable');
             }
             jQuery('#restart-message').show();
         },
-        error: function(msg){
-            jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+        error: function(msg) {
+            jQuery(".installed_img_" + jQuery(selected).val()).each(function() {
                 jQuery(this).show();
                 jQuery(this).attr('src', imageRoot + '/error.png');
             });
@@ -422,32 +429,32 @@ function enablePlugin(selected){
             }
         },
         dataType: "html"
-    }); 
+    });
 }
 
-function downgradePlugin(selected){
-    jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+function downgradePlugin(selected) {
+    jQuery(".installed_img_" + jQuery(selected).val()).each(function() {
         jQuery(this).show();
         jQuery(this).attr('src', imageRoot + '/progressbar.gif');
     });
-    
+
     jQuery.ajax({
         type: 'POST',
         url: "downgradePlugin",
         data: {
-            pluginName:jQuery(selected).val()
+            pluginName: jQuery(selected).val()
         },
-        success: function(){
-            jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+        success: function() {
+            jQuery(".installed_img_" + jQuery(selected).val()).each(function() {
                 jQuery(this).show();
                 jQuery(this).attr('src', imageRoot + '/green-check.jpg');
             });
-                
+
             jQuery('#restart-message').show();
             jQuery(selected).remove();
         },
-        error: function(msg){
-            jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+        error: function(msg) {
+            jQuery(".installed_img_" + jQuery(selected).val()).each(function() {
                 jQuery(this).show();
                 jQuery(this).attr('src', imageRoot + '/error.png');
             });
@@ -459,32 +466,32 @@ function downgradePlugin(selected){
             }
         },
         dataType: "html"
-    }); 
+    });
 }
 
-function unpinPlugin(selected){
-    jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+function unpinPlugin(selected) {
+    jQuery(".installed_img_" + jQuery(selected).val()).each(function() {
         jQuery(this).show();
         jQuery(this).attr('src', imageRoot + '/progressbar.gif');
     });
-    
+
     jQuery.ajax({
         type: 'POST',
         url: "unpinPlugin",
         data: {
-            pluginName:jQuery(selected).val()
+            pluginName: jQuery(selected).val()
         },
-        success: function(){
-            jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+        success: function() {
+            jQuery(".installed_img_" + jQuery(selected).val()).each(function() {
                 jQuery(this).show();
                 jQuery(this).attr('src', imageRoot + '/green-check.jpg');
             });
-                
+
             jQuery('#restart-message').show();
             jQuery(selected).parent().remove();
         },
-        error: function(msg){
-            jQuery(".installed_img_" + jQuery(selected).val()).each(function(){
+        error: function(msg) {
+            jQuery(".installed_img_" + jQuery(selected).val()).each(function() {
                 jQuery(this).show();
                 jQuery(this).attr('src', imageRoot + '/error.png');
             });
@@ -496,7 +503,7 @@ function unpinPlugin(selected){
             }
         },
         dataType: "html"
-    }); 
+    });
 }
 
 function uploadFile(file) {
@@ -514,10 +521,10 @@ function uploadFile(file) {
         xhr.onreadystatechange = function(e) {
             if (xhr.readyState == 4) {
                 jQuery("#progressbar").hide();
-                if (xhr.status == 200){
+                if (xhr.status == 200) {
                     showMessage(jQuery("#pluginUploadMsg"), "Plugin " + file.name + " sucessfully uploaded.");
                     jQuery('#restart-message').show();
-                }else{
+                } else {
                     showMessage(jQuery("#pluginUploadMsg"), xhr.responseText, true);
                 }
             }
@@ -531,17 +538,17 @@ function uploadFile(file) {
     }
 }
 
-function showMessage(infoTxt, msg, error){
+function showMessage(infoTxt, msg, error) {
     infoTxt.text(msg);
-    if (error == true){
-        infoTxt.css("color","red");
-    }else{
-        infoTxt.css("color","green");  
+    if (error == true) {
+        infoTxt.css("color", "red");
+    } else {
+        infoTxt.css("color", "green");
     }
     infoTxt.show();
 }
 
-function submitPoxyForm(){
+function submitPoxyForm() {
     forProxy = false;
     showMessage(jQuery("#proxyMsg"), "Configuring proxy ..", "black");
     var dataString = jQuery("#proxyForm").serialize();
@@ -549,11 +556,11 @@ function submitPoxyForm(){
         type: 'POST',
         url: "proxyConfigure",
         data: dataString,
-        success: function(){
+        success: function() {
             var msg = 'Hudson server could successfully connect to the internet';
             showMessage(jQuery("#proxyMsg"), msg);
         },
-        error: function(){
+        error: function() {
             var msg = 'Hudson server still could not connect to the internet. Check the HTTP proxy settings and try again.';
             showMessage(jQuery("#proxyMsg"), msg, true);
         },
@@ -564,10 +571,10 @@ function submitPoxyForm(){
             }
         },
         dataType: "html"
-    }); 
+    });
 }
 
-function configureUpdateSite(){
+function configureUpdateSite() {
     jQuery("#configureUpdateSiteMsg").show();
     jQuery("#configureUpdateSiteMsg").text("Configuring ..");
     var dataString = jQuery("#configureUpdateSiteForm").serialize();
@@ -575,11 +582,11 @@ function configureUpdateSite(){
         type: 'POST',
         url: "configureUpdateSite",
         data: dataString,
-        success: function(){
+        success: function() {
             var msg = 'Update Site Successfully Configured.';
             showMessage(jQuery("#configureUpdateSiteMsg"), msg);
         },
-        error: function(msg){
+        error: function(msg) {
             //var msg = 'Udate Site could note be Configured. Check the HTTP proxy settings and try again.';
             showMessage(jQuery("#configureUpdateSiteMsg"), msg.responseText, true);
         },
@@ -590,19 +597,19 @@ function configureUpdateSite(){
             }
         },
         dataType: "html"
-    }); 
+    });
 }
 
-function refreshUpdateCenter(){
+function refreshUpdateCenter() {
     jQuery("#updateRefreshMsg").show();
     jQuery("#updateRefreshMsg").text("Refreshing ..");
     jQuery.ajax({
         type: 'POST',
         url: "refreshUpdateCenter",
-        success: function(){
-            window.location.href=".";
+        success: function() {
+            window.location.href = ".";
         },
-        error: function(msg){
+        error: function(msg) {
             //var msg = 'Failed to refresh updates. Check the HTTP proxy settings and try again.';
             showMessage(jQuery("#updateRefreshMsg"), msg.responseText, true);
         },
@@ -611,5 +618,5 @@ function refreshUpdateCenter(){
                 showLoginDialog();
             }
         }
-    }); 
+    });
 }

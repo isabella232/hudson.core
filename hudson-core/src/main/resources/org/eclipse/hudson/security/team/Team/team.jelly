@@ -23,57 +23,63 @@
     <j:set var="imagesURL"  value="${rootURL}/images" />
     
     <li>
+        <button style="float:right; color: #C6223A;" value="${it.name}" class="teamDeleteButton">${%Delete Team}</button>
         <h3>${it.name}</h3>
         <p class="description">
             ${it.description}
         </p>
         <div class="teamList">
-            <div class="teamAdminContainer">
+            <div class="itemsContainer">
                 <b> Team Admins: </b>
-                <j:if test="${it.admins.size() == 0}">
-                    <p id="teamAdminNone_${it.name}">
-                        Team does not have any admins!
-                    </p>
-                </j:if>
-                <ol id="teamAdminList_${it.name}">
-                    <j:forEach var="teamAdmin" items="${it.admins}">
-                        <li>
-                            ${teamAdmin}
-                        </li>
-                    </j:forEach> 
-                </ol>
-                <span class="teamAdminAdd">
-                    <label>${%User or Group to add}:</label>
-                    <input size="40" type="text" id="teamAdminSid_${it.name}" />
-                    <button value="${it.name}" class="teamAdminAddButton">${%Add}</button>
-                    <span id="teamAdminAddMsg_${it.name}">
-                        <!-- message goes here -->
-                    </span>
-                </span>
+                <div class="memberList">
+                    <j:if test="${it.admins.size() == 0}">
+                        <p id="teamAdminNone_${it.name}">
+                            Team does not have any admins!
+                        </p>
+                    </j:if>
+                    <ol style="list-style-type:none; padding-left: 0px;" id="teamAdminList_${it.name}">
+                        <j:forEach var="teamAdmin" items="${it.admins}">
+                            <li>
+                                <input type="hidden" value="${teamAdmin}" name="hiddenUserName"/>
+                                <input type="hidden" value="${it.name}" name="hiddenTeamName"/>
+                                <img src="${imagesURL}/16x16/user.png" style="visibility:hidden" name="typeIcon"/> 
+                                <span style="margin-left:10px; font-size:13px;">
+                                    ${teamAdmin}
+                                </span>
+                                <img class="teamAdminRemove" style="margin-left:25px" src="${imagesURL}/16x16/delete.png"/>
+                            </li>
+                        </j:forEach> 
+                    </ol>
+                </div>
+                <div class="teamAdminAdd">
+                    <button value="${it.name}" class="teamAdminAddButton">${%Add Admin}</button>
+                </div>
             </div>
-            <div class="teamMemberContainer">
+            <div class="itemsContainer">
                 <b> Team Members: </b>
-                
-                <j:if test="${it.members.size() == 0}">
-                    <p id="teamMemberNone_${it.name}">
-                        Team does not have any members!
-                    </p>
-                </j:if>
-                <ol id="teamMemberList_${it.name}">
-                    <j:forEach var="teamMember" items="${it.members}">
-                        <li>
-                            ${teamMember}
-                        </li>
-                    </j:forEach> 
-                </ol>
-                <span class="teamMemberAdd">
-                    <label>${%User or Group to add}:</label>
-                    <input size="40" type="text" id="teamMemberSid_${it.name}" />
-                    <button value="${it.name}" class="teamMemberAddButton">${%Add}</button>
-                    <span id="teamMemberAddMsg_${it.name}">
-                        <!-- message goes here -->
-                    </span>
-                </span>
+                <div class="memberList">
+                    <j:if test="${it.members.size() == 0}">
+                        <p id="teamMemberNone_${it.name}">
+                            Team does not have any members!
+                        </p>
+                    </j:if>
+                    <ol style="list-style-type:none; padding-left: 0px;" id="teamMemberList_${it.name}">
+                        <j:forEach var="teamMember" items="${it.members}">
+                            <li>
+                                <input type="hidden" value="${teamMember}" name="hiddenUserName"/>
+                                <input type="hidden" value="${it.name}" name="hiddenTeamName"/>
+                                <img src="${imagesURL}/16x16/user.png" style="visibility:hidden" name="typeIcon"/>
+                                <span style="margin-left:10px; font-size:13px">
+                                    ${teamMember}
+                                </span>
+                                <img class="teamMemberRemove" style="margin-left:25px" src="${imagesURL}/16x16/delete.png"/>
+                            </li>
+                        </j:forEach> 
+                    </ol>
+                </div>
+                <div class="teamMemberAdd">
+                    <button value="${it.name}" class="teamMemberAddButton">${%Add Member}</button>
+                </div>
             </div>
         </div>
     </li> 

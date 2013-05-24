@@ -15,78 +15,15 @@
 
 
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    <style type="text/css">
-        #sysAdminInfo {
-           margin-left: 35px;
-        }
-        #sysAdminAdd  label{
-            float: left;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        #sysAdminAdd  input{
-            margin-bottom: 5px;
-            margin-top: 5px;
-            margin-left: 10px;
-        }
-        #sysAdminNone{
-            color: red;
-            font-weight: bold;
-        }
-    </style>
-    <script>
-        jQuery(document).ready(function() {
-        
-            jQuery('#sysAdminAddButton').button();
-            jQuery('#sysAdminAddButton').click(function() {
-               var sysAdminSid = jQuery('#sysAdminSid').val();
-               jQuery.ajax({
-                    type: 'POST',
-                    url: "${rootURL}/descriptor/${descriptor.clazz.name}/addSysAdmin",
-                    data: {
-                        sysAdminSid:sysAdminSid
-                    },
-                    success: function(msg){
-                        jQuery('#sysAdminNone').remove();
-                        var sysAdminItem = '<li>' + msg  + '</li>';
-                        jQuery(sysAdminItem).appendTo(jQuery('#sysAdminList'));
-                    },
-                    error: function(msg){
-                        var errorItem = '<li>' + msg + '(Unknown) </li>';
-                        jQuery(errorItem).appendTo(jQuery('#sysAdminList'));
-                        
-                    },
-                    dataType: "html"
-                });   
-            });
-            
-            
-             
-            jQuery('#sysAdminList li').each(function(){
-                var sysAdminSid = jQuery(this).text();
-                jQuery(this).remove();
-                jQuery.ajax({
-                    type: 'POST',
-                    url: "${rootURL}/descriptor/${descriptor.clazz.name}/checkSid",
-                    data: {
-                        sid:sysAdminSid
-                    },
-                    success: function(msg){
-                        var sysAdminItem = '<li>' + msg  + '</li>';
-                        jQuery(sysAdminItem).appendTo(jQuery('#sysAdminList'));
-                    },
-                    error: function(msg){
-                        var sysAdminItem = '<li>' + msg + '</li>';
-                        jQuery(sysAdminItem).appendTo(jQuery('#sysAdminList'));
-                        
-                    },
-                    dataType: "html"
-                });   
-            });
-             
-        });
-    </script> 
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"> 
+    <script type="text/javascript">
+        var rootURL = "${rootURL}";
+        var descriptorClazz = "${descriptor.clazz.name}";
+        var imageRoot = '${imagesURL}';
+    </script>
+    <link href="${cssURL}/team-auth.css" type="text/css" rel="stylesheet" />
+    <script src="${scriptsURL}/team-auth.js" type="text/javascript"></script>
+    
     <f:block xmlns:local="local">
         <div id="sysAdminInfo">
             <p>
@@ -98,28 +35,62 @@
             <b>
                 Current System Administrators:
             </b>
+            <j:if test="${(app.teamManager == null) || (app.teamManager.sysAdmins.size() == 0)}">
+                <p id="sysAdminNone">
+                    None (At least one System Administrator required)
+                </p>
+            </j:if>
             <ol name="sysAdminList" id="sysAdminList">
-                
-                <j:if test="${(app.teamManager == null) || (app.teamManager.sysAdmins.size() == 0)}">
-                    <li id="sysAdminNone">
-                       None (At least one System Administrator required)
-                    </li>
-                </j:if>
-                
-                 
                 <j:forEach var="sysAdmin" items="${app.teamManager.sysAdmins}">
                     <li>
-                        ${sysAdmin}
+                        <input type="hidden" value="${sysAdmin}" name="hiddenUserName"/>
+                        <img src="${imagesURL}/16x16/user.png" style="visibility:hidden" name="typeIcon"/> 
+                        <span style="margin-left:10px; font-size:13px;">
+                            ${sysAdmin}
+                        </span>
+                        <img class="sysAdminRemove" style="margin-left:25px" src="${imagesURL}/16x16/delete.png"/>
                     </li>
                 </j:forEach> 
-                
-                
             </ol>
-            <span id="sysAdminAdd">
-                <label for="sysAdminSid">${%User or Group name to add as System Administrator}:</label>
-                <input size="40" type="text" name="sysAdminSid" id="sysAdminSid" />
-                <input type="button" value="${%Add}" id="sysAdminAddButton"/>
-            </span>
+            <div class="sysAdminAdd">
+                <input type="button" id="sysAdminAddButton" value="${%Add Sys Admin}" />
+            </div>
+        </div>
+        
+        <!-- Template -->
+        <div style="margin-top: 10px; display: none" id="sysAdminTemplate">
+            <li>
+                <input type="hidden" name="hiddenUserName"/>
+                <img name="typeIcon"/> 
+                <span style="margin-left:10px; font-size:13px;">
+                </span>
+                <img class="sysAdminRemove" style="margin-left:25px" src="${imagesURL}/16x16/delete.png"/>
+            </li>
+        </div>
+        
+        <div style="margin-top: 10px; display: none" id="dialog-add-user">
+            <div>
+                <label>${%User or Group Name}:</label>
+                <input style="margin-left:5px" size="35" type="text" id="sidName" />
+                <div style="margin-top:10px">
+                    <span id="userAddMsg">
+                        <!-- message goes here -->
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 10px; display: none" id="dialog-remove-user">
+            <div>
+                <span>
+                    Do you really want to delete the member from the team?
+                </span>
+                <div style="margin-top:10px">
+                    <span id="userRemoveMsg">
+                        <!-- message goes here -->
+                    </span>
+                </div>
+            </div>
         </div>
       
     </f:block>

@@ -24,21 +24,14 @@ import hudson.util.FormValidation;
 import hudson.util.XStream2;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
-import org.eclipse.hudson.plugins.PluginCenter;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.HttpResponses;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,13 +45,13 @@ public final class TeamManager implements Saveable {
 
     private List<String> sysAdmins = new CopyOnWriteArrayList<String>();
     private List<Team> teams = new CopyOnWriteArrayList<Team>();
-    private static final XStream XSTREAM = new XStream2();
+    private transient final XStream xstream = new XStream2();
     private transient Logger logger = LoggerFactory.getLogger(TeamManager.class);
     private transient File hudsonHomeDir;
     private transient File teamsFolder;
     private transient final String teamsConfigFileName = "teams.xml";
     private transient DefaultTeam defaultTeam;
-    private static final String TEAMS_FOLDER_NAME = "teams";
+    private transient final String TEAMS_FOLDER_NAME = "teams";
 
     public TeamManager(File homeDir) {
         hudsonHomeDir = homeDir;
@@ -66,6 +59,7 @@ public final class TeamManager implements Saveable {
         if (!teamsFolder.exists()) {
             teamsFolder.mkdirs();
         }
+        initializeXstream();
         load();
         ensureDefaultTeam();
     }
@@ -73,6 +67,13 @@ public final class TeamManager implements Saveable {
     public void addSysAdmin(String adminName) throws IOException {
         if (!sysAdmins.contains(adminName)) {
             sysAdmins.add(adminName);
+            save();
+        }
+    }
+
+    public void removeSysAdmin(String adminName) throws IOException {
+        if (sysAdmins.contains(adminName)) {
+            sysAdmins.remove(adminName);
             save();
         }
     }
@@ -108,7 +109,7 @@ public final class TeamManager implements Saveable {
             }
         }
 
-        Team newTeam = new Team(teamName, description);
+        Team newTeam = new Team(teamName, description, this);
         teams.add(newTeam);
         save();
         return newTeam;
@@ -118,63 +119,144 @@ public final class TeamManager implements Saveable {
         return createTeam(teamName, teamName);
     }
 
-    public HttpResponse doCreateTeam(@QueryParameter String name, @QueryParameter String description) throws IOException {
+    public void deleteTeam(String teamName) throws TeamNotFoundException, IOException {
+        Team team = findTeam(teamName);
+        teams.remove(team);
+        save();
+    }
+
+    public HttpResponse doCreateTeam(@QueryParameter String teamName, @QueryParameter String description) throws IOException {
         if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
             return HttpResponses.forbidden();
         }
-        if ((name == null) || "".equals(name.trim())){
-           return new TeamUtils.ErrorHttpResponse("Team name required");
+        if ((teamName == null) || "".equals(teamName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team name required");
         }
         try {
-            Team team = createTeam(name, description);
+            Team team = createTeam(teamName, description);
             return HttpResponses.forwardToView(team, "team.jelly");
         } catch (TeamAlreadyExistsException ex) {
             return new TeamUtils.ErrorHttpResponse(ex.getLocalizedMessage());
         }
     }
-    
+
+    public HttpResponse doDeleteTeam(@QueryParameter String teamName) throws IOException {
+        if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
+            return HttpResponses.forbidden();
+        }
+        if ((teamName == null) || "".equals(teamName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team name required");
+        }
+        try {
+            deleteTeam(teamName);
+            return HttpResponses.ok();
+        } catch (TeamNotFoundException ex) {
+            return new TeamUtils.ErrorHttpResponse(ex.getLocalizedMessage());
+        }
+    }
+
     public HttpResponse doAddTeamAdmin(@QueryParameter String teamName, @QueryParameter String teamAdminSid) throws IOException {
         if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
             return HttpResponses.forbidden();
         }
-        
+        if ((teamName == null) || "".equals(teamName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team name required");
+        }
+        if ((teamAdminSid == null) || "".equals(teamAdminSid.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team admin name required");
+        }
         Team team;
         try {
             team = findTeam(teamName);
         } catch (TeamNotFoundException ex) {
-            return new TeamUtils.ErrorHttpResponse(teamName + " is not a valis team.");
+            return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
         }
 
-        if (!team.getAdmins().contains(teamAdminSid)){
+        if (!team.getAdmins().contains(teamAdminSid)) {
             team.addAdmin(teamAdminSid);
-            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getDisplayHtml(teamAdminSid));
-        }else {
+            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(teamAdminSid));
+        } else {
             return new TeamUtils.ErrorHttpResponse(teamAdminSid + " is already a team admin.");
         }
     }
-    
+
+    public HttpResponse doRemoveTeamAdmin(@QueryParameter String teamName, @QueryParameter String teamAdminSid) throws IOException {
+        if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
+            return HttpResponses.forbidden();
+        }
+        if ((teamName == null) || "".equals(teamName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team name required");
+        }
+        if ((teamAdminSid == null) || "".equals(teamAdminSid.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team admin name required");
+        }
+        Team team;
+        try {
+            team = findTeam(teamName);
+        } catch (TeamNotFoundException ex) {
+            return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
+        }
+
+        if (team.getAdmins().contains(teamAdminSid)) {
+            team.removeAdmin(teamAdminSid);
+            return HttpResponses.ok();
+        } else {
+            return new TeamUtils.ErrorHttpResponse(teamAdminSid + " is not a team admin.");
+        }
+    }
+
     public HttpResponse doAddTeamMember(@QueryParameter String teamName, @QueryParameter String teamMemberSid) throws IOException {
         if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
             return HttpResponses.forbidden();
         }
-        
+        if ((teamName == null) || "".equals(teamName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team name required");
+        }
+        if ((teamMemberSid == null) || "".equals(teamMemberSid.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team member name required");
+        }
         Team team;
         try {
             team = findTeam(teamName);
         } catch (TeamNotFoundException ex) {
-            return new TeamUtils.ErrorHttpResponse(teamName + " is not a valis team.");
+            return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
         }
 
-        if (!team.getMembers().contains(teamMemberSid)){
+        if (!team.getMembers().contains(teamMemberSid)) {
             team.addMember(teamMemberSid);
-            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getDisplayHtml(teamMemberSid));
-        }else {
+            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(teamMemberSid));
+        } else {
             return new TeamUtils.ErrorHttpResponse(teamMemberSid + " is already a team member.");
         }
     }
-    
+
+    public HttpResponse doRemoveTeamMember(@QueryParameter String teamName, @QueryParameter String teamMemberSid) throws IOException {
+        if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
+            return HttpResponses.forbidden();
+        }
+        if ((teamName == null) || "".equals(teamName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team name required");
+        }
+        if ((teamMemberSid == null) || "".equals(teamMemberSid.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team member name required");
+        }
+        Team team;
+        try {
+            team = findTeam(teamName);
+        } catch (TeamNotFoundException ex) {
+            return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
+        }
+
+        if (team.getMembers().contains(teamMemberSid)) {
+            team.removeMember(teamMemberSid);
+            return HttpResponses.ok();
+        } else {
+            return new TeamUtils.ErrorHttpResponse(teamMemberSid + " is not a team member.");
+        }
+    }
+
     public HttpResponse doCheckSid(@QueryParameter String sid) throws IOException {
-        return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getDisplayHtml(sid));
+        return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(sid));
     }
 
     public void addUser(String teamName, String userName) throws TeamNotFoundException, IOException {
@@ -226,17 +308,6 @@ public final class TeamManager implements Saveable {
         } else {
             return isAnonymousJob(jobName);
         }
-    }
-
-    private boolean isAnonymousJob(String jobName) {
-        for (Team team : teams) {
-            if (team.isJobOwner(jobName)) {
-                // job belongs to another team so has no access
-                return false;
-            }
-        }
-        // Not belong to any team, so has access
-        return true;
     }
 
     public boolean isUserHasAccess(String userName, String jobName) {
@@ -330,20 +401,6 @@ public final class TeamManager implements Saveable {
     }
 
     /**
-     * The file where the teams settings are saved.
-     */
-    private XmlFile getConfigFile() {
-        return new XmlFile(XSTREAM, new File(teamsFolder, teamsConfigFileName));
-    }
-    // This is purely fo unit test. Since Hudson is not fully loaded during
-    // test BulkChange saving mode is not available
-    private transient boolean useBulkSaveFlag = true;
-
-    public void setUseBulkSaveFlag(boolean flag) {
-        useBulkSaveFlag = flag;
-    }
-
-    /**
      * Save the settings to the configuration file.
      */
     @Override
@@ -355,63 +412,6 @@ public final class TeamManager implements Saveable {
         if (useBulkSaveFlag) {
             SaveableListener.fireOnChange(this, getConfigFile());
         }
-    }
-
-    /**
-     * Load the settings from the configuration file
-     */
-    public void load() {
-        XmlFile config = getConfigFile();
-        try {
-            if (config.exists()) {
-                config.unmarshal(this);
-            }
-        } catch (IOException e) {
-            logger.error("Failed to load " + config, e);
-        }
-    }
-
-    /**
-     * Get an ACL that provides system wide authorization
-     *
-     * @return TeamBasedACL with SYSTEM scope
-     */
-    ACL getRoolACL() {
-        return new TeamBasedACL(this, TeamBasedACL.SCOPE.GLOBAL);
-    }
-
-    /**
-     * Get an ACL that provides job specific authorization
-     *
-     * @return TeamBasedACL with JOB scope
-     */
-    ACL getACL(Job<?, ?> job) {
-        return new TeamBasedACL(this, TeamBasedACL.SCOPE.JOB, job);
-    }
-
-    /**
-     * Get an ACL that provides team specific authorization
-     *
-     * @return TeamBasedACL with JOB scope
-     */
-    ACL getACL(Team team) {
-        return new TeamBasedACL(this, TeamBasedACL.SCOPE.JOB, team);
-    }
-
-    private void ensureDefaultTeam() {
-        defaultTeam = new DefaultTeam();
-        try {
-            Team team = findTeam(DefaultTeam.DEFAULT_TEAM_NAME);
-            teams.remove(team);
-        } catch (TeamNotFoundException ex) {
-            // It's ok, we are going to remove it any way
-        }
-        defaultTeam.loadExistingJobs(hudsonHomeDir);
-        teams.add(defaultTeam);
-    }
-
-    Team getDefaultTeam() throws TeamNotFoundException {
-        return findTeam(DefaultTeam.DEFAULT_TEAM_NAME);
     }
 
     public String getTeamQualifiedJobId(String jobId) {
@@ -462,5 +462,96 @@ public final class TeamManager implements Saveable {
         public TeamAlreadyExistsException(String teamName) {
             super("Team " + teamName + " already exists.");
         }
+    }
+
+    void setUseBulkSaveFlag(boolean flag) {
+        useBulkSaveFlag = flag;
+    }
+
+    /**
+     * Get an ACL that provides system wide authorization
+     *
+     * @return TeamBasedACL with SYSTEM scope
+     */
+    ACL getRoolACL() {
+        return new TeamBasedACL(this, TeamBasedACL.SCOPE.GLOBAL);
+    }
+
+    /**
+     * Get an ACL that provides job specific authorization
+     *
+     * @return TeamBasedACL with JOB scope
+     */
+    ACL getACL(Job<?, ?> job) {
+        return new TeamBasedACL(this, TeamBasedACL.SCOPE.JOB, job);
+    }
+
+    /**
+     * Get an ACL that provides team specific authorization
+     *
+     * @return TeamBasedACL with JOB scope
+     */
+    ACL getACL(Team team) {
+        return new TeamBasedACL(this, TeamBasedACL.SCOPE.JOB, team);
+    }
+
+    Team getDefaultTeam() throws TeamNotFoundException {
+        return findTeam(DefaultTeam.DEFAULT_TEAM_NAME);
+    }
+
+    private boolean isAnonymousJob(String jobName) {
+        for (Team team : teams) {
+            if (team.isJobOwner(jobName)) {
+                // job belongs to another team so has no access
+                return false;
+            }
+        }
+        // Not belong to any team, so has access
+        return true;
+    }
+
+    /**
+     * The file where the teams settings are saved.
+     */
+    private XmlFile getConfigFile() {
+        return new XmlFile(xstream, new File(teamsFolder, teamsConfigFileName));
+    }
+    // This is purely fo unit test. Since Hudson is not fully loaded during
+    // test BulkChange saving mode is not available
+    private transient boolean useBulkSaveFlag = true;
+
+    /**
+     * Load the settings from the configuration file
+     */
+    private void load() {
+        XmlFile config = getConfigFile();
+        try {
+            if (config.exists()) {
+                config.unmarshal(this);
+            }
+        } catch (IOException e) {
+            logger.error("Failed to load " + config, e);
+        }
+    }
+
+    private void ensureDefaultTeam() {
+        defaultTeam = new DefaultTeam(this);
+        try {
+            Team team = findTeam(DefaultTeam.DEFAULT_TEAM_NAME);
+            teams.remove(team);
+        } catch (TeamNotFoundException ex) {
+            // It's ok, we are going to remove it any way
+        }
+        try {
+            defaultTeam.loadExistingJobs(hudsonHomeDir);
+        } catch (IOException ex) {
+            logger.error("Failed to load existing jobs", ex);
+        }
+        teams.add(defaultTeam);
+    }
+    
+    private void initializeXstream(){
+        xstream.alias("teamManager", TeamManager.class);
+        xstream.alias("team", Team.class);
     }
 }

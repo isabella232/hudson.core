@@ -10,14 +10,12 @@
  */
 package org.eclipse.hudson.security.team;
 
-import hudson.model.Hudson;
 import hudson.model.Items;
 import hudson.security.ACL;
 import hudson.security.AccessControlled;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.Permission;
 import hudson.security.SecurityRealm;
-import hudson.util.FormValidation;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -27,9 +25,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
-import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.HttpResponses;
-import org.kohsuke.stapler.QueryParameter;
 import org.springframework.security.AccessDeniedException;
 import org.springframework.security.Authentication;
 
@@ -44,22 +39,24 @@ public class Team implements AccessControlled {
     public static final String DEFAULT_TEAM_NAME = "default";
     private List<String> admins = new CopyOnWriteArrayList<String>();
     private List<String> members = new CopyOnWriteArrayList<String>();
-    private List<String> ownedJobNames = new CopyOnWriteArrayList<String>();
-    private String teamName;
+    private List<String> jobs = new CopyOnWriteArrayList<String>();
+    private String name;
     protected static final String JOBS_FOLDER_NAME = "jobs";
     private String description;
+    private transient TeamManager teamManager;
 
-    Team(String name) {
-        this(name, name);
+    Team(String name, TeamManager teamManager) {
+        this(name, name, teamManager);
     }
 
-    Team(String teamName, String description) {
-        this.teamName = teamName;
+    Team(String teamName, String description, TeamManager teamManager) {
+        this.name = teamName;
         this.description = description;
+        this.teamManager = teamManager;
     }
 
     public String getName() {
-        return teamName;
+        return name;
     }
 
     public String getDescription() {
@@ -70,21 +67,22 @@ public class Team implements AccessControlled {
         this.description = description;
     }
 
-    public void addAdmin(String adminName) {
+    public void addAdmin(String adminName) throws IOException {
         if (!admins.contains(adminName)) {
             admins.add(adminName);
+            teamManager.save();
         }
-        if (!members.contains(adminName)) {
-            members.add(adminName);
+    }
+
+    public void removeAdmin(String adminName) throws IOException {
+        if (admins.contains(adminName)) {
+            admins.remove(adminName);
+            teamManager.save();
         }
     }
 
     public List<String> getAdmins() {
         return admins;
-    }
-
-    public List<String> getMembers() {
-        return members;
     }
 
     public boolean isAdmin(String userName) {
@@ -103,14 +101,21 @@ public class Team implements AccessControlled {
         return isAdmin;
     }
 
+    public List<String> getMembers() {
+        return members;
+    }
+
     public void addMember(String userName) {
         if (!members.contains(userName)) {
             members.add(userName);
         }
     }
 
-    public void removeMember(String userName) {
-        members.remove(userName);
+    public void removeMember(String userName) throws IOException {
+        if (members.contains(userName)) {
+            members.remove(userName);
+            teamManager.save();
+        }
     }
 
     public boolean isMember(String userName) {
@@ -132,24 +137,29 @@ public class Team implements AccessControlled {
         }
     }
 
-    public void addJob(String jobname) {
-        if (!ownedJobNames.contains(jobname)) {
-            ownedJobNames.add(jobname);
+    public void addJob(String jobname) throws IOException {
+        if (!jobs.contains(jobname)) {
+            jobs.add(jobname);
+            teamManager.save();
         }
     }
 
-    public void removeJob(String jobname) {
-        ownedJobNames.remove(jobname);
+    public void removeJob(String jobname) throws IOException {
+        if (jobs.contains(jobname)) {
+            jobs.remove(jobname);
+            teamManager.save();
+        }
     }
 
     public boolean isJobOwner(String jobName) {
-        return ownedJobNames.contains(jobName);
+        return jobs.contains(jobName);
     }
 
-    void renameJob(String oldJobName, String newJobName) {
-        if (ownedJobNames.contains(oldJobName)) {
-            ownedJobNames.remove(oldJobName);
-            ownedJobNames.add(newJobName);
+    void renameJob(String oldJobName, String newJobName) throws IOException {
+        if (jobs.contains(oldJobName)) {
+            jobs.remove(oldJobName);
+            jobs.add(newJobName);
+            teamManager.save();
         }
     }
 
@@ -170,7 +180,7 @@ public class Team implements AccessControlled {
     }
 
     protected File getJobsFolder(File rootFolder) {
-        return new File(rootFolder, teamName + "/" + JOBS_FOLDER_NAME);
+        return new File(rootFolder, name + "/" + JOBS_FOLDER_NAME);
     }
 
     @Override

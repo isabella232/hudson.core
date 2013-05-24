@@ -99,7 +99,7 @@ public class TeamJobACLTest {
     }
 
     @Test
-    public void testAnonymousDefaultJobPermission() {
+    public void testAnonymousDefaultJobPermission() throws IOException {
         FreeStyleProject freeStyleJob = new FreeStyleProjectMock("testJob");
         try {
             teamManager.getDefaultTeam().addJob(freeStyleJob.getName());
@@ -115,7 +115,7 @@ public class TeamJobACLTest {
     }
 
     @Test
-    public void testEveryoneDefaultJobPermission() {
+    public void testEveryoneDefaultJobPermission() throws IOException {
         FreeStyleProject freeStyleJob = new FreeStyleProjectMock("testJob");
         try {
             teamManager.getDefaultTeam().addJob(freeStyleJob.getName());

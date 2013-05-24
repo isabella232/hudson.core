@@ -11,6 +11,7 @@
 package org.eclipse.hudson.security.team;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -21,8 +22,8 @@ import java.util.List;
  */
 public final class DefaultTeam extends Team{
     
-    DefaultTeam() {
-        super(DEFAULT_TEAM_NAME);
+    DefaultTeam(TeamManager teamManager) {
+        super(DEFAULT_TEAM_NAME, teamManager);
     }
     
     /**
@@ -30,7 +31,7 @@ public final class DefaultTeam extends Team{
      * default team.
      * @param hudsonHome 
      */
-    void loadExistingJobs(File rootFolder){
+    void loadExistingJobs(File rootFolder) throws IOException{
         List<File> jobRootFolders = getJobsRootFolders(rootFolder);
         for (File file : jobRootFolders){
             addJob(file.getName());

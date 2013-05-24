@@ -8,7 +8,6 @@
  * Contributors:
  *    Winston Prakash
  */
-
 package org.eclipse.hudson.security.team;
 
 import hudson.Functions;
@@ -33,18 +32,32 @@ import org.springframework.security.userdetails.UsernameNotFoundException;
  */
 public class TeamUtils {
 
-    private static final int SID_USER = 1;
-    private static final int SID_GROUP = 2;
-    private static final int SID_MAY_OR_MAYNOT_EXIST = 3;
-    private static final int SID_UNKNOWN = 4;
+    static final int SID_USER = 1;
+    static final int SID_GROUP = 2;
+    static final int SID_UNKNOWN = 3;
+    static final int SID_INVALID = 4;
 
-    public static String getDisplayHtml(String sid) {
+    static String getDisplayHtml(String sid) {
         String escSysAdminSid = Functions.escape(sid);
 
-        if (getUserType(sid) == SID_UNKNOWN) {
+        if (getUserType(sid) == SID_INVALID) {
             escSysAdminSid += " (Unknown)";
         }
-        return getIcon(sid) + escSysAdminSid;
+        return makeImg(getIcon(sid)) + escSysAdminSid;
+    }
+
+    static String getUserTypeString(String sid) {
+        int sidType = getUserType(sid);
+        switch (sidType) {
+            case SID_USER:
+                return "user";
+            case SID_GROUP:
+                return "group";
+            case SID_UNKNOWN:
+                return "unknown";
+            default:
+                return "invalid";
+        }
     }
 
     private static int getUserType(String sid) {
@@ -58,7 +71,7 @@ public class TeamUtils {
             sr.loadUserByUsername(sid);
             return SID_USER;
         } catch (UserMayOrMayNotExistException e) {
-            return SID_MAY_OR_MAYNOT_EXIST;
+            return SID_UNKNOWN;
         } catch (UsernameNotFoundException e) {
             // fall through next
         } catch (DataAccessException e) {
@@ -70,33 +83,33 @@ public class TeamUtils {
             return SID_GROUP;
         } catch (UserMayOrMayNotExistException e) {
             // undecidable, meaning the group may exist
-            return SID_MAY_OR_MAYNOT_EXIST;
+            return SID_UNKNOWN;
         } catch (UsernameNotFoundException e) {
             // fall through next
         } catch (DataAccessException e) {
             // fall through next
         }
-        return SID_UNKNOWN;
+        return SID_INVALID;
     }
 
-    private static String getIcon(String sid) {
+    static String getIcon(String sid) {
         int sidType = getUserType(sid);
         switch (sidType) {
             case SID_USER:
-                return makeImg("person.png");
+                return "person.png";
             case SID_GROUP:
-                return makeImg("user.png");
-            case SID_MAY_OR_MAYNOT_EXIST:
-                return makeImg("warning.png");
+                return "user.png";
+            case SID_UNKNOWN:
+                return "warning.png";
             default:
-                return makeImg("error.png");
+                return "error.png";
         }
     }
 
     private static String makeImg(String png) {
         return String.format("<img src='%s%s/images/16x16/%s' style='margin-right:0.2em'>", Stapler.getCurrentRequest().getContextPath(), Hudson.RESOURCE_PATH, png);
     }
-    
+
     public static class ErrorHttpResponse implements HttpResponse {
 
         private String message;

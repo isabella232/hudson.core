@@ -91,13 +91,40 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
                 return HttpResponses.forbidden();
             }
 
-            Hudson.getInstance().getTeamManager(this).addSysAdmin(sysAdminSid);
+            if ((sysAdminSid == null) || "".equals(sysAdminSid.trim())) {
+                return new TeamUtils.ErrorHttpResponse("Sys admin name required");
+            }
 
-            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getDisplayHtml(sysAdminSid));
+            TeamManager teamManager = Hudson.getInstance().getTeamManager(this);
+            if (teamManager.getSysAdmins().contains(sysAdminSid)) {
+                return new TeamUtils.ErrorHttpResponse(sysAdminSid + " is already a System Administrator.");
+            }
+
+            teamManager.addSysAdmin(sysAdminSid);
+
+            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(sysAdminSid));
+        }
+        
+        public HttpResponse doRemoveSysAdmin(@QueryParameter String sysAdminSid) throws IOException {
+            if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
+                return HttpResponses.forbidden();
+            }
+
+            if ((sysAdminSid == null) || "".equals(sysAdminSid.trim())) {
+                return new TeamUtils.ErrorHttpResponse("Sys admin name required");
+            }
+
+            TeamManager teamManager = Hudson.getInstance().getTeamManager(this);
+            if (teamManager.getSysAdmins().contains(sysAdminSid)) {
+                teamManager.removeSysAdmin(sysAdminSid);
+                return HttpResponses.ok();
+            }else{
+                return new TeamUtils.ErrorHttpResponse(sysAdminSid + " is not a System Administrator.");
+            }
         }
 
         public HttpResponse doCheckSid(@QueryParameter String sid) throws IOException {
-            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getDisplayHtml(sid));
+            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(sid));
         }
     }
 
