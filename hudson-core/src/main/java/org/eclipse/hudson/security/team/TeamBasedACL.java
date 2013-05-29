@@ -110,17 +110,17 @@ public class TeamBasedACL extends SidACL {
                 }
             }
             // Grant Read permission to 
-            Team defaultTeam;
+            Team publicTeam;
             try {
-                defaultTeam = teamManager.findTeam("default");
+                publicTeam = teamManager.findTeam(PublicTeam.PUBLIC_TEAM_NAME);
 
-                if (defaultTeam.isJobOwner(job.getId())) {
+                if (publicTeam.isJobOwner(job.getId())) {
                     if (permission.getImpliedBy() == Permission.READ) {
                         return true;
                     } 
                 }
             } catch (TeamNotFoundException ex) {
-                logger.error("The deafult team must exists.", ex);
+                logger.error("The public team must exists.", ex);
             }
             // TODO: Grant read permission to jobs marked as public scoped in all teams
         }

@@ -30,7 +30,7 @@
             <j:if test='${it.isCurrentUserSysAdmin()}'>
                 <st:include page="teamManager.jelly" /> 
             </j:if>     
-            <j:if test='${it.isCurrentUserTeamAdmin()}'>
+            <j:if test='${it.isCurrentUserTeamAdmin() &amp;&amp; !it.isCurrentUserSysAdmin()}'>
                 <st:include page="teamAdmin.jelly"/>
             </j:if>        
         

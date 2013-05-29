@@ -37,7 +37,7 @@ import org.springframework.security.Authentication;
  */
 public class Team implements AccessControlled {
 
-    public static final String DEFAULT_TEAM_NAME = "default";
+    public static final String PUBLIC_TEAM_NAME = "public";
     private List<String> admins = new CopyOnWriteArrayList<String>();
     private List<String> members = new CopyOnWriteArrayList<String>();
     private List<String> jobs = new CopyOnWriteArrayList<String>();
@@ -144,16 +144,16 @@ public class Team implements AccessControlled {
         }
     }
 
-    public void addJob(String jobname) throws IOException {
-        if (!jobs.contains(jobname)) {
-            jobs.add(jobname);
+    public void addJob(String jobId) throws IOException {
+        if (!jobs.contains(jobId)) {
+            jobs.add(jobId);
             getTeamManager().save();
         }
     }
 
-    public void removeJob(String jobname) throws IOException {
-        if (jobs.contains(jobname)) {
-            jobs.remove(jobname);
+    public void removeJob(String jobId) throws IOException {
+        if (jobs.contains(jobId)) {
+            jobs.remove(jobId);
             getTeamManager().save();
         }
     }

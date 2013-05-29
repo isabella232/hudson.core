@@ -14,24 +14,29 @@ import com.thoughtworks.xstream.XStream;
 import hudson.BulkChange;
 import hudson.XmlFile;
 import hudson.model.Hudson;
+import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
 import hudson.security.ACL;
-import hudson.security.Permission;
 import hudson.security.SecurityRealm;
 import hudson.util.FormValidation;
 import hudson.util.XStream2;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.HttpResponses;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +55,7 @@ public final class TeamManager implements Saveable {
     private transient File hudsonHomeDir;
     private transient File teamsFolder;
     private transient final String teamsConfigFileName = "teams.xml";
-    private transient DefaultTeam defaultTeam;
+    private transient PublicTeam publicTeam;
     private transient final String TEAMS_FOLDER_NAME = "teams";
 
     public TeamManager(File homeDir) {
@@ -61,7 +66,7 @@ public final class TeamManager implements Saveable {
         }
         initializeXstream();
         load();
-        ensureDefaultTeam();
+        ensurePublicTeam();
     }
 
     public void addSysAdmin(String adminName) throws IOException {
@@ -86,11 +91,14 @@ public final class TeamManager implements Saveable {
         String currentUser = HudsonSecurityManager.getAuthentication().getName();
         return isSysAdmin(currentUser);
     }
-    
+
     public boolean isCurrentUserTeamAdmin() {
         String currentUser = HudsonSecurityManager.getAuthentication().getName();
+        if (isCurrentUserSysAdmin()) {
+            return true;
+        }
         Team team = findCurrentUserTeam();
-        if (team != null){
+        if (team != null) {
             return team.isAdmin(currentUser);
         }
         return false;
@@ -141,10 +149,10 @@ public final class TeamManager implements Saveable {
 
     public HttpResponse doCreateTeam(@QueryParameter String teamName, @QueryParameter String description) throws IOException {
         if (!isCurrentUserSysAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to create team");
+            return new TeamUtils.ErrorHttpResponse("No permission to create team.");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Team name required");
+            return new TeamUtils.ErrorHttpResponse("Team name required.");
         }
         try {
             Team team = createTeam(teamName, description);
@@ -156,10 +164,10 @@ public final class TeamManager implements Saveable {
 
     public HttpResponse doDeleteTeam(@QueryParameter String teamName) throws IOException {
         if (!isCurrentUserSysAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to delete team");
+            return new TeamUtils.ErrorHttpResponse("No permission to delete team.");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Team name required");
+            return new TeamUtils.ErrorHttpResponse("Team name required.");
         }
         try {
             deleteTeam(teamName);
@@ -170,14 +178,14 @@ public final class TeamManager implements Saveable {
     }
 
     public HttpResponse doAddTeamAdmin(@QueryParameter String teamName, @QueryParameter String teamAdminSid) throws IOException {
-        if (!this.isCurrentUserTeamAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to add team admin");
+        if (!isCurrentUserTeamAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to add team admin.");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Team name required");
+            return new TeamUtils.ErrorHttpResponse("Team name required.");
         }
         if ((teamAdminSid == null) || "".equals(teamAdminSid.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Team admin name required");
+            return new TeamUtils.ErrorHttpResponse("Team admin name required.");
         }
         Team team;
         try {
@@ -196,13 +204,13 @@ public final class TeamManager implements Saveable {
 
     public HttpResponse doRemoveTeamAdmin(@QueryParameter String teamName, @QueryParameter String teamAdminSid) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to remove team admin");
+            return new TeamUtils.ErrorHttpResponse("No permission to remove team admin.");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Team name required");
+            return new TeamUtils.ErrorHttpResponse("Team name required.");
         }
         if ((teamAdminSid == null) || "".equals(teamAdminSid.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Team admin name required");
+            return new TeamUtils.ErrorHttpResponse("Team admin name required.");
         }
         Team team;
         try {
@@ -221,13 +229,13 @@ public final class TeamManager implements Saveable {
 
     public HttpResponse doAddTeamMember(@QueryParameter String teamName, @QueryParameter String teamMemberSid) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to add team member");
+            return new TeamUtils.ErrorHttpResponse("No permission to add team member.");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Team name required");
+            return new TeamUtils.ErrorHttpResponse("Team name required.");
         }
         if ((teamMemberSid == null) || "".equals(teamMemberSid.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Team member name required");
+            return new TeamUtils.ErrorHttpResponse("Team member name required.");
         }
         Team team;
         try {
@@ -249,10 +257,10 @@ public final class TeamManager implements Saveable {
             return new TeamUtils.ErrorHttpResponse("No permission to remove team member");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Team name required");
+            return new TeamUtils.ErrorHttpResponse("Team name required.");
         }
         if ((teamMemberSid == null) || "".equals(teamMemberSid.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Team member name required");
+            return new TeamUtils.ErrorHttpResponse("Team member name required.");
         }
         Team team;
         try {
@@ -269,8 +277,98 @@ public final class TeamManager implements Saveable {
         }
     }
 
+    public HttpResponse doMoveJob(@QueryParameter String jobId, @QueryParameter String teamName) throws IOException {
+        if (!isCurrentUserTeamAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to remove team member");
+        }
+        if ((teamName == null) || "".equals(teamName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team name required.");
+        }
+        if ((jobId == null) || "".equals(jobId.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Job name required.");
+        }
+        Team newTeam;
+        try {
+            newTeam = findTeam(teamName);
+        } catch (TeamNotFoundException ex) {
+            return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
+        }
+
+        Team oldTeam = findJobOwnerTeam(jobId);
+        if (oldTeam == null) {
+            return new TeamUtils.ErrorHttpResponse(jobId + " does not belong to any team.");
+        }
+
+        Item item = Hudson.getInstance().getItemById(jobId);
+        Job job;
+        if (item instanceof Job<?, ?>) {
+            job = (Job) item;
+            if (job.isBuilding()) {
+                return new TeamUtils.ErrorHttpResponse(job.getName() + " is building.");
+            }
+            try {
+                if (moveJob(job, oldTeam, newTeam)) {
+                    return HttpResponses.ok();
+                } else {
+                    return new TeamUtils.ErrorHttpResponse("Faile to move the jon " + jobId
+                            + " to the team " + teamName);
+                }
+            } catch (IOException ex) {
+                return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
+            }
+        } else {
+            return new TeamUtils.ErrorHttpResponse(jobId + " not a valid job Id.");
+        }
+    }
+
     public HttpResponse doCheckSid(@QueryParameter String sid) throws IOException {
         return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(sid));
+    }
+
+    private boolean moveJob(Job job, Team oldTeam, Team newTeam) throws IOException {
+        try {
+            File jobRootDir = job.getRootDir();
+            File newJobRootDir = new File(getJobsFolder(newTeam), job.getName());
+            newJobRootDir.mkdirs();
+            if (jobRootDir.renameTo(newJobRootDir)) {
+                String oldJobId = job.getId();
+                oldTeam.removeJob(job.getId());
+                String newJobId = getTeamQualifiedJobId(newTeam, job.getName());
+                job.setId(newJobId);
+                job.save();
+                newTeam.addJob(newJobId);
+                Hudson.getInstance().replaceItemId(oldJobId, newJobId);
+                return true;
+            }
+            return false;
+        } catch (Exception exc) {
+            throw new IOException(exc);
+        }
+    }
+
+    /**
+     * Get the name of the teams as JSON
+     * @return HttpResponse with JSON as content type
+     */
+    public HttpResponse doGetTeamsJson() {
+        return new HttpResponse() {
+            @Override
+            public void generateResponse(StaplerRequest sr, StaplerResponse rsp, Object o) throws IOException, ServletException {
+                rsp.setStatus(HttpServletResponse.SC_OK);
+                rsp.setContentType("application/json");
+                PrintWriter w = new PrintWriter(rsp.getWriter());
+                w.println("{");
+                for (int i = 0; i < teams.size(); i++) {
+                    w.print("\"" + teams.get(i).getName() + "\":\"" + teams.get(i).getName() + "\"");
+                    if (i < teams.size() - 1){
+                        w.println(",");
+                    }
+                }
+                w.println("}");
+                w.close();
+            }
+        };
+
     }
 
     public void addUser(String teamName, String userName) throws TeamNotFoundException, IOException {
@@ -311,26 +409,26 @@ public final class TeamManager implements Saveable {
         return team;
     }
 
-    public boolean isCurrentUserHasAccess(String jobName) {
+    public boolean isCurrentUserHasAccess(String jobId) {
         Team userTeam = findCurrentUserTeam();
         if (userTeam != null) {
-            if (userTeam.isJobOwner(jobName)) {
+            if (userTeam.isJobOwner(jobId)) {
                 return true;
             } else {
-                return isAnonymousJob(jobName);
+                return isAnonymousJob(jobId);
             }
         } else {
-            return isAnonymousJob(jobName);
+            return isAnonymousJob(jobId);
         }
     }
 
-    public boolean isUserHasAccess(String userName, String jobName) {
+    public boolean isUserHasAccess(String userName, String jobId) {
         Team userTeam = findUserTeam(userName);
         if (userTeam != null) {
-            return userTeam.isJobOwner(jobName);
+            return userTeam.isJobOwner(jobId);
         } else {
             for (Team team : teams) {
-                if (team.isJobOwner(jobName)) {
+                if (team.isJobOwner(jobId)) {
                     // Job belongs to a team so has no access
                     return false;
                 }
@@ -359,42 +457,42 @@ public final class TeamManager implements Saveable {
         return null;
     }
 
-    public Team findJobOwnerTeam(String jobName) {
+    public Team findJobOwnerTeam(String jobId) {
         for (Team team : teams) {
-            if (team.isJobOwner(jobName)) {
+            if (team.isJobOwner(jobId)) {
                 return team;
             }
         }
         return null;
     }
 
-    public void addJobToCurrentUserTeam(String jobName) throws IOException {
-        addJob(findCurrentUserTeam(), jobName);
+    public void addJobToCurrentUserTeam(String jobId) throws IOException {
+        addJob(findCurrentUserTeam(), jobId);
     }
 
-    public void addJobToUserTeam(String userName, String jobName) throws IOException {
-        addJob(findUserTeam(userName), jobName);
+    public void addJobToUserTeam(String userName, String jobId) throws IOException {
+        addJob(findUserTeam(userName), jobId);
 
     }
 
-    public void addJob(Team team, String jobName) throws IOException {
+    public void addJob(Team team, String jobId) throws IOException {
         if (team != null) {
-            team.addJob(jobName);
+            team.addJob(jobId);
             save();
         }
     }
 
-    public void removeJobFromCurrentUserTeam(String jobName) throws IOException {
-        removeJob(findCurrentUserTeam(), jobName);
+    public void removeJobFromCurrentUserTeam(String jobId) throws IOException {
+        removeJob(findCurrentUserTeam(), jobId);
     }
 
-    public void removeJobFromUserTeam(String userName, String jobName) throws IOException {
-        removeJob(findUserTeam(userName), jobName);
+    public void removeJobFromUserTeam(String userName, String jobId) throws IOException {
+        removeJob(findUserTeam(userName), jobId);
     }
 
-    public void removeJob(Team team, String jobName) throws IOException {
+    public void removeJob(Team team, String jobId) throws IOException {
         if (team != null) {
-            team.removeJob(jobName);
+            team.removeJob(jobId);
             save();
         }
     }
@@ -428,34 +526,79 @@ public final class TeamManager implements Saveable {
         }
     }
 
-    public String getTeamQualifiedJobId(String jobId) {
-        if (defaultTeam.isJobOwner(jobId)) {
-            return jobId;
+    /**
+     * Get the current user team qualified Id for the job name
+     *
+     * @param jobName
+     * @return String, Qualified Job ID
+     */
+    public String getTeamQualifiedJobId(String jobName) {
+        if (publicTeam.isJobOwner(jobName)) {
+            return jobName;
         }
 
         Team team = findCurrentUserTeam();
-        if ((team != null) && !Team.DEFAULT_TEAM_NAME.equals(team.getName())) {
-            jobId = team.getName() + "_" + jobId;
+        if ((team != null) && !Team.PUBLIC_TEAM_NAME.equals(team.getName())) {
+            jobName = team.getName() + "." + jobName;
         }
-        return jobId;
+        return jobName;
+    }
+    
+    /**
+     * Get the current user team qualified Id for the job name
+     * @param team
+     * @param jobName
+     * @return String, Team qualified Job ID
+     */
+    public String getTeamQualifiedJobId(Team team, String jobName) {
+        if (team == publicTeam) {
+            return jobName;
+        }
+        return team.getName() + "." + jobName;
     }
 
+    /**
+     * The Folder where all the jobs of the team to which this jobId belongs to
+     * are stored
+     *
+     * @param jobId
+     * @return String, path to the team jobs folder
+     */
     public String getJobsFolderName(String jobId) {
         Team team = findJobOwnerTeam(jobId);
         // May be just created job
         if (team == null) {
             team = findCurrentUserTeam();
         }
-        if ((team != null) && !Team.DEFAULT_TEAM_NAME.equals(team.getName())) {
+        if ((team != null) && !Team.PUBLIC_TEAM_NAME.equals(team.getName())) {
             return TEAMS_FOLDER_NAME + "/" + team.getName() + "/" + Team.JOBS_FOLDER_NAME;
         }
         return "jobs";
     }
 
+    /**
+     * Get the folder where the jobs of this team are stored
+     *
+     * @param team
+     * @return
+     */
+    public File getJobsFolder(Team team) {
+        if ((team != null) && !Team.PUBLIC_TEAM_NAME.equals(team.getName())) {
+            return new File(teamsFolder, "/" + team.getName() + "/" + Team.JOBS_FOLDER_NAME);
+        } else {
+            return new File(hudsonHomeDir, "jobs");
+        }
+    }
+
+    /**
+     * Get the root folders of all the jobs known to this Team manager
+     *
+     * @return
+     */
     public File[] getJobsRootFolders() {
         List<File> jobsRootFolders = new ArrayList<File>();
         for (Team team : teams) {
-            if (Team.DEFAULT_TEAM_NAME.equals(team.getName())) {
+            if (Team.PUBLIC_TEAM_NAME.equals(team.getName())) {
                 jobsRootFolders.addAll(team.getJobsRootFolders(hudsonHomeDir));
             } else {
                 jobsRootFolders.addAll(team.getJobsRootFolders(teamsFolder));
@@ -509,13 +652,13 @@ public final class TeamManager implements Saveable {
         return new TeamBasedACL(this, TeamBasedACL.SCOPE.JOB, team);
     }
 
-    Team getDefaultTeam() throws TeamNotFoundException {
-        return findTeam(DefaultTeam.DEFAULT_TEAM_NAME);
+    Team getPublicTeam() throws TeamNotFoundException {
+        return findTeam(PublicTeam.PUBLIC_TEAM_NAME);
     }
 
-    private boolean isAnonymousJob(String jobName) {
+    private boolean isAnonymousJob(String jobId) {
         for (Team team : teams) {
-            if (team.isJobOwner(jobName)) {
+            if (team.isJobOwner(jobId)) {
                 // job belongs to another team so has no access
                 return false;
             }
@@ -548,24 +691,25 @@ public final class TeamManager implements Saveable {
         }
     }
 
-    private void ensureDefaultTeam() {
-        defaultTeam = new DefaultTeam(this);
+    private void ensurePublicTeam() {
+        publicTeam = new PublicTeam(this);
         try {
-            Team team = findTeam(DefaultTeam.DEFAULT_TEAM_NAME);
+            Team team = findTeam(PublicTeam.PUBLIC_TEAM_NAME);
             teams.remove(team);
         } catch (TeamNotFoundException ex) {
             // It's ok, we are going to remove it any way
         }
         try {
-            defaultTeam.loadExistingJobs(hudsonHomeDir);
+            publicTeam.loadExistingJobs(hudsonHomeDir);
         } catch (IOException ex) {
             logger.error("Failed to load existing jobs", ex);
         }
-        teams.add(defaultTeam);
+        teams.add(publicTeam);
     }
 
     private void initializeXstream() {
         xstream.alias("teamManager", TeamManager.class);
         xstream.alias("team", Team.class);
+        xstream.alias("publicTeam", PublicTeam.class);
     }
 }

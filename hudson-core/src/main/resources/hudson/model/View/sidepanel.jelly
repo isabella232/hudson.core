@@ -35,7 +35,7 @@
           <j:if test="${app.teamManager.isCurrentUserSysAdmin()}">
               <l:task icon="images/24x24/user.png" href="${rootURL}/teamManager" title="${%Manage Teams}"/>
           </j:if>
-          <j:if test="${app.teamManager.isCurrentUserTeamAdmin()}">
+          <j:if test="${app.teamManager.isCurrentUserTeamAdmin() &amp;&amp; !app.teamManager.isCurrentUserSysAdmin()}">
               <l:task icon="images/24x24/user.png" href="${rootURL}/teamManager" title="${%Manage Team}"/>
           </j:if>
       </j:if>

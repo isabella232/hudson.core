@@ -16,15 +16,33 @@
 
 jQuery.noConflict();
 
+var images = [
+    imageRoot + '/green-check.jpg',
+    imageRoot + '/progressbar.gif',
+    imageRoot + '/error.png',
+    imageRoot + '/16x16/warning.png'
+];
+
 var pageInitialized = false;
 
 jQuery(document).ready(function() {
 
     //To avoid multiple fire of document.ready
-    if (pageInitialized){
+    if (pageInitialized) {
         return;
     }
     pageInitialized = true;
+
+    jQuery("#outerTabs").tabs();
+
+    jQuery("#outerTabs tr").hover(
+            function() {
+                jQuery(this).css("background", "#EEEDED");
+            },
+            function() {
+                jQuery(this).css("background", "");
+            }
+    );
 
     var createTeamButton = jQuery('#createTeamButton');
     createTeamButton.button();
@@ -66,6 +84,11 @@ jQuery(document).ready(function() {
         });
     });
 
+    var moveJobsButton = jQuery('#moveJobsButton');
+    moveJobsButton.button();
+    moveJobsButton.unbind("click").click(function() {
+        moveJobsButtonAction();
+    });
 
     jQuery('.teamList li').each(function() {
         verifySid(this);
@@ -101,6 +124,7 @@ function createTeam(teamName, teamDesc) {
             description: teamDesc
         },
         success: function(result) {
+            jQuery("#noTeamsMsg").remove();
             var resultItem = jQuery(result);
             jQuery(resultItem).appendTo(jQuery('ul.team'));
             var teamAdminAddButton = jQuery('.teamAdminAddButton', jQuery(resultItem));
@@ -343,6 +367,84 @@ function removeTeamMember(teamName, memberName, parent) {
         },
         error: function(msg) {
             showMessage(msg.responseText, true, jQuery('#userRemoveMsg'));
+        },
+        dataType: "html"
+    });
+}
+
+var moveCount;
+var jobsToMove;
+function moveJobsButtonAction() {
+    jQuery("#selectedJobs").empty();
+    jobsToMove = getJobsToMove();
+    moveCount = jobsToMove.length;
+    for (var i = 0; i < jobsToMove.length; i++) {
+        var item = '<li value="' + jobsToMove[i] + '">' + jobsToMove[i] + ' <img style="display: none"/></li>';
+        jQuery(item).attr("value", jobsToMove[i])
+        jQuery(item).appendTo(jQuery("#selectedJobs"));
+    }
+
+    jQuery('#dialog-move-jobs').dialog({
+        resizable: false,
+        height: 200 + moveCount * 20,
+        width: 400,
+        modal: true,
+        title: "Move Jobs to another Team",
+        buttons: {
+            'Move': function() {
+                if (moveCount > 0) {
+                    var teamName = jQuery("#teamChoice option:selected").val();
+                    for (var i = 0; i < jobsToMove.length; i++) {
+                        var img = jQuery("#selectedJobs li[value='" + jobsToMove[i] + "']").children('img');
+                        jQuery(img).attr('src', imageRoot + '/progressbar.gif');
+                        jQuery(img).show();
+                        moveJobs(jobsToMove[i], teamName);
+                    }
+                }
+            },
+            Cancel: function() {
+                jQuery(this).dialog("close");
+            }
+        }
+    });
+
+    jQuery.getJSON('getTeamsJson', function(json) {
+        jQuery('#teamChoice').empty();
+        jQuery.each(json, function(key, val) {
+            var item = '<option value="' + key + '">' + val + '</option>';
+            jQuery(item).appendTo(jQuery('#teamChoice'));
+        });
+    });
+
+}
+
+function getJobsToMove() {
+    var jobs = [];
+    jQuery('#teamJobsContainer input[@type=checkbox]:checked').each(function() {
+        jobs.push(jQuery(this).val());
+    });
+    return jobs;
+}
+
+function moveJobs(jobId, teamName) {
+    jQuery.ajax({
+        type: 'POST',
+        url: "moveJob",
+        data: {
+            jobId: jobId,
+            teamName: teamName
+        },
+        success: function() {
+            var img = jQuery("#selectedJobs li[value='" + jobId + "']").children('img');
+            jQuery(img).attr('src', imageRoot + '/green-check.jpg');
+            jQuery("#job_colum3_span_" + jobId).text(teamName);
+            moveCount--;
+            if (moveCount === 0) {
+                jQuery('#dialog-move-jobs').dialog("close");
+            }
+        },
+        error: function(msg) {
+            showMessage(msg.responseText, true, jQuery('#moveJobMsg'));
         },
         dataType: "html"
     });

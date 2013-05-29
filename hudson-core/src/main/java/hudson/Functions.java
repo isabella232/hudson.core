@@ -1,19 +1,21 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
  * Copyright (c) 2004-2012 Oracle Corporation.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *
- *   Kohsuke Kawaguchi, Winston Prakash, Stephen Connolly, Tom Huybrechts, Alan Harder, Romain Seguy
+ * Kohsuke Kawaguchi, Winston Prakash, Stephen Connolly, Tom Huybrechts, Alan
+ * Harder, Romain Seguy
  *
  *
- *******************************************************************************/ 
-
+ ******************************************************************************
+ */
 package hudson;
 
 import com.google.common.base.Predicate;
@@ -508,7 +510,7 @@ public class Functions {
         }
         return null;
     }
-    
+
     public static String getAncestorUrl(StaplerRequest req, Ancestor anc) {
         if (anc != null) {
             String ancUrl = anc.getUrl();
@@ -785,7 +787,7 @@ public class Functions {
         }
         return buf.append(c.getName());
     }
-    
+
     public static String getRequestRootPath() {
         return getRequestRootPath(null);
     }
@@ -796,15 +798,14 @@ public class Functions {
         }
         return getHttpRequestRootPath(req);
     }
-    
     private static RequestRootPathProvider requestRootPathProvider = new DefaultRequestRootPathProvider();
-    
+
     public static void setRequestRootPathProvider(RequestRootPathProvider requestRootPathProvider) {
-    	Functions.requestRootPathProvider = requestRootPathProvider;
+        Functions.requestRootPathProvider = requestRootPathProvider;
     }
 
     public static String getHttpRequestRootPath(HttpServletRequest req) {
-    	return requestRootPathProvider.getRootPath(req);
+        return requestRootPathProvider.getRootPath(req);
     }
 
     /**
@@ -1521,14 +1522,14 @@ public class Functions {
     public static Object rawHtml(Object o) {
         return InternationalizedStringExpression.rawHtml(o);
     }
-    
+
     public static String getJobsFolderName(String jobId) {
         String jobsFolderName = "jobs";
         if (jobId != null) {
-            TeamManager teamManager = Hudson.getInstance().getTeamManager();
-            if (teamManager != null) {
+        TeamManager teamManager = Hudson.getInstance().getTeamManager();
+        if (teamManager != null) {
                 jobsFolderName = teamManager.getJobsFolderName(jobId);
-            }
+        }
         }
         return jobsFolderName;
     }

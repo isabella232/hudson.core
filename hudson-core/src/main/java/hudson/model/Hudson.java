@@ -816,6 +816,18 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public TeamManager getTeamManager(TeamBasedAuthorizationStrategyDescriptor authorizationStrategy) {
        return teamManager;
     }
+    
+    /**
+     * Do not use this API, for internal purpose only
+     * @since 3.1.0
+     */
+    public void replaceItemId(String oldTemId, String newItemId){
+        if (items.containsKey(oldTemId)){
+            TopLevelItem item = items.get(oldTemId);
+            items.remove(oldTemId);
+            items.put(newItemId, item);
+        }
+    }
 
     public HudsonSecurityManager getSecurityManager() {
         return HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
@@ -1854,7 +1866,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     public String getUrlChildPrefix() {
-        return "job";
+        if (getTeamManager() == null) {
+            return "job";
+        } else {
+            return "jobById";
+        }
     }
 
     /**
@@ -2110,6 +2126,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public TopLevelItem getJob(String name) {
         return getItem(name);
     }
+    
+    public TopLevelItem getJobById(String id) {
+        return getItemById(id);
+    }
 
     /**
      * @deprecated Used only for mapping jobs to URL in a case-insensitive
@@ -2141,6 +2161,21 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             return null;
         }
         return item;
+    }
+    
+    /**
+     * Get the item based on id
+     * @param item id
+     * @return item, null if does not exist or no read permission
+     * @since 3.1.0
+     */
+    public TopLevelItem getItemById(String id) {
+       for (TopLevelItem item: getItems()){
+           if (item.getId().equals(id)){
+               return item;
+           }
+       }
+       return null;
     }
 
     @Override
@@ -2766,14 +2801,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     public TopLevelItem reloadProjectFromDisk(File jobDir) throws IOException {
         TopLevelItem item = (TopLevelItem) Items.load(this, jobDir);
-        String itemName = item.getName();
         if (getTeamManager() != null){
-            Team team = getTeamManager().findJobOwnerTeam(item.getName());
-            if ((team != null) && team.getName().equals(Team.DEFAULT_TEAM_NAME)){
-               itemName = getTeamManager().getTeamQualifiedJobId(itemName);
-            }
+             items.put(item.getId(), item);
+        }else{
+            items.put(item.getName(), item);
         }
-        items.put(itemName, item);
         rebuildDependencyGraph();
         return item;
     }

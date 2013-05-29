@@ -15,20 +15,20 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * The default team contains the jobs not specific to any team. 
+ * The public team contains the jobs not specific to any team. 
  * Every one has read access to these jobs except sysadmin
  * @since 3.1.0
  * @author Winston Prakash
  */
-public final class DefaultTeam extends Team{
+public final class PublicTeam extends Team{
     
-    DefaultTeam(TeamManager teamManager) {
-        super(DEFAULT_TEAM_NAME, teamManager);
+    PublicTeam(TeamManager teamManager) {
+        super(PUBLIC_TEAM_NAME, teamManager);
     }
     
     /**
      * Scan and find the jobs in the existing Hudson home and add them to the 
-     * default team.
+     * public team.
      * @param hudsonHome 
      */
     void loadExistingJobs(File rootFolder) throws IOException{

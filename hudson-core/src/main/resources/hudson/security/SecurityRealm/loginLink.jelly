@@ -57,7 +57,7 @@
         }
         
         function submitLoginForm(){
-            showMessage(jQuery('#loginMsg'), "Logging in ..", "blue");
+            showLoginMessage(jQuery('#loginMsg'), "Logging in ..", "blue");
             var dataString = jQuery("#loginForm").serialize();
             jQuery.ajax({
                 type: 'POST',
@@ -69,13 +69,13 @@
                 },
                 error: function(){
                     var msg = 'Failed to login. Check your credentials and try again.';
-                    showMessage(jQuery('#loginMsg'), msg, "red");
+                    showLoginMessage(jQuery('#loginMsg'), msg, "red");
                 },
                 dataType: "html"
             }); 
         }
         
-        function showMessage(widget, msg, color){
+        function showLoginMessage(widget, msg, color){
             widget.text(msg);
             widget.css("color",color);
             widget.show();

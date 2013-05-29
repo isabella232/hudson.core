@@ -99,13 +99,13 @@ public class TeamAwareSecurityRealmTest {
     }
 
     @Test
-    public void testDefaultJobPermission() throws IOException, TeamManager.TeamNotFoundException, TeamManager.TeamAlreadyExistsException {
+    public void testPublicJobPermission() throws IOException, TeamManager.TeamNotFoundException, TeamManager.TeamAlreadyExistsException {
         String teamName = "team1";
         Team newTeam = teamManager.createTeam(teamName);
         hudsonSecurityManager.setSecurityRealm(new TeamAwareSecurityRealmImpl(newTeam, false, false));
 
         FreeStyleProject freeStyleJob = new FreeStyleProjectMock("testJob");
-        teamManager.getDefaultTeam().addJob(freeStyleJob.getName());
+        teamManager.getPublicTeam().addJob(freeStyleJob.getName());
 
         //Dummy Sid
         Sid sid = new PrincipalSid("Paul");

@@ -342,7 +342,11 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     }
 
     public String getShortUrl() {
-        return getParent().getUrlChildPrefix() + '/' + Util.rawEncode(getName()) + '/';
+        if (Hudson.getInstance().getTeamManager() != null) {
+            return getParent().getUrlChildPrefix() + '/' + Util.rawEncode(getId()) + '/';
+        } else {
+            return getParent().getUrlChildPrefix() + '/' + Util.rawEncode(getName()) + '/';
+        }
     }
 
     public String getSearchUrl() {

@@ -82,51 +82,51 @@ public class TeamJobACLTest {
     }
 
     @Test
-    public void testDefaultJobPermission() throws IOException {
+    public void testPublicJobPermission() throws IOException {
         FreeStyleProject freeStyleJob = new FreeStyleProjectMock("testJob");
         try {
-            teamManager.getDefaultTeam().addJob(freeStyleJob.getName());
+            teamManager.getPublicTeam().addJob(freeStyleJob.getName());
         } catch (TeamNotFoundException ex) {
-            fail("Default Team must exist");
+            fail("Public Team must exist");
         }
         Sid sid = new PrincipalSid("Paul");
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.JOB, freeStyleJob);
-        Assert.assertFalse("Paul is not a SysAdmin and should not have default Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
-        Assert.assertTrue("Paul should have default Job READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
+        Assert.assertFalse("Paul is not a SysAdmin and should not have public Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
+        Assert.assertTrue("Paul should have pubic Job READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
 
         teamManager.addSysAdmin("Paul");
-        Assert.assertTrue("Paul is a SysAdmin and should have default Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
+        Assert.assertTrue("Paul is a SysAdmin and should have public Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
     }
 
     @Test
-    public void testAnonymousDefaultJobPermission() throws IOException {
+    public void testAnonymousPublicJobPermission() throws IOException {
         FreeStyleProject freeStyleJob = new FreeStyleProjectMock("testJob");
         try {
-            teamManager.getDefaultTeam().addJob(freeStyleJob.getName());
+            teamManager.getPublicTeam().addJob(freeStyleJob.getName());
         } catch (TeamNotFoundException ex) {
-            fail("Default Team must exist");
+            fail("Public Team must exist");
         }
 
         Sid sid = ACL.ANONYMOUS;
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.JOB, freeStyleJob);
-        Assert.assertFalse("Anonymous should not have default Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
-        Assert.assertTrue("Anonymous should have default Job READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
+        Assert.assertFalse("Anonymous should not have public Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
+        Assert.assertTrue("Anonymous should have public Job READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
 
     }
 
     @Test
-    public void testEveryoneDefaultJobPermission() throws IOException {
+    public void testEveryonePublicJobPermission() throws IOException {
         FreeStyleProject freeStyleJob = new FreeStyleProjectMock("testJob");
         try {
-            teamManager.getDefaultTeam().addJob(freeStyleJob.getName());
+            teamManager.getPublicTeam().addJob(freeStyleJob.getName());
         } catch (TeamNotFoundException ex) {
-            fail("Default Team must exist");
+            fail("Public Team must exist");
         }
 
         Sid sid = ACL.EVERYONE;
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.JOB, freeStyleJob);
-        Assert.assertFalse("Every one should not have default Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
-        Assert.assertTrue("Every one should have default Job READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
+        Assert.assertFalse("Every one should not have public Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
+        Assert.assertTrue("Every one should have piublic Job READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
 
     }
 }
