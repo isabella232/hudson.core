@@ -57,7 +57,7 @@ public class UpdateCenterTest {
 
         UpdateSite us = new UpdateSite("default", url.toExternalForm());
         UpdateSite.Data data = us.new Data(JSONObject.fromObject(json));
-        assertTrue(data.core.url.startsWith("http://hudson-ci.org/") || data.core.url.startsWith("http://eclipse.org/"));
+        assertTrue(data.core.url.startsWith("http://hudson-ci.org/") || data.core.url.startsWith("http://eclipse.org/") || data.core.url.startsWith("http://download.eclipse.org/"));
         assertTrue(data.plugins.containsKey("rake"));
         System.out.println(data.core.url);
     }
