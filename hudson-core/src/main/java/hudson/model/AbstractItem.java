@@ -202,60 +202,11 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
                 boolean success = false;
 
                 try {// rename data files
-                    boolean interrupted = false;
-                    boolean renamed = false;
-
-                    // try to rename the job directory.
-                    // this may fail on Windows due to some other processes
-                    // accessing a file.
-                    // so retry few times before we fall back to copy.
-                    for (int retry = 0; retry < 5; retry++) {
-                        if (oldRoot.renameTo(newRoot)) {
-                            renamed = true;
-                            break; // succeeded
-                        }
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            // process the interruption later
-                            interrupted = true;
-                        }
-                    }
-
-                    if (interrupted) {
+                    try {
+                        Util.moveDirectory(oldRoot, newRoot);
+                    } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
-
-                    if (!renamed) {
-                        // failed to rename. it must be that some lengthy
-                        // process is going on
-                        // to prevent a rename operation. So do a copy. Ideally
-                        // we'd like to
-                        // later delete the old copy, but we can't reliably do
-                        // so, as before the VM
-                        // shuts down there might be a new job created under the
-                        // old name.
-                        Copy cp = new Copy();
-                        cp.setProject(new org.apache.tools.ant.Project());
-                        cp.setTodir(newRoot);
-                        FileSet src = new FileSet();
-                        src.setDir(getRootDir());
-                        cp.addFileset(src);
-                        cp.setOverwrite(true);
-                        cp.setPreserveLastModified(true);
-                        cp.setFailOnError(false); // keep going even if
-                        // there's an error
-                        cp.execute();
-
-                        // try to delete as much as possible
-                        try {
-                            Util.deleteRecursive(oldRoot);
-                        } catch (IOException e) {
-                            // but ignore the error, since we expect that
-                            e.printStackTrace();
-                        }
-                    }
-
                     success = true;
                 } finally {
                     // if failed, back out the rename.

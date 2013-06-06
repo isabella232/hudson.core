@@ -335,6 +335,64 @@ public class Util {
         }
         return tmp;
     }
+    
+    public static boolean moveDirectory(File oldDir, File newDir) throws InterruptedException {
+        boolean renamed = false;
+        boolean interrupted = false;
+
+        // try to rename the job directory.
+        // this may fail on Windows due to some other processes
+        // accessing a file.
+        // so retry few times before we fall back to copy.
+        for (int retry = 0; retry < 5; retry++) {
+            if (oldDir.renameTo(newDir)) {
+                renamed = true;
+                break; // succeeded
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                // process the interruption later
+                interrupted = true;
+            }
+        }
+
+        if (interrupted) {
+            throw new InterruptedException();
+        }
+
+        if (!renamed) {
+            // failed to rename. it must be that some lengthy
+            // process is going on
+            // to prevent a rename operation. So do a copy. Ideally
+            // we'd like to
+            // later delete the old copy, but we can't reliably do
+            // so, as before the VM
+            // shuts down there might be a new job created under the
+            // old name.
+            Copy cp = new Copy();
+            cp.setProject(new org.apache.tools.ant.Project());
+            cp.setTodir(newDir);
+            FileSet src = new FileSet();
+            src.setDir(oldDir);
+            cp.addFileset(src);
+            cp.setOverwrite(true);
+            cp.setPreserveLastModified(true);
+            cp.setFailOnError(false); // keep going even if
+            // there's an error
+            cp.execute();
+
+            // try to delete as much as possible
+            try {
+                Util.deleteRecursive(oldDir);
+            } catch (IOException e) {
+                // but ignore the error, since we expect that
+                e.printStackTrace();
+            }
+        }
+        return renamed;
+    }
+    
     private static final Pattern errorCodeParser = Pattern.compile(".*CreateProcess.*error=([0-9]+).*");
 
     /**

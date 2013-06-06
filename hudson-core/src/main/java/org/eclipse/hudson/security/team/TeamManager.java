@@ -12,6 +12,7 @@ package org.eclipse.hudson.security.team;
 
 import com.thoughtworks.xstream.XStream;
 import hudson.BulkChange;
+import hudson.Util;
 import hudson.XmlFile;
 import hudson.model.Hudson;
 import hudson.model.Item;
@@ -330,7 +331,7 @@ public final class TeamManager implements Saveable {
             File jobRootDir = job.getRootDir();
             File newJobRootDir = new File(getJobsFolder(newTeam), job.getName());
             newJobRootDir.mkdirs();
-            if (jobRootDir.renameTo(newJobRootDir)) {
+            if (Util.moveDirectory(jobRootDir, newJobRootDir)) {
                 String oldJobId = job.getId();
                 oldTeam.removeJob(job.getId());
                 String newJobId = getTeamQualifiedJobId(newTeam, job.getName());
