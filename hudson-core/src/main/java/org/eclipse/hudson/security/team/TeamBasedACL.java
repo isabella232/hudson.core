@@ -13,7 +13,10 @@ package org.eclipse.hudson.security.team;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.security.Permission;
+import hudson.security.SecurityRealm;
 import hudson.security.SidACL;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +29,7 @@ import org.springframework.security.acls.sid.Sid;
  * @author Winston Prakash
  */
 public class TeamBasedACL extends SidACL {
-    
+
     private transient Logger logger = LoggerFactory.getLogger(TeamBasedACL.class);
 
     public enum SCOPE {
@@ -56,21 +59,24 @@ public class TeamBasedACL extends SidACL {
     @Override
     protected Boolean hasPermission(Sid sid, Permission permission) {
         String userName = toString(sid);
-        
+
         // SysAdmin gets all permission
         if (teamManager.isSysAdmin(userName)) {
-                return true;
-        } 
+            return true;
+        }
         if (scope == SCOPE.GLOBAL) {
             //All non team members gets only READ Permission
             if (permission.getImpliedBy() == Permission.READ) {
                 return true;
             }
-            // Member of any of the team get JOB CREATE Permission
+            // Member of any of the team with JOB CREATE Permission can create Job
             if (permission == Item.CREATE) {
                 Team team = teamManager.findUserTeam(userName);
                 if (team != null) {
-                    return true;
+                    TeamMember member = team.findTeamMember(userName);
+                    if (member != null) {
+                        return member.hasPermission(Permission.CREATE);
+                    }
                 }
             }
         }
@@ -99,32 +105,46 @@ public class TeamBasedACL extends SidACL {
                     if (jobTeam.isAdmin(userName)) {
                         return true;
                     } else {
-                        //TODO:
-                        //    Check permissions based on job scope, 
-                        //    Grant all permission to job owner if it is marked private
-                        //    No permission to all other team members for private jobs
-                        //    Grant member specific permissions 
-
-                        return true; // for now give full permission to all team members
+                        // All members of the team get read permission
+                        if (permission.getImpliedBy() == Permission.READ) {
+                            return true;
+                        }
+                        if (isTeamAwareSecurityRealm()) {
+                            return true; // for now give full permission to all team members
+                        } else {
+                            TeamMember member = jobTeam.findTeamMember(userName);
+                            return member.hasPermission(permission.getImpliedBy());
+                        }
                     }
                 }
-            }
-            // Grant Read permission to 
-            Team publicTeam;
-            try {
-                publicTeam = teamManager.findTeam(PublicTeam.PUBLIC_TEAM_NAME);
+                // Grant Read permission to 
+                Team publicTeam;
+                try {
+                    publicTeam = teamManager.findTeam(PublicTeam.PUBLIC_TEAM_NAME);
 
-                if (publicTeam.isJobOwner(job.getId())) {
-                    if (permission.getImpliedBy() == Permission.READ) {
-                        return true;
-                    } 
+                    if (publicTeam.isJobOwner(job.getId())) {
+                        if (permission.getImpliedBy() == Permission.READ) {
+                            return true;
+                        }
+                    }
+                } catch (TeamNotFoundException ex) {
+                    logger.error("The public team must exists.", ex);
                 }
-            } catch (TeamNotFoundException ex) {
-                logger.error("The public team must exists.", ex);
+                // TODO: Grant read permission to jobs marked as public scoped in all teams
             }
-            // TODO: Grant read permission to jobs marked as public scoped in all teams
         }
         return false;
+    }
 
+    private boolean isTeamAwareSecurityRealm() {
+        HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
+        SecurityRealm securityRealm = null;
+        if (hudsonSecurityManager != null) {
+            securityRealm = hudsonSecurityManager.getSecurityRealm();
+        }
+        if ((securityRealm != null) && securityRealm instanceof TeamAwareSecurityRealm) {
+            return true;
+        }
+        return false;
     }
 }

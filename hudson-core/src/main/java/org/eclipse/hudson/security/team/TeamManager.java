@@ -20,6 +20,7 @@ import hudson.model.Job;
 import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
 import hudson.security.ACL;
+import hudson.security.Permission;
 import hudson.security.SecurityRealm;
 import hudson.util.FormValidation;
 import hudson.util.XStream2;
@@ -178,57 +179,12 @@ public final class TeamManager implements Saveable {
         }
     }
 
-    public HttpResponse doAddTeamAdmin(@QueryParameter String teamName, @QueryParameter String teamAdminSid) throws IOException {
-        if (!isCurrentUserTeamAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to add team admin.");
-        }
-        if ((teamName == null) || "".equals(teamName.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Team name required.");
-        }
-        if ((teamAdminSid == null) || "".equals(teamAdminSid.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Team admin name required.");
-        }
-        Team team;
-        try {
-            team = findTeam(teamName);
-        } catch (TeamNotFoundException ex) {
-            return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
-        }
-
-        if (!team.getAdmins().contains(teamAdminSid)) {
-            team.addAdmin(teamAdminSid);
-            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(teamAdminSid));
-        } else {
-            return new TeamUtils.ErrorHttpResponse(teamAdminSid + " is already a team admin.");
-        }
-    }
-
-    public HttpResponse doRemoveTeamAdmin(@QueryParameter String teamName, @QueryParameter String teamAdminSid) throws IOException {
-        if (!isCurrentUserTeamAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to remove team admin.");
-        }
-        if ((teamName == null) || "".equals(teamName.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Team name required.");
-        }
-        if ((teamAdminSid == null) || "".equals(teamAdminSid.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Team admin name required.");
-        }
-        Team team;
-        try {
-            team = findTeam(teamName);
-        } catch (TeamNotFoundException ex) {
-            return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
-        }
-
-        if (team.getAdmins().contains(teamAdminSid)) {
-            team.removeAdmin(teamAdminSid);
-            return HttpResponses.ok();
-        } else {
-            return new TeamUtils.ErrorHttpResponse(teamAdminSid + " is not a team admin.");
-        }
-    }
-
-    public HttpResponse doAddTeamMember(@QueryParameter String teamName, @QueryParameter String teamMemberSid) throws IOException {
+    public HttpResponse doAddTeamMember(@QueryParameter String teamName,
+            @QueryParameter String teamMemberSid,
+            @QueryParameter boolean isTeamAdmin,
+            @QueryParameter boolean canCreate,
+            @QueryParameter boolean canDelete,
+            @QueryParameter boolean canConfigure) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
             return new TeamUtils.ErrorHttpResponse("No permission to add team member.");
         }
@@ -245,15 +201,46 @@ public final class TeamManager implements Saveable {
             return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
         }
 
-        if (!team.getMembers().contains(teamMemberSid)) {
-            team.addMember(teamMemberSid);
+        if (team.findTeamMember(teamMemberSid) == null) {
+            team.addMember(teamMemberSid, isTeamAdmin, canCreate, canDelete, canConfigure);
             return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(teamMemberSid));
         } else {
             return new TeamUtils.ErrorHttpResponse(teamMemberSid + " is already a team member.");
         }
     }
+    
+    public HttpResponse doUpdateTeamMember(@QueryParameter String teamName,
+            @QueryParameter String teamMemberSid,
+            @QueryParameter boolean isTeamAdmin,
+            @QueryParameter boolean canCreate,
+            @QueryParameter boolean canDelete,
+            @QueryParameter boolean canConfigure) throws IOException {
+        if (!isCurrentUserTeamAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to add team member.");
+        }
+        if ((teamName == null) || "".equals(teamName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team name required.");
+        }
+        if ((teamMemberSid == null) || "".equals(teamMemberSid.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team member name required.");
+        }
+        Team team;
+        try {
+            team = findTeam(teamName);
+        } catch (TeamNotFoundException ex) {
+            return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
+        }
+        TeamMember currentMember = team.findTeamMember(teamMemberSid);
+        if (currentMember != null) {
+            team.updateMember(teamMemberSid, isTeamAdmin, canCreate, canDelete, canConfigure);
+            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(teamMemberSid));
+        } else {
+            return new TeamUtils.ErrorHttpResponse(teamMemberSid + " is not a team member.");
+        }
+    }
 
-    public HttpResponse doRemoveTeamMember(@QueryParameter String teamName, @QueryParameter String teamMemberSid) throws IOException {
+    public HttpResponse doRemoveTeamMember(@QueryParameter String teamName, 
+            @QueryParameter String teamMemberSid) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
             return new TeamUtils.ErrorHttpResponse("No permission to remove team member");
         }
@@ -269,8 +256,8 @@ public final class TeamManager implements Saveable {
         } catch (TeamNotFoundException ex) {
             return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
         }
-
-        if (team.getMembers().contains(teamMemberSid)) {
+        TeamMember currentMember = team.findTeamMember(teamMemberSid);
+        if (currentMember != null) {
             team.removeMember(teamMemberSid);
             return HttpResponses.ok();
         } else {
@@ -349,6 +336,7 @@ public final class TeamManager implements Saveable {
 
     /**
      * Get the name of the teams as JSON
+     *
      * @return HttpResponse with JSON as content type
      */
     public HttpResponse doGetTeamsJson() {
@@ -361,7 +349,7 @@ public final class TeamManager implements Saveable {
                 w.println("{");
                 for (int i = 0; i < teams.size(); i++) {
                     w.print("\"" + teams.get(i).getName() + "\":\"" + teams.get(i).getName() + "\"");
-                    if (i < teams.size() - 1){
+                    if (i < teams.size() - 1) {
                         w.println(",");
                     }
                 }
@@ -372,9 +360,10 @@ public final class TeamManager implements Saveable {
 
     }
 
-    public void addUser(String teamName, String userName) throws TeamNotFoundException, IOException {
+    /* For Unit Test */
+    void addUser(String teamName, String userName) throws TeamNotFoundException, IOException {
         Team team = findTeam(teamName);
-        team.addMember(userName);
+        team.addMember(userName, false, false, false, false);
         save();
     }
 
@@ -544,9 +533,10 @@ public final class TeamManager implements Saveable {
         }
         return jobName;
     }
-    
+
     /**
      * Get the current user team qualified Id for the job name
+     *
      * @param team
      * @param jobName
      * @return String, Team qualified Job ID

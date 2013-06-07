@@ -38,8 +38,7 @@ import org.springframework.security.Authentication;
 public class Team implements AccessControlled {
 
     public static final String PUBLIC_TEAM_NAME = "public";
-    private List<String> admins = new CopyOnWriteArrayList<String>();
-    private List<String> members = new CopyOnWriteArrayList<String>();
+    private List<TeamMember> teamMembers = new CopyOnWriteArrayList<TeamMember>();
     private List<String> jobs = new CopyOnWriteArrayList<String>();
     private String name;
     protected static final String JOBS_FOLDER_NAME = "jobs";
@@ -68,24 +67,6 @@ public class Team implements AccessControlled {
         this.description = description;
     }
 
-    public void addAdmin(String adminName) throws IOException {
-        if (!admins.contains(adminName)) {
-            admins.add(adminName);
-            getTeamManager().save();
-        }
-    }
-
-    public void removeAdmin(String adminName) throws IOException {
-        if (admins.contains(adminName)) {
-            admins.remove(adminName);
-            getTeamManager().save();
-        }
-    }
-
-    public List<String> getAdmins() {
-        return admins;
-    }
-    
     public boolean isCurrentUserSysAdmin() {
         String currentUser = HudsonSecurityManager.getAuthentication().getName();
         return isAdmin(currentUser);
@@ -103,24 +84,79 @@ public class Team implements AccessControlled {
             TeamAwareSecurityRealm teamAwareSecurityRealm = (TeamAwareSecurityRealm) securityRealm;
             isAdmin = teamAwareSecurityRealm.isCurrentUserTeamAdmin();
         } else {
-            isAdmin = admins.contains(userName);
+            TeamMember member = findTeamMember(userName);
+            if (member != null) {
+                isAdmin = member.isTeamAdmin();
+            }
         }
         return isAdmin;
     }
 
-    public List<String> getMembers() {
-        return members;
+    public List<TeamMember> getTeamMembers() {
+        return Collections.unmodifiableList(teamMembers);
     }
 
-    public void addMember(String userName) {
-        if (!members.contains(userName)) {
-            members.add(userName);
+    public TeamMember findTeamMember(String userName) {
+        for (TeamMember member : teamMembers) {
+            if (userName.equals(member.getName())) {
+                return member;
+            }
+        }
+        return null;
+    }
+
+    void addMember(String teamMemberSid, boolean isTeamAdmin, boolean canCreate,
+            boolean canDelete, boolean canConfigure) throws IOException {
+        TeamMember newMember = new TeamMember();
+        newMember.setName(teamMemberSid);
+        newMember.setAsTeamAdmin(isTeamAdmin);
+        if (canCreate) {
+            newMember.addPermission(Permission.CREATE);
+        }
+        if (canDelete) {
+            newMember.addPermission(Permission.DELETE);
+        }
+        if (canConfigure) {
+            newMember.addPermission(Permission.CONFIGURE);
+        }
+        addMember(newMember);
+    }
+
+    void updateMember(String teamMemberSid, boolean isTeamAdmin, boolean canCreate,
+            boolean canDelete, boolean canConfigure) throws IOException {
+        TeamMember currentMember = findTeamMember(teamMemberSid);
+        if (currentMember != null) {
+            currentMember.setAsTeamAdmin(isTeamAdmin);
+            if (canCreate) {
+                currentMember.addPermission(Permission.CREATE);
+            } else {
+                currentMember.removePermission(Permission.CREATE);
+            }
+            if (canDelete) {
+                currentMember.addPermission(Permission.DELETE);
+            } else {
+                currentMember.removePermission(Permission.DELETE);
+            }
+            if (canConfigure) {
+                currentMember.addPermission(Permission.CONFIGURE);
+            } else {
+                currentMember.removePermission(Permission.CONFIGURE);
+            }
+            getTeamManager().save();
+        }
+    }
+
+    public void addMember(TeamMember member) throws IOException {
+        if (!teamMembers.contains(member)) {
+            teamMembers.add(member);
+            getTeamManager().save();
         }
     }
 
     public void removeMember(String userName) throws IOException {
-        if (members.contains(userName)) {
-            members.remove(userName);
+        TeamMember member = findTeamMember(userName);
+        if (member != null) {
+            teamMembers.remove(member);
             getTeamManager().save();
         }
     }
@@ -140,7 +176,7 @@ public class Team implements AccessControlled {
                 return false;
             }
         } else {
-            return members.contains(userName) || admins.contains(userName);
+            return findTeamMember(userName) != null;
         }
     }
 
@@ -214,7 +250,7 @@ public class Team implements AccessControlled {
     public boolean hasPermission(Permission permission) {
         return getACL().hasPermission(permission);
     }
-    
+
     // When the Team is unmarshalled it would not have Team Manager set
     private TeamManager getTeamManager() {
         if (teamManager == null) {

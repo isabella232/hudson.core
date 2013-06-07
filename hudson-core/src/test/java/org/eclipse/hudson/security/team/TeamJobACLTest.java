@@ -62,18 +62,19 @@ public class TeamJobACLTest {
     @Test
     public void testJobPermission() throws IOException, TeamManager.TeamAlreadyExistsException {
         String teamName = "team1";
-        teamManager.createTeam(teamName);
+        Team team = teamManager.createTeam(teamName);
         FreeStyleProject freeStyleJob = new FreeStyleProjectMock("testJob");
-        try {
-            teamManager.addUser(teamName, "Paul");
-            teamManager.addJobToUserTeam("Paul", freeStyleJob.getName());
-        } catch (TeamNotFoundException ex) {
-            fail("Team must exist");
-        }
+
+        TeamMember newMember = new TeamMember();
+        newMember.setName("Paul");
+        newMember.addPermission(Permission.CONFIGURE);
+        team.addMember(newMember);
+        teamManager.addJobToUserTeam("Paul", freeStyleJob.getName());
+
 
         Sid sid = new PrincipalSid("Paul");
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.JOB, freeStyleJob);
-        Assert.assertTrue("Paul is a team member and should have Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
+        Assert.assertTrue("Paul is a team member with Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
 
         Sid sid2 = new PrincipalSid("Chris");
         Assert.assertFalse("Chris is not a team member and should not have Job CONFIGURE permission", teamBasedACL.hasPermission(sid2, configurePermission).booleanValue());
