@@ -10,6 +10,11 @@
  */
 package org.eclipse.hudson.security.team;
 
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -22,6 +27,10 @@ import java.util.List;
  */
 public final class PublicTeam extends Team{
     
+    //Used for unmarshalling
+    PublicTeam(){
+        
+    }
     PublicTeam(TeamManager teamManager) {
         super(PUBLIC_TEAM_NAME, teamManager);
     }
@@ -41,5 +50,26 @@ public final class PublicTeam extends Team{
     @Override
     protected File getJobsFolder(File rootFolder){
         return new File(rootFolder, "/" + "jobs");
+    }
+    
+    public static class ConverterImpl implements Converter {
+
+        @Override
+        public boolean canConvert(Class type) {
+            return type == PublicTeam.class;
+        }
+
+        @Override
+        public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext mc) {
+            Team team = (Team) source;
+            writer.startNode("name");
+            writer.setValue(team.getName());
+            writer.endNode();
+        }
+
+        @Override
+        public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext uc) {
+            return new PublicTeam();
+        }
     }
 }

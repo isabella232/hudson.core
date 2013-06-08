@@ -10,7 +10,13 @@
  */
 package org.eclipse.hudson.security.team;
 
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import hudson.model.Hudson;
+import hudson.model.Item;
 import hudson.model.Items;
 import hudson.security.ACL;
 import hudson.security.AccessControlled;
@@ -44,6 +50,10 @@ public class Team implements AccessControlled {
     protected static final String JOBS_FOLDER_NAME = "jobs";
     private String description;
     private transient TeamManager teamManager;
+
+    //Used for unmarshalling
+    Team() {
+    }
 
     Team(String name, TeamManager teamManager) {
         this(name, name, teamManager);
@@ -84,7 +94,7 @@ public class Team implements AccessControlled {
             TeamAwareSecurityRealm teamAwareSecurityRealm = (TeamAwareSecurityRealm) securityRealm;
             isAdmin = teamAwareSecurityRealm.isCurrentUserTeamAdmin();
         } else {
-            TeamMember member = findTeamMember(userName);
+            TeamMember member = findMember(userName);
             if (member != null) {
                 isAdmin = member.isTeamAdmin();
             }
@@ -92,11 +102,15 @@ public class Team implements AccessControlled {
         return isAdmin;
     }
 
-    public List<TeamMember> getTeamMembers() {
+    public List<TeamMember> getMembers() {
         return Collections.unmodifiableList(teamMembers);
     }
 
-    public TeamMember findTeamMember(String userName) {
+    public List<String> getJobs() {
+        return Collections.unmodifiableList(jobs);
+    }
+
+    public TeamMember findMember(String userName) {
         for (TeamMember member : teamMembers) {
             if (userName.equals(member.getName())) {
                 return member;
@@ -106,41 +120,57 @@ public class Team implements AccessControlled {
     }
 
     void addMember(String teamMemberSid, boolean isTeamAdmin, boolean canCreate,
-            boolean canDelete, boolean canConfigure) throws IOException {
+            boolean canDelete, boolean canConfigure, boolean canBuild) throws IOException {
         TeamMember newMember = new TeamMember();
         newMember.setName(teamMemberSid);
         newMember.setAsTeamAdmin(isTeamAdmin);
         if (canCreate) {
-            newMember.addPermission(Permission.CREATE);
+            newMember.addPermission(Item.CREATE);
+            newMember.addPermission(Item.EXTENDED_READ);
         }
         if (canDelete) {
-            newMember.addPermission(Permission.DELETE);
+            newMember.addPermission(Item.DELETE);
+            newMember.addPermission(Item.WIPEOUT);
         }
         if (canConfigure) {
-            newMember.addPermission(Permission.CONFIGURE);
+            newMember.addPermission(Item.CONFIGURE);
         }
+        if (canBuild) {
+            newMember.addPermission(Item.BUILD);
+        }
+        newMember.addPermission(Item.READ);
+        newMember.addPermission(Item.WORKSPACE);
         addMember(newMember);
     }
 
     void updateMember(String teamMemberSid, boolean isTeamAdmin, boolean canCreate,
-            boolean canDelete, boolean canConfigure) throws IOException {
-        TeamMember currentMember = findTeamMember(teamMemberSid);
+            boolean canDelete, boolean canConfigure, boolean canBuild) throws IOException {
+        TeamMember currentMember = findMember(teamMemberSid);
         if (currentMember != null) {
             currentMember.setAsTeamAdmin(isTeamAdmin);
             if (canCreate) {
-                currentMember.addPermission(Permission.CREATE);
+                currentMember.addPermission(Item.CREATE);
+                currentMember.addPermission(Item.EXTENDED_READ);
             } else {
-                currentMember.removePermission(Permission.CREATE);
+                currentMember.removePermission(Item.CREATE);
+                currentMember.removePermission(Item.EXTENDED_READ);
             }
             if (canDelete) {
-                currentMember.addPermission(Permission.DELETE);
+                currentMember.addPermission(Item.DELETE);
+                currentMember.addPermission(Item.WIPEOUT);
             } else {
-                currentMember.removePermission(Permission.DELETE);
+                currentMember.removePermission(Item.DELETE);
+                currentMember.removePermission(Item.WIPEOUT);
             }
             if (canConfigure) {
-                currentMember.addPermission(Permission.CONFIGURE);
+                currentMember.addPermission(Item.CONFIGURE);
             } else {
-                currentMember.removePermission(Permission.CONFIGURE);
+                currentMember.removePermission(Item.CONFIGURE);
+            }
+            if (canBuild) {
+                currentMember.addPermission(Item.BUILD);
+            } else {
+                currentMember.removePermission(Item.BUILD);
             }
             getTeamManager().save();
         }
@@ -154,7 +184,7 @@ public class Team implements AccessControlled {
     }
 
     public void removeMember(String userName) throws IOException {
-        TeamMember member = findTeamMember(userName);
+        TeamMember member = findMember(userName);
         if (member != null) {
             teamMembers.remove(member);
             getTeamManager().save();
@@ -176,7 +206,7 @@ public class Team implements AccessControlled {
                 return false;
             }
         } else {
-            return findTeamMember(userName) != null;
+            return findMember(userName) != null;
         }
     }
 
@@ -235,6 +265,7 @@ public class Team implements AccessControlled {
         }
         // Team will not be used if Team Based Authorization Strategy is not used
         return new ACL() {
+            @Override
             public boolean hasPermission(Authentication a, Permission permission) {
                 return false;
             }
@@ -257,6 +288,70 @@ public class Team implements AccessControlled {
             return Hudson.getInstance().getTeamManager();
         } else {
             return teamManager;
+        }
+    }
+
+    private Object readResolve() {
+        if (teamMembers == null) {
+            teamMembers = new CopyOnWriteArrayList<TeamMember>();
+        }
+        if (jobs == null) {
+            jobs = new CopyOnWriteArrayList<String>();
+        }
+        return this;
+    }
+
+    public static class ConverterImpl implements Converter {
+
+        @Override
+        public boolean canConvert(Class type) {
+            return type == Team.class;
+        }
+
+        @Override
+        public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+            Team team = (Team) source;
+            writer.startNode("name");
+            writer.setValue(team.getName());
+            writer.endNode();
+            writer.startNode("description");
+            writer.setValue(team.getDescription());
+            writer.endNode();
+
+            for (String job : team.getJobs()) {
+                writer.startNode("job");
+                writer.setValue(job);
+                writer.endNode();
+            }
+            for (TeamMember member : team.getMembers()) {
+                writer.startNode("member");
+                context.convertAnother(member);
+                writer.endNode();
+            }
+        }
+
+        @Override
+        public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext uc) {
+            Team team = new Team();
+            while (reader.hasMoreChildren()) {
+                reader.moveDown();
+
+                if ("name".equals(reader.getNodeName())) {
+                    team.name = reader.getValue();
+                }
+                if ("description".equals(reader.getNodeName())) {
+                    team.description = reader.getValue();
+                }
+                if ("job".equals(reader.getNodeName())) {
+                    team.jobs.add(reader.getValue());
+                } else if ("member".equals(reader.getNodeName())) {
+                    TeamMember teamMember = (TeamMember) uc.convertAnother(team, TeamMember.class);
+                    team.teamMembers.add(teamMember);
+                }
+
+                reader.moveUp();
+            }
+            return team;
         }
     }
 }

@@ -73,9 +73,9 @@ public class TeamBasedACL extends SidACL {
             if (permission == Item.CREATE) {
                 Team team = teamManager.findUserTeam(userName);
                 if (team != null) {
-                    TeamMember member = team.findTeamMember(userName);
+                    TeamMember member = team.findMember(userName);
                     if (member != null) {
-                        return member.hasPermission(Permission.CREATE);
+                        return member.hasPermission(Item.CREATE);
                     }
                 }
             }
@@ -100,11 +100,7 @@ public class TeamBasedACL extends SidACL {
             Team jobTeam = teamManager.findJobOwnerTeam(job.getId());
 
             if (jobTeam != null) {
-                if (jobTeam.isMember(userName)) {
-                    // Team admin gets full permission on all jobs
-                    if (jobTeam.isAdmin(userName)) {
-                        return true;
-                    } else {
+                if (jobTeam.isMember(userName)) {  
                         // All members of the team get read permission
                         if (permission.getImpliedBy() == Permission.READ) {
                             return true;
@@ -112,10 +108,9 @@ public class TeamBasedACL extends SidACL {
                         if (isTeamAwareSecurityRealm()) {
                             return true; // for now give full permission to all team members
                         } else {
-                            TeamMember member = jobTeam.findTeamMember(userName);
-                            return member.hasPermission(permission.getImpliedBy());
+                            TeamMember member = jobTeam.findMember(userName);
+                            return member.hasPermission(permission);
                         }
-                    }
                 }
                 // Grant Read permission to 
                 Team publicTeam;

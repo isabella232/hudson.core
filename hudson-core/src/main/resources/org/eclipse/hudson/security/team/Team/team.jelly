@@ -31,32 +31,7 @@
             ${it.description}
         </p>
         <div class="teamList">
-            <div class="itemsContainer">
-                <b> Team Admins: </b>
-                <div class="memberList">
-                    <j:if test="${it.admins.size() == 0}">
-                        <p id="teamAdminNone_${it.name}">
-                            Team does not have any admins!
-                        </p>
-                    </j:if>
-                    <ol style="list-style-type:none; padding-left: 0px;" id="teamAdminList_${it.name}">
-                        <j:forEach var="teamAdmin" items="${it.admins}">
-                            <li>
-                                <input type="hidden" value="${teamAdmin}" name="hiddenUserName"/>
-                                <input type="hidden" value="${it.name}" name="hiddenTeamName"/>
-                                <img src="${imagesURL}/16x16/user.png" style="visibility:hidden" name="typeIcon"/> 
-                                <span style="margin-left:10px; font-size:13px;">
-                                    ${teamAdmin}
-                                </span>
-                                <img class="teamAdminRemove" style="margin-left:25px" src="${imagesURL}/16x16/delete.png"/>
-                            </li>
-                        </j:forEach> 
-                    </ol>
-                </div>
-                <div class="teamAdminAdd">
-                    <button value="${it.name}" class="teamAdminAddButton">${%Add Admin}</button>
-                </div>
-            </div>
+            
             <div class="itemsContainer">
                 <b> Team Members: </b>
                 <div class="memberList">
@@ -65,19 +40,66 @@
                             Team does not have any members!
                         </p>
                     </j:if>
-                    <ol style="list-style-type:none; padding-left: 0px;" id="teamMemberList_${it.name}">
-                        <j:forEach var="teamMember" items="${it.members}">
-                            <li>
-                                <input type="hidden" value="${teamMember}" name="hiddenUserName"/>
-                                <input type="hidden" value="${it.name}" name="hiddenTeamName"/>
-                                <img src="${imagesURL}/16x16/user.png" style="visibility:hidden" name="typeIcon"/>
-                                <span style="margin-left:10px; font-size:13px">
-                                    ${teamMember}
-                                </span>
-                                <img class="teamMemberRemove" style="margin-left:25px" src="${imagesURL}/16x16/delete.png"/>
-                            </li>
-                        </j:forEach> 
-                    </ol>
+                    <j:set var="headerVisibility" value='${(it.members.size() > 0) ? "visible" : "hidden"}'/>
+                    <table id="teamMemberList_${it.name}" width="100%"> 
+                        <tbody>
+                            <tr class="header" id="teamMemberListHeader1_${it.name}" style='visibility:${headerVisibility}'>
+                                <th colspan="2"></th>
+                                <th colspan="4">Permissions</th>             
+                            </tr>
+                            <tr class="header" id="teamMemberListHeader2_${it.name}" style='visibility:${headerVisibility}'>
+                                <th colspan="2"></th>
+                                <th>Admin</th>
+                                <th>Create</th>
+                                <th>Delete</th>
+                                <th>Configure</th>
+                                <th>Build</th>
+                            </tr>
+                            <j:forEach var="member" items="${it.members}">
+                                <tr >
+                                    <td align="center">
+                                        <img src="${imagesURL}/16x16/user.png" style="visibility:hidden" name="typeIcon"/>
+                                    </td>
+                                    <td width="150px">
+                                        <input type="hidden" value="${member.name}" name="hiddenUserName"/>
+                                        <input type="hidden" value="${it.name}" name="hiddenTeamName"/>
+                                        <span style="margin-left:10px; font-size:13px">
+                                            ${member.name}
+                                        </span>
+                                    </td>
+                                    <td align="center"> 
+                                        <j:set var="teamAdminIconVisibility" value='${member.isTeamAdmin() ? "visible" : "hidden"}'/>
+                                        <img style="visibility:${teamAdminIconVisibility}" src="${imagesURL}/16x16/check.png" name="adminIcon"/>
+                                    </td >
+                                    <td align="center"> 
+                                        <j:set var="createIconVisibility" value='${member.canCreate() ? "visible" : "hidden"}'/>
+                                        <img style="visibility:${createIconVisibility}" src="${imagesURL}/16x16/check.png" name="createIcon"/>
+                                    </td>
+                                    <td align="center"> 
+                                        <j:set var="deleteIconVisibility" value='${member.canDelete() ? "visible" : "hidden"}'/>
+                                        <img style="visibility:${deleteIconVisibility}" src="${imagesURL}/16x16/check.png" name="deleteIcon"/>
+                                    </td>
+                                    <td align="center"> 
+                                        <j:set var="configureIconVisibility" value='${member.canConfigure() ? "visible" : "hidden"}'/>
+                                        <img  style="visibility:${configureIconVisibility}" src="${imagesURL}/16x16/check.png" name="configureIcon"/>
+                                    </td>
+                                    <td align="center"> 
+                                        <j:set var="buildIconVisibility" value='${member.canBuild() ? "visible" : "hidden"}'/>
+                                        <img  style="visibility:${buildIconVisibility}" src="${imagesURL}/16x16/check.png" name="buildIcon"/>
+                                    </td>
+                                    <td width="40px">
+                                        
+                                    </td>
+                                    <td > 
+                                        <img style="cursor:pointer" class="teamMemberUpdate" src="${imagesURL}/16x16/notepad.png" name="updateIcon"/>
+                                    </td>
+                                    <td > 
+                                        <img style="cursor:pointer" class="teamMemberRemove" src="${imagesURL}/16x16/delete.png" name="removeIcon"/>
+                                    </td>
+                                </tr>
+                            </j:forEach>
+                        </tbody> 
+                    </table>
                 </div>
                 <div class="teamMemberAdd">
                     <button value="${it.name}" class="teamMemberAddButton">${%Add Member}</button>

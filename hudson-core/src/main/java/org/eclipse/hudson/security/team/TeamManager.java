@@ -11,6 +11,11 @@
 package org.eclipse.hudson.security.team;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import hudson.BulkChange;
 import hudson.Util;
 import hudson.XmlFile;
@@ -20,7 +25,6 @@ import hudson.model.Job;
 import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
 import hudson.security.ACL;
-import hudson.security.Permission;
 import hudson.security.SecurityRealm;
 import hudson.util.FormValidation;
 import hudson.util.XStream2;
@@ -28,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.servlet.ServletException;
@@ -123,7 +128,7 @@ public final class TeamManager implements Saveable {
     }
 
     public List<Team> getTeams() {
-        return teams;
+        return Collections.unmodifiableList(teams);
     }
 
     public Team createTeam(String teamName, String description) throws IOException, TeamAlreadyExistsException {
@@ -134,9 +139,13 @@ public final class TeamManager implements Saveable {
         }
 
         Team newTeam = new Team(teamName, description, this);
-        teams.add(newTeam);
-        save();
+        addTeam(newTeam);
         return newTeam;
+    }
+    
+    private void addTeam(Team team) throws IOException {
+        teams.add(team);
+        save();
     }
 
     public Team createTeam(String teamName) throws IOException, TeamAlreadyExistsException {
@@ -184,7 +193,8 @@ public final class TeamManager implements Saveable {
             @QueryParameter boolean isTeamAdmin,
             @QueryParameter boolean canCreate,
             @QueryParameter boolean canDelete,
-            @QueryParameter boolean canConfigure) throws IOException {
+            @QueryParameter boolean canConfigure,
+            @QueryParameter boolean canBuild) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
             return new TeamUtils.ErrorHttpResponse("No permission to add team member.");
         }
@@ -197,24 +207,24 @@ public final class TeamManager implements Saveable {
         Team team;
         try {
             team = findTeam(teamName);
+            if (team.findMember(teamMemberSid) == null) {
+                team.addMember(teamMemberSid, isTeamAdmin, canCreate, canDelete, canConfigure, canBuild);
+                return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(teamMemberSid));
+            } else {
+                return new TeamUtils.ErrorHttpResponse(teamMemberSid + " is already a team member.");
+            }
         } catch (TeamNotFoundException ex) {
             return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
         }
-
-        if (team.findTeamMember(teamMemberSid) == null) {
-            team.addMember(teamMemberSid, isTeamAdmin, canCreate, canDelete, canConfigure);
-            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(teamMemberSid));
-        } else {
-            return new TeamUtils.ErrorHttpResponse(teamMemberSid + " is already a team member.");
-        }
     }
-    
+
     public HttpResponse doUpdateTeamMember(@QueryParameter String teamName,
             @QueryParameter String teamMemberSid,
             @QueryParameter boolean isTeamAdmin,
             @QueryParameter boolean canCreate,
             @QueryParameter boolean canDelete,
-            @QueryParameter boolean canConfigure) throws IOException {
+            @QueryParameter boolean canConfigure,
+             @QueryParameter boolean canBuild) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
             return new TeamUtils.ErrorHttpResponse("No permission to add team member.");
         }
@@ -227,19 +237,20 @@ public final class TeamManager implements Saveable {
         Team team;
         try {
             team = findTeam(teamName);
+            TeamMember currentMember = team.findMember(teamMemberSid);
+            if (currentMember != null) {
+                team.updateMember(teamMemberSid, isTeamAdmin, canCreate, canDelete, canConfigure, canBuild);
+                return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(teamMemberSid));
+            } else {
+                return new TeamUtils.ErrorHttpResponse(teamMemberSid + " is not a team member.");
+            }
         } catch (TeamNotFoundException ex) {
             return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
         }
-        TeamMember currentMember = team.findTeamMember(teamMemberSid);
-        if (currentMember != null) {
-            team.updateMember(teamMemberSid, isTeamAdmin, canCreate, canDelete, canConfigure);
-            return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(teamMemberSid));
-        } else {
-            return new TeamUtils.ErrorHttpResponse(teamMemberSid + " is not a team member.");
-        }
+
     }
 
-    public HttpResponse doRemoveTeamMember(@QueryParameter String teamName, 
+    public HttpResponse doRemoveTeamMember(@QueryParameter String teamName,
             @QueryParameter String teamMemberSid) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
             return new TeamUtils.ErrorHttpResponse("No permission to remove team member");
@@ -256,7 +267,7 @@ public final class TeamManager implements Saveable {
         } catch (TeamNotFoundException ex) {
             return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
         }
-        TeamMember currentMember = team.findTeamMember(teamMemberSid);
+        TeamMember currentMember = team.findMember(teamMemberSid);
         if (currentMember != null) {
             team.removeMember(teamMemberSid);
             return HttpResponses.ok();
@@ -363,7 +374,7 @@ public final class TeamManager implements Saveable {
     /* For Unit Test */
     void addUser(String teamName, String userName) throws TeamNotFoundException, IOException {
         Team team = findTeam(teamName);
-        team.addMember(userName, false, false, false, false);
+        team.addMember(userName, false, false, false, false, false);
         save();
     }
 
@@ -698,9 +709,59 @@ public final class TeamManager implements Saveable {
         teams.add(publicTeam);
     }
 
+    private Object readResolve() {
+        if (sysAdmins == null) {
+            sysAdmins = new CopyOnWriteArrayList<String>();
+
+        }
+        if (teams == null) {
+            teams = new CopyOnWriteArrayList<Team>();
+        }
+        return this;
+    }
+
     private void initializeXstream() {
         xstream.alias("teamManager", TeamManager.class);
         xstream.alias("team", Team.class);
         xstream.alias("publicTeam", PublicTeam.class);
+    }
+    
+    public static class ConverterImpl implements Converter {
+
+        @Override
+        public boolean canConvert(Class type) {
+            return type == TeamManager.class;
+        }
+
+        @Override
+        public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+            TeamManager teamManager = (TeamManager) source;
+            for (String sid : teamManager.getSysAdmins()) {
+                writer.startNode("sysAdmin");
+                writer.setValue(sid);
+                writer.endNode();
+            }
+            for (Team team : teamManager.getTeams()) {
+                writer.startNode("team");
+                context.convertAnother(team);
+                writer.endNode();
+            }
+        }
+
+        @Override
+        public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext uc) {
+            TeamManager teamManager = (TeamManager) uc.currentObject();
+            while (reader.hasMoreChildren()) {
+                reader.moveDown();
+                if ("sysAdmin".equals(reader.getNodeName())) {
+                    teamManager.sysAdmins.add(reader.getValue());
+                } else if ("team".equals(reader.getNodeName())) {
+                    Team team = (Team) uc.convertAnother(teamManager, Team.class);
+                    teamManager.teams.add(team);
+                }
+                reader.moveUp();
+            }
+            return teamManager;
+        }
     }
 }

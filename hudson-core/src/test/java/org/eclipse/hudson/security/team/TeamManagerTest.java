@@ -10,6 +10,7 @@
  */
 package org.eclipse.hudson.security.team;
 
+import hudson.security.Permission;
 import java.io.File;
 import java.io.IOException;
 import junit.framework.Assert;
@@ -250,7 +251,7 @@ public class TeamManagerTest {
             teamManager.addUser(teamName, "chris");
             teamManager.addUser(teamName, "paul");
             Team team = teamManager.findTeam(teamName);
-            team.addJob("job1"); 
+            team.addJob("job1");
         } catch (TeamNotFoundException ex) {
             fail("Team must exist");
         }
@@ -307,6 +308,46 @@ public class TeamManagerTest {
             teamManager.findTeam(teamName);
         } catch (TeamNotFoundException ex) {
             fail("Team must exist");
+        }
+    }
+
+    @Test
+    public void testTeamPersistence() throws IOException, TeamManager.TeamAlreadyExistsException, TeamNotFoundException {
+
+        teamManager.setUseBulkSaveFlag(false);
+        teamManager.addSysAdmin("admin1");
+        teamManager.addSysAdmin("Paul");
+        Team team = teamManager.createTeam("Team1", "Team1 Description");
+        TeamMember member = new TeamMember();
+        member.setName("member1");
+        member.setAsTeamAdmin(true);
+        member.addPermission(Permission.DELETE);
+        team.addMember(member);
+        team.addJob("job1");
+
+        teamManager = new TeamManager(homeDir);
+        teamManager.setUseBulkSaveFlag(false);
+        if (!teamManager.isSysAdmin("admin1")) {
+            fail("SysAdmin admin1 must exists");
+        }
+        team = teamManager.findTeam("Team1");
+        if (team == null) {
+            fail("The team Team1 must exists");
+        } else {
+            if (!"Team1 Description".equals(team.getDescription())) {
+                fail("The team Team1 must have description 'Team1 Description' ");
+            }
+            if (!team.isJobOwner("job1")) {
+                fail("The team Team1 must b ethe owner of job1");
+            }
+            member = team.findMember("member1");
+            if (member == null) {
+                fail("The member member1 must exists in Team1 ");
+            } else {
+                if (!member.canDelete()) {
+                    fail("The member member1 must have the permission delete");
+                }
+            }
         }
     }
 }

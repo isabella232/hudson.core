@@ -44,7 +44,7 @@ p {
 #container {
     padding-left: 0px;
     padding-bottom: 20px;
-    width: 500px;
+    width: 600px;
 }
 
 #container h3 {
@@ -161,9 +161,20 @@ ul.team .teamList {
 }
 
 
-#dialog-add-user{
+#dialog-add-modify-user{
     margin-top: 10px;
     display: none;
+}
+
+#dialog-add-modify-user label{
+    display:inline-block;
+    font-weight: bold;
+    margin-top: 10px;
+    width: 140px;
+}
+
+#dialog-add-modify-user label{
+    display:inline-block;
 }
 
 #dialog-create-team  label{
@@ -185,3 +196,5 @@ ul.team .teamList {
 .teamAdminAdd{
     margin-top: 10px;
 }
+
+

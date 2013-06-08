@@ -35,7 +35,7 @@ jQuery(document).ready(function() {
 
     jQuery("#outerTabs").tabs();
 
-    jQuery("#outerTabs tr").hover(
+    jQuery("#outerTabs tr").not(".header").hover(
             function() {
                 jQuery(this).css("background", "#EEEDED");
             },
@@ -58,23 +58,16 @@ jQuery(document).ready(function() {
         });
     });
 
-    jQuery('#teamContainer button.teamAdminAddButton').each(function() {
-        jQuery(this).button();
-        jQuery(this).unbind("click").click(function() {
-            teamAdminAddButtonAction(jQuery(this).val());
-        });
-    });
-
-    jQuery('#teamContainer img.teamAdminRemove').each(function() {
-        jQuery(this).unbind("click").click(function() {
-            removeTeamAdminAction(this);
-        });
-    });
-
     jQuery('#teamContainer button.teamMemberAddButton').each(function() {
         jQuery(this).button();
         jQuery(this).unbind("click").click(function() {
             teamMemberAddButtonAction(jQuery(this).val());
+        });
+    });
+
+    jQuery('#teamContainer img.teamMemberUpdate').each(function() {
+        jQuery(this).unbind("click").click(function() {
+            updateTeamMemberAction(this);
         });
     });
 
@@ -90,7 +83,7 @@ jQuery(document).ready(function() {
         moveJobsButtonAction();
     });
 
-    jQuery('.teamList li').each(function() {
+    jQuery('.teamList tr').each(function() {
         verifySid(this);
     });
 
@@ -106,7 +99,7 @@ function  createTeamButtonAction() {
             'Create': function() {
                 var teamName = jQuery("#teamName").val();
                 var teamDesc = jQuery("#teamDesc").val();
-                createTeam(teamName, teamDesc);
+                createTeam(jQuery.trim(teamName), jQuery.trim(teamDesc));
             },
             Cancel: function() {
                 jQuery(this).dialog("close");
@@ -188,17 +181,30 @@ function deleteTeam(deleteButton) {
     });
 }
 
-function teamAdminAddButtonAction(teamName) {
-    jQuery('#dialog-add-user').dialog({
+function teamMemberAddButtonAction(teamName) {
+    jQuery("#cb_adminFlag").prop('checked', false);
+    jQuery("#cb_createFlag").prop('checked', true);
+    jQuery("#cb_deleteFlag").prop('checked', true);
+    jQuery("#cb_configureFlag").prop('checked', true);
+    jQuery("#cb_buildFlag").prop('checked', true);
+    
+    jQuery("#text_sidName").show();
+    jQuery("#label_sidName").hide();
+    jQuery('#dialog-add-modify-user').dialog({
         resizable: false,
-        height: 165,
-        width: 400,
+        height: 300,
+        width: 450,
         modal: true,
-        title: "Add Team Admin",
+        title: "Add Team Member",
         buttons: {
             'Add': function() {
-                var sid = jQuery("#sidName").val();
-                addTeamAdmin(teamName, sid);
+                var sid = jQuery("#text_sidName").val();
+                var adminFlag = jQuery("#cb_adminFlag").is(':checked');
+                var createFlag = jQuery("#cb_createFlag").is(':checked');
+                var deleteFlag = jQuery("#cb_deleteFlag").is(':checked');
+                var configureFlag = jQuery("#cb_configureFlag").val();
+                var buildFlag = jQuery("#cb_buildFlag").val();
+                addTeamMember(teamName, sid, adminFlag, createFlag, deleteFlag, configureFlag, buildFlag);
             },
             Cancel: function() {
                 jQuery(this).dialog("close");
@@ -207,31 +213,58 @@ function teamAdminAddButtonAction(teamName) {
     });
 }
 
-function addTeamAdmin(teamName, adminSid) {
+function addTeamMember(teamName, member, adminFlag, createFlag, deleteFlag, configureFlag, buildFlag) {
     jQuery.ajax({
         type: 'POST',
-        url: "addTeamAdmin",
+        url: "addTeamMember",
         data: {
             teamName: teamName,
-            teamAdminSid: adminSid
+            teamMemberSid: member,
+            isTeamAdmin: adminFlag,
+            canCreate: createFlag,
+            canDelete: deleteFlag,
+            canConfigure: configureFlag,
+            canBuild: buildFlag
         },
         success: function(iconNameResponse) {
-            jQuery('#teamAdminNone_' + teamName).remove();
+            jQuery('#teamMemberNone_' + teamName).remove();
+            jQuery('#teamMemberListHeader1_' + teamName).css('visibility', 'visible');
+            jQuery('#teamMemberListHeader2_' + teamName).css('visibility', 'visible');
 
-            var userTemplate = jQuery("#userTemplate li").clone();
-            jQuery("input[name='hiddenUserName']", userTemplate).attr("value", adminSid);
+            var userTemplate = jQuery("#userTemplate tr").clone();
+            jQuery("input[name='hiddenUserName']", userTemplate).attr("value", member);
             jQuery("input[name='hiddenTeamName']", userTemplate).attr("value", teamName);
-            var icon = jQuery(userTemplate).children("img[name='typeIcon']");
+            var icon = jQuery(userTemplate).find("img[name='typeIcon']");
             jQuery(icon).attr("src", imageRoot + "/16x16/" + iconNameResponse);
-            jQuery("span", userTemplate).text(adminSid);
-            var deleteIcon = jQuery(userTemplate).children("img[name='deleteIcon']");
-            jQuery(deleteIcon).addClass("teamAdminRemove");
-            jQuery(deleteIcon).unbind("click").click(function() {
-                removeTeamAdminAction(this);
-            });
-            jQuery(userTemplate).appendTo(jQuery('#teamAdminList_' + teamName));
+            jQuery("span", userTemplate).text(member);
 
-            jQuery('#dialog-add-user').dialog("close");
+            var adminIcon = jQuery(userTemplate).find("img[name='adminIcon']");
+            adminIcon.css('visibility', adminFlag ? 'visible' : 'hidden');
+            var createIcon = jQuery(userTemplate).find("img[name='createIcon']");
+            createIcon.css('visibility', createFlag ? 'visible' : 'hidden');
+            var deleteIcon = jQuery(userTemplate).find("img[name='deleteIcon']");
+            deleteIcon.css('visibility', deleteFlag ? 'visible' : 'hidden');
+            var configureIcon = jQuery(userTemplate).find("img[name='configureIcon']");
+            configureIcon.css('visibility', configureFlag ? 'visible' : 'hidden');
+            var buildIcon = jQuery(userTemplate).find("img[name='buildIcon']");
+            buildIcon.css('visibility', buildFlag ? 'visible' : 'hidden');
+
+            var updateIcon = jQuery(userTemplate).find("img[name='updateIcon']");
+            jQuery(updateIcon).addClass("teamMemberUpdate");
+            jQuery(updateIcon).unbind("click").click(function() {
+                updateTeamMemberAction(this);
+            });
+
+            var removeIcon = jQuery(userTemplate).find("img[name='removeIcon']");
+            jQuery(removeIcon).addClass("teamMemberRemove");
+            jQuery(removeIcon).unbind("click").click(function() {
+                removeTeamMemberAction(this);
+            });
+
+            var teamMemberList = jQuery('#teamMemberList_' + teamName);
+            jQuery(userTemplate).appendTo(jQuery(teamMemberList));
+
+            jQuery('#dialog-add-modify-user').dialog("close");
         },
         error: function(msg) {
             showMessage(msg.responseText, true, jQuery('#userAddMsg'));
@@ -240,19 +273,49 @@ function addTeamAdmin(teamName, adminSid) {
     });
 }
 
-function removeTeamAdminAction(deleteItem) {
-    var adminName = jQuery(deleteItem).siblings("input[name='hiddenUserName']").val();
-    var teamName = jQuery(deleteItem).siblings("input[name='hiddenTeamName']").val();
-    var parent = jQuery(deleteItem).parent();
-    jQuery('#dialog-remove-user').dialog({
+function updateTeamMemberAction(updateItem) {
+    var trParent = jQuery(updateItem).parents("tr:first");
+    var memberName = jQuery(trParent).find("input[name='hiddenUserName']").val();
+    var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
+    
+    var adminIcon = jQuery(trParent).find("img[name='adminIcon']");
+    var adminFlag = jQuery(adminIcon).css("visibility") == "visible";
+    jQuery("#cb_adminFlag").prop('checked', adminFlag)
+    
+    var createIcon = jQuery(trParent).find("img[name='createIcon']");
+    var createFlag = jQuery(createIcon).css("visibility") == "visible";
+    jQuery("#cb_createFlag").prop('checked', createFlag);
+    
+    var deleteIcon = jQuery(trParent).find("img[name='deleteIcon']");
+    var deleteFlag = jQuery(deleteIcon).css("visibility") == "visible";
+    jQuery("#cb_deleteFlag").prop('checked', deleteFlag);
+     
+    var configureIcon = jQuery(trParent).find("img[name='configureIcon']");
+    var configureFlag = jQuery(configureIcon).css("visibility") == "visible";
+    jQuery("#cb_configureFlag").prop('checked', configureFlag);
+    
+    var buildIcon = jQuery(trParent).find("img[name='buildIcon']");
+    var buildFlag = jQuery(buildIcon).css("visibility") == "visible";
+    jQuery("#cb_buildFlag").prop('checked', buildFlag);
+    
+    jQuery("#text_sidName").hide();
+    jQuery("#label_sidName").show();
+    jQuery("#label_sidName").text(memberName)
+     
+    jQuery('#dialog-add-modify-user').dialog({
         resizable: false,
-        height: 165,
-        width: 400,
+        height: 300,
+        width: 350,
         modal: true,
-        title: "Remove Team Admin - " + adminName,
+        title: "Update Team Member",
         buttons: {
-            'Remove': function() {
-                removeTeamAdmin(teamName, adminName, parent);
+            'Update': function() {
+                adminFlag = jQuery("#cb_adminFlag").is(':checked');
+                createFlag = jQuery("#cb_createFlag").is(':checked');
+                deleteFlag = jQuery("#cb_deleteFlag").is(':checked');
+                configureFlag = jQuery("#cb_configureFlag").is(':checked');
+                buildFlag = jQuery("#cb_buildFlag").is(':checked');
+                updateTeamMember(trParent, teamName, memberName, adminFlag, createFlag, deleteFlag, configureFlag, buildFlag);
             },
             Cancel: function() {
                 jQuery(this).dialog("close");
@@ -261,69 +324,38 @@ function removeTeamAdminAction(deleteItem) {
     });
 }
 
-function removeTeamAdmin(teamName, adminName, parent) {
+function updateTeamMember(trParent, teamName, member, adminFlag, createFlag, deleteFlag, configureFlag, buildFlag) {
     jQuery.ajax({
         type: 'POST',
-        url: "removeTeamAdmin",
+        url: "updateTeamMember",
         data: {
             teamName: teamName,
-            teamAdminSid: adminName
-        },
-        success: function(msg) {
-            parent.remove();
-            jQuery('#dialog-remove-user').dialog("close");
-        },
-        error: function(msg) {
-            showMessage(msg.responseText, true, jQuery('#userRemoveMsg'));
-        },
-        dataType: "html"
-    });
-}
-
-function teamMemberAddButtonAction(teamName) {
-    jQuery('#dialog-add-user').dialog({
-        resizable: false,
-        height: 165,
-        width: 400,
-        modal: true,
-        title: "Add Team Member",
-        buttons: {
-            'Add': function() {
-                var sid = jQuery("#sidName").val();
-                addTeamMember(teamName, sid);
-            },
-            Cancel: function() {
-                jQuery(this).dialog("close");
-            }
-        }
-    });
-}
-
-function addTeamMember(teamName, member) {
-    jQuery.ajax({
-        type: 'POST',
-        url: "addTeamMember",
-        data: {
-            teamName: teamName,
-            teamMemberSid: member
+            teamMemberSid: member,
+            isTeamAdmin: adminFlag,
+            canCreate: createFlag,
+            canDelete: deleteFlag,
+            canConfigure: configureFlag,
+            canBuild: buildFlag
         },
         success: function(iconNameResponse) {
             jQuery('#teamMemberNone_' + teamName).remove();
 
-            var userTemplate = jQuery("#userTemplate li").clone();
-            jQuery("input[name='hiddenUserName']", userTemplate).attr("value", member);
-            jQuery("input[name='hiddenTeamName']", userTemplate).attr("value", teamName);
-            var icon = jQuery(userTemplate).children("img[name='typeIcon']");
+            var icon = jQuery(trParent).find("img[name='typeIcon']");
             jQuery(icon).attr("src", imageRoot + "/16x16/" + iconNameResponse);
-            jQuery("span", userTemplate).text(member);
-            var deleteIcon = jQuery(userTemplate).children("img[name='deleteIcon']");
-            jQuery(deleteIcon).addClass("teamMemberRemove");
-            jQuery(deleteIcon).unbind("click").click(function() {
-                removeTeamMemberAction(this);
-            });
-            jQuery(userTemplate).appendTo(jQuery('#teamMemberList_' + teamName));
+            jQuery("span", trParent).text(member);
 
-            jQuery('#dialog-add-user').dialog("close");
+            var adminIcon = jQuery(trParent).find("img[name='adminIcon']");
+            adminIcon.css('visibility', adminFlag ? 'visible' : 'hidden');
+            var createIcon = jQuery(trParent).find("img[name='createIcon']");
+            createIcon.css('visibility', createFlag ? 'visible' : 'hidden');
+            var deleteIcon = jQuery(trParent).find("img[name='deleteIcon']");
+            deleteIcon.css('visibility', deleteFlag ? 'visible' : 'hidden');
+            var configureIcon = jQuery(trParent).find("img[name='configureIcon']");
+            configureIcon.css('visibility', configureFlag ? 'visible' : 'hidden');
+            var buildIcon = jQuery(trParent).find("img[name='buildIcon']");
+            buildIcon.css('visibility', buildFlag ? 'visible' : 'hidden');
+
+            jQuery('#dialog-add-modify-user').dialog("close");
         },
         error: function(msg) {
             showMessage(msg.responseText, true, jQuery('#userAddMsg'));
@@ -333,9 +365,9 @@ function addTeamMember(teamName, member) {
 }
 
 function removeTeamMemberAction(deleteItem) {
-    var memberName = jQuery(deleteItem).siblings("input[name='hiddenUserName']").val();
-    var teamName = jQuery(deleteItem).siblings("input[name='hiddenTeamName']").val();
-    var parent = jQuery(deleteItem).parent();
+    var trParent = jQuery(deleteItem).parents("tr:first");
+    var memberName = jQuery(trParent).find("input[name='hiddenUserName']").val();
+    var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
     jQuery('#dialog-remove-user').dialog({
         resizable: false,
         height: 165,
@@ -344,7 +376,7 @@ function removeTeamMemberAction(deleteItem) {
         title: "Remove Team Member - " + memberName,
         buttons: {
             'Remove': function() {
-                removeTeamMember(teamName, memberName, parent);
+                removeTeamMember(teamName, memberName, trParent);
             },
             Cancel: function() {
                 jQuery(this).dialog("close");
@@ -364,6 +396,10 @@ function removeTeamMember(teamName, memberName, parent) {
         success: function() {
             parent.remove();
             jQuery('#dialog-remove-user').dialog("close");
+            if (jQuery('#teamMemberList_' + teamName).find('tr').length < 3) {
+                jQuery('#teamMemberListHeader1_' + teamName).css('visibility', 'hidden');
+                jQuery('#teamMemberListHeader2_' + teamName).css('visibility', 'hidden');
+            }
         },
         error: function(msg) {
             showMessage(msg.responseText, true, jQuery('#userRemoveMsg'));
@@ -451,20 +487,22 @@ function moveJobs(jobId, teamName) {
 }
 
 function verifySid(sidElement) {
-    var sid = jQuery(sidElement).children('span').text();
-    jQuery.ajax({
-        type: 'POST',
-        url: "checkSid",
-        data: {
-            sid: sid
-        },
-        success: function(iconNameResponse) {
-            var icon = jQuery(sidElement).children("img[name='typeIcon']");
-            jQuery(icon).attr("src", imageRoot + "/16x16/" + iconNameResponse);
-            jQuery(icon).css('visibility', 'visible');
-        },
-        dataType: "html"
-    });
+    var sid = jQuery(sidElement).find("input[name='hiddenUserName']").val();
+    if (sid) {
+        jQuery.ajax({
+            type: 'POST',
+            url: "checkSid",
+            data: {
+                sid: sid
+            },
+            success: function(iconNameResponse) {
+                var icon = jQuery(sidElement).find("img[name='typeIcon']");
+                jQuery(icon).attr("src", imageRoot + "/16x16/" + iconNameResponse);
+                jQuery(icon).css('visibility', 'visible');
+            },
+            dataType: "html"
+        });
+    }
 }
 
 function showMessage(msg, error, infoTxt) {
