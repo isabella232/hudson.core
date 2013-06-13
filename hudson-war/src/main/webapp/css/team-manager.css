@@ -60,13 +60,13 @@ p {
     border-bottom-color: #dfcdeb;
 }
 
-#outerTabs {
+#teamManagerTabs {
     padding: 0px;
     background: none;
     border-width: 0px;
 }
 
-#outerTabs .ui-tabs-nav {
+#teamManagerTabs .ui-tabs-nav {
     padding-left: 0px;
     background: transparent;
     border-width: 0px 0px 1px 0px;
@@ -76,14 +76,35 @@ p {
     border-radius: 0px;
 }
 
-#outerTabs .ui-tabs-nav li {
-    border-color:#d4bde6;
-}
-
-#outerTabs .ui-tabs-panel {
+#teamManagerTabs .ui-tabs-panel {
     /*background: url(images/ui-bg_highlight-hard_100_f5f3e5_1x100.png) repeat-x scroll 50% top #f5f3e5;*/
     border-width: 0px 1px 1px 1px;
     border-color:#d4bde6;
+}
+
+#teamManagerTabs .ui-tabs-nav li {
+    border-color:#d4bde6;
+}
+
+.teamAdminTabs {
+    padding: 0px;
+    background: none;
+    border-width: 0px;
+}
+
+.teamAdminTabs .ui-tabs-nav {
+    padding-left: 0px;
+    background: transparent;
+    border-width: 0px 0px 1px 0px;
+    border-color:#d4bde6;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    border-radius: 0px;
+}
+
+.teamAdminTabs .ui-tabs-nav li {
+    border-color:#d4bde6;
+    Color: blue;
 }
 
 ul.team  label{
@@ -173,8 +194,11 @@ ul.team .teamList {
     width: 140px;
 }
 
-#dialog-add-modify-user label{
+
+#dialog-configure-visibility label{
     display:inline-block;
+    margin-top: 5px;
+    width: 140px;
 }
 
 #dialog-create-team  label{

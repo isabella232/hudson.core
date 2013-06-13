@@ -71,9 +71,9 @@ public class TeamBasedACL extends SidACL {
             }
             // Member of any of the team with JOB CREATE Permission can create Job
             if (permission == Item.CREATE) {
-                Team team = teamManager.findUserTeam(userName);
-                if (team != null) {
-                    TeamMember member = team.findMember(userName);
+                Team userTeam = teamManager.findUserTeam(userName);
+                if (userTeam != null) {
+                    TeamMember member = userTeam.findMember(userName);
                     if (member != null) {
                         return member.hasPermission(Item.CREATE);
                     }
@@ -85,13 +85,13 @@ public class TeamBasedACL extends SidACL {
             if (teamManager.isSysAdmin(userName)) {
                 return true;
             }
-            Team team = teamManager.findUserTeam(userName);
+            Team userTeam = teamManager.findUserTeam(userName);
 
-            if (team != null) {
+            if (userTeam != null && (userTeam == team)) {
                 // Team admin gets to do all team maintenance operations
-                if (team.isAdmin(userName)) {
+                if (userTeam.isAdmin(userName)) {
                     return true;
-                } else if (team.isMember(userName) && permission.getImpliedBy() == Permission.READ) {
+                } else if (userTeam.isMember(userName) && permission.getImpliedBy() == Permission.READ) {
                     return true;
                 }
             }
@@ -100,22 +100,23 @@ public class TeamBasedACL extends SidACL {
             Team jobTeam = teamManager.findJobOwnerTeam(job.getId());
 
             if (jobTeam != null) {
-                if (jobTeam.isMember(userName)) {  
-                        // All members of the team get read permission
+                if (jobTeam.isMember(userName)) {
+                    // All members of the team get read permission
                         if (permission.getImpliedBy() == Permission.READ) {
-                            return true;
-                        }
-                        if (isTeamAwareSecurityRealm()) {
-                            return true; // for now give full permission to all team members
-                        } else {
-                            TeamMember member = jobTeam.findMember(userName);
-                            return member.hasPermission(permission);
-                        }
+                        return true;
+                    }
+                    if (isTeamAwareSecurityRealm()) {
+                        return true; // for now give full permission to all team members
+                    } else {
+                        TeamMember member = jobTeam.findMember(userName);
+                        return member.hasPermission(permission);
+                    }
                 }
-                // Grant Read permission to 
-                Team publicTeam;
+            }
+            // Grant Read permission to Public Jobs and jobs based on visibility
+            if (permission.getImpliedBy() == Permission.READ) {
                 try {
-                    publicTeam = teamManager.findTeam(PublicTeam.PUBLIC_TEAM_NAME);
+                    Team publicTeam = teamManager.findTeam(PublicTeam.PUBLIC_TEAM_NAME);
 
                     if (publicTeam.isJobOwner(job.getId())) {
                         if (permission.getImpliedBy() == Permission.READ) {
@@ -125,7 +126,19 @@ public class TeamBasedACL extends SidACL {
                 } catch (TeamNotFoundException ex) {
                     logger.error("The public team must exists.", ex);
                 }
-                // TODO: Grant read permission to jobs marked as public scoped in all teams
+
+                if (jobTeam != null) {
+                    TeamJob teamJob = jobTeam.findJob(job.getId());
+                    Team userTeam = teamManager.findUserTeam(userName);
+                    if (userTeam != null) {
+                        if (teamJob.isVisible(userTeam.getName())) {
+                            return true;
+                        }
+                    }
+                    if (teamJob.isVisible(PublicTeam.PUBLIC_TEAM_NAME)) {
+                        return true;
+                    }
+                }
             }
         }
         return false;

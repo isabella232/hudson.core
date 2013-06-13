@@ -142,7 +142,7 @@ public final class TeamManager implements Saveable {
         addTeam(newTeam);
         return newTeam;
     }
-    
+
     private void addTeam(Team team) throws IOException {
         teams.add(team);
         save();
@@ -224,7 +224,7 @@ public final class TeamManager implements Saveable {
             @QueryParameter boolean canCreate,
             @QueryParameter boolean canDelete,
             @QueryParameter boolean canConfigure,
-             @QueryParameter boolean canBuild) throws IOException {
+            @QueryParameter boolean canBuild) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
             return new TeamUtils.ErrorHttpResponse("No permission to add team member.");
         }
@@ -284,7 +284,7 @@ public final class TeamManager implements Saveable {
             return new TeamUtils.ErrorHttpResponse("Team name required.");
         }
         if ((jobId == null) || "".equals(jobId.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Job name required.");
+            return new TeamUtils.ErrorHttpResponse("Job id required.");
         }
         Team newTeam;
         try {
@@ -306,40 +306,55 @@ public final class TeamManager implements Saveable {
                 return new TeamUtils.ErrorHttpResponse(job.getName() + " is building.");
             }
             try {
-                if (moveJob(job, oldTeam, newTeam)) {
-                    return HttpResponses.ok();
-                } else {
-                    return new TeamUtils.ErrorHttpResponse("Faile to move the jon " + jobId
-                            + " to the team " + teamName);
-                }
+                moveJob(job, oldTeam, newTeam);
+                return HttpResponses.ok();
             } catch (IOException ex) {
-                return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
+                return new TeamUtils.ErrorHttpResponse("Faile to move the job " + jobId
+                            + " to the team " + teamName + ". " + ex.getLocalizedMessage());
             }
         } else {
             return new TeamUtils.ErrorHttpResponse(jobId + " not a valid job Id.");
         }
     }
 
+    public HttpResponse doSetJobVisibility(@QueryParameter String jobId, @QueryParameter String teamNames) throws IOException {
+        if (!isCurrentUserTeamAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to set job visibility.");
+        }
+        if ((jobId == null) || "".equals(jobId.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Job id required.");
+        }
+        Team ownerTeam = findJobOwnerTeam(jobId);
+        if (ownerTeam == null) {
+            return new TeamUtils.ErrorHttpResponse(jobId + " does not belong to any team.");
+        } else {
+            TeamJob job = ownerTeam.findJob(jobId);
+            job.removeAllVisibilities();
+            for (String teamName : teamNames.split(":")) {
+                job.addVisibility(teamName);
+            }
+            save();
+        }
+        return HttpResponses.ok();
+    }
+
     public HttpResponse doCheckSid(@QueryParameter String sid) throws IOException {
         return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(sid));
     }
 
-    private boolean moveJob(Job job, Team oldTeam, Team newTeam) throws IOException {
+    private void moveJob(Job job, Team oldTeam, Team newTeam) throws IOException {
         try {
             File jobRootDir = job.getRootDir();
             File newJobRootDir = new File(getJobsFolder(newTeam), job.getName());
             newJobRootDir.mkdirs();
-            if (Util.moveDirectory(jobRootDir, newJobRootDir)) {
-                String oldJobId = job.getId();
-                oldTeam.removeJob(job.getId());
-                String newJobId = getTeamQualifiedJobId(newTeam, job.getName());
-                job.setId(newJobId);
-                job.save();
-                newTeam.addJob(newJobId);
-                Hudson.getInstance().replaceItemId(oldJobId, newJobId);
-                return true;
-            }
-            return false;
+            Util.moveDirectory(jobRootDir, newJobRootDir);
+            String oldJobId = job.getId();
+            oldTeam.removeJob(job.getId());
+            String newJobId = getTeamQualifiedJobId(newTeam, job.getName());
+            job.setId(newJobId);
+            job.save();
+            newTeam.addJob(new TeamJob(newJobId));
+            Hudson.getInstance().replaceItemId(oldJobId, newJobId);
         } catch (Exception exc) {
             throw new IOException(exc);
         }
@@ -478,7 +493,7 @@ public final class TeamManager implements Saveable {
 
     public void addJob(Team team, String jobId) throws IOException {
         if (team != null) {
-            team.addJob(jobId);
+            team.addJob(new TeamJob(jobId));
             save();
         }
     }
@@ -709,23 +724,12 @@ public final class TeamManager implements Saveable {
         teams.add(publicTeam);
     }
 
-    private Object readResolve() {
-        if (sysAdmins == null) {
-            sysAdmins = new CopyOnWriteArrayList<String>();
-
-        }
-        if (teams == null) {
-            teams = new CopyOnWriteArrayList<Team>();
-        }
-        return this;
-    }
-
     private void initializeXstream() {
         xstream.alias("teamManager", TeamManager.class);
         xstream.alias("team", Team.class);
         xstream.alias("publicTeam", PublicTeam.class);
     }
-    
+
     public static class ConverterImpl implements Converter {
 
         @Override
@@ -736,12 +740,12 @@ public final class TeamManager implements Saveable {
         @Override
         public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
             TeamManager teamManager = (TeamManager) source;
-            for (String sid : teamManager.getSysAdmins()) {
+            for (String sid : teamManager.sysAdmins) {
                 writer.startNode("sysAdmin");
                 writer.setValue(sid);
                 writer.endNode();
             }
-            for (Team team : teamManager.getTeams()) {
+            for (Team team : teamManager.teams) {
                 writer.startNode("team");
                 context.convertAnother(team);
                 writer.endNode();

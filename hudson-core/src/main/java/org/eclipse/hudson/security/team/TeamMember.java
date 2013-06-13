@@ -50,17 +50,17 @@ public class TeamMember {
         return isTeamAdmin;
     }
 
-    public void setAsTeamAdmin(boolean teamAdmin) {
+    void setAsTeamAdmin(boolean teamAdmin) {
         this.isTeamAdmin = teamAdmin;
     }
 
-    public void addPermission(Permission permission) {
+    void addPermission(Permission permission) {
         if (!grantedPermissions.contains(permission)) {
             grantedPermissions.add(permission);
         }
     }
 
-    public void removePermission(Permission permission) {
+    void removePermission(Permission permission) {
         if (grantedPermissions.contains(permission)) {
             grantedPermissions.remove(permission);
         }
@@ -145,7 +145,7 @@ public class TeamMember {
         public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
             TeamMember teamMember = (TeamMember) source;
             writer.startNode("name");
-            writer.setValue(teamMember.getName());
+            writer.setValue(teamMember.name);
             writer.endNode();
             StringWriter strWriter = new StringWriter();
 

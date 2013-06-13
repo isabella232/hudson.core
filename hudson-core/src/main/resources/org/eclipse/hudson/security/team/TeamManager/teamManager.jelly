@@ -17,7 +17,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"> 
              
     <div id="container">
-        <div id="outerTabs">
+        <div id="teamManagerTabs">
             <ul>
                 <li>
                     <a href="#teamTab">Manage Teams</a>
@@ -62,23 +62,32 @@
                 </j:if>
                
                 <div id="teamJobsContainer">
-                    <table width="100%" border="0" id="teamJobsList" cellpadding="5">       
-                        <j:forEach var="job" items="${app.items}">
-                            <tr>
-                                <td class="column1">
-                                    <input class="move_cb_${job.name}" type="checkbox" value="${job.id}"/>
-                                </td>
-                                <td class="column2">
-                                    ${job.name}
-                                </td>
-                                <td class="column3">
-                                    <span id="job_colum3_span_${job.id}">
-                                        ${it.findJobOwnerTeam(job.id).name}
-                                    </span>
-                                </td>
-                            </tr> 
-                        </j:forEach>
+                    <table width="100%" border="0" id="teamJobsList" cellpadding="5"> 
+                        <tbody>
+                            <j:set var="headerVisibility" value='${(app.items.size() > 0) ? "visible" : "hidden"}'/>
+                            <tr class="header" id="JobsListHeader" style='visibility:${headerVisibility}'>
+                                <th align="left">Select</th>
+                                <th align="left">Job Name</th>
+                                <th align="left">Team Name</th>      
+                            </tr>      
+                            <j:forEach var="job" items="${app.items}">
+                                <tr>
+                                    <td class="column1">
+                                        <input class="move_cb_${job.name}" type="checkbox" value="${job.id}"/>
+                                    </td>
+                                    <td class="column2">
+                                        ${job.name}
+                                    </td>
+                                    <td class="column3">
+                                        <span id="job_colum3_span_${job.id}">
+                                            ${it.findJobOwnerTeam(job.id).name}
+                                        </span>
+                                    </td>
+                                </tr> 
+                            </j:forEach>
+                        </tbody>
                     </table>
+                
                     <br style="clear:both"/>
                 </div> 
                 <div>

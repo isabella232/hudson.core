@@ -45,7 +45,7 @@ public class Team implements AccessControlled {
 
     public static final String PUBLIC_TEAM_NAME = "public";
     private List<TeamMember> teamMembers = new CopyOnWriteArrayList<TeamMember>();
-    private List<String> jobs = new CopyOnWriteArrayList<String>();
+    private List<TeamJob> jobs = new CopyOnWriteArrayList<TeamJob>();
     private String name;
     protected static final String JOBS_FOLDER_NAME = "jobs";
     private String description;
@@ -73,8 +73,9 @@ public class Team implements AccessControlled {
         return description;
     }
 
-    public void setDescription(String description) {
+    void setDescription(String description) throws IOException {
         this.description = description;
+        getTeamManager().save();
     }
 
     public boolean isCurrentUserSysAdmin() {
@@ -106,7 +107,7 @@ public class Team implements AccessControlled {
         return Collections.unmodifiableList(teamMembers);
     }
 
-    public List<String> getJobs() {
+    public List<TeamJob> getJobs() {
         return Collections.unmodifiableList(jobs);
     }
 
@@ -176,14 +177,14 @@ public class Team implements AccessControlled {
         }
     }
 
-    public void addMember(TeamMember member) throws IOException {
+    void addMember(TeamMember member) throws IOException {
         if (!teamMembers.contains(member)) {
             teamMembers.add(member);
             getTeamManager().save();
         }
     }
 
-    public void removeMember(String userName) throws IOException {
+    void removeMember(String userName) throws IOException {
         TeamMember member = findMember(userName);
         if (member != null) {
             teamMembers.remove(member);
@@ -210,30 +211,52 @@ public class Team implements AccessControlled {
         }
     }
 
-    public void addJob(String jobId) throws IOException {
-        if (!jobs.contains(jobId)) {
-            jobs.add(jobId);
+    public TeamJob findJob(String jobId) {
+        for (TeamJob job : jobs) {
+            if (jobId.equals(job.getId())) {
+                return job;
+            }
+        }
+        return null;
+    }
+
+    void addJob(TeamJob job) throws IOException {
+        if (!jobs.contains(job)) {
+            jobs.add(job);
             getTeamManager().save();
         }
     }
 
-    public void removeJob(String jobId) throws IOException {
-        if (jobs.contains(jobId)) {
-            jobs.remove(jobId);
-            getTeamManager().save();
+    boolean removeJob(String jobId) throws IOException {
+        for (TeamJob job : jobs) {
+            if (jobId.equals(job.getId())) {
+                return removeJob(job);
+            }
         }
+        return false;
     }
 
-    public boolean isJobOwner(String jobName) {
-        return jobs.contains(jobName);
+    boolean removeJob(TeamJob job) throws IOException {
+        if (jobs.contains(job)) {
+            if (jobs.remove(job)) {
+                getTeamManager().save();
+                return true;
+            }
+        }
+        return false;
     }
 
-    void renameJob(String oldJobName, String newJobName) throws IOException {
-        if (jobs.contains(oldJobName)) {
-            jobs.remove(oldJobName);
-            jobs.add(newJobName);
+    public boolean isJobOwner(String jobId) {
+        return findJob(jobId) != null;
+    }
+
+    void renameJob(String oldJobId, String newJobId) throws IOException {
+        TeamJob job = findJob(oldJobId);
+        if (job != null) {
+            job.setId(newJobId);
             getTeamManager().save();
         }
+
     }
 
     List<File> getJobsRootFolders(File rootFolder) {
@@ -291,16 +314,6 @@ public class Team implements AccessControlled {
         }
     }
 
-    private Object readResolve() {
-        if (teamMembers == null) {
-            teamMembers = new CopyOnWriteArrayList<TeamMember>();
-        }
-        if (jobs == null) {
-            jobs = new CopyOnWriteArrayList<String>();
-        }
-        return this;
-    }
-
     public static class ConverterImpl implements Converter {
 
         @Override
@@ -318,9 +331,9 @@ public class Team implements AccessControlled {
             writer.setValue(team.getDescription());
             writer.endNode();
 
-            for (String job : team.getJobs()) {
+            for (TeamJob job : team.getJobs()) {
                 writer.startNode("job");
-                writer.setValue(job);
+                context.convertAnother(job);
                 writer.endNode();
             }
             for (TeamMember member : team.getMembers()) {
@@ -343,7 +356,8 @@ public class Team implements AccessControlled {
                     team.description = reader.getValue();
                 }
                 if ("job".equals(reader.getNodeName())) {
-                    team.jobs.add(reader.getValue());
+                    TeamJob teamJob = (TeamJob) uc.convertAnother(team, TeamJob.class);
+                    team.jobs.add(teamJob);
                 } else if ("member".equals(reader.getNodeName())) {
                     TeamMember teamMember = (TeamMember) uc.convertAnother(team, TeamMember.class);
                     team.teamMembers.add(teamMember);

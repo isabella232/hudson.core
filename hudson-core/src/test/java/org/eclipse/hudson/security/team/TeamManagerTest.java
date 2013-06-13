@@ -229,7 +229,7 @@ public class TeamManagerTest {
             teamManager.addUser(teamName, "chris");
             teamManager.addUser(teamName, "paul");
             Team team = teamManager.findTeam(teamName);
-            team.addJob("job1");
+            team.addJob(new TeamJob("job1"));
         } catch (TeamNotFoundException ex) {
             fail("Team must exist");
         }
@@ -251,7 +251,7 @@ public class TeamManagerTest {
             teamManager.addUser(teamName, "chris");
             teamManager.addUser(teamName, "paul");
             Team team = teamManager.findTeam(teamName);
-            team.addJob("job1");
+            team.addJob(new TeamJob("job1"));
         } catch (TeamNotFoundException ex) {
             fail("Team must exist");
         }
@@ -323,7 +323,7 @@ public class TeamManagerTest {
         member.setAsTeamAdmin(true);
         member.addPermission(Permission.DELETE);
         team.addMember(member);
-        team.addJob("job1");
+        team.addJob(new TeamJob("job1"));
 
         teamManager = new TeamManager(homeDir);
         teamManager.setUseBulkSaveFlag(false);

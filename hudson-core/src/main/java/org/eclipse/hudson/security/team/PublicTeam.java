@@ -43,7 +43,9 @@ public final class PublicTeam extends Team{
     void loadExistingJobs(File rootFolder) throws IOException{
         List<File> jobRootFolders = getJobsRootFolders(rootFolder);
         for (File file : jobRootFolders){
-            addJob(file.getName());
+            TeamJob job = new TeamJob(file.getName());
+            job.addVisibility(PUBLIC_TEAM_NAME); 
+            addJob(job);
         }
     }
     

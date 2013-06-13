@@ -82,7 +82,7 @@ public class TeamAwareSecurityRealmTest {
         Team team1 = teamManager.createTeam("team1");
         hudsonSecurityManager.setSecurityRealm(new TeamAwareSecurityRealmImpl(team1, false, false));
         FreeStyleProject freeStyleJob = new FreeStyleProjectMock("testJob");
-        team1.addJob(freeStyleJob.getName());
+        team1.addJob(new TeamJob(freeStyleJob.getName()));
 
         //Dummy Sid
         Sid sid = new PrincipalSid("Paul");
@@ -91,7 +91,7 @@ public class TeamAwareSecurityRealmTest {
 
         Team team2 = teamManager.createTeam("team2");
         freeStyleJob = new FreeStyleProjectMock("testJob2");
-        team2.addJob(freeStyleJob.getName());
+        team2.addJob(new TeamJob(freeStyleJob.getName()));
 
         teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.JOB, freeStyleJob);
         Assert.assertFalse("Current user should not have Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
@@ -105,7 +105,7 @@ public class TeamAwareSecurityRealmTest {
         hudsonSecurityManager.setSecurityRealm(new TeamAwareSecurityRealmImpl(newTeam, false, false));
 
         FreeStyleProject freeStyleJob = new FreeStyleProjectMock("testJob");
-        teamManager.getPublicTeam().addJob(freeStyleJob.getName());
+        teamManager.getPublicTeam().addJob(new TeamJob(freeStyleJob.getName()));
 
         //Dummy Sid
         Sid sid = new PrincipalSid("Paul");

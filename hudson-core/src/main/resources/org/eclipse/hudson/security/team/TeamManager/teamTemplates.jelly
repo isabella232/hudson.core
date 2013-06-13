@@ -113,7 +113,40 @@
             </div>
         </div>
     </div>
+    
+    <!-- Dialog template for configuring Job Visibility -->
+    <div style="margin-top: 10px; display: none" id="dialog-configure-visibility">
+        <div>
+            <span>
+                Configure the visibility of the job. Publicly visible jobs can be viewed by anyone.
+            </span>
             
-     
+            <div style="margin-top: 10px;">
+                <label>${%Publicly visible}:</label>
+                <input type="checkbox" style="margin-left:5px" id="publicVisibility" value="public"/>
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <span style="font-weight: bold;">${%Visible to team(s)}:</span>
+            </div>
+            
+            <div id="configure-visibility-team-list">
+                 
+            </div>
+            
+            <div style="margin-top:10px">
+                <span id="configureVisibilityMsg">
+                    <!-- message goes here -->
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <div style="display: none" id="team-visibility-item-template">
+        <div>
+            <label></label>
+            <input type="checkbox" style="margin-left:5px" value="public"/>
+        </div>
+    </div>
 </j:jelly>            
             

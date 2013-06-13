@@ -336,7 +336,7 @@ public class Util {
         return tmp;
     }
     
-    public static boolean moveDirectory(File oldDir, File newDir) throws InterruptedException {
+    public static void moveDirectory(File oldDir, File newDir) throws InterruptedException {
         boolean renamed = false;
         boolean interrupted = false;
 
@@ -390,7 +390,6 @@ public class Util {
                 e.printStackTrace();
             }
         }
-        return renamed;
     }
     
     private static final Pattern errorCodeParser = Pattern.compile(".*CreateProcess.*error=([0-9]+).*");

@@ -33,7 +33,8 @@ jQuery(document).ready(function() {
     }
     pageInitialized = true;
 
-    jQuery("#outerTabs").tabs();
+    jQuery("#teamManagerTabs").tabs();
+    jQuery(".teamAdminTabs").tabs();
 
     jQuery("#outerTabs tr").not(".header").hover(
             function() {
@@ -74,6 +75,12 @@ jQuery(document).ready(function() {
     jQuery('#teamContainer img.teamMemberRemove').each(function() {
         jQuery(this).unbind("click").click(function() {
             removeTeamMemberAction(this);
+        });
+    });
+
+    jQuery('#teamContainer img.configureJobVisibility').each(function() {
+        jQuery(this).unbind("click").click(function() {
+            configureJobVisibilityAction(this);
         });
     });
 
@@ -187,7 +194,7 @@ function teamMemberAddButtonAction(teamName) {
     jQuery("#cb_deleteFlag").prop('checked', true);
     jQuery("#cb_configureFlag").prop('checked', true);
     jQuery("#cb_buildFlag").prop('checked', true);
-    
+
     jQuery("#text_sidName").show();
     jQuery("#label_sidName").hide();
     jQuery('#dialog-add-modify-user').dialog({
@@ -277,31 +284,31 @@ function updateTeamMemberAction(updateItem) {
     var trParent = jQuery(updateItem).parents("tr:first");
     var memberName = jQuery(trParent).find("input[name='hiddenUserName']").val();
     var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
-    
+
     var adminIcon = jQuery(trParent).find("img[name='adminIcon']");
     var adminFlag = jQuery(adminIcon).css("visibility") == "visible";
     jQuery("#cb_adminFlag").prop('checked', adminFlag)
-    
+
     var createIcon = jQuery(trParent).find("img[name='createIcon']");
     var createFlag = jQuery(createIcon).css("visibility") == "visible";
     jQuery("#cb_createFlag").prop('checked', createFlag);
-    
+
     var deleteIcon = jQuery(trParent).find("img[name='deleteIcon']");
     var deleteFlag = jQuery(deleteIcon).css("visibility") == "visible";
     jQuery("#cb_deleteFlag").prop('checked', deleteFlag);
-     
+
     var configureIcon = jQuery(trParent).find("img[name='configureIcon']");
     var configureFlag = jQuery(configureIcon).css("visibility") == "visible";
     jQuery("#cb_configureFlag").prop('checked', configureFlag);
-    
+
     var buildIcon = jQuery(trParent).find("img[name='buildIcon']");
     var buildFlag = jQuery(buildIcon).css("visibility") == "visible";
     jQuery("#cb_buildFlag").prop('checked', buildFlag);
-    
+
     jQuery("#text_sidName").hide();
     jQuery("#label_sidName").show();
-    jQuery("#label_sidName").text(memberName)
-     
+    jQuery("#label_sidName").text(memberName);
+
     jQuery('#dialog-add-modify-user').dialog({
         resizable: false,
         height: 300,
@@ -408,6 +415,80 @@ function removeTeamMember(teamName, memberName, parent) {
     });
 }
 
+function configureJobVisibilityAction(configureJobItem) {
+    var trParent = jQuery(configureJobItem).parents("tr:first");
+    var jobId = jQuery(trParent).find("input[name='hiddenJobId']").val();
+    var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
+    var teamNames = jQuery(trParent).find("input[name='hiddenVisibilities']").val();
+
+    jQuery('#dialog-configure-visibility').dialog({
+        resizable: false,
+        height: 300,
+        width: 350,
+        modal: true,
+        title: "Update Job Visibility",
+        buttons: {
+            'Update': function() {
+                teamNames = "";
+                jQuery('#configure-visibility-team-list input[@type=checkbox]:checked').each(function() {
+                    teamNames += (jQuery(this).val() + ":");
+                });
+                if (jQuery('#publicVisibility').is(":checked")) {
+                    teamNames += "public";
+                }
+                jQuery(trParent).find("input[name='hiddenVisibilities']").val(teamNames);
+                configureJobVisibility(jobId, teamNames);
+            },
+            Cancel: function() {
+                jQuery(this).dialog("close");
+            }
+        }
+    });
+
+    jQuery.getJSON('getTeamsJson', function(json) {
+        jQuery('#configure-visibility-team-list').empty();
+        var publicItem = jQuery('#publicVisibility');
+        if (teamNames.indexOf("public") >= 0) {
+            jQuery(publicItem).prop('checked', true);
+        } else {
+            jQuery(publicItem).prop('checked', false);
+        }
+        jQuery.each(json, function(key, val) {
+            if (key !== "public") {
+                var item = jQuery("#team-visibility-item-template div").clone();
+                jQuery(item).find("label").text(key);
+                var input = jQuery(item).find("input");
+                jQuery(input).val(key);
+                if (key === teamName) {
+                    jQuery(input).prop('checked', true);
+                    jQuery(input).prop('disabled', true);
+                } else {
+                    jQuery(input).prop('checked', (teamNames.indexOf(key) >= 0));
+                }
+                jQuery(item).appendTo(jQuery('#configure-visibility-team-list'));
+            } 
+        });
+    });
+}
+
+function configureJobVisibility(jobId, teamNames) {
+    jQuery.ajax({
+        type: 'POST',
+        url: "setJobVisibility",
+        data: {
+            jobId: jobId,
+            teamNames: teamNames
+        },
+        success: function() {
+            jQuery('#dialog-configure-visibility').dialog("close");
+        },
+        error: function(msg) {
+            showMessage(msg.responseText, true, jQuery('#configureVisibilityMsg'));
+        },
+        dataType: "html"
+    });
+}
+
 var moveCount;
 var jobsToMove;
 function moveJobsButtonAction() {
@@ -416,7 +497,7 @@ function moveJobsButtonAction() {
     moveCount = jobsToMove.length;
     for (var i = 0; i < jobsToMove.length; i++) {
         var item = '<li value="' + jobsToMove[i] + '">' + jobsToMove[i] + ' <img style="display: none"/></li>';
-        jQuery(item).attr("value", jobsToMove[i])
+        jQuery(item).attr("value", jobsToMove[i]);
         jQuery(item).appendTo(jQuery("#selectedJobs"));
     }
 
