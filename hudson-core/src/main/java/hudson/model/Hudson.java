@@ -489,6 +489,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             String itemId = item.getName();
             if (getTeamManager() != null) {
                itemId = getTeamManager().getTeamQualifiedJobId(itemId);
+               item.setTeamId(getTeamManager().getCurrentUserTeamName());
             }
             item.setId(itemId);
             items.put(itemId, item);
@@ -2180,11 +2181,19 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     @Override
     public File getRootDirFor(TopLevelItem child) {
+        if (getTeamManager() != null) {
+            String jobsFolderName = getTeamManager().getJobsFolderName(child.getTeamId(), child.getId());
+            return new File(new File(getRootDir(), jobsFolderName), child.getName());
+        }
         return getRootDirFor(child.getId(), child.getName());
     }
 
     private File getRootDirFor(String jobId, String jobName) {
-        return new File(new File(getRootDir(), Functions.getJobsFolderName(jobId)), jobName);
+        String jobsFolderName = "jobs";
+        if (getTeamManager() != null) {
+            jobsFolderName = getTeamManager().getJobsFolderName(jobId);
+        }
+        return new File(new File(getRootDir(), jobsFolderName), jobName);
     }
 
     /**
@@ -2295,14 +2304,15 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * assumed to be synchronized on Hudson by the caller.
      */
     public void onRenamed(TopLevelItem job, String oldName, String newName) throws IOException {
-        String itemId = job.getId();
-        items.remove(itemId);
-        itemId = newName;
+        String oldItemId = oldName;
+        String newItemId = newName;
         if (getTeamManager() != null) {
-            itemId = getTeamManager().getTeamQualifiedJobId(newName);
+            oldItemId = getTeamManager().getTeamQualifiedJobId(job.getTeamId(), oldName);
+            newItemId = getTeamManager().getTeamQualifiedJobId(job.getTeamId(), newName);
         }
-        job.setId(itemId);
-        items.put(itemId, job);
+        items.remove(oldItemId);
+        job.setId(newItemId);
+        items.put(newItemId, job);
 
         for (View v : views) {
             v.onJobRenamed(job, oldName, newName);

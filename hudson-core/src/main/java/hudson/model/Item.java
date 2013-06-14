@@ -71,12 +71,22 @@ public interface Item extends PersistenceRoot, SearchableModelObject, AccessCont
      *
      * <p> The id must be unique among other {@link Item}s that belong to the
      * same parent.</p>
-     * @return id
+     * @return String ID for the item
      * @since 3.1.0
      */
     public String getId();
     
     public void setId(String id);
+    
+    /**
+     * A unique string to identify the team which this item belongs to
+     *
+     * @return String team ID
+     * @since 3.1.0
+     */
+    public String getTeamId();
+    
+    public void setTeamId(String id);
     
 
     /**

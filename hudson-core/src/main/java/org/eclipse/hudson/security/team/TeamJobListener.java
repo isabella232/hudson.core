@@ -16,6 +16,7 @@ import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.listeners.ItemListener;
 import java.io.IOException;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +42,8 @@ public class TeamJobListener extends ItemListener {
                 }
             } catch (IOException ex) {
                 logger.error("Failed to rename job in current user team", ex);
+            } catch (TeamManager.TeamNotFoundException ex) {
+                logger.error("Failed to rename job in current user team", ex);
             }
         }
     }
@@ -50,9 +53,17 @@ public class TeamJobListener extends ItemListener {
         if (item instanceof Job<?, ?>) {
             try {
                 if (getTeamManager() != null) {
-                    String newJobId = item.getId();
-                    String oldJobId = getTeamManager().getTeamQualifiedJobId(oldJobName);
+                    String newJobId = getTeamManager().getTeamQualifiedJobId(item.getTeamId(), newJobName);
+                    String oldJobId = getTeamManager().getTeamQualifiedJobId(item.getTeamId(), oldJobName);
                     getTeamManager().renameJobInCurrentUserTeam(oldJobId, newJobId);
+                    Team team;
+                    try {
+                        team = getTeamManager().findTeam(item.getTeamId());
+                    } catch (TeamManager.TeamNotFoundException ex) {
+                        logger.info(ex.getLocalizedMessage() + " Assuming public team"); 
+                        team = getTeamManager().getPublicTeam(); 
+                    }
+                    getTeamManager().renameJob(team, oldJobId, newJobId);
                 }
             } catch (IOException ex) {
                 logger.error("Failed to rename job in current user team", ex);

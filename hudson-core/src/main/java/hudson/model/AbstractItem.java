@@ -28,8 +28,6 @@ import hudson.security.Permission;
 import hudson.security.ACL;
 import hudson.util.AtomicFileWriter;
 import hudson.util.IOException2;
-import org.apache.tools.ant.taskdefs.Copy;
-import org.apache.tools.ant.types.FileSet;
 import org.kohsuke.stapler.WebMethod;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
@@ -54,6 +52,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.eclipse.hudson.security.team.Team;
 
 /**
  * Partial default implementation of {@link Item}.
@@ -76,6 +75,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     private transient ItemGroup parent;
     
     protected String id;
+    protected String teamId = Team.PUBLIC_TEAM_NAME;
 
     protected AbstractItem(ItemGroup parent, String name) {
         this.parent = parent;
@@ -98,6 +98,16 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     @Override
     public void setId(String id) {
         this.id = id;
+    }
+    
+    @Override
+    public String getTeamId() {
+        return teamId;
+    }
+
+    @Override
+    public void setTeamId(String teamId) {
+        this.teamId = teamId;
     }
 
     @Exported(visibility = 999)

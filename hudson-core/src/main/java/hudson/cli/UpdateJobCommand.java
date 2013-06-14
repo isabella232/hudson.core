@@ -52,7 +52,7 @@ public class UpdateJobCommand extends CLICommand {
         if (teamManager != null){
             name = teamManager.getTeamQualifiedJobId(name);
         }
-        TopLevelItem item = h.getItem(name);
+        TopLevelItem item = h.getItemById(name);
 
         if (item == null && !create) {
             stderr.println("Job '" + name + "' does not exist and create is set to false");
@@ -65,8 +65,11 @@ public class UpdateJobCommand extends CLICommand {
         } else {
             try {
                 h.checkPermission(Job.CONFIGURE);
-                 
-                File rootDirOfJob = new File(new File(h.getRootDir(), Functions.getJobsFolderName(item.getId())), name);
+                String jobsFolderName = "jobs";
+                if (teamManager != null){
+                    jobsFolderName = teamManager.getJobsFolderName(item.getTeamId(), item.getId());  
+                } 
+                File rootDirOfJob = new File(new File(h.getRootDir(), jobsFolderName), name);
                 // place it as config.xml
                 File configXml = Items.getConfigFile(rootDirOfJob).getFile();
                 IOUtils.copy(stdin, configXml);

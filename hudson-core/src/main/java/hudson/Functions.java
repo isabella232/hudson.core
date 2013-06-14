@@ -1522,15 +1522,4 @@ public class Functions {
     public static Object rawHtml(Object o) {
         return InternationalizedStringExpression.rawHtml(o);
     }
-
-    public static String getJobsFolderName(String jobId) {
-        String jobsFolderName = "jobs";
-        if (jobId != null) {
-        TeamManager teamManager = Hudson.getInstance().getTeamManager();
-        if (teamManager != null) {
-                jobsFolderName = teamManager.getJobsFolderName(jobId);
-        }
-        }
-        return jobsFolderName;
-    }
 }

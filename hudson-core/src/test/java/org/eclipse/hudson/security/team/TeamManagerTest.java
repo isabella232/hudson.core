@@ -137,7 +137,7 @@ public class TeamManagerTest {
      * Test of findJobOwnerTeam method, of class TeamManager.
      */
     @Test
-    public void testFindJobOwnerTeam() throws IOException, TeamManager.TeamAlreadyExistsException {
+    public void testFindJobOwnerTeam() throws IOException, TeamManager.TeamAlreadyExistsException, TeamNotFoundException {
         String teamName = "team1";
         teamManager.createTeam(teamName);
 
