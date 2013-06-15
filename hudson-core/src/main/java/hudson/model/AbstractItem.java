@@ -405,17 +405,23 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     /**
      * Deletes this item.
      */
-    public synchronized void delete() throws IOException, InterruptedException {
-        checkPermission(DELETE);
-        performDelete();
+    public void delete() throws IOException, InterruptedException {
+        final ItemGroup group = getParent();
+        // Lock parent, and then 'this' before deleting.
+        synchronized (group) {
+            synchronized (this) {
+                checkPermission(DELETE);
+                performDelete();
 
-        try {
-            invokeOnDeleted();
-        } catch (AbstractMethodError e) {
-            // ignore
+                try {
+                    invokeOnDeleted();
+                } catch (AbstractMethodError e) {
+                    // ignore
+                }
+
+                Hudson.getInstance().rebuildDependencyGraph();
+            }
         }
-
-        Hudson.getInstance().rebuildDependencyGraph();
     }
 
     /**
