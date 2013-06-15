@@ -21,7 +21,6 @@ import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
 import org.junit.After;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.acls.sid.PrincipalSid;

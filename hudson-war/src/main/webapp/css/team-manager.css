@@ -221,4 +221,29 @@ ul.team .teamList {
     margin-top: 10px;
 }
 
+#teamList{
+    border: 1px solid #D4BDE6; 
+    /*background-color: rgb(235, 236, 228);*/ 
+    border-radius: 5px 5px 5px 5px;
+}
 
+#teamListScroll {
+    height: 100px;
+    overflow: auto;
+    border-right-width: 5px; 
+    border-bottom-width: 5px; 
+    margin-top: 5px; 
+    margin-left: 2px;
+}
+
+#teamInfo{
+    margin-top: 10px;
+    border: 1px solid #D4BDE6; 
+    /*background-color: rgb(235, 236, 228);*/ 
+    border-radius: 5px 5px 5px 5px;
+}
+
+#selectableTeamList .ui-selecting { background: #FECA40; }
+#selectableTeamList .ui-selected { background: #F39814; color: white; }
+#selectableTeamList { list-style-type: none; margin: 0; padding: 2px; }
+#selectableTeamList li { margin: 3px; padding: 0.4em; height: 12px; }

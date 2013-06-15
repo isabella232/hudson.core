@@ -24,6 +24,7 @@ var images = [
 ];
 
 var pageInitialized = false;
+var selectedTeam;
 
 jQuery(document).ready(function() {
 
@@ -34,7 +35,6 @@ jQuery(document).ready(function() {
     pageInitialized = true;
 
     jQuery("#teamManagerTabs").tabs();
-    jQuery(".teamAdminTabs").tabs();
 
     jQuery("#outerTabs tr").not(".header").hover(
             function() {
@@ -45,43 +45,22 @@ jQuery(document).ready(function() {
             }
     );
 
+    jQuery("#selectableTeamList").selectable({
+        selected: function(event, ui) {
+            selectedTeam = jQuery(ui.selected);
+            jQuery("#teamInfo").load('teams/' + jQuery(selectedTeam).text(), function() {
+                onTeamDetailsLoad();
+            });
+        }
+    });
+
+    // select the first team, so that its details can be loaded
+    selectSelectableElement(jQuery("#selectableTeamList"), jQuery("#selectableTeamList").children(":eq(0)"));
+
     var createTeamButton = jQuery('#createTeamButton');
     createTeamButton.button();
     createTeamButton.unbind("click").click(function() {
         createTeamButtonAction();
-    });
-
-    jQuery('#teamContainer button.teamDeleteButton').each(function() {
-        jQuery(this).button();
-        jQuery(this).addClass('redButton');
-        jQuery(this).unbind("click").click(function() {
-            deleteTeamButtonAction(this);
-        });
-    });
-
-    jQuery('#teamContainer button.teamMemberAddButton').each(function() {
-        jQuery(this).button();
-        jQuery(this).unbind("click").click(function() {
-            teamMemberAddButtonAction(jQuery(this).val());
-        });
-    });
-
-    jQuery('#teamContainer img.teamMemberUpdate').each(function() {
-        jQuery(this).unbind("click").click(function() {
-            updateTeamMemberAction(this);
-        });
-    });
-
-    jQuery('#teamContainer img.teamMemberRemove').each(function() {
-        jQuery(this).unbind("click").click(function() {
-            removeTeamMemberAction(this);
-        });
-    });
-
-    jQuery('#teamContainer img.configureJobVisibility').each(function() {
-        jQuery(this).unbind("click").click(function() {
-            configureJobVisibilityAction(this);
-        });
     });
 
     var moveJobsButton = jQuery('#moveJobsButton');
@@ -89,12 +68,59 @@ jQuery(document).ready(function() {
     moveJobsButton.unbind("click").click(function() {
         moveJobsButtonAction();
     });
+});
 
-    jQuery('.teamList tr').each(function() {
-        verifySid(this);
+function onTeamDetailsLoad() {
+
+    jQuery("#teamAdminTabs").tabs();
+
+    jQuery('#teamInfo button.teamDeleteButton').each(function() {
+        jQuery(this).button();
+        jQuery(this).addClass('redButton');
+        jQuery(this).unbind("click").click(function() {
+            deleteTeamButtonAction(this);
+        });
     });
 
-});
+    jQuery('#teamInfo button.teamMemberAddButton').each(function() {
+        jQuery(this).button();
+        jQuery(this).unbind("click").click(function() {
+            teamMemberAddButtonAction(jQuery(this).val());
+        });
+    });
+
+    jQuery('#teamInfo img.teamMemberUpdate').each(function() {
+        jQuery(this).unbind("click").click(function() {
+            updateTeamMemberAction(this);
+        });
+    });
+
+    jQuery('#teamInfo img.teamMemberRemove').each(function() {
+        jQuery(this).unbind("click").click(function() {
+            removeTeamMemberAction(this);
+        });
+    });
+
+    jQuery('#teamInfo img.configureJobVisibility').each(function() {
+        jQuery(this).unbind("click").click(function() {
+            configureJobVisibilityAction(this);
+        });
+    });
+
+    jQuery('#teamMemberTab tr').each(function() {
+        verifySid(this);
+    });
+}
+
+function selectSelectableElement(selectableContainer, elementToSelect) {
+    jQuery("li", selectableContainer).each(function() {
+        if (this != elementToSelect[0]) {
+            jQuery(this).removeClass("ui-selected").addClass("ui-unselecting");
+        }
+    });
+    elementToSelect.addClass("ui-selecting");
+    selectableContainer.data("selectable")._mouseStop(null);
+}
 
 function  createTeamButtonAction() {
     jQuery('#dialog-create-team').dialog({
@@ -124,25 +150,16 @@ function createTeam(teamName, teamDesc) {
             description: teamDesc
         },
         success: function(result) {
-            jQuery("#noTeamsMsg").remove();
-            var resultItem = jQuery(result);
-            jQuery(resultItem).appendTo(jQuery('ul.team'));
-            var teamAdminAddButton = jQuery('.teamAdminAddButton', jQuery(resultItem));
-            teamAdminAddButton.button();
-            teamAdminAddButton.unbind("click").click(function() {
-                teamAdminAddButtonAction(jQuery(this).val());
-            });
-            var teamMemberAddButton = jQuery('.teamMemberAddButton', jQuery(resultItem));
-            teamMemberAddButton.button();
-            teamMemberAddButton.unbind("click").click(function() {
-                teamMemberAddButtonAction(jQuery(this).val())
-            });
-            var teamDeleteButton = jQuery('.teamDeleteButton', jQuery(resultItem));
-            teamDeleteButton.button();
-            teamDeleteButton.unbind("click").click(function() {
-                deleteTeamButtonAction(this);
-            });
+            jQuery("#noTeamsMsg").hide();
+            jQuery("#teamInfo").show();
+            jQuery("#teamList").show();
+            var teamItem = jQuery('<li class="ui-widget-content" title="' + teamName + '">' + teamName + '</li>');
+            jQuery(teamItem).appendTo(jQuery('#selectableTeamList'));
             jQuery('#dialog-create-team').dialog("close");
+            jQuery("#teamInfo").load('teams/' + teamName, function() {
+                onTeamDetailsLoad();
+            });
+            selectSelectableElement(jQuery("#selectableTeamList"), jQuery("#selectableTeamList li:last-child"));
         },
         error: function(msg) {
             showMessage(msg.responseText, true, jQuery('#teamAddMsg'));
@@ -171,7 +188,6 @@ function  deleteTeamButtonAction(deleteButton) {
 
 function deleteTeam(deleteButton) {
     var teamName = jQuery(deleteButton).val();
-    var parent = jQuery(deleteButton).parent();
     jQuery.ajax({
         type: 'POST',
         url: "deleteTeam",
@@ -179,7 +195,19 @@ function deleteTeam(deleteButton) {
             teamName: teamName,
         },
         success: function(result) {
-            jQuery(parent).remove();
+            var nextSelectable = jQuery(selectedTeam).next();
+            if (nextSelectable.length == 0) {
+                nextSelectable = jQuery(selectedTeam).prev();
+            }
+            jQuery(selectedTeam).remove();
+            if (nextSelectable.length > 0) {
+                //selectSelectableElement(jQuery("#selectableTeamList"), jQuery("#selectableTeamList li:first-child"));
+                selectSelectableElement(jQuery("#selectableTeamList"), jQuery(nextSelectable));
+            } else {
+                jQuery("#noTeamsMsg").show();
+                jQuery("#teamInfo").hide();
+                jQuery("#teamList").hide();
+            }
             jQuery('#dialog-delete-team').dialog("close");
         },
         error: function(msg) {
@@ -466,7 +494,7 @@ function configureJobVisibilityAction(configureJobItem) {
                     jQuery(input).prop('checked', (teamNames.indexOf(key) >= 0));
                 }
                 jQuery(item).appendTo(jQuery('#configure-visibility-team-list'));
-            } 
+            }
         });
     });
 }

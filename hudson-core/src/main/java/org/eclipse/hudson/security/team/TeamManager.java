@@ -33,7 +33,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
@@ -128,8 +130,21 @@ public final class TeamManager implements Saveable {
         return isSysAdmin;
     }
 
-    public List<Team> getTeams() {
-        return Collections.unmodifiableList(teams);
+    //Used by TeamManager Jelly to display team details in master-details fashion
+    public Map<String, Team> getTeams() {
+        Map<String, Team> teamMap = new HashMap<String, Team>();
+        for (Team team : teams) {
+            teamMap.put(team.getName(), team);
+        }
+        return teamMap;
+    }
+    
+    public List<String> getTeamNames() {
+        List<String> teamList = new ArrayList<String>();
+        for (Team team : teams) {
+            teamList.add(team.getName());
+        }
+        return teamList;
     }
 
     public Team createTeam(String teamName, String description) throws IOException, TeamAlreadyExistsException {

@@ -29,21 +29,32 @@
             </ul> 
             <div id="teamTab">
                 <div id="teamContainer">
-                    <div id="noTeamsMsg">
-                        <j:if test="${it.teams.size() == 1}">
-                            <h2>
-                                <img src="${imagesURL}/48x48/warning.png"/>
-                                This Hudson does not have any teams!!
-                            </h2>
-                        </j:if>
+                    <j:set var="noTeamMsgVisibility" value='${(it.teams.size() > 1) ? "none" : "visible"}'/>
+                    <div id="noTeamsMsg" style='display:${noTeamMsgVisibility}'>
+                        <h2>
+                            <img src="${imagesURL}/48x48/warning.png"/>
+                            This Hudson does not have any teams!!
+                        </h2>
+                         
                     </div>
-                    <ul class="team">
-                        <j:forEach var="team" items="${it.teams}">
-                            <j:if test='${!team.name.equals("public")}'>
-                                <st:include it="${team}" page="team.jelly"/>
-                            </j:if>
-                        </j:forEach>
-                    </ul> 
+                    
+                    <j:set var="teamInfoVisibility" value='${(it.teams.size() == 1) ? "none" : "visible"}'/>
+                    <div style='display:${teamInfoVisibility}' id="teamList">
+                        <div id="teamListScroll">
+                            <ol id="selectableTeamList">    
+                                <j:forEach var="teamName" items="${it.teamNames}">
+                                    <j:if test='${!teamName.equals("public")}'>
+                                        <li class="ui-widget-content" title="${teamName}">${teamName}</li> 
+                                    </j:if>
+                                </j:forEach>
+                            </ol>
+                        </div>
+                    </div>
+                        
+                    <div style='display:${teamInfoVisibility}' id="teamInfo">
+                        <!-- Team Info is displayed here dynamically -->
+                    </div>
+                         
                     <br style="clear:both"/>
                 </div> 
                 <div>
