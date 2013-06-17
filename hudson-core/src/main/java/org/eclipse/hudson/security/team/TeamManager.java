@@ -182,8 +182,8 @@ public final class TeamManager implements Saveable {
             return new TeamUtils.ErrorHttpResponse("Team name required.");
         }
         try {
-            Team team = createTeam(teamName, description);
-            return HttpResponses.forwardToView(team, "team.jelly");
+            createTeam(teamName, description);
+            return HttpResponses.ok();
         } catch (TeamAlreadyExistsException ex) {
             return new TeamUtils.ErrorHttpResponse(ex.getLocalizedMessage());
         }
