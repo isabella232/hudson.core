@@ -166,6 +166,11 @@ public class MatrixConfiguration extends Project<MatrixConfiguration, MatrixRun>
     public boolean isConfigurable() {
         return false;
     }
+    
+    @Override
+     public boolean isConcurrentBuild() {
+         return getParent().isConcurrentBuild();
+    } 
 
     @Override
     protected Class<MatrixRun> getBuildClass() {

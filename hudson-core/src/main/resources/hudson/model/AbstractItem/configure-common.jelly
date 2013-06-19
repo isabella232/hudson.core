@@ -26,12 +26,10 @@
     <j:set var="concurrentBuildProperty" value="${cu.getBooleanProperty(it, it.CONCURRENT_BUILD_PROPERTY_NAME)}"/>
     <j:set var="concurrentBuild" value="${concurrentBuildProperty.getValue()}"/>
 
-    <j:if test="${app.CONCURRENT_BUILD}">
-        <f:optionalBlock field="concurrentBuild" title="${%title.concurrentbuilds}"
-        		   checked="${concurrentBuild}"
-                   resetUrl="${jobUrl}/resetProjectProperty?propertyName=${it.CONCURRENT_BUILD_PROPERTY_NAME}"
-                   isPropertyOverridden="${concurrentBuildProperty.isOverridden()}"/>
-    </j:if>
+    <f:optionalBlock field="concurrentBuild" title="${%title.concurrentbuilds}"
+                         checked="${concurrentBuild}"
+                         resetUrl="${jobUrl}/resetProjectProperty?propertyName=${it.CONCURRENT_BUILD_PROPERTY_NAME}"
+                         isPropertyOverridden="${concurrentBuildProperty.isOverridden()}"/>
     <j:set var="jdks" value="${app.JDKs}"/>
     <j:if test="${jdks.size() gt 1}">
         <!-- if there's only one JDK configured, always use that. -->

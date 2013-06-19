@@ -9,7 +9,7 @@
 #
 # Contributors: 
 #
-#    Kohsuke Kawaguchi, Stephen Connolly, Nikita Levyankov, Anton Kozak
+#    Kohsuke Kawaguchi, Winston Prakash, Stephen Connolly, Nikita Levyankov, Anton Kozak
 #        
 #
 #************************************************************************** --> 
@@ -22,6 +22,10 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
 
   <p:config-disableBuild/>
+  <f:optionalBlock field="concurrentBuild" title="${%Execute concurrent builds if necessary}"
+                   checked="${concurrentBuild}"
+                   resetUrl="${jobUrl}/resetProjectProperty?propertyName=${it.CONCURRENT_BUILD_PROPERTY_NAME}"
+                   isPropertyOverridden="${concurrentBuildProperty.isOverridden()}"/>
   <j:set var="jobUrl" value="${h.getNearestAncestorUrl(request,it)}"/>
 
   <f:section title="${%Advanced Job Options}">
