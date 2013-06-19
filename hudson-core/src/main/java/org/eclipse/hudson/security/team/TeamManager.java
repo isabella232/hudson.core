@@ -618,7 +618,7 @@ public final class TeamManager implements Saveable {
     }
     
     public String getJobsFolderName(String teamName, String jobId) {
-        if ((teamName != null) && !"".equals(teamName)){
+        if ((teamName != null) && !"".equals(teamName) && !Team.PUBLIC_TEAM_NAME.equals(teamName)){
             return TEAMS_FOLDER_NAME + "/" + teamName + "/" + Team.JOBS_FOLDER_NAME;
         }else{
             return getJobsFolderName(jobId);
