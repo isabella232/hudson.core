@@ -53,7 +53,10 @@ public abstract class Lifecycle implements ExtensionPoint {
         if (INSTANCE == null) {
             Lifecycle instance;
             String p = System.getProperty("hudson.lifecycle");
-            if (p != null) {
+            // Do this first for better error reporting
+            if (RestartCommandLifecycle.isConfigured())
+                instance = new RestartCommandLifecycle();
+            else if (p != null) {
                 try {
                     ClassLoader cl = Hudson.getInstance().getPluginManager().uberClassLoader;
                     instance = (Lifecycle) cl.loadClass(p).newInstance();

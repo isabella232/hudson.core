@@ -18,6 +18,8 @@ package org.eclipse.hudson.plugins;
 
 import hudson.ProxyConfiguration;
 import hudson.Util;
+import hudson.lifecycle.Lifecycle;
+import hudson.lifecycle.RestartNotSupportedException;
 import hudson.markup.MarkupFormatter;
 import hudson.model.Hudson;
 import hudson.security.Permission;
@@ -30,6 +32,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
@@ -281,6 +284,20 @@ final public class PluginCenter {
         return new ErrorHttpResponse("Failed to upload plugin");
     }
 
+    public void doRestart(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+        Lifecycle lifecycle = Lifecycle.get();
+        if (lifecycle.canRestart()) {
+            logger.info("Restarting Hudson...");
+            try {
+                Hudson.getInstance().safeRestart();
+            } catch (RestartNotSupportedException ex) {
+                logger.error("Restart not supported", ex); 
+            }
+        } else {
+            logger.warn("Lifecycle.canRestart returned false");
+        }
+        rsp.forwardToPreviousPage(req);
+    }
     public HttpResponse doSearchPlugins(@QueryParameter String searchStr, @QueryParameter boolean searchDescription) {
         PluginSearchList pluginSearchList = new PluginSearchList(this, searchStr, searchDescription);
         return HttpResponses.forwardToView(pluginSearchList, "index.jelly");
