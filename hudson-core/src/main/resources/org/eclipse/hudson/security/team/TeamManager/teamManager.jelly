@@ -103,7 +103,7 @@
                 </div> 
                 <div>
                     <input type="button" id="moveJobsButton" value="Move Jobs" />
-                    <span id="createTeamMsg">
+                    <span id="moveJobMsg">
                         <!-- message goes here -->
                     </span>
                 </div>
