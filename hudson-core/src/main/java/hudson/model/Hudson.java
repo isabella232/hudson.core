@@ -298,6 +298,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     private static Hudson theInstance;
     private transient volatile boolean isQuietingDown;
     private transient volatile boolean terminating;
+    private transient volatile boolean isSafeRestarting;
     private List<JDK> jdks = new ArrayList<JDK>();
     private transient volatile DependencyGraph dependencyGraph;
     /**
@@ -3178,6 +3179,16 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             }
         }.start();
     }
+    
+    /**
+     * Allow lifecycle to determine if it was invoked safely.
+     * @return true if safeRestart is in progress
+     * 
+     * @since 3.1.0
+     */
+    public boolean isSafeRestarting() {
+        return isSafeRestarting;
+    }
 
     /**
      * Queues up a restart to be performed once there are no builds currently
@@ -3190,6 +3201,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         lifecycle.verifyRestartable(); // verify that Hudson is restartable
         // Quiet down so that we won't launch new builds.
         isQuietingDown = true;
+        isSafeRestarting = true;
 
         new Thread("safe-restart thread") {
             final String exitUser = getAuthentication().getName();
@@ -3220,6 +3232,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                     logger.warn("Failed to restart Hudson", e);
                 } catch (IOException e) {
                     logger.warn("Failed to restart Hudson", e);
+                } finally {
+                    Hudson.this.isSafeRestarting = false;
                 }
             }
         }.start();

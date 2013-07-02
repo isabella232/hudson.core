@@ -32,10 +32,12 @@ import hudson.util.VersionNumber;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.logging.Level;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -91,6 +93,10 @@ final public class InitialSetup {
     private File hudsonHomeDir;
     private boolean proxyNeeded = false;
     private List<PluginInstallationJob> installationsJobs = new CopyOnWriteArrayList<PluginInstallationJob>();
+    private static ClassLoader outerClassLoader;
+    private static ClassLoader initialClassLoader;
+    private static int highInitThreadNumber = 0;
+    private static InitialSetup INSTANCE;
 
     public InitialSetup(File homeDir, ServletContext context) throws MalformedURLException, IOException {
         hudsonHomeDir = homeDir;
@@ -103,6 +109,12 @@ final public class InitialSetup {
         initSetupFile = new XmlFile(new File(homeDir, "initSetup.xml"));
         refreshUpdateCenterMetadataCache();
         check();
+        // This is only created once during startup, so is effectively a singleton
+        INSTANCE = this;
+    }
+    
+    public static InitialSetup getLastInitialSetup() {
+        return INSTANCE;
     }
 
     public boolean needsInitSetup() {
@@ -272,43 +284,46 @@ final public class InitialSetup {
 
         return HttpResponses.ok();
     }
+    
+   private class OuterClassLoader extends ClassLoader {
+        OuterClassLoader(ClassLoader parent) {
+            super(parent);
+        }
+    }
 
     public void invokeHudson() {
         final WebAppController controller = WebAppController.get();
-
+        
+        if (initialClassLoader == null) {
+            initialClassLoader = getClass().getClassLoader();
+        }
+        
+        Class hudsonIsLoadingClass;
+        try {
+            outerClassLoader = new OuterClassLoader(initialClassLoader);
+            
+            hudsonIsLoadingClass = outerClassLoader.loadClass("hudson.util.HudsonIsLoading");
+            HudsonIsLoading hudsonIsLoading = (HudsonIsLoading) hudsonIsLoadingClass.newInstance();
+            Class runnableClass = outerClassLoader.loadClass("org.eclipse.hudson.init.InitialRunnable");
+            Constructor ctor = runnableClass.getDeclaredConstructors()[0];
+            ctor.setAccessible(true);
+            InitialRunnable initialRunnable = (InitialRunnable) ctor.newInstance(controller, logger, hudsonHomeDir, servletContext);
+ 
+            controller.install(hudsonIsLoading);
+            Thread initThread = new Thread(initialRunnable, "hudson initialization thread "+(++highInitThreadNumber));
+            initThread.setContextClassLoader(outerClassLoader);
+            initThread.start();
+            
+        } catch (Exception ex) {
+            logger.error("Hudson failed to load!!!", ex);
+        }
+        
+        /** Above replaces these lines
         controller.install(new HudsonIsLoading());
 
         new Thread("hudson initialization thread") {
-            @Override
-            public void run() {
-                try {
-                    // Creating of the god object performs most of the booting muck
-                    Hudson hudson = new Hudson(hudsonHomeDir, servletContext);
-
-                    //Now Hudson is fully loaded, reload Hudson Security Manager
-                    HudsonSecurityEntitiesHolder.setHudsonSecurityManager(new HudsonSecurityManager(hudsonHomeDir));
-
-                    // once its done, hook up to stapler and things should be ready to go
-                    controller.install(hudson);
-
-                    // trigger the loading of changelogs in the background,
-                    // but give the system 10 seconds so that the first page
-                    // can be served quickly
-                    Trigger.timer.schedule(new SafeTimerTask() {
-                        public void doRun() {
-                            User.getUnknown().getBuilds();
-                        }
-                    }, 1000 * 10);
-                } catch (Error e) {
-                    logger.error("Failed to initialize Hudson", e);
-                    controller.install(new HudsonFailedToLoad(e));
-                    throw e;
-                } catch (Exception e) {
-                    logger.error("Failed to initialize Hudson", e);
-                    controller.install(new HudsonFailedToLoad(e));
-                }
-            }
         }.start();
+        */
     }
 
     private static class ErrorHttpResponse implements HttpResponse {
