@@ -15,16 +15,18 @@
 
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout">
-        
-             
-    <div id="container">
-  
-        <div id="teamContainer">
-            <ul class="team">
-                <st:include it="${it.findCurrentUserTeam()}" page="team.jelly"/>
-            </ul> 
-            <br style="clear:both"/>
-        </div> 
+    
+    <script type="text/javascript">
+        var currentUserTeam = '${it.findCurrentUserTeam().name}';
+    </script>
+    <div id="container">        
+        <div id="teamManagerTabs">
+            <div id="teamInfo">
+                <!--
+                <st:include it="${it.findCurrentUserTeam()}" page="index.jelly"/>
+                -->
+            </div> 
+        </div>
     </div>
     
     <st:include page="teamTemplates.jelly"/>   

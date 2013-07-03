@@ -35,6 +35,7 @@ jQuery(document).ready(function() {
     pageInitialized = true;
 
     jQuery("#teamManagerTabs").tabs();
+    jQuery("#teamAdminTabs").tabs();
 
     jQuery("#outerTabs tr").not(".header").hover(
             function() {
@@ -45,17 +46,19 @@ jQuery(document).ready(function() {
             }
     );
 
-    jQuery("#selectableTeamList").selectable({
-        selected: function(event, ui) {
-            selectedTeam = jQuery(ui.selected);
-            jQuery("#teamInfo").load('teams/' + jQuery(selectedTeam).text(), function() {
-                onTeamDetailsLoad();
-            });
-        }
-    });
+    if (jQuery("#selectableTeamList").length > 0) {
+        jQuery("#selectableTeamList").selectable({
+            selected: function(event, ui) {
+                selectedTeam = jQuery(ui.selected);
+                jQuery("#teamInfo").load('teams/' + jQuery(selectedTeam).text(), function() {
+                    onTeamDetailsLoad();
+                });
+            }
+        });
 
-    // select the first team, so that its details can be loaded
-    selectSelectableElement(jQuery("#selectableTeamList"), jQuery("#selectableTeamList").children(":eq(0)"));
+        // select the first team, so that its details can be loaded
+        selectSelectableElement(jQuery("#selectableTeamList"), jQuery("#selectableTeamList").children(":eq(0)"));
+    }
 
     var createTeamButton = jQuery('#createTeamButton');
     createTeamButton.button();
@@ -68,6 +71,12 @@ jQuery(document).ready(function() {
     moveJobsButton.unbind("click").click(function() {
         moveJobsButtonAction();
     });
+
+    if (currentUserTeam != '') {
+        jQuery("#teamInfo").load('teams/' + currentUserTeam, function() {
+            onTeamDetailsLoad();
+        });
+    }
 });
 
 function onTeamDetailsLoad() {
