@@ -22,9 +22,7 @@
     <div id="container">        
         <div id="teamManagerTabs">
             <div id="teamInfo">
-                <!--
-                <st:include it="${it.findCurrentUserTeam()}" page="index.jelly"/>
-                -->
+                <!-- Team Info is displayed here dynamically -->
             </div> 
         </div>
     </div>

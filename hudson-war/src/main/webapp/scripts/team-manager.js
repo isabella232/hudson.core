@@ -72,7 +72,7 @@ jQuery(document).ready(function() {
         moveJobsButtonAction();
     });
 
-    if (currentUserTeam != '') {
+    if (typeof currentUserTeam !== 'undefined') {
         jQuery("#teamInfo").load('teams/' + currentUserTeam, function() {
             onTeamDetailsLoad();
         });
@@ -141,7 +141,11 @@ function  createTeamButtonAction() {
             'Create': function() {
                 var teamName = jQuery("#teamName").val();
                 var teamDesc = jQuery("#teamDesc").val();
-                createTeam(jQuery.trim(teamName), jQuery.trim(teamDesc));
+                if (!/^[a-zA-Z0-9]+$/.test(teamName)) {
+                   showMessage("Only Alpha-Numeric charactesrs allowed in team name.", true, jQuery('#teamAddMsg'));
+                } else {
+                    createTeam(jQuery.trim(teamName), jQuery.trim(teamDesc));
+                }
             },
             Cancel: function() {
                 jQuery(this).dialog("close");
