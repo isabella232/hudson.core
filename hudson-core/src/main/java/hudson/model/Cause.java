@@ -197,6 +197,12 @@ public abstract class Cause {
             User u = User.get(authenticationName, false);
             return u != null ? u.getDisplayName() : authenticationName;
         }
+        
+        @Exported(visibility = 3)
+        public String getUserId() {
+            User u = User.get(authenticationName, false);
+            return u != null ? u.getId() : authenticationName;
+        }
 
         @Override
         public String getShortDescription() {
