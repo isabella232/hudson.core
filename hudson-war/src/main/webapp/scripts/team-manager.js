@@ -521,6 +521,7 @@ var moveCount;
 var jobsToMove;
 function moveJobsButtonAction() {
     jQuery("#selectedJobs").empty();
+    jQuery('#moveJobMsg').hide();
     jobsToMove = getJobsToMove();
     moveCount = jobsToMove.length;
     for (var i = 0; i < jobsToMove.length; i++) {
@@ -531,7 +532,7 @@ function moveJobsButtonAction() {
 
     jQuery('#dialog-move-jobs').dialog({
         resizable: false,
-        height: 200 + moveCount * 20,
+        height: 200 + moveCount * 25,
         width: 400,
         modal: true,
         title: "Move Jobs to another Team",
@@ -541,9 +542,9 @@ function moveJobsButtonAction() {
                     var teamName = jQuery("#teamChoice option:selected").val();
                     for (var i = 0; i < jobsToMove.length; i++) {
                         var img = jQuery("#selectedJobs li[value='" + jobsToMove[i] + "']").children('img');
-                        jQuery(img).attr('src', imageRoot + '/progressbar.gif');
+                        jQuery(img).attr('src', imageRoot + '/spinner.gif');
                         jQuery(img).show();
-                        moveJobs(jobsToMove[i], teamName);
+                        moveJobs(jobsToMove[i], teamName, img);
                     }
                 }
             },
@@ -571,7 +572,7 @@ function getJobsToMove() {
     return jobs;
 }
 
-function moveJobs(jobId, teamName) {
+function moveJobs(jobId, teamName, img) {
     jQuery.ajax({
         type: 'POST',
         url: "moveJob",
@@ -580,7 +581,6 @@ function moveJobs(jobId, teamName) {
             teamName: teamName
         },
         success: function() {
-            var img = jQuery("#selectedJobs li[value='" + jobId + "']").children('img');
             jQuery(img).attr('src', imageRoot + '/green-check.jpg');
             jQuery("#job_colum3_span_" + jobId).text(teamName);
             moveCount--;
@@ -589,6 +589,11 @@ function moveJobs(jobId, teamName) {
             }
         },
         error: function(msg) {
+            var originalHeight = jQuery('#dialog-move-jobs').height();
+            jQuery('#dialog-move-jobs').css({
+                height: originalHeight + 50
+            });
+            jQuery(img).attr('src', imageRoot + '/16x16/error.png');
             showMessage(msg.responseText, true, jQuery('#moveJobMsg'));
         },
         dataType: "html"
