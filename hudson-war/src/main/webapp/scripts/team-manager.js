@@ -142,7 +142,7 @@ function  createTeamButtonAction() {
                 var teamName = jQuery("#teamName").val();
                 var teamDesc = jQuery("#teamDesc").val();
                 if (!/^[a-zA-Z0-9]+$/.test(teamName)) {
-                   showMessage("Only Alpha-Numeric charactesrs allowed in team name.", true, jQuery('#teamAddMsg'));
+                   showMessage("Only Alpha-Numeric characters allowed in team name.", true, jQuery('#teamAddMsg'));
                 } else {
                     createTeam(jQuery.trim(teamName), jQuery.trim(teamDesc));
                 }
