@@ -194,4 +194,21 @@ public abstract class Lifecycle implements ExtensionPoint {
             return false;
         }
     }
+    
+    /**
+     * Return true if <code>restart</code> can be called in a safe restart.
+     * Any lifecycle that is able to restart at all must be safe restartable,
+     * but safe restartable lifecycles are not necessarily unsafe restartable
+     * (without the shutdown sequence).
+     * <p>
+     * <code>isSafeRestartable</code> is appropriate for testing whether a
+     * restart button or link should be shown when a configuration
+     * option requires restart to take effect. The button must cause a
+     * safe restart.
+     * 
+     * @since 3.0.1
+     */
+    public boolean isSafeRestartable() {
+        return canRestart();
+    }
 }

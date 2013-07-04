@@ -290,8 +290,12 @@ final public class InitialSetup {
             super(parent);
         }
     }
+   
+   public void invokeHudson() {
+       invokeHudson(false);
+   }
 
-    public void invokeHudson() {
+    public void invokeHudson(boolean restart) {
         final WebAppController controller = WebAppController.get();
         
         if (initialClassLoader == null) {

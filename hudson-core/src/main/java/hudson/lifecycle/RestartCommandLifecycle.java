@@ -36,7 +36,8 @@ public class RestartCommandLifecycle extends Lifecycle {
     
     private static final Logger LOGGER = Logger.getLogger(RestartCommandLifecycle.class.getName());
     
-    private static final String HUDSON_RESTART = "hudson-restart";
+    private static final String HUDSON_RESTART_SCRIPT_NAME = "hudson-restart";
+    private static final String HUDSON_RESTART_COMMAND_KEY = "hudson.restart";
     
     private static String restartCommand = null;
     private static File restartScript = null;
@@ -54,21 +55,21 @@ public class RestartCommandLifecycle extends Lifecycle {
         public boolean accept(File pathname) {
             String name = pathname.getName();
             String extension = getExtension(name);
-            return HUDSON_RESTART.equals(name.substring(0, name.length()-extension.length()));
+            return HUDSON_RESTART_SCRIPT_NAME.equals(name.substring(0, name.length()-extension.length()));
         }
     }
     
     private static boolean checkReturn() {
         String hl = System.getProperty("hudson.lifecycle");
         if (hl != null) {
-            LOGGER.log(WARNING, "hudson.lifecycle specified, "+(restartCommand != null ? "restart.command" : "hudson-restart script")+" ignored");
+            LOGGER.log(WARNING, "hudson.lifecycle specified, "+(restartCommand != null ? HUDSON_RESTART_COMMAND_KEY : HUDSON_RESTART_SCRIPT_NAME+" script")+" ignored");
             return false;
         }
         return true;
     }
 
     public static boolean isConfigured() {
-        String p = System.getProperty("hudson.restart");
+        String p = System.getProperty(HUDSON_RESTART_COMMAND_KEY);
         if (p != null) {
             restartCommand = p;
             return checkReturn();
@@ -81,7 +82,7 @@ public class RestartCommandLifecycle extends Lifecycle {
             }
             restartScript = restartScripts[0];
             if (numScripts > 1) {
-                LOGGER.log(WARNING, "More than one hudson-restart script, using " + restartScript.getName());
+                LOGGER.log(WARNING, "More than one "+HUDSON_RESTART_SCRIPT_NAME+" script, using " + restartScript.getName());
             }
             return checkReturn();
         }
@@ -101,7 +102,6 @@ public class RestartCommandLifecycle extends Lifecycle {
         if (ret != 0) {
             throw new IOException("Restart command '"+restartCommand+"' failed with return code "+ret);
         }
-        System.exit(0);
     }
 
     /**

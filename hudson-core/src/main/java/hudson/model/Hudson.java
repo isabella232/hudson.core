@@ -296,7 +296,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     private static Hudson theInstance;
     private transient volatile boolean isQuietingDown;
     private transient volatile boolean terminating;
-    private transient volatile boolean isSafeRestarting;
+    private transient volatile boolean safeRestarting;
     private List<JDK> jdks = new ArrayList<JDK>();
     private transient volatile DependencyGraph dependencyGraph;
     /**
@@ -533,6 +533,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     private Boolean noUsageStatistics;
     /**
+     * Number of times Hudson has been started in this JVM.
+     */
+    private static int invocationCount = 0;
+    
+    /**
      * HTTP proxy configuration.
      */
     public transient volatile ProxyConfiguration proxy;
@@ -542,14 +547,18 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     private transient final LogRecorderManager log = new LogRecorderManager();
 
     public Hudson(File root, ServletContext context) throws IOException, InterruptedException, ReactorException {
-        this(root, context, null);
+        this(root, context, null, false);
+    }
+
+    public Hudson(File root, ServletContext context, PluginManager pluginManager) throws IOException, InterruptedException, ReactorException {
+        this(root, context, pluginManager, false);
     }
 
     /**
      * @param pluginManager If non-null, use existing plugin manager. create a
      * new one.
      */
-    public Hudson(File root, ServletContext context, PluginManager pluginManager) throws IOException, InterruptedException, ReactorException {
+    public Hudson(File root, ServletContext context, PluginManager pluginManager, boolean restart) throws IOException, InterruptedException, ReactorException {
         // As hudson is starting, grant this process full control
         HudsonSecurityManager.grantFullControl();
         try {
@@ -557,14 +566,22 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             this.servletContext = context;
             computeVersion(context);
             if (theInstance != null) {
-                throw new IllegalStateException("second instance");
+                if (!restart) {
+                    throw new IllegalStateException("second instance");
+                }
             }
             theInstance = this;
+            invocationCount++;
 
             // doing this early allows InitStrategy to set environment upfront
             final InitStrategy is = InitStrategy.get(Thread.currentThread().getContextClassLoader());
 
-            Trigger.timer = new Timer("Hudson cron thread");
+            // In case reinitializing for soft restart, cancel all events
+            if (Trigger.timer != null) {
+                Trigger.timer.cancel();
+                Trigger.timer.purge();
+            }
+            Trigger.timer = new Timer("Hudson cron thread "+invocationCount);
             queue = new Queue(CONSISTENT_HASH ? LoadBalancer.CONSISTENT_HASH : LoadBalancer.DEFAULT);
 
             try {
@@ -3189,7 +3206,18 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * @since 3.1.0
      */
     public boolean isSafeRestarting() {
-        return isSafeRestarting;
+        return safeRestarting;
+    }
+    
+    private void verifySafeRestartable(Lifecycle lifecycle) throws RestartNotSupportedException {
+        // In case the lifecycle requires safe restart
+        safeRestarting = true;
+        try {
+            lifecycle.verifyRestartable(); // verify that Hudson is restartable
+        } catch (RestartNotSupportedException e) {
+            safeRestarting = false;
+            throw e;
+        }
     }
 
     /**
@@ -3200,10 +3228,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     public void safeRestart() throws RestartNotSupportedException {
         final Lifecycle lifecycle = Lifecycle.get();
-        lifecycle.verifyRestartable(); // verify that Hudson is restartable
+        verifySafeRestartable(lifecycle);
         // Quiet down so that we won't launch new builds.
         isQuietingDown = true;
-        isSafeRestarting = true;
 
         new Thread("safe-restart thread") {
             final String exitUser = getAuthentication().getName();
@@ -3235,7 +3262,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                 } catch (IOException e) {
                     logger.warn("Failed to restart Hudson", e);
                 } finally {
-                    Hudson.this.isSafeRestarting = false;
+                    Hudson.this.safeRestarting = false;
                 }
             }
         }.start();

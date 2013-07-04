@@ -286,15 +286,11 @@ final public class PluginCenter {
 
     public void doRestart(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         Lifecycle lifecycle = Lifecycle.get();
-        if (lifecycle.canRestart()) {
-            logger.info("Restarting Hudson...");
-            try {
-                Hudson.getInstance().safeRestart();
-            } catch (RestartNotSupportedException ex) {
-                logger.error("Restart not supported", ex); 
-            }
-        } else {
-            logger.warn("Lifecycle.canRestart returned false");
+        logger.info("Safely restarting Hudson...");
+        try {
+            Hudson.getInstance().safeRestart();
+        } catch (RestartNotSupportedException ex) {
+            logger.error("Restart not supported", ex); 
         }
         rsp.forwardToPreviousPage(req);
     }

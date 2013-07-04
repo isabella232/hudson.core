@@ -42,24 +42,22 @@
                 <div id="outerTabs">
                     <div id="restart-message">
                         <span>
-                            Hudson must be restarted for the plugin changes to take effect.=
-                            <f:form method="post" action="restart" name="restart">
-                             <f:block>
-                               <f:submit value="Restart" />
-                             </f:block>
-                           </f:form>
-                           <br/>
-                            <br/>
+                            Hudson must be restarted for the plugin changes to take effect.<br/>
                             <j:invokeStatic var="lifecycle"
                               className="hudson.lifecycle.Lifecycle"
                               method="get" />
-                            <j:if test="${lifecycle.canRestart}">
+                            <j:choose>
+                              <j:when test="${lifecycle.safeRestartable}">
                                 <f:form method="post" action="restart" name="restart">
-                                 <f:block>
                                    <f:submit value="Restart" />
-                                 </f:block>
                                 </f:form>
-                            </j:if>
+                              </j:when>
+                              <j:otherwise>
+                                <span>
+                                    Manual restart required (lifecycle is not restartable).
+                                </span>
+                              </j:otherwise>
+                            </j:choose>
                         </span>                              
                     </div>
                     <ul>
