@@ -311,7 +311,7 @@ final public class InitialSetup {
             Class runnableClass = outerClassLoader.loadClass("org.eclipse.hudson.init.InitialRunnable");
             Constructor ctor = runnableClass.getDeclaredConstructors()[0];
             ctor.setAccessible(true);
-            InitialRunnable initialRunnable = (InitialRunnable) ctor.newInstance(controller, logger, hudsonHomeDir, servletContext);
+            InitialRunnable initialRunnable = (InitialRunnable) ctor.newInstance(controller, logger, hudsonHomeDir, servletContext, restart);
  
             controller.install(hudsonIsLoading);
             Thread initThread = new Thread(initialRunnable, "hudson initialization thread "+(++highInitThreadNumber));
