@@ -49,6 +49,7 @@ jQuery(document).ready(function() {
     if (jQuery("#selectableTeamList").length > 0) {
         jQuery("#selectableTeamList").selectable({
             selected: function(event, ui) {
+                jQuery(ui.selected).siblings().removeClass("ui-selected");
                 selectedTeam = jQuery(ui.selected);
                 jQuery("#teamInfo").load('teams/' + jQuery(selectedTeam).text(), function() {
                     onTeamDetailsLoad();
