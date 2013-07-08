@@ -35,18 +35,20 @@ public class InitialRunnable  implements Runnable {
         Logger logger;
         private File hudsonHomeDir;
         private ServletContext servletContext;
-        public InitialRunnable(WebAppController controller, Logger logger, File hudsonHomeDir, ServletContext servletContext) {
+        private boolean restart;
+        public InitialRunnable(WebAppController controller, Logger logger, File hudsonHomeDir, ServletContext servletContext, boolean restart) {
             this.controller = controller;
             this.logger = logger;
             this.hudsonHomeDir = hudsonHomeDir;
             this.servletContext = servletContext;
+            this.restart = restart;
         }
         
         @Override
         public void run() {
             try {
                 // Creating of the god object performs most of the booting muck
-                Hudson hudson = new Hudson(hudsonHomeDir, servletContext);
+                Hudson hudson = new Hudson(hudsonHomeDir, servletContext, null, restart);
 
                 //Now Hudson is fully loaded, reload Hudson Security Manager
                 HudsonSecurityEntitiesHolder.setHudsonSecurityManager(new HudsonSecurityManager(hudsonHomeDir));
