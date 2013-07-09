@@ -799,6 +799,15 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public PluginCenter getPluginCenter() {
         return pluginCenter;
     }
+    
+    /**
+     * TeamManagement is returned only if the Team based authorization is set.
+     * @return TeamManager
+     * @since 3.1.0
+     */
+    public boolean isTeamManagementEnabled() {
+        return getTeamManager() != null;
+    }
 
     /**
      * TeamManager is returned only if the Team based authorization is set.
@@ -3414,6 +3423,12 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         }
 
         try {
+            if (isTeamManagementEnabled()){
+                if (value.indexOf('.') != -1) {
+                    return FormValidation.error("The job name cannot contain '.' when team management is enabled. ");
+                }
+                value = getTeamManager().getTeamQualifiedJobName(value);
+            }
             checkJobName(value);
             return FormValidation.ok();
         } catch (Failure e) {

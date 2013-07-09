@@ -32,12 +32,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
@@ -571,10 +569,6 @@ public final class TeamManager implements Saveable {
      * @return String, Qualified Job ID
      */
     public String getTeamQualifiedJobName(String jobName) {
-        if (publicTeam.isJobOwner(jobName)) {
-            return jobName;
-        }
-
         Team team = findCurrentUserTeam();
         if ((team != null) && !Team.PUBLIC_TEAM_NAME.equals(team.getName())) {
             jobName = team.getName() + "." + jobName;

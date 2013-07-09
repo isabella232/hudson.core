@@ -49,9 +49,6 @@ public class UpdateJobCommand extends CLICommand {
     protected int run() throws Exception {
         Hudson h = Hudson.getInstance();
         TeamManager teamManager = Hudson.getInstance().getTeamManager();
-        if (teamManager != null){
-            name = teamManager.getTeamQualifiedJobName(name);
-        }
         TopLevelItem item = h.getItem(name);
 
         if (item == null && !create) {

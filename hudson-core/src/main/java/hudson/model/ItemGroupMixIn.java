@@ -127,10 +127,18 @@ public abstract class ItemGroupMixIn {
         }
 
         { // check if the name looks good
+            Hudson hudson = Hudson.getInstance();
             Hudson.checkGoodName(name);
             name = name.trim();
-            if (parent.getItem(name) != null) {
-                throw new Failure(Messages.Hudson_JobAlreadyExists(name));
+            if (hudson.isTeamManagementEnabled() && (name.indexOf('.') != -1)) {
+                throw new Failure("The job name cannot contain '.' when team management is enabled. ");
+            }
+            String existingJobName = name;
+            if (hudson.isTeamManagementEnabled()){
+                existingJobName = hudson.getTeamManager().getTeamQualifiedJobName(name);
+            }
+            if (parent.getItem(existingJobName) != null) {
+                throw new Failure(Messages.Hudson_JobAlreadyExists(existingJobName));
             }
         }
 
@@ -238,8 +246,13 @@ public abstract class ItemGroupMixIn {
             throws IOException {
         acl.checkPermission(Job.CREATE);
 
-        if (parent.getItem(name) != null) {
-            throw new IllegalArgumentException("Project of the name " + name + " already exists");
+        Hudson hudson = Hudson.getInstance();
+        String existingJobName = name;
+        if (hudson.isTeamManagementEnabled()) {
+            existingJobName = hudson.getTeamManager().getTeamQualifiedJobName(name);
+        }
+        if (parent.getItem(existingJobName) != null) {
+            throw new IllegalArgumentException("Job with name " + name + " already exists");
         }
 
         TopLevelItem item;
