@@ -85,20 +85,6 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     public void onCreatedFromScratch() {
         // noop
     }
-
-    @Override
-    public String getId() {
-        if (id != null){
-            return id;
-        } else {
-            return name;
-        }
-    }
-    
-    @Override
-    public void setId(String id) {
-        this.id = id;
-    }
     
     @Override
     public String getTeamId() {
@@ -158,6 +144,9 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
      * would involve copying files and etc.
      */
     protected void doSetName(String name) {
+        if ((Hudson.getInstance() != null) && (Hudson.getInstance().getTeamManager() != null)) {
+           name = Hudson.getInstance().getTeamManager().getTeamQualifiedJobName(name);
+        }
         this.name = name;
     }
 
@@ -303,11 +292,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     }
 
     public String getShortUrl() {
-        if (Hudson.getInstance().getTeamManager() != null) {
-            return getParent().getUrlChildPrefix() + '/' + Util.rawEncode(getId()) + '/';
-        } else {
-            return getParent().getUrlChildPrefix() + '/' + Util.rawEncode(getName()) + '/';
-        }
+        return getParent().getUrlChildPrefix() + '/' + Util.rawEncode(getName()) + '/';
     }
 
     public String getSearchUrl() {

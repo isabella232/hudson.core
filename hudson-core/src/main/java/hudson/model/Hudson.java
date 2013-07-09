@@ -485,22 +485,15 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     private transient final ItemGroupMixIn itemGroupMixIn = new ItemGroupMixIn(this, this) {
         @Override
         protected void add(TopLevelItem item) {
-            String itemId = item.getName();
             if (getTeamManager() != null) {
-               itemId = getTeamManager().getTeamQualifiedJobId(itemId);
                item.setTeamId(getTeamManager().getCurrentUserTeamName());
             }
-            item.setId(itemId);
-            items.put(itemId, item);
+            items.put( item.getName(), item);
         }
 
         @Override
         protected File getRootDirFor(String name) {
-            String jobId = null;
-            if (getTeamManager() != null) {
-                jobId = getTeamManager().getTeamQualifiedJobId(name);
-            }
-            return Hudson.this.getRootDirFor(jobId, name);
+            return Hudson.this.getRootDirFor(name);
         }
 
         /**
@@ -842,11 +835,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Do not use this API, for internal purpose only
      * @since 3.1.0
      */
-    public void replaceItemId(String oldTemId, String newItemId){
-        if (items.containsKey(oldTemId)){
-            TopLevelItem item = items.get(oldTemId);
-            items.remove(oldTemId);
-            items.put(newItemId, item);
+    public void replaceItemId(String oldItemName, String newItemName){
+        if (items.containsKey(oldItemName)){
+            TopLevelItem item = items.get(oldItemName);
+            items.remove(oldItemName);
+            items.put(newItemName, item);
         }
     }
 
@@ -1887,11 +1880,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     public String getUrlChildPrefix() {
-        if (getTeamManager() == null) {
-            return "job";
-        } else {
-            return "jobById";
-        }
+        return "job";
     }
 
     /**
@@ -2147,10 +2136,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public TopLevelItem getJob(String name) {
         return getItem(name);
     }
-    
-    public TopLevelItem getJobById(String id) {
-        return getItemById(id);
-    }
 
     /**
      * @deprecated Used only for mapping jobs to URL in a case-insensitive
@@ -2174,9 +2159,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     @Override
     public TopLevelItem getItem(String name) {
-        if (getTeamManager() != null){
-               name = getTeamManager().getTeamQualifiedJobId(name);
-        }
         TopLevelItem item = items.get(name);
         if (item == null || !item.hasPermission(Item.READ)) {
             return null;
@@ -2184,34 +2166,19 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         return item;
     }
     
-    /**
-     * Get the item based on id
-     * @param item id
-     * @return item, null if does not exist or no read permission
-     * @since 3.1.0
-     */
-    public TopLevelItem getItemById(String id) {
-       for (TopLevelItem item: getItems()){
-           if (item.getId().equals(id)){
-               return item;
-           }
-       }
-       return null;
-    }
-
     @Override
     public File getRootDirFor(TopLevelItem child) {
         if (getTeamManager() != null) {
-            String jobsFolderName = getTeamManager().getJobsFolderName(child.getTeamId(), child.getId());
+            String jobsFolderName = getTeamManager().getJobsFolderName(child.getTeamId(), child.getName());
             return new File(new File(getRootDir(), jobsFolderName), child.getName());
         }
-        return getRootDirFor(child.getId(), child.getName());
+        return getRootDirFor(child.getName());
     }
 
-    private File getRootDirFor(String jobId, String jobName) {
+    private File getRootDirFor(String jobName) {
         String jobsFolderName = "jobs";
         if (getTeamManager() != null) {
-            jobsFolderName = getTeamManager().getJobsFolderName(jobId);
+            jobsFolderName = getTeamManager().getJobsFolderName(jobName);
         }
         return new File(new File(getRootDir(), jobsFolderName), jobName);
     }
@@ -2292,9 +2259,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     public synchronized void putItem(TopLevelItem item) throws IOException, InterruptedException {
 
-        String itemId = item.getId();
-
-        TopLevelItem old = items.get(itemId);
+        TopLevelItem old = items.get(item.getName());
         if (old == item) {
             return; // noop
         }
@@ -2302,7 +2267,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         if (old != null) {
             old.delete();
         }
-        items.put(itemId, item);
+        items.put(item.getName(), item);
         ItemListener.fireOnCreated(item);
     }
 
@@ -2324,15 +2289,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * assumed to be synchronized on Hudson by the caller.
      */
     public void onRenamed(TopLevelItem job, String oldName, String newName) throws IOException {
-        String oldItemId = oldName;
-        String newItemId = newName;
-        if (getTeamManager() != null) {
-            oldItemId = getTeamManager().getTeamQualifiedJobId(job.getTeamId(), oldName);
-            newItemId = getTeamManager().getTeamQualifiedJobId(job.getTeamId(), newName);
-        }
-        items.remove(oldItemId);
-        job.setId(newItemId);
-        items.put(newItemId, job);
+        items.remove(oldName);
+        items.put(newName, job);
 
         for (View v : views) {
             v.onJobRenamed(job, oldName, newName);
@@ -2348,9 +2306,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         for (ItemListener l : ItemListener.all()) {
             l.onDeleted(item);
         }
-        String itemId = item.getId();
 
-        items.remove(itemId);
+        items.remove(item.getName());
         for (View v : views) {
             v.onJobRenamed(item, item.getName(), null);
         }
@@ -2454,8 +2411,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             g.requires(loadHudson).attains(JOB_LOADED).notFatal().add("Loading job " + jobRootDir.getName(), new Executable() {
                 public void run(Reactor session) throws Exception {
                     TopLevelItem item = (TopLevelItem) Items.load(Hudson.this, jobRootDir);
-                    String itemId = item.getId();
-                    items.put(itemId, item);
+                    items.put(item.getName(), item);
                 }
             });
         }
@@ -2831,11 +2787,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     public TopLevelItem reloadProjectFromDisk(File jobDir) throws IOException {
         TopLevelItem item = (TopLevelItem) Items.load(this, jobDir);
-        if (getTeamManager() != null){
-             items.put(item.getId(), item);
-        }else{
-            items.put(item.getName(), item);
-        }
+        items.put(item.getName(), item);
         rebuildDependencyGraph();
         return item;
     }

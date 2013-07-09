@@ -211,9 +211,9 @@ public class Team implements AccessControlled {
         }
     }
 
-    public TeamJob findJob(String jobId) {
+    public TeamJob findJob(String jobName) {
         for (TeamJob job : jobs) {
-            if (jobId.equals(job.getId())) {
+            if (jobName.equals(job.getId())) {
                 return job;
             }
         }
@@ -227,9 +227,9 @@ public class Team implements AccessControlled {
         }
     }
 
-    boolean removeJob(String jobId) throws IOException {
+    boolean removeJob(String jobName) throws IOException {
         for (TeamJob job : jobs) {
-            if (jobId.equals(job.getId())) {
+            if (jobName.equals(job.getId())) {
                 return removeJob(job);
             }
         }
@@ -246,12 +246,12 @@ public class Team implements AccessControlled {
         return false;
     }
 
-    public boolean isJobOwner(String jobId) {
-        return findJob(jobId) != null;
+    public boolean isJobOwner(String jobName) {
+        return findJob(jobName) != null;
     }
 
-    void renameJob(String oldJobId, String newJobId) throws IOException {
-        TeamJob job = findJob(oldJobId);
+    void renameJob(String oldJobName, String newJobId) throws IOException {
+        TeamJob job = findJob(oldJobName);
         if (job != null) {
             job.setId(newJobId);
             getTeamManager().save();

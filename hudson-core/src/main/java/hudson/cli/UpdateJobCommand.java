@@ -50,9 +50,9 @@ public class UpdateJobCommand extends CLICommand {
         Hudson h = Hudson.getInstance();
         TeamManager teamManager = Hudson.getInstance().getTeamManager();
         if (teamManager != null){
-            name = teamManager.getTeamQualifiedJobId(name);
+            name = teamManager.getTeamQualifiedJobName(name);
         }
-        TopLevelItem item = h.getItemById(name);
+        TopLevelItem item = h.getItem(name);
 
         if (item == null && !create) {
             stderr.println("Job '" + name + "' does not exist and create is set to false");
@@ -67,7 +67,7 @@ public class UpdateJobCommand extends CLICommand {
                 h.checkPermission(Job.CONFIGURE);
                 String jobsFolderName = "jobs";
                 if (teamManager != null){
-                    jobsFolderName = teamManager.getJobsFolderName(item.getTeamId(), item.getId());  
+                    jobsFolderName = teamManager.getJobsFolderName(item.getTeamId(), item.getName());  
                 } 
                 File rootDirOfJob = new File(new File(h.getRootDir(), jobsFolderName), name);
                 // place it as config.xml

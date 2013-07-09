@@ -16,7 +16,6 @@ import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.listeners.ItemListener;
 import java.io.IOException;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +37,7 @@ public class TeamJobListener extends ItemListener {
             Job job = (Job) item;
             try {
                 if (getTeamManager() != null) {
-                    getTeamManager().addJobToCurrentUserTeam(job.getId());
+                    getTeamManager().addJobToCurrentUserTeam(job.getName());
                 }
             } catch (IOException ex) {
                 logger.error("Failed to rename job in current user team", ex);
@@ -53,9 +52,8 @@ public class TeamJobListener extends ItemListener {
         if (item instanceof Job<?, ?>) {
             try {
                 if (getTeamManager() != null) {
-                    String newJobId = getTeamManager().getTeamQualifiedJobId(item.getTeamId(), newJobName);
-                    String oldJobId = getTeamManager().getTeamQualifiedJobId(item.getTeamId(), oldJobName);
-                    getTeamManager().renameJobInCurrentUserTeam(oldJobId, newJobId);
+        
+                    getTeamManager().renameJobInCurrentUserTeam(oldJobName, newJobName);
                     Team team;
                     try {
                         team = getTeamManager().findTeam(item.getTeamId());
@@ -63,7 +61,7 @@ public class TeamJobListener extends ItemListener {
                         logger.info(ex.getLocalizedMessage() + " Assuming public team"); 
                         team = getTeamManager().getPublicTeam(); 
                     }
-                    getTeamManager().renameJob(team, oldJobId, newJobId);
+                    getTeamManager().renameJob(team, newJobName, newJobName);
                 }
             } catch (IOException ex) {
                 logger.error("Failed to rename job in current user team", ex);
@@ -77,7 +75,7 @@ public class TeamJobListener extends ItemListener {
             Job job = (Job) item;
             try {
                 if (getTeamManager() != null) {
-                    getTeamManager().removeJobFromCurrentUserTeam(job.getId());
+                    getTeamManager().removeJobFromCurrentUserTeam(job.getName());
                 }
             } catch (IOException ex) {
                 logger.error("Failed to rename job in current user team", ex);

@@ -65,19 +65,6 @@ public interface Item extends PersistenceRoot, SearchableModelObject, AccessCont
      */
     abstract Collection<? extends Job> getAllJobs();
     
-    
-    /**
-     * A unique string to identify the item
-     *
-     * <p> The id must be unique among other {@link Item}s that belong to the
-     * same parent.</p>
-     * @return String ID for the item
-     * @since 3.1.0
-     */
-    public String getId();
-    
-    public void setId(String id);
-    
     /**
      * A unique string to identify the team which this item belongs to
      *

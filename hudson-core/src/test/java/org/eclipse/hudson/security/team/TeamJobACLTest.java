@@ -126,7 +126,7 @@ public class TeamJobACLTest {
         String teamName = "team1";
         Team team = teamManager.createTeam(teamName);
         FreeStyleProject freeStyleJob = new FreeStyleProjectMock("testJob");
-        TeamJob teamJob = new TeamJob(freeStyleJob.getId());
+        TeamJob teamJob = new TeamJob(freeStyleJob.getName());
         teamJob.addVisibility("public");
         team.addJob(teamJob);
 
