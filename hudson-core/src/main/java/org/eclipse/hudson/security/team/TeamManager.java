@@ -683,7 +683,7 @@ public final class TeamManager implements Saveable {
      *
      * @return TeamBasedACL with SYSTEM scope
      */
-    ACL getRoolACL() {
+    ACL getRootACL() {
         return new TeamBasedACL(this, TeamBasedACL.SCOPE.GLOBAL);
     }
 

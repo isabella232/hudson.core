@@ -50,7 +50,7 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
      */
     @Override
     public ACL getRootACL() {
-        return getTeamManager().getRoolACL();
+        return getTeamManager().getRootACL();
     }
 
     /**

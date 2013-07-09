@@ -121,6 +121,14 @@ public abstract class View extends AbstractModelObject implements AccessControll
     public final TopLevelItem getJob(String name) {
         return getItem(name);
     }
+    
+    /**
+     * This is the one used in the URL when TeamManager is effective
+     * binding.
+     */
+    public final TopLevelItem getJobById(String name) {
+        return Hudson.getInstance().getItemById(name);
+    }
 
     /**
      * Checks if the job is in this collection.
