@@ -33,7 +33,6 @@ import static junit.framework.Assert.assertTrue;
 import static org.easymock.EasyMock.expect;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
-import org.eclipse.hudson.security.team.TeamManager;
 import static org.junit.Assert.assertFalse;
 import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
@@ -104,6 +103,7 @@ public class FreeStyleProjectTest {
     public void testOnCreatedFromScratchAnonymousAuthentication() {
         Hudson hudson = createMock(Hudson.class);
         expect(hudson.getTeamManager()).andReturn(null).anyTimes();
+        expect(hudson.isTeamManagementEnabled()).andReturn(false).anyTimes();
         mockStatic(Hudson.class);
         expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
         mockStatic(User.class);
@@ -173,6 +173,7 @@ public class FreeStyleProjectTest {
     public void testOnCopiedFromAnonymousAuthentication() {
         Hudson hudson = createMock(Hudson.class);
         expect(hudson.getTeamManager()).andReturn(null).anyTimes();
+        expect(hudson.isTeamManagementEnabled()).andReturn(false).anyTimes();
         mockStatic(Hudson.class);
         expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
         mockStatic(User.class);

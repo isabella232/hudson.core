@@ -79,6 +79,9 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
 
     protected AbstractItem(ItemGroup parent, String name) {
         this.parent = parent;
+        if ((Hudson.getInstance() != null) && (Hudson.getInstance().isTeamManagementEnabled())) {
+            name = Hudson.getInstance().getTeamManager().getTeamQualifiedJobName(name);
+        }
         doSetName(name);
     }
 
@@ -144,9 +147,6 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
      * would involve copying files and etc.
      */
     protected void doSetName(String name) {
-        if ((Hudson.getInstance() != null) && (Hudson.getInstance().getTeamManager() != null)) {
-           name = Hudson.getInstance().getTeamManager().getTeamQualifiedJobName(name);
-        }
         this.name = name;
     }
 
