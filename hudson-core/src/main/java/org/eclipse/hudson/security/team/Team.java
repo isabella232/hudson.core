@@ -191,7 +191,7 @@ public class Team implements AccessControlled {
             getTeamManager().save();
         }
     }
-
+    
     public boolean isMember(String userName) {
         HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
         SecurityRealm securityRealm = null;

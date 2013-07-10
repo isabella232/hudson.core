@@ -77,14 +77,7 @@ public class WorkspaceCleanupThread extends AsyncPeriodicWork {
     }
 
     private void process(Hudson h) throws IOException, InterruptedException {
-        File[] jobsRootDirs;
-        TeamManager teamManager = Hudson.getInstance().getTeamManager();
-        if (teamManager != null) {
-            jobsRootDirs = teamManager.getJobsRootFolders();
-        } else {
-            File jobs = new File(h.getRootDir(), "jobs");
-            jobsRootDirs = jobs.listFiles(DIR_FILTER);
-        }
+        File[] jobsRootDirs = Hudson.getInstance().getTeamManager().getJobsRootFolders();
         if (jobsRootDirs == null) {
             return;
         }

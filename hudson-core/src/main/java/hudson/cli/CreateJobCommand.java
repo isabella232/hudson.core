@@ -18,7 +18,11 @@ package hudson.cli;
 
 import hudson.model.Hudson;
 import hudson.Extension;
+import static hudson.cli.UpdateJobCommand.ensureJobInTeam;
+import static hudson.cli.UpdateJobCommand.validateTeam;
 import hudson.model.Item;
+import hudson.model.TopLevelItem;
+import org.eclipse.hudson.security.team.Team;
 import org.kohsuke.args4j.Argument;
 
 /**
@@ -35,17 +39,25 @@ public class CreateJobCommand extends CLICommand {
     }
     @Argument(metaVar = "NAME", usage = "Name of the job to create")
     public String name;
+    @Argument(metaVar = "TEAM", usage = "Team to create job in", index = 1, required = false)
+    public String team;
 
     protected int run() throws Exception {
         Hudson h = Hudson.getInstance();
         h.checkPermission(Item.CREATE);
+        Team targetTeam = validateTeam(team, true, stderr);
+
+        if (team != null && targetTeam == null) {
+            return -1;
+        }
 
         if (h.getItem(name) != null) {
             stderr.println("Job '" + name + "' already exists");
             return -1;
         }
 
-        h.createProjectFromXML(name, stdin);
+        TopLevelItem newItem = h.createProjectFromXML(name, stdin);
+        ensureJobInTeam(newItem, targetTeam, name, stderr);
         return 0;
     }
 }

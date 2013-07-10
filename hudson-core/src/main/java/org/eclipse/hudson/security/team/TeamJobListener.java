@@ -36,9 +36,7 @@ public class TeamJobListener extends ItemListener {
         if (item instanceof Job<?, ?>) {
             Job job = (Job) item;
             try {
-                if (getTeamManager() != null) {
-                    getTeamManager().addJobToCurrentUserTeam(job.getName());
-                }
+                getTeamManager().addJobToCurrentUserTeam(job.getName());
             } catch (IOException ex) {
                 logger.error("Failed to rename job in current user team", ex);
             } catch (TeamManager.TeamNotFoundException ex) {
@@ -51,10 +49,8 @@ public class TeamJobListener extends ItemListener {
     public void onRenamed(Item item, String oldJobName, String newJobName) {
         if (item instanceof Job<?, ?>) {
             try {
-                if (getTeamManager() != null) {
-                    Team team = getTeamManager().findJobOwnerTeam(oldJobName);
-                    getTeamManager().renameJob(team, newJobName, newJobName);
-                }
+                Team team = getTeamManager().findJobOwnerTeam(oldJobName);
+                getTeamManager().renameJob(team, newJobName, newJobName);
             } catch (IOException ex) {
                 logger.error("Failed to rename job in current user team", ex);
             }
@@ -66,9 +62,7 @@ public class TeamJobListener extends ItemListener {
         if (item instanceof Job<?, ?>) {
             Job job = (Job) item;
             try {
-                if (getTeamManager() != null) {
-                    getTeamManager().removeJobFromCurrentUserTeam(job.getName());
-                }
+                getTeamManager().removeJobFromCurrentUserTeam(job.getName());
             } catch (IOException ex) {
                 logger.error("Failed to rename job in current user team", ex);
             }

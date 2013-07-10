@@ -95,7 +95,7 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
                 return new TeamUtils.ErrorHttpResponse("Sys admin name required");
             }
 
-            TeamManager teamManager = Hudson.getInstance().getTeamManager(true);
+            TeamManager teamManager = Hudson.getInstance().getTeamManager();
             if (teamManager.getSysAdmins().contains(sysAdminSid)) {
                 return new TeamUtils.ErrorHttpResponse(sysAdminSid + " is already a System Administrator.");
             }
@@ -114,7 +114,7 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
                 return new TeamUtils.ErrorHttpResponse("Sys admin name required");
             }
 
-            TeamManager teamManager = Hudson.getInstance().getTeamManager(true);
+            TeamManager teamManager = Hudson.getInstance().getTeamManager();
             if (teamManager.getSysAdmins().contains(sysAdminSid)) {
                 teamManager.removeSysAdmin(sysAdminSid);
                 return HttpResponses.ok();

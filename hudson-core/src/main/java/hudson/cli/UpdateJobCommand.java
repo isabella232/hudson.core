@@ -26,7 +26,10 @@ import hudson.model.TopLevelItem;
 import hudson.util.IOUtils;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
+import org.eclipse.hudson.security.team.Team;
 import org.eclipse.hudson.security.team.TeamManager;
+import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
 import org.kohsuke.args4j.Argument;
 
 /**
@@ -45,11 +48,18 @@ public class UpdateJobCommand extends CLICommand {
     public String name;
     @Argument(metaVar = "CREATE", usage = "Create the job if needed", index = 1, required = true)
     public Boolean create;
+    @Argument(metaVar = "TEAM", usage = "Team to create job in", index = 1, required = false)
+    public String team;
 
     protected int run() throws Exception {
         Hudson h = Hudson.getInstance();
         TeamManager teamManager = Hudson.getInstance().getTeamManager();
         TopLevelItem item = h.getItem(name);
+        Team targetTeam = validateTeam(team, create, stderr);
+
+        if (team != null && targetTeam == null) {
+            return -1;
+        }
 
         if (item == null && !create) {
             stderr.println("Job '" + name + "' does not exist and create is set to false");
@@ -58,14 +68,12 @@ public class UpdateJobCommand extends CLICommand {
 
         if (item == null) {
             h.checkPermission(Item.CREATE);
-            h.createProjectFromXML(name, stdin);
+            TopLevelItem newItem = h.createProjectFromXML(name, stdin);
+            ensureJobInTeam(newItem, targetTeam, name, stderr);
         } else {
             try {
                 h.checkPermission(Job.CONFIGURE);
-                String jobsFolderName = "jobs";
-                if (teamManager != null){
-                    jobsFolderName = teamManager.getJobsFolderName(item.getName());  
-                } 
+                String jobsFolderName = teamManager.getJobsFolderName(item.getName());  
                 File rootDirOfJob = new File(new File(h.getRootDir(), jobsFolderName), name);
                 // place it as config.xml
                 File configXml = Items.getConfigFile(rootDirOfJob).getFile();
@@ -77,5 +85,60 @@ public class UpdateJobCommand extends CLICommand {
             }
         }
         return 0;
+    }
+    
+    /**
+     * If job is not in targetTeam, move it there.
+     * 
+     * @param item job
+     * @param targetTeam desired team or null if none
+     * @param name job name requested
+     * @param stderr
+     * @throws Exception 
+     */
+    public static void ensureJobInTeam(TopLevelItem item, Team targetTeam, String name, PrintStream stderr) throws Exception {
+        if (targetTeam != null) {
+            try {
+                Hudson.getInstance().getTeamManager().ensureJobInTeam(item, targetTeam);
+                
+            } catch (IOException e) {
+                item.delete();
+                stderr.println("Unable to create job "+name+" in team "+targetTeam.getName()+" due to IOException");
+                throw e;
+            }
+        }
+    }
+    
+    /**
+     * Validate team exists and user can access it.
+     * 
+     * @param team team name
+     * @param create true if create new job
+     * @param stderr
+     * @return 
+     */
+    public static Team validateTeam(String team, boolean create, PrintStream stderr) {
+        Hudson h = Hudson.getInstance();
+        TeamManager teamManager = h.getTeamManager();
+        Team targetTeam = null;
+        if (team != null) {
+            if (!create) {
+                stderr.println("team may only be used for create - for update use fully qualified name");
+            } else if (!teamManager.isTeamManagementEnabled()) {
+                stderr.println("team may not be specified unless team management is enabled");
+            } else {
+                try {
+                    // check team exists first for better error message
+                    targetTeam = teamManager.findTeam(team);
+                    if (!teamManager.isCurrentUserHasAccessToTeam(team)) {
+                        stderr.println("Current user does not have access to team "+team);
+                        targetTeam = null;
+                    }
+                } catch (TeamNotFoundException e) {
+                    stderr.println("Team "+team+" does not exist");
+                }
+            }
+        }
+        return targetTeam;
     }
 }

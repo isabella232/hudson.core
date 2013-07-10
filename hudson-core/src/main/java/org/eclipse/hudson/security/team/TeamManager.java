@@ -17,14 +17,15 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import hudson.BulkChange;
-import hudson.Util;
 import hudson.XmlFile;
 import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Saveable;
+import hudson.model.TopLevelItem;
 import hudson.model.listeners.SaveableListener;
 import hudson.security.ACL;
+import hudson.security.AuthorizationStrategy;
 import hudson.security.SecurityRealm;
 import hudson.util.FormValidation;
 import hudson.util.XStream2;
@@ -50,13 +51,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Manger that manages the teams and their persistence
+ * Manager that manages the teams and their persistence
  *
  * @since 3.1.0
  * @author Winston Prakash
  */
 public final class TeamManager implements Saveable {
 
+    public static final String TEAM_SEPARATOR = ".";
+    
     private List<String> sysAdmins = new CopyOnWriteArrayList<String>();
     private List<Team> teams = new CopyOnWriteArrayList<Team>();
     private transient final XStream xstream = new XStream2();
@@ -78,6 +81,17 @@ public final class TeamManager implements Saveable {
         ensurePublicTeam();
     }
 
+    public boolean isTeamManagementEnabled() {
+        HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
+        if (hudsonSecurityManager != null) {
+            AuthorizationStrategy authorizationStrategy = hudsonSecurityManager.getAuthorizationStrategy();
+            if (authorizationStrategy instanceof TeamBasedAuthorizationStrategy) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public void addSysAdmin(String adminName) throws IOException {
         if (!sysAdmins.contains(adminName)) {
             sysAdmins.add(adminName);
@@ -356,35 +370,41 @@ public final class TeamManager implements Saveable {
     public HttpResponse doCheckSid(@QueryParameter String sid) throws IOException {
         return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(sid));
     }
+    
+    public void ensureJobInTeam(TopLevelItem item, Team team) throws IOException {
+        Job job = (Job) item;
+        Team ownerTeam = findJobOwnerTeam(job.getName());
+        if (!team.equals(ownerTeam)) {
+            moveJob(job, ownerTeam, team);
+        }
+    }
 
     private void moveJob(Job job, Team oldTeam, Team newTeam) throws IOException {
         try {
-           
             String oldJobName = job.getName();
-            String unqualifiedJobName = getUnqualifiedJobName(job.getName());
-            String qualifiedNewJobName = getTeamQualifiedJobName(newTeam.getName(), unqualifiedJobName);
+            String unqualifiedJobName = getUnqualifiedJobName(oldTeam, job.getName());
+            String qualifiedNewJobName = getTeamQualifiedJobName(newTeam, unqualifiedJobName);
             
-//          File jobRootDir = job.getRootDir();  
-//          File newJobRootDir = new File(getJobsFolder(newTeam), qualifiedNewJobName);
-//          newJobRootDir.mkdirs();
-//          Util.moveDirectory(jobRootDir, newJobRootDir);
-            
+            // Add the new job, rename before removing the old job
+            // ensures team manager will find correct locations.
             newTeam.addJob(new TeamJob(qualifiedNewJobName));
             job.renameTo(qualifiedNewJobName); 
             oldTeam.removeJob(oldJobName);
             
-            Hudson.getInstance().replaceItemId(job.getName(), qualifiedNewJobName);
+            Hudson.getInstance().replaceItem(job.getName(), qualifiedNewJobName);
         } catch (Exception exc) {
             throw new IOException(exc);
         }
     }
     
-    private String getUnqualifiedJobName(String jobName){
-        int index = jobName.indexOf('.');
-        if (jobName.indexOf('.') != -1){
-          jobName = jobName.substring(index + 1);
+    private String getUnqualifiedJobName(Team team, String jobName){
+        if (Team.PUBLIC_TEAM_NAME.equals(team.getName())) {
+            return jobName;
         }
-        return jobName;
+        if (jobName.startsWith(team.getName()+TEAM_SEPARATOR)) {
+            return jobName.substring(team.getName().length()+1);
+        }
+        throw new IllegalStateException("Job "+jobName+" does not belong to Team "+team.getName());
     }
 
     /**
@@ -433,6 +453,42 @@ public final class TeamManager implements Saveable {
         Team team = findTeam(teamName);
         teams.remove(team);
         save();
+    }
+    
+    /**
+     * Return true if current user has access to team. Team management
+     * must be enabled.
+     * @param teamName
+     * @return 
+     */
+    public boolean isCurrentUserHasAccessToTeam(String teamName) {
+        if (isTeamManagementEnabled()) {
+            try {
+                Team team = findTeam(teamName);
+                if (isCurrentUserSysAdmin()) {
+                    return true;
+                }
+                HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
+                SecurityRealm securityRealm = null;
+                if (hudsonSecurityManager != null) {
+                    securityRealm = hudsonSecurityManager.getSecurityRealm();
+                }
+                if ((securityRealm != null) && securityRealm instanceof TeamAwareSecurityRealm) {
+                    TeamAwareSecurityRealm teamAwareSecurityRealm = (TeamAwareSecurityRealm) securityRealm;
+                    if (team.equals(teamAwareSecurityRealm.GetCurrentUserTeam())) {
+                        return true;
+                    }
+                } else {
+                    String currentUser = HudsonSecurityManager.getAuthentication().getName();
+                    if (team.isMember(currentUser)) {
+                        return true;
+                    }
+                }
+            } catch (TeamNotFoundException ex) {
+                // no access
+            }
+        }
+        return false;
     }
 
     public Team findCurrentUserTeam() {
@@ -585,7 +641,7 @@ public final class TeamManager implements Saveable {
     public String getTeamQualifiedJobName(String jobName) {
         Team team = findCurrentUserTeam();
         if ((team != null) && !Team.PUBLIC_TEAM_NAME.equals(team.getName())) {
-            jobName = team.getName() + "." + jobName;
+            jobName = team.getName() + TEAM_SEPARATOR + jobName;
         }
         return jobName;
     }
@@ -597,26 +653,34 @@ public final class TeamManager implements Saveable {
      * @param jobName
      * @return String, Team qualified Job ID
      */
-    public String getTeamQualifiedJobName(String teamName, String jobName) {
-        if ((teamName == null) || "".equals(jobName) || Team.PUBLIC_TEAM_NAME.equals(teamName)) {
+    public String getTeamQualifiedJobName(Team team, String jobName) {
+        String teamName = team.getName();
+        if (Team.PUBLIC_TEAM_NAME.equals(teamName)) {
             return jobName;
         }
-        String qualifiedJobName = teamName + "." + jobName;
+        StringBuilder sb = new StringBuilder(teamName + TEAM_SEPARATOR + jobName);
+        // Make sure the name is unique
+        Hudson h = Hudson.getInstance();
         int postfix = 2;
-        try {
-            while (findTeam(teamName).isJobOwner(qualifiedJobName)){
-                qualifiedJobName += ("_" + postfix);
+        int baseLength = sb.length();
+        while (true) {
+            String qualifiedName = sb.toString();
+            if (!team.isJobOwner(qualifiedName) && !publicTeam.isJobOwner(qualifiedName)) {
+                    break;
             }
-        } catch (TeamNotFoundException ex) {
-            logger.info("getTeamQualifiedJobName: " + ex.getLocalizedMessage());
-            return jobName;
+            sb.setLength(baseLength);
+            sb.append("_" + postfix++);
         }
-        return qualifiedJobName;
+        return sb.toString();
     }
 
     /**
      * The Folder where all the jobs of the team to which this jobName belongs to
-     * are stored
+     * are stored.
+     * 
+     * <p>This method should be called to determine the jobs folder
+     * whether or not team management is enabled, as team manager alone
+     * knows where team jobs are.
      *
      * @param jobName
      * @return String, path to the team jobs folder
@@ -624,7 +688,7 @@ public final class TeamManager implements Saveable {
     public String getJobsFolderName(String jobName) {
         Team team = findJobOwnerTeam(jobName);
         // May be just created job
-        if (team == null) {
+        if (team == null && isTeamManagementEnabled()) {
             team = findCurrentUserTeam();
         }
         if ((team != null) && !Team.PUBLIC_TEAM_NAME.equals(team.getName())) {

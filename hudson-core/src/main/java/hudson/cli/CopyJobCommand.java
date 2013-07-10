@@ -20,7 +20,10 @@ import hudson.model.Hudson;
 import hudson.model.Job;
 import hudson.model.TopLevelItem;
 import hudson.Extension;
+import static hudson.cli.UpdateJobCommand.ensureJobInTeam;
+import static hudson.cli.UpdateJobCommand.validateTeam;
 import hudson.model.Item;
+import org.eclipse.hudson.security.team.Team;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
@@ -40,12 +43,19 @@ public class CopyJobCommand extends CLICommand {
     public TopLevelItem src;
     @Argument(metaVar = "DST", usage = "Name of the new job to be created.", index = 1, required = true)
     public String dst;
+    @Argument(metaVar = "TEAM", usage = "Team to create job in", index = 1, required = false)
+    public String team;
     @Option(name = "-fs", aliases = {"--force-save"}, usage = "Force saving the destination job in order to enable build functionality.")
     public boolean forceSave;
 
     protected int run() throws Exception {
         Hudson h = Hudson.getInstance();
         h.checkPermission(Item.CREATE);
+        Team targetTeam = validateTeam(team, true, stderr);
+
+        if (team != null && targetTeam == null) {
+            return -1;
+        }
 
         if (h.getItem(dst) != null) {
             stderr.println("Job '" + dst + "' already exists");
@@ -53,7 +63,8 @@ public class CopyJobCommand extends CLICommand {
         }
 
         h.copy(src, dst);
-        Job newJob = (Job) Hudson.getInstance().getItem(dst);
+        TopLevelItem newJob = Hudson.getInstance().getItem(dst);
+        ensureJobInTeam(newJob, targetTeam, dst, stderr);
         if (forceSave && null != newJob) {
             newJob.save();
         }

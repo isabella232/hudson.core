@@ -798,50 +798,28 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
     
     /**
-     * TeamManagement is returned only if the Team based authorization is set.
-     * @return TeamManager
+     * @return true if team management is enabled
      * @since 3.1.0
      */
     public boolean isTeamManagementEnabled() {
-        return getTeamManager() != null;
+        return teamManager.isTeamManagementEnabled();
     }
 
     /**
-     * TeamManager is returned only if the Team based authorization is set.
+     * TeamManager is returned whether or not Team based authorization is set.
+     * 
      * @return TeamManager
      * @since 3.1.0
      */
     public TeamManager getTeamManager() {
-        HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
-        if (hudsonSecurityManager != null) {
-            AuthorizationStrategy authorizationStrategy = hudsonSecurityManager.getAuthorizationStrategy();
-            if (authorizationStrategy instanceof TeamBasedAuthorizationStrategy) {
-                return teamManager;
-            }
-        }
-        return null;
-    }
-    
-    /**
-     * TeamManager is returned only if the Team based authorization strategy is set.
-     * However, we need the team manager to set the initial system admin,
-     * before the Team based authorization strategy is set. Only for internal purpose
-     * 
-     * @deprecated Internal purpose only. Do not use. Use getTeamManager() for general purpose
-     */
-    public TeamManager getTeamManager(boolean byPass) {
-        if (byPass) {
-            return teamManager;
-        } else {
-            return getTeamManager();
-        }
+        return teamManager;
     }
     
     /**
      * Do not use this API, for internal purpose only
      * @since 3.1.0
      */
-    public void replaceItemId(String oldItemName, String newItemName){
+    public void replaceItem(String oldItemName, String newItemName){
         if (items.containsKey(oldItemName)){
             TopLevelItem item = items.get(oldItemName);
             items.remove(oldItemName);
@@ -2174,18 +2152,12 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     
     @Override
     public File getRootDirFor(TopLevelItem child) {
-        if (getTeamManager() != null) {
-            String jobsFolderName = getTeamManager().getJobsFolderName(child.getName());
-            return new File(new File(getRootDir(), jobsFolderName), child.getName());
-        }
-        return getRootDirFor(child.getName());
+        String jobsFolderName = getTeamManager().getJobsFolderName(child.getName());
+        return new File(new File(getRootDir(), jobsFolderName), child.getName());
     }
 
     private File getRootDirFor(String jobName) {
-        String jobsFolderName = "jobs";
-        if (getTeamManager() != null) {
-            jobsFolderName = getTeamManager().getJobsFolderName(jobName);
-        }
+        String jobsFolderName = getTeamManager().getJobsFolderName(jobName);
         return new File(new File(getRootDir(), jobsFolderName), jobName);
     }
 
@@ -2379,15 +2351,17 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         }
         File[] jobsRootDirs;
 
-        if (getTeamManager() != null) {
+        //Winston - most alternatives duplicate logic in getJobsRootFolders
+        // but this one seems different. Please check.
+        //if (getTeamManager() != null) {
             jobsRootDirs = getTeamManager().getJobsRootFolders();
-        } else {
-            jobsRootDirs = projectsDir.listFiles(new FileFilter() {
-                public boolean accept(File child) {
-                    return child.isDirectory() && Items.getConfigFile(child).exists();
-                }
-            });
-        }
+        //} else {
+        //    jobsRootDirs = projectsDir.listFiles(new FileFilter() {
+        //        public boolean accept(File child) {
+        //            return child.isDirectory() && Items.getConfigFile(child).exists();
+        //        }
+        //    });
+        //}
 
         TaskGraphBuilder g = new TaskGraphBuilder();
         Handle loadHudson = g.requires(EXTENSIONS_AUGMENTED).attains(JOB_LOADED).add("Loading global config", new Executable() {
