@@ -33,8 +33,7 @@ public class TeamBasedACL extends SidACL {
     private transient Logger logger = LoggerFactory.getLogger(TeamBasedACL.class);
 
     public enum SCOPE {
-
-        GLOBAL, TEAM, JOB
+        GLOBAL, TEAM_MANAGEMENT, TEAM, JOB
     };
     private final SCOPE scope;
     private final TeamManager teamManager;
@@ -64,6 +63,14 @@ public class TeamBasedACL extends SidACL {
         if (teamManager.isSysAdmin(userName)) {
             return true;
         }
+        
+        if (scope == SCOPE.TEAM_MANAGEMENT) {
+            //Only Sysadmin gets to do Team Management
+            if (teamManager.isSysAdmin(userName)) {
+                return true;
+            }
+        }
+        
         if (scope == SCOPE.GLOBAL) {
             //All non team members gets only READ Permission
             if (permission.getImpliedBy() == Permission.READ) {
@@ -141,7 +148,7 @@ public class TeamBasedACL extends SidACL {
                 }
             }
         }
-        return false;
+        return null;
     }
 
     private boolean isTeamAwareSecurityRealm() {

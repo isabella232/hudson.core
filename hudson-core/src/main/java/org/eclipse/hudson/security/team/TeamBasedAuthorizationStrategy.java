@@ -50,7 +50,7 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
      */
     @Override
     public ACL getRootACL() {
-        return getTeamManager().getRootACL();
+        return new TeamBasedACL(getTeamManager(), TeamBasedACL.SCOPE.GLOBAL);
     }
 
     /**
@@ -61,11 +61,15 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
      */
     @Override
     public ACL getACL(Job<?, ?> job) {
-        return getTeamManager().getACL(job);
+        return new TeamBasedACL(getTeamManager(), TeamBasedACL.SCOPE.JOB, job);
     }
 
     public ACL getACL(Team team) {
-        return getTeamManager().getACL(team);
+        return new TeamBasedACL(getTeamManager(), TeamBasedACL.SCOPE.JOB, team);
+    }
+    
+    public ACL getACL(TeamManager teamManager) {
+        return new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.TEAM_MANAGEMENT);
     }
 
     /**

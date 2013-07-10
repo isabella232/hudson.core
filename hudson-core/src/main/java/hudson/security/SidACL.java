@@ -1,19 +1,20 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
  * Copyright (c) 2004-2009 Oracle Corporation.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * 
- *    Kohsuke Kawaguchi
+ *
+ * Kohsuke Kawaguchi
  *
  *
- *******************************************************************************/ 
-
+ ******************************************************************************
+ */
 package hudson.security;
 
 import org.springframework.security.Authentication;
@@ -21,10 +22,8 @@ import org.springframework.security.GrantedAuthority;
 import org.springframework.security.acls.sid.PrincipalSid;
 import org.springframework.security.acls.sid.GrantedAuthoritySid;
 import org.springframework.security.acls.sid.Sid;
-
-import java.util.logging.Logger;
-import static java.util.logging.Level.FINE;
-import static java.util.logging.Level.FINER;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ACL} that checks permissions based on {@link GrantedAuthority} of the
@@ -34,19 +33,17 @@ import static java.util.logging.Level.FINER;
  */
 public abstract class SidACL extends ACL {
 
+    private transient Logger logger = LoggerFactory.getLogger(SidACL.class);
+
     @Override
     public boolean hasPermission(Authentication a, Permission permission) {
         if (a == SYSTEM) {
-            if (LOGGER.isLoggable(FINE)) {
-                LOGGER.fine("hasPermission(" + a + "," + permission + ")=>SYSTEM user has full access");
-            }
+            logger.debug("hasPermission(" + a + "," + permission + ")=>SYSTEM user has full access");
             return true;
         }
         Boolean b = _hasPermission(a, permission);
 
-        if (LOGGER.isLoggable(FINE)) {
-            LOGGER.fine("hasPermission(" + a + "," + permission + ")=>" + (b == null ? "null, thus false" : b));
-        }
+        logger.debug("hasPermission(" + a + "," + permission + ")=>" + (b == null ? "null, thus false" : b));
 
         if (b == null) {
             b = false;    // default to rejection
@@ -64,11 +61,10 @@ public abstract class SidACL extends ACL {
      */
     protected Boolean _hasPermission(Authentication a, Permission permission) {
         // ACL entries for this principal takes precedence
+        logger.debug("Checking if principal " + a.getName() + " has " + permission);
         Boolean b = hasPermission(new PrincipalSid(a), permission);
         if (b != null) {
-            if (LOGGER.isLoggable(FINER)) {
-                LOGGER.finer("hasPermission(PrincipalSID:" + a.getPrincipal() + "," + permission + ")=>" + b);
-            }
+            logger.debug("hasPermission(PrincipalSID:" + a.getPrincipal() + "," + permission + ")=>" + b);
             return b;
         }
 
@@ -76,11 +72,10 @@ public abstract class SidACL extends ACL {
         // has any ACL entries.
         // here we are using GrantedAuthority as a group
         for (GrantedAuthority ga : a.getAuthorities()) {
+            logger.debug("Checking if principal's role " + ga.getAuthority() + " has " + permission);
             b = hasPermission(new GrantedAuthoritySid(ga), permission);
             if (b != null) {
-                if (LOGGER.isLoggable(FINER)) {
-                    LOGGER.finer("hasPermission(GroupSID:" + ga.getAuthority() + "," + permission + ")=>" + b);
-                }
+                logger.debug("hasPermission(GroupSID:" + ga.getAuthority() + "," + permission + ")=>" + b);
                 return b;
             }
         }
@@ -89,9 +84,7 @@ public abstract class SidACL extends ACL {
         for (Sid sid : AUTOMATIC_SIDS) {
             b = hasPermission(sid, permission);
             if (b != null) {
-                if (LOGGER.isLoggable(FINER)) {
-                    LOGGER.finer("hasPermission(" + sid + "," + permission + ")=>" + b);
-                }
+                logger.debug("hasPermission(" + sid + "," + permission + ")=>" + b);
                 return b;
             }
         }
@@ -151,5 +144,4 @@ public abstract class SidACL extends ACL {
             }
         };
     }
-    private static final Logger LOGGER = Logger.getLogger(SidACL.class.getName());
 }

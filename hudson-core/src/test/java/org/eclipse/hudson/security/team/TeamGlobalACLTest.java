@@ -60,7 +60,7 @@ public class TeamGlobalACLTest {
         //Paul should not get global configure permission before adding as Sysadmin
         Sid sid = new PrincipalSid("Paul");
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.GLOBAL);
-        Assert.assertFalse("Paul should not have global CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
+        Assert.assertNull("Paul should not have global CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission));
 
         //Now Paul should get global configure permission since added as Sysadmin
         teamManager.addSysAdmin("Paul");
@@ -73,7 +73,7 @@ public class TeamGlobalACLTest {
         //Chris, a non SysAdmin, should not get global create permission 
         Sid sid = new PrincipalSid("Chris");
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.GLOBAL);
-        Assert.assertFalse("Chris should not have global CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
+        Assert.assertNull("Chris should not have global CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission));
 
         //But Chris should get READ permission
         Assert.assertTrue("Chris should have global READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
@@ -85,7 +85,7 @@ public class TeamGlobalACLTest {
         //Anonymous, should not get global create permission 
         Sid sid = ACL.ANONYMOUS;
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.GLOBAL);
-        Assert.assertFalse("Anonymous should not have global CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
+        Assert.assertNull("Anonymous should not have global CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission));
 
         //Anonymous should get READ permission
         Assert.assertTrue("Anonymous should have global READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
@@ -97,7 +97,7 @@ public class TeamGlobalACLTest {
         //Evru one, should not get global create permission 
         Sid sid = ACL.EVERYONE;
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.GLOBAL);
-        Assert.assertFalse("Every one should not have global CREATE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
+        Assert.assertNull("Every one should not have global CREATE permission", teamBasedACL.hasPermission(sid, configurePermission));
 
         //Every one should get READ permission
         Assert.assertTrue("Every one should have global READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());

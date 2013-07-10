@@ -75,8 +75,8 @@ public class TeamJobACLTest {
         Assert.assertTrue("Paul is a team member with Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
 
         Sid sid2 = new PrincipalSid("Chris");
-        Assert.assertFalse("Chris is not a team member and should not have Job CONFIGURE permission", teamBasedACL.hasPermission(sid2, configurePermission).booleanValue());
-        Assert.assertFalse("Chris is not a team member and should not have Job READ permission", teamBasedACL.hasPermission(sid2, readPermission).booleanValue());
+        Assert.assertNull("Chris is not a team member and should not have Job CONFIGURE permission", teamBasedACL.hasPermission(sid2, configurePermission));
+        Assert.assertNull("Chris is not a team member and should not have Job READ permission", teamBasedACL.hasPermission(sid2, readPermission));
 
     }
 
@@ -88,7 +88,7 @@ public class TeamJobACLTest {
 
         Sid sid = new PrincipalSid("Paul");
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.JOB, freeStyleJob);
-        Assert.assertFalse("Paul is not a SysAdmin and should not have public Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
+        Assert.assertNull("Paul is not a SysAdmin and should not have public Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission));
         Assert.assertTrue("Paul should have pubic Job READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
 
         teamManager.addSysAdmin("Paul");
@@ -104,7 +104,7 @@ public class TeamJobACLTest {
 
         Sid sid = ACL.ANONYMOUS;
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.JOB, freeStyleJob);
-        Assert.assertFalse("Anonymous should not have public Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
+        Assert.assertNull("Anonymous should not have public Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission));
         Assert.assertTrue("Anonymous should have public Job READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
 
     }
@@ -116,7 +116,7 @@ public class TeamJobACLTest {
         teamManager.getPublicTeam().addJob(new TeamJob(freeStyleJob.getName()));
         Sid sid = ACL.EVERYONE;
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.JOB, freeStyleJob);
-        Assert.assertFalse("Every one should not have public Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
+        Assert.assertNull("Every one should not have public Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission));
         Assert.assertTrue("Every one should have piublic Job READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
 
     }
@@ -135,7 +135,7 @@ public class TeamJobACLTest {
         Assert.assertTrue("Anonymous should have testJob READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
 
         teamJob.removeVisibility("public");
-        Assert.assertFalse("Anonymous should not have testJob READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
+        Assert.assertNull("Anonymous should not have testJob READ permission", teamBasedACL.hasPermission(sid, readPermission));
 
         String teamName2 = "team2";
         Team team2 = teamManager.createTeam(teamName2);
@@ -147,7 +147,7 @@ public class TeamJobACLTest {
         teamJob.addVisibility(team2.getName());
 
         Sid sid2 = new PrincipalSid("Chris");
-        Assert.assertFalse("Chris should not have Job CONFIGURE permission", teamBasedACL.hasPermission(sid2, configurePermission).booleanValue());
+        Assert.assertNull("Chris should not have Job CONFIGURE permission", teamBasedACL.hasPermission(sid2, configurePermission));
         Assert.assertTrue("Chris should have testJob READ permission", teamBasedACL.hasPermission(sid2, readPermission).booleanValue());
 
     }

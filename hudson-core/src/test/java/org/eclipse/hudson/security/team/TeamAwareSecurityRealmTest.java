@@ -69,7 +69,7 @@ public class TeamAwareSecurityRealmTest {
         //Dummy Sid
         Sid sid = new PrincipalSid("Paul");
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.GLOBAL);
-        Assert.assertFalse("Current user should not have global CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
+        Assert.assertNull("Current user should not have global CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission));
         Assert.assertTrue("Current user should have global READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
 
         hudsonSecurityManager.setSecurityRealm(new TeamAwareSecurityRealmImpl(newTeam, true, false));
@@ -94,8 +94,8 @@ public class TeamAwareSecurityRealmTest {
         team2.addJob(new TeamJob(freeStyleJob.getName()));
 
         teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.JOB, freeStyleJob);
-        Assert.assertFalse("Current user should not have Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
-        Assert.assertFalse("Current user should not have Job READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
+        Assert.assertNull("Current user should not have Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission));
+        Assert.assertNull("Current user should not have Job READ permission", teamBasedACL.hasPermission(sid, readPermission));
     }
 
     @Test
@@ -110,7 +110,7 @@ public class TeamAwareSecurityRealmTest {
         //Dummy Sid
         Sid sid = new PrincipalSid("Paul");
         TeamBasedACL teamBasedACL = new TeamBasedACL(teamManager, TeamBasedACL.SCOPE.JOB, freeStyleJob);
-        Assert.assertFalse("Current user should not have Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission).booleanValue());
+        Assert.assertNull("Current user should not have Job CONFIGURE permission", teamBasedACL.hasPermission(sid, configurePermission));
         Assert.assertTrue("Current user should have Job READ permission", teamBasedACL.hasPermission(sid, readPermission).booleanValue());
     }
 
