@@ -66,17 +66,6 @@ public interface Item extends PersistenceRoot, SearchableModelObject, AccessCont
     abstract Collection<? extends Job> getAllJobs();
     
     /**
-     * A unique string to identify the team which this item belongs to
-     *
-     * @return String team ID
-     * @since 3.1.0
-     */
-    public String getTeamId();
-    
-    public void setTeamId(String id);
-    
-
-    /**
      * Gets the name of the item.
      *
      * <p> This name is also used for directory name, so it cannot contain any

@@ -485,9 +485,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     private transient final ItemGroupMixIn itemGroupMixIn = new ItemGroupMixIn(this, this) {
         @Override
         protected void add(TopLevelItem item) {
-            if (getTeamManager() != null) {
-               item.setTeamId(getTeamManager().getCurrentUserTeamName());
-            }
             items.put( item.getName(), item);
         }
 
@@ -2178,7 +2175,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     @Override
     public File getRootDirFor(TopLevelItem child) {
         if (getTeamManager() != null) {
-            String jobsFolderName = getTeamManager().getJobsFolderName(child.getTeamId(), child.getName());
+            String jobsFolderName = getTeamManager().getJobsFolderName(child.getName());
             return new File(new File(getRootDir(), jobsFolderName), child.getName());
         }
         return getRootDirFor(child.getName());

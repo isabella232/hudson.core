@@ -89,16 +89,6 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
         // noop
     }
     
-    @Override
-    public String getTeamId() {
-        return teamId;
-    }
-
-    @Override
-    public void setTeamId(String teamId) {
-        this.teamId = teamId;
-    }
-
     @Exported(visibility = 999)
     public String getName() {
         return name;

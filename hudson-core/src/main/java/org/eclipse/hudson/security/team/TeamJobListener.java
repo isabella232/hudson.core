@@ -52,15 +52,7 @@ public class TeamJobListener extends ItemListener {
         if (item instanceof Job<?, ?>) {
             try {
                 if (getTeamManager() != null) {
-        
-                    getTeamManager().renameJobInCurrentUserTeam(oldJobName, newJobName);
-                    Team team;
-                    try {
-                        team = getTeamManager().findTeam(item.getTeamId());
-                    } catch (TeamManager.TeamNotFoundException ex) {
-                        logger.info(ex.getLocalizedMessage() + " Assuming public team"); 
-                        team = getTeamManager().getPublicTeam(); 
-                    }
+                    Team team = getTeamManager().findJobOwnerTeam(oldJobName);
                     getTeamManager().renameJob(team, newJobName, newJobName);
                 }
             } catch (IOException ex) {

@@ -64,7 +64,7 @@ public class UpdateJobCommand extends CLICommand {
                 h.checkPermission(Job.CONFIGURE);
                 String jobsFolderName = "jobs";
                 if (teamManager != null){
-                    jobsFolderName = teamManager.getJobsFolderName(item.getTeamId(), item.getName());  
+                    jobsFolderName = teamManager.getJobsFolderName(item.getName());  
                 } 
                 File rootDirOfJob = new File(new File(h.getRootDir(), jobsFolderName), name);
                 // place it as config.xml

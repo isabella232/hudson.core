@@ -84,14 +84,14 @@
                             <j:forEach var="job" items="${app.items}">
                                 <tr>
                                     <td class="column1">
-                                        <input class="move_cb_${job.name}" type="checkbox" value="${job.id}"/>
+                                        <input class="move_cb_${job.name}" type="checkbox" value="${job.name}"/>
                                     </td>
                                     <td class="column2">
                                         ${job.name}
                                     </td>
                                     <td class="column3">
-                                        <span id="job_colum3_span_${job.id}">
-                                            ${it.findJobOwnerTeam(job.id).name}
+                                        <span id="job_colum3_span_${job.name}">
+                                            ${it.findJobOwnerTeam(job.name).name}
                                         </span>
                                     </td>
                                 </tr> 

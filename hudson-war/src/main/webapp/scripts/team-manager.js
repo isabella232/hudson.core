@@ -459,7 +459,7 @@ function removeTeamMember(teamName, memberName, parent) {
 
 function configureJobVisibilityAction(configureJobItem) {
     var trParent = jQuery(configureJobItem).parents("tr:first");
-    var jobId = jQuery(trParent).find("input[name='hiddenJobId']").val();
+    var jobName = jQuery(trParent).find("input[name='hiddenJobId']").val();
     var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
     var teamNames = jQuery(trParent).find("input[name='hiddenVisibilities']").val();
 
@@ -479,7 +479,7 @@ function configureJobVisibilityAction(configureJobItem) {
                     teamNames += "public";
                 }
                 jQuery(trParent).find("input[name='hiddenVisibilities']").val(teamNames);
-                configureJobVisibility(jobId, teamNames);
+                configureJobVisibility(jobName, teamNames);
             },
             Cancel: function() {
                 jQuery(this).dialog("close");
@@ -513,12 +513,12 @@ function configureJobVisibilityAction(configureJobItem) {
     });
 }
 
-function configureJobVisibility(jobId, teamNames) {
+function configureJobVisibility(jobName, teamNames) {
     jQuery.ajax({
         type: 'POST',
         url: "setJobVisibility",
         data: {
-            jobId: jobId,
+            jobName: jobName,
             teamNames: teamNames
         },
         success: function() {
@@ -586,17 +586,17 @@ function getJobsToMove() {
     return jobs;
 }
 
-function moveJobs(jobId, teamName, img) {
+function moveJobs(jobName, teamName, img) {
     jQuery.ajax({
         type: 'POST',
         url: "moveJob",
         data: {
-            jobId: jobId,
+            jobName: jobName,
             teamName: teamName
         },
         success: function() {
             jQuery(img).attr('src', imageRoot + '/green-check.jpg');
-            jQuery("#job_colum3_span_" + jobId).text(teamName);
+            jQuery("#job_colum3_span_" + jobName).text(teamName);
             moveCount--;
             if (moveCount === 0) {
                 jQuery('#dialog-move-jobs').dialog("close");

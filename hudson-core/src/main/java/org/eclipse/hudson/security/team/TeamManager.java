@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
@@ -298,7 +299,7 @@ public final class TeamManager implements Saveable {
             return new TeamUtils.ErrorHttpResponse("Team name required.");
         }
         if ((jobName == null) || "".equals(jobName.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Job id required.");
+            return new TeamUtils.ErrorHttpResponse("Job  required.");
         }
         Team newTeam;
         try {
@@ -358,19 +359,32 @@ public final class TeamManager implements Saveable {
 
     private void moveJob(Job job, Team oldTeam, Team newTeam) throws IOException {
         try {
-            File jobRootDir = job.getRootDir();
-            File newJobRootDir = new File(getJobsFolder(newTeam), job.getName());
-            newJobRootDir.mkdirs();
-            Util.moveDirectory(jobRootDir, newJobRootDir);
-            oldTeam.removeJob(job.getName());
-            String newJobName = getTeamQualifiedJobName(newTeam.getName(), job.getName());
-            newTeam.addJob(new TeamJob(newJobName));
-            job.setTeamId(newTeam.getName()); 
-            job.save();
-            Hudson.getInstance().replaceItemId(job.getName(), newJobName);
+           
+            String oldJobName = job.getName();
+            String unqualifiedJobName = getUnqualifiedJobName(job.getName());
+            String qualifiedNewJobName = getTeamQualifiedJobName(newTeam.getName(), unqualifiedJobName);
+            
+//          File jobRootDir = job.getRootDir();  
+//          File newJobRootDir = new File(getJobsFolder(newTeam), qualifiedNewJobName);
+//          newJobRootDir.mkdirs();
+//          Util.moveDirectory(jobRootDir, newJobRootDir);
+            
+            newTeam.addJob(new TeamJob(qualifiedNewJobName));
+            job.renameTo(qualifiedNewJobName); 
+            oldTeam.removeJob(oldJobName);
+            
+            Hudson.getInstance().replaceItemId(job.getName(), qualifiedNewJobName);
         } catch (Exception exc) {
             throw new IOException(exc);
         }
+    }
+    
+    private String getUnqualifiedJobName(String jobName){
+        int index = jobName.indexOf('.');
+        if (jobName.indexOf('.') != -1){
+          jobName = jobName.substring(index + 1);
+        }
+        return jobName;
     }
 
     /**
@@ -587,7 +601,17 @@ public final class TeamManager implements Saveable {
         if ((teamName == null) || "".equals(jobName) || Team.PUBLIC_TEAM_NAME.equals(teamName)) {
             return jobName;
         }
-        return teamName + "." + jobName;
+        String qualifiedJobName = teamName + "." + jobName;
+        int postfix = 2;
+        try {
+            while (findTeam(teamName).isJobOwner(qualifiedJobName)){
+                qualifiedJobName += ("_" + postfix);
+            }
+        } catch (TeamNotFoundException ex) {
+            logger.info("getTeamQualifiedJobName: " + ex.getLocalizedMessage());
+            return jobName;
+        }
+        return qualifiedJobName;
     }
 
     /**
