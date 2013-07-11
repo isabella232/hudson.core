@@ -137,7 +137,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         if (isCurrentUserSysAdmin()) {
             return true;
         }
-        Team team = findCurrentUserTeam();
+        Team team = findUserTeam(authentication.getName());
         if ((team != null) && !isPublicTeam(team)) {
             if (team.isAdmin(authentication.getName())) {
                 return true;
@@ -559,8 +559,18 @@ public final class TeamManager implements Saveable, AccessControlled {
             TeamAwareSecurityRealm teamAwareSecurityRealm = (TeamAwareSecurityRealm) securityRealm;
             team = teamAwareSecurityRealm.GetCurrentUserTeam();
         } else {
-            String currentUser = HudsonSecurityManager.getAuthentication().getName();
-            team = findUserTeam(currentUser);
+            Authentication authentication = HudsonSecurityManager.getAuthentication();
+            team = findUserTeam(authentication.getName());
+            if ((team == null) || isPublicTeam(team)) {
+                for (GrantedAuthority ga : authentication.getAuthorities()) {
+                    String grantedAuthority = ga.getAuthority();
+                    team = findUserTeam(grantedAuthority);
+                    if ((team != null) && !isPublicTeam(team)) {
+                        return team;
+                    }
+                }
+            }
+            team = getPublicTeam();
         }
         return team;
     }
