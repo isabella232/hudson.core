@@ -454,13 +454,10 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     private String getUnqualifiedJobName(Team team, String jobName) {
-        if (Team.PUBLIC_TEAM_NAME.equals(team.getName())) {
-            return jobName;
-        }
-        if (jobName.startsWith(team.getName() + TEAM_SEPARATOR)) {
+        if (!Team.PUBLIC_TEAM_NAME.equals(team.getName()) && jobName.startsWith(team.getName() + TEAM_SEPARATOR)) {
             return jobName.substring(team.getName().length() + 1);
         }
-        throw new IllegalStateException("Job " + jobName + " does not belong to Team " + team.getName());
+        return jobName;
     }
 
     /**
@@ -741,6 +738,26 @@ public final class TeamManager implements Saveable, AccessControlled {
             sb.append("_" + postfix++);
         }
         return sb.toString();
+    }
+    
+    /**
+     * Get the part of job name that is unique within the team.
+     * That is, given <team-name>.<job-part> return job part
+     * if the job is already in <team-name> or <team-name> is
+     * the current user team and team is not the public team.
+     * Otherwise, return jobName.
+     * @param jobName
+     * @return 
+     */
+    public String getUnqualifiedJobName(String jobName) {
+        Team team = findJobOwnerTeam(jobName);
+        if (team == null) {
+            team = findCurrentUserTeam();
+        }
+        if (team != null) {
+            return getUnqualifiedJobName(team, jobName);
+        }
+        return jobName;
     }
 
     /**
