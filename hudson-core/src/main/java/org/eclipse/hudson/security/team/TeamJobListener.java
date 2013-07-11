@@ -16,6 +16,7 @@ import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.listeners.ItemListener;
 import java.io.IOException;
+import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,44 +34,68 @@ public class TeamJobListener extends ItemListener {
 
     @Override
     public void onCreated(Item item) {
-        if (Hudson.getInstance().isTeamManagementEnabled()) {
-            if (item instanceof Job<?, ?>) {
-                Job job = (Job) item;
-                try {
-                    getTeamManager().addJobToCurrentUserTeam(job.getName());
-                } catch (IOException ex) {
-                    logger.error("Failed to rename job in current user team", ex);
-                } catch (TeamManager.TeamNotFoundException ex) {
-                    logger.error("Failed to rename job in current user team", ex);
-                }
+        // If team management enabled, job was created in correct team
+        if (item instanceof Job<?, ?>) {
+            if (!Hudson.getInstance().isTeamManagementEnabled()) {
+                addToPublicTeam(item.getName());
+            } else if (getTeamManager().findJobOwnerTeam(item.getName()) == null) {
+                addToCurrentUserTeam(item.getName());
             }
         }
     }
 
     @Override
     public void onRenamed(Item item, String oldJobName, String newJobName) {
-        if (Hudson.getInstance().isTeamManagementEnabled()) {
-            if (item instanceof Job<?, ?>) {
-                try {
-                    Team team = getTeamManager().findJobOwnerTeam(oldJobName);
-                    getTeamManager().renameJob(team, newJobName, newJobName);
-                } catch (IOException ex) {
-                    logger.error("Failed to rename job in current user team", ex);
-                }
+        if (item instanceof Job<?, ?>) {
+            removeJob(oldJobName);
+            // If team management enabled, job has been added to correct team.
+            if (!Hudson.getInstance().isTeamManagementEnabled()) {
+                addToPublicTeam(newJobName);
+            } else if (getTeamManager().findJobOwnerTeam(newJobName) == null) {
+                addToCurrentUserTeam(newJobName);
             }
         }
     }
 
     @Override
     public void onDeleted(Item item) {
-        if (Hudson.getInstance().isTeamManagementEnabled()) {
-            if (item instanceof Job<?, ?>) {
-                Job job = (Job) item;
-                try {
-                    getTeamManager().removeJobFromCurrentUserTeam(job.getName());
-                } catch (IOException ex) {
-                    logger.error("Failed to rename job in current user team", ex);
-                }
+        if (item instanceof Job<?, ?>) {
+            removeJob(item.getName());
+        }
+    }
+    
+    private void logFailedToAdd(String jobName, String teamName, Exception ex) {
+        logger.error("Failed to add job "+jobName+" to "+teamName+" team", ex);
+    }
+    
+    private void addToCurrentUserTeam(String jobName) {
+        try {
+            getTeamManager().addJobToCurrentUserTeam(jobName);
+            // Log because this case shouldn't occur - could be a bug
+            logger.info("Job "+jobName+" added to team "+getTeamManager().findJobOwnerTeam(jobName).getName());
+        } catch (IOException ex) {
+            logFailedToAdd(jobName, "current user", ex);
+        } catch (TeamNotFoundException ex) {
+            logFailedToAdd(jobName, "current user", ex);
+        }
+    }
+    
+    private void addToPublicTeam(String jobName) {
+        Team publicTeam = getTeamManager().getPublicTeam();
+        try {
+            publicTeam.addJob(new TeamJob(jobName));
+        } catch (IOException ex) {
+            logFailedToAdd(jobName, "public", ex);
+        }
+    }
+    
+    private void removeJob(String jobName) {
+        Team team = getTeamManager().findJobOwnerTeam(jobName);
+        if (team != null) {
+            try {
+                team.removeJob(jobName);
+            } catch (IOException ex) {
+                logger.error("Failed to remove job "+jobName+" in team"+team.getName(), ex);
             }
         }
     }
