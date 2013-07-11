@@ -355,20 +355,10 @@ public abstract class PluginManager extends AbstractModelObject {
      * convenience method to be used by the {@link #loadBundledPlugins()}.
      */
     protected void copyBundledPlugin(URL src, String fileName) throws IOException {
-        long lastModified = src.openConnection().getLastModified();
         File file = new File(rootDir, fileName);
-        File pinFile = new File(rootDir, fileName + ".pinned");
-
-        // update file if:
-        //  - no file exists today
-        //  - bundled version and current version differs (by timestamp), and the file isn't pinned.
-        if (!file.exists() || (file.lastModified() != lastModified && !pinFile.exists())) {
+        // update file no file exists 
+        if (!file.exists()) {
             FileUtils.copyURLToFile(src, file);
-            file.setLastModified(src.openConnection().getLastModified());
-            // lastModified is set for two reasons:
-            // - to avoid unpacking as much as possible, but still do it on both upgrade and downgrade
-            // - to make sure the value is not changed after each restart, so we can avoid
-            // unpacking the plugin itself in ClassicPluginStrategy.explode
         }
     }
 
