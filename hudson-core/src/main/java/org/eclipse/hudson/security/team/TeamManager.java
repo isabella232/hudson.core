@@ -784,7 +784,7 @@ public final class TeamManager implements Saveable, AccessControlled {
     public File[] getJobsRootFolders() {
         List<File> jobsRootFolders = new ArrayList<File>();
         for (Team team : teams) {
-            if (Team.PUBLIC_TEAM_NAME.equals(team.getName())) {
+            if (isPublicTeam(team)) {
                 jobsRootFolders.addAll(team.getJobsRootFolders(hudsonHomeDir));
             } else {
                 jobsRootFolders.addAll(team.getJobsRootFolders(teamsFolder));

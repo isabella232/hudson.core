@@ -32,6 +32,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import org.eclipse.hudson.security.team.TeamManager;
 
 /**
  * Defines a bunch of static methods to be used as a "mix-in" for
@@ -130,8 +131,9 @@ public abstract class ItemGroupMixIn {
             Hudson hudson = Hudson.getInstance();
             Hudson.checkGoodName(name);
             name = name.trim();
-            if (hudson.isTeamManagementEnabled() && (name.indexOf('.') != -1)) {
-                throw new Failure("The job name cannot contain '.' when team management is enabled. ");
+            
+            if (hudson.isTeamManagementEnabled() && (name.indexOf(TeamManager.TEAM_SEPARATOR) != -1)) {
+                throw new Failure("The job name cannot contain" + TeamManager.TEAM_SEPARATOR + "when team management is enabled. ");
             }
             String existingJobName = name;
             if (hudson.isTeamManagementEnabled()){

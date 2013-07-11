@@ -2351,18 +2351,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         }
         File[] jobsRootDirs;
 
-        //Winston - most alternatives duplicate logic in getJobsRootFolders
-        // but this one seems different. Please check.
-        //if (getTeamManager() != null) {
-            jobsRootDirs = getTeamManager().getJobsRootFolders();
-        //} else {
-        //    jobsRootDirs = projectsDir.listFiles(new FileFilter() {
-        //        public boolean accept(File child) {
-        //            return child.isDirectory() && Items.getConfigFile(child).exists();
-        //        }
-        //    });
-        //}
-
+        jobsRootDirs = getTeamManager().getJobsRootFolders();
+         
         TaskGraphBuilder g = new TaskGraphBuilder();
         Handle loadHudson = g.requires(EXTENSIONS_AUGMENTED).attains(JOB_LOADED).add("Loading global config", new Executable() {
             public void run(Reactor session) throws Exception {
@@ -3395,8 +3385,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
         try {
             if (isTeamManagementEnabled()){
-                if (value.indexOf('.') != -1) {
-                    return FormValidation.error("The job name cannot contain '.' when team management is enabled. ");
+                if (value.indexOf(TeamManager.TEAM_SEPARATOR) != -1) {
+                    return FormValidation.error("The job name cannot contain" + TeamManager.TEAM_SEPARATOR + "when team management is enabled. ");
                 }
                 value = getTeamManager().getTeamQualifiedJobName(value);
             }

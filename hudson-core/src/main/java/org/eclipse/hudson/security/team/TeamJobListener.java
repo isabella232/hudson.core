@@ -33,38 +33,44 @@ public class TeamJobListener extends ItemListener {
 
     @Override
     public void onCreated(Item item) {
-        if (item instanceof Job<?, ?>) {
-            Job job = (Job) item;
-            try {
-                getTeamManager().addJobToCurrentUserTeam(job.getName());
-            } catch (IOException ex) {
-                logger.error("Failed to rename job in current user team", ex);
-            } catch (TeamManager.TeamNotFoundException ex) {
-                logger.error("Failed to rename job in current user team", ex);
+        if (Hudson.getInstance().isTeamManagementEnabled()) {
+            if (item instanceof Job<?, ?>) {
+                Job job = (Job) item;
+                try {
+                    getTeamManager().addJobToCurrentUserTeam(job.getName());
+                } catch (IOException ex) {
+                    logger.error("Failed to rename job in current user team", ex);
+                } catch (TeamManager.TeamNotFoundException ex) {
+                    logger.error("Failed to rename job in current user team", ex);
+                }
             }
         }
     }
 
     @Override
     public void onRenamed(Item item, String oldJobName, String newJobName) {
-        if (item instanceof Job<?, ?>) {
-            try {
-                Team team = getTeamManager().findJobOwnerTeam(oldJobName);
-                getTeamManager().renameJob(team, newJobName, newJobName);
-            } catch (IOException ex) {
-                logger.error("Failed to rename job in current user team", ex);
+        if (Hudson.getInstance().isTeamManagementEnabled()) {
+            if (item instanceof Job<?, ?>) {
+                try {
+                    Team team = getTeamManager().findJobOwnerTeam(oldJobName);
+                    getTeamManager().renameJob(team, newJobName, newJobName);
+                } catch (IOException ex) {
+                    logger.error("Failed to rename job in current user team", ex);
+                }
             }
         }
     }
 
     @Override
     public void onDeleted(Item item) {
-        if (item instanceof Job<?, ?>) {
-            Job job = (Job) item;
-            try {
-                getTeamManager().removeJobFromCurrentUserTeam(job.getName());
-            } catch (IOException ex) {
-                logger.error("Failed to rename job in current user team", ex);
+        if (Hudson.getInstance().isTeamManagementEnabled()) {
+            if (item instanceof Job<?, ?>) {
+                Job job = (Job) item;
+                try {
+                    getTeamManager().removeJobFromCurrentUserTeam(job.getName());
+                } catch (IOException ex) {
+                    logger.error("Failed to rename job in current user team", ex);
+                }
             }
         }
     }
