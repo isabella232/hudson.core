@@ -77,7 +77,7 @@
                     ${%Useful when you modified config files directly on disk.}
                 </local:feature>
                 
-                <j:if test="${it.teamManager != null}">
+                <j:if test="${it.isTeamManagementEnabled()}">
                     <local:feature icon="user.png" href="teamManager/" title="${%Manage Teams}"/>
                 </j:if>
                 
