@@ -709,8 +709,8 @@ public final class TeamManager implements Saveable, AccessControlled {
      */
     public String getTeamQualifiedJobName(String jobName) {
         Team team = findCurrentUserTeam();
-        if ((team != null) && !isPublicTeam(team)) {
-            jobName = team.getName() + TEAM_SEPARATOR + jobName;
+        if (team != null) {
+            return getTeamQualifiedJobName(team, jobName);
         }
         return jobName;
     }
@@ -734,7 +734,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         int baseLength = sb.length();
         while (true) {
             String qualifiedName = sb.toString();
-            if (!team.isJobOwner(qualifiedName) && !publicTeam.isJobOwner(qualifiedName)) {
+            if (findJobOwnerTeam(qualifiedName) == null) {
                 break;
             }
             sb.setLength(baseLength);
