@@ -36,7 +36,7 @@
             <li>
               ${%The job was renamed recently and no build was done under the new name.}
             </li>
-            <j:if test="${app.teamManager != null}">
+            <j:if test="${app.teamManagementEnabled}">
                 <li>
                     ${%The job was moved from another team recently and no build was done under the new team.}
                 </li>
