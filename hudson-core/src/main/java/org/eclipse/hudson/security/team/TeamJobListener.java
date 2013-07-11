@@ -34,11 +34,11 @@ public class TeamJobListener extends ItemListener {
 
     @Override
     public void onCreated(Item item) {
-        // If team management enabled, job was created in correct team
         if (item instanceof Job<?, ?>) {
             if (!Hudson.getInstance().isTeamManagementEnabled()) {
                 addToPublicTeam(item.getName());
             } else if (getTeamManager().findJobOwnerTeam(item.getName()) == null) {
+                // Job going to other than default user team must already be added, else...
                 addToCurrentUserTeam(item.getName());
             }
         }
@@ -48,10 +48,10 @@ public class TeamJobListener extends ItemListener {
     public void onRenamed(Item item, String oldJobName, String newJobName) {
         if (item instanceof Job<?, ?>) {
             removeJob(oldJobName);
-            // If team management enabled, job has been added to correct team.
             if (!Hudson.getInstance().isTeamManagementEnabled()) {
                 addToPublicTeam(newJobName);
             } else if (getTeamManager().findJobOwnerTeam(newJobName) == null) {
+                // Job going to other than default user team must already be added, else...
                 addToCurrentUserTeam(newJobName);
             }
         }
