@@ -35,13 +35,13 @@
             <b>
                 Current System Administrators:
             </b>
-            <j:if test="${app.getTeamManager(true).sysAdmins.size() == 0}">
+            <j:if test="${app.getTeamManager().sysAdmins.size() == 0}">
                 <p id="sysAdminNone">
                     None (At least one System Administrator required)
                 </p>
             </j:if>
             <ol name="sysAdminList" id="sysAdminList">
-                <j:forEach var="sysAdmin" items="${app.getTeamManager(true).sysAdmins}">
+                <j:forEach var="sysAdmin" items="${app.getTeamManager().sysAdmins}">
                     <li>
                         <input type="hidden" value="${sysAdmin}" name="hiddenUserName"/>
                         <img src="${imagesURL}/16x16/user.png" style="visibility:hidden" name="typeIcon"/> 
