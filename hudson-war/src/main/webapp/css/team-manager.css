@@ -38,7 +38,7 @@ textarea {
 }
 
 p {
-    font-size: 14px;
+    font-size: 12px;
 }
 
 #container {
@@ -48,7 +48,7 @@ p {
 }
 
 #container h3 {
-    font-size: 18px;
+    font-size: 14px;
     margin-top: 5px; 
     margin-bottom: 5px;
     color: #863566;
@@ -80,6 +80,7 @@ p {
     /*background: url(images/ui-bg_highlight-hard_100_f5f3e5_1x100.png) repeat-x scroll 50% top #f5f3e5;*/
     border-width: 0px 1px 1px 1px;
     border-color:#d4bde6;
+    padding: 10px;
 }
 
 #teamManagerTabs .ui-tabs-nav li {
@@ -127,7 +128,7 @@ ul.team > li {
 }
 
 ul.team h3 {
-    font-size: 18px;
+    font-size: 14px;
     margin: 0;
     color: #863566;
     white-space: nowrap;
@@ -228,7 +229,7 @@ ul.team .teamList {
 }
 
 #teamListScroll {
-    height: 100px;
+    height: 130px;
     overflow: auto;
     border-right-width: 5px; 
     border-bottom-width: 5px; 
