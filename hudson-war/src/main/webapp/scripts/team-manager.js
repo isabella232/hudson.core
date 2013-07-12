@@ -133,6 +133,8 @@ function selectSelectableElement(selectableContainer, elementToSelect) {
 }
 
 function  createTeamButtonAction() {
+    jQuery("#teamDesc").attr('value', ""); 
+    showMessage("", false, jQuery('#teamAddMsg'));
     jQuery('#dialog-create-team').dialog({
         resizable: false,
         height: 200,
