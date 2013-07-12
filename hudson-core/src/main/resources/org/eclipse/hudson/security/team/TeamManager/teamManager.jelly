@@ -29,6 +29,12 @@
             </ul> 
             <div id="teamTab">
                 <div id="teamContainer">
+                    <div style="margin-bottom: 5px;">
+                        <input type="button" id="createTeamButton" value="Add New Team" />
+                        <span id="createTeamMsg">
+                            <!-- message goes here -->
+                        </span>
+                    </div>
                     <j:set var="noTeamMsgVisibility" value='${(it.teams.size() > 1) ? "none" : "visible"}'/>
                     <div id="noTeamsMsg" style='display:${noTeamMsgVisibility}'>
                         <h2>
@@ -54,15 +60,8 @@
                     <div style='display:${teamInfoVisibility}' id="teamInfo">
                         <!-- Team Info is displayed here dynamically -->
                     </div>
-                         
-                    <br style="clear:both"/>
                 </div> 
-                <div>
-                    <input type="button" id="createTeamButton" value="Create New Team" />
-                    <span id="createTeamMsg">
-                        <!-- message goes here -->
-                    </span>
-                </div>
+                 
             </div>
             <div id="jobsTab">
                 <j:if test="${app.items.size() == 0}">
@@ -98,8 +97,6 @@
                             </j:forEach>
                         </tbody>
                     </table>
-                
-                    <br style="clear:both"/>
                 </div> 
                 <div>
                     <input type="button" id="moveJobsButton" value="Move Jobs" />

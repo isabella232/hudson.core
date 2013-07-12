@@ -22,12 +22,12 @@
     <j:set var="rootURL" value="${h.getRequestRootPath(request)}" />
     <j:set var="imagesURL"  value="${rootURL}/images" />
     
-    <div style="margin:15px">
+    <div style="margin:5px">
         <j:if test="${app.teamManager.isCurrentUserSysAdmin()}">
             <button style="float:right; color: #C6223A;" value="${it.name}" class="teamDeleteButton">${%Delete Team}</button>
         </j:if>
         <h3>${it.name}</h3>
-        <p class="description">
+        <p class="description" style="margin-top: 5px; margin-bottom: 5px;">
             ${it.description}
         </p>
     </div>
@@ -43,6 +43,9 @@
         </ul> 
         <div id="teamMemberTab">
             <div class="itemsContainer">
+                <div class="teamMemberAdd">
+                    <button value="${it.name}" class="teamMemberAddButton">${%Add New Member}</button>
+                </div>
                 <div class="memberList">
                     <j:if test="${it.members.size() == 0}">
                         <p id="teamMemberNone_${it.name}">
@@ -109,9 +112,6 @@
                             </j:forEach>
                         </tbody> 
                     </table>
-                </div>
-                <div class="teamMemberAdd">
-                    <button value="${it.name}" class="teamMemberAddButton">${%Add Member}</button>
                 </div>
             </div>
         </div>
