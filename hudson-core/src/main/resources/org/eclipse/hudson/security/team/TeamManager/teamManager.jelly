@@ -127,7 +127,7 @@
     <div style="margin-top: 10px; display: none" id="dialog-delete-team">
         <div>
             <span>
-                The team will be permanently deleted. Do you really want to delete the team?
+                The team will be permanently deleted and any team jobs will become public. Do you really want to delete the team?
             </span>
             <div style="margin-top:10px">
                 <span id="teamDeleteMsg">

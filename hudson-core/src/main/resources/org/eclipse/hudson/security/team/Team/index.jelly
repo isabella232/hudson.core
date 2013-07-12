@@ -24,8 +24,7 @@
     
     <div style="margin:5px">
         <j:if test="${app.teamManager.isCurrentUserSysAdmin()}">
-            <button style="float:right; color: #C6223A;" value="${it.name}" class="teamDeleteButton">${%Delete Team}</button>
-        </j:if>
+            <button style="float:right; color: #C6223A;" value="${it.name}" class="teamDeleteButton">${%Delete Team}</button>        </j:if>
         <h3>${it.name}</h3>
         <p class="description" style="margin-top: 5px; margin-bottom: 5px;">
             ${it.description}

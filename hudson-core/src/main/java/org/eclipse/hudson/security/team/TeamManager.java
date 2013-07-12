@@ -240,6 +240,17 @@ public final class TeamManager implements Saveable, AccessControlled {
 
     public void deleteTeam(String teamName) throws TeamNotFoundException, IOException {
         Team team = findTeam(teamName);
+        if (Team.PUBLIC_TEAM_NAME.equals(team.getName())) {
+            throw new IOException("Cannot delete public team");
+        }
+        // Make deleted team jobs public
+        Team publicTeam = getPublicTeam();
+        for (TeamJob job : team.getJobs()) {
+            TopLevelItem item = Hudson.getInstance().getItem(job.getId());
+            if (item != null && (item instanceof Job)) {
+                moveJob((Job)item, team, publicTeam);
+            }
+        }
         teams.remove(team);
         save();
     }
