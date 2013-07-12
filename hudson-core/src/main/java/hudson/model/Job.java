@@ -1441,15 +1441,14 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             save();
 
             String newName = req.getParameter("name");
-            if (newName != null && !newName.equals(name)) {
+            if (newName != null && !newName.equals(getEditableName())) {
                 
                 if (Hudson.getInstance().isTeamManagementEnabled()) {
-                    // Make the name qualified before confirm
-                    // Don't change teams in a rename
+                    // Make the name qualified in the same team before confirm
                     TeamManager teamManager = Hudson.getInstance().getTeamManager();
                     Team team = teamManager.findJobOwnerTeam(getName());
                     if (team != null) {
-                        // newName in this case is an unqualified job name
+                        // newName in this case is an unqualified job name, so fix
                         newName = teamManager.getTeamQualifiedJobName(team, newName);
                     }
                 }
