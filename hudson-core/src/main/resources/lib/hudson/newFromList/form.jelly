@@ -34,6 +34,11 @@
       <s:textbox id="name" name="name" checkUrl="'${rootURL}/${attrs.checkUrl}?value='+encodeURIComponent(this.value)"/>
       <script>$('name').focus();</script>
     </s:entry>
+    <j:if test="${!empty(attrs.teamNames)}">
+      <s:entry title="${attrs.teamTitle}">
+        <s:editableComboBox id="team" name="team" items="${attrs.teamNames}" checkUrl="'${rootURL}/${attrs.checkTeamUrl}?value='+encodeURIComponent(this.value)"/>
+      </s:entry>
+    </j:if>
 
     <j:forEach var="descriptor" items="${descriptors}">
       <s:block>

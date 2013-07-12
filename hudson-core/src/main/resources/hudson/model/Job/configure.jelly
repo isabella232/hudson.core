@@ -34,7 +34,7 @@
         
         <j:if test="${it.isNameEditable()}">
           <f:entry title="${%name(it.pronoun)}">
-            <f:textbox name="name" value="${it.name}" />
+            <f:textbox name="name" value="${it.editableName}" />
           </f:entry>
         </j:if>
         <j:set var="cascadingCandidates" value="${cu.getCascadingParents(it.class, it)}"/>

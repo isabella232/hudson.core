@@ -32,7 +32,10 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import org.eclipse.hudson.security.team.Team;
 import org.eclipse.hudson.security.team.TeamManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Defines a bunch of static methods to be used as a "mix-in" for
@@ -43,6 +46,8 @@ import org.eclipse.hudson.security.team.TeamManager;
  */
 public abstract class ItemGroupMixIn {
 
+    private transient Logger logger = LoggerFactory.getLogger(ItemGroupMixIn.class);
+    
     /**
      * {@link ItemGroup} for which we are working.
      */
@@ -127,7 +132,9 @@ public abstract class ItemGroupMixIn {
             throw new Failure("Query parameter 'name' is required");
         }
 
-        { // check if the name looks good
+        Team requestedTeam = null;
+
+        {   // check if the name looks good
             Hudson hudson = Hudson.getInstance();
             Hudson.checkGoodName(name);
             name = name.trim();
@@ -142,8 +149,21 @@ public abstract class ItemGroupMixIn {
             if (parent.getItem(existingJobName) != null) {
                 throw new Failure(Messages.Hudson_JobAlreadyExists(existingJobName));
             }
+            
+            // see if team requested
+            if (hudson.isTeamManagementEnabled()) {
+                String team = req.getParameter("team");
+                String teamName = team.trim();
+                if (teamName.length() > 0) {
+                    try {
+                        requestedTeam = hudson.getTeamManager().findTeam(teamName);
+                    } catch (TeamManager.TeamNotFoundException ex) {
+                        logger.error("Requested team "+teamName+" not found");
+                    }
+                }
+            }
         }
-
+        
         String mode = req.getParameter("mode");
         if (mode != null && mode.equals("copy")) {
             String from = req.getParameter("from");
@@ -179,6 +199,11 @@ public abstract class ItemGroupMixIn {
                 // create empty job and redirect to the project config screen
                 result = createProject(Items.getDescriptor(mode), name, true);
             }
+        }
+        
+        if (Hudson.getInstance().isTeamManagementEnabled() && requestedTeam != null) {
+            TeamManager teamManager = Hudson.getInstance().getTeamManager();
+            teamManager.ensureJobInTeam(result, requestedTeam);
         }
 
         rsp.sendRedirect2(redirectAfterCreateItem(req, result));

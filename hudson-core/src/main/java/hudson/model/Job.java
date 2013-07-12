@@ -67,6 +67,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import net.sf.json.JSONException;
 
@@ -91,6 +93,8 @@ import org.kohsuke.stapler.export.Exported;
 import static javax.servlet.http.HttpServletResponse.*;
 import org.eclipse.hudson.graph.*;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.eclipse.hudson.security.team.Team;
+import org.eclipse.hudson.security.team.TeamManager;
 
 /**
  * A job is an runnable entity under the monitoring of Hudson.
@@ -559,6 +563,20 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     public boolean isNameEditable() {
         return true;
+    }
+    
+    /**
+     * If team enabled, allow user to edit only the unqualified portion
+     * of the job name; otherwise, edit the full name.
+     * @return editable name
+     * @since 3.1.0
+     */
+    public String getEditableName() {
+        String editableName = getName();
+        if (Hudson.getInstance().isTeamManagementEnabled()) {
+            editableName = Hudson.getInstance().getTeamManager().getUnqualifiedJobName(editableName);
+        }
+        return editableName;
     }
 
     /**
@@ -1424,6 +1442,18 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
             String newName = req.getParameter("name");
             if (newName != null && !newName.equals(name)) {
+                
+                if (Hudson.getInstance().isTeamManagementEnabled()) {
+                    // Make the name qualified before confirm
+                    // Don't change teams in a rename
+                    TeamManager teamManager = Hudson.getInstance().getTeamManager();
+                    Team team = teamManager.findJobOwnerTeam(getName());
+                    if (team != null) {
+                        // newName in this case is an unqualified job name
+                        newName = teamManager.getTeamQualifiedJobName(team, newName);
+                    }
+                }
+
                 // check this error early to avoid HTTP response splitting.
                 Hudson.checkGoodName(newName);
                 rsp.sendRedirect("rename?newName=" + URLEncoder.encode(newName, "UTF-8"));
@@ -1544,6 +1574,20 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             // redirect to page explaining that we can't rename now
             rsp.sendRedirect("rename?newName=" + URLEncoder.encode(newName, "UTF-8"));
             return;
+        }
+        
+        if (Hudson.getInstance().isTeamManagementEnabled()) {
+            // Do this before rename or team will change to default for user
+            TeamManager teamManager = Hudson.getInstance().getTeamManager();
+            Team team = teamManager.findJobOwnerTeam(getName());
+            if (team != null) {
+                try {
+                    // newName is already a qualified job name
+                    teamManager.addJob(team, newName);
+                } catch (TeamManager.TeamNotFoundException ex) {
+                    // Can't happen with non-null team
+                }
+            }
         }
 
         renameTo(newName);

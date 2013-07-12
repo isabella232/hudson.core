@@ -198,6 +198,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.regex.Pattern;
 import org.antlr.runtime.RecognitionException;
@@ -3391,6 +3392,35 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                 value = getTeamManager().getTeamQualifiedJobName(value);
             }
             checkJobName(value);
+            return FormValidation.ok();
+        } catch (Failure e) {
+            return FormValidation.error(e.getMessage());
+        }
+    }
+
+    /**
+     * Makes sure that the given name is good as a team name.
+     */
+    public FormValidation doCheckTeamName(@QueryParameter String value) {
+        // this method can be used to check if a file exists anywhere in the file system,
+        // so it should be protected.
+        checkPermission(Item.CREATE);
+
+        if (fixEmpty(value) == null) {
+            return FormValidation.ok();
+        }
+
+        try {
+            if (isTeamManagementEnabled()) {
+                try {
+                    getTeamManager().findTeam(value);
+                } catch (TeamManager.TeamNotFoundException ex) {
+                    throw new Failure("No such team "+value);
+                }
+                if (!getTeamManager().isCurrentUserHasAccessToTeam(value)) {
+                    throw new Failure("Current user cannot access team "+value);
+                }
+            }
             return FormValidation.ok();
         } catch (Failure e) {
             return FormValidation.error(e.getMessage());

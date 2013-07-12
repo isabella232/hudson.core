@@ -31,8 +31,20 @@
       </h1>
       
       <j:invokeStatic var="jobs" className="hudson.model.Items" method="all" />
-      <n:form nameTitle="${%Job name}" copyTitle="${%Copy existing job}" copyNames="${app.jobNames}"
-              descriptors="${jobs}" checkUrl="checkJobName" xmlns:n="/lib/hudson/newFromList" />
+      <j:choose>
+          <j:when test="${app.teamManagementEnabled and app.teamManager.currentUserInMultipleTeams}">
+              <n:form nameTitle="${%Job name}" copyTitle="${%Copy existing job}" copyNames="${app.jobNames}"
+                  descriptors="${jobs}" checkUrl="checkJobName" xmlns:n="/lib/hudson/newFromList"
+                  teamNames="${app.teamManager.currentUserTeams}" teamTitle="${%Team name}" 
+                  checkTeamUrl="checkTeamName" />
+          </j:when>
+          <j:otherwise>
+              <n:form nameTitle="${%Team name}" copyTitle="${%New job in team}" copyNames="${app.teamManager.currentUserTeams}"
+                  descriptors="${teams}" checkUrl="checkTeamName" xmlns:n="/lib/hudson/newFromList" />
+          </j:otherwise>
+      </j:choose>
+      <!--n:form nameTitle="${%Job name}" copyTitle="${%Copy existing job}" copyNames="${app.jobNames}"
+              descriptors="${jobs}" checkUrl="checkJobName" xmlns:n="/lib/hudson/newFromList" /-->
     </l:main-panel>
   </l:layout>
 </j:jelly>

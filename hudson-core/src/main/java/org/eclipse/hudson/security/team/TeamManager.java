@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -544,7 +545,45 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return false;
     }
-
+    
+    private String getCurrentUser() {
+        Authentication authentication = HudsonSecurityManager.getAuthentication();
+        return authentication.getName();
+    }
+    
+    /**
+     * Check if current user is in more than one team.
+     */
+    public boolean isCurrentUserInMultipleTeams() {
+        if (isCurrentUserSysAdmin()) {
+            return teams.size() > 1;
+        }
+        String user = getCurrentUser();
+        int count = 0;
+        for (Team team : teams) {
+            if (team.isMember(user)) {
+                count++;
+            }
+        }
+        return count > 1;
+    }
+    
+    /**
+     * Get all the teams current user is a member of.
+     * Sys admin is considered to be a member of all teams.
+     */
+    public Collection<String> getCurrentUserTeams() {
+        List<String> list = new ArrayList<String>();
+        boolean admin = isCurrentUserSysAdmin();
+        String user = getCurrentUser();
+        for (Team team : teams) {
+            if (admin || team.isMember(user)) {
+                list.add(team.getName());
+            }
+        }
+        return list;
+    }
+    
     public Team findCurrentUserTeam() {
         Team team;
         HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
