@@ -48,7 +48,7 @@
                     <div style='display:${teamInfoVisibility}' id="teamList">
                         <div id="teamListScroll">
                             <ol id="selectableTeamList">    
-                                <j:forEach var="teamName" items="${it.teamNames}">
+                                <j:forEach var="teamName" items="${it.currentUserAdminTeams}">
                                     <j:if test='${!teamName.equals("public")}'>
                                         <li class="ui-widget-content" title="${teamName}">${teamName}</li> 
                                     </j:if>
@@ -80,7 +80,7 @@
                                 <th align="left">Job Name</th>
                                 <th align="left">Team Name</th>      
                             </tr>      
-                            <j:forEach var="job" items="${app.items}">
+                            <j:forEach var="job" items="${it.currentUserAdminJobs}">
                                 <tr>
                                     <td class="column1">
                                         <input class="move_cb_${job.name}" type="checkbox" value="${job.name}"/>

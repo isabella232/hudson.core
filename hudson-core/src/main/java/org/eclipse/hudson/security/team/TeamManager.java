@@ -133,6 +133,7 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     public boolean isCurrentUserTeamAdmin() {
+        /* This is a bad test. User may not be admin of default team but may be of another.
         Authentication authentication = HudsonSecurityManager.getAuthentication();
         logger.debug("Checking if principal " + authentication.getName() + " is a Team Admin");
         if (isCurrentUserSysAdmin()) {
@@ -153,6 +154,16 @@ public final class TeamManager implements Saveable, AccessControlled {
                         return true;
                     }
                 }
+            }
+        }
+        */
+        if (isCurrentUserSysAdmin()) {
+            return true;
+        }
+        String user = getCurrentUser();
+        for (Team team : teams) {
+            if (team.isAdmin(user)) {
+                return true;
             }
         }
         return false;
@@ -473,7 +484,7 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     /**
-     * Get the name of the teams as JSON
+     * Get the name of the current user admin teams as JSON
      *
      * @return HttpResponse with JSON as content type
      */
@@ -485,8 +496,9 @@ public final class TeamManager implements Saveable, AccessControlled {
                 rsp.setContentType("application/json");
                 PrintWriter w = new PrintWriter(rsp.getWriter());
                 w.println("{");
+                List<String> teams = (List<String>) getCurrentUserAdminTeams();
                 for (int i = 0; i < teams.size(); i++) {
-                    w.print("\"" + teams.get(i).getName() + "\":\"" + teams.get(i).getName() + "\"");
+                    w.print("\"" + teams.get(i) + "\":\"" + teams.get(i) + "\"");
                     if (i < teams.size() - 1) {
                         w.println(",");
                     }
@@ -560,6 +572,75 @@ public final class TeamManager implements Saveable, AccessControlled {
     private String getCurrentUser() {
         Authentication authentication = HudsonSecurityManager.getAuthentication();
         return authentication.getName();
+    }
+    
+    /**
+     * Check if current user is not sys admin and is admin of exactly one team.
+     * @return 
+     */
+    public boolean isCurrentUserAdminInSingleTeam() {
+        if (isCurrentUserSysAdmin()) {
+            return false;
+        }
+        String user = getCurrentUser();
+        int count = 0;
+        for (Team team : teams) {
+            if (team.isAdmin(user)) {
+                count++;
+            }
+        }
+        return count == 1;
+    }
+    
+    /**
+     * Check if current user is admin in more than one team
+     */
+    public boolean isCurrentUserAdminInMultipleTeams() {
+        if (isCurrentUserSysAdmin()) {
+            return true;
+        }
+        String user = getCurrentUser();
+        int count = 0;
+        for (Team team : teams) {
+            if (team.isAdmin(user)) {
+                count++;
+            }
+        }
+        return count > 1;
+    }
+    
+    /**
+     * Get all the teams current user is admin of.
+     * Sys admin is considered to be admin of all teams.
+     */
+    public Collection<String> getCurrentUserAdminTeams() {
+        List<String> list = new ArrayList<String>();
+        boolean admin = isCurrentUserSysAdmin();
+        String user = getCurrentUser();
+        for (Team team : teams) {
+            if (admin || team.isAdmin(user)) {
+                list.add(team.getName());
+            }
+        }
+        return list;
+    }
+    
+    public Collection<Job> getCurrentUserAdminJobs() {
+        Hudson hudson = Hudson.getInstance();
+        List<Job> jobs = new ArrayList<Job>();
+        boolean admin = isCurrentUserSysAdmin();
+        String user = getCurrentUser();
+        for (Team team : teams) {
+            if (admin || team.isAdmin(user)) {
+                for (TeamJob teamJob : team.getJobs()) {
+                    TopLevelItem item = hudson.getItem(teamJob.getId());
+                    if (item != null && (item instanceof Job)) {
+                        jobs.add((Job) item);
+                    }
+                }
+            }
+        }
+        return jobs;
     }
     
     /**
