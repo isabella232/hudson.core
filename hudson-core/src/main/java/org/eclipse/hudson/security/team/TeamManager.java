@@ -26,7 +26,6 @@ import hudson.model.TopLevelItem;
 import hudson.model.listeners.SaveableListener;
 import hudson.security.ACL;
 import hudson.security.AccessControlled;
-import hudson.security.AuthorizationStrategy;
 import hudson.security.Permission;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.SecurityRealm;
@@ -41,7 +40,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
@@ -140,7 +138,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         for (Team team : teams) {
             if (team.isAdmin(user)) {
                 return true;
-            }else{
+            } else {
                 // Check if any of the group the user is a memmber has given
                 // Team Admin Role
                 for (GrantedAuthority ga : getCurrentUserRoles()) {
@@ -187,14 +185,14 @@ public final class TeamManager implements Saveable, AccessControlled {
         return teamList;
     }
 
-    public Team createTeam(String teamName, String description) throws IOException, TeamAlreadyExistsException {
+    public Team createTeam(String teamName, String description, String customFolder) throws IOException, TeamAlreadyExistsException {
         for (Team team : teams) {
             if (teamName.equals(team.getName())) {
                 throw new TeamAlreadyExistsException(teamName);
             }
         }
 
-        Team newTeam = new Team(teamName, description, this);
+        Team newTeam = new Team(teamName, description, customFolder, this);
         addTeam(newTeam);
         return newTeam;
     }
@@ -231,7 +229,7 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     public Team createTeam(String teamName) throws IOException, TeamAlreadyExistsException {
-        return createTeam(teamName, teamName);
+        return createTeam(teamName, teamName, null);
     }
 
     public void deleteTeam(String teamName) throws TeamNotFoundException, IOException {
@@ -244,22 +242,28 @@ public final class TeamManager implements Saveable, AccessControlled {
         for (TeamJob job : team.getJobs()) {
             TopLevelItem item = Hudson.getInstance().getItem(job.getId());
             if (item != null && (item instanceof Job)) {
-                moveJob((Job)item, team, publicTeam);
+                moveJob((Job) item, team, publicTeam);
             }
         }
         teams.remove(team);
         save();
     }
 
-    public HttpResponse doCreateTeam(@QueryParameter String teamName, @QueryParameter String description) throws IOException {
+    public HttpResponse doCreateTeam(@QueryParameter String teamName, @QueryParameter String description, @QueryParameter String customFolder) throws IOException {
         if (!isCurrentUserSysAdmin()) {
             return new TeamUtils.ErrorHttpResponse("No permission to create team.");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Team name required.");
         }
+        if ((customFolder != null) && !"".equals(customFolder.trim())) {
+            File folder = new File(customFolder.trim());
+            if (!folder.mkdirs()) {
+                return new TeamUtils.ErrorHttpResponse("Could not create custom team folder - " + customFolder);
+            }
+        }
         try {
-            createTeam(teamName, description);
+            createTeam(teamName, description, customFolder);
             return HttpResponses.ok();
         } catch (TeamAlreadyExistsException ex) {
             return new TeamUtils.ErrorHttpResponse(ex.getLocalizedMessage());
@@ -430,7 +434,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return HttpResponses.ok();
     }
-
+    
     public HttpResponse doCheckSid(@QueryParameter String sid) throws IOException {
         return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(sid));
     }
@@ -544,7 +548,7 @@ public final class TeamManager implements Saveable, AccessControlled {
                 } else {
                     if (team.isMember(getCurrentUser())) {
                         return true;
-                    }else{
+                    } else {
                         for (GrantedAuthority ga : getCurrentUserRoles()) {
                             if (team.isMember(ga.getAuthority())) {
                                 return true;
@@ -558,35 +562,36 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return false;
     }
-    
+
     private String getCurrentUser() {
         Authentication authentication = HudsonSecurityManager.getAuthentication();
         return authentication.getName();
     }
-    
+
     private GrantedAuthority[] getCurrentUserRoles() {
         Authentication authentication = HudsonSecurityManager.getAuthentication();
         return authentication.getAuthorities();
     }
-    
+
     /**
      * Check if current user is not sys admin and is admin of exactly one team.
-     * @return 
+     *
+     * @return
      */
     public boolean isCurrentUserAdminInSingleTeam() {
         return getCurrentUserAdminTeams().size() == 1;
     }
-    
+
     /**
      * Check if current user is admin in more than one team
      */
     public boolean isCurrentUserAdminInMultipleTeams() {
         return getCurrentUserAdminTeams().size() > 1;
     }
-    
+
     /**
-     * Get all the teams current user is admin of.
-     * Sys admin is considered to be admin of all teams.
+     * Get all the teams current user is admin of. Sys admin is considered to be
+     * admin of all teams.
      */
     public Collection<String> getCurrentUserAdminTeams() {
         List<String> list = new ArrayList<String>();
@@ -595,7 +600,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         for (Team team : teams) {
             if (admin || team.isMember(user)) {
                 list.add(team.getName());
-            }else{
+            } else {
                 // Check if any of the group the user is a memmber, has given Team Admin Role
                 for (GrantedAuthority ga : getCurrentUserRoles()) {
                     logger.debug("Checking if the principal's role " + ga.toString() + " is a Team Admin Role");
@@ -607,7 +612,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return list;
     }
-    
+
     public Collection<Job> getCurrentUserAdminJobs() {
         Hudson hudson = Hudson.getInstance();
         List<Job> jobs = new ArrayList<Job>();
@@ -616,15 +621,15 @@ public final class TeamManager implements Saveable, AccessControlled {
         for (Team team : teams) {
             boolean teamAdmin = false;
             if (team.isAdmin(user)) {
-               teamAdmin = true; 
+                teamAdmin = true;
             } else {
                 // Check if any of the group the user is a memmber, has Team Admin Role
                 // and 
                 for (GrantedAuthority ga : getCurrentUserRoles()) {
                     if (team.isAdmin(ga.getAuthority())) {
-                        teamAdmin = true; 
+                        teamAdmin = true;
                     }
-                }  
+                }
             }
             if (sysAdmin || teamAdmin) {
                 for (TeamJob teamJob : team.getJobs()) {
@@ -637,17 +642,17 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return jobs;
     }
-    
+
     /**
      * Check if current user is in more than one team.
      */
     public boolean isCurrentUserInMultipleTeams() {
         return getCurrentUserTeams().size() > 1;
     }
-    
+
     /**
-     * Get all the teams current user is a member of.
-     * Sys admin is considered to be a member of all teams.
+     * Get all the teams current user is a member of. Sys admin is considered to
+     * be a member of all teams.
      */
     public Collection<String> getCurrentUserTeams() {
         List<String> list = new ArrayList<String>();
@@ -656,7 +661,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         for (Team team : teams) {
             if (admin || team.isMember(user)) {
                 list.add(team.getName());
-            }else{
+            } else {
                 // Check if any of the group the user is a memmber, is also a member of the team
                 for (GrantedAuthority ga : getCurrentUserRoles()) {
                     logger.debug("Checking if the principal's role " + ga.toString() + " is a Team Admin Role");
@@ -668,7 +673,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return list;
     }
-    
+
     public Team findCurrentUserTeam() {
         Team team;
         HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
@@ -863,15 +868,15 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return sb.toString();
     }
-    
+
     /**
-     * Get the part of job name that is unique within the team.
-     * That is, given <team-name>.<job-part> return job part
-     * if the job is already in <team-name> or <team-name> is
-     * the current user team and team is not the public team.
-     * Otherwise, return jobName.
+     * Get the part of job name that is unique within the team. That is, given
+     * <team-name>.<job-part> return job part if the job is already in
+     * <team-name> or <team-name> is the current user team and team is not the
+     * public team. Otherwise, return jobName.
+     *
      * @param jobName
-     * @return 
+     * @return
      */
     public String getUnqualifiedJobName(String jobName) {
         Team team = findJobOwnerTeam(jobName);
@@ -893,42 +898,21 @@ public final class TeamManager implements Saveable, AccessControlled {
      * jobs are.
      *
      * @param jobName
-     * @return String, path to the team jobs folder
+     * @return File, team jobs folder
      */
-    public String getJobsFolderName(String jobName) {
+     
+    public File getRootFolderForJob(String jobName) {
         Team team = findJobOwnerTeam(jobName);
         // May be just created job
-        if (team == null && isTeamManagementEnabled()) {
+        if ((team == null) && isTeamManagementEnabled()) {
             team = findCurrentUserTeam();
         }
-        if ((team != null) && !isPublicTeam(team)) {
-            return TEAMS_FOLDER_NAME + "/" + team.getName() + "/" + Team.JOBS_FOLDER_NAME;
-        }
-        return "jobs";
-    }
-
-    public String getJobsFolderName(String teamName, String jobName) {
-        if ((teamName != null) && !"".equals(teamName) && !Team.PUBLIC_TEAM_NAME.equals(teamName)) {
-            return TEAMS_FOLDER_NAME + "/" + teamName + "/" + Team.JOBS_FOLDER_NAME;
+        if (isPublicTeam(team)) {
+            return new File(team.getJobsFolder(hudsonHomeDir), jobName);
         } else {
-            return getJobsFolderName(jobName);
+            return new File(team.getJobsFolder(teamsFolder), jobName);
         }
     }
-
-    /**
-     * Get the folder where the jobs of this team are stored
-     *
-     * @param team
-     * @return
-     */
-    public File getJobsFolder(Team team) {
-        if ((team != null) && !isPublicTeam(team)) {
-            return new File(teamsFolder, "/" + team.getName() + "/" + Team.JOBS_FOLDER_NAME);
-        } else {
-            return new File(hudsonHomeDir, "jobs");
-        }
-    }
-
     /**
      * Get the root folders of all the jobs known to this Team manager
      *

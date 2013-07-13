@@ -73,13 +73,12 @@ public class UpdateJobCommand extends CLICommand {
         } else {
             try {
                 h.checkPermission(Job.CONFIGURE);
-                String jobsFolderName = teamManager.getJobsFolderName(item.getName());  
-                File rootDirOfJob = new File(new File(h.getRootDir(), jobsFolderName), name);
+                File rootDirOfJob = teamManager.getRootFolderForJob(item.getName()); 
                 // place it as config.xml
                 File configXml = Items.getConfigFile(rootDirOfJob).getFile();
                 IOUtils.copy(stdin, configXml);
 
-                item = h.reloadProjectFromDisk(configXml.getParentFile());
+                h.reloadProjectFromDisk(configXml.getParentFile());
             } catch (IOException e) {
                 throw e;
             }

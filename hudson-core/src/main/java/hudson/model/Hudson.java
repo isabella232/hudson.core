@@ -2153,13 +2153,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     
     @Override
     public File getRootDirFor(TopLevelItem child) {
-        String jobsFolderName = getTeamManager().getJobsFolderName(child.getName());
-        return new File(new File(getRootDir(), jobsFolderName), child.getName());
+        return getRootDirFor(child.getName());
     }
 
     private File getRootDirFor(String jobName) {
-        String jobsFolderName = getTeamManager().getJobsFolderName(jobName);
-        return new File(new File(getRootDir(), jobsFolderName), jobName);
+       return getTeamManager().getRootFolderForJob(jobName);
     }
 
     /**
@@ -2350,9 +2348,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             }
             throw new IOException("Unable to create " + projectsDir + "\nPermission issue? Please create this directory manually.");
         }
-        File[] jobsRootDirs;
-
-        jobsRootDirs = getTeamManager().getJobsRootFolders();
+        File[] jobsRootDirs = getTeamManager().getJobsRootFolders();
          
         TaskGraphBuilder g = new TaskGraphBuilder();
         Handle loadHudson = g.requires(EXTENSIONS_AUGMENTED).attains(JOB_LOADED).add("Loading global config", new Executable() {

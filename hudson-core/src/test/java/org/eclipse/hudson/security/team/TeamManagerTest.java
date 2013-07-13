@@ -317,7 +317,7 @@ public class TeamManagerTest {
         teamManager.setUseBulkSaveFlag(false);
         teamManager.addSysAdmin("admin1");
         teamManager.addSysAdmin("Paul");
-        Team team = teamManager.createTeam("Team1", "Team1 Description");
+        Team team = teamManager.createTeam("Team1", "Team1 Description", null);
         TeamMember member = new TeamMember();
         member.setName("member1");
         member.setAsTeamAdmin(true);

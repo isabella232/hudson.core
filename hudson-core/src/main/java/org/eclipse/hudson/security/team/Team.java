@@ -50,6 +50,7 @@ public class Team implements AccessControlled {
     protected static final String JOBS_FOLDER_NAME = "jobs";
     private String description;
     private transient TeamManager teamManager;
+    private String customFolderName;
 
     //Used for unmarshalling
     Team() {
@@ -60,9 +61,14 @@ public class Team implements AccessControlled {
     }
 
     Team(String teamName, String description, TeamManager teamManager) {
+        this(teamName, description, null, teamManager);
+    }
+    
+    Team(String teamName, String description, String customFolderName, TeamManager teamManager) {
         this.name = teamName;
         this.description = description;
         this.teamManager = teamManager;
+        this.customFolderName = customFolderName;
     }
 
     public String getName() {
@@ -76,6 +82,14 @@ public class Team implements AccessControlled {
     void setDescription(String description) throws IOException {
         this.description = description;
         getTeamManager().save();
+    }
+    
+    String getCustomFolderName() {
+        return customFolderName;
+    }
+
+    void setCustomFolderName(String customTeamFolderName) {
+        this.customFolderName = customTeamFolderName;
     }
 
     public boolean isCurrentUserSysAdmin() {
@@ -259,8 +273,8 @@ public class Team implements AccessControlled {
 
     }
 
-    List<File> getJobsRootFolders(File rootFolder) {
-        File jobsFolder = getJobsFolder(rootFolder);
+    List<File> getJobsRootFolders(File teamsFolder) {
+        File jobsFolder = getJobsFolder(teamsFolder);
         if (jobsFolder.exists()) {
             File[] jobsRootFolders = jobsFolder.listFiles(new FileFilter() {
                 @Override
@@ -274,9 +288,16 @@ public class Team implements AccessControlled {
         }
         return Collections.EMPTY_LIST;
     }
-
-    protected File getJobsFolder(File rootFolder) {
-        return new File(rootFolder, name + "/" + JOBS_FOLDER_NAME);
+    
+    /**
+     * The folder where all the jobs of this team is saved
+     * @return File
+     */
+    File getJobsFolder(File teamsFolder) {
+        if ((customFolderName != null) && !"".equals(customFolderName.trim())){
+            return new File(customFolderName);
+        }
+        return new File(teamsFolder, name + "/" + JOBS_FOLDER_NAME);
     }
 
     @Override
@@ -330,6 +351,11 @@ public class Team implements AccessControlled {
             writer.startNode("description");
             writer.setValue(team.getDescription());
             writer.endNode();
+            if ((team.customFolderName != null) && !"".equals(team.customFolderName.trim())) {
+                writer.startNode("customFolderName");
+                writer.setValue(team.getCustomFolderName());
+                writer.endNode();
+            }
 
             for (TeamJob job : team.getJobs()) {
                 writer.startNode("job");
@@ -355,6 +381,11 @@ public class Team implements AccessControlled {
                 if ("description".equals(reader.getNodeName())) {
                     team.description = reader.getValue();
                 }
+                 
+                if ("customFolderName".equals(reader.getNodeName())) {
+                    team.customFolderName = reader.getValue();
+                }
+                
                 if ("job".equals(reader.getNodeName())) {
                     TeamJob teamJob = (TeamJob) uc.convertAnother(team, TeamJob.class);
                     team.jobs.add(teamJob);

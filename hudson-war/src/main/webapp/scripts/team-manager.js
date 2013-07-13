@@ -137,17 +137,18 @@ function  createTeamButtonAction() {
     showMessage("", false, jQuery('#teamAddMsg'));
     jQuery('#dialog-create-team').dialog({
         resizable: false,
-        height: 200,
-        width: 450,
+        height: 250,
+        width: 550,
         modal: true,
         buttons: {
             'Create': function() {
                 var teamName = jQuery("#teamName").val();
                 var teamDesc = jQuery("#teamDesc").val();
+                var teamFolder = jQuery("#teamCustomFolder").val();
                 if (!/^[a-zA-Z0-9]+$/.test(teamName)) {
                    showMessage("Only Alpha-Numeric characters allowed in team name.", true, jQuery('#teamAddMsg'));
                 } else {
-                    createTeam(jQuery.trim(teamName), jQuery.trim(teamDesc));
+                    createTeam(jQuery.trim(teamName), jQuery.trim(teamDesc), jQuery.trim(teamFolder));
                 }
             },
             Cancel: function() {
@@ -157,13 +158,14 @@ function  createTeamButtonAction() {
     });
 }
 
-function createTeam(teamName, teamDesc) {
+function createTeam(teamName, teamDesc, teamFolder) {
     jQuery.ajax({
         type: 'POST',
         url: "createTeam",
         data: {
             teamName: teamName,
-            description: teamDesc
+            description: teamDesc,
+            customFolder: teamFolder
         },
         success: function(result) {
             jQuery("#noTeamsMsg").hide();

@@ -116,7 +116,11 @@
             <input type="text" name="teamName" id="teamName" size="25"/>
             <br/>
             <label for="teamDesc">Description:</label> 
-            <input type="text" name="teamDesc" id="teamDesc" size="50"/>
+            <input type="text" name="teamDesc" id="teamDesc" size="65"/>
+            <label for="teamDesc">Custom team folder:</label> 
+            <input type="text" name="customFolder" id="teamCustomFolder" size="65"/>
+            <br/>
+            <span>(Provide absolute path or leave it empty)</span>
         </div>
         <div style="margin-top:10px">
             <span id="teamAddMsg">
