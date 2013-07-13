@@ -598,13 +598,13 @@ public final class TeamManager implements Saveable, AccessControlled {
         boolean admin = isCurrentUserSysAdmin();
         String user = getCurrentUser();
         for (Team team : teams) {
-            if (admin || team.isMember(user)) {
+            if (admin || team.isAdmin(user)) {
                 list.add(team.getName());
             } else {
                 // Check if any of the group the user is a memmber, has given Team Admin Role
                 for (GrantedAuthority ga : getCurrentUserRoles()) {
                     logger.debug("Checking if the principal's role " + ga.toString() + " is a Team Admin Role");
-                    if (team.isMember(ga.getAuthority())) {
+                    if (team.isAdmin(ga.getAuthority())) {
                         list.add(team.getName());
                     }
                 }
