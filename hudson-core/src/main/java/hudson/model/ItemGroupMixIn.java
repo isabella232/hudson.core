@@ -153,12 +153,14 @@ public abstract class ItemGroupMixIn {
             // see if team requested
             if (hudson.isTeamManagementEnabled()) {
                 String team = req.getParameter("team");
-                String teamName = team.trim();
-                if (teamName.length() > 0) {
-                    try {
-                        requestedTeam = hudson.getTeamManager().findTeam(teamName);
-                    } catch (TeamManager.TeamNotFoundException ex) {
-                        logger.error("Requested team "+teamName+" not found");
+                if (team != null){
+                    String teamName = team.trim();
+                    if (teamName.length() > 0) {
+                        try {
+                            requestedTeam = hudson.getTeamManager().findTeam(teamName);
+                        } catch (TeamManager.TeamNotFoundException ex) {
+                            logger.error("Requested team " + teamName + " not found");
+                        }
                     }
                 }
             }

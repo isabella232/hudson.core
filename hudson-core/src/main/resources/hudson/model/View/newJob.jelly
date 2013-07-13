@@ -34,9 +34,7 @@
       <n:form nameTitle="${%Job name}" copyTitle="${%Copy existing job}" copyNames="${app.jobNames}"
         descriptors="${jobs}" checkUrl="checkJobName" xmlns:n="/lib/hudson/newFromList"
         teamNames="${app.teamManager.currentUserTeams}" teamTitle="${%Team name}" 
-        checkTeamUrl="checkTeamName" chooseTeam="app.getTeamManager().getCurrentUserTeams().size() > 1" />
-      <!--n:form nameTitle="${%Job name}" copyTitle="${%Copy existing job}" copyNames="${app.jobNames}"
-              descriptors="${jobs}" checkUrl="checkJobName" xmlns:n="/lib/hudson/newFromList" /-->
+        checkTeamUrl="checkTeamName" chooseTeam="${app.getTeamManager().getCurrentUserTeams().size() > 1}" />
     </l:main-panel>
   </l:layout>
 </j:jelly>

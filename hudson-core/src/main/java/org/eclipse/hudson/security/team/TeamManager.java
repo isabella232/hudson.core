@@ -542,9 +542,14 @@ public final class TeamManager implements Saveable, AccessControlled {
                         return true;
                     }
                 } else {
-                    String currentUser = HudsonSecurityManager.getAuthentication().getName();
-                    if (team.isMember(currentUser)) {
+                    if (team.isMember(getCurrentUser())) {
                         return true;
+                    }else{
+                        for (GrantedAuthority ga : getCurrentUserRoles()) {
+                            if (team.isMember(ga.getAuthority())) {
+                                return true;
+                            }
+                        }
                     }
                 }
             } catch (TeamNotFoundException ex) {
