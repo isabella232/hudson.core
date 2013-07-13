@@ -117,13 +117,13 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     public boolean isCurrentUserSysAdmin() {
-        Authentication authentication = HudsonSecurityManager.getAuthentication();
-        logger.debug("Checking if principal " + authentication.getName() + " is a System Admin");
-        if (isSysAdmin(authentication.getName())) {
+        String user = getCurrentUser();
+        logger.debug("Checking if principal " + user + " is a System Admin");
+        if (isSysAdmin(user)) {
             return true;
         } else {
-            for (GrantedAuthority ga : authentication.getAuthorities()) {
-                logger.debug("Checking if principal's role " + ga.toString() + " is a System Admin Role");
+            for (GrantedAuthority ga : getCurrentUserRoles()) {
+                logger.debug("Checking if the principal's role " + ga.toString() + " is a System Admin Role");
                 if (isSysAdmin(ga.getAuthority())) {
                     return true;
                 }
@@ -133,30 +133,6 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     public boolean isCurrentUserTeamAdmin() {
-        /* This is a bad test. User may not be admin of default team but may be of another.
-        Authentication authentication = HudsonSecurityManager.getAuthentication();
-        logger.debug("Checking if principal " + authentication.getName() + " is a Team Admin");
-        if (isCurrentUserSysAdmin()) {
-            return true;
-        }
-        Team team = findUserTeam(authentication.getName());
-        if ((team != null) && !isPublicTeam(team)) {
-            if (team.isAdmin(authentication.getName())) {
-                return true;
-            }
-        } else {
-            for (GrantedAuthority ga : authentication.getAuthorities()) {
-                logger.debug("Checking if principal's role " + ga.toString() + " is a Team Admin Role");
-                String grantedAuthority = ga.getAuthority();
-                team = findUserTeam(grantedAuthority);
-                if ((team != null) && !isPublicTeam(team)) {
-                    if (team.isAdmin(grantedAuthority)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        */
         if (isCurrentUserSysAdmin()) {
             return true;
         }
@@ -164,6 +140,15 @@ public final class TeamManager implements Saveable, AccessControlled {
         for (Team team : teams) {
             if (team.isAdmin(user)) {
                 return true;
+            }else{
+                // Check if any of the group the user is a memmber has given
+                // Team Admin Role
+                for (GrantedAuthority ga : getCurrentUserRoles()) {
+                    logger.debug("Checking if the principal's role " + ga.toString() + " is a Team Admin Role");
+                    if (team.isAdmin(ga.getAuthority())) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -574,39 +559,24 @@ public final class TeamManager implements Saveable, AccessControlled {
         return authentication.getName();
     }
     
+    private GrantedAuthority[] getCurrentUserRoles() {
+        Authentication authentication = HudsonSecurityManager.getAuthentication();
+        return authentication.getAuthorities();
+    }
+    
     /**
      * Check if current user is not sys admin and is admin of exactly one team.
      * @return 
      */
     public boolean isCurrentUserAdminInSingleTeam() {
-        if (isCurrentUserSysAdmin()) {
-            return false;
-        }
-        String user = getCurrentUser();
-        int count = 0;
-        for (Team team : teams) {
-            if (team.isAdmin(user)) {
-                count++;
-            }
-        }
-        return count == 1;
+        return getCurrentUserAdminTeams().size() == 1;
     }
     
     /**
      * Check if current user is admin in more than one team
      */
     public boolean isCurrentUserAdminInMultipleTeams() {
-        if (isCurrentUserSysAdmin()) {
-            return true;
-        }
-        String user = getCurrentUser();
-        int count = 0;
-        for (Team team : teams) {
-            if (team.isAdmin(user)) {
-                count++;
-            }
-        }
-        return count > 1;
+        return getCurrentUserAdminTeams().size() > 1;
     }
     
     /**
@@ -618,8 +588,16 @@ public final class TeamManager implements Saveable, AccessControlled {
         boolean admin = isCurrentUserSysAdmin();
         String user = getCurrentUser();
         for (Team team : teams) {
-            if (admin || team.isAdmin(user)) {
+            if (admin || team.isMember(user)) {
                 list.add(team.getName());
+            }else{
+                // Check if any of the group the user is a memmber, has given Team Admin Role
+                for (GrantedAuthority ga : getCurrentUserRoles()) {
+                    logger.debug("Checking if the principal's role " + ga.toString() + " is a Team Admin Role");
+                    if (team.isMember(ga.getAuthority())) {
+                        list.add(team.getName());
+                    }
+                }
             }
         }
         return list;
@@ -628,10 +606,22 @@ public final class TeamManager implements Saveable, AccessControlled {
     public Collection<Job> getCurrentUserAdminJobs() {
         Hudson hudson = Hudson.getInstance();
         List<Job> jobs = new ArrayList<Job>();
-        boolean admin = isCurrentUserSysAdmin();
+        boolean sysAdmin = isCurrentUserSysAdmin();
         String user = getCurrentUser();
         for (Team team : teams) {
-            if (admin || team.isAdmin(user)) {
+            boolean teamAdmin = false;
+            if (team.isAdmin(user)) {
+               teamAdmin = true; 
+            } else {
+                // Check if any of the group the user is a memmber, has Team Admin Role
+                // and 
+                for (GrantedAuthority ga : getCurrentUserRoles()) {
+                    if (team.isAdmin(ga.getAuthority())) {
+                        teamAdmin = true; 
+                    }
+                }  
+            }
+            if (sysAdmin || teamAdmin) {
                 for (TeamJob teamJob : team.getJobs()) {
                     TopLevelItem item = hudson.getItem(teamJob.getId());
                     if (item != null && (item instanceof Job)) {
@@ -647,17 +637,7 @@ public final class TeamManager implements Saveable, AccessControlled {
      * Check if current user is in more than one team.
      */
     public boolean isCurrentUserInMultipleTeams() {
-        if (isCurrentUserSysAdmin()) {
-            return teams.size() > 1;
-        }
-        String user = getCurrentUser();
-        int count = 0;
-        for (Team team : teams) {
-            if (team.isMember(user)) {
-                count++;
-            }
-        }
-        return count > 1;
+        return getCurrentUserTeams().size() > 1;
     }
     
     /**
@@ -671,6 +651,14 @@ public final class TeamManager implements Saveable, AccessControlled {
         for (Team team : teams) {
             if (admin || team.isMember(user)) {
                 list.add(team.getName());
+            }else{
+                // Check if any of the group the user is a memmber, is also a member of the team
+                for (GrantedAuthority ga : getCurrentUserRoles()) {
+                    logger.debug("Checking if the principal's role " + ga.toString() + " is a Team Admin Role");
+                    if (team.isMember(ga.getAuthority())) {
+                        list.add(team.getName());
+                    }
+                }
             }
         }
         return list;
