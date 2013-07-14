@@ -588,6 +588,17 @@ public final class TeamManager implements Saveable, AccessControlled {
     public boolean isCurrentUserAdminInMultipleTeams() {
         return getCurrentUserAdminTeams().size() > 1;
     }
+    
+    /**
+     * Get the team in the case where current user is admin of only one team.
+     */
+    public String getCurrentUserAdminTeam() {
+        List<String> teams = (List<String>) getCurrentUserAdminTeams();
+        if (teams.size() == 1) {
+            return teams.get(0);
+        }
+        throw new IllegalStateException("Current user is admin of "+teams.size()+" teams");
+    }
 
     /**
      * Get all the teams current user is admin of. Sys admin is considered to be
