@@ -258,7 +258,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         if ((customFolder != null) && !"".equals(customFolder.trim())) {
             File folder = new File(customFolder.trim());
-            if (!folder.mkdirs()) {
+            if (!folder.exists() && !folder.mkdirs()) {
                 return new TeamUtils.ErrorHttpResponse("Could not create custom team folder - " + customFolder);
             }
         }
