@@ -27,10 +27,10 @@
         
         <st:include page="sidepanel.jelly" />
         <l:main-panel>   
-            <j:if test='${it.isCurrentUserAdminInMultipleTeams()}'>
+            <j:if test='${it.isCurrentUserSysAdmin() || it.isCurrentUserAdminInMultipleTeams()}'>
                 <st:include page="teamManager.jelly" /> 
             </j:if>     
-            <j:if test='${it.isCurrentUserAdminInSingleTeam()}'>
+            <j:if test='${!it.isCurrentUserSysAdmin() &amp;&amp; it.isCurrentUserAdminInSingleTeam()}'>
                 <st:include page="teamAdmin.jelly"/>
             </j:if>        
         

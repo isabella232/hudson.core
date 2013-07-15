@@ -32,10 +32,10 @@
       <l:task icon="images/24x24/setting.png" href="${rootURL}/manage" title="${%Manage Hudson}" permission="${app.ADMINISTER}" it="${app}" />
       
       <j:if test="${app.isTeamManagementEnabled()}">
-        <j:if test="${app.teamManager.currentUserAdminInMultipleTeams}">
+        <j:if test="${app.getTeamManager().isCurrentUserSysAdmin() || app.getTeamManager().isCurrentUserAdminInMultipleTeams()}">
           <l:task icon="images/24x24/user.png" href="${rootURL}/teamManager" title="${%Manage Teams}"/>
         </j:if>
-        <j:if test="${app.teamManager.currentUserAdminInSingleTeam}">
+        <j:if test="${!app.getTeamManager().isCurrentUserSysAdmin() &amp;&amp; app.getTeamManager().isCurrentUserAdminInSingleTeam()}">
           <l:task icon="images/24x24/user.png" href="${rootURL}/teamManager" title="${%Manage Team}"/>
         </j:if>
       </j:if>
