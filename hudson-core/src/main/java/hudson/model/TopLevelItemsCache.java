@@ -41,7 +41,7 @@ class TopLevelItemsCache {
     
     TopLevelItemsCache() { 
         
-        cache = CacheBuilder.<LazyTopLevelItem.Key,TopLevelItem>newBuilder()
+        cache = CacheBuilder.newBuilder()
                 .initialCapacity(INITIAL_CAPACITY)
                 .expireAfterAccess(EVICT_IN_SECONDS, TimeUnit.SECONDS)
                 .maximumSize(MAX_ENTRIES)

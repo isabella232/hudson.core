@@ -733,7 +733,7 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
         
         private LazyRunValueCache() {
             
-            cache = CacheBuilder.<LazyRunValue.Key, RunValue>newBuilder()
+            cache = CacheBuilder.newBuilder()
                         .expireAfterAccess(EVICT_BUILD_IN_SECONDS, TimeUnit.SECONDS)
                         .initialCapacity(1024)
                         .maximumSize(MAX_ENTRIES)
