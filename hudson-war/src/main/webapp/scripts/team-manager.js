@@ -591,6 +591,9 @@ function getJobsToMove() {
 }
 
 function moveJobs(jobName, teamName, img) {
+    jQuery('#teamJobsContainer input[@type=checkbox]:checked').each(function() {
+        jQuery(this).prop('checked', false);
+    });
     jQuery.ajax({
         type: 'POST',
         url: "moveJob",
@@ -600,7 +603,7 @@ function moveJobs(jobName, teamName, img) {
         },
         success: function() {
             jQuery(img).attr('src', imageRoot + '/green-check.jpg');
-            jQuery("#job_colum3_span_" + jobName).text(teamName);
+            jQuery("#job_colum3_span_" + jobName.replace(".","\\.")).text(teamName);
             moveCount--;
             if (moveCount === 0) {
                 jQuery('#dialog-move-jobs').dialog("close");

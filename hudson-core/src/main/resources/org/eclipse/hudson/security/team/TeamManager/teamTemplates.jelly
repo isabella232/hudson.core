@@ -74,22 +74,22 @@
             
             <div>
                 <label>${%Can Create}:</label>
-                <input type="checkbox" style="margin-left:5px" id="cb_createFlag" checked="yes"/>
+                <input type="checkbox" style="margin-left:5px" id="cb_createFlag" checked="checked"/>
             </div>
             
             <div>
                 <label>${%Can Delete}:</label>
-                <input type="checkbox" style="margin-left:5px" id="cb_deleteFlag" checked="yes"/>
+                <input type="checkbox" style="margin-left:5px" id="cb_deleteFlag" checked="checked"/>
             </div>
             
             <div>
                 <label>${%Can Configure}:</label>
-                <input type="checkbox" style="margin-left:5px" id="cb_configureFlag" checked="yes"/>
+                <input type="checkbox" style="margin-left:5px" id="cb_configureFlag" checked="checked"/>
             </div>
             
             <div>
                 <label>${%Can Build}:</label>
-                <input type="checkbox" style="margin-left:5px" id="cb_buildFlag" checked="yes"/>
+                <input type="checkbox" style="margin-left:5px" id="cb_buildFlag" checked="checked"/>
             </div>
              
             <div style="margin-top:10px">
