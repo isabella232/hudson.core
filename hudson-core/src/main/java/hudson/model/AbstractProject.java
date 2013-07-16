@@ -1,7 +1,7 @@
 /**
  * *****************************************************************************
  *
- * Copyright (c) 2004-2011 Oracle Corporation.
+ * Copyright (c) 2004-2013 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -12,7 +12,8 @@
  *
  * Kohsuke Kawaguchi, Brian Westrich, Erik Ramfelt, Ertan Deniz, Jean-Baptiste
  * Quenot, Luca Domenico Milanesio, R. Tyler Ballance, Stephen Connolly, Tom
- * Huybrechts, id:cactusman, Yahoo! Inc., Anton Kozak, Nikita Levyankov
+ * Huybrechts, id:cactusman, Yahoo! Inc., Anton Kozak, Nikita Levyankov,
+ * Roy Varghese
  *
  *
  ******************************************************************************
@@ -160,7 +161,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      */
     protected transient /*
              * almost final
-             */ RunMap<R> builds = new RunMap<R>();
+             */ RunMap<P,R> builds;
     /**
      * The quiet period. Null to delegate to the system default.
      *
@@ -296,6 +297,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
 
     protected AbstractProject(ItemGroup parent, String name) {
         super(parent, name);
+        this.builds = new RunMap(this);
 
         //TODO: Investigate when this case happens.
         //if (Hudson.getInstance() != null && !Hudson.getInstance().getNodes().isEmpty()) {
@@ -322,8 +324,9 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     public void onLoad(ItemGroup<? extends Item> parent, String name) throws IOException {
         super.onLoad(parent, name);
 
-        this.builds = new RunMap<R>();
-        this.builds.load(this, new Constructor<R>() {
+        this.builds = new RunMap(this);
+        
+        this.builds.load( (P)this, new Constructor<R>() {
             public R create(File dir) throws IOException {
                 return loadBuild(dir);
             }
@@ -1180,6 +1183,11 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
         this.builds.remove(run);
     }
 
+    @Override
+    public BuildHistory<P,R> getBuildHistory() {
+        return builds;
+    }
+    
     /**
      * Determines Class&lt;R>.
      */
@@ -1891,7 +1899,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
 
     @Override
     protected HistoryWidget createHistoryWidget() {
-        return new BuildHistoryWidget<R>(this, getBuilds(), HISTORY_ADAPTER);
+        return new BuildHistoryWidget(this, getBuildHistory(), HISTORY_ADAPTER);
     }
 
     public boolean isParameterized() {

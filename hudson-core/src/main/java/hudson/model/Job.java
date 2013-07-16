@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2012 Oracle Corporation.
+ * Copyright (c) 2004-2013 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -10,7 +10,8 @@
  * Contributors:
  *
  *   Kohsuke Kawaguchi, Winston Prakash, Martin Eigenbrodt, Matthew R. Harrah,
- *   Stephen Connolly, Tom Huybrechts, Anton Kozak, Nikita Levyankov
+ *   Stephen Connolly, Tom Huybrechts, Anton Kozak, Nikita Levyankov,
+ *   Roy Varghese
  *
  *******************************************************************************/ 
 
@@ -41,6 +42,7 @@ import hudson.search.SearchItem;
 import hudson.search.SearchItems;
 import hudson.security.*;
 import hudson.tasks.LogRotator;
+import hudson.util.BuildHistoryList;
 import hudson.util.CopyOnWriteList;
 
 import hudson.util.IOException2;
@@ -186,7 +188,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Selected cascadingProject for this job.
      */
     protected transient JobT cascadingProject;
-    private transient ThreadLocal<Boolean> allowSave = new ThreadLocal<Boolean>() {
+    private final static transient ThreadLocal<Boolean> allowSave = new ThreadLocal<Boolean>() {
         @Override
         protected Boolean initialValue() {
             return true;
@@ -199,9 +201,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * @param allowSave allow save.
      */
     public void setAllowSave(Boolean allowSave) {
-        if (null == this.allowSave) {
-            initAllowSave();
-        }
         this.allowSave.set(allowSave);
     }
 
@@ -315,9 +314,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     @Override
     public synchronized void save() throws IOException {
-        if (null == allowSave) {
-            initAllowSave();
-        }
         if (isAllowSave()) {
             super.save();
             holdOffBuildUntilSave = false;
@@ -329,9 +325,14 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     public void onLoad(ItemGroup<? extends Item> parent, String name)
             throws IOException {
         super.onLoad(parent, name);
-        cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
-                cascadingProjectName);
-        initAllowSave();
+//        cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
+//                cascadingProjectName);
+        if ( cascadingProjectName  != null ) {
+            TopLevelItem tlItem = Hudson.getInstance().getItem(cascadingProjectName);
+            if ( this.getClass().isAssignableFrom( tlItem.getClass())) {
+                cascadingProject = (JobT) tlItem;
+            }
+        }
         TextFile f = getNextBuildNumberFile();
         if (f.exists()) {
             // starting 1.28, we store nextBuildNumber in a separate file.
@@ -381,14 +382,15 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
         save();
     }
-
+    
     protected void initAllowSave() {
-        allowSave = new ThreadLocal<Boolean>() {
-            @Override
-            protected Boolean initialValue() {
-                return true;
-            }
-        };
+//        No need to init, ThreadLocal is now a final static variable
+//        allowSave = new ThreadLocal<Boolean>() {
+//            @Override
+//            protected Boolean initialValue() {
+//                return true;
+//            }
+//        };
     }
 
     /**
@@ -895,10 +897,12 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     protected HistoryWidget createHistoryWidget() {
-        return new HistoryWidget<Job, RunT>(this, getBuilds(), HISTORY_ADAPTER);
+        return new HistoryWidget(this, getBuildHistory(), HISTORY_ADAPTER);
     }
-    protected static final HistoryWidget.Adapter<Run> HISTORY_ADAPTER = new Adapter<Run>() {
-        public int compare(Run record, String key) {
+ 
+    protected static final HistoryWidget.Adapter<BuildHistory.Record> HISTORY_ADAPTER = 
+            new Adapter<BuildHistory.Record>() {
+        public int compare(BuildHistory.Record record, String key) {
             try {
                 int k = Integer.parseInt(key);
                 return record.getNumber() - k;
@@ -907,11 +911,11 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             }
         }
 
-        public String getKey(Run record) {
+        public String getKey(BuildHistory.Record record) {
             return String.valueOf(record.getNumber());
         }
 
-        public boolean isBuilding(Run record) {
+        public boolean isBuilding(BuildHistory.Record record) {
             return record.isBuilding();
         }
 
@@ -924,7 +928,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             }
         }
     };
-
     /**
      * @inheritDoc
      */
@@ -1103,7 +1106,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             return new File(getRootDir(), BUILDS_DIRNAME);
         }
     }
-
+    
+    public abstract BuildHistory<JobT,RunT> getBuildHistory();
+    
     /**
      * Gets all the runs.
      *
@@ -1126,12 +1131,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getLastBuild() {
-        SortedMap<Integer, ? extends RunT> runs = _getRuns();
-
-        if (runs.isEmpty()) {
-            return null;
-        }
-        return runs.get(runs.firstKey());
+        return getBuildHistory().getLastBuild();
     }
 
     /**
@@ -1140,12 +1140,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getFirstBuild() {
-        SortedMap<Integer, ? extends RunT> runs = _getRuns();
-
-        if (runs.isEmpty()) {
-            return null;
-        }
-        return runs.get(runs.lastKey());
+        return getBuildHistory().getFirstBuild();
     }
 
     /**
@@ -1158,13 +1153,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getLastSuccessfulBuild() {
-        RunT r = getLastBuild();
-        // temporary work around till we figure out what's causing this bug
-        while (r != null
-                && (r.isBuilding() || r.getResult() == null || r.getResult().isWorseThan(Result.UNSTABLE))) {
-            r = r.getPreviousBuild();
-        }
-        return r;
+        return getBuildHistory().getLastSuccessfulBuild();
     }
 
     /**
@@ -1176,12 +1165,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getLastUnsuccessfulBuild() {
-        RunT r = getLastBuild();
-        while (r != null
-                && (r.isBuilding() || r.getResult() == Result.SUCCESS)) {
-            r = r.getPreviousBuild();
-        }
-        return r;
+        return getBuildHistory().getLastUnsuccessfulBuild();
     }
 
     /**
@@ -1192,12 +1176,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getLastUnstableBuild() {
-        RunT r = getLastBuild();
-        while (r != null
-                && (r.isBuilding() || r.getResult() != Result.UNSTABLE)) {
-            r = r.getPreviousBuild();
-        }
-        return r;
+        return getBuildHistory().getLastUnstableBuild();
     }
 
     /**
@@ -1208,12 +1187,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getLastStableBuild() {
-        RunT r = getLastBuild();
-        while (r != null
-                && (r.isBuilding() || r.getResult().isWorseThan(Result.SUCCESS))) {
-            r = r.getPreviousBuild();
-        }
-        return r;
+        return getBuildHistory().getLastStableBuild();
     }
 
     /**
@@ -1222,11 +1196,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getLastFailedBuild() {
-        RunT r = getLastBuild();
-        while (r != null && (r.isBuilding() || r.getResult() != Result.FAILURE)) {
-            r = r.getPreviousBuild();
-        }
-        return r;
+        return getBuildHistory().getLastFailedBuild();
     }
 
     /**
@@ -1235,11 +1205,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getLastCompletedBuild() {
-        RunT r = getLastBuild();
-        while (r != null && r.isBuilding()) {
-            r = r.getPreviousBuild();
-        }
-        return r;
+        return getBuildHistory().getLastCompletedBuild();
     }
 
     /**
@@ -1251,21 +1217,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Never null.
      */
     public List<RunT> getLastBuildsOverThreshold(int numberOfBuilds, Result threshold) {
-
-        List<RunT> result = new ArrayList<RunT>(numberOfBuilds);
-
-        RunT r = getLastBuild();
-        while (r != null && result.size() < numberOfBuilds) {
-
-            if (!r.isBuilding()
-                    && (r.getResult() != null && r.getResult().isBetterOrEqualTo(threshold))) {
-
-                result.add(r);
-            }
-            r = r.getPreviousBuild();
-        }
-
-        return result;
+        return getBuildHistory().getLastBuildsOverThreshold(numberOfBuilds, threshold);
     }
 
     public final long getEstimatedDuration() {
@@ -1383,9 +1335,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         // we can give a simple view of build health from the last five builds
         int failCount = 0;
         int totalCount = 0;
-        RunT i = getLastBuild();
-        while (totalCount < 5 && i != null) {
-            switch (i.getIconColor()) {
+
+        BuildHistory.Record r = getBuildHistory().getLast();
+        while (totalCount < 5 && r != null) {
+            switch (r.getIconColor()) {
                 case GREEN:
                 case BLUE:
                 case YELLOW:
@@ -1401,7 +1354,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                     // do nothing as these are inconclusive statuses
                     break;
             }
-            i = i.getPreviousBuild();
+            r = r.getPrevious();
         }
         if (totalCount > 0) {
             int score = (int) ((100.0 * (totalCount - failCount)) / totalCount);
@@ -1624,7 +1577,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     public BuildTimelineWidget getTimeline() {
-        return new BuildTimelineWidget(getBuilds());
+        final BuildHistoryList<JobT, RunT> bhl = BuildHistoryList.newBuildHistoryList(getBuildHistory());
+        return new BuildTimelineWidget(bhl);
     }
 
     /**
@@ -1834,6 +1788,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         return graph;
     }
 
+    
+
     // For backward compatibility with JFreechart
     private class TimeTrendChartLabel extends ChartLabel {
 
@@ -1900,6 +1856,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             return run.getDisplayName() + " : " + run.getDurationString();
         }
     }
+    
     private String getRelPath(StaplerRequest req) {
         String relPath = req.getParameter("rel");
         if (relPath == null) {
@@ -1907,4 +1864,5 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
         return relPath;
     }
+    
 }

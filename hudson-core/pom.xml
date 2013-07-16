@@ -635,6 +635,12 @@
             <artifactId>commons-logging</artifactId>
             <version>${commons-logging.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+            
         <!--
         | these are now optional in commons-logging:1.1.1,
         | keeping them around in case any plugins use them

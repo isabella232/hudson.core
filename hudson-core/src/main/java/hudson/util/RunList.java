@@ -25,7 +25,6 @@ import hudson.model.Run;
 import hudson.model.View;
 
 import java.util.AbstractList;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,7 +40,7 @@ import java.util.List;
  *
  * @author Kohsuke Kawaguchi
  */
-public class RunList<R extends Run> extends ArrayList<R> {
+public class RunList<R extends Run> extends AbstractRunList<R> {
 
     public RunList() {
     }
@@ -50,10 +49,12 @@ public class RunList<R extends Run> extends ArrayList<R> {
         addAll(j.getBuilds());
     }
 
+    @Override
     public R getFirstBuild() {
         return isEmpty() ? null : get(size() - 1);
     }
 
+    @Override
     public R getLastBuild() {
         return isEmpty() ? null : get(0);
     }
@@ -85,6 +86,7 @@ public class RunList<R extends Run> extends ArrayList<R> {
     /**
      * Filter the list to non-successful builds only.
      */
+    @Override
     public RunList<R> failureOnly() {
         for (Iterator<R> itr = iterator(); itr.hasNext();) {
             Run r = itr.next();
@@ -98,6 +100,7 @@ public class RunList<R extends Run> extends ArrayList<R> {
     /**
      * Filter the list to builds on a single node only
      */
+    @Override
     public RunList<R> node(Node node) {
         for (Iterator<R> itr = iterator(); itr.hasNext();) {
             Run r = itr.next();
@@ -111,6 +114,7 @@ public class RunList<R extends Run> extends ArrayList<R> {
     /**
      * Filter the list to regression builds only.
      */
+    @Override
     public RunList<R> regressionOnly() {
         for (Iterator<R> itr = iterator(); itr.hasNext();) {
             Run r = itr.next();
@@ -126,6 +130,7 @@ public class RunList<R extends Run> extends ArrayList<R> {
      *
      * {@code s&lt=;e}.
      */
+    @Override
     public RunList<R> byTimestamp(long start, long end) {
         AbstractList<Long> TIMESTAMP_ADAPTER = new AbstractList<Long>() {
             public Long get(int index) {
@@ -166,6 +171,7 @@ public class RunList<R extends Run> extends ArrayList<R> {
      * also removes on-going builds, as RSS cannot be used to publish
      * information if it changes.
      */
+    @Override
     public RunList<R> newBuilds() {
         GregorianCalendar threshold = new GregorianCalendar();
         threshold.add(Calendar.DAY_OF_YEAR, -7);

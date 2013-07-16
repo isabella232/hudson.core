@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2013 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,8 @@
  *
  * Contributors:
  *
- *    Kohsuke Kawaguchi,   Daniel Dyer, Red Hat, Inc., Tom Huybrechts, Romain Seguy, Yahoo! Inc.,   Darek Ostolski
+ *    Kohsuke Kawaguchi,   Daniel Dyer, Red Hat, Inc., Tom Huybrechts, 
+ *    Romain Seguy, Yahoo! Inc.,   Darek Ostolski, Roy Varghese
  *
  *
  *******************************************************************************/ 
@@ -150,7 +151,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * The build result. This value may change while the state is in
      * {@link State#BUILDING}.
      */
-    protected volatile Result result;
+    private volatile Result result;
     /**
      * Human-readable description. Can be null.
      */
@@ -165,9 +166,9 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     /**
      * The current build state.
      */
-    protected volatile transient State state;
+    private volatile transient State state;
 
-    private static enum State {
+    static enum State {
 
         /**
          * Build is created/queued but we haven't started building it.
@@ -235,7 +236,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     protected Run(JobT job, long timestamp) {
         this.project = job;
         this.timestamp = timestamp;
-        this.state = State.NOT_STARTED;
+        setState(State.NOT_STARTED);
     }
 
     /**
@@ -244,8 +245,8 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     protected Run(JobT project, File buildDir) throws IOException {
         this(project, parseTimestampFromBuildDir(buildDir));
         this.previousBuildInProgress = _this(); // loaded builds are always completed
-        this.state = State.COMPLETED;
-        this.result = Result.FAILURE;  // defensive measure. value should be overwritten by unmarshal, but just in case the saved data is inconsistent
+        setState(State.COMPLETED);
+        setResult(Result.FAILURE);  // defensive measure. value should be overwritten by unmarshal, but just in case the saved data is inconsistent
         getDataFile().unmarshal(this); // load the rest of the data
     }
 
@@ -307,7 +308,8 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     public void setResult(Result r) {
         // state can change only when we are building
-        assert state == State.BUILDING;
+        // roy: can also change during testing
+        // assert state == State.BUILDING;
 
         // result can only get worse
         if (result == null) {
@@ -319,6 +321,14 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 result = r;
             }
         }
+    }
+    
+    final void setState(State state) {
+        this.state = state;
+    }
+    
+    final State getState() {
+        return state;
     }
 
     /**
@@ -640,7 +650,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Gets the most recent {@linkplain #isBuilding() completed} build excluding
      * 'this' Run itself.
      */
-    public final RunT getPreviousCompletedBuild() {
+    public RunT getPreviousCompletedBuild() {
         RunT r = getPreviousBuild();
         while (r != null && r.isBuilding()) {
             r = r.getPreviousBuild();
@@ -656,7 +666,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * <p> We basically follow the existing skip list, and wherever we find a
      * non-optimal pointer, we remember them in 'fixUp' and update them later.
      */
-    public final RunT getPreviousBuildInProgress() {
+    public RunT getPreviousBuildInProgress() {
         if (previousBuildInProgress == this) {
             return null;    // the most common case
         }
@@ -1341,7 +1351,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     protected final void run(Runner job) {
-        if (result != null) {
+        if (getResult() != null) {
             return;     // already built.
         }
         StreamBuildListener listener = null;
@@ -1389,25 +1399,25 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
                     setResult(job.run(listener));
 
-                    LOGGER.info(toString() + " main build action completed: " + result);
+                    LOGGER.log(FINE, "Build " + this + " main build action completed: " + getResult());
                     CheckPoint.MAIN_COMPLETED.report();
                 } catch (ThreadDeath t) {
                     throw t;
                 } catch (AbortException e) { // orderly abortion.
-                    result = Result.FAILURE;
+                    setResult(Result.FAILURE);
                     listener.error(e.getMessage());
                     LOGGER.log(FINE, "Build " + this + " aborted", e);
                 } catch (RunnerAbortedException e) { // orderly abortion.
-                    result = Result.FAILURE;
+                    setResult(Result.FAILURE);
                     LOGGER.log(FINE, "Build " + this + " aborted", e);
                 } catch (InterruptedException e) {
                     // aborted
-                    result = Result.ABORTED;
+                    setResult(Result.ABORTED);
                     listener.getLogger().println(Messages.Run_BuildAborted());
                     LOGGER.log(Level.INFO, toString() + " aborted", e);
                 } catch (Throwable e) {
                     handleFatalBuildProblem(listener, e);
-                    result = Result.FAILURE;
+                    setResult(Result.FAILURE);
                 }
 
                 // even if the main build fails fatally, try to run post build processing
@@ -1417,7 +1427,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 throw t;
             } catch (Throwable e) {
                 handleFatalBuildProblem(listener, e);
-                result = Result.FAILURE;
+                setResult(Result.FAILURE);
             } finally {
                 long end = System.currentTimeMillis();
                 duration = Math.max(end - start, 0);  // @see HUDSON-5844
@@ -1427,7 +1437,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 // will now see this build as completed.
                 // things like triggering other builds requires this as pre-condition.
                 // see issue #980.
-                state = State.POST_PRODUCTION;
+                setState(State.POST_PRODUCTION);
 
                 try {
                     job.cleanUp(listener);
@@ -1439,7 +1449,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 RunListener.fireCompleted(this, listener);
 
                 if (listener != null) {
-                    listener.finished(result);
+                    listener.finished(getResult());
                 }
                 if (listener != null) {
                     listener.closeQuietly();
@@ -1493,7 +1503,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Called when a job started building.
      */
     protected void onStartBuilding() {
-        state = State.BUILDING;
+        setState(State.BUILDING);
         if (runner != null) {
             RunnerStack.INSTANCE.push(runner);
         }
@@ -1506,15 +1516,15 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         // signal that we've finished building.
         if (runner != null) {
             // MavenBuilds may be created without their corresponding runners.
-            state = State.COMPLETED;
+            setState(State.COMPLETED);
             runner.checkpoints.allDone();
             runner = null;
             RunnerStack.INSTANCE.pop();
         } else {
-            state = State.COMPLETED;
+            setState(State.COMPLETED);
         }
-        if (result == null) {
-            result = Result.FAILURE;
+        if (getResult() == null) {
+            setResult(Result.FAILURE);
             LOGGER.warning(toString() + ": No build result is set, so marking as failure. This shouldn't happen.");
         }
 

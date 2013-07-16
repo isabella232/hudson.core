@@ -15,6 +15,10 @@
 package hudson.model;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -129,16 +133,148 @@ public class SimpleJobTest extends TestCase {
             @Override
             protected void removeRun(Run run) {
             }
+
+            @Override
+            public BuildHistory getBuildHistory() {
+                return createMockBuildHistory(_getRuns());
+            }
+            
+
             
         };
         return project;
+    }
+    
+    private BuildHistory createMockBuildHistory(final SortedMap<Integer, ? extends Run> runs) {
+        return new BuildHistory() {
+
+            @Override
+            public BuildHistory.Record getFirst() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public BuildHistory.Record getLast() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public BuildHistory.Record getLastCompleted() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public BuildHistory.Record getLastFailed() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public BuildHistory.Record getLastStable() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public BuildHistory.Record getLastUnstable() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public BuildHistory.Record getLastSuccessful() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public BuildHistory.Record getLastUnsuccessful() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public List<Record> getLastRecordsOverThreshold(int n, Result threshold) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public Run getLastBuild() {
+                try {
+                    return runs.get(runs.lastKey());
+                }
+                catch (NoSuchElementException e) {
+                    return null;
+                }
+            }
+
+            @Override
+            public Run getFirstBuild() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public Run getLastSuccessfulBuild() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public Run getLastUnsuccessfulBuild() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public Run getLastUnstableBuild() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public Run getLastStableBuild() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public Run getLastFailedBuild() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public Run getLastCompletedBuild() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public List getLastBuildsOverThreshold(int n, Result threshold) {
+                List<Run> result = new ArrayList<Run>(n);
+
+                Run r = getLastBuild();
+                while (r != null && result.size() < n) {
+
+                    if (!r.isBuilding() && 
+                        (r.getResult() != null && 
+                         r.getResult().isBetterOrEqualTo(threshold))) {
+
+                            result.add(r);
+                    }
+                    r = r.getPreviousBuild();
+                }
+
+                return result;
+            }
+
+            @Override
+            public Iterator iterator() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public List allRecords() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+            
+        };
     }
     
     private static class TestBuild extends Run {
         
         public TestBuild(Job project, Result result, long duration, TestBuild previousBuild) throws IOException {
             super(project);
-            this.result = result;
+            setResult(result);
             this.duration = duration;
             this.previousBuild = previousBuild;
         }
@@ -149,13 +285,13 @@ public class SimpleJobTest extends TestCase {
         }
         
         @Override
-        public Result getResult() {
-            return result;
+        public boolean isBuilding() {
+            return false;
         }
         
         @Override
-        public boolean isBuilding() {
-            return false;
+        public String toString() {
+            return "TestBuild";
         }
         
     }

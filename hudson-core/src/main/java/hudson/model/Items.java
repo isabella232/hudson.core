@@ -110,9 +110,20 @@ public class Items {
      * file itself.
      */
     public static Item load(ItemGroup parent, File dir) throws IOException {
-        Item item = (Item) getConfigFile(dir).read();
-        item.onLoad(parent, dir.getName());
-        return item;
+        return newLazyTopLevelItem(parent, dir, null);
+    }
+    
+    static LazyTopLevelItem newLazyTopLevelItem(TopLevelItem item) {
+        return newLazyTopLevelItem(item.getParent(), item.getRootDir(), item);
+    }
+    
+    static LazyTopLevelItem newLazyTopLevelItem(ItemGroup parent, 
+                                                File configFileDir,
+                                                TopLevelItem item) {
+        
+        final XmlFile configFile = getConfigFile(configFileDir);
+        
+        return new LazyTopLevelItem(configFile, parent, configFileDir.getName(), item);
     }
 
     /**

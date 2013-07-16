@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2013 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  *
  * Contributors:
  * 
- *    Kohsuke Kawaguchi
+ *    Kohsuke Kawaguchi, Roy Varghese
  *
  *
  *******************************************************************************/ 
@@ -35,7 +35,8 @@ import hudson.model.Descriptor.FormException;
  *
  * @author Kohsuke Kawaguchi
  */
-public abstract class ViewJob<JobT extends ViewJob<JobT, RunT>, RunT extends Run<JobT, RunT>>
+public abstract class ViewJob<JobT extends ViewJob<JobT, RunT>, 
+        RunT extends Run<JobT, RunT> & BuildNavigable>
         extends Job<JobT, RunT> {
 
     /**
@@ -46,7 +47,7 @@ public abstract class ViewJob<JobT extends ViewJob<JobT, RunT>, RunT extends Run
     /**
      * All {@link Run}s. Copy-on-write semantics.
      */
-    protected transient /*almost final*/ RunMap<RunT> runs = new RunMap<RunT>();
+    protected transient /*almost final*/ RunMap<JobT,RunT> runs ;
     private transient boolean notLoaded = true;
     /**
      * If the reloading of runs are in progress (in another thread, set to
@@ -71,10 +72,12 @@ public abstract class ViewJob<JobT extends ViewJob<JobT, RunT>, RunT extends Run
      */
     protected ViewJob(Hudson parent, String name) {
         super(parent, name);
+        initRuns();
     }
 
     protected ViewJob(ItemGroup parent, String name) {
         super(parent, name);
+        initRuns();
     }
 
     public boolean isBuildable() {
@@ -86,14 +89,18 @@ public abstract class ViewJob<JobT extends ViewJob<JobT, RunT>, RunT extends Run
         super.onLoad(parent, name);
         notLoaded = true;
     }
-
+    
+    private void initRuns() {
+        if (runs == null) {
+            runs = new RunMap(this);
+        }
+    }
+    
     protected SortedMap<Integer, RunT> _getRuns() {
         if (notLoaded || runs == null) {
             // if none is loaded yet, do so immediately.
             synchronized (this) {
-                if (runs == null) {
-                    runs = new RunMap<RunT>();
-                }
+                initRuns();
                 if (notLoaded) {
                     notLoaded = false;
                     _reload();
@@ -115,6 +122,11 @@ public abstract class ViewJob<JobT extends ViewJob<JobT, RunT>, RunT extends Run
         return runs;
     }
 
+    @Override
+    public BuildHistory<JobT, RunT> getBuildHistory() {
+        return (BuildHistory<JobT,RunT>)_getRuns();
+    }
+    
     public void removeRun(RunT run) {
         // reload the info next time
         nextUpdate = 0;
