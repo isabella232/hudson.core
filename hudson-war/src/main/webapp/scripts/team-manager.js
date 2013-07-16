@@ -138,7 +138,7 @@ function  createTeamButtonAction() {
     jQuery('#dialog-create-team').dialog({
         resizable: false,
         height: 250,
-        width: 550,
+        width: 600,
         modal: true,
         buttons: {
             'Create': function() {
