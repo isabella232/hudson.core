@@ -291,6 +291,12 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * All {@link Item}s keyed by their {@link Item#getName() name}s.
      */
     /*package*/ transient final Map<String, TopLevelItem> items = new CopyOnWriteMap.Tree<String, TopLevelItem>(CaseInsensitiveComparator.INSTANCE);
+    
+    /**
+     * A cache of top level items
+     */
+    private transient final TopLevelItemsCache itemsCache = new TopLevelItemsCache();
+    
     /**
      * The sole instance.
      */
@@ -486,7 +492,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     private transient final ItemGroupMixIn itemGroupMixIn = new ItemGroupMixIn(this, this) {
         @Override
         protected void add(TopLevelItem item) {
-            items.put( item.getName(), item);
+            assert item.getRootDir().exists();
+            final LazyTopLevelItem lzItem = Items.newLazyTopLevelItem(item);
+            items.put(item.getName(), lzItem);
         }
 
         @Override
@@ -1293,7 +1301,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         List<TopLevelItem> viewableItems = new ArrayList<TopLevelItem>();
         for (TopLevelItem item : items.values()) {
             if (item.hasPermission(Item.READ)) {
-                    viewableItems.add(item);
+                viewableItems.add(LazyTopLevelItem.getIfInstanceOf(item, TopLevelItem.class));
             }
         }
 
@@ -1305,7 +1313,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         List<TopLevelItem> viewableItems = new ArrayList<TopLevelItem>();
         for (TopLevelItem item : items.values()) {
             if (!item.hasPermission(Item.READ)) {
-                viewableItems.add(item);
+                viewableItems.add(LazyTopLevelItem.getIfInstanceOf(item, TopLevelItem.class));
             }
         }
 
@@ -1320,6 +1328,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * @since 1.296
      */
     public Map<String, TopLevelItem> getItemMap() {
+        // Is this circumventing permissions?
         return Collections.unmodifiableMap(items);
     }
 
@@ -1329,8 +1338,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public <T> List<T> getItems(Class<T> type) {
         List<T> r = new ArrayList<T>();
         for (TopLevelItem i : getItems()) {
-            if (type.isInstance(i)) {
-                r.add(type.cast(i));
+            T t = LazyTopLevelItem.getIfInstanceOf(i, type);
+            if (t != null) {
+                r.add(t);
             }
         }
         return r;
@@ -1349,13 +1359,15 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         while (!q.isEmpty()) {
             ItemGroup<?> parent = q.pop();
             for (Item i : parent.getItems()) {
-                if (type.isInstance(i)) {
-                    if (i.hasPermission(Item.READ)) {
-                        r.add(type.cast(i));
+                T t = LazyTopLevelItem.getIfInstanceOf(i, type);
+                if (t != null) {
+                    if (t.hasPermission(Item.READ)) {
+                        r.add(t);
                     }
                 }
-                if (i instanceof ItemGroup) {
-                    q.push((ItemGroup) i);
+                ItemGroup ig = LazyTopLevelItem.getIfInstanceOf(i, ItemGroup.class);
+                if (ig != null) {
+                    q.push(ig);
                 }
             }
         }
@@ -1370,7 +1382,12 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * to search recursively.
      */
     public List<Project> getProjects() {
-        return Util.createSubList(items.values(), Project.class);
+        return getItems(Project.class);
+//        This line seems to circumvent the check for Permission.
+//        It also won't work with LazyTopLevelItem, so replacing it with
+//        line above.
+//        
+//        return Util.createSubList(items.values(), Project.class);
     }
 
     /**
@@ -2131,7 +2148,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         for (Entry<String, TopLevelItem> e : items.entrySet()) {
             if (Functions.toEmailSafeString(e.getKey()).equalsIgnoreCase(match)) {
                 TopLevelItem item = e.getValue();
-                return item.hasPermission(Item.READ) ? item : null;
+                return item.hasPermission(Item.READ) ? 
+                            LazyTopLevelItem.getIfInstanceOf(item, TopLevelItem.class): 
+                            null;
             }
         }
         return null;
@@ -2148,7 +2167,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         if (item == null || !item.hasPermission(Item.READ)) {
             return null;
         }
-        return item;
+        return LazyTopLevelItem.getIfInstanceOf(item, TopLevelItem.class);
     }
     
     @Override
@@ -3870,6 +3889,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             // totally unparseable
             return null;
         }
+    }
+    
+    TopLevelItemsCache itemsCache() {
+        return itemsCache;
+        
     }
     /**
      * Hash of {@link #VERSION}.

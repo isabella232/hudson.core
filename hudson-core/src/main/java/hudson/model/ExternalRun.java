@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2013 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  *
  * Contributors:
  * 
- *    Kohsuke Kawaguchi
+ *    Kohsuke Kawaguchi, Roy Varghese
  *
  *
  *******************************************************************************/ 
@@ -38,7 +38,8 @@ import static javax.xml.stream.XMLStreamConstants.*;
  *
  * @author Kohsuke Kawaguchi
  */
-public class ExternalRun extends Run<ExternalJob, ExternalRun> {
+public class ExternalRun extends Run<ExternalJob, ExternalRun> 
+    implements BuildNavigable {
 
     /**
      * Loads a run from a log file.
@@ -154,5 +155,16 @@ public class ExternalRun extends Run<ExternalJob, ExternalRun> {
             // save the updated duration
             save();
         }
+    }
+
+    @Override
+    public BuildNavigator getBuildNavigator() {
+        return null;
+    }
+
+    @Override
+    public void setBuildNavigator(BuildNavigator buildNavigator) {
+        // no-op. Let super classes take care of managing builds
+        // for now.
     }
 }

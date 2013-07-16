@@ -154,6 +154,11 @@ public class Executor extends Thread implements ModelObject {
                         workUnit.setExecutor(null);
                     }
                 }
+                
+                // Free executable and workunit for GC
+                executable = null;
+                workUnit = null;
+                
             }
         } catch (RuntimeException e) {
             causeOfDeath = e;

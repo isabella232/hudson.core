@@ -98,6 +98,7 @@ public class LogRotator implements Describable<LogRotator> {
     }
 
     public void perform(Job<?, ?> job) throws IOException, InterruptedException {
+
         LOGGER.log(FINE, "Running the log rotation for " + job.getFullDisplayName());
 
         // keep the last successful build regardless of the status

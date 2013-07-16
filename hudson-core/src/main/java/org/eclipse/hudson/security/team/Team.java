@@ -149,6 +149,7 @@ public class Team implements AccessControlled {
         }
         if (canConfigure) {
             newMember.addPermission(Item.CONFIGURE);
+            newMember.addPermission(Item.EXTENDED_READ);
         }
         if (canBuild) {
             newMember.addPermission(Item.BUILD);
@@ -168,7 +169,9 @@ public class Team implements AccessControlled {
                 currentMember.addPermission(Item.EXTENDED_READ);
             } else {
                 currentMember.removePermission(Item.CREATE);
-                currentMember.removePermission(Item.EXTENDED_READ);
+                if (!canConfigure) {
+                    currentMember.removePermission(Item.EXTENDED_READ);
+                }
             }
             if (canDelete) {
                 currentMember.addPermission(Item.DELETE);
@@ -179,8 +182,12 @@ public class Team implements AccessControlled {
             }
             if (canConfigure) {
                 currentMember.addPermission(Item.CONFIGURE);
+                currentMember.addPermission(Item.EXTENDED_READ);
             } else {
                 currentMember.removePermission(Item.CONFIGURE);
+                if (!canCreate) {
+                    currentMember.removePermission(Item.EXTENDED_READ);
+                }
             }
             if (canBuild) {
                 currentMember.addPermission(Item.BUILD);

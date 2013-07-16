@@ -26,6 +26,8 @@ import hudson.scm.ChangeLogSet.Entry;
 import hudson.search.CollectionSearchIndex;
 import hudson.search.SearchIndexBuilder;
 import hudson.security.*;
+import hudson.util.AbstractRunList;
+import hudson.util.BuildHistoryList;
 import hudson.util.DescriptorList;
 import hudson.util.RunList;
 import hudson.widgets.Widget;
@@ -633,16 +635,20 @@ public abstract class View extends AbstractModelObject implements AccessControll
     public void doRssFailed(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         rss(req, rsp, " failed builds", getBuilds().failureOnly());
     }
+    
+    public BuildHistoryList getBuildHistoryList() {
+        return BuildHistoryList.newBuildHistoryList(this);
+    }
 
     public RunList getBuilds() {
         return new RunList(this);
     }
 
     public BuildTimelineWidget getTimeline() {
-        return new BuildTimelineWidget(getBuilds());
+        return new BuildTimelineWidget(getBuildHistoryList());
     }
 
-    private void rss(StaplerRequest req, StaplerResponse rsp, String suffix, RunList runs) throws IOException, ServletException {
+    private void rss(StaplerRequest req, StaplerResponse rsp, String suffix, AbstractRunList runs) throws IOException, ServletException {
         RSS.forwardToRss(getDisplayName() + suffix, getUrl(),
                 runs.newBuilds(), Run.FEED_ADAPTER, req, rsp);
     }

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2009 Oracle Corporation.
+ * Copyright (c) 2004-2013 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  *
  * Contributors:
  * 
- *    Kohsuke Kawaguchi
+ *    Kohsuke Kawaguchi, Roy Varghese
  *
  *
  *******************************************************************************/ 
@@ -18,9 +18,9 @@ package hudson.model;
 
 import hudson.slaves.WorkspaceList;
 import hudson.slaves.WorkspaceList.Lease;
-
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
+import java.util.Calendar;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -29,6 +29,10 @@ public class FreeStyleBuild extends Build<FreeStyleProject, FreeStyleBuild> {
 
     public FreeStyleBuild(FreeStyleProject project) throws IOException {
         super(project);
+    }
+    
+    public FreeStyleBuild(FreeStyleProject project, Calendar timestamp) {
+        super(project, timestamp);
     }
 
     public FreeStyleBuild(FreeStyleProject project, File buildDir) throws IOException {

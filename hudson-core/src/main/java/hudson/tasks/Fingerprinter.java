@@ -308,13 +308,16 @@ public class Fingerprinter extends Recorder implements Serializable {
         }
 
         public void onLoad() {
-            Run pb = build.getPreviousBuild();
-            if (pb != null) {
-                FingerprintAction a = pb.getAction(FingerprintAction.class);
-                if (a != null) {
-                    compact(a);
-                }
-            }
+            // This causes unnecessary loading of previous build.
+            // The compacting to save memory may not be a big saving anymore
+            // after lazy loading improvements.
+//            Run pb = build.getPreviousBuild();
+//            if (pb != null) {
+//                FingerprintAction a = pb.getAction(FingerprintAction.class);
+//                if (a != null) {
+//                    compact(a);
+//                }
+//            }
         }
 
         public void onAttached(Run r) {

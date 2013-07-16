@@ -33,6 +33,7 @@ import hudson.slaves.OfflineCause;
 import hudson.slaves.OfflineCause.ByCLI;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.Publisher;
+import hudson.util.BuildHistoryList;
 import hudson.util.DaemonThreadFactory;
 import hudson.util.ExceptionCatchingThreadFactory;
 import hudson.util.RemotingDiagnostics;
@@ -71,6 +72,7 @@ import java.nio.charset.Charset;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.Inet4Address;
+import java.util.Collection;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 
@@ -387,7 +389,9 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
     }
 
     public BuildTimelineWidget getTimeline() {
-        return new BuildTimelineWidget(getBuilds());
+        Collection<Job> allJobs = Hudson.getInstance().getAllItems(Job.class);
+        
+        return new BuildTimelineWidget(BuildHistoryList.newBuildHistoryList(allJobs));
     }
 
     /**

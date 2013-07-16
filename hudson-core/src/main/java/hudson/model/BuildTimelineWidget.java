@@ -17,7 +17,7 @@
 package hudson.model;
 
 import hudson.Functions;
-import hudson.util.RunList;
+import hudson.util.BuildHistoryList;
 import java.util.TimeZone;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -45,18 +45,20 @@ import org.kohsuke.stapler.QueryParameter;
  */
 public class BuildTimelineWidget {
 
-    protected final RunList<?> builds;
+//    protected final RunList<?> builds;
+    protected final BuildHistoryList buildHistory;
+    
 
-    public BuildTimelineWidget(RunList<?> builds) {
-        this.builds = builds;
+    public BuildTimelineWidget(BuildHistoryList buildHistory) {
+        this.buildHistory = buildHistory;
     }
 
-    public Run<?, ?> getFirstBuild() {
-        return builds.getFirstBuild();
+    public BuildHistory.Record getFirstBuild() {
+        return buildHistory.getFirstBuild();
     }
 
-    public Run<?, ?> getLastBuild() {
-        return builds.getLastBuild();
+    public BuildHistory.Record getLastBuild() {
+        return buildHistory.getLastBuild();
     }
 
     /**
@@ -70,10 +72,11 @@ public class BuildTimelineWidget {
 
     public TimelineEventList doData(StaplerRequest req, @QueryParameter long min, @QueryParameter long max) throws IOException {
         TimelineEventList result = new TimelineEventList();
-        for (Run r : builds.byTimestamp(min, max)) {
+        for (Object o : buildHistory.byTimestamp(min, max)) {
+            BuildHistory.Record r = (BuildHistory.Record)o;
             Event e = new Event();
             e.start = r.getTime();
-            e.end = new Date(r.timestamp + r.getDuration());
+            e.end = new Date(r.getTimeInMillis()+ r.getDuration());
             e.title = r.getFullDisplayName();
             // what to put in the description?
             // e.description = "Longish description of event "+r.getFullDisplayName();

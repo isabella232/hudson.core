@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2004-2010 Oracle Corporation.
+ * Copyright (c) 2004-2013 Oracle Corporation.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,7 @@
  *
  * Contributors:
  *
- *    Kohsuke Kawaguchi, Yahoo! Inc., CloudBees, Inc.
+ *    Kohsuke Kawaguchi, Yahoo! Inc., CloudBees, Inc., Roy Varghese
  *
  *
  *******************************************************************************/ 
@@ -18,15 +18,12 @@ package hudson.model;
 
 import hudson.AbortException;
 import hudson.EnvVars;
+import hudson.FilePath;
 import hudson.Functions;
 import hudson.Launcher;
 import hudson.Util;
-import hudson.FilePath;
 import hudson.console.AnnotatedLargeText;
 import hudson.console.ExpandableDetailsNote;
-import hudson.slaves.WorkspaceList;
-import hudson.slaves.NodeProperty;
-import hudson.slaves.WorkspaceList.Lease;
 import hudson.matrix.MatrixConfiguration;
 import hudson.model.Fingerprint.BuildPtr;
 import hudson.model.Fingerprint.RangeSet;
@@ -34,27 +31,23 @@ import hudson.model.listeners.SCMListener;
 import hudson.scm.ChangeLogParser;
 import hudson.scm.ChangeLogSet;
 import hudson.scm.ChangeLogSet.Entry;
-import hudson.scm.SCM;
 import hudson.scm.NullChangeLogParser;
+import hudson.scm.SCM;
+import hudson.slaves.NodeProperty;
+import hudson.slaves.WorkspaceList;
+import hudson.slaves.WorkspaceList.Lease;
 import hudson.tasks.BuildStep;
+import hudson.tasks.BuildStepMonitor;
+import hudson.tasks.BuildTrigger;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.Builder;
 import hudson.tasks.Fingerprinter.FingerprintAction;
 import hudson.tasks.Publisher;
-import hudson.tasks.BuildStepMonitor;
-import hudson.tasks.BuildTrigger;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.util.AdaptedIterator;
 import hudson.util.Iterators;
 import hudson.util.LogTaskListener;
 import hudson.util.VariableResolver;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.export.Exported;
-import org.xml.sax.SAXException;
-
-import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -71,6 +64,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.ServletException;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.export.Exported;
+import org.xml.sax.SAXException;
 
 /**
  * Base implementation of {@link Run}s that build software.
@@ -80,8 +79,71 @@ import java.util.logging.Logger;
  * @author Kohsuke Kawaguchi
  * @see AbstractProject
  */
-public abstract class AbstractBuild<P extends AbstractProject<P, R>, R extends AbstractBuild<P, R>> extends Run<P, R> implements Queue.Executable {
+public abstract class AbstractBuild<P extends AbstractProject<P, R>, R extends AbstractBuild<P, R>> 
+    extends Run<P, R> implements Queue.Executable, BuildNavigable {
 
+    @Override
+    public R getPreviousBuild() {
+        return buildNavigator.getPreviousBuild();
+    }
+
+    @Override
+    public R getPreviousCompletedBuild() {
+        return buildNavigator.getPreviousCompletedBuild();
+    }
+    
+    @Override
+    public R getPreviousBuildInProgress() {
+        return buildNavigator.getPreviousBuildInProgress();
+    }
+    
+    @Override
+    public R getPreviousBuiltBuild() {
+        return buildNavigator.getPreviousBuiltBuild();
+    }
+
+    @Override
+    public R getPreviousNotFailedBuild() {
+        return buildNavigator.getPreviousNotFailedBuild();
+    }
+
+    @Override
+    public R getPreviousFailedBuild() {
+        return buildNavigator.getPreviousFailedBuild();
+    }
+
+    @Override
+    public R getPreviousSuccessfulBuild() {
+        return buildNavigator.getPreviousSuccessfulBuild();
+    }
+
+    @Override
+    public List<R> getPreviousBuildsOverThreshold(int numberOfBuilds, Result threshold) {
+        return buildNavigator.getPreviousBuildsOverThreshold(numberOfBuilds, threshold);
+    }
+
+    @Override
+    public R getNextBuild() {
+        return buildNavigator.getNextBuild();
+    }
+    
+    @Override
+    final public BallColor getIconColor() {
+        // Final because buildNavigator will provide this information.
+        return buildNavigator.getIconColor();
+    }
+    
+    @Override
+    final public Summary getBuildStatusSummary() {
+        return buildNavigator.getBuildStatusSummary();
+    }
+
+    /**
+     * Injected by RunMap when this build is added to the RunMap.
+     * When it is removed, it is set back to null;
+     */
+    protected transient BuildNavigator<R> buildNavigator;
+    
     /**
      * Set if we want the blame information to flow from upstream to downstream
      * build.
@@ -144,6 +206,33 @@ public abstract class AbstractBuild<P extends AbstractProject<P, R>, R extends A
     protected AbstractBuild(P project, File buildDir) throws IOException {
         super(project, buildDir);
     }
+    
+
+    @Override
+    public void setBuildNavigator(BuildNavigator navigator) {
+        this.buildNavigator = navigator;      
+    }
+    
+    @Override
+    public BuildNavigator getBuildNavigator() {
+        return this.buildNavigator;
+    }
+    
+    @Exported
+    @Override
+    public boolean isBuilding() {
+        return getState().compareTo(State.POST_PRODUCTION) < 0;
+    }
+
+    /**
+     * Returns true if the log file is still being updated.
+     */
+    @Override
+    public boolean isLogUpdated() {
+        return getState().compareTo(State.COMPLETED) < 0;
+    }    
+    
+    
 
     public final P getProject() {
         return getParent();
@@ -565,11 +654,11 @@ public abstract class AbstractBuild<P extends AbstractProject<P, R>, R extends A
             try {
                 post2(listener);
 
-                if (result.isBetterOrEqualTo(Result.UNSTABLE)) {
+                if (getResult().isBetterOrEqualTo(Result.UNSTABLE)) {
                     createSymlink(listener, "lastSuccessful");
                 }
 
-                if (result.isBetterOrEqualTo(Result.SUCCESS)) {
+                if (getResult().isBetterOrEqualTo(Result.SUCCESS)) {
                     createSymlink(listener, "lastStable");
                 }
             } finally {
