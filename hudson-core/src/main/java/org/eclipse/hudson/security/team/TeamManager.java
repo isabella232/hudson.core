@@ -381,8 +381,9 @@ public final class TeamManager implements Saveable, AccessControlled {
             return new TeamUtils.ErrorHttpResponse("Team name required.");
         }
         if ((jobName == null) || "".equals(jobName.trim())) {
-            return new TeamUtils.ErrorHttpResponse("Job  required.");
+            return new TeamUtils.ErrorHttpResponse("Job name required.");
         }
+        
         Team newTeam;
         try {
             newTeam = findTeam(teamName);
@@ -393,6 +394,10 @@ public final class TeamManager implements Saveable, AccessControlled {
         Team oldTeam = findJobOwnerTeam(jobName);
         if (oldTeam == null) {
             return new TeamUtils.ErrorHttpResponse(jobName + " does not belong to any team.");
+        }
+        
+        if (oldTeam == newTeam){
+            return new TeamUtils.ErrorHttpResponse(jobName + " is already in team " + oldTeam.getName());
         }
 
         Item item = Hudson.getInstance().getItem(jobName);
