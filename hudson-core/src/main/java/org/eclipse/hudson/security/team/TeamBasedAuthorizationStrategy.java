@@ -65,7 +65,7 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
     }
 
     public ACL getACL(Team team) {
-        return new TeamBasedACL(getTeamManager(), TeamBasedACL.SCOPE.JOB, team);
+        return new TeamBasedACL(getTeamManager(), TeamBasedACL.SCOPE.TEAM, team);
     }
     
     public ACL getACL(TeamManager teamManager) {

@@ -91,7 +91,7 @@ final class LazyTopLevelItem implements TopLevelItem, IJob, StaplerProxy {
     // Cache to service hasPermission() requests, which can be numerous.
     // This prevents the item() method from being called and thus instantiating
     // the object again and again.
-    private HashMap<String, Boolean> permissions = null;
+//    private HashMap<String, Boolean> permissions = null;
     
     
     
@@ -273,19 +273,24 @@ final class LazyTopLevelItem implements TopLevelItem, IJob, StaplerProxy {
     
     @Override
     public boolean hasPermission(Permission permission) {
-        final String id = permission.getId();
-        if ( permissions == null ) {
-            // No locking.
-            permissions = new HashMap<String, Boolean>();
-        }
+        return item().hasPermission(permission);
+        // Fix 413185: Permissions should never be cached
+        // Only the Authorization Scheme ACL knows about
+        // permission in all contexcts.
+                
+//        final String id = permission.getId();
+//        if ( permissions == null ) {
+//            // No locking.
+//            permissions = new HashMap<String, Boolean>();
+//        }
+//        
+//        Boolean b = permissions.get(id);
+//        if ( b == null ) {
+//            b = item().hasPermission(permission);
+//            permissions.put(id, b);
+//        }
         
-        Boolean b = permissions.get(id);
-        if ( b == null ) {
-            b = item().hasPermission(permission);
-            permissions.put(id, b);
-        }
-        
-        return b;
+//        return b;
     }
 
     @Override
