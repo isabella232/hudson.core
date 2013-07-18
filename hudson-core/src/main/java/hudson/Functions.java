@@ -1527,7 +1527,7 @@ public class Functions {
     public static BallColor getJobStatusIcon(String jobName){
         AbstractProject job = (AbstractProject) Hudson.getInstance().getItem(jobName);
         if (job != null){
-            return job.getIconColor().toString();
+            return job.getIconColor();
         }
         return null;
     }
