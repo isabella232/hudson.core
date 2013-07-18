@@ -320,14 +320,24 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
 //        return new ReadonlySortedMap<J,R>(builds.tailMap(fromKey));
     }
     
-
+    /**
+     * Callers must first check that map is not empty.
+     * @return 
+     * @throws NoSuchElementException if map is empty
+     */
     public Integer firstKey() {
         return builds.firstKey();
     }
 
+    /**
+     * Callers must first check that map is not empty.
+     * @return 
+     * @throws NoSuchElementException if map is empty
+     */
     public Integer lastKey() {
         return builds.lastKey();
     }
+    
     public static final Comparator<Comparable> COMPARATOR = new Comparator<Comparable>() {
         public int compare(Comparable o1, Comparable o2) {
             return -o1.compareTo(o2);
@@ -350,22 +360,18 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
     
     @Override
     public RunValue<J,R> getFirst() {
-        try {
-            return builds.get(builds.lastKey());
-        }
-        catch (NoSuchElementException ex) {
+        if (builds.isEmpty()) {
             return null;
         }
+        return builds.get(builds.lastKey());
     }
         
     @Override
     public RunValue<J,R> getLast() {
-        try {
-            return builds.get(builds.firstKey());
-        }
-        catch (NoSuchElementException ex) {
+        if (builds.isEmpty()) {
             return null;
         }
+        return builds.get(builds.firstKey());
     }
     
     @Override
@@ -376,7 +382,7 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
 
     @Override
     public R getFirstBuild() {
-        final RunValue<J,R> runValue = builds.get(builds.lastKey());
+        final RunValue<J,R> runValue = getFirst();
         return runValue != null? runValue.getBuild(): null;
     }
     
