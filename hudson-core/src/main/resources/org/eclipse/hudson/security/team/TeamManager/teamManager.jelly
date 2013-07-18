@@ -79,6 +79,7 @@
                             <j:set var="headerVisibility" value='${(app.items.size() > 0) ? "visible" : "hidden"}'/>
                             <tr class="header" id="JobsListHeader" style='visibility:${headerVisibility}'>
                                 <th align="left">Select</th>
+                                <th align="left">Status</th>
                                 <th align="left">Job Name</th>
                                 <th align="left">Team Name</th>      
                             </tr>      
@@ -88,9 +89,12 @@
                                         <input class="move_cb_${job.name}" type="checkbox" value="${job.name}"/>
                                     </td>
                                     <td class="column2">
-                                        ${job.name}
+                                         <img src='${h.getJobStatusIcon(job.name).getImageOf("24x24")}'/>
                                     </td>
                                     <td class="column3">
+                                        <a href="${rootURL}/job/${job.name}">${job.name}</a>
+                                    </td>
+                                    <td class="column4">
                                         <span id="job_colum3_span_${job.name}">
                                             ${it.findJobOwnerTeam(job.name).name}
                                         </span>
@@ -100,7 +104,7 @@
                         </tbody>
                     </table>
                 </div> 
-                <div>
+                <div style="padding-top: 5px;">
                     <input type="button" id="moveJobsButton" value="Move Jobs" />
                 </div>
             </div>

@@ -544,7 +544,6 @@ function moveJobsButtonAction() {
     moveCount = jobsToMove.length;
     for (var i = 0; i < jobsToMove.length; i++) {
         var item = '<li value="' + jobsToMove[i] + '">' + jobsToMove[i] + ' <img style="display: none"/></li>';
-        jQuery(item).attr("value", jobsToMove[i]);
         jQuery(item).appendTo(jQuery("#selectedJobs"));
     }
 

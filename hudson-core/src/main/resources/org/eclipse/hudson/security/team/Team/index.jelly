@@ -126,25 +126,25 @@
                     <table id="teamJobList_${it.name}" width="100%"> 
                         <tbody>
                             <tr height="25px" class="header" id="teamJobListHeader_${it.name}" style='visibility:${headerVisibility}'>
-                                <th>Status</th>
-                                <th>Job Name</th>
-                                <th>Configure<br/>Visibility</th>
+                                <th align="left" class="column1">Status</th>
+                                <th align="left" style="padding-left: 10px;" class="column2">Job Name</th>
+                                <th align="left" class="column3">Configure<br/>Visibility</th>
                             </tr>
                             <j:forEach var="job" items="${it.jobs}">
                                 <tr >
-                                    <td align="center">
-                                        <l:ballColorTd it="${app.getItem(job.id).iconColor}"/>
+                                    <td class="column1">
+                                         <img src='${h.getJobStatusIcon(job.id).getImageOf("24x24")}'/>
                                     </td>
-                                    <td width="150px" align="center">
+                                    <td class="column2">
                                         <input type="hidden" value="${job.id}" name="hiddenJobId"/>
                                         <input type="hidden" value="${it.name}" name="hiddenTeamName"/>
                                         <input type="hidden" value="${job.visiblitiesAsString}" name="hiddenVisibilities"/>
                                         <span style="margin-left:10px; font-size:13px">
-                                            ${job.id}
+                                            <a href="${rootURL}/job/${job.id}">${job.id}</a>
                                         </span>
                                     </td>
                                         
-                                    <td  align="center"> 
+                                    <td class="column3"> 
                                         <img style="cursor:pointer" class="configureJobVisibility" src="${imagesURL}/16x16/notepad.png" name="configureIcon"/>
                                     </td>
                                 </tr>

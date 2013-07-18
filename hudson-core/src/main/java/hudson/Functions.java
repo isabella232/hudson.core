@@ -24,6 +24,7 @@ import hudson.console.ConsoleAnnotationDescriptor;
 import hudson.console.ConsoleAnnotatorFactory;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
+import hudson.model.BallColor;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.model.DescriptorVisibilityFilter;
@@ -1521,5 +1522,13 @@ public class Functions {
 
     public static Object rawHtml(Object o) {
         return InternationalizedStringExpression.rawHtml(o);
+    }
+    
+    public static BallColor getJobStatusIcon(String jobName){
+        AbstractProject job = (AbstractProject) Hudson.getInstance().getItem(jobName);
+        if (job != null){
+            return job.getIconColor().toString();
+        }
+        return null;
     }
 }
