@@ -325,11 +325,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     public void onLoad(ItemGroup<? extends Item> parent, String name)
             throws IOException {
         super.onLoad(parent, name);
-//        cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
-//                cascadingProjectName);
-        if ( cascadingProjectName  != null ) {
+        if ((cascadingProjectName  != null) && StringUtils.isNotBlank(cascadingProjectName)) {
             TopLevelItem tlItem = Hudson.getInstance().getItem(cascadingProjectName);
-            if ( this.getClass().isAssignableFrom( tlItem.getClass())) {
+            //Fix: 413184. Gaurd against null, the job may be externally deleted or moved
+            if ( (tlItem != null) && this.getClass().isAssignableFrom( tlItem.getClass())) {
                 cascadingProject = (JobT) tlItem;
             }
         }
@@ -1683,15 +1682,18 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     /**
-     * Returns selected ccascading project.
+     * Returns selected cascading project.
      *
      * @return cascading project.
      */
     @SuppressWarnings({"unchecked"})
     public synchronized JobT getCascadingProject() {
         if (StringUtils.isNotBlank(cascadingProjectName) && cascadingProject == null) {
-            cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
-                    cascadingProjectName);
+            TopLevelItem tlItem = Hudson.getInstance().getItem(cascadingProjectName);
+            //Fix: 413184. Gaurd against null, the job may be externally deleted or moved
+            if ((tlItem != null) && this.getClass().isAssignableFrom(tlItem.getClass())) {
+                cascadingProject = (JobT) tlItem;
+            }
         }
         return cascadingProject;
     }
