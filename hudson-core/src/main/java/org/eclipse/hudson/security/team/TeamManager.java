@@ -920,8 +920,12 @@ public final class TeamManager implements Saveable, AccessControlled {
     public File getRootFolderForJob(String jobName) {
         Team team = findJobOwnerTeam(jobName);
         // May be just created job
-        if ((team == null) && isTeamManagementEnabled()) {
-            team = findCurrentUserTeam();
+        if ((team == null)) {
+            if (isTeamManagementEnabled()) {
+                team = findCurrentUserTeam();
+            } else {
+                team = getPublicTeam();
+            }
         }
         if (isPublicTeam(team)) {
             return new File(team.getJobsFolder(hudsonHomeDir), jobName);
