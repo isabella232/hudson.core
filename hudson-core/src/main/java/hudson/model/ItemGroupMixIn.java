@@ -159,7 +159,7 @@ public abstract class ItemGroupMixIn {
                         try {
                             requestedTeam = hudson.getTeamManager().findTeam(teamName);
                         } catch (TeamManager.TeamNotFoundException ex) {
-                            logger.error("Requested team " + teamName + " not found");
+                            throw new Failure("Requested team " + teamName + " not found");
                         }
                     }
                 }
