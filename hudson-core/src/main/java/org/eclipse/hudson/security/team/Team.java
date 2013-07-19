@@ -281,7 +281,7 @@ public class Team implements AccessControlled {
             File[] jobsRootFolders = jobsFolder.listFiles(new FileFilter() {
                 @Override
                 public boolean accept(File child) {
-                    return child.isDirectory() && Items.getConfigFile(child).exists();
+                    return jobs.contains(child.getName()) && child.isDirectory() && Items.getConfigFile(child).exists();
                 }
             });
             if (jobsRootFolders != null) {
