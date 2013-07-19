@@ -940,7 +940,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Renames a job.
      */
     @Override
-    public synchronized void renameTo(String newName) throws IOException {
+    public void renameTo(String newName) throws IOException {
         super.renameTo(newName);
     }
 
