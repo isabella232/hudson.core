@@ -33,8 +33,8 @@
       <j:invokeStatic var="jobs" className="hudson.model.Items" method="all" />
       <n:form nameTitle="${%Job name}" copyTitle="${%Copy existing job}" copyNames="${app.jobNames}"
         descriptors="${jobs}" checkUrl="checkJobName" xmlns:n="/lib/hudson/newFromList"
-        teamNames="${app.teamManager.currentUserTeams}" teamTitle="${%Team name}" 
-        checkTeamUrl="checkTeamName" chooseTeam="${app.getTeamManager().getCurrentUserTeams().size() > 1}" />
+        teamNames="${app.teamManager.currentUserTeamsWithCreatePermission}" teamTitle="${%Team name}" 
+        checkTeamUrl="checkTeamName" chooseTeam="${app.teamManager.currentUserTeamsWithCreatePermission.size() > 1}" />
     </l:main-panel>
   </l:layout>
 </j:jelly>

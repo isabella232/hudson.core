@@ -15,6 +15,7 @@ import hudson.model.Job;
 import hudson.security.Permission;
 import hudson.security.SecurityRealm;
 import hudson.security.SidACL;
+import java.util.List;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
@@ -78,11 +79,10 @@ public class TeamBasedACL extends SidACL {
             }
             // Member of any of the team with JOB CREATE Permission can create Job
             if (permission == Item.CREATE) {
-                Team userTeam = teamManager.findUserTeam(userName);
-                if (userTeam != null) {
+                for (Team userTeam : teamManager.findUserTeams(userName)) {
                     TeamMember member = userTeam.findMember(userName);
-                    if (member != null) {
-                        return member.hasPermission(Item.CREATE);
+                    if ((member != null) && member.hasPermission(Item.CREATE)) {
+                        return true;
                     }
                 }
             }
@@ -92,14 +92,15 @@ public class TeamBasedACL extends SidACL {
             if (teamManager.isSysAdmin(userName)) {
                 return true;
             }
-            Team userTeam = teamManager.findUserTeam(userName);
-
-            if (userTeam != null && (userTeam == team)) {
-                // Team admin gets to do all team maintenance operations
-                if (userTeam.isAdmin(userName)) {
-                    return true;
-                } else if (userTeam.isMember(userName) && permission.getImpliedBy() == Permission.READ) {
-                    return true;
+            
+            for (Team userTeam : teamManager.findUserTeams(userName)) {
+                if (userTeam == team) {
+                    // Team admin gets to do all team maintenance operations
+                    if (userTeam.isAdmin(userName)) {
+                        return true;
+                    } else if (userTeam.isMember(userName) && permission.getImpliedBy() == Permission.READ) {
+                        return true;
+                    }
                 }
             }
         }
@@ -136,8 +137,7 @@ public class TeamBasedACL extends SidACL {
 
                 if (jobTeam != null) {
                     TeamJob teamJob = jobTeam.findJob(job.getName());
-                    Team userTeam = teamManager.findUserTeam(userName);
-                    if (userTeam != null) {
+                    for (Team userTeam : teamManager.findUserTeams(userName)) {
                         if (teamJob.isVisible(userTeam.getName())) {
                             return true;
                         }

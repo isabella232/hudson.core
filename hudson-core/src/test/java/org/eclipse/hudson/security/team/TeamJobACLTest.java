@@ -67,6 +67,7 @@ public class TeamJobACLTest {
         newMember.setName("Paul");
         newMember.addPermission(Item.CONFIGURE);
         team.addMember(newMember);
+        
         teamManager.addJobToUserTeam("Paul", freeStyleJob.getName());
 
 

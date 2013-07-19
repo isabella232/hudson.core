@@ -92,11 +92,6 @@ public class Team implements AccessControlled {
         this.customFolderName = customTeamFolderName;
     }
 
-    public boolean isCurrentUserSysAdmin() {
-        String currentUser = HudsonSecurityManager.getAuthentication().getName();
-        return isAdmin(currentUser);
-    }
-
     public boolean isAdmin(String userName) {
         // Team Manager ACL always assume userName current user
         boolean isAdmin = false;

@@ -108,7 +108,7 @@ public class TeamManagerTest {
             fail("Team must exist");
         }
 
-        Team team = teamManager.findUserTeam("chris");
+        Team team = teamManager.findUserTeams("chris").get(0); 
         Assert.assertTrue(teamName.equals(team.getName()));
     }
 

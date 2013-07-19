@@ -16,6 +16,7 @@ import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.listeners.ItemListener;
 import java.io.IOException;
+import java.util.List;
 import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +71,14 @@ public class TeamJobListener extends ItemListener {
     
     private void addToCurrentUserTeam(String jobName) {
         try {
-            getTeamManager().addJobToCurrentUserTeam(jobName);
+            //getTeamManager().addJobToCurrentUserTeam(jobName);
+            List<Team> userTeams = getTeamManager().getCurrentUserTeamsWithPermission(Item.CREATE); 
+            if (!userTeams.isEmpty()){
+                getTeamManager().addJob(userTeams.get(0), jobName);
+            }else{
+                // As a last resort add as a public scoped job
+                addToPublicTeam(jobName);
+            }
             // Log because this case shouldn't occur - could be a bug
             logger.info("Job "+jobName+" added to team "+getTeamManager().findJobOwnerTeam(jobName).getName());
         } catch (IOException ex) {
