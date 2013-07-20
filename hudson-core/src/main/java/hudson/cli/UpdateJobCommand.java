@@ -44,6 +44,7 @@ public class UpdateJobCommand extends CLICommand {
     public String getShortDescription() {
         return "Updates and potentionally creates a job by reading stdin as a configuration XML file.";
     }
+    // ?? name needs to be unqualified for create or qualified for update
     @Argument(metaVar = "NAME", usage = "Name of the job to update. Provide team qualified name if Team Management is enabled. Ex: team1.job1.", required = true)
     public String name;
     @Argument(metaVar = "CREATE", usage = "Create the job if needed", index = 1, required = true)
