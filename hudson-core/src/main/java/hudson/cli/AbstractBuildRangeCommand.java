@@ -29,7 +29,7 @@ import java.util.List;
  */
 public abstract class AbstractBuildRangeCommand extends CLICommand {
 
-    @Argument(metaVar = "JOB", usage = "Name of the job to build", required = true, index = 0)
+    @Argument(metaVar = "JOB", usage = "Name of the job to build. ", required = true, index = 0)
     public AbstractProject<?, ?> job;
     @Argument(metaVar = "RANGE", usage = "Range of the build records to delete. 'N-M', 'N,M', or 'N'", required = true, index = 1)
     public String range;

@@ -44,11 +44,11 @@ public class UpdateJobCommand extends CLICommand {
     public String getShortDescription() {
         return "Updates and potentionally creates a job by reading stdin as a configuration XML file.";
     }
-    @Argument(metaVar = "NAME", usage = "Name of the job to update", required = true)
+    @Argument(metaVar = "NAME", usage = "Name of the job to update. Provide team qualified name if Team Management is enabled. Ex: team1.job1.", required = true)
     public String name;
     @Argument(metaVar = "CREATE", usage = "Create the job if needed", index = 1, required = true)
     public Boolean create;
-    @Argument(metaVar = "TEAM", usage = "Team to create job in", index = 1, required = false)
+    @Argument(metaVar = "TEAM", usage = "Team to create the job in", index = 1, required = false)
     public String team;
 
     protected int run() throws Exception {
@@ -98,11 +98,10 @@ public class UpdateJobCommand extends CLICommand {
     public static void ensureJobInTeam(TopLevelItem item, Team targetTeam, String name, PrintStream stderr) throws Exception {
         if (targetTeam != null) {
             try {
-                Hudson.getInstance().getTeamManager().ensureJobInTeam(item, targetTeam);
-                
+                Hudson.getInstance().getTeamManager().ensureJobInTeam(item, targetTeam, name);
             } catch (IOException e) {
                 item.delete();
-                stderr.println("Unable to create job "+name+" in team "+targetTeam.getName()+" due to IOException");
+                stderr.println("Unable to create job "+ name +" in team " + targetTeam.getName() + " due to IOException");
                 throw e;
             }
         }

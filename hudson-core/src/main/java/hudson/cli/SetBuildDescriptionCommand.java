@@ -32,7 +32,7 @@ public class SetBuildDescriptionCommand extends CLICommand implements Serializab
     public String getShortDescription() {
         return "Sets the description of a build";
     }
-    @Argument(metaVar = "JOB", usage = "Name of the job to build", required = true, index = 0)
+    @Argument(metaVar = "JOB", usage = "Name of the job to build. Provide team qualified name if Team Management is enabled. Ex: team1.job1.", required = true, index = 0)
     public transient AbstractProject<?, ?> job;
     @Argument(metaVar = "BUILD#", usage = "Number of the build", required = true, index = 1)
     public int number;

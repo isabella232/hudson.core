@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Properties;
+import org.eclipse.hudson.jna.NativeUtils;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 
 /**
@@ -129,6 +130,7 @@ public class ClientAuthenticationCache implements Serializable {
     }
 
     private void save() throws IOException, InterruptedException {
+        final NativeUtils nativeUtils = NativeUtils.getInstance();
         store.act(new FileCallable<Void>() {
             public Void invoke(File f, VirtualChannel channel) throws IOException, InterruptedException {
                 f.getParentFile().mkdirs();
@@ -141,7 +143,7 @@ public class ClientAuthenticationCache implements Serializable {
                 }
 
                 // try to protect this file from other users, if we can.
-                Util.chmod(f, 0600, false);
+                Util.chmod(f, 0600, false, null);
                 return null;
             }
         });

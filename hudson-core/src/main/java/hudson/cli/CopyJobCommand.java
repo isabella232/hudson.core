@@ -39,11 +39,11 @@ public class CopyJobCommand extends CLICommand {
     public String getShortDescription() {
         return "Copies a job";
     }
-    @Argument(metaVar = "SRC", usage = "Name of the job to copy", required = true)
+    @Argument(metaVar = "SRC", usage = "Name of the job to copy. Provide team qualified name if Team Management is enabled. Ex: team1.job1.", required = true)
     public TopLevelItem src;
-    @Argument(metaVar = "DST", usage = "Name of the new job to be created.", index = 1, required = true)
+    @Argument(metaVar = "DST", usage = "Name of the new job to be created. The job name should not be team qualified. Ex: job1 ", index = 1, required = true)
     public String dst;
-    @Argument(metaVar = "TEAM", usage = "Team to create job in", index = 1, required = false)
+    @Argument(metaVar = "TEAM", usage = "Team to create the job in.", index = 2, required = false)
     public String team;
     @Option(name = "-fs", aliases = {"--force-save"}, usage = "Force saving the destination job in order to enable build functionality.")
     public boolean forceSave;

@@ -50,7 +50,7 @@ public class BuildCommand extends CLICommand {
     public String getShortDescription() {
         return "Builds a job, and optionally waits until its completion.";
     }
-    @Argument(metaVar = "JOB", usage = "Name of the job to build", required = true)
+    @Argument(metaVar = "JOB", usage = "Name of the job to build. Provide team qualified name if Team Management is enabled. Ex: team1.job1.", required = true)
     public AbstractProject<?, ?> job;
     @Option(name = "-s", usage = "Wait until the completion/abortion of the command")
     public boolean sync = false;

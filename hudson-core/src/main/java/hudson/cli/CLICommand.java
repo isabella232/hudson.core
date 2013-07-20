@@ -160,12 +160,12 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
         new ClassParser().parse(authenticator, p);
 
         try {
-            p.parseArgument(args.toArray(new String[args.size()]));
             Authentication auth = authenticator.authenticate();
             if (auth == Hudson.ANONYMOUS) {
                 auth = loadStoredAuthentication();
             }
             sc.setAuthentication(auth); // run the CLI with the right credential
+            p.parseArgument(args.toArray(new String[args.size()]));
             if (!(this instanceof LoginCommand || this instanceof HelpCommand)) {
                 Hudson.getInstance().checkPermission(Hudson.READ);
             }

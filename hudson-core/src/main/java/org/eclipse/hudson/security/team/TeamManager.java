@@ -233,7 +233,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         for (TeamJob job : team.getJobs()) {
             TopLevelItem item = Hudson.getInstance().getItem(job.getId());
             if (item != null && (item instanceof Job)) {
-                moveJob((Job) item, team, publicTeam);
+                moveJob((Job) item, team, publicTeam, null);
             }
         }
         teams.remove(team);
@@ -399,7 +399,7 @@ public final class TeamManager implements Saveable, AccessControlled {
                 return new TeamUtils.ErrorHttpResponse(job.getName() + " is building.");
             }
             try {
-                moveJob(job, oldTeam, newTeam);
+                moveJob(job, oldTeam, newTeam, null);
                 return HttpResponses.ok();
             } catch (IOException ex) {
                 return new TeamUtils.ErrorHttpResponse("Faile to move the job " + jobName
@@ -435,18 +435,31 @@ public final class TeamManager implements Saveable, AccessControlled {
         return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(sid));
     }
 
-    public void ensureJobInTeam(TopLevelItem item, Team team) throws IOException {
+    public void ensureJobInTeam(TopLevelItem item, Team team, String originalName) throws IOException {
         Job job = (Job) item;
         Team ownerTeam = findJobOwnerTeam(job.getName());
         if (!team.equals(ownerTeam)) {
-            moveJob(job, ownerTeam, team);
+            moveJob(job, ownerTeam, team, originalName);
         }
     }
 
-    private void moveJob(Job job, Team oldTeam, Team newTeam) throws IOException {
+    /**
+     * Copy jobs from old team to new team. Supplying the original name helps, when job is created
+     * for one team and then moved to another team (Ex. Create Job in a  team). When the job 
+     * is created in first team it may take a unique name different from the supplied original name.
+     * @param job
+     * @param oldTeam
+     * @param newTeam
+     * @param originalName - original name with which the moved job should be created.
+     * @throws IOException 
+     */
+    private void moveJob(Job job, Team oldTeam, Team newTeam, String originalName) throws IOException {
         try {
             String oldJobName = job.getName();
-            String unqualifiedJobName = getUnqualifiedJobName(oldTeam, job.getName());
+            String unqualifiedJobName = originalName;
+            if ((originalName == null) || "".equals(originalName.trim())) {
+                unqualifiedJobName = getUnqualifiedJobName(oldTeam, job.getName());
+            }
             String qualifiedNewJobName = getTeamQualifiedJobName(newTeam, unqualifiedJobName);
 
             // Add the new job, rename before removing the old job

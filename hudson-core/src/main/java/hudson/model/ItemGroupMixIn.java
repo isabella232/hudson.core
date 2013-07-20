@@ -111,10 +111,10 @@ public abstract class ItemGroupMixIn {
         }
     };
 
-    private void ensureJobInTeam(TopLevelItem result, Team requestedTeam) throws IOException {
+    private void ensureJobInTeam(TopLevelItem result, Team requestedTeam, String originalName) throws IOException {
         // Make sure always dealing with a real item
         result = Hudson.getInstance().getItem(result.getName());
-        Hudson.getInstance().getTeamManager().ensureJobInTeam(result, requestedTeam);
+        Hudson.getInstance().getTeamManager().ensureJobInTeam(result, requestedTeam, originalName);
     }
     
     /**
@@ -199,7 +199,7 @@ public abstract class ItemGroupMixIn {
                 result = createProjectFromXML(name, req.getInputStream());
                 rsp.setStatus(HttpServletResponse.SC_OK);
                 if (requestedTeam != null) {
-                    ensureJobInTeam(result, requestedTeam);
+                    ensureJobInTeam(result, requestedTeam, name);
                 }
                 return result;
             } else {
@@ -213,7 +213,7 @@ public abstract class ItemGroupMixIn {
         }
         
         if (requestedTeam != null) {
-            ensureJobInTeam(result, requestedTeam);
+            ensureJobInTeam(result, requestedTeam, name);
         }
 
         rsp.sendRedirect2(redirectAfterCreateItem(req, result));
@@ -250,7 +250,7 @@ public abstract class ItemGroupMixIn {
         result.onCopiedFrom(src);
 
         add(result);
-        ItemListener.fireOnCopied(src, result);
+        ItemListener.fireOnCopied(src, Hudson.getInstance().getItem(name));
 
         return result;
     }
@@ -268,7 +268,7 @@ public abstract class ItemGroupMixIn {
             TopLevelItem result = (TopLevelItem) Items.load(parent, configXml.getParentFile());
             add(result);
 
-            ItemListener.fireOnCreated(result);
+            ItemListener.fireOnCreated(Hudson.getInstance().getItem(name));
             Hudson.getInstance().rebuildDependencyGraph();
 
             return result;
