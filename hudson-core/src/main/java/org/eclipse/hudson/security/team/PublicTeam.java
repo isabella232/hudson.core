@@ -41,7 +41,7 @@ public final class PublicTeam extends Team{
      * @param hudsonHome 
      */
     void loadExistingJobs(File rootFolder) throws IOException{
-        List<File> jobRootFolders = getJobsRootFolders(rootFolder);
+        List<File> jobRootFolders = getJobsRootFolders(rootFolder, true/*initializingTeam*/);
         for (File file : jobRootFolders){
             TeamJob job = new TeamJob(file.getName());
             job.addVisibility(PUBLIC_TEAM_NAME); 

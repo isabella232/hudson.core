@@ -111,6 +111,12 @@ public abstract class ItemGroupMixIn {
         }
     };
 
+    private void ensureJobInTeam(TopLevelItem result, Team requestedTeam) throws IOException {
+        // Make sure always dealing with a real item
+        result = Hudson.getInstance().getItem(result.getName());
+        Hudson.getInstance().getTeamManager().ensureJobInTeam(result, requestedTeam);
+    }
+    
     /**
      * Creates a {@link TopLevelItem} from the submission of the
      * '/lib/hudson/newFromList/formList' or throws an exception if it fails.
@@ -192,6 +198,9 @@ public abstract class ItemGroupMixIn {
             if (isXmlSubmission) {
                 result = createProjectFromXML(name, req.getInputStream());
                 rsp.setStatus(HttpServletResponse.SC_OK);
+                if (requestedTeam != null) {
+                    ensureJobInTeam(result, requestedTeam);
+                }
                 return result;
             } else {
                 if (mode == null) {
@@ -203,9 +212,8 @@ public abstract class ItemGroupMixIn {
             }
         }
         
-        if (Hudson.getInstance().isTeamManagementEnabled() && requestedTeam != null) {
-            TeamManager teamManager = Hudson.getInstance().getTeamManager();
-            teamManager.ensureJobInTeam(result, requestedTeam);
+        if (requestedTeam != null) {
+            ensureJobInTeam(result, requestedTeam);
         }
 
         rsp.sendRedirect2(redirectAfterCreateItem(req, result));

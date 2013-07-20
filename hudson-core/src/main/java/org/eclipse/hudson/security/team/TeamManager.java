@@ -716,7 +716,11 @@ public final class TeamManager implements Saveable, AccessControlled {
     public List<Team> findCurrentUserTeams() {
         Authentication authentication = HudsonSecurityManager.getAuthentication();
         List<Team> userTeams = findUserTeams(authentication.getName());
-        for (GrantedAuthority ga : authentication.getAuthorities()) {
+        GrantedAuthority[] gas = authentication.getAuthorities();
+        if (gas == null) {
+            throw new IllegalStateException("authentication.getAuthorities() returned null array");
+        }
+        for (GrantedAuthority ga : gas) {
             String grantedAuthority = ga.getAuthority();
             userTeams.addAll(findUserTeams(grantedAuthority));
         }

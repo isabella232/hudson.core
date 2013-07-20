@@ -28,7 +28,9 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
@@ -274,14 +276,28 @@ public class Team implements AccessControlled {
         }
 
     }
-
+    
     List<File> getJobsRootFolders(File teamsFolder) {
+        return getJobsRootFolders(teamsFolder, false);
+    }
+
+    List<File> getJobsRootFolders(File teamsFolder, final boolean initializingTeam) {
+        // if !initializingTeam make sure jobs on disk with no entries in teams.xml are ignored
         File jobsFolder = getJobsFolder(teamsFolder);
         if (jobsFolder.exists()) {
+            final Set<String> jobNames = new HashSet<String>();;
+            if (!initializingTeam) {
+                for (TeamJob job : jobs) {
+                    jobNames.add(job.getId());
+                }
+            }
             File[] jobsRootFolders = jobsFolder.listFiles(new FileFilter() {
                 @Override
                 public boolean accept(File child) {
-                    return jobs.contains(child.getName()) && child.isDirectory() && Items.getConfigFile(child).exists();
+                    if (!initializingTeam && !jobNames.contains(child.getName())) {
+                        return false;
+                    }
+                    return child.isDirectory() && Items.getConfigFile(child).exists();
                 }
             });
             if (jobsRootFolders != null) {

@@ -114,12 +114,21 @@ public class Items {
     }
     
     static LazyTopLevelItem newLazyTopLevelItem(TopLevelItem item) {
+        // Don't wrap - make this method idempotent
+        if (item instanceof LazyTopLevelItem) {
+            return (LazyTopLevelItem) item;
+        }
         return newLazyTopLevelItem(item.getParent(), item.getRootDir(), item);
     }
     
     static LazyTopLevelItem newLazyTopLevelItem(ItemGroup parent, 
                                                 File configFileDir,
                                                 TopLevelItem item) {
+        
+        // Sanity check
+        if (item instanceof LazyTopLevelItem) {
+            throw new IllegalStateException("Attempting to wrap LazyTopLevelItem "+item.getName());
+        }
         
         final XmlFile configFile = getConfigFile(configFileDir);
         

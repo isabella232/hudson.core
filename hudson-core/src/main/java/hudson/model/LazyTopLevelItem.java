@@ -128,8 +128,9 @@ final class LazyTopLevelItem implements TopLevelItem, IJob, StaplerProxy {
         if ( item.getClass() == LazyTopLevelItem.class) {
 
             LazyTopLevelItem lazyItem = (LazyTopLevelItem) item;
-            if ( clazz.isAssignableFrom(lazyItem.itemType())) {
-                return (T) lazyItem.item();
+            TopLevelItem realItem = lazyItem.item();
+            if (clazz.isAssignableFrom(realItem.getClass())) {
+                return (T) realItem;
             }
                 
         }
