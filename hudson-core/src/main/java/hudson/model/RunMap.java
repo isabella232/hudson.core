@@ -619,7 +619,7 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
 
             for (String build : buildDirs) {
                 
-                if (buildXmlExists(buildDir)) {
+                if (buildXmlExists(new File(buildDir, build))) {
                     // if the build result file isn't in the directory, ignore it.
                     try {
                         RunValue<J,R> lzRunValue = new LazyRunValue<J,R>(this, buildDir, build, cons);
