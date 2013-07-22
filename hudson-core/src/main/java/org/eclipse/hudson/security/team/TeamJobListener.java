@@ -79,8 +79,6 @@ public class TeamJobListener extends ItemListener {
                 // As a last resort add as a public scoped job
                 addToPublicTeam(jobName);
             }
-            // Log because this case shouldn't occur - could be a bug
-            logger.info("Job "+jobName+" added to team "+getTeamManager().findJobOwnerTeam(jobName).getName());
         } catch (IOException ex) {
             logFailedToAdd(jobName, "current user", ex);
         } catch (TeamNotFoundException ex) {
