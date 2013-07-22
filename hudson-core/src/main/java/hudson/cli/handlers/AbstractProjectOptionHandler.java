@@ -31,7 +31,7 @@ import org.kohsuke.args4j.spi.Setter;
  *
  * @author Kohsuke Kawaguchi
  */
-public class AbstractProjectOptionHandler extends OptionHandler<AbstractProject> {
+public class AbstractProjectOptionHandler extends RequiresAuthenticationOptionHandler<AbstractProject> {
 
     public AbstractProjectOptionHandler(CmdLineParser parser, OptionDef option, Setter<AbstractProject> setter) {
         super(parser, option, setter);
@@ -42,11 +42,13 @@ public class AbstractProjectOptionHandler extends OptionHandler<AbstractProject>
         Hudson h = Hudson.getInstance();
         String src = params.getParameter(0);
 
-        AbstractProject s = h.getItemByFullName(src, AbstractProject.class);
-        if (s == null) {
-            throw new CmdLineException(owner, "No such job '" + src + "' perhaps you meant " + AbstractProject.findNearest(src) + "?");
+        if (isAuthenticated()) {
+            AbstractProject s = h.getItemByFullName(src, AbstractProject.class);
+            if (s == null) {
+                throw new CmdLineException(owner, "No such job '" + src + "' perhaps you meant " + AbstractProject.findNearest(src) + "?");
+            }
+            setter.addValue(s);
         }
-        setter.addValue(s);
         return 1;
     }
 

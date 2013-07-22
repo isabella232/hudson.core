@@ -22,6 +22,7 @@ import hudson.ExtensionPoint;
 import hudson.cli.declarative.CLIMethod;
 import hudson.ExtensionPoint.LegacyInstancesAreScopedToHudson;
 import hudson.cli.declarative.OptionHandlerExtension;
+import hudson.cli.handlers.RequiresAuthenticationOptionHandler;
 import hudson.model.Hudson;
 import hudson.remoting.Callable;
 import hudson.remoting.Channel;
@@ -142,6 +143,11 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
      * command to generate the list of commands.
      */
     public abstract String getShortDescription();
+    
+    private void parseArguments(CmdLineParser p, List<String> args, boolean isAuthenticated) throws CmdLineException {
+        RequiresAuthenticationOptionHandler.setIsAuthenticated(isAuthenticated);
+        p.parseArgument(args.toArray(new String[args.size()]));
+    }
 
     public int main(List<String> args, Locale locale, InputStream stdin, PrintStream stdout, PrintStream stderr) {
         this.stdin = new BufferedInputStream(stdin);
@@ -160,12 +166,14 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
         new ClassParser().parse(authenticator, p);
 
         try {
-            p.parseArgument(args.toArray(new String[args.size()]));
+            parseArguments(p, args, false);
             Authentication auth = authenticator.authenticate();
             if (auth == Hudson.ANONYMOUS) {
                 auth = loadStoredAuthentication();
             }
             sc.setAuthentication(auth); // run the CLI with the right credential
+            // parse again to deal with arguments that require authentication
+            parseArguments(p, args, true);
             if (!(this instanceof LoginCommand || this instanceof HelpCommand)) {
                 Hudson.getInstance().checkPermission(Hudson.READ);
             }
