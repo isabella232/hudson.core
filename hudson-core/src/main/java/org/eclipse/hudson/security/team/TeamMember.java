@@ -18,7 +18,9 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import hudson.model.Item;
 import hudson.security.Permission;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -122,7 +124,7 @@ public class TeamMember {
         grantedPermissions.add(Item.READ);
         grantedPermissions.add(Item.WORKSPACE);
     }
-
+    
     private void setTeamAdminGrantedPermissions() {
         teamAdminGrantedPermissions.add(Item.READ);
         teamAdminGrantedPermissions.add(Item.EXTENDED_READ);
@@ -132,6 +134,18 @@ public class TeamMember {
         teamAdminGrantedPermissions.add(Item.CONFIGURE);
         teamAdminGrantedPermissions.add(Item.BUILD);
         teamAdminGrantedPermissions.add(Item.WORKSPACE);
+    }
+
+    List<String> getPermissions() {
+        List<String> permissionNames = new ArrayList<String>();
+        Set<Permission> permissions = grantedPermissions;
+        if (isTeamAdmin) {
+            permissions = teamAdminGrantedPermissions;
+        }
+        for (Permission permission : permissions) {
+            permissionNames.add(permission.getName());
+        }
+        return permissionNames;
     }
 
     public static class ConverterImpl implements Converter {

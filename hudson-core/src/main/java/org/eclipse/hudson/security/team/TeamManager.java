@@ -35,7 +35,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -621,7 +623,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return list;
     }
-
+    
     public Collection<Job> getCurrentUserAdminJobs() {
         Hudson hudson = Hudson.getInstance();
         List<Job> jobs = new ArrayList<Job>();
@@ -681,6 +683,45 @@ public final class TeamManager implements Saveable, AccessControlled {
             }
         }
         return list;
+    }
+    
+    // Used in org.cli.ListTeamsCommand
+    public List<String> getCurrentUserVisibleTeams() {
+        List<String> teams = (List<String>) getCurrentUserTeams();
+        if (!teams.contains(Team.PUBLIC_TEAM_NAME)) {
+            teams.add(Team.PUBLIC_TEAM_NAME);
+        }
+        return teams;
+    }
+    
+    /** All team permissions in sorted order */
+    public static String[] ALL_TEAM_PERMISSIONS = new String[] {
+        Item.BUILD.getName(),
+        Item.CONFIGURE.getName(),
+        Item.CREATE.getName(),
+        Item.DELETE.getName(),
+        Item.EXTENDED_READ.getName(),
+        Item.READ.getName(),
+        Item.WIPEOUT.getName(),
+        Item.WORKSPACE.getName(),
+    };
+    
+    // Used in org.cli.ListTeamsCommand
+    public String[] getCurrentUserTeamPermissions(String teamName) throws TeamNotFoundException {
+        Team team = findTeam(teamName);
+        if (isCurrentUserSysAdmin())
+            return ALL_TEAM_PERMISSIONS;
+        TeamMember member = team.findMember(getCurrentUser());
+        if (member != null) {
+                List<String> memberPermissions = member.getPermissions();
+                String[] permissions = memberPermissions.toArray(new String[memberPermissions.size()]);
+                Arrays.sort(permissions);
+                return permissions;
+        } else if (Team.PUBLIC_TEAM_NAME.equals(teamName)) {
+            // Even anonymous can read
+            return new String[] {Item.READ.getName()};
+        }
+        return new String[0];
     }
     
     // Used in hudson.model.view.newJob.jelly
