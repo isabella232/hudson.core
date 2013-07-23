@@ -817,6 +817,10 @@ public final class TeamManager implements Saveable, AccessControlled {
         addJob(findUserTeams(userName).get(0), jobName); 
 
     }
+    
+    public void addJobToCurrentUserTeam(String jobName) throws IOException, TeamNotFoundException {
+        addJobToUserTeam(getCurrentUser(), jobName);
+    }
 
     public void removeJobFromUserTeam(String userName, String jobName) throws IOException {
         removeJob(findUserTeams(userName).get(0), jobName);
