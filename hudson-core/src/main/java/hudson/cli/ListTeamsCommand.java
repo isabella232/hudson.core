@@ -72,7 +72,7 @@ public class ListTeamsCommand extends CLICommand {
             case CSV:
                 stdout.printf("Team,%s,%s,%s,%s,%s,%s,%s,%s\n", TeamManager.ALL_TEAM_PERMISSIONS);
                 for (String team : teams) {
-                    stdout.printf(team+",%s,%s,%s,%s,%s,%s,%s,%s\n",
+                    stdout.printf(QuotedStringTokenizer.quote(team)+",%s,%s,%s,%s,%s,%s,%s,%s\n",
                         convertToXArray(teamManager.getCurrentUserTeamPermissions(team)));
                 }
                 break;
