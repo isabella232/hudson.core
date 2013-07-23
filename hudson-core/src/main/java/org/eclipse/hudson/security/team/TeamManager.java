@@ -41,6 +41,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -706,24 +708,6 @@ public final class TeamManager implements Saveable, AccessControlled {
         Item.WORKSPACE.getName(),
     };
     
-    // Used in org.cli.ListTeamsCommand
-    public String[] getCurrentUserTeamPermissions(String teamName) throws TeamNotFoundException {
-        Team team = findTeam(teamName);
-        if (isCurrentUserSysAdmin())
-            return ALL_TEAM_PERMISSIONS;
-        TeamMember member = team.findMember(getCurrentUser());
-        if (member != null) {
-                List<String> memberPermissions = member.getPermissions();
-                String[] permissions = memberPermissions.toArray(new String[memberPermissions.size()]);
-                Arrays.sort(permissions);
-                return permissions;
-        } else if (Team.PUBLIC_TEAM_NAME.equals(teamName)) {
-            // Even anonymous can read
-            return new String[] {Item.READ.getName()};
-        }
-        return new String[0];
-    }
-    
     // Used in hudson.model.view.newJob.jelly
     public Collection<String> getCurrentUserTeamsWithCreatePermission() {
         List<Team> teamsWithPermission;
@@ -982,7 +966,61 @@ public final class TeamManager implements Saveable, AccessControlled {
         return userTeamsWithPermission;
     }
 
-    public static class TeamNotFoundException extends Exception {
+    // Used by ListTeamsCommand
+    public boolean isUserHasAccessToTeam(String user, String team) {
+        if (Team.PUBLIC_TEAM_NAME.equals(team)) {
+            return true;
+        }
+        List<Team> userTeams = findUserTeams(user);
+        for (Team userTeam : userTeams) {
+            if (team.equals(userTeam.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Used by ListTeamsCommand
+    public Set<String> getCurrentUserAdminUsers() {
+        Set<String> adminUsers = new TreeSet<String>();
+        String currentUser = getCurrentUser();
+        boolean isSysAdmin = isSysAdmin(currentUser);
+        for (Team team : teams) {
+            if (isSysAdmin || team.isAdmin(currentUser)) {
+                List<TeamMember> members = team.getMembers();
+                for (TeamMember member : members) {
+                    adminUsers.add(member.getName());
+                }
+            }
+        }
+        return adminUsers;
+    }
+
+    // Used by ListTeamsCommand
+    public String[] getUserTeamPermissions(String user, String teamName) throws TeamNotFoundException {
+        Team team = findTeam(teamName);
+        if (isSysAdmin(user)) {
+            return ALL_TEAM_PERMISSIONS;
+        }
+        TeamMember member = team.findMember(user);
+        if (member != null) {
+            List<String> memberPermissions = member.getPermissions();
+            String[] permissions = memberPermissions.toArray(new String[memberPermissions.size()]);
+            Arrays.sort(permissions);
+            return permissions;
+        } else if (Team.PUBLIC_TEAM_NAME.equals(teamName)) {
+            // Even anonymous can read
+            return new String[] {Item.READ.getName()};
+        }
+        return new String[0];
+    }
+
+     // Used in org.cli.ListTeamsCommand?
+    public String[] getCurrentUserTeamPermissions(String teamName) throws TeamNotFoundException {
+        return getUserTeamPermissions(getCurrentUser(), teamName);
+    }
+    
+   public static class TeamNotFoundException extends Exception {
 
         public TeamNotFoundException(String teamName) {
             super("Team " + teamName + " does not exist.");
