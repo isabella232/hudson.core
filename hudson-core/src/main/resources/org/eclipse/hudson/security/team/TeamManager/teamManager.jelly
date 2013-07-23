@@ -83,20 +83,20 @@
                                 <th align="left">Job Name</th>
                                 <th align="left">Team Name</th>      
                             </tr>      
-                            <j:forEach var="job" items="${it.currentUserAdminJobs}">
+                            <j:forEach var="jobName" items="${it.currentUserAdminJobs}">
                                 <tr>
                                     <td class="column1">
-                                        <input class="move_cb_${job.name}" type="checkbox" value="${job.name}"/>
+                                        <input class="move_cb_${jobName}" type="checkbox" value="${jobName}"/>
                                     </td>
                                     <td class="column2">
-                                         <img src='${h.getJobStatusIcon(job.name).getImageOf("24x24")}'/>
+                                         <img src='${h.getJobStatusIcon(jobName).getImageOf("24x24")}'/>
                                     </td>
                                     <td class="column3">
-                                        <a href="${rootURL}/job/${job.name}">${job.name}</a>
+                                        <a href="${rootURL}/job/${jobName}">${jobName}</a>
                                     </td>
                                     <td class="column4">
-                                        <span id="job_colum3_span_${job.name}">
-                                            ${it.findJobOwnerTeam(job.name).name}
+                                        <span id="job_colum3_span_${jobName}">
+                                            ${it.findJobOwnerTeam(jobName).name}
                                         </span>
                                     </td>
                                 </tr> 

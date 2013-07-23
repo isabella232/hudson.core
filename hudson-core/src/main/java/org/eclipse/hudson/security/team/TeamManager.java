@@ -621,12 +621,13 @@ public final class TeamManager implements Saveable, AccessControlled {
                 }
             }
         }
+        Collections.sort(list);
         return list;
     }
     
-    public Collection<Job> getCurrentUserAdminJobs() {
+    public Collection<String> getCurrentUserAdminJobs() {
         Hudson hudson = Hudson.getInstance();
-        List<Job> jobs = new ArrayList<Job>();
+        List<String> jobNames = new ArrayList<String>();
         boolean sysAdmin = isCurrentUserSysAdmin();
         String user = getCurrentUser();
         for (Team team : teams) {
@@ -646,12 +647,13 @@ public final class TeamManager implements Saveable, AccessControlled {
                 for (TeamJob teamJob : team.getJobs()) {
                     TopLevelItem item = hudson.getItem(teamJob.getId());
                     if (item != null && (item instanceof Job)) {
-                        jobs.add((Job) item);
+                        jobNames.add(item.getName());
                     }
                 }
             }
         }
-        return jobs;
+        Collections.sort(jobNames);
+        return jobNames;
     }
 
     /**

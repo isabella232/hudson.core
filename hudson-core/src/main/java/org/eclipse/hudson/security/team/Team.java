@@ -26,11 +26,13 @@ import hudson.security.SecurityRealm;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
@@ -120,6 +122,14 @@ public class Team implements AccessControlled {
 
     public List<TeamJob> getJobs() {
         return Collections.unmodifiableList(jobs);
+    }
+    
+    public Set<String> getJobNames(){
+        Set<String> jobNames = new TreeSet<String>();
+        for (TeamJob job : getJobs()){
+            jobNames.add(job.getId()); 
+        }
+        return jobNames;
     }
 
     public TeamMember findMember(String userName) {
