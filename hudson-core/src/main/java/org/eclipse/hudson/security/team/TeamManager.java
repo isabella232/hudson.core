@@ -814,19 +814,21 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     public void addJobToUserTeam(String userName, String jobName) throws IOException, TeamNotFoundException {
-        addJob(findUserTeams(userName).get(0), jobName); 
-
+        // Fix bug in hudson.model.listeners.ItemListenerTest - no team found for user
+        List<Team> userTeams = findUserTeams(userName);
+        Team team = userTeams.isEmpty() ? publicTeam : userTeams.get(0);
+        addJob(team, jobName); 
     }
     
     public void addJobToCurrentUserTeam(String jobName) throws IOException, TeamNotFoundException {
         addJobToUserTeam(getCurrentUser(), jobName);
     }
 
-    public void removeJobFromUserTeam(String userName, String jobName) throws IOException {
+    void removeJobFromUserTeam(String userName, String jobName) throws IOException {
         removeJob(findUserTeams(userName).get(0), jobName);
     }
     
-    public void renameJobInUserTeam(String userName, String oldJobName, String newJobName) throws IOException {
+    void renameJobInUserTeam(String userName, String oldJobName, String newJobName) throws IOException {
         renameJob(findUserTeams(userName).get(0), oldJobName, newJobName);
     }
 
