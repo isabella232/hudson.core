@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.util.Map;
 import org.eclipse.hudson.security.team.Team;
 import org.eclipse.hudson.security.team.TeamManager;
+import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -227,6 +228,21 @@ public abstract class ItemGroupMixIn {
     protected String redirectAfterCreateItem(StaplerRequest req, TopLevelItem result) throws IOException {
         return req.getContextPath() + '/' + result.getUrl() + "configure";
     }
+    
+    private void addJobToCurrentUserTeam(String name) throws IOException {
+        // Fix 413481 - NPE because Hudson getItem returns null for newly created job
+        // Circularity. Hudson getItem requires READ permission.
+        // If team is enabled, permission is determined by user's access
+        // to team containing job. But TeamJobListener can't add the
+        // job because getItem, used to get a real Job for listeners,
+        // returns null.
+        try {
+            Hudson.getInstance().getTeamManager().addJobToCurrentUserTeam(name);
+        } catch (TeamNotFoundException e) {
+            // should never happen
+            logger.error("Current user team not found while adding job "+name);
+        }
+    }
 
     /**
      * Copies an existing {@link TopLevelItem} to a new name.
@@ -250,7 +266,10 @@ public abstract class ItemGroupMixIn {
         result.onCopiedFrom(src);
 
         add(result);
-        ItemListener.fireOnCopied(src, Hudson.getInstance().getItem(name));
+        
+        addJobToCurrentUserTeam(result.getName());
+        
+        ItemListener.fireOnCopied(src, Hudson.getInstance().getItem(result.getName()));
 
         return result;
     }
@@ -267,8 +286,10 @@ public abstract class ItemGroupMixIn {
             // load it
             TopLevelItem result = (TopLevelItem) Items.load(parent, configXml.getParentFile());
             add(result);
+            
+            addJobToCurrentUserTeam(result.getName());
 
-            ItemListener.fireOnCreated(Hudson.getInstance().getItem(name));
+            ItemListener.fireOnCreated(Hudson.getInstance().getItem(result.getName()));
             Hudson.getInstance().rebuildDependencyGraph();
 
             return result;
