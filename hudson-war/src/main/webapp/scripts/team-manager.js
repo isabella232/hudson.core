@@ -472,7 +472,7 @@ function configureJobVisibilityAction(configureJobItem) {
         height: 300,
         width: 350,
         modal: true,
-        title: "Update Job Visibility",
+        title: "Update Job Visibility - " + jobName,
         buttons: {
             'Update': function() {
                 teamNames = "";
@@ -491,7 +491,7 @@ function configureJobVisibilityAction(configureJobItem) {
         }
     });
 
-    jQuery.getJSON('getTeamsJson', function(json) {
+    jQuery.getJSON('getAllTeamsJson', function(json) {
         jQuery('#configure-visibility-team-list').empty();
         var publicItem = jQuery('#publicVisibility');
         if (teamNames.indexOf("public") >= 0) {

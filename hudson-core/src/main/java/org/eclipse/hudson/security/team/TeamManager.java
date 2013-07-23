@@ -494,22 +494,39 @@ public final class TeamManager implements Saveable, AccessControlled {
         return new HttpResponse() {
             @Override
             public void generateResponse(StaplerRequest sr, StaplerResponse rsp, Object o) throws IOException, ServletException {
-                rsp.setStatus(HttpServletResponse.SC_OK);
-                rsp.setContentType("application/json");
-                PrintWriter w = new PrintWriter(rsp.getWriter());
-                w.println("{");
-                List<String> teams = (List<String>) getCurrentUserAdminTeams();
-                for (int i = 0; i < teams.size(); i++) {
-                    w.print("\"" + teams.get(i) + "\":\"" + teams.get(i) + "\"");
-                    if (i < teams.size() - 1) {
-                        w.println(",");
-                    }
-                }
-                w.println("}");
-                w.close();
+                writeJson(rsp, (List<String>) getCurrentUserAdminTeams());
             }
         };
 
+    }
+    
+    /**
+     * Get names of all teams in TeamManager as JSON
+     *
+     * @return HttpResponse with JSON as content type
+     */
+    public HttpResponse doGetAllTeamsJson() {
+        return new HttpResponse() {
+            @Override
+            public void generateResponse(StaplerRequest sr, StaplerResponse rsp, Object o) throws IOException, ServletException {
+                writeJson(rsp, getTeamNames());
+            }
+        };
+    }
+    
+    private void writeJson(StaplerResponse rsp, List<String> teams) throws IOException {
+        rsp.setStatus(HttpServletResponse.SC_OK);
+        rsp.setContentType("application/json");
+        PrintWriter w = new PrintWriter(rsp.getWriter());
+        w.println("{");
+        for (int i = 0; i < teams.size(); i++) {
+            w.print("\"" + teams.get(i) + "\":\"" + teams.get(i) + "\"");
+            if (i < teams.size() - 1) {
+                w.println(",");
+            }
+        }
+        w.println("}");
+        w.close();
     }
 
     /* For Unit Test */
