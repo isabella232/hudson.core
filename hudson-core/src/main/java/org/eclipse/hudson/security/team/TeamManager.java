@@ -495,22 +495,39 @@ public final class TeamManager implements Saveable, AccessControlled {
         return new HttpResponse() {
             @Override
             public void generateResponse(StaplerRequest sr, StaplerResponse rsp, Object o) throws IOException, ServletException {
-                rsp.setStatus(HttpServletResponse.SC_OK);
-                rsp.setContentType("application/json");
-                PrintWriter w = new PrintWriter(rsp.getWriter());
-                w.println("{");
-                List<String> teams = (List<String>) getCurrentUserAdminTeams();
-                for (int i = 0; i < teams.size(); i++) {
-                    w.print("\"" + teams.get(i) + "\":\"" + teams.get(i) + "\"");
-                    if (i < teams.size() - 1) {
-                        w.println(",");
-                    }
-                }
-                w.println("}");
-                w.close();
+                writeJson(rsp, (List<String>) getCurrentUserAdminTeams());
             }
         };
 
+    }
+    
+    /**
+     * Get names of all teams in TeamManager as JSON
+     *
+     * @return HttpResponse with JSON as content type
+     */
+    public HttpResponse doGetAllTeamsJson() {
+        return new HttpResponse() {
+            @Override
+            public void generateResponse(StaplerRequest sr, StaplerResponse rsp, Object o) throws IOException, ServletException {
+                writeJson(rsp, getTeamNames());
+            }
+        };
+    }
+    
+    private void writeJson(StaplerResponse rsp, List<String> teams) throws IOException {
+        rsp.setStatus(HttpServletResponse.SC_OK);
+        rsp.setContentType("application/json");
+        PrintWriter w = new PrintWriter(rsp.getWriter());
+        w.println("{");
+        for (int i = 0; i < teams.size(); i++) {
+            w.print("\"" + teams.get(i) + "\":\"" + teams.get(i) + "\"");
+            if (i < teams.size() - 1) {
+                w.println(",");
+            }
+        }
+        w.println("}");
+        w.close();
     }
 
     /* For Unit Test */
@@ -624,12 +641,13 @@ public final class TeamManager implements Saveable, AccessControlled {
                 }
             }
         }
+        Collections.sort(list);
         return list;
     }
     
-    public Collection<Job> getCurrentUserAdminJobs() {
+    public Collection<String> getCurrentUserAdminJobs() {
         Hudson hudson = Hudson.getInstance();
-        List<Job> jobs = new ArrayList<Job>();
+        List<String> jobNames = new ArrayList<String>();
         boolean sysAdmin = isCurrentUserSysAdmin();
         String user = getCurrentUser();
         for (Team team : teams) {
@@ -649,12 +667,13 @@ public final class TeamManager implements Saveable, AccessControlled {
                 for (TeamJob teamJob : team.getJobs()) {
                     TopLevelItem item = hudson.getItem(teamJob.getId());
                     if (item != null && (item instanceof Job)) {
-                        jobs.add((Job) item);
+                        jobNames.add(item.getName());
                     }
                 }
             }
         }
-        return jobs;
+        Collections.sort(jobNames);
+        return jobNames;
     }
 
     /**
@@ -719,6 +738,14 @@ public final class TeamManager implements Saveable, AccessControlled {
         return userTeams;
     }
     
+    public Team findUserTeamForJob(String userName) {
+        List<Team> userTeams = findUserTeams(userName);
+        if (userTeams.isEmpty()) {
+            return publicTeam;
+        }
+        return userTeams.get(0);
+    }
+    
     private TeamAwareSecurityRealm getTeamAwareSecurityRealm(){
         HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
         if (hudsonSecurityManager != null) {
@@ -779,9 +806,7 @@ public final class TeamManager implements Saveable, AccessControlled {
 
     public void addJobToUserTeam(String userName, String jobName) throws IOException, TeamNotFoundException {
         // Fix bug in hudson.model.listeners.ItemListenerTest - no team found for user
-        List<Team> userTeams = findUserTeams(userName);
-        Team team = userTeams.isEmpty() ? publicTeam : userTeams.get(0);
-        addJob(team, jobName); 
+        addJob(findUserTeamForJob(userName), jobName); 
     }
     
     public void addJobToCurrentUserTeam(String jobName) throws IOException, TeamNotFoundException {
@@ -789,10 +814,12 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     void removeJobFromUserTeam(String userName, String jobName) throws IOException {
+        // Used only in tests
         removeJob(findUserTeams(userName).get(0), jobName);
     }
     
     void renameJobInUserTeam(String userName, String oldJobName, String newJobName) throws IOException {
+        // Used only in tests
         renameJob(findUserTeams(userName).get(0), oldJobName, newJobName);
     }
 

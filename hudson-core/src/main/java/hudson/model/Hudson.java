@@ -1911,8 +1911,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 			}
 			String hostNamePart = theUrl.getProtocol() + "://"
 					+ theUrl.getHost();
-			return hostNamePart + Functions.getRequestRootPath();
-
+			return hostNamePart + Functions.getRequestRootPath() + '/';
 		}
 
         StaplerRequest req = Stapler.getCurrentRequest();
