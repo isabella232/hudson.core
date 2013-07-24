@@ -71,7 +71,10 @@
                                                 <t:buildProgressBar build="${exe}" executor="${executor}"/>
                                             </j:when>
                                             <j:otherwise>
-                                                <span>${%Unknown Task}</span>
+                                                <!-- Display read only info -->
+                                                ${exeparent.fullDisplayName}&#160;
+                                                #${exe.number}
+                                                <t:buildProgressBar build="${exe}" executor="${executor}"/>
                                             </j:otherwise>
                                         </j:choose>
                                     </div>

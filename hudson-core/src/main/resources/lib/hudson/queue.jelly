@@ -58,16 +58,17 @@
                                         <a href="${rootURL}/${item.task.url}">
                                             ${item.task.fullDisplayName}
                                         </a>
-                                        <j:if test="${stuck}">
-                                            &#160;
-                                            <a href="http://wiki.hudson-ci.org/display/HUDSON/Executor+Starvation">
-                                                <img src="${imagesURL}/16x16/hourglass.png"  />
-                                            </a>
-                                        </j:if>
                                     </j:when>
                                     <j:otherwise>
-                                        <span>${%Unknown Task}</span>
+                                        <!-- Display read only information -->
+                                        ${item.task.fullDisplayName}
                                     </j:otherwise>
+                                    <j:if test="${stuck}">
+                                            &#160;
+                                        <a href="http://wiki.hudson-ci.org/display/HUDSON/Executor+Starvation">
+                                            <img src="${imagesURL}/16x16/hourglass.png"  />
+                                        </a>
+                                    </j:if>
                                 </j:choose>
                             </td>
                             <td class="pane" width="16" align="center" valign="middle">
