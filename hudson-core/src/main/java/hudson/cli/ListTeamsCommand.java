@@ -69,7 +69,10 @@ public class ListTeamsCommand extends CLICommand {
                         break;
                     }
                 }
+<<<<<<< Updated upstream
                 // NB: Users administered by current user must be in teams visible to current user
+=======
+>>>>>>> Stashed changes
                 Set<String> usersAdministered = teamManager.getCurrentUserAdminUsers();
                 if (userArray.length == 1 && "*".equals(userArray[0])) {
                     // all users administered by current user
@@ -88,6 +91,7 @@ public class ListTeamsCommand extends CLICommand {
             case XML:
                 PrintWriter w = new PrintWriter(stdout);
                 if (userArray != null) {
+<<<<<<< Updated upstream
                     w.println("<users>");
                     for (String user : userArray) {
                         w.println("  <user>");
@@ -104,6 +108,22 @@ public class ListTeamsCommand extends CLICommand {
                         w.println("  </user>");
                     }
                     w.println("</users>");
+=======
+                    for (String user : userArray) {
+                        w.println("<user>");
+                        w.println("  <name>");
+                        w.println(user);
+                        w.println("</name>");
+                        w.println("  <teams>");
+                        for (String team : teams) {
+                            if (teamManager.isUserHasAccessToTeam(user, team)) {
+                                printTeamXml(w, user, team, "    ");
+                            }
+                        }
+                        w.println("  </teams>");
+                        w.println("</user>");
+                    }
+>>>>>>> Stashed changes
                 } else {
                     Authentication authentication = HudsonSecurityManager.getAuthentication();
                     w.println("<teams>");
@@ -119,21 +139,32 @@ public class ListTeamsCommand extends CLICommand {
                     stdout.printf("User,Team,%s,%s,%s,%s,%s,%s,%s,%s\n", TeamManager.ALL_TEAM_PERMISSIONS);
                     for (String user : userArray) {
                         for (String team : teams) {
+<<<<<<< Updated upstream
                             if (teamManager.isUserHasAccessToTeam(user, team)) {
                                 stdout.printf(user+","+team+",%s,%s,%s,%s,%s,%s,%s,%s\n",
                                     convertToXArray(teamManager.getUserTeamPermissions(user, team)));
                             }
+=======
+                            if (teamManager.isUserHasAccessToTeam(user, team))
+                            stdout.printf(QuotedStringTokenizer.quote(user)+","+QuotedStringTokenizer.quote(team)+",%s,%s,%s,%s,%s,%s,%s,%s\n",
+                                convertToXArray(teamManager.getCurrentUserTeamPermissions(team)));
+>>>>>>> Stashed changes
                         }
                     }
                 } else {
                     stdout.printf("Team,%s,%s,%s,%s,%s,%s,%s,%s\n", TeamManager.ALL_TEAM_PERMISSIONS);
                     for (String team : teams) {
+<<<<<<< Updated upstream
                         stdout.printf(team+",%s,%s,%s,%s,%s,%s,%s,%s\n",
+=======
+                        stdout.printf(QuotedStringTokenizer.quote(team)+",%s,%s,%s,%s,%s,%s,%s,%s\n",
+>>>>>>> Stashed changes
                             convertToXArray(teamManager.getCurrentUserTeamPermissions(team)));
                     }
                 }
                 break;
             case PLAIN:
+<<<<<<< Updated upstream
                 int bigTeam = findBig(teams);
                 if (userArray != null) {
                     int bigUser = findBig(userArray);
@@ -142,6 +173,26 @@ public class ListTeamsCommand extends CLICommand {
                             if (teamManager.isUserHasAccessToTeam(user, team)) {
                                 printPlain(user, team, bigUser, bigTeam);
                             }
+=======
+                int big = 0;
+                for (String team : teams) {
+                    if (big < team.length()) {
+                        big = team.length();
+                    }
+                }
+                // FIXME deal with users
+                for (String team : teams) {
+                    int len = team.length();
+                    stdout.print(team);
+                    pad(stdout, big-len+1);
+                    String[] permissions = teamManager.getCurrentUserTeamPermissions(team);
+                    for (int i = 0; i < permissions.length; i++) {
+                        if (i == permissions.length - 1) {
+                            stdout.println(permissions[i]);
+                        } else {
+                            stdout.print(permissions[i]);
+                            stdout.print(" ");
+>>>>>>> Stashed changes
                         }
                     }
                 } else {
@@ -154,6 +205,7 @@ public class ListTeamsCommand extends CLICommand {
         return 0;
     }
     
+<<<<<<< Updated upstream
     private int findBig(String[] sa) {
         int big = 0;
         for (String s : sa) {
@@ -183,12 +235,16 @@ public class ListTeamsCommand extends CLICommand {
     }
     
     private void printTeamXml(PrintWriter w, String user, String team, String indent) throws TeamManager.TeamNotFoundException {
+=======
+    private void printTeamXml(PrintWriter w, String user, String team, String indent) {
+>>>>>>> Stashed changes
         w.print(indent);
         w.println("<team>");
         w.print(indent);
         w.print("  <name>");
         w.print(team);
         w.println("</name>");
+<<<<<<< Updated upstream
         String[] permissions = teamManager.getUserTeamPermissions(user, team);
         if (permissions.length > 0) {
             w.print(indent);
@@ -201,6 +257,13 @@ public class ListTeamsCommand extends CLICommand {
             }
             w.print(indent);
             w.println("  </permissions>");
+=======
+        for (String permission : teamManager.getUserTeamPermissions(user, team)) {
+            w.print(indent);
+            w.print("  <permission>");
+            w.print(permission);
+            w.println("</permission>");
+>>>>>>> Stashed changes
         }
         w.print(indent);
         w.println("</team>");

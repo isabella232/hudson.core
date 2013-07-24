@@ -758,6 +758,14 @@ public final class TeamManager implements Saveable, AccessControlled {
         return userTeams;
     }
     
+    public Team findUserTeamForJob(String userName) {
+        List<Team> userTeams = findUserTeams(userName);
+        if (userTeams.isEmpty()) {
+            return publicTeam;
+        }
+        return userTeams.get(0);
+    }
+    
     private TeamAwareSecurityRealm getTeamAwareSecurityRealm(){
         HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
         if (hudsonSecurityManager != null) {
@@ -818,9 +826,7 @@ public final class TeamManager implements Saveable, AccessControlled {
 
     public void addJobToUserTeam(String userName, String jobName) throws IOException, TeamNotFoundException {
         // Fix bug in hudson.model.listeners.ItemListenerTest - no team found for user
-        List<Team> userTeams = findUserTeams(userName);
-        Team team = userTeams.isEmpty() ? publicTeam : userTeams.get(0);
-        addJob(team, jobName); 
+        addJob(findUserTeamForJob(userName), jobName); 
     }
     
     public void addJobToCurrentUserTeam(String jobName) throws IOException, TeamNotFoundException {
@@ -828,10 +834,12 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     void removeJobFromUserTeam(String userName, String jobName) throws IOException {
+        // Used only in tests
         removeJob(findUserTeams(userName).get(0), jobName);
     }
     
     void renameJobInUserTeam(String userName, String oldJobName, String newJobName) throws IOException {
+        // Used only in tests
         renameJob(findUserTeams(userName).get(0), oldJobName, newJobName);
     }
 
