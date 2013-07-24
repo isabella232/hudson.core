@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
@@ -687,27 +688,6 @@ public final class TeamManager implements Saveable, AccessControlled {
         return list;
     }
     
-    // Used in org.cli.ListTeamsCommand
-    public List<String> getCurrentUserVisibleTeams() {
-        List<String> teams = (List<String>) getCurrentUserTeams();
-        if (!teams.contains(Team.PUBLIC_TEAM_NAME)) {
-            teams.add(Team.PUBLIC_TEAM_NAME);
-        }
-        return teams;
-    }
-    
-    /** All team permissions in sorted order */
-    public static String[] ALL_TEAM_PERMISSIONS = new String[] {
-        Item.BUILD.getName(),
-        Item.CONFIGURE.getName(),
-        Item.CREATE.getName(),
-        Item.DELETE.getName(),
-        Item.EXTENDED_READ.getName(),
-        Item.READ.getName(),
-        Item.WIPEOUT.getName(),
-        Item.WORKSPACE.getName(),
-    };
-    
     // Used in hudson.model.view.newJob.jelly
     public Collection<String> getCurrentUserTeamsWithCreatePermission() {
         List<Team> teamsWithPermission;
@@ -966,6 +946,30 @@ public final class TeamManager implements Saveable, AccessControlled {
         return userTeamsWithPermission;
     }
 
+    public static final String ADMIN = "Admin";
+    
+    /** All team permissions in sorted order */
+    public static String[] ALL_TEAM_PERMISSIONS = new String[] {
+        ADMIN, // not a real permission, but needed to distinguish admins
+        Item.BUILD.getName(),
+        Item.CONFIGURE.getName(),
+        Item.CREATE.getName(),
+        Item.DELETE.getName(),
+        Item.EXTENDED_READ.getName(),
+        Item.READ.getName(),
+        Item.WIPEOUT.getName(),
+        Item.WORKSPACE.getName(),
+    };
+    
+    // Used in org.cli.ListTeamsCommand
+    public List<String> getCurrentUserVisibleTeams() {
+        List<String> teams = (List<String>) getCurrentUserTeams();
+        if (!teams.contains(Team.PUBLIC_TEAM_NAME)) {
+            teams.add(Team.PUBLIC_TEAM_NAME);
+        }
+        return teams;
+    }
+    
     // Used by ListTeamsCommand
     public boolean isUserHasAccessToTeam(String user, String team) {
         if (Team.PUBLIC_TEAM_NAME.equals(team)) {
@@ -981,16 +985,18 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     // Used by ListTeamsCommand
-    public Set<String> getCurrentUserAdminUsers() {
+    public Collection<String> getCurrentUserAdminUsers() {
         Set<String> adminUsers = new TreeSet<String>();
-        String currentUser = getCurrentUser();
-        boolean isSysAdmin = isSysAdmin(currentUser);
-        for (Team team : teams) {
-            if (isSysAdmin || team.isAdmin(currentUser)) {
+        Collection<String> adminTeams = getCurrentUserAdminTeams();
+        for (String teamName : adminTeams) {
+            try {
+                Team team = findTeam(teamName);
                 List<TeamMember> members = team.getMembers();
                 for (TeamMember member : members) {
                     adminUsers.add(member.getName());
                 }
+            } catch (TeamNotFoundException ex) {
+                ; // shouldn't happen
             }
         }
         return adminUsers;
@@ -1005,6 +1011,10 @@ public final class TeamManager implements Saveable, AccessControlled {
         TeamMember member = team.findMember(user);
         if (member != null) {
             List<String> memberPermissions = member.getPermissions();
+            if (team.isAdmin(user)) {
+                // Add the pseudo-permission
+                memberPermissions.add(0, ADMIN);
+            }
             String[] permissions = memberPermissions.toArray(new String[memberPermissions.size()]);
             Arrays.sort(permissions);
             return permissions;

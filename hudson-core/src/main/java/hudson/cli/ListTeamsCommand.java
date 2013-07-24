@@ -18,9 +18,6 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.eclipse.hudson.security.team.TeamManager;
 import org.kohsuke.args4j.Option;
@@ -58,6 +55,7 @@ public class ListTeamsCommand extends CLICommand {
         teamManager = Hudson.getInstance().getTeamManager();
         String[] teams = new String[0];
         String[] userArray = null;
+        String[] adminTeams = null;
         if (teamManager.isTeamManagementEnabled()) {
             Collection<String> currentUserTeams = teamManager.getCurrentUserVisibleTeams();
             Arrays.sort(teams = currentUserTeams.toArray(new String[currentUserTeams.size()]));
@@ -70,7 +68,8 @@ public class ListTeamsCommand extends CLICommand {
                     }
                 }
                 // NB: Users administered by current user must be in teams visible to current user
-                Set<String> usersAdministered = teamManager.getCurrentUserAdminUsers();
+                // but not necessarily all those teams are administered by the current user.
+                Collection<String> usersAdministered = teamManager.getCurrentUserAdminUsers();
                 if (userArray.length == 1 && "*".equals(userArray[0])) {
                     // all users administered by current user
                     userArray = usersAdministered.toArray(new String[usersAdministered.size()]);
@@ -82,6 +81,10 @@ public class ListTeamsCommand extends CLICommand {
                     }
                 }
                 Arrays.sort(userArray);
+
+                Collection<String> cuAdminTeams = teamManager.getCurrentUserAdminTeams();
+                adminTeams = cuAdminTeams.toArray(new String[cuAdminTeams.size()]);
+                Arrays.sort(adminTeams);
             }
         }
         switch (format) {
@@ -95,7 +98,7 @@ public class ListTeamsCommand extends CLICommand {
                         w.print(user);
                         w.println("</name>");
                         w.println("    <teams>");
-                        for (String team : teams) {
+                        for (String team : adminTeams) {
                             if (teamManager.isUserHasAccessToTeam(user, team)) {
                                 printTeamXml(w, user, team, "      ");
                             }
@@ -116,9 +119,9 @@ public class ListTeamsCommand extends CLICommand {
                 break;
             case CSV:
                 if (userArray != null) {
-                    stdout.printf("User,Team,%s,%s,%s,%s,%s,%s,%s,%s\n", TeamManager.ALL_TEAM_PERMISSIONS);
+                    stdout.printf("User,Team,%s,%s,%s,%s,%s,%s,%s,%s,%s\n", TeamManager.ALL_TEAM_PERMISSIONS);
                     for (String user : userArray) {
-                        for (String team : teams) {
+                        for (String team : adminTeams) {
                             if (teamManager.isUserHasAccessToTeam(user, team)) {
                                 stdout.printf(user+","+team+",%s,%s,%s,%s,%s,%s,%s,%s\n",
                                     convertToXArray(teamManager.getUserTeamPermissions(user, team)));
@@ -126,7 +129,7 @@ public class ListTeamsCommand extends CLICommand {
                         }
                     }
                 } else {
-                    stdout.printf("Team,%s,%s,%s,%s,%s,%s,%s,%s\n", TeamManager.ALL_TEAM_PERMISSIONS);
+                    stdout.printf("Team,%s,%s,%s,%s,%s,%s,%s,%s,%s\n", TeamManager.ALL_TEAM_PERMISSIONS);
                     for (String team : teams) {
                         stdout.printf(team+",%s,%s,%s,%s,%s,%s,%s,%s\n",
                             convertToXArray(teamManager.getCurrentUserTeamPermissions(team)));
@@ -134,17 +137,18 @@ public class ListTeamsCommand extends CLICommand {
                 }
                 break;
             case PLAIN:
-                int bigTeam = findBig(teams);
                 if (userArray != null) {
+                    int bigTeam = findBig(adminTeams);
                     int bigUser = findBig(userArray);
                     for (String user : userArray) {
-                        for (String team : teams) {
+                        for (String team : adminTeams) {
                             if (teamManager.isUserHasAccessToTeam(user, team)) {
                                 printPlain(user, team, bigUser, bigTeam);
                             }
                         }
                     }
                 } else {
+                    int bigTeam = findBig(teams);
                     for (String team : teams) {
                         printPlain(getCurrentUser(), team, 0, bigTeam);
                     }
@@ -170,7 +174,7 @@ public class ListTeamsCommand extends CLICommand {
             pad(stdout, bigUser-user.length()+1);
         }
         stdout.print(team);
-        pad(stdout, bigTeam-team.length()+1);
+        pad(stdout, bigTeam-team.length()+2);
         String[] permissions = teamManager.getUserTeamPermissions(user, team);
         for (int i = 0; i < permissions.length; i++) {
             if (i == permissions.length - 1) {
