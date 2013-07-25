@@ -261,7 +261,21 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
      * LDAP.
      */
     private transient SpringSecurityLdapTemplate ldapTemplate;
-    private static String GROUP_SEARCH_FILTER = "(| (member={0}) (uniqueMember={0}) (memberUid={1}))";
+    
+    /**
+     * LDAP filter to look for Roles of a user (Groups to which the user belongs to)
+     */
+    private static String ROLE_SEARCH_FILTER = System.getProperty(LDAPSecurityRealm.class.getName() + ".roleSearch", "(| (member={0}) (uniqueMember={0}) (memberUid={1}))");
+    
+    /**
+     * LDAP filter to look for groups by their names. Can be overridden by System Property
+     *
+     * "{0}" is the group name as given by the user. See
+     * http://msdn.microsoft.com/en-us/library/aa746475(VS.85).aspx for the
+     * syntax by example. WANTED: The specification of the syntax.
+     */
+    public static String GROUP_SEARCH_FILTER = System.getProperty(LDAPSecurityRealm.class.getName() + ".groupSearch",
+            "(& (cn={0}) (| (objectclass=groupOfNames) (objectclass=groupOfUniqueNames) (objectclass=posixGroup)))");
 
     @DataBoundConstructor
     public LDAPSecurityRealm(String server, String rootDN, String userSearchBase, String userSearch, String groupSearchBase, String managerDN, String managerPassword) {
@@ -353,7 +367,7 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
 
         AuthoritiesPopulatorImpl authoritiesPopulator = new AuthoritiesPopulatorImpl(securityContextSource, groupSearchBase);
         authoritiesPopulator.setSearchSubtree(true);
-        authoritiesPopulator.setGroupSearchFilter(GROUP_SEARCH_FILTER);
+        authoritiesPopulator.setGroupSearchFilter(ROLE_SEARCH_FILTER);
 
 
         // talk to LDAP
@@ -425,7 +439,7 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
 
         // TODO: obtain a DN instead so that we can obtain multiple attributes later
         String searchBase = groupSearchBase != null ? groupSearchBase : "";
-        final Set<String> groups = (Set<String>) ldapTemplate.searchForSingleAttributeValues(searchBase, GROUP_SEARCH,
+        final Set<String> groups = (Set<String>) ldapTemplate.searchForSingleAttributeValues(searchBase, GROUP_SEARCH_FILTER,
                 new String[]{groupname}, "cn");
 
         if (groups.isEmpty()) {
@@ -607,13 +621,4 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
         }
     }
     private static final Logger LOGGER = Logger.getLogger(LDAPSecurityRealm.class.getName());
-    /**
-     * LDAP filter to look for groups by their names.
-     *
-     * "{0}" is the group name as given by the user. See
-     * http://msdn.microsoft.com/en-us/library/aa746475(VS.85).aspx for the
-     * syntax by example. WANTED: The specification of the syntax.
-     */
-    public static String GROUP_SEARCH = System.getProperty(LDAPSecurityRealm.class.getName() + ".groupSearch",
-            "(& (cn={0}) (| (objectclass=groupOfNames) (objectclass=groupOfUniqueNames) (objectclass=posixGroup)))");
 }
