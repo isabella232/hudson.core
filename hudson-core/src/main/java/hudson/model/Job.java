@@ -896,7 +896,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     protected HistoryWidget createHistoryWidget() {
-        return new HistoryWidget(this, getBuildHistory(), HISTORY_ADAPTER);
+        return new HistoryWidget(this, getBuildHistoryData(), HISTORY_ADAPTER);
     }
  
     protected static final HistoryWidget.Adapter<BuildHistory.Record> HISTORY_ADAPTER = 
@@ -1106,7 +1106,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
     }
     
-    public abstract BuildHistory<JobT,RunT> getBuildHistory();
+    public abstract BuildHistory<JobT,RunT> getBuildHistoryData();
     
     /**
      * Gets all the runs.
@@ -1130,7 +1130,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getLastBuild() {
-        return getBuildHistory().getLastBuild();
+        return getBuildHistoryData().getLastBuild();
     }
 
     /**
@@ -1139,7 +1139,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getFirstBuild() {
-        return getBuildHistory().getFirstBuild();
+        return getBuildHistoryData().getFirstBuild();
     }
 
     /**
@@ -1152,7 +1152,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getLastSuccessfulBuild() {
-        return getBuildHistory().getLastSuccessfulBuild();
+        return getBuildHistoryData().getLastSuccessfulBuild();
     }
 
     /**
@@ -1164,7 +1164,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getLastUnsuccessfulBuild() {
-        return getBuildHistory().getLastUnsuccessfulBuild();
+        return getBuildHistoryData().getLastUnsuccessfulBuild();
     }
 
     /**
@@ -1175,7 +1175,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getLastUnstableBuild() {
-        return getBuildHistory().getLastUnstableBuild();
+        return getBuildHistoryData().getLastUnstableBuild();
     }
 
     /**
@@ -1186,7 +1186,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getLastStableBuild() {
-        return getBuildHistory().getLastStableBuild();
+        return getBuildHistoryData().getLastStableBuild();
     }
 
     /**
@@ -1195,7 +1195,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getLastFailedBuild() {
-        return getBuildHistory().getLastFailedBuild();
+        return getBuildHistoryData().getLastFailedBuild();
     }
 
     /**
@@ -1204,7 +1204,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Exported
     @QuickSilver
     public RunT getLastCompletedBuild() {
-        return getBuildHistory().getLastCompletedBuild();
+        return getBuildHistoryData().getLastCompletedBuild();
     }
 
     /**
@@ -1216,7 +1216,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Never null.
      */
     public List<RunT> getLastBuildsOverThreshold(int numberOfBuilds, Result threshold) {
-        return getBuildHistory().getLastBuildsOverThreshold(numberOfBuilds, threshold);
+        return getBuildHistoryData().getLastBuildsOverThreshold(numberOfBuilds, threshold);
     }
 
     public final long getEstimatedDuration() {
@@ -1335,7 +1335,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         int failCount = 0;
         int totalCount = 0;
 
-        BuildHistory.Record r = getBuildHistory().getLast();
+        BuildHistory.Record r = getBuildHistoryData().getLast();
         while (totalCount < 5 && r != null) {
             switch (r.getIconColor()) {
                 case GREEN:
@@ -1576,7 +1576,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     public BuildTimelineWidget getTimeline() {
-        final BuildHistoryList<JobT, RunT> bhl = BuildHistoryList.newBuildHistoryList(getBuildHistory());
+        final BuildHistoryList<JobT, RunT> bhl = BuildHistoryList.newBuildHistoryList(getBuildHistoryData());
         return new BuildTimelineWidget(bhl);
     }
 

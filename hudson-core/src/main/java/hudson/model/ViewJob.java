@@ -123,7 +123,7 @@ public abstract class ViewJob<JobT extends ViewJob<JobT, RunT>,
     }
 
     @Override
-    public BuildHistory<JobT, RunT> getBuildHistory() {
+    public BuildHistory<JobT, RunT> getBuildHistoryData() {
         return (BuildHistory<JobT,RunT>)_getRuns();
     }
     

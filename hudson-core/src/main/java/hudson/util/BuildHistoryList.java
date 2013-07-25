@@ -80,7 +80,7 @@ public class BuildHistoryList<J extends Job<J,R>, R extends Run<J,R>>
             BuildHistoryList<JobT,RunT> newBuildHistoryList(Collection<JobT> jobs) {
       ArrayList<Record<JobT,RunT>> list = new ArrayList<Record<JobT,RunT>>();
       for (JobT job: jobs) {
-          BuildHistory<JobT,RunT> bh = job.getBuildHistory();
+          BuildHistory<JobT,RunT> bh = job.getBuildHistoryData();
           list.addAll(bh.allRecords());
       }
       Collections.sort(list, new DateComparator<JobT,RunT>());
@@ -94,7 +94,7 @@ public class BuildHistoryList<J extends Job<J,R>, R extends Run<J,R>>
         ArrayList list = new ArrayList();
         for (Item item : view.getItems()) {
             for (Job<?, ?> j : item.getAllJobs()) {
-                list.addAll(j.getBuildHistory().allRecords());
+                list.addAll(j.getBuildHistoryData().allRecords());
             }
         }
         Collections.sort(list, new DateComparator());

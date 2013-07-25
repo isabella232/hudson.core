@@ -135,7 +135,7 @@ public class SimpleJobTest extends TestCase {
             }
 
             @Override
-            public BuildHistory getBuildHistory() {
+            public BuildHistory getBuildHistoryData() {
                 return createMockBuildHistory(_getRuns());
             }
             

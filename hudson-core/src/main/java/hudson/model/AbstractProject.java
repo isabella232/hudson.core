@@ -1184,7 +1184,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     }
 
     @Override
-    public BuildHistory<P,R> getBuildHistory() {
+    public BuildHistory<P,R> getBuildHistoryData() {
         return builds;
     }
     
@@ -1899,7 +1899,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
 
     @Override
     protected HistoryWidget createHistoryWidget() {
-        return new BuildHistoryWidget(this, getBuildHistory(), HISTORY_ADAPTER);
+        return new BuildHistoryWidget(this, getBuildHistoryData(), HISTORY_ADAPTER);
     }
 
     public boolean isParameterized() {
