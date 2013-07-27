@@ -54,7 +54,7 @@
                               </j:when>
                               <j:otherwise>
                                 <span>
-                                    Manual restart required (lifecycle is not restartable).
+                                    Manual restart required. See <a href="http://wiki.eclipse.org/Hudson-ci/features/Restart_Within_Hudson">Restart Within Hudson</a>.
                                 </span>
                               </j:otherwise>
                             </j:choose>
