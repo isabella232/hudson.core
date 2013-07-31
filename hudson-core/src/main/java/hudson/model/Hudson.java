@@ -1909,8 +1909,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 			} catch (MalformedURLException e) {
 				return url;
 			}
+            // Fix 414064 If Hudson URL is configured, the port is ignored
+            int port = theUrl.getPort();
+            String thePort = port == 80 ? "" : ":" + port;
 			String hostNamePart = theUrl.getProtocol() + "://"
-					+ theUrl.getHost();
+					+ theUrl.getHost() + thePort;
 			return hostNamePart + Functions.getRequestRootPath() + '/';
 		}
 
