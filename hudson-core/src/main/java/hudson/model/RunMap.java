@@ -536,15 +536,16 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
     public List<R> getLastBuildsOverThreshold(int numberOfBuilds, Result threshold) {
         final List<Record<J,R>> records = getLastRecordsOverThreshold(numberOfBuilds, threshold);
         
-        List<R> builds = new ArrayList<R>(records.size());
-        R r = null;
-        for (Record<J,R> record : records) {
-            if ((r = record.getBuild()) != null) {
-                builds.add(r);
+        return Lists.transform(records, new Function<Record<J,R>, R>() {
+
+            @Override
+            public R apply(Record<J, R> input) {
+                return input.getBuild();
             }
+            
+        });
+        
         }
-        return builds;
-    }
 
     
     @Override
@@ -801,7 +802,7 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
         
         protected void sync() {
             R build = getBuild();
-            if ( build == null ) {
+            if ( build == null || build.hasLoadFailure() ) {
                 return;
             }
             setBuildNumber( build.getNumber());
@@ -1152,17 +1153,18 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
         
         @Override
         public List<R> getPreviousBuildsOverThreshold(int numberOfBuilds, Result threshold) {
-            List<BuildHistory.Record<J,R>> records = getPreviousOverThreshold(numberOfBuilds, threshold);
             
-            List<R> builds = new ArrayList<R>(records.size());
-            R r = null;
-            for (BuildHistory.Record<J,R> record : records) {
-                if ((r = record.getBuild()) != null) {
-                    builds.add(r);
+            return Lists.transform(getPreviousOverThreshold(numberOfBuilds, threshold),
+                    new Function<BuildHistory.Record<J,R>, R>() {
+
+                        @Override
+                        public R apply(BuildHistory.Record<J,R> f) {
+                            return f != null? f.getBuild(): null;
                 }
+
+                    });
+
             }
-            return builds;
-        }
 
 
         @Override

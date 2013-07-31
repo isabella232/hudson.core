@@ -35,6 +35,7 @@ import org.eclipse.hudson.graph.Graph;
 import org.kohsuke.stapler.StaplerProxy;
 import org.springframework.security.AccessDeniedException;
 
+
 /**
  * A decorator around a top-level job that loads the real job lazily and hangs
  * onto it with a weak reference.
@@ -88,13 +89,6 @@ final class LazyTopLevelItem implements TopLevelItem, IJob, StaplerProxy {
     // for the wrapped object, not for the wrapper.
     private Class itemType = null;
 
-    // Cache to service hasPermission() requests, which can be numerous.
-    // This prevents the item() method from being called and thus instantiating
-    // the object again and again.
-//    private HashMap<String, Boolean> permissions = null;
-    
-    
-    
     LazyTopLevelItem(XmlFile configFile, ItemGroup parent, String name, TopLevelItem item) {
         this.key = new Key(configFile, parent, name);
         
@@ -267,6 +261,7 @@ final class LazyTopLevelItem implements TopLevelItem, IJob, StaplerProxy {
     }
 
     @Override
+
     public void checkPermission(Permission permission) throws AccessDeniedException {
         item().checkPermission(permission);
     }
@@ -275,30 +270,12 @@ final class LazyTopLevelItem implements TopLevelItem, IJob, StaplerProxy {
     @Override
     public boolean hasPermission(Permission permission) {
         return item().hasPermission(permission);
-        // Fix 413185: Permissions should never be cached
-        // Only the Authorization Scheme ACL knows about
-        // permission in all contexcts.
-                
-//        final String id = permission.getId();
-//        if ( permissions == null ) {
-//            // No locking.
-//            permissions = new HashMap<String, Boolean>();
-//        }
-//        
-//        Boolean b = permissions.get(id);
-//        if ( b == null ) {
-//            b = item().hasPermission(permission);
-//            permissions.put(id, b);
-//        }
-        
-//        return b;
     }
 
     @Override
     public Object getTarget() {
         return item();
     }
-
     @Override
     public boolean isNameEditable() {
         return job().isNameEditable();

@@ -99,6 +99,7 @@ import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
 import com.thoughtworks.xstream.XStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
@@ -151,7 +152,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * The build result. This value may change while the state is in
      * {@link State#BUILDING}.
      */
-    protected volatile Result result;
+    private volatile Result result;
     /**
      * Human-readable description. Can be null.
      */
@@ -167,6 +168,13 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * The current build state.
      */
     private volatile transient State state;
+
+    
+    /**
+     * Stores any exception thrown when loading from 'dataFile'(build.xml)
+     */
+    private Exception dataFileLoadException;
+    
 
     static enum State {
 
@@ -247,7 +255,20 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         this.previousBuildInProgress = _this(); // loaded builds are always completed
         setState(State.COMPLETED);
         setResult(Result.FAILURE);  // defensive measure. value should be overwritten by unmarshal, but just in case the saved data is inconsistent
+        
+        // Throwing an exception at this point means the exception
+        // is thrown when the object is lazily retrieved. For compatibility,
+        // we cannot have this, a 'dummy' object needs to be returned, which 
+        // will get whatever information has been previously cached injected
+        // back into it. 
+        try {
         getDataFile().unmarshal(this); // load the rest of the data
+    }
+        catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Unable to load Run object.", ex);
+            dataFileLoadException = ex;
+        }
+
     }
 
     /**
@@ -262,6 +283,14 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
     }
 
+    public boolean hasLoadFailure() {
+        return dataFileLoadException != null;
+    }
+    
+    public Exception getLoadFailure() {
+        return dataFileLoadException;
+    }
+    
     @Override
     public void addAction(Action a) {
         super.addAction(a);
