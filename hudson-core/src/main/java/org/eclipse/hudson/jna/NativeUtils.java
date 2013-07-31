@@ -41,7 +41,7 @@ public class NativeUtils implements Serializable {
     private NativeMacSupport nativeMacSupport;
     private static Logger logger = LoggerFactory.getLogger(NativeUtils.class);
 
-   public static final NativeUtils INSTANCE = new NativeUtils();
+   public static NativeUtils INSTANCE;
 
     private NativeUtils() {
         try {
@@ -125,13 +125,20 @@ public class NativeUtils implements Serializable {
         return nativeZfsSupports;
     }
 
-    public static NativeUtils getInstance() {
+    /**
+     * Delay the instance creation until needed, else slave ClassLoader deserialization will try to
+     * instantiate the instance and will fail to load the extension points.
+     * @return 
+     */
+    public static synchronized NativeUtils getInstance() {
+        if (INSTANCE == null){
+            INSTANCE = new NativeUtils();
+        }
         return INSTANCE;
     }
 
     /**
      * Check if any Native Unix Support plugin is installed
-     *
      * @return
      */
     public boolean hasUnixSupport() {
