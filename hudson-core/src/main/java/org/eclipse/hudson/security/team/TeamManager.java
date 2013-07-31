@@ -759,6 +759,12 @@ public final class TeamManager implements Saveable, AccessControlled {
     
     // this could be private
     public List<Team> findCurrentUserTeams() {
+        
+        //Check if we have to use TeamAwareSecurityRealm
+        if (getTeamAwareSecurityRealm() != null) {
+            return Arrays.asList(getTeamAwareSecurityRealm().GetCurrentUserTeam());
+        }
+        
         Authentication authentication = HudsonSecurityManager.getAuthentication();
         List<Team> userTeams = findUserTeams(authentication.getName());
         GrantedAuthority[] gas = authentication.getAuthorities();
@@ -918,10 +924,15 @@ public final class TeamManager implements Saveable, AccessControlled {
         Team team = findJobOwnerTeam(jobName);
         // May be just created job, get the job folder from the first 
         // team the current user or user role has create permission
-        if ((team == null) && isTeamManagementEnabled()) { 
-            List<Team> currentUserTeamsWithPermission = getCurrentUserTeamsWithPermission(Item.CREATE);
-            if (!currentUserTeamsWithPermission.isEmpty()){
-                team = currentUserTeamsWithPermission.get(0); 
+         
+        if ((team == null) && isTeamManagementEnabled()) {
+            if (getTeamAwareSecurityRealm() != null) {
+                team = getTeamAwareSecurityRealm().GetCurrentUserTeam();
+            } else {
+                List<Team> currentUserTeamsWithPermission = getCurrentUserTeamsWithPermission(Item.CREATE);
+                if (!currentUserTeamsWithPermission.isEmpty()) {
+                    team = currentUserTeamsWithPermission.get(0);
+                }
             }
         }
         if (team != null) {
@@ -953,6 +964,12 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
     
     List<Team> getCurrentUserTeamsWithPermission(Permission permission) {
+        
+         //Check if we have to use TeamAwareSecurityRealm
+        if (getTeamAwareSecurityRealm() != null) {
+            return Arrays.asList(getTeamAwareSecurityRealm().GetCurrentUserTeam());
+        }
+        
         List<Team> userTeamsWithPermission = new ArrayList<Team>();
         Authentication authentication = HudsonSecurityManager.getAuthentication();
         List<Team> userTeams = findCurrentUserTeams();

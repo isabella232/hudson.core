@@ -15,7 +15,6 @@ import hudson.model.Job;
 import hudson.security.Permission;
 import hudson.security.SecurityRealm;
 import hudson.security.SidACL;
-import java.util.List;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
@@ -80,6 +79,9 @@ public class TeamBasedACL extends SidACL {
             // Member of any of the team with JOB CREATE Permission can create Job
             if (permission == Item.CREATE) {
                 for (Team userTeam : teamManager.findUserTeams(userName)) {
+                    if (isTeamAwareSecurityRealm()) {
+                        return true; // for now give full permission to all team members
+                    }
                     TeamMember member = userTeam.findMember(userName);
                     if ((member != null) && member.hasPermission(Item.CREATE)) {
                         return true;
@@ -110,7 +112,7 @@ public class TeamBasedACL extends SidACL {
             if (jobTeam != null) {
                 if (jobTeam.isMember(userName)) {
                     // All members of the team get read permission
-                        if (permission.getImpliedBy() == Permission.READ) {
+                    if (permission.getImpliedBy() == Permission.READ) {
                         return true;
                     }
                     if (isTeamAwareSecurityRealm()) {
