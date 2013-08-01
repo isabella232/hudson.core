@@ -110,7 +110,17 @@ public class Items {
      * file itself.
      */
     public static Item load(ItemGroup parent, File dir) throws IOException {
-        return newLazyTopLevelItem(parent, dir, null);
+         return load(parent, dir, true);
+    }
+    
+    static Item load(ItemGroup parent, File dir, boolean loadLazy) throws IOException {
+        if (loadLazy) {
+            return newLazyTopLevelItem(parent, dir, null);
+        } else {
+            Item item = (Item) getConfigFile(dir).read();
+            item.onLoad(parent, dir.getName());
+            return item;
+        }
     }
     
     static LazyTopLevelItem newLazyTopLevelItem(TopLevelItem item) {

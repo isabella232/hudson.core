@@ -94,7 +94,7 @@ public abstract class ItemGroupMixIn {
         CopyOnWriteMap.Tree<K, V> configurations = new CopyOnWriteMap.Tree<K, V>();
         for (File subdir : subdirs) {
             try {
-                V item = (V) Items.load(parent, subdir);
+                V item = (V) Items.load(parent, subdir, false);
                 configurations.put(key.call(item), item);
             } catch (IOException e) {
                 e.printStackTrace(); // TODO: logging

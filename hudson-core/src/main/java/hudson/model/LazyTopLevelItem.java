@@ -92,8 +92,7 @@ final class LazyTopLevelItem implements TopLevelItem, IJob, StaplerProxy {
     LazyTopLevelItem(XmlFile configFile, ItemGroup parent, String name, TopLevelItem item) {
         this.key = new Key(configFile, parent, name);
         
-        assert parent.getClass() == Hudson.class;
-        itemsCache = ((Hudson)parent).itemsCache();
+        itemsCache = Hudson.getInstance().itemsCache();
         
         // Add to cache if value is already created/available.
         if ( item != null ) {
