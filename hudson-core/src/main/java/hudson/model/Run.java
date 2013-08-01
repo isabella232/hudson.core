@@ -152,7 +152,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * The build result. This value may change while the state is in
      * {@link State#BUILDING}.
      */
-    private volatile Result result;
+    protected volatile Result result;
     /**
      * Human-readable description. Can be null.
      */
