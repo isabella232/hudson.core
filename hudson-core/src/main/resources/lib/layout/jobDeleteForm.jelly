@@ -81,18 +81,33 @@
                             showConfirmationDialog();
                         }
                     }
+                },
+                error: function(msg) {
+                   showMessage(jQuery('#deleteMsg'), msg.statusText, "red");
+                   //Show the dialog again with close button now
+                   jQuery('#confirmationDialog').dialog({
+                        height: 250,
+                        resizable: false,
+                        width: 350,
+                        modal: true,
+                        buttons: {
+                          Cancel: function() {
+                             jQuery( this ).dialog("close");
+                          }
+                        }
+                   });
                 }
-                
             });
         }
         
         function showConfirmationDialog() {
            showMessage(jQuery('#deleteMsg'), "${%Are you sure about deleting the job?}", "black");
            jQuery('#confirmationDialog').dialog({
-                height: 150,
+                height: 250,
                 resizable: false,
                 width: 350,
                 modal: true,
+                title: "Delete job - ${it.name}",
                 buttons: {
                     'Delete': function() {
                         showMessage(jQuery('#deleteMsg'), "Deleting ..", "blue");
@@ -100,8 +115,8 @@
                             type: 'POST',
                             url: "doDelete",
                             success: deletingJob,
-                            error: function(msg){
-                                var msg = 'Failed to delete the job';
+                            error: function(retMsg){
+                                var msg = 'Failed to delete the job. ' + retMsg.statusText;
                                 showMessage(jQuery('#deleteMsg'), msg, "red");
                             },
                             dataType: "html"
