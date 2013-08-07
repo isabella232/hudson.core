@@ -376,10 +376,12 @@ public class Team implements AccessControlled {
             writer.startNode("name");
             writer.setValue(team.getName());
             writer.endNode();
-            writer.startNode("description");
-            writer.setValue(team.getDescription());
-            writer.endNode();
-            if ((team.customFolderName != null) && !"".equals(team.customFolderName.trim())) {
+            if ((team.getDescription() != null) && !"".equals(team.getDescription().trim())) {
+                writer.startNode("description");
+                writer.setValue(team.getDescription());
+                writer.endNode();
+            }
+            if ((team.getCustomFolderName() != null) && !"".equals(team.getCustomFolderName().trim())) {
                 writer.startNode("customFolderName");
                 writer.setValue(team.getCustomFolderName());
                 writer.endNode();
