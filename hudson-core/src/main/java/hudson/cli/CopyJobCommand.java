@@ -62,8 +62,9 @@ public class CopyJobCommand extends CLICommand {
             return -1;
         }
 
-        h.copy(src, dst);
-        TopLevelItem newJob = Hudson.getInstance().getItem(dst);
+        TopLevelItem newJob = h.copy(src, dst);
+        // Ensure this is a real job
+        newJob = h.getItem(newJob.getName());
         ensureJobInTeam(newJob, targetTeam, dst, stderr);
         if (forceSave && null != newJob) {
             newJob.save();
