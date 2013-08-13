@@ -1301,7 +1301,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         List<TopLevelItem> viewableItems = new ArrayList<TopLevelItem>();
         for (TopLevelItem item : items.values()) {
             if (item.hasPermission(Item.READ)) {
-                viewableItems.add(LazyTopLevelItem.getIfInstanceOf(item, TopLevelItem.class));
+                TopLevelItem instance = LazyTopLevelItem.getIfInstanceOf(item, TopLevelItem.class);
+                if (instance != null) {
+                    viewableItems.add(instance);
+                }
             }
         }
 
@@ -1313,7 +1316,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         List<TopLevelItem> viewableItems = new ArrayList<TopLevelItem>();
         for (TopLevelItem item : items.values()) {
             if (!item.hasPermission(Item.READ)) {
-                viewableItems.add(LazyTopLevelItem.getIfInstanceOf(item, TopLevelItem.class));
+                TopLevelItem instance = LazyTopLevelItem.getIfInstanceOf(item, TopLevelItem.class);
+                if (instance != null) {
+                    viewableItems.add(instance);
+                }
             }
         }
 
