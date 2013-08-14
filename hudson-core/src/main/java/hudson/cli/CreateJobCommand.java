@@ -37,9 +37,9 @@ public class CreateJobCommand extends CLICommand {
     public String getShortDescription() {
         return "Creates a new job by reading stdin as a configuration XML file";
     }
-    @Argument(metaVar = "NAME", usage = "Name of the job to create. The job name should not be team  qualified. Ex: job1.")
+    @Argument(metaVar = "NAME", usage = "Name of the job to create. The job name should not be team  qualified. Ex: job1.", required = true)
     public String name;
-    @Argument(metaVar = "TEAM", usage = "Team to create the job in. ", index = 1, required = false)
+    @Argument(metaVar = "TEAM", usage = "Team to create the job in. Optional.", index = 1, required = false)
     public String team;
 
     protected int run() throws Exception {
