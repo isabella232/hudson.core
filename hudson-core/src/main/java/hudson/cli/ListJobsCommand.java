@@ -12,12 +12,21 @@
 package hudson.cli;
 
 import hudson.Extension;
+import hudson.XmlFile;
 import static hudson.cli.ListTeamsCommand.Format.XML;
 import static hudson.cli.UpdateJobCommand.validateTeam;
+import hudson.model.AbstractItem;
 import hudson.model.Hudson;
+import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.TopLevelItem;
+import hudson.security.Permission;
 import hudson.util.QuotedStringTokenizer;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -25,6 +34,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.eclipse.hudson.security.team.Team;
 import org.eclipse.hudson.security.team.TeamManager;
@@ -54,24 +65,56 @@ public class ListJobsCommand extends CLICommand {
     enum Format {
         XML, CSV, PLAIN
     }
-    @Argument(metaVar = "TEAM", usage = "Team to list; if omitted, all visible teams.", required = false)
+    @Option(name = "-team", usage = "Team to list; if omitted, all visible teams.")
     public String team;
-    @Option(name = "-format", usage = "Controls how the output from this command is printed.")
+    @Option(name = "-job", usage = "Fully-qualified job name. The config.xml for the job is returned.")
+    public String job;
+    @Option(name = "-format", usage = "Controls how the output from this command is printed. Always xml with -job option.")
     public ListTeamsCommand.Format format = ListTeamsCommand.Format.PLAIN;
-
-    TeamManager teamManager;
     
     @Override
     protected int run() throws TeamManager.TeamNotFoundException {
         Team targetTeam = validateReadAccessToTeam(team, stderr);
 
+        TeamManager teamManager = Hudson.getInstance().getTeamManager();
+        String[] jobs = null;
+        
         if (team != null && targetTeam == null) {
             return -1;
         }
 
-        teamManager = Hudson.getInstance().getTeamManager();
-        String[] jobs = null;
-        if (targetTeam != null) {
+        if (job != null && targetTeam != null && !targetTeam.isJobOwner(job)) {
+            stderr.println("Job "+job+" is not in team "+team);
+            return -1;
+        }
+        
+        if (job != null) {
+            if (targetTeam == null) {
+                targetTeam = teamManager.findJobOwnerTeam(job);
+            }
+            if (targetTeam == null) {
+                stderr.println("Job "+job+" does not exist");
+                return -1;
+            }
+            if (!targetTeam.hasPermission(Item.EXTENDED_READ)) {
+                stderr.println("User does not have permission to read config.xml");
+                return -1;
+            }
+            TopLevelItem item = Hudson.getInstance().getItem(job);
+            if (item instanceof AbstractItem) {
+                XmlFile file = ((AbstractItem)item).getConfigFile();
+                try {
+                    file.writeRawTo(stdout);
+                } catch (IOException ex) {
+                    stderr.println("Error reading config.xml for job "+job);
+                    return -1;
+                }
+            } else {
+                stderr.println("Cannot read config.xml");
+                return -1;
+            }
+            return 0;
+        } else if (targetTeam != null) {
             Set<String> aTeamJobs = targetTeam.getJobNames();
             Arrays.sort(jobs = aTeamJobs.toArray(new String[aTeamJobs.size()]));
         } else {
@@ -128,5 +171,13 @@ public class ListJobsCommand extends CLICommand {
             }
         }
         return targetTeam;
+    }
+
+    public static String rtrim(String s) {
+        int i = s.length()-1;
+        while (i >= 0 && Character.isWhitespace(s.charAt(i))) {
+            i--;
+        }
+        return s.substring(0, i+1);
     }
 }

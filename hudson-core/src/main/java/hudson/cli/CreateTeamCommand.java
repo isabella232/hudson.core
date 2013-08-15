@@ -33,7 +33,7 @@ public class CreateTeamCommand extends CLICommand {
     public String team;
     @Argument(metaVar = "DESCRIPTION", usage = "Team Description", index=1, required=false)
     public String description;
-    @Argument(metaVar = "LOCATION", usage = "Team location", index=2, required=false)
+    @Argument(metaVar = "LOCATION", usage = "Team location (custom folder)", index=2, required=false)
     public String location;
 
     protected int run() throws Exception {
