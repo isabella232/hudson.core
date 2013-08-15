@@ -526,7 +526,12 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      *
      * @return The length-limited description.
      */
-    public String getTruncatedDescription() {
+    final public String getTruncatedDescription() {
+        return getTruncatedDescription(description);
+    }
+    
+    static String getTruncatedDescription(String description) {
+        
         final int maxDescrLength = 100;
         if (description == null || description.length() < maxDescrLength) {
             return description;

@@ -51,7 +51,7 @@
                         </a>
                     </td>
                     <td>
-                        <a href="${jobBaseUrl}${b.parent.url}">${b.parent.fullDisplayName}</a>
+                        <a href="${jobBaseUrl}${b.parent.url}">${b.parent.displayName}</a>
                         <st:nbsp/>
                         <a href="${jobBaseUrl}${b.url}">#${b.number}</a>
                     </td>
