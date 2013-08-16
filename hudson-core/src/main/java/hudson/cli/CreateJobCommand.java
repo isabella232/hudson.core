@@ -57,6 +57,7 @@ public class CreateJobCommand extends CLICommand {
         }
 
         TopLevelItem newItem = h.createProjectFromXML(name, stdin);
+        newItem = h.getItem(newItem.getName());
         ensureJobInTeam(newItem, targetTeam, name, stderr);
         return 0;
     }
