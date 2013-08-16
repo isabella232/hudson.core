@@ -64,6 +64,8 @@ public interface BuildHistory<JobT extends Job<JobT, RunT>, RunT extends Run<Job
         String getBuiltOnNodeName();
         
         String getDisplayName();
+        String getDescription();
+        String getTruncatedDescription();
         String getFullDisplayName();
         String getUrl();
         

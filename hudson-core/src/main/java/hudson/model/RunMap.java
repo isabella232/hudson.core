@@ -31,7 +31,9 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.XppReader;
 import hudson.Extension;
+import hudson.XmlFile;
 import hudson.model.listeners.RunListener;
+import hudson.model.listeners.SaveableListener;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.util.AtomicFileWriter;
 import hudson.util.XStream2;
@@ -785,6 +787,7 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
         long duration;
         String fullDisplayName;
         String displayName;
+        String description;
         String url;
         String builtOnStr;
         
@@ -800,6 +803,23 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
         RunValue() {
         }
         
+        static void update(Run run) {
+            // Updates a RunValue with the latest information from Run
+            final Object job = run.getParent();
+            if (job instanceof AbstractProject) {
+                final AbstractProject p = (AbstractProject) job;
+                RunValue rv = (RunValue) p.builds.builds.get(run.getNumber());
+                if ( rv != null ) {
+                    // Can happen if build has not yet been added to project
+                    // or is in the process of being added.
+                    rv.sync();
+                    p.builds.recalcMarkers();
+                    p.builds.saveToRunMapXml();
+                }
+
+            }
+        }
+        
         protected void sync() {
             R build = getBuild();
             if ( build == null || build.hasLoadFailure() ) {
@@ -812,6 +832,7 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
             setLogUpdated( build.isLogUpdated());
             setTimeInMillis( build.getTimeInMillis());
             setDisplayName( build.getDisplayName());
+            setDescription( build.getDescription());
             setDuration( build.getDuration());
             
             if ( build instanceof AbstractBuild) {
@@ -864,6 +885,14 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
                 return;
             }
             this.displayName = name;
+            markDirty(true);
+        }
+        
+        void setDescription(String desc) {
+            if ( StringUtils.equals(this.description, desc)) {
+                return;
+            }
+            this.description = desc;
             markDirty(true);
         }
         
@@ -988,6 +1017,16 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
         @Override
         public String getUrl() {
             return url;
+        }
+        
+        @Override
+        public String getDescription() {
+            return description;
+        }
+        
+        @Override
+        public String getTruncatedDescription() {
+            return Run.getTruncatedDescription(description);
         }
         
         @Override
@@ -1278,15 +1317,21 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
                 writer.setValue(String.valueOf(current.buildNumber));
                 writer.endNode();
 
-                if ( current.displayName != null) {
+                if ( StringUtils.isNotEmpty(current.displayName)) {
                     writer.startNode("displayName");
                     writer.setValue(current.displayName);
                     writer.endNode();
                 }
                 
-                if ( current.fullDisplayName != null) {
+                if ( StringUtils.isNotEmpty(current.fullDisplayName)) {
                     writer.startNode("fullDisplayName");
                     writer.setValue(current.fullDisplayName);
+                    writer.endNode();
+                }
+                
+                if ( StringUtils.isNotEmpty(current.description )) {
+                    writer.startNode("description");
+                    writer.setValue(current.description);
                     writer.endNode();
                 }
                 
@@ -1355,6 +1400,9 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
                     }
                     else if ( "fullDisplayName".equals(name)) {
                         rv.fullDisplayName = reader.getValue();
+                    }
+                    else if ( "description".equals(name)) {
+                        rv.description = reader.getValue();
                     }
                     else if ( "buildDir".equals(name)) {
                         rv.key.buildsDir = this.buildsDir;
@@ -1542,45 +1590,44 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
      */
     @Extension
     public static class RunValueUpdater extends RunListener<Run> {
-        
-        
-        private void update(Run run) {
-            // Updates a RunValue with the latest information from Run
-            final Object job = run.getParent();
-            if (job instanceof AbstractProject) {
-                final AbstractProject p = (AbstractProject) job;
-                RunValue rv = (RunValue) p.builds.builds.get(run.getNumber());
-                rv.sync();
-                p.builds.recalcMarkers();
-                p.builds.saveToRunMapXml();
-
-            }
-        }
 
         @Override
         public void onCompleted(Run r, TaskListener listener) {
-            update(r);
+            RunValue.update(r);
         }
 
         @Override
         public void onFinalized(Run r) {
-            update(r);
+            RunValue.update(r);
         }
 
         @Override
         public void onStarted(Run r, TaskListener listener) {
-            update(r);
+            RunValue.update(r);
         }
 
         @Override
         public void onDeleted(Run r) {
-            update(r);
+            RunValue.update(r);
         }
-        
-        
-        
     }
     
+    /**
+     * This detects changes to the build configuration, which may
+     * happen after the build has completed.
+     */
+    @Extension
+    public static class RunValueUpdater2 extends SaveableListener {
+
+        @Override
+        public void onChange(Saveable saveable, XmlFile file) {
+            if (saveable instanceof Run) {
+                RunValue.update((Run)saveable);
+            }
+        }
+    
+        
+    }
     
     public static class ConverterImpl implements Converter {
 
