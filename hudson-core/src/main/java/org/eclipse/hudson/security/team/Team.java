@@ -134,7 +134,7 @@ public class Team implements AccessControlled {
 
     public TeamMember findMember(String userName) {
         for (TeamMember member : teamMembers) {
-            if (userName.equals(member.getName())) {
+            if (userName.equalsIgnoreCase(member.getName())) {
                 return member;
             }
         }

@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,7 +70,7 @@ import org.springframework.security.GrantedAuthority;
 public final class TeamManager implements Saveable, AccessControlled {
 
     public static final String TEAM_SEPARATOR = ".";
-    private List<String> sysAdmins = new CopyOnWriteArrayList<String>();
+    private List<String> sysAdmins = new CopyOnWriteArrayList();
     private List<Team> teams = new CopyOnWriteArrayList<Team>();
     private transient final XStream xstream = new XStream2();
     private transient Logger logger = LoggerFactory.getLogger(TeamManager.class);
@@ -161,7 +162,12 @@ public final class TeamManager implements Saveable, AccessControlled {
         if (getTeamAwareSecurityRealm() != null) {
             return getTeamAwareSecurityRealm().isCurrentUserSysAdmin();
         }else{
-            return sysAdmins.contains(userName);
+            for (Object obj : sysAdmins) {
+                if (userName.equalsIgnoreCase((String) obj)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
