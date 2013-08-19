@@ -49,7 +49,7 @@ public class UpdateJobCommand extends CLICommand {
     public String name;
     @Argument(metaVar = "CREATE", usage = "Create the job if needed", index = 1, required = true)
     public Boolean create;
-    @Argument(metaVar = "TEAM", usage = "Team to create the job in", index = 1, required = false)
+    @Argument(metaVar = "TEAM", usage = "Team to create the job in", index = 2, required = false)
     public String team;
 
     protected int run() throws Exception {
