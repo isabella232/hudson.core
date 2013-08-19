@@ -14,32 +14,21 @@ package hudson.cli;
 import hudson.Extension;
 import hudson.XmlFile;
 import static hudson.cli.ListTeamsCommand.Format.XML;
-import static hudson.cli.UpdateJobCommand.validateTeam;
 import hudson.model.AbstractItem;
 import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.TopLevelItem;
-import hudson.security.Permission;
-import hudson.util.QuotedStringTokenizer;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.eclipse.hudson.security.team.Team;
 import org.eclipse.hudson.security.team.TeamManager;
-import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 import org.springframework.security.Authentication;
 
@@ -108,6 +97,8 @@ public class ListJobsCommand extends CLICommand {
                 } catch (IOException ex) {
                     stderr.println("Error reading config.xml for job "+job);
                     return -1;
+                } finally {
+                    stdout.flush();
                 }
             } else {
                 stderr.println("Cannot read config.xml");
@@ -145,6 +136,7 @@ public class ListJobsCommand extends CLICommand {
                 for (String job : jobs) {
                     stdout.println(job);
                 }
+                stdout.flush();
                 break;
         }
         return 0;

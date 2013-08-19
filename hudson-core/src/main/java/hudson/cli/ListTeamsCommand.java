@@ -135,6 +135,7 @@ public class ListTeamsCommand extends CLICommand {
                             convertToXArray(teamManager.getCurrentUserTeamPermissions(team)));
                     }
                 }
+                stdout.flush();
                 break;
             case PLAIN:
                 if (userArray != null) {
@@ -153,6 +154,7 @@ public class ListTeamsCommand extends CLICommand {
                         printPlain(getCurrentUser(), team, 0, bigTeam);
                     }
                 }
+                stdout.flush();
                 break;
         }
         return 0;
