@@ -19,12 +19,16 @@ package hudson.cli;
 import hudson.model.Hudson;
 import hudson.Extension;
 import static hudson.cli.UpdateJobCommand.validateTeam;
+import hudson.model.Failure;
 import hudson.model.Item;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import org.eclipse.hudson.security.team.Team;
+import org.eclipse.hudson.security.team.TeamManager;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
@@ -55,7 +59,12 @@ public class CreateJobCommand extends CLICommand {
         if (team != null && targetTeam == null) {
             return -1;
         }
-
+        
+        name = name.trim();
+        if (!isGoodName(name, stderr)) {
+            return -1;
+        }
+            
         String qualifiedJobName = targetTeam == null
                 ? name
                 : h.getTeamManager().getTeamQualifiedJobName(targetTeam, name);
@@ -85,5 +94,21 @@ public class CreateJobCommand extends CLICommand {
         
         h.createProjectFromXML(name, team, xml);
         return 0;
+    }
+    
+    public static boolean isGoodName(String name, PrintStream stderr) {
+        if (Hudson.getInstance().isTeamManagementEnabled() && name.contains(TeamManager.TEAM_SEPARATOR)) {
+            stderr.println("The job name cannot contain \"" + TeamManager.TEAM_SEPARATOR + "\" when team management is enabled.");
+            return false;
+        }
+        
+        try {
+            Hudson.checkGoodName(name);
+        } catch (Failure e) {
+            stderr.println(e.getMessage());
+            return false;
+        }
+        
+        return true;
     }
 }

@@ -19,6 +19,7 @@ package hudson.cli;
 import hudson.model.Hudson;
 import hudson.Extension;
 import hudson.Functions;
+import static hudson.cli.CreateJobCommand.isGoodName;
 import hudson.model.Item;
 import hudson.model.Items;
 import hudson.model.Job;
@@ -74,6 +75,10 @@ public class UpdateJobCommand extends CLICommand {
         }
 
         if (item == null) {
+            name = name.trim();
+            if (!isGoodName(name, stderr)) {
+                return -1;
+            }
             h.checkPermission(Item.CREATE);
             h.createProjectFromXML(name, team, stdin);
         } else {

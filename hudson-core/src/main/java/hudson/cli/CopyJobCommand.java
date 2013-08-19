@@ -19,6 +19,7 @@ package hudson.cli;
 import hudson.model.Hudson;
 import hudson.model.TopLevelItem;
 import hudson.Extension;
+import static hudson.cli.CreateJobCommand.isGoodName;
 import static hudson.cli.UpdateJobCommand.validateTeam;
 import hudson.model.Item;
 import org.eclipse.hudson.security.team.Team;
@@ -55,6 +56,11 @@ public class CopyJobCommand extends CLICommand {
             return -1;
         }
 
+        dst = dst.trim();
+        if (!isGoodName(dst, stderr)) {
+            return -1;
+        }
+            
         String qualifiedJobName = targetTeam == null
                 ? dst
                 : h.getTeamManager().getTeamQualifiedJobName(targetTeam, dst);
