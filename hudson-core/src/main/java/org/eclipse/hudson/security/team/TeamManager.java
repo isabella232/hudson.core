@@ -884,10 +884,9 @@ public final class TeamManager implements Saveable, AccessControlled {
      */
     public String getTeamQualifiedJobName(Team team, String jobName) {
         String teamName = team.getName();
-        if (Team.PUBLIC_TEAM_NAME.equals(teamName)) {
-            return jobName;
-        }
-        StringBuilder sb = new StringBuilder(teamName + TEAM_SEPARATOR + jobName);
+        StringBuilder sb = Team.PUBLIC_TEAM_NAME.equals(teamName)
+                ? new StringBuilder(jobName)
+                : new StringBuilder(teamName + TEAM_SEPARATOR + jobName);
         // Make sure the name is unique
         Hudson h = Hudson.getInstance();
         int postfix = 2;
