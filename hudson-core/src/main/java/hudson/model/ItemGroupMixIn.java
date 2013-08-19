@@ -112,12 +112,6 @@ public abstract class ItemGroupMixIn {
         }
     };
 
-    private void ensureJobInTeam(TopLevelItem result, Team requestedTeam, String originalName) throws IOException {
-        // Make sure always dealing with a real item
-        result = Hudson.getInstance().getItem(result.getName());
-        Hudson.getInstance().getTeamManager().ensureJobInTeam(result, requestedTeam, originalName);
-    }
-    
     /**
      * Creates a {@link TopLevelItem} from the submission of the
      * '/lib/hudson/newFromList/formList' or throws an exception if it fails.
@@ -139,7 +133,7 @@ public abstract class ItemGroupMixIn {
             throw new Failure("Query parameter 'name' is required");
         }
 
-        Team requestedTeam = null;
+        String team = null;
 
         {   // check if the name looks good
             Hudson hudson = Hudson.getInstance();
@@ -149,17 +143,11 @@ public abstract class ItemGroupMixIn {
             if (hudson.isTeamManagementEnabled() && (name.indexOf(TeamManager.TEAM_SEPARATOR) != -1)) {
                 throw new Failure("The job name cannot contain" + TeamManager.TEAM_SEPARATOR + "when team management is enabled. ");
             }
-            String existingJobName = name;
-            if (hudson.isTeamManagementEnabled()){
-                existingJobName = hudson.getTeamManager().getTeamQualifiedJobName(name);
-            }
-            if (parent.getItem(existingJobName) != null) {
-                throw new Failure(Messages.Hudson_JobAlreadyExists(existingJobName));
-            }
             
             // see if team requested
+            Team requestedTeam = null;
             if (hudson.isTeamManagementEnabled()) {
-                String team = req.getParameter("team");
+                team = req.getParameter("team");
                 if (team != null){
                     String teamName = team.trim();
                     if (teamName.length() > 0) {
@@ -168,8 +156,20 @@ public abstract class ItemGroupMixIn {
                         } catch (TeamManager.TeamNotFoundException ex) {
                             throw new Failure("Requested team " + teamName + " not found");
                         }
+                    } else {
+                        team = null;
                     }
                 }
+            }
+            
+            String existingJobName = name;
+            if (hudson.isTeamManagementEnabled()){
+                existingJobName = requestedTeam == null
+                        ? hudson.getTeamManager().getTeamQualifiedJobName(name)
+                        : hudson.getTeamManager().getTeamQualifiedJobName(requestedTeam, name);
+            }
+            if (parent.getItem(existingJobName) != null) {
+                throw new Failure(Messages.Hudson_JobAlreadyExists(existingJobName));
             }
         }
         
@@ -194,14 +194,11 @@ public abstract class ItemGroupMixIn {
                 throw new Failure(from + " cannot be copied");
             }
 
-            result = copy((TopLevelItem) src, name);
+            result = copy((TopLevelItem) src, name, team);
         } else {
             if (isXmlSubmission) {
-                result = createProjectFromXML(name, req.getInputStream());
+                result = createProjectFromXML(name, team, req.getInputStream());
                 rsp.setStatus(HttpServletResponse.SC_OK);
-                if (requestedTeam != null) {
-                    ensureJobInTeam(result, requestedTeam, name);
-                }
                 return result;
             } else {
                 if (mode == null) {
@@ -209,14 +206,10 @@ public abstract class ItemGroupMixIn {
                 }
 
                 // create empty job and redirect to the project config screen
-                result = createProject(Items.getDescriptor(mode), name, true);
+                result = createProject(Items.getDescriptor(mode), name, team, true);
             }
         }
         
-        if (requestedTeam != null) {
-            ensureJobInTeam(result, requestedTeam, name);
-        }
-
         rsp.sendRedirect2(redirectAfterCreateItem(req, result));
         return result;
     }
@@ -254,9 +247,24 @@ public abstract class ItemGroupMixIn {
      */
     @SuppressWarnings({"unchecked" })
     public synchronized <T extends TopLevelItem> T copy(T src, String name) throws IOException {
+        return copy(src, name, null);
+    }
+
+    /**
+     * Copies an existing {@link TopLevelItem} to a new name.
+     *
+     * The caller is responsible for calling
+     * {@link ItemListener#fireOnCopied(Item, Item)}. This method cannot do that
+     * because it doesn't know how to make the newly added item reachable from
+     * the parent.
+     */
+    @SuppressWarnings({"unchecked" })
+    public synchronized <T extends TopLevelItem> T copy(T src, String name, String teamName) throws IOException {
         acl.checkPermission(Job.CREATE);
 
-        T result = (T) createProject(src.getDescriptor(), name, false);
+        String jobName = teamName == null ? name : createInTeam(name, teamName);
+        
+        T result = (T) createProject(src.getDescriptor(), jobName, false);
 
         // copy config
         Util.copyFile(Items.getConfigFile(src).getFile(), Items.getConfigFile(result).getFile());
@@ -267,18 +275,43 @@ public abstract class ItemGroupMixIn {
 
         add(result);
         
-        addJobToCurrentUserTeam(result.getName());
+        if (teamName == null) {
+            addJobToCurrentUserTeam(result.getName());
+        }
         
         ItemListener.fireOnCopied(src, Hudson.getInstance().getItem(result.getName()));
 
         return result;
     }
 
+    private String createInTeam(String name, String teamName) throws IOException {
+        // To be created in a specific team, a job must first be added
+        // to the team, ensuring that Hudson will find the correct rootDir.
+        TeamManager teamManager = Hudson.getInstance().getTeamManager();
+        if (!teamManager.isTeamManagementEnabled()) {
+            throw new IOException("Team management is not enabled");
+        }
+        Team team;
+        try {
+            team = teamManager.findTeam(teamName);
+        } catch (TeamNotFoundException e) {
+            throw new IOException("Team "+teamName+" does not exist");
+        }
+        // addJob does the necessary name assembly and returns qualified job name
+        return teamManager.addJob(name, team);
+    }
+
     public synchronized TopLevelItem createProjectFromXML(String name, InputStream xml) throws IOException {
+        return createProjectFromXML(name, null, xml);
+    }
+    
+    public synchronized TopLevelItem createProjectFromXML(String name, String teamName, InputStream xml) throws IOException {
         acl.checkPermission(Job.CREATE);
 
+        String jobName = teamName == null ? name : createInTeam(name, teamName);
+        
         // place it as config.xml
-        File configXml = Items.getConfigFile(getRootDirFor(name)).getFile();
+        File configXml = Items.getConfigFile(getRootDirFor(jobName)).getFile();
         configXml.getParentFile().mkdirs();
         try {
             IOUtils.copy(xml, configXml);
@@ -287,22 +320,35 @@ public abstract class ItemGroupMixIn {
             TopLevelItem result = (TopLevelItem) Items.load(parent, configXml.getParentFile());
             add(result);
             
-            addJobToCurrentUserTeam(result.getName());
-
-            ItemListener.fireOnCreated(Hudson.getInstance().getItem(result.getName()));
+            if (teamName == null) {
+                addJobToCurrentUserTeam(result.getName());
+            }
+            
+            assert(result.getName().equals(jobName));
+            
+            ItemListener.fireOnCreated(Hudson.getInstance().getItem(jobName));
             Hudson.getInstance().rebuildDependencyGraph();
 
             return result;
         } catch (IOException e) {
             // if anything fails, delete the config file to avoid further confusion
+            Hudson.getInstance().getTeamManager().removeJob(jobName);
             Util.deleteRecursive(configXml.getParentFile());
             throw e;
         }
     }
 
-    public synchronized TopLevelItem createProject(TopLevelItemDescriptor type, String name, boolean notify)
+    public synchronized TopLevelItem createProject(TopLevelItemDescriptor type, String name, boolean notify) throws IOException {
+        return createProject(type, name, null, notify);
+    }
+
+    public synchronized TopLevelItem createProject(TopLevelItemDescriptor type, String name, String teamName, boolean notify)
             throws IOException {
         acl.checkPermission(Job.CREATE);
+        
+        if (teamName != null) {
+            name = createInTeam(name, teamName);
+        }
 
         Hudson hudson = Hudson.getInstance();
         String existingJobName = name;

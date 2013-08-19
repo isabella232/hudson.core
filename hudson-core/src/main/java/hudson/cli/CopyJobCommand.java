@@ -17,10 +17,8 @@
 package hudson.cli;
 
 import hudson.model.Hudson;
-import hudson.model.Job;
 import hudson.model.TopLevelItem;
 import hudson.Extension;
-import static hudson.cli.UpdateJobCommand.ensureJobInTeam;
 import static hudson.cli.UpdateJobCommand.validateTeam;
 import hudson.model.Item;
 import org.eclipse.hudson.security.team.Team;
@@ -57,15 +55,17 @@ public class CopyJobCommand extends CLICommand {
             return -1;
         }
 
-        if (h.getItem(dst) != null) {
-            stderr.println("Job '" + dst + "' already exists");
+        String qualifiedJobName = targetTeam == null
+                ? dst
+                : h.getTeamManager().getTeamQualifiedJobName(targetTeam, dst);
+        if (h.getItem(qualifiedJobName) != null) {
+                stderr.println("Job '" + qualifiedJobName + "' already exists");
             return -1;
         }
 
-        TopLevelItem newJob = h.copy(src, dst);
+        TopLevelItem newJob = h.copy(src, dst, team);
         // Ensure this is a real job
         newJob = h.getItem(newJob.getName());
-        ensureJobInTeam(newJob, targetTeam, dst, stderr);
         if (forceSave && null != newJob) {
             newJob.save();
         }

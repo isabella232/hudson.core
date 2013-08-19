@@ -446,14 +446,6 @@ public final class TeamManager implements Saveable, AccessControlled {
         return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(sid));
     }
 
-    public void ensureJobInTeam(TopLevelItem item, Team team, String originalName) throws IOException {
-        Job job = (Job) item;
-        Team ownerTeam = findJobOwnerTeam(job.getName());
-        if (!team.equals(ownerTeam)) {
-            moveJob(job, ownerTeam, team, originalName);
-        }
-    }
-
     /**
      * Copy jobs from old team to new team. Supplying the original name helps, when job is created
      * for one team and then moved to another team (Ex. Create Job in a  team). When the job 
@@ -483,6 +475,21 @@ public final class TeamManager implements Saveable, AccessControlled {
         } catch (Exception exc) {
             throw new IOException(exc);
         }
+    }
+    
+    /**
+     * Before a job is created in a team, it must be added to the team so the
+     * correct location will be found.
+     * 
+     * @param unqualifiedJobName job name with no team qualification
+     * @param team team the job is to be created in
+     * @return qualified job name to be used to create
+     * @throws IOException 
+     */
+    public String addJob(String unqualifiedJobName, Team team) throws IOException {
+        String qualifiedNewJobName = getTeamQualifiedJobName(team, unqualifiedJobName);
+        team.addJob(new TeamJob(qualifiedNewJobName));
+        return qualifiedNewJobName;
     }
 
     private String getUnqualifiedJobName(Team team, String jobName) {
@@ -815,6 +822,10 @@ public final class TeamManager implements Saveable, AccessControlled {
             save();
         }
     }
+    
+    public void removeJob(String jobName) throws IOException {
+        removeJob(findJobOwnerTeam(jobName), jobName);
+    }
 
     public void addJobToUserTeam(String userName, String jobName) throws IOException, TeamNotFoundException {
         // Fix bug in hudson.model.listeners.ItemListenerTest - no team found for user
@@ -863,7 +874,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return jobName;
     }
-
+    
     /**
      * Get the current user team qualified Id for the job name
      *

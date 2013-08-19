@@ -53,24 +53,29 @@ public class UpdateJobCommand extends CLICommand {
     public String team;
 
     protected int run() throws Exception {
-        Hudson h = Hudson.getInstance();
-        TeamManager teamManager = Hudson.getInstance().getTeamManager();
-        TopLevelItem item = h.getItem(name);
         Team targetTeam = validateTeam(team, create, stderr);
-
+        Hudson h = Hudson.getInstance();
+        TeamManager teamManager = h.getTeamManager();
+        
         if (team != null && targetTeam == null) {
             return -1;
         }
 
+        String qualifiedJobName = targetTeam == null
+                ? name
+                : teamManager.getTeamQualifiedJobName(targetTeam, name);
+        TopLevelItem item = h.getItem(qualifiedJobName);
+
         if (item == null && !create) {
-            stderr.println("Job '" + name + "' does not exist and create is set to false");
+            stderr.println("Job '" + qualifiedJobName + "' does not exist and create is set to false");
             return -1;
+        } else if (item != null && create) {
+            
         }
 
         if (item == null) {
             h.checkPermission(Item.CREATE);
-            TopLevelItem newItem = h.createProjectFromXML(name, stdin);
-            ensureJobInTeam(newItem, targetTeam, name, stderr);
+            h.createProjectFromXML(name, team, stdin);
         } else {
             try {
                 h.checkPermission(Job.CONFIGURE);
@@ -85,27 +90,6 @@ public class UpdateJobCommand extends CLICommand {
             }
         }
         return 0;
-    }
-    
-    /**
-     * If job is not in targetTeam, move it there.
-     * 
-     * @param item job
-     * @param targetTeam desired team or null if none
-     * @param name job name requested
-     * @param stderr
-     * @throws Exception 
-     */
-    public static void ensureJobInTeam(TopLevelItem item, Team targetTeam, String name, PrintStream stderr) throws Exception {
-        if (targetTeam != null) {
-            try {
-                Hudson.getInstance().getTeamManager().ensureJobInTeam(item, targetTeam, name);
-            } catch (IOException e) {
-                item.delete();
-                stderr.println("Unable to create job "+ name +" in team " + targetTeam.getName() + " due to IOException");
-                throw e;
-            }
-        }
     }
     
     /**

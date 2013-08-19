@@ -18,10 +18,8 @@ package hudson.cli;
 
 import hudson.model.Hudson;
 import hudson.Extension;
-import static hudson.cli.UpdateJobCommand.ensureJobInTeam;
 import static hudson.cli.UpdateJobCommand.validateTeam;
 import hudson.model.Item;
-import hudson.model.TopLevelItem;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -58,8 +56,11 @@ public class CreateJobCommand extends CLICommand {
             return -1;
         }
 
-        if (h.getItem(name) != null) {
-            stderr.println("Job '" + name + "' already exists");
+        String qualifiedJobName = targetTeam == null
+                ? name
+                : h.getTeamManager().getTeamQualifiedJobName(targetTeam, name);
+        if (h.getItem(qualifiedJobName) != null) {
+                stderr.println("Job '" + qualifiedJobName + "' already exists");
             return -1;
         }
         
@@ -82,9 +83,7 @@ public class CreateJobCommand extends CLICommand {
             }
         }
         
-        TopLevelItem newItem = h.createProjectFromXML(name, xml);
-        newItem = h.getItem(newItem.getName());
-        ensureJobInTeam(newItem, targetTeam, name, stderr);
+        h.createProjectFromXML(name, team, xml);
         return 0;
     }
 }

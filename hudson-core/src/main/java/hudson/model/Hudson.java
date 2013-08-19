@@ -2775,6 +2775,17 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
+     * Creates a new job from its configuration XML in a specific team.
+     * The type of the job created
+     * will be determined by what's in this XML.
+     *
+     * @since 3.1.0
+     */
+    public TopLevelItem createProjectFromXML(String name, String teamName, InputStream xml) throws IOException {
+        return itemGroupMixIn.createProjectFromXML(name, teamName, xml);
+    }
+
+    /**
      * Reload a project to update its definition.
      *
      * @since 2.x.x
@@ -2796,6 +2807,20 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     @SuppressWarnings({"unchecked" })
     public <T extends TopLevelItem> T copy(T src, String name) throws IOException {
         return itemGroupMixIn.copy(src, name);
+    }
+
+    /**
+     * Copys a job to a specific team.
+     *
+     * @param src A {@link TopLevelItem} to be copied.
+     * @param name Name of the newly created project.
+     * @return Newly created {@link TopLevelItem}.
+     * 
+     * @since 3.1.0
+     */
+    @SuppressWarnings({"unchecked" })
+    public <T extends TopLevelItem> T copy(T src, String name, String teamName) throws IOException {
+        return itemGroupMixIn.copy(src, name, teamName);
     }
 
     // a little more convenient overloading that assumes the caller gives us the right type
