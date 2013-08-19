@@ -51,6 +51,13 @@ public class CreateTeamCommand extends CLICommand {
             return -1;
         }
         
+        for (int i = 0; i < team.length(); i++) {
+            if (!isAlphaNumeric(team.charAt(i))) {
+                stderr.println("Only Alpha-Numeric characters allowed in team name");
+                return -1;
+            }
+        }
+        
         if (description == null) {
             description = team;
         }
@@ -75,5 +82,9 @@ public class CreateTeamCommand extends CLICommand {
         }
         
         return 0;
+    }
+    
+    private boolean isAlphaNumeric(char c) {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c >= '9');
     }
 }
