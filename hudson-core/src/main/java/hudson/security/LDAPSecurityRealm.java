@@ -401,7 +401,7 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
     @Override
     protected UserDetails authenticate(String username, String password) throws AuthenticationException {
         return (UserDetails) getSecurityComponents().manager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)).getPrincipal();
+                new UsernamePasswordAuthenticationToken(username, password, ACL.NO_AUTHORITIES)).getPrincipal();
     }
 
     /**

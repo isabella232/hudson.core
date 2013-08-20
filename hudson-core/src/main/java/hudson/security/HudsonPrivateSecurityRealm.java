@@ -247,7 +247,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
      */
     private void loginAndTakeBack(StaplerRequest req, StaplerResponse rsp, User u) throws ServletException, IOException {
         // ... and let him login
-        Authentication a = new UsernamePasswordAuthenticationToken(u.getId(), req.getParameter("password1"));
+        Authentication a = new UsernamePasswordAuthenticationToken(u.getId(), req.getParameter("password1"), ACL.NO_AUTHORITIES);
         a = this.getSecurityComponents().manager.authenticate(a);
         SecurityContextHolder.getContext().setAuthentication(a);
 

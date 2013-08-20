@@ -21,6 +21,7 @@ import org.springframework.security.acls.sid.PrincipalSid;
 import org.springframework.security.acls.sid.Sid;
 import hudson.model.Executor;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.springframework.security.GrantedAuthority;
 
 /**
  * Gate-keeper that controls access to Hudson's model objects.
@@ -88,6 +89,7 @@ public abstract class ACL {
      */
     public static final Sid ANONYMOUS = new PrincipalSid("anonymous");
     protected static final Sid[] AUTOMATIC_SIDS = new Sid[]{EVERYONE, ANONYMOUS};
+    public static final GrantedAuthority[] NO_AUTHORITIES = new GrantedAuthority[0];
     /**
      * {@link Sid} that represents the Hudson itself. <p> This is used when
      * Hudson is performing computation for itself, instead of acting on behalf
@@ -97,5 +99,5 @@ public abstract class ACL {
      * who triggered a build &mdash; so in a future, perhaps {@link Executor}
      * will run on behalf of the user who triggered a build.)
      */
-    public static final Authentication SYSTEM = new UsernamePasswordAuthenticationToken("SYSTEM", "SYSTEM");
+    public static final Authentication SYSTEM = new UsernamePasswordAuthenticationToken("SYSTEM", "SYSTEM", NO_AUTHORITIES);
 }
