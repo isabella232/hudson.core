@@ -58,6 +58,7 @@ import java.util.logging.Logger;
  */
 public class ZFSInstaller extends AdministrativeMonitor implements Serializable {
 
+    private NativeUtils nativeUtils = NativeUtils.getInstance();
     /**
      * True if $HUDSON_HOME is a ZFS file system by itself.
      */
@@ -66,7 +67,6 @@ public class ZFSInstaller extends AdministrativeMonitor implements Serializable 
      * This will be the file system name that we'll create.
      */
     private String prospectiveZfsFileSystemName;
-    private NativeUtils nativeUtils = NativeUtils.getInstance();
 
     public boolean isActivated() {
         return active;
