@@ -48,7 +48,7 @@ public class UpdateJobCommand extends CLICommand {
     // ?? name needs to be unqualified for create or qualified for update
     @Argument(metaVar = "NAME", usage = "Name of the job to update. Provide team qualified name if Team Management is enabled. Ex: team1.job1.", required = true)
     public String name;
-    @Argument(metaVar = "CREATE", usage = "Create the job if needed (true/false)", index = 1, required = true)
+    @Argument(metaVar = "CREATE", usage = "Create the job if needed, true|false", index = 1, required = true)
     public Boolean create;
     @Argument(metaVar = "TEAM", usage = "Team to create the job in (optional)", index = 2, required = false)
     public String team;
