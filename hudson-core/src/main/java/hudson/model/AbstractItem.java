@@ -53,6 +53,7 @@ import javax.xml.transform.stream.StreamSource;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.team.Team;
+import org.eclipse.hudson.security.team.TeamManager;
 
 /**
  * Partial default implementation of {@link Item}.
@@ -77,7 +78,11 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     protected AbstractItem(ItemGroup parent, String name) {
         this.parent = parent;
         if ((Hudson.getInstance() != null) && (Hudson.getInstance().isTeamManagementEnabled())) {
-            name = Hudson.getInstance().getTeamManager().getTeamQualifiedJobName(name);
+            // A job created by itemGroupMixin with an explicit team already
+            // has a qualified name and has been added to the team
+            TeamManager teamManager = Hudson.getInstance().getTeamManager();
+            if (teamManager.findJobOwnerTeam(name) == null)
+                name = teamManager.getTeamQualifiedJobName(name);
         }
         doSetName(name);
     }

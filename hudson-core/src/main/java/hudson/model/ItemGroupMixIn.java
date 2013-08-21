@@ -276,6 +276,8 @@ public abstract class ItemGroupMixIn {
         add(result);
         
         if (teamName == null) {
+            // The default implementation of onCopied calls onCreated, but it
+            // may be overridden, so do it here and don't depend on listener
             addJobToCurrentUserTeam(result.getName());
         }
         
@@ -352,7 +354,7 @@ public abstract class ItemGroupMixIn {
 
         Hudson hudson = Hudson.getInstance();
         String existingJobName = name;
-        if (hudson.isTeamManagementEnabled()) {
+        if (hudson.isTeamManagementEnabled() && teamName == null) {
             existingJobName = hudson.getTeamManager().getTeamQualifiedJobName(name);
         }
         if (parent.getItem(existingJobName) != null) {
