@@ -65,7 +65,7 @@
             <table style="padding-left: 2em;" id="management-links">
                 
                 <local:feature icon="secure.png" href="securityManager"    title="${%Configure Security}">
-                    ${%Configure Authentication and Authorization Stretegy for Hudson Security.}
+                    ${%Configure Authentication and Authorization Strategy for Hudson Security.}
                 </local:feature>
                 
                 <local:feature icon="setting.png" href="configure" title="${%Configure System}">
