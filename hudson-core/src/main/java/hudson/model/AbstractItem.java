@@ -74,9 +74,6 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     protected volatile String description;
     private transient ItemGroup parent;
     
-    protected String id;
-    protected String teamId = Team.PUBLIC_TEAM_NAME;
-
     protected AbstractItem(ItemGroup parent, String name) {
         this.parent = parent;
         if ((Hudson.getInstance() != null) && (Hudson.getInstance().isTeamManagementEnabled())) {
