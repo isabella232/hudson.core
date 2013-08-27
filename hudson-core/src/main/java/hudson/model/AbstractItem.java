@@ -77,7 +77,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     
     protected AbstractItem(ItemGroup parent, String name) {
         this.parent = parent;
-        if ((Hudson.getInstance() != null) && (Hudson.getInstance().isTeamManagementEnabled())) {
+        if ((parent instanceof Hudson) && (Hudson.getInstance() != null) && (Hudson.getInstance().isTeamManagementEnabled())) {
             // A job created by itemGroupMixin with an explicit team already
             // has a qualified name and has been added to the team
             TeamManager teamManager = Hudson.getInstance().getTeamManager();
