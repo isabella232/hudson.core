@@ -319,7 +319,7 @@ public abstract class ItemGroupMixIn {
             IOUtils.copy(xml, configXml);
 
             // load it
-            TopLevelItem result = (TopLevelItem) Items.load(parent, configXml.getParentFile());
+            TopLevelItem result = (TopLevelItem) Items.load(parent, configXml.getParentFile(), false);
             add(result);
             
             if (teamName == null) {

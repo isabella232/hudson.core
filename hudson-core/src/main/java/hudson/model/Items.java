@@ -113,7 +113,15 @@ public class Items {
          return load(parent, dir, true);
     }
     
-    static Item load(ItemGroup parent, File dir, boolean loadLazy) throws IOException {
+    /**
+     * Loads a {@link Item} from a config file. 
+     * @param dir The directory that contains the config file, not the config
+     * file itself.
+     * @param loadLazy true if return a LazyTopLevelItem without actually loading;
+     * false to actually load the file and return a real item.
+     * @throws IOException
+     */
+    public static Item load(ItemGroup parent, File dir, boolean loadLazy) throws IOException {
         if (loadLazy) {
             return newLazyTopLevelItem(parent, dir, null);
         } else {
