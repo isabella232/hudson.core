@@ -1917,7 +1917,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 			}
             // Fix 414064 If Hudson URL is configured, the port is ignored
             int port = theUrl.getPort();
-            String thePort = port == 80 ? "" : ":" + port;
+            String thePort = port == 80 || port == -1 ? "" : ":" + port;
 			String hostNamePart = theUrl.getProtocol() + "://"
 					+ theUrl.getHost() + thePort;
 			return hostNamePart + Functions.getRequestRootPath() + '/';
