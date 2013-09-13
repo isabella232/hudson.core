@@ -19,6 +19,7 @@ package hudson.cli;
 import hudson.model.Hudson;
 import hudson.Extension;
 import hudson.Functions;
+import hudson.XmlFile;
 import static hudson.cli.CreateJobCommand.isGoodName;
 import hudson.model.Item;
 import hudson.model.Items;
@@ -71,7 +72,8 @@ public class UpdateJobCommand extends CLICommand {
             stderr.println("Job '" + qualifiedJobName + "' does not exist and create is set to false");
             return -1;
         } else if (item != null && create) {
-            
+            stderr.println("Job '" + qualifiedJobName + "' already exists and create is set to true");
+            return -1;
         }
 
         if (item == null) {
@@ -82,15 +84,23 @@ public class UpdateJobCommand extends CLICommand {
             h.checkPermission(Item.CREATE);
             h.createProjectFromXML(name, team, stdin);
         } else {
+            XmlFile oldConfigXml = null;
+            Object oldItem = null;
             try {
                 h.checkPermission(Job.CONFIGURE);
-                File rootDirOfJob = teamManager.getRootFolderForJob(item.getName()); 
+                File rootDirOfJob = teamManager.getRootFolderForJob(item.getName());
+                // if the new config.xml is bad, need to restore the previous one
+                oldConfigXml = Items.getConfigFile(rootDirOfJob);
+                oldItem = oldConfigXml.read();
                 // place it as config.xml
-                File configXml = Items.getConfigFile(rootDirOfJob).getFile();
+                File configXml = oldConfigXml.getFile();
                 IOUtils.copy(stdin, configXml);
 
                 h.reloadProjectFromDisk(configXml.getParentFile());
             } catch (IOException e) {
+                if (oldConfigXml != null && oldItem != null) {
+                    oldConfigXml.write(oldItem);
+                }
                 throw e;
             }
         }
