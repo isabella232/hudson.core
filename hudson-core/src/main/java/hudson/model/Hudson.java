@@ -2791,7 +2791,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * @since 2.x.x
      */
     public TopLevelItem reloadProjectFromDisk(File jobDir) throws IOException {
-        TopLevelItem item = (TopLevelItem) Items.load(this, jobDir);
+        TopLevelItem item = (TopLevelItem) Items.load(this, jobDir, false);
         items.put(item.getName(), item);
         rebuildDependencyGraph();
         return item;
