@@ -1005,6 +1005,16 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
         }
         
         @Override
+        public String getTimestampString() {
+            return Run.getTimestampString(getTimeInMillis());
+        }
+        
+        @Override
+        public String getTimestampString2() {
+            return Run.getTimestampString2(getTimeInMillis());
+        }
+        
+        @Override
         public Date getTime() {
             return new Date(getTimeInMillis());
         }

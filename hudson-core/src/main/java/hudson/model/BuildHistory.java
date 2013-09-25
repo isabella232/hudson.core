@@ -58,6 +58,9 @@ public interface BuildHistory<JobT extends Job<JobT, RunT>, RunT extends Run<Job
         
         long getTimeInMillis();
         Calendar getTimestamp();
+        String getTimestampString();
+        String getTimestampString2();
+        
         Date getTime();
         long getDuration();
         

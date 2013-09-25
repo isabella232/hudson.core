@@ -583,6 +583,10 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * @return string like "3 minutes" "1 day" etc.
      */
     public String getTimestampString() {
+        return getTimestampString(timestamp);
+    }
+    
+    final static String getTimestampString(long timestamp) {
         long duration = new GregorianCalendar().getTimeInMillis() - timestamp;
         return Util.getPastTimeString(duration);
     }
@@ -591,6 +595,10 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Returns the timestamp formatted in xs:dateTime.
      */
     public String getTimestampString2() {
+        return getTimestampString2(timestamp);
+    }
+    
+    final static String getTimestampString2(long timestamp) {
         return Util.XS_DATETIME_FORMATTER.format(new Date(timestamp));
     }
 
