@@ -708,6 +708,15 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
         }
         return true;
     }
+    
+    public final boolean isPartiallyIdle() {
+        for (Executor e : executors) {
+            if (e.isIdle()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Returns the time when this computer last became idle.

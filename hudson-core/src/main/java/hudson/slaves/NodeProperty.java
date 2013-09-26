@@ -27,6 +27,7 @@ import hudson.model.Describable;
 import hudson.model.Environment;
 import hudson.model.Hudson;
 import hudson.model.Node;
+import hudson.model.Queue;
 import hudson.model.Queue.Task;
 
 import java.io.IOException;
@@ -74,6 +75,10 @@ public abstract class NodeProperty<N extends Node> implements Describable<NodePr
      */
     public CauseOfBlockage canTake(Task task) {
         return null;
+    }
+    
+    public CauseOfBlockage canTake(Queue.BuildableItem item) {
+        return canTake(item.task);  // backward compatible behaviour
     }
 
     /**

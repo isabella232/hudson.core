@@ -56,6 +56,14 @@ public abstract class QueueTaskDispatcher implements ExtensionPoint {
      * built-in check logic.)
      */
     public abstract CauseOfBlockage canTake(Node node, Task task);
+    
+    public CauseOfBlockage canTake(Node node, Queue.BuildableItem item) {
+        return canTake(node,item.task);  
+    }
+    
+    public CauseOfBlockage canRun(Queue.Item item) {
+        return null;
+    }
 
     /**
      * All registered {@link QueueTaskDispatcher}s.
