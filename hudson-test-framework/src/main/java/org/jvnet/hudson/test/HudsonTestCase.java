@@ -615,6 +615,15 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
             return slave;
         }
     }
+    
+    public DumbSlave createSlave(String nodeName, String labels, EnvVars env) throws Exception {
+        synchronized (hudson) {
+            DumbSlave slave = new DumbSlave(nodeName, "dummy",
+    				createTmpDir().getPath(), "1", Node.Mode.NORMAL, labels==null?"":labels, createComputerLauncher(env), RetentionStrategy.NOOP, Collections.EMPTY_LIST);
+    		hudson.addNode(slave);
+    		return slave;
+    	}
+    }
 
     public PretendSlave createPretendSlave(FakeLauncher faker) throws Exception {
         synchronized (hudson) {

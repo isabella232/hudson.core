@@ -45,6 +45,9 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P, B>,
         implements Saveable, BuildableItemWithBuildWrappers, IBaseBuildableProject {
 
     public static final String BUILDERS_PROPERTY_NAME = "builders";
+    public static final String BUILDWRAPPERS_PROPERTY_NAME = "buildwrappers";
+    public static final String PUBLISHERS_PROPERTY_NAME = "publishers";
+    
     /**
      * List of active {@link Builder}s configured for this project.
      *
@@ -99,7 +102,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P, B>,
     protected void buildProjectProperties() throws IOException {
         super.buildProjectProperties();
         convertBuildersProjectProperty();
-        convertBuildWrappersProjectProperties();
+        convertBuildWrappersProperties();
         convertPublishersProperties();
     }
 
@@ -137,10 +140,42 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P, B>,
         }
         return r;
     }
+    
+    /**
+     * Adds a new {@link BuildStep} builder to this {@link Project} and saves the
+     * configuration.
+     *
+     * @param builder builder.
+     * @throws java.io.IOException exception.
+     */
+    @SuppressWarnings("unchecked")
+    public void addBuilder(Builder builder) throws IOException {
+        CascadingUtil.getExternalProjectProperty(this,
+                builder.getDescriptor().getJsonSafeClassName()).setValue(builder);
+        save();
+    }
+    
+     /**
+     * Removes a {@link BuildStep} builder from this project, if it's active.
+     *
+     * @param builder builder.
+     * @throws java.io.IOException exception.
+     */
+    @Override
+    public void removeBuilder(Descriptor<Builder> builder) throws IOException {
+        removeProjectProperty(builder.getJsonSafeClassName());
+        save();
+    }
+    
+    @Override
+    public Builder getBuilder(Descriptor<Builder> descriptor) {
+        return (Builder) CascadingUtil.getExternalProjectProperty(this, descriptor.getJsonSafeClassName()).getValue();
+    }
 
     /**
      * @inheritDoc
      */
+    @Override
     public List<Builder> getBuilders() {
         return getBuildersList().toList();
     }
@@ -148,38 +183,23 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P, B>,
     /**
      * @inheritDoc
      */
-    @SuppressWarnings("unchecked")
-    public DescribableList<Builder, Descriptor<Builder>> getBuildersList() {
-        return CascadingUtil.getDescribableListProjectProperty(this, BUILDERS_PROPERTY_NAME).getValue();
-    }
-
-    /**
-     * @inheritDoc
-     */
+    @Override
     public void setBuilders(DescribableList<Builder, Descriptor<Builder>> builders) {
         CascadingUtil.getDescribableListProjectProperty(this, BUILDERS_PROPERTY_NAME).setValue(builders);
     }
-
+    
     /**
      * @inheritDoc
+     * 
+     * @deprecated as of 2.2.0 do not use this field directly. Use other methods such as getBuilders, addBuilder & removeBuilder
      */
-    public Map<Descriptor<Publisher>, Publisher> getPublishers() {
-        return getPublishersList().toMap();
+    @SuppressWarnings("unchecked")
+    @Deprecated
+    @Override
+    public DescribableList<Builder, Descriptor<Builder>> getBuildersList() {
+        return CascadingUtil.getDescribableListProjectProperty(this, BUILDERS_PROPERTY_NAME).getValue();
     }
-
-    public Publisher getPublisher(Descriptor<Publisher> descriptor) {
-        return (Publisher) CascadingUtil.getExternalProjectProperty(this, descriptor.getJsonSafeClassName()).getValue();
-    }
-
-    /**
-     * Returns the list of the publishers available in the hudson.
-     *
-     * @return the list of the publishers available in the hudson.
-     */
-    public DescribableList<Publisher, Descriptor<Publisher>> getPublishersList() {
-        return DescribableListUtil.convertToDescribableList(Functions.getPublisherDescriptors(this), this);
-    }
-
+    
     /**
      * Adds a new {@link BuildStep} to this {@link Project} and saves the
      * configuration.
@@ -188,6 +208,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P, B>,
      * @throws java.io.IOException exception.
      */
     @SuppressWarnings("unchecked")
+    @Override
     public void addPublisher(Publisher publisher) throws IOException {
         CascadingUtil.getExternalProjectProperty(this,
                 publisher.getDescriptor().getJsonSafeClassName()).setValue(publisher);
@@ -200,21 +221,101 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P, B>,
      * @param publisher publisher.
      * @throws java.io.IOException exception.
      */
+    @Override
     public void removePublisher(Descriptor<Publisher> publisher) throws IOException {
         removeProjectProperty(publisher.getJsonSafeClassName());
         save();
     }
 
-    /**
+    @Override
+    public Publisher getPublisher(Descriptor<Publisher> descriptor) {
+        return (Publisher) CascadingUtil.getExternalProjectProperty(this, descriptor.getJsonSafeClassName()).getValue();
+    }
+    
+     /**
      * @inheritDoc
      */
-    public Map<Descriptor<BuildWrapper>, BuildWrapper> getBuildWrappers() {
-        return getBuildWrappersList().toMap();
+    @Override
+    public Map<Descriptor<Publisher>, Publisher> getPublishers() {
+        return getPublishersList().toMap();
+    }
+    
+    /**
+     * @inheritDoc
+     * 
+     */
+    @Override
+    public void setPublishers(DescribableList<Publisher, Descriptor<Publisher>> publishers) {
+        CascadingUtil.getDescribableListProjectProperty(this, PUBLISHERS_PROPERTY_NAME).setValue(publishers);
+    }
+
+    /**
+     * Returns the list of the publishers available in the hudson.
+     *
+     * @return the list of the publishers available in the hudson.
+     * * @deprecated as of 2.2.0 do not use this field directly. Use other methods such as getPublishers, addPublisher & removePublisher
+     */
+    @Deprecated
+    @Override
+    public DescribableList<Publisher, Descriptor<Publisher>> getPublishersList() {
+        return DescribableListUtil.convertToDescribableList(Functions.getPublisherDescriptors(this), this);
+    }
+
+    /**
+     * Adds a new {@link BuildStep} to this {@link Project} and saves the
+     * configuration.
+     *
+     * @param buildWrapper buildWrapper.
+     * @throws java.io.IOException exception.
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void addBuildWrapper(BuildWrapper buildWrapper) throws IOException {
+        CascadingUtil.getExternalProjectProperty(this,
+                buildWrapper.getDescriptor().getJsonSafeClassName()).setValue(buildWrapper);
+        save();
+    }
+    
+     /**
+     * Removes a buildWrapper from this project, if it's active.
+     *
+     * @param buildWrapper buildWrapper.
+     * @throws java.io.IOException exception.
+     */
+     @Override
+    public void removeBuildWrapper(Descriptor<BuildWrapper> buildWrapper) throws IOException {
+        removeProjectProperty(buildWrapper.getJsonSafeClassName());
+        save();
+    }
+    
+    @Override
+    public BuildWrapper getBuildWrapper(Descriptor<BuildWrapper> descriptor) {
+        return (BuildWrapper) CascadingUtil.getExternalProjectProperty(this, descriptor.getJsonSafeClassName()).getValue();
     }
 
     /**
      * @inheritDoc
      */
+     @Override
+    public Map<Descriptor<BuildWrapper>, BuildWrapper> getBuildWrappers() {
+        return getBuildWrappersList().toMap();
+    }
+    
+     /**
+     * @inheritDoc
+     * 
+     */
+    @Override
+    public void setBuildWrappers(DescribableList<BuildWrapper, Descriptor<BuildWrapper>> buildWrappers) {
+        CascadingUtil.getDescribableListProjectProperty(this, BUILDWRAPPERS_PROPERTY_NAME).setValue(buildWrappers);
+    }
+    /**
+     * @inheritDoc
+     * 
+     * @deprecated as of 2.2.0 don't use this field directly. Use other methods such as getBuildWrappers, addBuildWrapper & removeBuildWrapper
+     */
+    @Override
+    @Deprecated
     public DescribableList<BuildWrapper, Descriptor<BuildWrapper>> getBuildWrappersList() {
         return DescribableListUtil.convertToDescribableList(Functions.getBuildWrapperDescriptors(this), this);
     }
@@ -244,6 +345,11 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P, B>,
             throws FormException {
         CascadingUtil.buildExternalProperties(req, json, descriptors, this);
     }
+    
+    protected void buildBuilders(StaplerRequest req, JSONObject json, List<Descriptor<Builder>> descriptors)
+            throws FormException {
+        CascadingUtil.buildExternalProperties(req, json, descriptors, this);
+    }
 
     protected void convertPublishersProperties() {
         if (null != publishers) {
@@ -252,17 +358,25 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P, B>,
         }
     }
 
-    protected void convertBuildWrappersProjectProperties() {
+    protected void convertBuildWrappersProperties() {
         if (null != buildWrappers) {
             putAllProjectProperties(DescribableListUtil.convertToProjectProperties(buildWrappers, this), false);
             buildWrappers = null;
         }
     }
 
+    protected void convertBuildersProperties() {
+        if (null != builders && null == getProperty(BUILDERS_PROPERTY_NAME)) {
+            putAllProjectProperties(DescribableListUtil.convertToProjectProperties(builders, this), false);
+            builders = null;
+        }
+    }
+    
     protected void convertBuildersProjectProperty() {
         if (null != builders && null == getProperty(BUILDERS_PROPERTY_NAME)) {
             setBuilders(builders);
             builders = null;
         }
     }
+    
 }

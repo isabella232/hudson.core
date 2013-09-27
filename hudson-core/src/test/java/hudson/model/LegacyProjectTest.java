@@ -110,7 +110,7 @@ public class LegacyProjectTest {
         project.setAllowSave(false);
         project.initProjectProperties();
         //Property should be null, because of legacy implementation. Version < 2.2.0
-        project.convertBuildWrappersProjectProperties();
+        project.convertBuildWrappersProperties();
         //Verify buildWrappers
         assertTrue(project.getBuildWrappersList().isEmpty());
     }
