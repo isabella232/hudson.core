@@ -2178,6 +2178,71 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         return LazyTopLevelItem.getIfInstanceOf(item, TopLevelItem.class);
     }
     
+    public Item getItem(String relativeName, ItemGroup context) {
+        if (context == null) {
+            context = this;
+        }
+        if (relativeName == null) {
+            return null;
+        }
+        // absolute
+        if (relativeName.startsWith("/")) {
+            return getItemByFullName(relativeName);
+        }
+
+        Object/*Item|ItemGroup*/ ctx = context;
+
+        StringTokenizer tokens = new StringTokenizer(relativeName, "/");
+        while (tokens.hasMoreTokens()) {
+            String s = tokens.nextToken();
+            if (s.equals("..")) {
+                if (ctx instanceof Item) {
+                    ctx = ((Item) ctx).getParent();
+                    continue;
+                }
+
+                ctx = null;    // can't go up further
+                break;
+            }
+            if (s.equals(".")) {
+                continue;
+            }
+
+            if (ctx instanceof ItemGroup) {
+                ItemGroup g = (ItemGroup) ctx;
+                Item i = g.getItem(s);
+                if (i == null || !i.hasPermission(Item.READ)) {
+                    ctx = null;    // can't go up further
+                    break;
+                }
+                ctx = i;
+            }
+        }
+
+        if (ctx instanceof Item) {
+            return (Item) ctx;
+        }
+
+        // fall back to the classic interpretation
+        return getItemByFullName(relativeName);
+    }
+
+    public final Item getItem(String relativeName, Item context) {
+        return getItem(relativeName, context != null ? context.getParent() : null);
+    }
+
+    public final <T extends Item> T getItem(String relativeName, ItemGroup context, Class<T> type) {
+        Item r = getItem(relativeName, context);
+        if (type.isInstance(r)) {
+            return type.cast(r);
+        }
+        return null;
+    }
+
+    public final <T extends Item> T getItem(String relativeName, Item context, Class<T> type) {
+        return getItem(relativeName, context != null ? context.getParent() : null, type);
+    }
+    
     @Override
     public File getRootDirFor(TopLevelItem child) {
         return getRootDirFor(child.getName());
