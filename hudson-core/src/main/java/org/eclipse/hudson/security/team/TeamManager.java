@@ -17,6 +17,7 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import hudson.BulkChange;
+import hudson.Util;
 import hudson.XmlFile;
 import hudson.model.Hudson;
 import hudson.model.Item;
@@ -249,6 +250,12 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         teams.remove(team);
         save();
+        
+        File teamFolder = team.getTeamFolder(teamsFolder);
+        if (teamFolder.exists() && teamFolder.isDirectory()) {
+            Util.deleteContentsRecursive(teamFolder);
+            Util.deleteFile(teamFolder);
+        }
     }
 
     public HttpResponse doCreateTeam(@QueryParameter String teamName, @QueryParameter String description, @QueryParameter String customFolder) throws IOException {

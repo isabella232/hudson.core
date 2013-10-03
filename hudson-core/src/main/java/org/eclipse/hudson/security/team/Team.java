@@ -318,6 +318,21 @@ public class Team implements AccessControlled {
     }
     
     /**
+     * Return the team directory.
+     * @param teamsFolder the outer "teams" folder
+     * @return team folder or null for public team
+     */
+    File getTeamFolder(File teamsFolder) {
+        if (PUBLIC_TEAM_NAME.equals(name)) {
+            return teamsFolder;
+        }
+        if ((customFolderName != null) && !"".equals(customFolderName.trim())){
+            return new File(customFolderName);
+        }
+        return new File(teamsFolder, name);
+    }
+    
+    /**
      * The folder where all the jobs of this team is saved
      * @return File
      */
