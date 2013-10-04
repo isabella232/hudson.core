@@ -90,6 +90,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         initializeXstream();
         load();
         ensurePublicTeam();
+        ensureCustomFolders();
     }
 
     public boolean isTeamManagementEnabled() {
@@ -1152,6 +1153,43 @@ public final class TeamManager implements Saveable, AccessControlled {
             }
         } catch (IOException e) {
             logger.error("Failed to load " + config, e);
+        }
+    }
+    
+    private void ensureCustomFolders() {
+        // NB: It would be best to clean up jobs at any of the logger calls below
+        // but we're in the TeamManager constructor so it can't be called from
+        // Team to save teams.xml. These end cases should be rare.
+        for (Team team : teams) {
+            String customFolderName = team.getCustomFolderName();
+            if (customFolderName != null && customFolderName.trim().length() > 0) {
+                File jobsDir = team.getJobsFolder(teamsFolder);
+                // In 3.1.0 there was no child jobs folder
+                if (!jobsDir.exists()) {
+                    List<TeamJob> jobs = team.getJobs();
+                    if (!jobs.isEmpty()) {
+                        // move the jobs to jobs folder
+                        if (jobsDir.mkdirs()) {
+                            for (TeamJob job : jobs) {
+                                File teamDir = team.getTeamFolder(teamsFolder);
+                                File oldJobDir = new File(teamDir, job.getId());
+                                if (oldJobDir.exists() && oldJobDir.isDirectory()) {
+                                    File newJobDir = new File(jobsDir, job.getId());
+                                    try {
+                                        Util.moveDirectory(oldJobDir, newJobDir);
+                                    } catch (InterruptedException e) {
+                                        logger.error("Failed to move "+oldJobDir.getAbsolutePath());
+                                    }
+                                } else {
+                                    logger.error("Job folder not found "+oldJobDir.getAbsolutePath());
+                                }
+                            }
+                        } else {
+                            logger.error("Can't create "+jobsDir.getAbsolutePath());
+                        }
+                    }
+                }
+            }
         }
     }
 

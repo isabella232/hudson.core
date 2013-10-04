@@ -318,9 +318,9 @@ public class Team implements AccessControlled {
     }
     
     /**
-     * Return the team directory.
-     * @param teamsFolder the outer "teams" folder
-     * @return team folder or null for public team
+     * Return the team folder.
+     * @param teamsFolder the outer "teams" folder, or for public, hudson home
+     * @return team folder that will contain "jobs" folder
      */
     File getTeamFolder(File teamsFolder) {
         if (PUBLIC_TEAM_NAME.equals(name)) {
@@ -333,14 +333,11 @@ public class Team implements AccessControlled {
     }
     
     /**
-     * The folder where all the jobs of this team is saved
+     * The folder where all the jobs of this team are saved
      * @return File
      */
     File getJobsFolder(File teamsFolder) {
-        if ((customFolderName != null) && !"".equals(customFolderName.trim())){
-            return new File(customFolderName);
-        }
-        return new File(teamsFolder, name + "/" + JOBS_FOLDER_NAME);
+        return new File(getTeamFolder(teamsFolder), JOBS_FOLDER_NAME);
     }
 
     @Override
