@@ -18,7 +18,6 @@ package hudson.cli;
 
 import hudson.model.Hudson;
 import hudson.Extension;
-import hudson.Functions;
 import hudson.XmlFile;
 import static hudson.cli.CreateJobCommand.isGoodName;
 import hudson.model.Item;
@@ -64,8 +63,8 @@ public class UpdateJobCommand extends CLICommand {
         }
 
         String qualifiedJobName = targetTeam == null
-                ? name
-                : teamManager.getTeamQualifiedJobName(targetTeam, name);
+                ? getNewJobName(name)
+                : teamManager.getRawTeamQualifiedJobName(targetTeam, name);
         TopLevelItem item = h.getItem(qualifiedJobName);
 
         if (item == null && !create) {
@@ -105,6 +104,20 @@ public class UpdateJobCommand extends CLICommand {
             }
         }
         return 0;
+    }
+    
+    /**
+     * If team management enabled, return qualified job name;
+     * otherwise, just the name.
+     * @param name job name specified
+     * @return job name that will be created
+     */
+    public static String getNewJobName(String name) {
+        TeamManager teamManager = Hudson.getInstance().getTeamManager();
+        if (teamManager.isTeamManagementEnabled()) {
+            return teamManager.getRawTeamQualifiedJobName(name);
+        }
+        return name;
     }
     
     /**

@@ -153,6 +153,7 @@ public abstract class ItemGroupMixIn {
                     if (teamName.length() > 0) {
                         try {
                             requestedTeam = hudson.getTeamManager().findTeam(teamName);
+                            team = teamName;
                         } catch (TeamManager.TeamNotFoundException ex) {
                             throw new Failure("Requested team " + teamName + " not found");
                         }
@@ -165,8 +166,8 @@ public abstract class ItemGroupMixIn {
             String existingJobName = name;
             if (hudson.isTeamManagementEnabled()){
                 existingJobName = requestedTeam == null
-                        ? hudson.getTeamManager().getTeamQualifiedJobName(name)
-                        : hudson.getTeamManager().getTeamQualifiedJobName(requestedTeam, name);
+                        ? hudson.getTeamManager().getRawTeamQualifiedJobName(name)
+                        : hudson.getTeamManager().getRawTeamQualifiedJobName(requestedTeam, name);
             }
             if (parent.getItem(existingJobName) != null) {
                 throw new Failure(Messages.Hudson_JobAlreadyExists(existingJobName));
@@ -222,21 +223,6 @@ public abstract class ItemGroupMixIn {
         return req.getContextPath() + '/' + result.getUrl() + "configure";
     }
     
-    private void addJobToCurrentUserTeam(String name) throws IOException {
-        // Fix 413481 - NPE because Hudson getItem returns null for newly created job
-        // Circularity. Hudson getItem requires READ permission.
-        // If team is enabled, permission is determined by user's access
-        // to team containing job. But TeamJobListener can't add the
-        // job because getItem, used to get a real Job for listeners,
-        // returns null.
-        try {
-            Hudson.getInstance().getTeamManager().addJobToCurrentUserTeam(name);
-        } catch (TeamNotFoundException e) {
-            // should never happen
-            logger.error("Current user team not found while adding job "+name);
-        }
-    }
-
     /**
      * Copies an existing {@link TopLevelItem} to a new name.
      *
@@ -262,7 +248,7 @@ public abstract class ItemGroupMixIn {
     public synchronized <T extends TopLevelItem> T copy(T src, String name, String teamName) throws IOException {
         acl.checkPermission(Job.CREATE);
 
-        String jobName = teamName == null ? name : createInTeam(name, teamName);
+        String jobName = createInTeam(name, teamName);
         
         T result = (T) createProject(src.getDescriptor(), jobName, false);
 
@@ -275,12 +261,6 @@ public abstract class ItemGroupMixIn {
 
         add(result);
         
-        if (teamName == null) {
-            // The default implementation of onCopied calls onCreated, but it
-            // may be overridden, so do it here and don't depend on listener
-            addJobToCurrentUserTeam(result.getName());
-        }
-        
         ItemListener.fireOnCopied(src, Hudson.getInstance().getItem(result.getName()));
 
         return result;
@@ -291,13 +271,25 @@ public abstract class ItemGroupMixIn {
         // to the team, ensuring that Hudson will find the correct rootDir.
         TeamManager teamManager = Hudson.getInstance().getTeamManager();
         if (!teamManager.isTeamManagementEnabled()) {
-            throw new IOException("Team management is not enabled");
+            if (teamName != null) {
+                throw new IOException("Team management is not enabled");
+            }
+            return name;
         }
         Team team;
-        try {
-            team = teamManager.findTeam(teamName);
-        } catch (TeamNotFoundException e) {
-            throw new IOException("Team "+teamName+" does not exist");
+        if (teamName == null) {
+            try {
+                team = teamManager.findCurrentUserTeamForNewJob();
+            } catch (TeamNotFoundException ex) {
+                // Shouldn't happen, as user is already confirmed for Job.CREATE
+                return name;
+            }
+        } else {
+            try {
+                team = teamManager.findTeam(teamName);
+            } catch (TeamNotFoundException e) {
+                throw new IOException("Team "+teamName+" does not exist");
+            }
         }
         // addJob does the necessary name assembly and returns qualified job name
         return teamManager.addJob(name, team);
@@ -310,7 +302,7 @@ public abstract class ItemGroupMixIn {
     public synchronized TopLevelItem createProjectFromXML(String name, String teamName, InputStream xml) throws IOException {
         acl.checkPermission(Job.CREATE);
 
-        String jobName = teamName == null ? name : createInTeam(name, teamName);
+        String jobName = createInTeam(name, teamName);
         
         // place it as config.xml
         File configXml = Items.getConfigFile(getRootDirFor(jobName)).getFile();
@@ -321,10 +313,6 @@ public abstract class ItemGroupMixIn {
             // load it
             TopLevelItem result = (TopLevelItem) Items.load(parent, configXml.getParentFile(), false);
             add(result);
-            
-            if (teamName == null) {
-                addJobToCurrentUserTeam(result.getName());
-            }
             
             assert(result.getName().equals(jobName));
             
@@ -348,9 +336,7 @@ public abstract class ItemGroupMixIn {
             throws IOException {
         acl.checkPermission(Job.CREATE);
         
-        if (teamName != null) {
-            name = createInTeam(name, teamName);
-        }
+        name = createInTeam(name, teamName);
 
         Hudson hudson = Hudson.getInstance();
         String existingJobName = name;

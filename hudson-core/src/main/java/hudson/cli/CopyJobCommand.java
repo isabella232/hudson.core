@@ -20,6 +20,7 @@ import hudson.model.Hudson;
 import hudson.model.TopLevelItem;
 import hudson.Extension;
 import static hudson.cli.CreateJobCommand.isGoodName;
+import static hudson.cli.UpdateJobCommand.getNewJobName;
 import static hudson.cli.UpdateJobCommand.validateTeam;
 import hudson.model.Item;
 import org.eclipse.hudson.security.team.Team;
@@ -62,8 +63,8 @@ public class CopyJobCommand extends CLICommand {
         }
             
         String qualifiedJobName = targetTeam == null
-                ? dst
-                : h.getTeamManager().getTeamQualifiedJobName(targetTeam, dst);
+                ? getNewJobName(dst)
+                : h.getTeamManager().getRawTeamQualifiedJobName(targetTeam, dst);
         if (h.getItem(qualifiedJobName) != null) {
                 stderr.println("Job '" + qualifiedJobName + "' already exists");
             return -1;

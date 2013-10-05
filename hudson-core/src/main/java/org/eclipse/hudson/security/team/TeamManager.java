@@ -740,6 +740,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         return list;
     }
     
+    
     // Used in hudson.model.view.newJob.jelly
     public Collection<String> getCurrentUserTeamsWithCreatePermission() {
         List<Team> teamsWithPermission;
@@ -893,6 +894,51 @@ public final class TeamManager implements Saveable, AccessControlled {
             return getTeamQualifiedJobName(currentUserTeamsWithPermission.get(0), jobName);
         }
         return jobName;
+    }
+    
+    /**
+     * Called to check duplicate job name before create.
+     * For this purpose, we want a job name that is not necessarily unique.
+     * @param jobName requested job name
+     * @return qualified name to check
+     */
+    public String getRawTeamQualifiedJobName(String jobName) {
+        List<Team> currentUserTeamsWithPermission = getCurrentUserTeamsWithPermission(Item.CREATE);
+        if (!currentUserTeamsWithPermission.isEmpty()) {
+            return getRawTeamQualifiedJobName(currentUserTeamsWithPermission.get(0), jobName);
+        }
+        return jobName;
+    }
+    
+    /**
+     * Called to check duplicate job name before create.
+     * For this purpose, we want a job name that is not necessarily unique.
+     * @param team requested team
+     * @param jobName requested job name
+     * @return qualified name to check
+     */
+    public String getRawTeamQualifiedJobName(Team team, String jobName) {
+        if (isPublicTeam(team)) {
+            return jobName;
+        }
+        return team.getName() + TEAM_SEPARATOR + jobName;
+    }
+    
+    /**
+     * 
+     * @return the implicit team for the current user
+     * @throws TeamNotFoundException 
+     */
+    public Team findCurrentUserTeamForNewJob() throws TeamNotFoundException {
+        // This will only find explicit team members with create permission
+        List<Team> currentUserTeamsWithPermission = getCurrentUserTeamsWithPermission(Item.CREATE);
+        if (!currentUserTeamsWithPermission.isEmpty()) {
+            return currentUserTeamsWithPermission.get(0);
+        }
+        if (isCurrentUserSysAdmin()) {
+            return publicTeam;
+        }
+        throw new TeamNotFoundException("User does not have create permission in any team");
     }
     
     /**

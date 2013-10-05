@@ -18,6 +18,7 @@ package hudson.cli;
 
 import hudson.model.Hudson;
 import hudson.Extension;
+import static hudson.cli.UpdateJobCommand.getNewJobName;
 import static hudson.cli.UpdateJobCommand.validateTeam;
 import hudson.model.Failure;
 import hudson.model.Item;
@@ -66,8 +67,8 @@ public class CreateJobCommand extends CLICommand {
         }
             
         String qualifiedJobName = targetTeam == null
-                ? name
-                : h.getTeamManager().getTeamQualifiedJobName(targetTeam, name);
+                ? getNewJobName(name)
+                : h.getTeamManager().getRawTeamQualifiedJobName(targetTeam, name);
         if (h.getItem(qualifiedJobName) != null) {
                 stderr.println("Job '" + qualifiedJobName + "' already exists");
             return -1;
