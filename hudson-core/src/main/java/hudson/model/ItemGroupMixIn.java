@@ -248,9 +248,7 @@ public abstract class ItemGroupMixIn {
     public synchronized <T extends TopLevelItem> T copy(T src, String name, String teamName) throws IOException {
         acl.checkPermission(Job.CREATE);
 
-        String jobName = createInTeam(name, teamName);
-        
-        T result = (T) createProject(src.getDescriptor(), jobName, false);
+        T result = (T) createProject(src.getDescriptor(), name, teamName, false);
 
         // copy config
         Util.copyFile(Items.getConfigFile(src).getFile(), Items.getConfigFile(result).getFile());
