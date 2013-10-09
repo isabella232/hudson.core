@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Writer;
 import org.owasp.html.Handler;
 import org.owasp.html.HtmlSanitizer;
+import org.owasp.html.HtmlStreamEventReceiver;
 import org.owasp.html.HtmlStreamRenderer;
 
 /**
@@ -55,7 +56,8 @@ public class RawHtmlMarkupFormatter extends MarkupFormatter {
                 }
         );
         // Use the policy defined above to sanitize the HTML.
-        HtmlSanitizer.sanitize(markup, EbayPolicyExample.POLICY_DEFINITION.apply(renderer));
+        HtmlStreamEventReceiver receiver = EbayPolicyExample.getEnforceTableNestingReceiver(renderer);
+        HtmlSanitizer.sanitize(markup, EbayPolicyExample.POLICY_DEFINITION.apply(receiver));
     }
 
     @Extension

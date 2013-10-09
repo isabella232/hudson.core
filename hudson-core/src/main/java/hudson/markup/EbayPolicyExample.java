@@ -40,8 +40,14 @@ import org.owasp.html.PolicyFactory;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import org.owasp.html.HtmlStreamEventReceiver;
+import org.owasp.html.TagBalancingHtmlStreamEventReceiver;
 
 /**
  * Based on the
@@ -204,7 +210,128 @@ public class EbayPolicyExample {
               "ul", "ol", "li", "dd", "dt", "dl", "tbody", "thead", "tfoot",
               "table", "td", "th", "tr", "colgroup", "fieldset", "legend")
           .toFactory();
+  
+    private static class State extends ArrayList<String> {
+        public void push(String element) {
+            add(element);
+        }
+        public boolean pop(String element) {
+            int i = find(element);
+            if (i >= 0) {
+                this.removeRange(i, size());
+                return true;
+            }
+            return false;
+        }
+        public boolean in(String element) {
+            return find(element) >= 0;
+        }
+        private int find(String element) {
+            for (int i = size()-1; i >= 0; i--) {
+                if (get(i).equals(element)) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+    }
+    
+    private static class NestingRules {
+        private HashMap<String,String[]> rules = new HashMap<String,String[]>();
+        public NestingRules addRule(String element, String... require) {
+            rules.put(element, require);
+            return this;
+        }
+        
+        public String[] getParents(String element) {
+            return rules.get(element);
+        }
+    }
+    
+    private static final NestingRules TABLE_NESTING_RULES = new NestingRules()
+        .addRule("thead", "table")
+        .addRule("tfoot", "table")
+        .addRule("tbody", "table")
+        .addRule("tr", "table")
+        .addRule("th", "tr")
+        .addRule("td", "tr")
+        .addRule("caption", "table")
+        .addRule("colgroup", "table");
 
+    /**
+     * An HtmlStreamEventReceiver that enforces minimal rules about table nesting.
+     * Must be wrapped by TagBalancingHtmlStreamEventReceiver for correct operation.
+     */
+    private static class EnforceTableNestingReceiver implements HtmlStreamEventReceiver {
+
+        private HtmlStreamEventReceiver underlying;
+        private State state = new State();
+        private int skipTo = -1;
+        
+        private boolean allow(String element) {
+            String[] parents = TABLE_NESTING_RULES.getParents(element);
+            if (parents != null) {
+                for (String parent : parents) {
+                    if (state.in(parent)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            return true;
+        }
+        
+        public EnforceTableNestingReceiver(HtmlStreamEventReceiver target) {
+            underlying = target;
+        }
+        
+        @Override
+        public void openDocument() {
+            underlying.openDocument();
+        }
+
+        @Override
+        public void closeDocument() {
+            underlying.closeDocument();
+        }
+
+        @Override
+        public void openTag(String element, List<String> list) {
+            // We assume this is nested in EnforceTableNestingReceiver,
+            // which canonicalizes all HTML element names to lower case
+            if (skipTo < 0) {
+                if (allow(element)) {
+                    underlying.openTag(element, list);
+                } else {
+                    skipTo = state.size();
+                }
+            }
+            state.push(element);
+        }
+
+        @Override
+        public void closeTag(String element) {
+            if (skipTo < 0) {
+                underlying.closeTag(element);
+            }
+            state.pop(element);
+            if (state.size() == skipTo) {
+                skipTo = -1;
+            }
+        }
+
+        @Override
+        public void text(String string) {
+            if (skipTo < 0) {
+                underlying.text(string);
+            }
+        }
+    }
+    
+    public static HtmlStreamEventReceiver getEnforceTableNestingReceiver(HtmlStreamEventReceiver target) {
+        return new TagBalancingHtmlStreamEventReceiver(new EnforceTableNestingReceiver(target));
+    }
+    
   public static void main(String[] args) throws IOException {
     if (args.length != 0) {
       System.err.println("Reads from STDIN and writes to STDOUT");
