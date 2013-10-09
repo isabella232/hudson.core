@@ -1048,10 +1048,20 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
         public String getBuiltOnNodeName() {
             return builtOnStr;
         }
+        
+        @Override
+        public Executor getExecutor() {
+            return Run.getExecutor(getBuild());
+        }
             
         @Override
         public RunValue<J,R> getPrevious() {
             return previous;
+        }
+        
+        @Override
+        public List<BuildBadgeAction> getBadgeActions() {
+            return Run.getBadgeActions(getBuild());
         }
         
         @Override

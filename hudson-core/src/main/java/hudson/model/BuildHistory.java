@@ -72,6 +72,9 @@ public interface BuildHistory<JobT extends Job<JobT, RunT>, RunT extends Run<Job
         String getFullDisplayName();
         String getUrl();
         
+        Executor getExecutor();
+        List<BuildBadgeAction> getBadgeActions();
+        
         
         Record<JobT,RunT> getPrevious();
         Record<JobT,RunT> getNext();

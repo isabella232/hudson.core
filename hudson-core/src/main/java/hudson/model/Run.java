@@ -365,8 +365,12 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * {@link BuildBadgeAction}s.
      */
     public List<BuildBadgeAction> getBadgeActions() {
+        return getBadgeActions(this);
+    }
+    
+    static List<BuildBadgeAction> getBadgeActions(Run run) {
         List<BuildBadgeAction> r = null;
-        for (Action a : getActions()) {
+        for (Action a : run.getActions()) {
             if (a instanceof BuildBadgeAction) {
                 if (r == null) {
                     r = new ArrayList<BuildBadgeAction>();
@@ -374,11 +378,11 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 r.add((BuildBadgeAction) a);
             }
         }
-        if (isKeepLog()) {
+        if (run.isKeepLog()) {
             if (r == null) {
                 r = new ArrayList<BuildBadgeAction>();
             }
-            r.add(new KeepLogBuildBadge());
+            r.add(run.new KeepLogBuildBadge());
         }
         if (r == null) {
             return Collections.emptyList();
@@ -407,10 +411,14 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Gets the {@link Executor} building this job, if it's being built.
      * Otherwise null.
      */
-    public Executor getExecutor() {
+    final public Executor getExecutor() {
+        return getExecutor(this);
+    }
+    
+    static Executor getExecutor(Run run) {
         for (Computer c : Hudson.getInstance().getComputers()) {
             for (Executor e : c.getExecutors()) {
-                if (e.getCurrentExecutable() == this) {
+                if (e.getCurrentExecutable() == run) {
                     return e;
                 }
             }
