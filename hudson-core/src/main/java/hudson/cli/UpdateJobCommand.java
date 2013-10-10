@@ -62,9 +62,10 @@ public class UpdateJobCommand extends CLICommand {
             return -1;
         }
 
-        String qualifiedJobName = targetTeam == null
-                ? getNewJobName(name)
-                : teamManager.getRawTeamQualifiedJobName(targetTeam, name);
+        String qualifiedJobName = !create ? name :
+                (targetTeam == null
+                    ? getNewJobName(name)
+                    : teamManager.getRawTeamQualifiedJobName(targetTeam, name));
         TopLevelItem item = h.getItem(qualifiedJobName);
 
         if (item == null && !create) {
@@ -86,7 +87,7 @@ public class UpdateJobCommand extends CLICommand {
             XmlFile oldConfigXml = null;
             Object oldItem = null;
             try {
-                h.checkPermission(Job.CONFIGURE);
+                item.checkPermission(Job.CONFIGURE);
                 File rootDirOfJob = teamManager.getRootFolderForJob(item.getName());
                 // if the new config.xml is bad, need to restore the previous one
                 oldConfigXml = Items.getConfigFile(rootDirOfJob);
