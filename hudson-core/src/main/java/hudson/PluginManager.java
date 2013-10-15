@@ -361,6 +361,20 @@ public abstract class PluginManager extends AbstractModelObject {
             FileUtils.copyURLToFile(src, file);
         }
     }
+    
+    public PluginWrapper whichPlugin(Class c) {
+        PluginWrapper oneAndOnly = null;
+        ClassLoader cl = c.getClassLoader();
+        for (PluginWrapper p : activePlugins) {
+            if (p.classLoader == cl) {
+                if (oneAndOnly != null) {
+                    return null;    // ambigious
+                }
+                oneAndOnly = p;
+            }
+        }
+        return oneAndOnly;
+    }
 
     /**
      * Creates a hudson.PluginStrategy, looking at the corresponding system

@@ -1,25 +1,26 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
  * Copyright (c) 2004-2010 Oracle Corporation.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *
- *    Kohsuke Kawaguchi
+ * Kohsuke Kawaguchi
  *
  *
- *******************************************************************************/ 
-
+ ******************************************************************************
+ */
 package hudson.model;
 
 import hudson.RelativePath;
 import hudson.XmlFile;
 import hudson.BulkChange;
-import hudson.Functions;
+import hudson.PluginWrapper;
 import hudson.Util;
 import static hudson.Util.singleQuote;
 import hudson.diagnosis.OldDataMonitor;
@@ -34,7 +35,6 @@ import org.springframework.util.StringUtils;
 import org.jvnet.tiger_types.Types;
 import org.apache.commons.io.IOUtils;
 
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import javax.servlet.ServletException;
 import javax.servlet.RequestDispatcher;
 import java.io.File;
@@ -58,6 +58,8 @@ import java.lang.reflect.Type;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.beans.Introspector;
+import java.net.URL;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 /**
  * Metadata about a configurable instance.
@@ -119,6 +121,12 @@ public abstract class Descriptor<T extends Describable<T>> implements Saveable {
      * descriptor itself.
      */
     private transient volatile Map<String, PropertyType> propertyTypes, globalPropertyTypes;
+    /**
+     * Help file redirect, keyed by the field name to the path.
+     *
+     * @see #getHelpFile(String)
+     */
+    private final Map<String, String> helpRedirect = new HashMap<String, String>();
 
     /**
      * Represents a readable property on {@link Describable}.
@@ -585,11 +593,21 @@ public abstract class Descriptor<T extends Describable<T>> implements Saveable {
     /**
      * Returns the path to the help screen HTML for the given field.
      *
-     * <p> The help files are assumed to be at "help/FIELDNAME.html" with
-     * possible locale variations.
+     * <p>
+     * The help files are assumed to be at "help/FIELDNAME.html" with possible
+     * locale variations.
      */
     public String getHelpFile(final String fieldName) {
-        for (Class c = clazz; c != null; c = c.getSuperclass()) {
+        return getHelpFile(clazz, fieldName);
+    }
+
+    public String getHelpFile(Class<?> clazz, String fieldName) {
+        String v = helpRedirect.get(fieldName);
+        if (v != null) {
+            return v;
+        }
+
+        for (Class<?> c : getAncestors(clazz)) {
             String page = "/descriptor/" + getId() + "/help";
             String suffix;
             if (fieldName == null) {
@@ -607,13 +625,53 @@ public abstract class Descriptor<T extends Describable<T>> implements Saveable {
                 throw new Error(e);
             }
 
-            InputStream in = getHelpStream(c, suffix);
-            IOUtils.closeQuietly(in);
-            if (in != null) {
+            if (getStaticHelpUrl(c, suffix) != null) {
                 return page;
             }
         }
         return null;
+    }
+
+    private Iterable<Class<?>> getAncestors(Class clazz) {
+        List<Class<?>> r = new ArrayList<Class<?>>();
+        for (; clazz != null; clazz = clazz.getSuperclass()) {
+            r.add(clazz);
+        }
+        return r;
+    }
+
+    private URL getStaticHelpUrl(Class<?> c, String suffix) {
+        Locale locale = Stapler.getCurrentRequest().getLocale();
+
+        String base = "help" + suffix;
+
+        URL url;
+        url = c.getResource(base + '_' + locale.getLanguage() + '_' + locale.getCountry() + '_' + locale.getVariant() + ".html");
+        if (url != null) {
+            return url;
+        }
+        url = c.getResource(base + '_' + locale.getLanguage() + '_' + locale.getCountry() + ".html");
+        if (url != null) {
+            return url;
+        }
+        url = c.getResource(base + '_' + locale.getLanguage() + ".html");
+        if (url != null) {
+            return url;
+        }
+
+        // default
+        return c.getResource(base + ".html");
+    }
+
+    /**
+     * Tells Hudson that the help file for the field 'fieldName' is defined in
+     * the help file for the 'fieldNameToRedirectTo' in the 'owner' class.
+     *
+     * @since 1.425
+     */
+    protected void addHelpFileRedirect(String fieldName, Class<? extends Describable> owner, String fieldNameToRedirectTo) {
+        helpRedirect.put(fieldName,
+                Hudson.getInstance().getDescriptor(owner).getHelpFile(fieldNameToRedirectTo));
     }
 
     /**
@@ -732,51 +790,39 @@ public abstract class Descriptor<T extends Describable<T>> implements Saveable {
 
         path = path.replace('/', '-');
 
-        for (Class c = clazz; c != null; c = c.getSuperclass()) {
+        PluginWrapper pw = getPlugin();
+        if (pw != null) {
+            rsp.setHeader("X-Plugin-Short-Name", pw.getShortName());
+            rsp.setHeader("X-Plugin-Long-Name", pw.getLongName());
+            rsp.setHeader("X-Plugin-From", pw.getUrl());
+        }
+
+        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
             RequestDispatcher rd = Stapler.getCurrentRequest().getView(c, "help" + path);
-            if (rd != null) {// Jelly-generated help page
+            if (rd != null) {// template based help page
                 rd.forward(req, rsp);
                 return;
             }
 
-            InputStream in = getHelpStream(c, path);
-            if (in != null) {
+            URL url = getStaticHelpUrl(c, path);
+            if (url != null) {
                 // TODO: generalize macro expansion and perhaps even support JEXL
                 rsp.setContentType("text/html;charset=UTF-8");
-                String literal = IOUtils.toString(in, "UTF-8");
-                rsp.getWriter().println(Util.replaceMacro(literal, Collections.singletonMap("rootURL", Functions.getRequestRootPath(req))));
-                in.close();
+                InputStream in = url.openStream();
+                try {
+                    String literal = IOUtils.toString(in, "UTF-8");
+                    rsp.getWriter().println(Util.replaceMacro(literal, Collections.singletonMap("rootURL", req.getContextPath())));
+                } finally {
+                    IOUtils.closeQuietly(in);
+                }
                 return;
             }
         }
         rsp.sendError(SC_NOT_FOUND);
     }
 
-    private InputStream getHelpStream(Class c, String suffix) {
-        Locale locale = Stapler.getCurrentRequest().getLocale();
-        String base = c.getName().replace('.', '/').replace('$', '/') + "/help" + suffix;
-
-        ClassLoader cl = c.getClassLoader();
-        if (cl == null) {
-            return null;
-        }
-
-        InputStream in;
-        in = cl.getResourceAsStream(base + '_' + locale.getLanguage() + '_' + locale.getCountry() + '_' + locale.getVariant() + ".html");
-        if (in != null) {
-            return in;
-        }
-        in = cl.getResourceAsStream(base + '_' + locale.getLanguage() + '_' + locale.getCountry() + ".html");
-        if (in != null) {
-            return in;
-        }
-        in = cl.getResourceAsStream(base + '_' + locale.getLanguage() + ".html");
-        if (in != null) {
-            return in;
-        }
-
-        // default
-        return cl.getResourceAsStream(base + ".html");
+    protected PluginWrapper getPlugin() {
+        return Hudson.getInstance().getPluginManager().whichPlugin(clazz);
     }
 
 //

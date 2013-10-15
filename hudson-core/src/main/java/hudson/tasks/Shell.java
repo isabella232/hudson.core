@@ -21,7 +21,10 @@ import hudson.Functions;
 import hudson.Util;
 import hudson.Extension;
 import hudson.model.AbstractProject;
+import hudson.remoting.Callable;
+import hudson.remoting.VirtualChannel;
 import hudson.util.FormValidation;
+import java.io.IOException;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -30,6 +33,7 @@ import org.kohsuke.stapler.QueryParameter;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 /**
  * Executes a series of commands by using a shell.
@@ -38,6 +42,8 @@ import java.util.Arrays;
  */
 public class Shell extends CommandInterpreter {
 
+    private static final Logger LOGGER = Logger.getLogger(Shell.class.getName());
+    
     @DataBoundConstructor
     public Shell(String command) {
         super(fixCrLf(command));
@@ -128,6 +134,25 @@ public class Shell extends CommandInterpreter {
             }
             return shell;
         }
+        
+        public String getShellOrDefault(VirtualChannel channel) {
+            if (shell != null) 
+                return shell;
+
+            String interpreter = null;
+            try {
+                interpreter = channel.call(new Shellinterpreter());
+            } catch (IOException e) {
+                LOGGER.warning(e.getMessage());
+            } catch (InterruptedException e) {
+                LOGGER.warning(e.getMessage());
+            }
+            if (interpreter == null) {
+                interpreter = getShellOrDefault();
+            }
+
+            return interpreter;
+        }
 
         public void setShell(String shell) {
             this.shell = Util.fixEmptyAndTrim(shell);
@@ -155,6 +180,15 @@ public class Shell extends CommandInterpreter {
         public FormValidation doCheck(@QueryParameter String value) {
             // Executable requires admin permission
             return FormValidation.validateExecutable(value);
+        }
+        
+        private static final class Shellinterpreter implements Callable<String, IOException> {
+
+            private static final long serialVersionUID = 1L;
+
+            public String call() throws IOException {
+                return Functions.isWindows() ? "sh" : "/bin/sh";
+            }
         }
     }
 }
