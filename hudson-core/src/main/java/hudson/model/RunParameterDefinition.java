@@ -43,6 +43,16 @@ public class RunParameterDefinition extends SimpleParameterDefinition {
     public Job getProject() {
         return (Job) Hudson.getInstance().getItem(projectName);
     }
+    
+    @Override
+    public ParameterDefinition copyWithDefaultValue(ParameterValue defaultValue) {
+        if (defaultValue instanceof RunParameterValue) {
+            RunParameterValue value = (RunParameterValue) defaultValue;
+            return new RunParameterDefinition(getName(), value.getRunId(), getDescription());
+        } else {
+            return this;
+        }
+    }
 
     @Extension
     public static class DescriptorImpl extends ParameterDescriptor {

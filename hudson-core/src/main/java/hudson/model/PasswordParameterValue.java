@@ -61,4 +61,8 @@ public class PasswordParameterValue extends ParameterValue {
     public boolean isSensitive() {
         return true;
     }
+    
+    public Secret getValue() {
+        return value;
+    }
 }

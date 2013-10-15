@@ -102,6 +102,17 @@ public abstract class ParameterDefinition implements
         this.name = name;
         this.description = description;
     }
+    
+    /**
+     * Create a new instance of this parameter definition and use the passed
+     * parameter value as the default value.
+     *
+     * @since 3.1.1
+     */
+    public ParameterDefinition copyWithDefaultValue(ParameterValue defaultValue) {
+        // By default, just return this again
+        return this;
+    }
 
     @Exported
     public String getType() {
