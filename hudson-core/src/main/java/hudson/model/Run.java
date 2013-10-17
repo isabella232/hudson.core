@@ -1449,17 +1449,17 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
                     setResult(job.run(listener));
 
-                    LOGGER.log(FINE, "Build " + this + " main build action completed: " + getResult());
+                    LOGGER.log(Level.INFO, "Build " + this + " main build action completed: " + getResult());
                     CheckPoint.MAIN_COMPLETED.report();
                 } catch (ThreadDeath t) {
                     throw t;
                 } catch (AbortException e) { // orderly abortion.
                     setResult(Result.FAILURE);
                     listener.error(e.getMessage());
-                    LOGGER.log(FINE, "Build " + this + " aborted", e);
+                    LOGGER.log(Level.INFO, "Build " + this + " aborted", e);
                 } catch (RunnerAbortedException e) { // orderly abortion.
                     setResult(Result.FAILURE);
-                    LOGGER.log(FINE, "Build " + this + " aborted", e);
+                    LOGGER.log(Level.INFO, "Build " + this + " aborted", e);
                 } catch (InterruptedException e) {
                     // aborted
                     setResult(Result.ABORTED);
