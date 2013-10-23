@@ -133,7 +133,7 @@
         <maven-enunciate-plugin.version>1.26.2</maven-enunciate-plugin.version>
         <cobertura-maven-plugin.version>2.5.1</cobertura-maven-plugin.version>
         
-        <hudson-remoting.version>3.0.1</hudson-remoting.version>
+        <hudson-remoting.version>3.0.2</hudson-remoting.version>
         
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- by default only check remote repositories once per week -->
