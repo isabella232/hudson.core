@@ -9,13 +9,15 @@
  *
  * Contributors:
  *
- *    Nikita Levyankov
+ *    Winston Prakash, Nikita Levyankov
  *
  *******************************************************************************/
 
 package org.eclipse.hudson.api.model;
 
 import hudson.model.Descriptor;
+import hudson.model.Project;
+import hudson.tasks.BuildStep;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.Builder;
 import hudson.tasks.Publisher;
@@ -34,25 +36,68 @@ import java.util.Map;
 public interface IBaseBuildableProject extends IAbstractProject {
 
     /**
+     * Adds a new {@link hudson.tasks.BuildStep}, builder, to this
+     * {@link IBaseBuildableProject} and saves the configuration.
+     *
+     * @param builder builder.
+     * @throws java.io.IOException exception.
+     */
+    public void addBuilder(Builder builder) throws IOException;
+
+    /**
+     * Removes a {@link BuildStep} builder from this project, if it's active.
+     *
+     * @param builder builder.
+     * @throws java.io.IOException exception.
+     */
+    public void removeBuilder(Descriptor<Builder> builder) throws IOException;
+    
+    public Builder getBuilder(Descriptor<Builder> descriptor);
+    
+    /**
      * @return list of project {@link hudson.tasks.Builder}
      */
     List<Builder> getBuilders();
+    
+    void setBuilders(DescribableList<Builder, Descriptor<Builder>> builders);
 
     DescribableList<Builder, Descriptor<Builder>> getBuildersList();
 
-    void setBuilders(DescribableList<Builder, Descriptor<Builder>> builders);
-
     /**
-     * @return map of project {@link hudson.tasks.BuildWrapper}
+     * Adds a new {@link BuildStep} to this {@link Project} and saves the
+     * configuration.
+     *
+     * @param buildWrapper buildWrapper.
+     * @throws java.io.IOException exception.
      */
-    Map<Descriptor<BuildWrapper>, BuildWrapper> getBuildWrappers();
-
+    public void addBuildWrapper(BuildWrapper buildWrapper) throws IOException;
+    
+     /**
+     * Removes a buildWrapper from this project, if it's active.
+     *
+     * @param buildWrapper buildWrapper.
+     * @throws java.io.IOException exception.
+     */
+    public void removeBuildWrapper(Descriptor<BuildWrapper> buildWrapper) throws IOException;
+    
+    public BuildWrapper getBuildWrapper(Descriptor<BuildWrapper> descriptor);
     /**
-     * @return map of project {@link hudson.tasks.Publisher}
+     * @inheritDoc
      */
-    Map<Descriptor<Publisher>, Publisher> getPublishers();
-
-    Publisher getPublisher(Descriptor<Publisher> descriptor);
+    public Map<Descriptor<BuildWrapper>, BuildWrapper> getBuildWrappers();
+    
+     /**
+     * @inheritDoc
+     * 
+     */
+    public void setBuildWrappers(DescribableList<BuildWrapper, Descriptor<BuildWrapper>> buildWrappers);
+    /**
+     * @inheritDoc
+     * 
+     * @deprecated as of 2.2.0 don't use this field directly. Use other methods such as getBuildWrappers, addBuildWrapper & removeBuildWrapper
+     */
+    @Deprecated
+    public DescribableList<BuildWrapper, Descriptor<BuildWrapper>> getBuildWrappersList();
 
     /**
      * Adds a new {@link hudson.tasks.BuildStep} to this
@@ -70,4 +115,23 @@ public interface IBaseBuildableProject extends IAbstractProject {
      * @throws java.io.IOException exception.
      */
     void removePublisher(Descriptor<Publisher> publisher) throws IOException;
+    
+
+    Publisher getPublisher(Descriptor<Publisher> descriptor);
+    
+    /**
+     * @return map of project {@link hudson.tasks.Publisher}
+     */
+    Map<Descriptor<Publisher>, Publisher> getPublishers();
+    
+    public void setPublishers(DescribableList<Publisher, Descriptor<Publisher>> publishers);
+
+    /**
+     * Returns the list of the publishers available in the hudson.
+     *
+     * @return the list of the publishers available in the hudson.
+     * * @deprecated as of 2.2.0 do not use this field directly. Use other methods such as getPublishers, addPublisher & removePublisher
+     */
+    @Deprecated
+    public DescribableList<Publisher, Descriptor<Publisher>> getPublishersList();
 }

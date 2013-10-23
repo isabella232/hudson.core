@@ -42,10 +42,30 @@ public abstract class CauseOfBlockage {
      */
     public static CauseOfBlockage fromMessage(final Localizable l) {
         return new CauseOfBlockage() {
+            @Override
             public String getShortDescription() {
                 return l.toString();
             }
         };
+    }
+    
+    interface NeedsMoreExecutor {}
+
+    public static CauseOfBlockage createNeedsMoreExecutor(Localizable l) {
+        return new NeedsMoreExecutorImpl(l);
+    }
+
+    private static final class NeedsMoreExecutorImpl extends CauseOfBlockage implements NeedsMoreExecutor {
+        private final Localizable l;
+
+        private NeedsMoreExecutorImpl(Localizable l) {
+            this.l = l;
+        }
+
+        @Override
+        public String getShortDescription() {
+            return l.toString();
+        }
     }
 
     /**
@@ -64,6 +84,7 @@ public abstract class CauseOfBlockage {
             this.node = node;
         }
 
+        @Override
         public String getShortDescription() {
             return Messages.Queue_NodeOffline(node.getDisplayName());
         }
@@ -86,6 +107,7 @@ public abstract class CauseOfBlockage {
             this.label = l;
         }
 
+        @Override
         public String getShortDescription() {
             return Messages.Queue_AllNodesOffline(label.getName());
         }
@@ -107,6 +129,7 @@ public abstract class CauseOfBlockage {
             this.node = node;
         }
 
+        @Override
         public String getShortDescription() {
             return Messages.Queue_WaitingForNextAvailableExecutorOn(node.getNodeName());
         }
@@ -129,6 +152,7 @@ public abstract class CauseOfBlockage {
             this.label = label;
         }
 
+        @Override
         public String getShortDescription() {
             return Messages.Queue_WaitingForNextAvailableExecutorOn(label.getName());
         }

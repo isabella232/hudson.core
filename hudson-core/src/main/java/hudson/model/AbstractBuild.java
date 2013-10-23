@@ -858,6 +858,10 @@ public abstract class AbstractBuild<P extends AbstractProject<P, R>, R extends A
     public Calendar due() {
         return getTimestamp();
     }
+    
+    public AbstractBuild<?,?> getRootBuild() {
+        return this;
+    }
 
     /**
      * Builds up a set of variable names that contain sensitive values that

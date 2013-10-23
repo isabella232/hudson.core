@@ -20,5 +20,21 @@
 -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:p="/lib/hudson/project">
-    <t:cascadingDescriptorList title="${%Post-build Actions}" descriptors="${h.getPublisherDescriptors(it)}"/>
+ 
+  <t:cascadingDescriptorList title="${%Post-build Actions}" descriptors="${h.getPublisherDescriptors(it)}"/>
+  
+  <!-- Fix: Display the Post build actions as a dropdown list and fetch configurations dynamically via ajax-->
+  <!--
+    <f:section title="${%Post-build Actions}">
+        <f:block>
+            <f:hetero-list name="publisher" hasHeader="true"
+                     descriptors="${h.getPublisherDescriptors(it)}"
+                     items="${it.publishersList}"
+                     oneEach="true"
+                     menuAlign="bl-tl"
+                     honorOrder="true"
+                     addCaption="${%Add post-build action}"/>
+        </f:block>
+    </f:section>
+   -->
 </j:jelly>
