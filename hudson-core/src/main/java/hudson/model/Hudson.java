@@ -3485,9 +3485,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         }
     }
     
-    private static final int TEAM_NAME_LIMIT = 64;
-    private static final int JOB_NAME_LIMIT_TEAM = 128;
-    private static final int JOB_NAME_LIMIT_NO_TEAM = TEAM_NAME_LIMIT + JOB_NAME_LIMIT_TEAM;
+    public static final int TEAM_NAME_LIMIT = 64;
+    public static final int JOB_NAME_LIMIT_TEAM = 128;
+    public static final int JOB_NAME_LIMIT_NO_TEAM = TEAM_NAME_LIMIT + JOB_NAME_LIMIT_TEAM;
 
     /**
      * Makes sure that the given name is good as a job name.
@@ -3508,11 +3508,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                 }
                 value = getTeamManager().getTeamQualifiedJobName(value);
                 if (value.trim().length() > JOB_NAME_LIMIT_TEAM) {
-                    return FormValidation.error("Job name cannot exceed " + JOB_NAME_LIMIT_TEAM + "characters when team management is enabled. ");
+                    return FormValidation.error("Job name cannot exceed " + JOB_NAME_LIMIT_TEAM + " characters when team management is enabled. ");
                 }
             } else {
                 if (value.trim().length() > JOB_NAME_LIMIT_NO_TEAM) {
-                    return FormValidation.error("Job name cannot exceed " + JOB_NAME_LIMIT_NO_TEAM + "characters. ");
+                    return FormValidation.error("Job name cannot exceed " + JOB_NAME_LIMIT_NO_TEAM + " characters. ");
                 }
             }
             checkJobName(value);
@@ -3535,10 +3535,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         }
 
         try {
-            checkGoodName(value);
-            if (value.trim().length() > TEAM_NAME_LIMIT) {
-                throw new Failure("Team name cannot exceed "+TEAM_NAME_LIMIT+" characters.");
-            }
             if (isTeamManagementEnabled()) {
                 try {
                     getTeamManager().findTeam(value);

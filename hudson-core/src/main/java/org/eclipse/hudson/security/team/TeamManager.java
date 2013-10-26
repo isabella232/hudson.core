@@ -19,6 +19,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import hudson.BulkChange;
 import hudson.Util;
 import hudson.XmlFile;
+import hudson.model.Failure;
 import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.model.Job;
@@ -195,6 +196,18 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
     
     public Team createTeam(String teamName, String description, String customFolder) throws IOException, TeamAlreadyExistsException {
+        try {
+            Hudson.checkGoodName(teamName);
+            if (teamName.trim().length() > Hudson.TEAM_NAME_LIMIT) {
+                throw new Failure("Team name cannot exceed "+Hudson.TEAM_NAME_LIMIT+" characters.");
+            }
+        } catch (Failure ex) {
+            throw new IOException(ex.getMessage());
+        }
+        return internalCreateTeam(teamName, description, customFolder);
+    }
+    
+    private Team internalCreateTeam(String teamName, String description, String customFolder) throws IOException, TeamAlreadyExistsException {
         for (Team team : teams) {
             if (teamName.equals(team.getName())) {
                 throw new TeamAlreadyExistsException(teamName);
@@ -285,7 +298,15 @@ public final class TeamManager implements Saveable, AccessControlled {
             }
         }
         try {
-            createTeam(teamName, description, customFolder);
+            Hudson.checkGoodName(teamName);
+            if (teamName.trim().length() > Hudson.TEAM_NAME_LIMIT) {
+                throw new Failure("Team name cannot exceed "+Hudson.TEAM_NAME_LIMIT+" characters.");
+            }
+        } catch (Failure ex) {
+            return new TeamUtils.ErrorHttpResponse(ex.getMessage());
+        }
+        try {
+            internalCreateTeam(teamName, description, customFolder);
             return HttpResponses.ok();
         } catch (TeamAlreadyExistsException ex) {
             return new TeamUtils.ErrorHttpResponse(ex.getLocalizedMessage());

@@ -17,9 +17,11 @@
 package hudson.model;
 
 import hudson.Util;
+import static hudson.model.Hudson.JOB_NAME_LIMIT_NO_TEAM;
 import hudson.model.listeners.ItemListener;
 import hudson.security.AccessControlled;
 import hudson.util.CopyOnWriteMap;
+import hudson.util.FormValidation;
 import hudson.util.Function1;
 import hudson.util.IOUtils;
 import org.kohsuke.stapler.StaplerRequest;
@@ -140,8 +142,17 @@ public abstract class ItemGroupMixIn {
             Hudson.checkGoodName(name);
             name = name.trim();
             
-            if (hudson.isTeamManagementEnabled() && (name.indexOf(TeamManager.TEAM_SEPARATOR) != -1)) {
-                throw new Failure("The job name cannot contain" + TeamManager.TEAM_SEPARATOR + "when team management is enabled. ");
+            if (hudson.isTeamManagementEnabled()) {
+                if (name.indexOf(TeamManager.TEAM_SEPARATOR) != -1) {
+                    throw new Failure("The job name cannot contain" + TeamManager.TEAM_SEPARATOR + "when team management is enabled. ");
+                }
+                if (name.length() > Hudson.JOB_NAME_LIMIT_TEAM) {
+                    throw new Failure("Job name cannot exceed " + Hudson.JOB_NAME_LIMIT_TEAM + " characters when team management is enabled. ");
+                }
+            } else {
+                if (name.length() > Hudson.JOB_NAME_LIMIT_NO_TEAM) {
+                    throw new Failure("Job name cannot exceed " + Hudson.JOB_NAME_LIMIT_NO_TEAM + " characters. ");
+                }
             }
             
             // see if team requested
