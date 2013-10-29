@@ -138,10 +138,9 @@ public abstract class ItemGroupMixIn {
         String team = null;
 
         {   // check if the name looks good
-            Hudson hudson = Hudson.getInstance();
-            Hudson.checkGoodName(name);
-            name = name.trim();
+            name = Hudson.checkGoodJobName(name);
             
+            Hudson hudson = Hudson.getInstance();
             if (hudson.isTeamManagementEnabled()) {
                 if (name.indexOf(TeamManager.TEAM_SEPARATOR) != -1) {
                     throw new Failure("The job name cannot contain" + TeamManager.TEAM_SEPARATOR + "when team management is enabled. ");
@@ -313,6 +312,8 @@ public abstract class ItemGroupMixIn {
 
         String jobName = createInTeam(name, teamName);
         
+        jobName = Hudson.checkGoodJobName(jobName);
+        
         // place it as config.xml
         File configXml = Items.getConfigFile(getRootDirFor(jobName)).getFile();
         configXml.getParentFile().mkdirs();
@@ -346,6 +347,8 @@ public abstract class ItemGroupMixIn {
         acl.checkPermission(Job.CREATE);
         
         name = createInTeam(name, teamName);
+        
+        name = Hudson.checkGoodJobName(name);
 
         Hudson hudson = Hudson.getInstance();
         String existingJobName = name;

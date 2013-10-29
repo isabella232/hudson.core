@@ -2923,19 +2923,29 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     /**
-     * Makes sure that the given name is good as a job name.
-     *
-     * @return trimmed name if valid; throws ParseException if not
+     * Makes sure the given name is good as a job name.
+     * 
+     * @return trimmed name if good
+     * @throws Failure
      */
-    private String checkJobName(String name) throws Failure {
-        checkGoodName(name);
-        name = name.trim();
-        if (getItem(name) != null) {
-            throw new Failure(Messages.Hudson_JobAlreadyExists(name));
-        }
-        // looks good
-        return name;
-    }
+    public static String checkGoodJobName(String name) {
+       Hudson.checkGoodName(name);
+       name = name.trim();
+
+       if (Hudson.getInstance().isTeamManagementEnabled()) {
+           if (name.indexOf(TeamManager.TEAM_SEPARATOR) != -1) {
+               throw new Failure("The job name cannot contain " + TeamManager.TEAM_SEPARATOR + "when team management is enabled. ");
+           }
+           if (name.length() > Hudson.JOB_NAME_LIMIT_TEAM) {
+               throw new Failure("Job name cannot exceed " + Hudson.JOB_NAME_LIMIT_TEAM + " characters when team management is enabled. ");
+           }
+       } else {
+           if (name.length() > Hudson.JOB_NAME_LIMIT_NO_TEAM) {
+               throw new Failure("Job name cannot exceed " + Hudson.JOB_NAME_LIMIT_NO_TEAM + " characters. ");
+           }
+       }
+       return name;
+   }
 
     private static String toPrintableName(String name) {
         StringBuilder printableName = new StringBuilder();
@@ -3487,7 +3497,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     
     public static final int TEAM_NAME_LIMIT = 64;
     public static final int JOB_NAME_LIMIT_TEAM = 128;
-    public static final int JOB_NAME_LIMIT_NO_TEAM = TEAM_NAME_LIMIT + JOB_NAME_LIMIT_TEAM;
+    public static final int JOB_NAME_LIMIT_NO_TEAM = TEAM_NAME_LIMIT + JOB_NAME_LIMIT_TEAM + 1;
 
     /**
      * Makes sure that the given name is good as a job name.
@@ -3502,20 +3512,10 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         }
 
         try {
-            if (isTeamManagementEnabled()){
-                if (value.indexOf(TeamManager.TEAM_SEPARATOR) != -1) {
-                    return FormValidation.error("The job name cannot contain" + TeamManager.TEAM_SEPARATOR + "when team management is enabled. ");
-                }
-                value = getTeamManager().getTeamQualifiedJobName(value);
-                if (value.trim().length() > JOB_NAME_LIMIT_TEAM) {
-                    return FormValidation.error("Job name cannot exceed " + JOB_NAME_LIMIT_TEAM + " characters when team management is enabled. ");
-                }
-            } else {
-                if (value.trim().length() > JOB_NAME_LIMIT_NO_TEAM) {
-                    return FormValidation.error("Job name cannot exceed " + JOB_NAME_LIMIT_NO_TEAM + " characters. ");
-                }
+            String name = checkGoodJobName(value);
+            if (getItem(name) != null) {
+                throw new Failure(Messages.Hudson_JobAlreadyExists(name));
             }
-            checkJobName(value);
             return FormValidation.ok();
         } catch (Failure e) {
             return FormValidation.error(e.getMessage());

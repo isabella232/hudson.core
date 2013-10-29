@@ -1395,6 +1395,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             String newName = req.getParameter("name");
             if (newName != null && !newName.equals(getEditableName())) {
                 
+                // check this error early to avoid HTTP response splitting.
+                newName = Hudson.checkGoodJobName(newName);
+                
                 if (Hudson.getInstance().isTeamManagementEnabled()) {
                     // Make the name qualified in the same team before confirm
                     TeamManager teamManager = Hudson.getInstance().getTeamManager();
@@ -1405,8 +1408,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                     }
                 }
 
-                // check this error early to avoid HTTP response splitting.
-                Hudson.checkGoodName(newName);
                 rsp.sendRedirect("rename?newName=" + URLEncoder.encode(newName, "UTF-8"));
             } else {
                 rsp.sendRedirect(".");
@@ -1519,8 +1520,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         checkPermission(DELETE);
 
         String newName = req.getParameter("newName");
-        Hudson.checkGoodName(newName);
-
+        String checkName = newName;
+        
         if (isBuilding()) {
             // redirect to page explaining that we can't rename now
             rsp.sendRedirect("rename?newName=" + URLEncoder.encode(newName, "UTF-8"));
@@ -1533,13 +1534,20 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             Team team = teamManager.findJobOwnerTeam(getName());
             if (team != null) {
                 try {
-                    // newName is already a qualified job name
+                    // newName must already be a qualified job name
+                    if (!teamManager.isQualifiedJobName(team, newName)) {
+                        throw new Failure("Job name "+newName+" is improperly qualified");
+                    }
+                    checkName = teamManager.getUnqualifiedJobName(team, newName);
+                    
                     teamManager.addJob(team, newName);
                 } catch (TeamManager.TeamNotFoundException ex) {
                     // Can't happen with non-null team
                 }
             }
         }
+        
+        Hudson.checkGoodJobName(checkName);
 
         renameTo(newName);
         // send to the new job page

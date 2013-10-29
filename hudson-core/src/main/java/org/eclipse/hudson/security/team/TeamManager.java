@@ -418,7 +418,7 @@ public final class TeamManager implements Saveable, AccessControlled {
 
     public HttpResponse doMoveJob(@QueryParameter String jobName, @QueryParameter String teamName) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to remove team member");
+            return new TeamUtils.ErrorHttpResponse("No permission to move job");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Team name required.");
@@ -442,7 +442,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         if (oldTeam == newTeam){
             return new TeamUtils.ErrorHttpResponse(jobName + " is already in team " + oldTeam.getName());
         }
-
+        
         Item item = Hudson.getInstance().getItem(jobName);
         Job job;
         if (item instanceof Job<?, ?>) {
@@ -504,6 +504,15 @@ public final class TeamManager implements Saveable, AccessControlled {
             if ((originalName == null) || "".equals(originalName.trim())) {
                 unqualifiedJobName = getUnqualifiedJobName(oldTeam, job.getName());
             }
+            unqualifiedJobName = unqualifiedJobName.trim();
+            // Deal with public job name created with team disabled corner case.
+            if (isPublicTeam(oldTeam)) {
+                // Job name might be too long or contain team separator
+                if (unqualifiedJobName.length() > Hudson.JOB_NAME_LIMIT_TEAM) {
+                    unqualifiedJobName = unqualifiedJobName.substring(0, Hudson.JOB_NAME_LIMIT_TEAM);
+                }
+                unqualifiedJobName = unqualifiedJobName.replace(TEAM_SEPARATOR, "_");
+            }
             String qualifiedNewJobName = getTeamQualifiedJobName(newTeam, unqualifiedJobName);
 
             // Add the new job, rename before removing the old job
@@ -533,7 +542,14 @@ public final class TeamManager implements Saveable, AccessControlled {
         return qualifiedNewJobName;
     }
 
-    private String getUnqualifiedJobName(Team team, String jobName) {
+    /**
+     * Strip team qualification from job name.
+     * 
+     * @param team must not be null
+     * @param jobName qualified job name
+     * @return unqualified job name
+     */
+    public String getUnqualifiedJobName(Team team, String jobName) {
         if (!Team.PUBLIC_TEAM_NAME.equals(team.getName()) && jobName.startsWith(team.getName() + TEAM_SEPARATOR)) {
             return jobName.substring(team.getName().length() + 1);
         }
@@ -987,6 +1003,26 @@ public final class TeamManager implements Saveable, AccessControlled {
             sb.append("_" + postfix++);
         }
         return sb.toString();
+    }
+    
+    /**
+     * Check that jobName is properly qualified for the team.
+     * The check fails if:
+     * <pre>
+     *  - The team is public but the name is qualified (contains a '.')
+     *  - The team is not public, but the name is not qualified
+     *    by team name
+     * </pre>
+     * 
+     * @param team must not be null
+     * @param jobName
+     * @return true if check succeeds
+     */
+    public boolean isQualifiedJobName(Team team, String jobName) {
+        if (isPublicTeam(team) && jobName.indexOf('.') >= 0) {
+            return false;
+        }
+        return jobName.startsWith(team.getName()+TEAM_SEPARATOR);
     }
 
     /**
