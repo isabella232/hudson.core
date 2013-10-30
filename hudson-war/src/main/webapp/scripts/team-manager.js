@@ -142,16 +142,16 @@ function  createTeamButtonAction() {
         modal: true,
         buttons: {
             'Create': function() {
-                var teamName = jQuery("#teamName").val();
+                var teamName = jQuery.trim(jQuery("#teamName").val());
                 var teamDesc = jQuery("#teamDesc").val();
                 var teamFolder = jQuery("#teamCustomFolder").val();
-                if (!/^[a-zA-Z0-9]+$/.test(teamName)) {
+                if (!/^[-_a-zA-Z0-9]+$/.test(teamName)) {
                    showMessage("Only Alpha-Numeric characters allowed in team name.", true, jQuery('#teamAddMsg'));
-                } else if ($.trim(teamName).length > 64) {
+                } else if (teamName.length > 64) {
                     // Must be same as Hudson.TEAM_NAME_LIMIT
                     showMessage("Team name may not exceed 64 characters.", true, jQuery('#teamAddMsg'));
                 } else {
-                    createTeam(jQuery.trim(teamName), jQuery.trim(teamDesc), jQuery.trim(teamFolder));
+                    createTeam(teamName, jQuery.trim(teamDesc), jQuery.trim(teamFolder));
                 }
             },
             Cancel: function() {
