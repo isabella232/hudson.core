@@ -24,6 +24,7 @@ import hudson.util.CopyOnWriteMap;
 import hudson.util.FormValidation;
 import hudson.util.Function1;
 import hudson.util.IOUtils;
+import hudson.util.XmlUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -34,11 +35,15 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import org.eclipse.hudson.security.team.Team;
 import org.eclipse.hudson.security.team.TeamManager;
 import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**
  * Defines a bunch of static methods to be used as a "mix-in" for
@@ -247,9 +252,25 @@ public abstract class ItemGroupMixIn {
         acl.checkPermission(Job.CREATE);
 
         T result = (T) createProject(src.getDescriptor(), name, teamName, false);
-
+        
+        File jobConfigFile = Items.getConfigFile(result).getFile();
+         
         // copy config
-        Util.copyFile(Items.getConfigFile(src).getFile(), Items.getConfigFile(result).getFile());
+        Util.copyFile(Items.getConfigFile(src).getFile(), jobConfigFile);
+        
+        try {
+             Document  jobConfigDoc = XmlUtils.parseXmlFile(jobConfigFile);
+            if (XmlUtils.hasElement(jobConfigDoc, "cascadingChildrenNames")) {
+                XmlUtils.deleteElement(jobConfigDoc, "cascadingChildrenNames");
+                XmlUtils.writeXmlFile(jobConfigDoc, jobConfigFile);
+            }
+        } catch (ParserConfigurationException ex) {
+            logger.warn(ex.getLocalizedMessage());
+        } catch (SAXException ex) {
+            logger.warn(ex.getLocalizedMessage());
+        } catch (TransformerException ex) {
+            logger.warn(ex.getLocalizedMessage());
+        }
 
         // reload from the new config
         result = (T) Items.load(parent, result.getRootDir());

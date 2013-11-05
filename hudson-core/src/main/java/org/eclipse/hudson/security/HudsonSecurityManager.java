@@ -29,6 +29,7 @@ import hudson.model.listeners.SaveableListener;
 import hudson.security.*;
 import hudson.util.TextFile;
 import hudson.util.XStream2;
+import hudson.util.XmlUtils;
 import java.io.File;
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -439,24 +440,24 @@ public class HudsonSecurityManager implements Saveable {
                 return false;
             }
 
-            Document globalConfigDoc = parseXmlFile(globalConfigFile);
+            Document globalConfigDoc = XmlUtils.parseXmlFile(globalConfigFile);
 
-            if (isSecuritySet(globalConfigDoc)) {
+            if (XmlUtils.hasElement(globalConfigDoc, "useSecurity")) {
                 DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                 Document securityConfigDoc = builder.newDocument();
 
                 Element root = securityConfigDoc.createElement("hudsonSecurityManager");
                 securityConfigDoc.appendChild(root);
-                moveElement(globalConfigDoc, securityConfigDoc, root, "useSecurity");
-                moveElement(globalConfigDoc, securityConfigDoc, root, "markupFormatter");
-                moveElement(globalConfigDoc, securityConfigDoc, root, "authorizationStrategy");
-                moveElement(globalConfigDoc, securityConfigDoc, root, "securityRealm");
+                XmlUtils.moveElement(globalConfigDoc, securityConfigDoc, root, "useSecurity");
+                XmlUtils.moveElement(globalConfigDoc, securityConfigDoc, root, "markupFormatter");
+                XmlUtils.moveElement(globalConfigDoc, securityConfigDoc, root, "authorizationStrategy");
+                XmlUtils.moveElement(globalConfigDoc, securityConfigDoc, root, "securityRealm");
 
                 File securityConfigFile = new File(hudsonHome, securityConfigFileName);
                 securityConfigFile.createNewFile();
-                writeXmlFile(securityConfigDoc, securityConfigFile);
+                XmlUtils.writeXmlFile(securityConfigDoc, securityConfigFile);
 
-                writeXmlFile(globalConfigDoc, globalConfigFile);
+                XmlUtils.writeXmlFile(globalConfigDoc, globalConfigFile);
                 return true;
             } else {
                 return false;
@@ -466,38 +467,5 @@ public class HudsonSecurityManager implements Saveable {
             exc.printStackTrace();
             return false;
         }
-    }
-
-    private void moveElement(Document fromDoc, Document toDoc, Element root, String elementName) {
-        NodeList list = fromDoc.getElementsByTagName(elementName);
-        if ((list != null) && (list.getLength() > 0)) {
-            Element element = (Element) list.item(0);
-            Node node = toDoc.importNode(element, true);
-            root.appendChild(node);
-            element.getParentNode().removeChild(element);
-        }
-    }
-
-    private Document parseXmlFile(File xmlFile) throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setValidating(false);
-
-        Document doc = factory.newDocumentBuilder().parse(xmlFile);
-        return doc;
-    }
-
-    private void writeXmlFile(Document doc, File file) throws TransformerConfigurationException, TransformerException {
-        Source source = new DOMSource(doc);
-        Result result = new StreamResult(file);
-
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-        transformer.transform(source, result);
-    }
-
-    private boolean isSecuritySet(Document globalConfigDoc) {
-        NodeList list = globalConfigDoc.getElementsByTagName("useSecurity");
-        return (list != null) && (list.getLength() > 0);
     }
 }
