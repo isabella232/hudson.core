@@ -146,7 +146,7 @@ function  createTeamButtonAction() {
                 var teamDesc = jQuery("#teamDesc").val();
                 var teamFolder = jQuery("#teamCustomFolder").val();
                 if (!/^[-_a-zA-Z0-9]+$/.test(teamName)) {
-                   showMessage("Only Alpha-Numeric characters allowed in team name.", true, jQuery('#teamAddMsg'));
+                   showMessage("Only alphanumeric characters, - or _ allowed in team name.", true, jQuery('#teamAddMsg'));
                 } else if (teamName.length > 64) {
                     // Must be same as Hudson.TEAM_NAME_LIMIT
                     showMessage("Team name may not exceed 64 characters.", true, jQuery('#teamAddMsg'));

@@ -12,6 +12,7 @@
 package hudson.cli;
 
 import hudson.Extension;
+import hudson.model.Failure;
 import hudson.model.Hudson;
 import java.io.File;
 import org.eclipse.hudson.security.team.TeamManager;
@@ -51,11 +52,11 @@ public class CreateTeamCommand extends CLICommand {
             return -1;
         }
         
-        for (int i = 0; i < team.length(); i++) {
-            if (!isAlphaNumeric(team.charAt(i))) {
-                stderr.println("Only Alpha-Numeric characters allowed in team name");
-                return -1;
-            }
+        try {
+            Hudson.checkGoodTeamName(team);
+        } catch (Failure ex) {
+            stderr.println(ex.getMessage());
+            return -1;
         }
         
         if (description == null) {
@@ -82,9 +83,5 @@ public class CreateTeamCommand extends CLICommand {
         }
         
         return 0;
-    }
-    
-    private boolean isAlphaNumeric(char c) {
-        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
     }
 }

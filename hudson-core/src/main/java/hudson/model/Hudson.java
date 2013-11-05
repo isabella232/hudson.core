@@ -2921,7 +2921,17 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
         // looks good
     }
-
+    
+    private static final Pattern TEAM_NAME_PATTERN = Pattern.compile("^[-_a-zA-Z0-9]+$");
+    
+    public static String checkGoodTeamName(String name) {
+        name = name.trim();
+        if (!TEAM_NAME_PATTERN.matcher(name).find()) {
+            throw new Failure("Only alphanumeric characters, - or _ allowed in team name.");
+        }
+        return name;
+    }
+    
     /**
      * Makes sure the given name is good as a job name.
      * 
@@ -2934,7 +2944,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
        if (Hudson.getInstance().isTeamManagementEnabled()) {
            if (name.indexOf(TeamManager.TEAM_SEPARATOR) != -1) {
-               throw new Failure("The job name cannot contain " + TeamManager.TEAM_SEPARATOR + "when team management is enabled. ");
+               throw new Failure("The job name cannot contain " + TeamManager.TEAM_SEPARATOR + "when team management is enabled.");
            }
            if (name.length() > Hudson.JOB_NAME_LIMIT_TEAM) {
                throw new Failure("Job name cannot exceed " + Hudson.JOB_NAME_LIMIT_TEAM + " characters when team management is enabled. ");

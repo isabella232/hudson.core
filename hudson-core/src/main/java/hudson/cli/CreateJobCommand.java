@@ -98,13 +98,8 @@ public class CreateJobCommand extends CLICommand {
     }
     
     public static boolean isGoodName(String name, PrintStream stderr) {
-        if (Hudson.getInstance().isTeamManagementEnabled() && name.contains(TeamManager.TEAM_SEPARATOR)) {
-            stderr.println("The job name cannot contain \"" + TeamManager.TEAM_SEPARATOR + "\" when team management is enabled.");
-            return false;
-        }
-        
         try {
-            Hudson.checkGoodName(name);
+            Hudson.checkGoodJobName(name);
         } catch (Failure e) {
             stderr.println(e.getMessage());
             return false;

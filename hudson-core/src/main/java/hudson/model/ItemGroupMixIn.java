@@ -141,18 +141,6 @@ public abstract class ItemGroupMixIn {
             name = Hudson.checkGoodJobName(name);
             
             Hudson hudson = Hudson.getInstance();
-            if (hudson.isTeamManagementEnabled()) {
-                if (name.indexOf(TeamManager.TEAM_SEPARATOR) != -1) {
-                    throw new Failure("The job name cannot contain" + TeamManager.TEAM_SEPARATOR + "when team management is enabled. ");
-                }
-                if (name.length() > Hudson.JOB_NAME_LIMIT_TEAM) {
-                    throw new Failure("Job name cannot exceed " + Hudson.JOB_NAME_LIMIT_TEAM + " characters when team management is enabled. ");
-                }
-            } else {
-                if (name.length() > Hudson.JOB_NAME_LIMIT_NO_TEAM) {
-                    throw new Failure("Job name cannot exceed " + Hudson.JOB_NAME_LIMIT_NO_TEAM + " characters. ");
-                }
-            }
             
             // see if team requested
             Team requestedTeam = null;
@@ -275,6 +263,8 @@ public abstract class ItemGroupMixIn {
     }
 
     private String createInTeam(String name, String teamName) throws IOException {
+        name = Hudson.checkGoodJobName(name);
+        
         // To be created in a specific team, a job must first be added
         // to the team, ensuring that Hudson will find the correct rootDir.
         TeamManager teamManager = Hudson.getInstance().getTeamManager();
@@ -309,10 +299,8 @@ public abstract class ItemGroupMixIn {
     
     public synchronized TopLevelItem createProjectFromXML(String name, String teamName, InputStream xml) throws IOException {
         acl.checkPermission(Job.CREATE);
-
-        String jobName = createInTeam(name, teamName);
         
-        jobName = Hudson.checkGoodJobName(jobName);
+        String jobName = createInTeam(name, teamName);
         
         // place it as config.xml
         File configXml = Items.getConfigFile(getRootDirFor(jobName)).getFile();
@@ -347,8 +335,6 @@ public abstract class ItemGroupMixIn {
         acl.checkPermission(Job.CREATE);
         
         name = createInTeam(name, teamName);
-        
-        name = Hudson.checkGoodJobName(name);
 
         Hudson hudson = Hudson.getInstance();
         String existingJobName = name;
