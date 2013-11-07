@@ -44,6 +44,7 @@ import hudson.security.*;
 import hudson.tasks.LogRotator;
 import hudson.util.BuildHistoryList;
 import hudson.util.CopyOnWriteList;
+import hudson.util.DescribableList;
 
 import hudson.util.IOException2;
 import hudson.util.RunList;
@@ -56,6 +57,7 @@ import java.awt.Color;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectStreamException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URLEncoder;
@@ -64,6 +66,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +97,9 @@ import org.kohsuke.stapler.export.Exported;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import org.eclipse.hudson.graph.*;
+import org.eclipse.hudson.model.project.property.BooleanProjectProperty;
+import org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty;
+import org.eclipse.hudson.model.project.property.DescribableListProjectProperty;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.team.Team;
 import org.eclipse.hudson.security.team.TeamManager;
@@ -195,6 +201,41 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
     };
 
+    protected Job(ItemGroup parent, String name) {
+        super(parent, name);
+    }
+    
+    //Bug Fix: 406889 - Non overriden job properties or properties with no values should not be written to config.xml
+    Object writeReplace() throws ObjectStreamException, IOException {
+        for (Iterator<Map.Entry<String, IProjectProperty>> it = jobProperties.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<String, IProjectProperty> entry = it.next();
+            IProjectProperty projProperty = entry.getValue();
+            if (!projProperty.isOverridden()) {
+                if (cascadingProject != null) {
+                    it.remove();
+                } else {
+                    if ((projProperty.getValue() == null) || (projProperty.getValue() == projProperty.getDefaultValue())) {
+                        it.remove();
+                    } else {
+                        if (projProperty instanceof CopyOnWriteListProjectProperty) {
+                            CopyOnWriteList list = (CopyOnWriteList) projProperty.getValue();
+                            if (list.isEmpty()) {
+                                it.remove();
+                            }
+                        }
+                        if (projProperty instanceof DescribableListProjectProperty) {
+                            DescribableList list = (DescribableList) projProperty.getValue();
+                            if (list.isEmpty()) {
+                                it.remove();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return this;
+    }
+
     /**
      * Set true if save operation for config is permitted, false - otherwise .
      *
@@ -213,9 +254,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         return allowSave.get();
     }
 
-    protected Job(ItemGroup parent, String name) {
-        super(parent, name);
-    }
 
     /**
      * {@inheritDoc}
