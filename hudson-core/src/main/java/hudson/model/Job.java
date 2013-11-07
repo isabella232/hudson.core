@@ -66,14 +66,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import net.sf.json.JSONException;
 
@@ -97,7 +96,6 @@ import org.kohsuke.stapler.export.Exported;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import org.eclipse.hudson.graph.*;
-import org.eclipse.hudson.model.project.property.BooleanProjectProperty;
 import org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty;
 import org.eclipse.hudson.model.project.property.DescribableListProjectProperty;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
@@ -332,6 +330,24 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     public void removeCascadingChild(String cascadingChildName) throws IOException {
         cascadingChildrenNames.remove(cascadingChildName);
         save();
+    }
+    
+    //Cleanup any cascading mess (called during Hudson startup)
+    public void cleanCascading() throws IOException{
+        Set<String> cascadingChildrenToRemove = new HashSet();
+        for (String cascadingChild : getCascadingChildrenNames()) {
+            TopLevelItem tlItem = Hudson.getInstance().getItem(cascadingChild);
+            if ((tlItem != null) && getClass().isAssignableFrom(tlItem.getClass())) {
+                JobT cascadingChildJob = (JobT) tlItem;
+                if (cascadingChildJob.getCascadingProject() != this) {
+                   cascadingChildrenToRemove.add(cascadingChild);
+                }
+            }else{
+                cascadingChildrenToRemove.add(cascadingChild);
+            }
+        }
+        cascadingChildrenNames.removeAll(cascadingChildrenToRemove);
+        save(); 
     }
 
     /**

@@ -2477,6 +2477,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
         g.requires(JOB_LOADED).add("Finalizing set up", new Executable() {
             public void run(Reactor session) throws Exception {
+                
+                for (AbstractProject job : Hudson.getInstance().getAllItems(AbstractProject.class)) {
+                    job.cleanCascading();
+                }
+                
                 rebuildDependencyGraph();
 
                 // recompute label objects - populates the labels mapping.
