@@ -17,14 +17,14 @@
 hudsonRules["A.reset-button"] = function(e) {
     e.onclick = function() {
         new Ajax.Request(this.getAttribute("resetURL"), {
-                method : 'get',
-                onSuccess : function(x) {
-                    location.reload(true);
-                },
-                onFailure : function(x) {
+            method: 'get',
+            onSuccess: function(x) {
+                location.reload(true);
+            },
+            onFailure: function(x) {
 
-                }
-            });
+            }
+        });
         return false;
     }
     e.tabIndex = 9999; // make help link unnavigable from keyboard
@@ -37,13 +37,14 @@ function getJobUrl() {
 }
 
 function onCascadingProjectUpdated() {
-    if(isRunAsTest) return;
+    if (isRunAsTest)
+        return;
     jQuery('select[name=cascadingProjectName]').change(function() {
-        var jobUrl = getJobUrl()+'/updateCascadingProject';
+        var jobUrl = getJobUrl() + '/updateCascadingProject';
         var cascadingProject = jQuery(this).val();
-        new Ajax.Request(jobUrl+'?projectName='+cascadingProject, {
-            method : 'get',
-            onSuccess : function(x) {
+        new Ajax.Request(jobUrl + '?projectName=' + cascadingProject, {
+            method: 'get',
+            onSuccess: function(x) {
                 location.reload(true);
             }
         });
@@ -51,34 +52,51 @@ function onCascadingProjectUpdated() {
 }
 
 function onProjectPropertyChanged() {
-    if(isRunAsTest) return;
+    if (isRunAsTest)
+        return;
     var modify = function() {
-        var ref = jQuery(this).attr('id');
-        var cascadingProperty = '';
-        if (ref != '') {
-            cascadingProperty = jQuery(this).attr('name');
-        } else {
-            var parent = jQuery(this).parents('tr');
-            while (parent.attr("nameref") == undefined && parent.size() !== 0) {
-                parent = jQuery(parent).parents('tr');
-            }
-            var childRef = parent.attr("nameref");
-            cascadingProperty = jQuery('#'+childRef).attr('name');
-        }
-        if(cascadingProperty !== undefined) {
-            var jobUrl = getJobUrl()+'/modifyCascadingProperty?propertyName='+cascadingProperty;
+        var cascadingProperty = findCascadingProperty(this);
+        if (cascadingProperty !== undefined) {
+            var jobUrl = getJobUrl() + '/modifyCascadingProperty?propertyName=' + cascadingProperty;
             new Ajax.Request(jobUrl, {
-                method : 'get'
+                method: 'get'
             });
         }
     };
+
     jQuery("form[action=configSubmit] input[type=checkbox]").live('click', modify);
-    jQuery("form[action=configSubmit] input[type!=checkbox]").live('change', modify);
+    jQuery("form[action=configSubmit] input[type=text]").live('change', modify);
+    jQuery("form[action=configSubmit] input[type=button]").live('click', modify);
     jQuery("form[action=configSubmit] .setting-input").live('change', modify);
     jQuery("form[action=configSubmit] button").live('click', modify);
 }
 
-jQuery(document).ready(function(){
+function findCascadingProperty(start) {
+    var trStart = jQuery(start).closest("tr[ref]");
+    if (trStart.length > 0) {
+        if (!jQuery(trStart).closest("table").hasClass("configure")) {
+            return findCascadingProperty(jQuery(trStart).parent() );
+        }
+        checkBox = jQuery(trStart).find("input[type=checkbox]").first();
+    } else {
+        trStart = jQuery(start).closest("tr[nameref]");
+        var nameref = jQuery(trStart).attr("nameref");
+        trStart = jQuery(trStart).siblings("[ref=" + nameref + "]");
+        trStart = jQuery(trStart).last();
+        if ((trStart === undefined) || (trStart.length == 0)) {
+            return;
+        }
+        if (!jQuery(trStart).closest("table").hasClass("configure")) {
+            return findCascadingProperty(jQuery(trStart).parent());
+        }
+        checkBox = jQuery(trStart).find("input[type=checkbox]").first();
+    }
+    if (checkBox !== undefined) {
+         return jQuery(checkBox).attr('name');
+    }
+}
+
+jQuery(document).ready(function() {
     onCascadingProjectUpdated();
     onProjectPropertyChanged();
 });
