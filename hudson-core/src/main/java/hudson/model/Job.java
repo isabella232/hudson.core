@@ -346,8 +346,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 cascadingChildrenToRemove.add(cascadingChild);
             }
         }
-        cascadingChildrenNames.removeAll(cascadingChildrenToRemove);
-        save(); 
+        if (!cascadingChildrenToRemove.isEmpty()) {
+            cascadingChildrenNames.removeAll(cascadingChildrenToRemove);
+            save();
+        }
     }
 
     /**
@@ -388,9 +390,6 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
         TextFile f = getNextBuildNumberFile();
         if (f.exists()) {
-            // starting 1.28, we store nextBuildNumber in a separate file.
-            // but old Hudson didn't do it, so if the file doesn't exist,
-            // assume that nextBuildNumber was read from config.xml
             try {
                 synchronized (this) {
                     this.nextBuildNumber = Integer.parseInt(f.readTrim());
@@ -399,9 +398,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 throw new IOException2(f + " doesn't contain a number", e);
             }
         } else {
-            // From the old Hudson, or doCreateItem. Create this file now.
             saveNextBuildNumber();
-            save(); // and delete it from the config.xml
         }
 
         if (properties == null) // didn't exist < 1.72

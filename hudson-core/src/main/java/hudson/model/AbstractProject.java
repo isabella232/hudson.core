@@ -366,21 +366,21 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
 
     void convertBlockBuildWhenUpstreamBuildingProperty() throws IOException {
         if (null == getProperty(BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME)) {
-            setBlockBuildWhenUpstreamBuilding(blockBuildWhenUpstreamBuilding);
+            setBlockBuildWhenUpstreamBuilding(blockBuildWhenUpstreamBuilding, false);
             blockBuildWhenUpstreamBuilding = false;
         }
     }
 
     void convertBlockBuildWhenDownstreamBuildingProperty() throws IOException {
         if (null == getProperty(BLOCK_BUILD_WHEN_DOWNSTREAM_BUILDING_PROPERTY_NAME)) {
-            setBlockBuildWhenDownstreamBuilding(blockBuildWhenDownstreamBuilding);
+            setBlockBuildWhenDownstreamBuilding(blockBuildWhenDownstreamBuilding, false);
             blockBuildWhenDownstreamBuilding = false;
         }
     }
 
     void convertConcurrentBuildProperty() throws IOException {
         if (null == getProperty(CONCURRENT_BUILD_PROPERTY_NAME)) {
-            setConcurrentBuild(concurrentBuild);
+            setConcurrentBuild(concurrentBuild, false);
             concurrentBuild = false;
         }
     }
@@ -394,7 +394,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
 
     void convertQuietPeriodProperty() throws IOException {
         if (null != quietPeriod && null == getProperty(QUIET_PERIOD_PROPERTY_NAME)) {
-            setQuietPeriod(quietPeriod);
+            setQuietPeriod(quietPeriod, false);
             quietPeriod = null;
         }
     }
@@ -415,7 +415,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
 
     void convertScmProperty() throws IOException {
         if (null != scm && null == getProperty(SCM_PROPERTY_NAME)) {
-            setScm(scm);
+            setScm(scm, false);
             scm = null;
         }
     }
@@ -460,10 +460,16 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
         return Hudson.CONCURRENT_BUILD
                 && CascadingUtil.getBooleanProjectProperty(this, CONCURRENT_BUILD_PROPERTY_NAME).getValue();
     }
-
-    public void setConcurrentBuild(boolean b) throws IOException {
+    
+    void setConcurrentBuild(boolean b) throws IOException {
+         setConcurrentBuild(b, true);
+    }
+    
+    void setConcurrentBuild(boolean b, boolean doSave) throws IOException {
         CascadingUtil.getBooleanProjectProperty(this, CONCURRENT_BUILD_PROPERTY_NAME).setValue(b);
-        save();
+        if (doSave) {
+            save();
+        }
     }
 
     public boolean isCleanWorkspaceRequired() {
@@ -704,9 +710,16 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      * @param seconds quiet period
      * @throws IOException if any.
      */
+    
     public void setQuietPeriod(Integer seconds) throws IOException {
+        setQuietPeriod(seconds, true);
+    }
+    
+    void setQuietPeriod(Integer seconds, boolean doSave) throws IOException {
         CascadingUtil.getIntegerProjectProperty(this, QUIET_PERIOD_PROPERTY_NAME).setValue(seconds);
-        save();
+        if (doSave) {
+            save();
+        }
     }
 
     public int getScmCheckoutRetryCount() {
@@ -787,20 +800,32 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
         return CascadingUtil.getBooleanProjectProperty(this,
                 BLOCK_BUILD_WHEN_DOWNSTREAM_BUILDING_PROPERTY_NAME).getValue();
     }
+    
+    void setBlockBuildWhenDownstreamBuilding(boolean b, boolean doSave) throws IOException {
+        CascadingUtil.getBooleanProjectProperty(this, BLOCK_BUILD_WHEN_DOWNSTREAM_BUILDING_PROPERTY_NAME).setValue(b);
+        if (doSave) {
+            save();
+        }
+    }
 
     public void setBlockBuildWhenDownstreamBuilding(boolean b) throws IOException {
-        CascadingUtil.getBooleanProjectProperty(this, BLOCK_BUILD_WHEN_DOWNSTREAM_BUILDING_PROPERTY_NAME).setValue(b);
-        save();
+        setBlockBuildWhenDownstreamBuilding(b, true);
     }
 
     public boolean blockBuildWhenUpstreamBuilding() {
         return CascadingUtil.getBooleanProjectProperty(this,
                 BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME).getValue();
     }
+    
+    void setBlockBuildWhenUpstreamBuilding(boolean b, boolean doSave) throws IOException {
+        CascadingUtil.getBooleanProjectProperty(this, BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME).setValue(b);
+        if (doSave) {
+            save();
+        }
+    }
 
     public void setBlockBuildWhenUpstreamBuilding(boolean b) throws IOException {
-        CascadingUtil.getBooleanProjectProperty(this, BLOCK_BUILD_WHEN_UPSTREAM_BUILDING_PROPERTY_NAME).setValue(b);
-        save();
+        setBlockBuildWhenUpstreamBuilding(b, true);
     }
 
     public boolean isDisabled() {
@@ -1682,11 +1707,18 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     public SCM getScm() {
         return CascadingUtil.getScmProjectProperty(this, SCM_PROPERTY_NAME).getValue();
     }
+    
+    @SuppressWarnings("unchecked")
+    void setScm(SCM scm, boolean doSave) throws IOException {
+        CascadingUtil.getScmProjectProperty(this, SCM_PROPERTY_NAME).setValue(scm);
+        if (doSave) {
+            save();
+        }
+    }
 
     @SuppressWarnings("unchecked")
     public void setScm(SCM scm) throws IOException {
-        CascadingUtil.getScmProjectProperty(this, SCM_PROPERTY_NAME).setValue(scm);
-        save();
+         setScm(scm, true);
     }
 
     /**
