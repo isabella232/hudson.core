@@ -46,4 +46,15 @@ public class SCMProjectProperty extends BaseProjectProperty<SCM> {
     protected boolean returnOriginalValue() {
         return isOverridden() || (null != getOriginalValue() && !getDefaultValue().equals(getOriginalValue()));
     }
+    
+    @Override
+    protected boolean updateOriginalValue(SCM value, SCM cascadingValue) {
+        if ((value instanceof NullSCM) && !(cascadingValue instanceof NullSCM)) {
+            value = null;
+            clearOriginalValue(value);
+            return false;
+        } else {
+            return super.updateOriginalValue(value, cascadingValue);
+        }
+    }
 }

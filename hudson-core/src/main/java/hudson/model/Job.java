@@ -742,9 +742,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         if (null != cascadingJobProperties && !cascadingJobProperties.isEmpty()) {
             for (String key : cascadingJobProperties) {
                 IProjectProperty projectProperty = CascadingUtil.getProjectProperty(this, key);
-                Object value = projectProperty.getValue();
-                if (null != value) {
-                    result.add(value);
+                if ((projectProperty != null) && (projectProperty.getValue() != null)) {
+                    result.add(projectProperty.getValue());
                 }
             }
         }
