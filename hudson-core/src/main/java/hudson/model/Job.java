@@ -204,35 +204,35 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
     
     //Bug Fix: 406889 - Non overriden job properties or properties with no values should not be written to config.xml
-    Object writeReplace() throws ObjectStreamException, IOException {
-        for (Iterator<Map.Entry<String, IProjectProperty>> it = jobProperties.entrySet().iterator(); it.hasNext();) {
-            Map.Entry<String, IProjectProperty> entry = it.next();
-            IProjectProperty projProperty = entry.getValue();
-            if (!projProperty.isOverridden()) {
-                if (cascadingProject != null) {
-                    it.remove();
-                } else {
-                    if ((projProperty.getValue() == null) || (projProperty.getValue() == projProperty.getDefaultValue())) {
-                        it.remove();
-                    } else {
-                        if (projProperty instanceof CopyOnWriteListProjectProperty) {
-                            CopyOnWriteList list = (CopyOnWriteList) projProperty.getValue();
-                            if (list.isEmpty()) {
-                                it.remove();
-                            }
-                        }
-                        if (projProperty instanceof DescribableListProjectProperty) {
-                            DescribableList list = (DescribableList) projProperty.getValue();
-                            if (list.isEmpty()) {
-                                it.remove();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return this;
-    }
+//    Object writeReplace() throws ObjectStreamException, IOException {
+//        for (Iterator<Map.Entry<String, IProjectProperty>> it = jobProperties.entrySet().iterator(); it.hasNext();) {
+//            Map.Entry<String, IProjectProperty> entry = it.next();
+//            IProjectProperty projProperty = entry.getValue();
+//            if (!projProperty.isOverridden()) {
+//                if (cascadingProject != null) {
+//                    it.remove();
+//                } else {
+//                    if ((projProperty.getValue() == null) || (projProperty.getValue() == projProperty.getDefaultValue())) {
+//                        it.remove();
+//                    } else {
+//                        if (projProperty instanceof CopyOnWriteListProjectProperty) {
+//                            CopyOnWriteList list = (CopyOnWriteList) projProperty.getValue();
+//                            if (list.isEmpty()) {
+//                                it.remove();
+//                            }
+//                        }
+//                        if (projProperty instanceof DescribableListProjectProperty) {
+//                            DescribableList list = (DescribableList) projProperty.getValue();
+//                            if (list.isEmpty()) {
+//                                it.remove();
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return this;
+//    }
 
     /**
      * Set true if save operation for config is permitted, false - otherwise .

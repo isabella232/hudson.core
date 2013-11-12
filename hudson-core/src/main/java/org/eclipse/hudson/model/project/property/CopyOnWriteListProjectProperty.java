@@ -33,6 +33,7 @@ public class CopyOnWriteListProjectProperty extends BaseProjectProperty<CopyOnWr
     @Override
     public CopyOnWriteList getDefaultValue() {
         CopyOnWriteList result = new CopyOnWriteList();
+        setOriginalValue(result, false);
         return result;
     }
 
