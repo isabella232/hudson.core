@@ -34,6 +34,7 @@
     <j:if test="${jdks.size() gt 1}">
         <!-- if there's only one JDK configured, always use that. -->
         <f:entry title="JDK"
+                 resetUrl="${jobUrl}/resetProjectProperty?propertyName=${it.JDK_PROPERTY_NAME}"
                  description="${%JDK to be used for this Job}"
                  isPropertyOverridden="${cu.getStringProjectProperty(it, it.JDK_PROPERTY_NAME).isOverridden()}">
             <select class="setting-input validated" name="jdk"
