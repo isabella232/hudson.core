@@ -196,7 +196,7 @@ public class Items {
         XSTREAM.alias("axis-list-property", AxisListProjectProperty.class);
         XSTREAM.alias("describable-list-property", DescribableListProjectProperty.class);
         XSTREAM.aliasField("cascading-job-properties", Job.class, "cascadingJobProperties");
-        XSTREAM.aliasField("project-properties", Job.class, "jobProperties");
+        XSTREAM.aliasField("project-properties", Job.class, "persistableJobProperties");
         XSTREAM.alias("appointed-node-property", AppointedNode.class);
     }
 }

@@ -141,7 +141,12 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * for accessing to this field.
      */
     private volatile LogRotator logRotator;
-    private ConcurrentMap<String, IProjectProperty> jobProperties = new ConcurrentHashMap<String, IProjectProperty>();
+    private transient ConcurrentMap<String, IProjectProperty> jobProperties = new ConcurrentHashMap<String, IProjectProperty>();
+    /**
+     * This field is used for persisting only the overridenJobProperties in the config.xml 
+     */
+    private ConcurrentMap<String, IProjectProperty> persistableJobProperties = new ConcurrentHashMap<String, IProjectProperty>();;
+    
     /**
      * Not all plugins are good at calculating their health report quickly.
      * These fields are used to cache the health reports to speed up rendering
@@ -204,35 +209,40 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
     
     //Bug Fix: 406889 - Non overriden job properties or properties with no values should not be written to config.xml
-//    Object writeReplace() throws ObjectStreamException, IOException {
-//        for (Iterator<Map.Entry<String, IProjectProperty>> it = jobProperties.entrySet().iterator(); it.hasNext();) {
-//            Map.Entry<String, IProjectProperty> entry = it.next();
-//            IProjectProperty projProperty = entry.getValue();
-//            if (!projProperty.isOverridden()) {
-//                if (cascadingProject != null) {
-//                    it.remove();
-//                } else {
-//                    if ((projProperty.getValue() == null) || (projProperty.getValue() == projProperty.getDefaultValue())) {
-//                        it.remove();
-//                    } else {
-//                        if (projProperty instanceof CopyOnWriteListProjectProperty) {
-//                            CopyOnWriteList list = (CopyOnWriteList) projProperty.getValue();
-//                            if (list.isEmpty()) {
-//                                it.remove();
-//                            }
-//                        }
-//                        if (projProperty instanceof DescribableListProjectProperty) {
-//                            DescribableList list = (DescribableList) projProperty.getValue();
-//                            if (list.isEmpty()) {
-//                                it.remove();
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return this;
-//    }
+    private Object writeReplace() throws ObjectStreamException, IOException {
+        persistableJobProperties.clear();
+        for (String key : jobProperties.keySet()) {
+            persistableJobProperties.put(key, jobProperties.get(key));
+        }
+        
+//      If the job has cascadind parent then strip all the job properties that are not overriden
+//      Also do not persist if the value is null or default value or has no elements
+        for (Iterator<Map.Entry<String, IProjectProperty>> it = persistableJobProperties.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<String, IProjectProperty> entry = it.next();
+            IProjectProperty projProperty = entry.getValue();
+            if (hasCascadingProject() && !projProperty.isOverridden()) {
+                it.remove();
+            } else { 
+                if ((projProperty.getValue() == null) || (projProperty.getValue() == projProperty.getDefaultValue())) {
+                    it.remove();
+                } else {
+                    if (projProperty instanceof CopyOnWriteListProjectProperty) {
+                        CopyOnWriteList list = (CopyOnWriteList) projProperty.getValue();
+                        if (list.isEmpty()) {
+                            it.remove();
+                        }
+                    }
+                    if (projProperty instanceof DescribableListProjectProperty) {
+                        DescribableList list = (DescribableList) projProperty.getValue();
+                        if (list.isEmpty()) {
+                            it.remove();
+                        }
+                    }
+                }
+            }
+        }
+        return this;
+    }
 
     /**
      * Set true if save operation for config is permitted, false - otherwise .
@@ -408,6 +418,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
         if (cascadingChildrenNames == null) {
             cascadingChildrenNames = new CopyOnWriteArraySet<String>();
+        }
+        jobProperties = new ConcurrentHashMap<String, IProjectProperty>();
+        for (String key : persistableJobProperties.keySet()){
+            jobProperties.put(key, persistableJobProperties.get(key));
         }
         buildProjectProperties();
         for (JobProperty p : getAllProperties()) {
