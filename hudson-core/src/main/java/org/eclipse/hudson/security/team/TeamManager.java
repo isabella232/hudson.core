@@ -197,7 +197,7 @@ public final class TeamManager implements Saveable, AccessControlled {
     
     public Team createTeam(String teamName, String description, String customFolder) throws IOException, TeamAlreadyExistsException {
         try {
-            Hudson.checkGoodName(teamName);
+            Hudson.checkGoodTeamName(teamName);
             if (teamName.trim().length() > Hudson.TEAM_NAME_LIMIT) {
                 throw new Failure("Team name cannot exceed "+Hudson.TEAM_NAME_LIMIT+" characters.");
             }
