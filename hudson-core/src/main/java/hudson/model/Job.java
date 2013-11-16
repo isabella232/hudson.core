@@ -569,7 +569,18 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 // should we block until the build is cancelled?
             }
         }
-        CascadingUtil.unlinkProjectFromCascadingParents(getCascadingProject(), name);
+        Set<String> cascadingChildren = new HashSet(getCascadingChildrenNames());
+        for (String cascadingChild : cascadingChildren) {
+            Item item = Hudson.getInstance().getItem(cascadingChild);
+            if (item != null && item instanceof Job) {
+                Job childJob = (Job) item;
+                if (this.equals(childJob.getCascadingProject())) {
+                    childJob.clearCascadingProject();
+                }
+            }
+        }
+        clearCascadingProject();
+        cascadingChildrenNames.clear();
         super.performDelete();
     }
 
