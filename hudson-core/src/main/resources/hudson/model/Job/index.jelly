@@ -48,8 +48,11 @@
       </j:if>
 
       <st:include page="jobpropertysummaries.jelly" />
+      
       <!-- inject main part here -->
       <st:include page="main.jelly" />
+      
+      <st:include page="cascading.jelly" />
 
       <st:include page="permalinks.jelly" />
     </l:main-panel>

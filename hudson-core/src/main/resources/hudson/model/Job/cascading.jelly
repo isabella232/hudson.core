@@ -1,0 +1,40 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2004-2009 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#    Kohsuke Kawaguchi
+#        
+#
+#************************************************************************** --> 
+
+
+<!-- display permalinks of the page -->
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+    <j:set var="job" value="${it}" />
+    <j:if test="${job.hasCascadingProject()}">
+        <h2>${%Cascading Parent}</h2>
+        <ul> 
+            <li>
+                <a href="../${job.getCascadingProjectName()}">${job.getCascadingProjectName()}</a>
+            </li>
+        </ul>
+    </j:if>
+    <j:if test="${job.getCascadingChildrenNames().size() > 0}">
+        <h2>${%Cascading Children}</h2>
+        <j:forEach var="child" items="${job.getCascadingChildrenNames()}" >
+            <ul> 
+                <li>
+                    <a href="../${child}">${child}</a>
+                </li>
+            </ul>
+        </j:forEach>
+    </j:if>
+</j:jelly>
