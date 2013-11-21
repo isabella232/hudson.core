@@ -1019,8 +1019,8 @@ public final class TeamManager implements Saveable, AccessControlled {
      * @return true if check succeeds
      */
     public boolean isQualifiedJobName(Team team, String jobName) {
-        if (isPublicTeam(team) && jobName.indexOf('.') >= 0) {
-            return false;
+        if (isPublicTeam(team)) {
+            return jobName.indexOf('.') < 0;
         }
         return jobName.startsWith(team.getName()+TEAM_SEPARATOR);
     }
