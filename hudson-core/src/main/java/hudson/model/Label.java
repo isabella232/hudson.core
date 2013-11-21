@@ -44,6 +44,8 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import hudson.matrix.Axis;
+import hudson.matrix.MatrixProject;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -341,6 +343,14 @@ public abstract class Label extends Actionable implements Comparable<Label>, Mod
         for (AbstractProject p : Util.filter(Hudson.getInstance().getItems(), AbstractProject.class)) {
             if (this.equals(p.getAssignedLabel())) {
                 r.add(p);
+            }
+        }
+        for (MatrixProject p : Util.filter(Hudson.getInstance().getItems(), MatrixProject.class)) {
+            for (Axis axis : p.getAxes()) {
+                if (axis.getValues().contains(getName())){
+                    r.add(p);
+                }
+                 
             }
         }
         return r;
