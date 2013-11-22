@@ -140,6 +140,7 @@ public interface ICascadingJob<T extends Job<?, ?>> extends IJob<T> {
      * instead.
      *
      * @param cascadingProjectName new project name.
+     * @throws java.io.IOException
      */
-    void renameCascadingProjectNameTo(String cascadingProjectName);
+    void renameCascadingProjectNameTo(String cascadingProjectName) throws IOException;
 }

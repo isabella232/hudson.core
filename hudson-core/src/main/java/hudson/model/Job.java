@@ -73,6 +73,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import net.sf.json.JSONException;
 
@@ -1758,9 +1760,13 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * instead.
      *
      * @param cascadingProjectName new project name.
+     * @throws java.io.IOException
      */
-    public void renameCascadingProjectNameTo(String cascadingProjectName) {
+    @Override
+    public void renameCascadingProjectNameTo(String cascadingProjectName) throws IOException{
         this.cascadingProjectName = cascadingProjectName;
+        getCascadingProject();
+        save();
     }
 
     /**

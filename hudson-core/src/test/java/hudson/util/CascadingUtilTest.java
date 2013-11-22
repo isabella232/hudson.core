@@ -23,6 +23,7 @@ import hudson.model.ParametersDefinitionProperty;
 import hudson.security.AuthorizationMatrixProperty;
 import hudson.tasks.JavadocArchiver;
 import hudson.tasks.Publisher;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.json.JSONObject;
@@ -193,22 +194,22 @@ public class CascadingUtilTest {
     }
 
     @Test
-    public void testRenameCascadingParentLinksNullNames() {
+    public void testRenameCascadingParentLinksNullNames() throws IOException {
         CascadingUtil.renameCascadingParentLinks(null, null);
     }
 
     @Test
-    public void testRenameCascadingParentLinksEmptyNames() {
+    public void testRenameCascadingParentLinksEmptyNames()  throws IOException {
         CascadingUtil.renameCascadingParentLinks("", "");
     }
 
     @Test
-    public void testRenameCascadingParentLinksNullName1() {
+    public void testRenameCascadingParentLinksNullName1()  throws IOException {
         CascadingUtil.renameCascadingParentLinks(null, "name");
     }
 
     @Test
-    public void testRenameCascadingParentLinksNullName2() {
+    public void testRenameCascadingParentLinksNullName2()  throws IOException {
         CascadingUtil.renameCascadingParentLinks("name", null);
     }
 

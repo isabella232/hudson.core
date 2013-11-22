@@ -405,7 +405,7 @@ public class CascadingUtil {
      * @param oldName old project name.
      * @param newName new project name.
      */
-    public static void renameCascadingParentLinks(final String oldName, final String newName) {
+    public static void renameCascadingParentLinks(final String oldName, final String newName) throws IOException {
         if (StringUtils.isBlank(newName) || StringUtils.isBlank(oldName)) {
             return;
         }
