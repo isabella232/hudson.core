@@ -353,10 +353,12 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 cascadingChildrenToRemove.add(cascadingChild);
             }
         }
+        //390862: Can't delete jobs copied from cascading parent
         if (!cascadingChildrenToRemove.isEmpty()) {
             cascadingChildrenNames.removeAll(cascadingChildrenToRemove);
-            save();
         }
+        //406889: Cleanup the non overridden job properties or properties with no values in config.xml
+        save();
     }
 
     /**
