@@ -69,8 +69,8 @@ public class CascadingUtilTest {
 
         Hudson hudson = createMock(Hudson.class);
         mockStatic(Hudson.class);
-        expect(hudson.getAllItems(Job.class)).andReturn(jobs).anyTimes();
         expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
+        expect(hudson.getItem("newCascadingProject")).andReturn(project1).anyTimes();
         replay(Hudson.class, hudson);
 
         //Can't unlink from null project
@@ -113,8 +113,8 @@ public class CascadingUtilTest {
 
         Hudson hudson = createMock(Hudson.class);
         mockStatic(Hudson.class);
-        expect(hudson.getAllItems(Job.class)).andReturn(jobs);
         expect(Hudson.getInstance()).andReturn(hudson);
+        expect(hudson.getItem("p2")).andReturn(project2).anyTimes();
         replay(Hudson.class, hudson);
 
         CascadingUtil.unlinkProjectFromCascadingParents(project1, "p2");
@@ -230,6 +230,7 @@ public class CascadingUtilTest {
         mockStatic(Hudson.class);
         expect(hudson.getAllItems(Job.class)).andReturn(jobs).anyTimes();
         expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
+        expect(hudson.getItem("p4")).andReturn(project4).anyTimes();
         replay(Hudson.class, hudson);
 
         project2.setCascadingProject(project1);
@@ -285,8 +286,8 @@ public class CascadingUtilTest {
 
         Hudson hudson = createMock(Hudson.class);
         mockStatic(Hudson.class);
-        expect(hudson.getAllItems(Job.class)).andReturn(jobs).anyTimes();
         expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
+        expect(hudson.getItem("p4")).andReturn(project4).anyTimes();
         replay(Hudson.class, hudson);
 
         project2.setCascadingProject(project1);
