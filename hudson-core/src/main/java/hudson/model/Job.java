@@ -17,7 +17,6 @@
 
 package hudson.model;
 
-import hudson.Functions;
 import hudson.util.CascadingUtil;
 import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.commons.collections.ListUtils;
@@ -73,8 +72,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import net.sf.json.JSONException;
 
@@ -1745,11 +1742,13 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         } else if (!StringUtils.equalsIgnoreCase(this.cascadingProjectName, cascadingProjectName)) {
             CascadingUtil.unlinkProjectFromCascadingParents(cascadingProject, name);
             this.cascadingProjectName = cascadingProjectName;
-            cascadingProject = (JobT) Functions.getItemByName(Hudson.getInstance().getAllItems(this.getClass()),
-                    cascadingProjectName);
-            CascadingUtil.linkCascadingProjectsToChild(cascadingProject, name);
-            for (IProjectProperty property : jobProperties.values()) {
-                property.onCascadingProjectChanged();
+            TopLevelItem item = Hudson.getInstance().getItem(cascadingProjectName);
+            if (item instanceof Job) {
+                cascadingProject = (JobT) item;
+                CascadingUtil.linkCascadingProjectsToChild(cascadingProject, name);
+                for (IProjectProperty property : jobProperties.values()) {
+                    property.onCascadingProjectChanged();
+                }
             }
         }
     }

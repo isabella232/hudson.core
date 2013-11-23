@@ -24,6 +24,7 @@ import hudson.model.Job;
 import hudson.model.JobPropertyDescriptor;
 import hudson.model.ParameterDefinition;
 import hudson.model.ParametersDefinitionProperty;
+import hudson.model.TopLevelItem;
 import hudson.security.AuthorizationMatrixProperty;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
@@ -306,9 +307,12 @@ public class CascadingUtil {
                 return true;
             }
             for (String childName : cascadingChildren) {
-                Job job = Functions.getItemByName(Hudson.getInstance().getAllItems(Job.class), childName);
-                if (null != job && hasCyclicCascadingLink(cascadingCandidate, job.getCascadingChildrenNames())) {
-                    return true;
+                TopLevelItem item = Hudson.getInstance().getItem(childName);
+                if (item instanceof Job) {
+                    Job job = (Job) item;
+                    if (hasCyclicCascadingLink(cascadingCandidate, job.getCascadingChildrenNames())) {
+                        return true;
+                    }
                 }
             }
         }
@@ -327,8 +331,9 @@ public class CascadingUtil {
     public static boolean unlinkProjectFromCascadingParents(ICascadingJob cascadingProject, String projectToUnlink)
             throws IOException {
         if (null != cascadingProject && null != projectToUnlink) {
-            Job job = Functions.getItemByName(Hudson.getInstance().getAllItems(Job.class), projectToUnlink);
-            if (null != job) {
+            TopLevelItem item = Hudson.getInstance().getItem(projectToUnlink);
+            if (item instanceof Job) {
+                Job job = (Job) item;
                 Set<String> set = new HashSet<String>(job.getCascadingChildrenNames());
                 set.add(projectToUnlink);
                 return unlinkProjectFromCascadingParents(cascadingProject, set);
