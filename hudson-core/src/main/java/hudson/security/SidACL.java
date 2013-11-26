@@ -33,17 +33,17 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class SidACL extends ACL {
 
-    private transient Logger logger = LoggerFactory.getLogger(SidACL.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SidACL.class);
 
     @Override
     public boolean hasPermission(Authentication a, Permission permission) {
         if (a == SYSTEM) {
-            logger.debug("hasPermission(" + a + "," + permission + ")=>SYSTEM user has full access");
+            LOGGER.debug("hasPermission(" + a + "," + permission + ")=>SYSTEM user has full access");
             return true;
         }
         Boolean b = _hasPermission(a, permission);
 
-        logger.debug("hasPermission(" + a + "," + permission + ")=>" + (b == null ? "null, thus false" : b));
+        LOGGER.debug("hasPermission(" + a + "," + permission + ")=>" + (b == null ? "null, thus false" : b));
 
         if (b == null) {
             b = false;    // default to rejection
@@ -61,10 +61,10 @@ public abstract class SidACL extends ACL {
      */
     protected Boolean _hasPermission(Authentication a, Permission permission) {
         // ACL entries for this principal takes precedence
-        logger.debug("Checking if principal " + a.getName() + " has " + permission);
+        LOGGER.debug("Checking if principal " + a.getName() + " has " + permission);
         Boolean b = hasPermission(new PrincipalSid(a), permission);
         if (b != null) {
-            logger.debug("hasPermission(PrincipalSID:" + a.getPrincipal() + "," + permission + ")=>" + b);
+            LOGGER.debug("hasPermission(PrincipalSID:" + a.getPrincipal() + "," + permission + ")=>" + b);
             return b;
         }
 
@@ -72,10 +72,10 @@ public abstract class SidACL extends ACL {
         // has any ACL entries.
         // here we are using GrantedAuthority as a group
         for (GrantedAuthority ga : a.getAuthorities()) {
-            logger.debug("Checking if principal's role " + ga.getAuthority() + " has " + permission);
+            LOGGER.debug("Checking if principal's role " + ga.getAuthority() + " has " + permission);
             b = hasPermission(new GrantedAuthoritySid(ga), permission);
             if (b != null) {
-                logger.debug("hasPermission(GroupSID:" + ga.getAuthority() + "," + permission + ")=>" + b);
+                LOGGER.debug("hasPermission(GroupSID:" + ga.getAuthority() + "," + permission + ")=>" + b);
                 return b;
             }
         }
@@ -84,7 +84,7 @@ public abstract class SidACL extends ACL {
         for (Sid sid : AUTOMATIC_SIDS) {
             b = hasPermission(sid, permission);
             if (b != null) {
-                logger.debug("hasPermission(" + sid + "," + permission + ")=>" + b);
+                LOGGER.debug("hasPermission(" + sid + "," + permission + ")=>" + b);
                 return b;
             }
         }
