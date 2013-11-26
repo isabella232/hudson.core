@@ -19,13 +19,13 @@
   <parent>
     <groupId>org.eclipse.hudson</groupId>
     <artifactId>hudson-parent</artifactId>
-    <version> 3.1.1-RC1</version>
+    <version> 3.1.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>org.eclipse.hudson.plugins</groupId>
   <artifactId>hudson-plugin-parent</artifactId>
-  <version>3.1.1-RC1</version>
+  <version>3.1.1-SNAPSHOT</version>
   <name>Hudson :: Plugin Parent POM</name>
   <packaging>pom</packaging>
 
@@ -51,19 +51,19 @@
       <groupId>org.eclipse.hudson</groupId>
       <artifactId>hudson-war</artifactId>
       <type>war</type>
-      <version>3.1.1-RC1</version>
+      <version>3.1.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.hudson</groupId>
       <artifactId>hudson-core</artifactId>
-      <version>3.1.1-RC1</version>
+      <version>3.1.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.hudson</groupId>
       <artifactId>hudson-test-framework</artifactId>
-      <version>3.1.1-RC1</version>
+      <version>3.1.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
