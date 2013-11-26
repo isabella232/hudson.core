@@ -75,7 +75,22 @@
                                    }else{
                                       showConfirmationDialog();
                                    }
-                               }
+                               },
+                               error: function(msg) {
+                                   showMessage(jQuery('#deleteMsg'), msg.statusText, "red");
+                                   //Show the dialog again with close button now
+                                   jQuery('#confirmationDialog').dialog({
+                                        height: 250,
+                                        resizable: false,
+                                        width: 350,
+                                        modal: true,
+                                        buttons: {
+                                          Cancel: function() {
+                                             jQuery( this ).dialog("close");
+                                          }
+                                        }
+                                   });
+                                }
                            });
                         }else{
                             showConfirmationDialog();
