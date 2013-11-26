@@ -631,7 +631,7 @@ public abstract class Descriptor<T extends Describable<T>> implements Saveable {
                 throw new Error(e);
             }
 
-            if (getStaticHelpUrl(c, suffix) != null) {
+            if (getHelpStream(c, suffix) != null) {
                 return page;
             }
         }
@@ -644,6 +644,33 @@ public abstract class Descriptor<T extends Describable<T>> implements Saveable {
             r.add(clazz);
         }
         return r;
+    }
+    
+    private InputStream getHelpStream(Class c, String suffix) {
+        Locale locale = Stapler.getCurrentRequest().getLocale();
+        String base = c.getName().replace('.', '/').replace('$', '/') + "/help" + suffix;
+
+        ClassLoader cl = c.getClassLoader();
+        if (cl == null) {
+            return null;
+        }
+
+        InputStream in;
+        in = cl.getResourceAsStream(base + '_' + locale.getLanguage() + '_' + locale.getCountry() + '_' + locale.getVariant() + ".html");
+        if (in != null) {
+            return in;
+        }
+        in = cl.getResourceAsStream(base + '_' + locale.getLanguage() + '_' + locale.getCountry() + ".html");
+        if (in != null) {
+            return in;
+        }
+        in = cl.getResourceAsStream(base + '_' + locale.getLanguage() + ".html");
+        if (in != null) {
+            return in;
+        }
+
+        // default
+        return cl.getResourceAsStream(base + ".html");
     }
 
     private URL getStaticHelpUrl(Class<?> c, String suffix) {
@@ -810,11 +837,11 @@ public abstract class Descriptor<T extends Describable<T>> implements Saveable {
                 return;
             }
 
-            URL url = getStaticHelpUrl(c, path);
-            if (url != null) {
+            InputStream in = getHelpStream(c, path);
+            if (in != null) {
                 // TODO: generalize macro expansion and perhaps even support JEXL
                 rsp.setContentType("text/html;charset=UTF-8");
-                InputStream in = url.openStream();
+                //InputStream in = url.openStream();
                 try {
                     String literal = IOUtils.toString(in, "UTF-8");
                     rsp.getWriter().println(Util.replaceMacro(literal, Collections.singletonMap("rootURL", req.getContextPath())));
