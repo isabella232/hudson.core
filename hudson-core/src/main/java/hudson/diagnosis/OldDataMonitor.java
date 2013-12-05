@@ -182,13 +182,17 @@ public class OldDataMonitor extends AdministrativeMonitor {
         if (buf.length() == 0) {
             return;
         }
-        OldDataMonitor odm = (OldDataMonitor) Hudson.getInstance().getAdministrativeMonitor("OldData");
-        synchronized (odm) {
-            VersionRange vr = odm.data.get(obj);
-            if (vr != null) {
-                vr.extra = buf.toString();
-            } else {
-                odm.data.put(obj, new VersionRange(null, buf.toString()));
+        // Do not throw error if Hudson model object was not yet constructed
+        // in the instance configuration was unmarshalled during initial setup
+        if (Hudson.getInstance() != null) {
+            OldDataMonitor odm = (OldDataMonitor) Hudson.getInstance().getAdministrativeMonitor("OldData");
+            synchronized (odm) {
+                VersionRange vr = odm.data.get(obj);
+                if (vr != null) {
+                    vr.extra = buf.toString();
+                } else {
+                    odm.data.put(obj, new VersionRange(null, buf.toString()));
+                }
             }
         }
     }
