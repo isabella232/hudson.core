@@ -58,7 +58,7 @@ public enum BallColor implements StatusIcon {
     GREY_ANIME("grey_anime", Messages._BallColor_InProgress(), ColorPalette.GREY),
     DISABLED("grey", Messages._BallColor_Disabled(), ColorPalette.GREY),
     DISABLED_ANIME("grey_anime", Messages._BallColor_InProgress(), ColorPalette.GREY),
-    ABORTED("grey", Messages._BallColor_Aborted(), ColorPalette.GREY),
+    ABORTED("grey_aborted", Messages._BallColor_Aborted(), ColorPalette.GREY),
     ABORTED_ANIME("grey_anime", Messages._BallColor_InProgress(), ColorPalette.GREY),;
     private final Localizable description;
     private final String image;
