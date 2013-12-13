@@ -144,7 +144,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     /**
      * This field is used for persisting only the overridenJobProperties in the config.xml 
      */
-    private ConcurrentMap<String, IProjectProperty> persistableJobProperties = new ConcurrentHashMap<String, IProjectProperty>();;
+    private ConcurrentMap<String, IProjectProperty> persistableJobProperties = new ConcurrentHashMap<String, IProjectProperty>();
     
     /**
      * Not all plugins are good at calculating their health report quickly.
@@ -205,6 +205,13 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     protected Job(ItemGroup parent, String name) {
         super(parent, name);
+    }
+    
+    public Object readResolve() {
+        if (persistableJobProperties == null) {
+            persistableJobProperties = new ConcurrentHashMap<String, IProjectProperty>();
+        }
+        return this;
     }
     
     //Bug Fix: 406889 - Non overriden job properties or properties with no values should not be written to config.xml
@@ -418,7 +425,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             cascadingChildrenNames = new CopyOnWriteArraySet<String>();
         }
         jobProperties = new ConcurrentHashMap<String, IProjectProperty>();
-        for (String key : persistableJobProperties.keySet()){
+        for (String key : persistableJobProperties.keySet()) {
             jobProperties.put(key, persistableJobProperties.get(key));
         }
         buildProjectProperties();

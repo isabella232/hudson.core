@@ -75,11 +75,4 @@ public abstract class Project<P extends Project<P, B>, B extends Build<P, B>>
      */
     @Deprecated
     private transient String slave;
-
-    private Object readResolve() {
-        if (slave != null) {
-            OldDataMonitor.report(this, "1.60");
-        }
-        return this;
-    }
 }
