@@ -220,28 +220,32 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         for (String key : jobProperties.keySet()) {
             persistableJobProperties.put(key, jobProperties.get(key));
         }
-        
-        // If the job has cascadind parent then strip all the job properties that are not overriden
-        // Also do not persist if the value is null or default value or has no elements
+
+        // If the job has cascading parent then strip all the job properties that are not overriden
+        // If the job has no cascading parent, then do not persist if the value is null or default value or has no elements
         // Caution: Do not check default value on CopyOnWriteListProjectProperty & DescribableListProjectProperty
         //          it resets the value to empty list
         for (Iterator<Map.Entry<String, IProjectProperty>> it = persistableJobProperties.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, IProjectProperty> entry = it.next();
             IProjectProperty projProperty = entry.getValue();
-            if (hasCascadingProject() && !projProperty.isOverridden()) {
-                it.remove();
-            } else if (projProperty instanceof CopyOnWriteListProjectProperty) {
-                CopyOnWriteList list = (CopyOnWriteList) projProperty.getValue();
-                if (list.isEmpty()) {
+            if (hasCascadingProject()) {
+                if (!projProperty.isOverridden()) {
                     it.remove();
                 }
-            } else if (projProperty instanceof DescribableListProjectProperty) {
-                DescribableList list = (DescribableList) projProperty.getValue();
-                if (list.isEmpty()) {
+            } else {
+                if (projProperty instanceof CopyOnWriteListProjectProperty) {
+                    CopyOnWriteList list = (CopyOnWriteList) projProperty.getValue();
+                    if (list.isEmpty()) {
+                        it.remove();
+                    }
+                } else if (projProperty instanceof DescribableListProjectProperty) {
+                    DescribableList list = (DescribableList) projProperty.getValue();
+                    if (list.isEmpty()) {
+                        it.remove();
+                    }
+                } else if ((projProperty.getValue() == null) || (projProperty.getValue() == projProperty.getDefaultValue())) {
                     it.remove();
                 }
-            } else if ((projProperty.getValue() == null) || (projProperty.getValue() == projProperty.getDefaultValue())) {
-                it.remove();
             }
         }
         return this;
