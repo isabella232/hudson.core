@@ -1943,6 +1943,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
 
         // if a build is parameterized, let that take over
         ParametersDefinitionProperty pp = getProperty(ParametersDefinitionProperty.class);
+        pp.setOwner(this);
         if (pp != null) {
             pp._doBuild(req, rsp);
             return;
