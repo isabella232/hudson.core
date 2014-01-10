@@ -22,6 +22,7 @@ package hudson.model;
 
 import hudson.AbortException;
 import hudson.CopyOnWrite;
+import hudson.ExtensionList;
 import hudson.FeedAdapter;
 import hudson.FilePath;
 import hudson.Functions;
@@ -1423,6 +1424,13 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
                 return new BecauseOfUpstreamBuildInProgress(bup);
             }
         }
+        ExtensionList<BuildBlocker> blockers = Hudson.getInstance().getExtensionList(BuildBlocker.class);
+        for (BuildBlocker blocker : blockers) {
+            CauseOfBlockage cause = blocker.getCauseOfBlockage(this);
+            if (cause != null) {
+                return cause;
+            }
+        }
         return null;
     }
 
@@ -1943,8 +1951,8 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
 
         // if a build is parameterized, let that take over
         ParametersDefinitionProperty pp = getProperty(ParametersDefinitionProperty.class);
-        pp.setOwner(this);
         if (pp != null) {
+            pp.setOwner(this);
             pp._doBuild(req, rsp);
             return;
         }
