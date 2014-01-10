@@ -393,7 +393,7 @@ public class MatrixProjectTest {
         }
 
         @Override
-        protected void updateTransientActions() {
+        public void updateTransientActions() {
         }
 
         @Override

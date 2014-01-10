@@ -87,18 +87,20 @@ public class SCMTrigger extends Trigger<SCMedItem> {
         }
         DescriptorImpl d = getDescriptor();
 
-        LOGGER.fine("Scheduling a polling for " + job);
-        if (d.synchronousPolling) {
-            LOGGER.fine("Running the trigger directly without threading, "
-                    + "as it's already taken care of by Trigger.Cron");
-            new Runner(additionalActions).run();
-        } else {
+        for (SCMedItem job : jobs) {
+            LOGGER.fine("Scheduling a polling for jobs " + getJobNames());
+            if (d.synchronousPolling) {
+                LOGGER.fine("Running the trigger directly without threading, "
+                        + "as it's already taken care of by Trigger.Cron");
+                new Runner(job, additionalActions).run();
+            } else {
             // schedule the polling.
-            // even if we end up submitting this too many times, that's OK.
-            // the real exclusion control happens inside Runner.
-            LOGGER.fine("scheduling the trigger to (asynchronously) run");
-            d.queue.execute(new Runner(additionalActions));
-            d.clogCheck();
+                // even if we end up submitting this too many times, that's OK.
+                // the real exclusion control happens inside Runner.
+                LOGGER.fine("scheduling the trigger to (asynchronously) run");
+                d.queue.execute(new Runner(job, additionalActions));
+                d.clogCheck();
+            }
         }
     }
 
@@ -108,14 +110,14 @@ public class SCMTrigger extends Trigger<SCMedItem> {
     }
 
     @Override
-    public Collection<? extends Action> getProjectActions() {
-        return Collections.singleton(new SCMAction());
+    public Collection<? extends Action> getProjectActions(AbstractProject job) {
+        return Collections.singleton(new SCMAction(job));
     }
 
     /**
      * Returns the file that records the last/current polling activity.
      */
-    public File getLogFile() {
+    public File getLogFile(AbstractProject job) {
         return new File(job.getRootDir(), "scm-polling.log");
     }
 
@@ -191,7 +193,7 @@ public class SCMTrigger extends Trigger<SCMedItem> {
         public List<SCMedItem> getItemsBeingPolled() {
             List<SCMedItem> r = new ArrayList<SCMedItem>();
             for (Runner i : getRunners()) {
-                r.add(i.getTarget());
+                r.addAll(i.getTarget());
             }
             return r;
         }
@@ -342,9 +344,15 @@ public class SCMTrigger extends Trigger<SCMedItem> {
      * Action object for {@link Project}. Used to display the last polling log.
      */
     public final class SCMAction implements Action {
+        
+        AbstractProject job;
+                
+        SCMAction(AbstractProject job){
+            this.job = job;
+        }
 
         public AbstractProject<?, ?> getOwner() {
-            return job.asProject();
+            return job;
         }
 
         public String getIconFileName() {
@@ -360,7 +368,7 @@ public class SCMTrigger extends Trigger<SCMedItem> {
         }
 
         public String getLog() throws IOException {
-            return Util.loadFile(getLogFile());
+            return Util.loadFile(getLogFile(job));
         }
 
         /**
@@ -369,7 +377,7 @@ public class SCMTrigger extends Trigger<SCMedItem> {
          * @since 1.350
          */
         public void writeLogTo(XMLOutput out) throws IOException {
-            new AnnotatedLargeText<SCMAction>(getLogFile(), Charset.defaultCharset(), true, this).writeHtmlTo(0, out.asWriter());
+            new AnnotatedLargeText<SCMAction>(getLogFile(job), Charset.defaultCharset(), true, this).writeHtmlTo(0, out.asWriter());
         }
     }
     private static final Logger LOGGER = Logger.getLogger(SCMTrigger.class.getName());
@@ -378,18 +386,20 @@ public class SCMTrigger extends Trigger<SCMedItem> {
      * {@link Runnable} that actually performs polling.
      */
     public class Runner implements Runnable {
-
+        SCMedItem scmedItem;
         /**
          * When did the polling start?
          */
         private volatile long startTime;
         private Action[] additionalActions;
 
-        public Runner() {
+        public Runner(SCMedItem item) {
+            scmedItem = item;
             additionalActions = new Action[0];
         }
 
-        public Runner(Action[] actions) {
+        public Runner(SCMedItem item, Action[] actions) {
+            scmedItem = item;
             if (actions == null) {
                 additionalActions = new Action[0];
             } else {
@@ -401,14 +411,18 @@ public class SCMTrigger extends Trigger<SCMedItem> {
          * Where the log file is written.
          */
         public File getLogFile() {
-            return SCMTrigger.this.getLogFile();
+            if (scmedItem instanceof AbstractProject) {
+                return SCMTrigger.this.getLogFile((AbstractProject) scmedItem);
+            } else {
+                return null;
+            }
         }
 
         /**
          * For which {@link Item} are we polling?
          */
-        public SCMedItem getTarget() {
-            return job;
+        public  List<SCMedItem> getTarget() {
+            return jobs;
         }
 
         /**
@@ -429,30 +443,35 @@ public class SCMTrigger extends Trigger<SCMedItem> {
             try {
                 // to make sure that the log file contains up-to-date text,
                 // don't do buffering.
-                StreamTaskListener listener = new StreamTaskListener(getLogFile());
+                if (scmedItem instanceof AbstractProject) {
+                    AbstractProject job = (AbstractProject) scmedItem;
+                    StreamTaskListener listener = new StreamTaskListener(getLogFile());
 
-                try {
-                    PrintStream logger = listener.getLogger();
-                    long start = System.currentTimeMillis();
-                    logger.println("Started on " + DateFormat.getDateTimeInstance().format(new Date()));
-                    boolean result = job.poll(listener).hasChanges();
-                    logger.println("Done. Took " + Util.getTimeSpanString(System.currentTimeMillis() - start));
-                    if (result) {
-                        logger.println("Changes found");
-                    } else {
-                        logger.println("No changes");
+                    try {
+                        PrintStream logger = listener.getLogger();
+                        long start = System.currentTimeMillis();
+                        logger.println("Started on " + DateFormat.getDateTimeInstance().format(new Date()));
+                        boolean result = job.poll(listener).hasChanges();
+                        logger.println("Done. Took " + Util.getTimeSpanString(System.currentTimeMillis() - start));
+                        if (result) {
+                            logger.println("Changes found");
+                        } else {
+                            logger.println("No changes");
+                        }
+                        return result;
+                    } catch (Error e) {
+                        e.printStackTrace(listener.error("Failed to record SCM polling"));
+                        LOGGER.log(Level.SEVERE, "Failed to record SCM polling", e);
+                        throw e;
+                    } catch (RuntimeException e) {
+                        e.printStackTrace(listener.error("Failed to record SCM polling"));
+                        LOGGER.log(Level.SEVERE, "Failed to record SCM polling", e);
+                        throw e;
+                    } finally {
+                        listener.close();
                     }
-                    return result;
-                } catch (Error e) {
-                    e.printStackTrace(listener.error("Failed to record SCM polling"));
-                    LOGGER.log(Level.SEVERE, "Failed to record SCM polling", e);
-                    throw e;
-                } catch (RuntimeException e) {
-                    e.printStackTrace(listener.error("Failed to record SCM polling"));
-                    LOGGER.log(Level.SEVERE, "Failed to record SCM polling", e);
-                    throw e;
-                } finally {
-                    listener.close();
+                } else {
+                    return false;
                 }
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Failed to record SCM polling", e);
@@ -462,12 +481,13 @@ public class SCMTrigger extends Trigger<SCMedItem> {
 
         public void run() {
             String threadName = Thread.currentThread().getName();
-            Thread.currentThread().setName("SCM polling for " + job);
+            Thread.currentThread().setName("SCM polling for " + scmedItem);
             try {
                 startTime = System.currentTimeMillis();
                 if (runPolling()) {
-                    AbstractProject p = job.asProject();
-                    String name = " #" + p.getNextBuildNumber();
+                    if (scmedItem instanceof AbstractProject) {
+                    AbstractProject job = (AbstractProject) scmedItem;
+                    String name = " #" + job.getNextBuildNumber();
                     SCMTriggerCause cause;
                     try {
                         cause = new SCMTriggerCause(getLogFile());
@@ -475,10 +495,11 @@ public class SCMTrigger extends Trigger<SCMedItem> {
                         LOGGER.log(WARNING, "Failed to parse the polling log", e);
                         cause = new SCMTriggerCause();
                     }
-                    if (p.scheduleBuild(p.getQuietPeriod(), cause, additionalActions)) {
+                    if (job.scheduleBuild(job.getQuietPeriod(), cause, additionalActions)) {
                         LOGGER.info("SCM changes detected in " + job.getName() + ". Triggering " + name);
                     } else {
                         LOGGER.info("SCM changes detected in " + job.getName() + ". Job is already in the queue");
+                    }
                     }
                 }
             } finally {
@@ -487,7 +508,7 @@ public class SCMTrigger extends Trigger<SCMedItem> {
         }
 
         private SCMedItem job() {
-            return job;
+            return scmedItem;
         }
 
         // as per the requirement of SequentialExecutionQueue, value equality is necessary
@@ -498,7 +519,7 @@ public class SCMTrigger extends Trigger<SCMedItem> {
 
         @Override
         public int hashCode() {
-            return job.hashCode();
+            return scmedItem.hashCode();
         }
     }
 

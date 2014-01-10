@@ -884,7 +884,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      *
      * <p> Override {@link #createTransientActions()} instead.
      */
-    protected void updateTransientActions() {
+    public void updateTransientActions() {
         transientActions = createTransientActions();
     }
 

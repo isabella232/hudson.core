@@ -42,7 +42,9 @@ public class TimerTrigger extends Trigger<BuildableItem> {
 
     @Override
     public void run() {
-        job.scheduleBuild(0, new TimerTriggerCause());
+        for (BuildableItem job : jobs) {
+            job.scheduleBuild(0, new TimerTriggerCause());
+        }
     }
 
     @Extension

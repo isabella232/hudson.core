@@ -509,6 +509,9 @@ public class CascadingUtil {
                     } else if (!childProperty.allowOverrideValue(trigger, childProperty.getValue())) {
                         childProperty.setOverridden(false);
                     }
+                    if (childJob instanceof AbstractProject) {
+                        ((AbstractProject) childJob).updateTransientActions();
+                    }
                 }
             }
         }

@@ -136,7 +136,7 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P, B>,
             r.addAll(step.getProjectActions(this));
         }
         for (Trigger trigger : getTriggersList()) {
-            r.addAll(trigger.getProjectActions());
+            r.addAll(trigger.getProjectActions(this));
         }
         return r;
     }

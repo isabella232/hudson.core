@@ -32,7 +32,7 @@ public class FreeStyleProjectMock extends FreeStyleProject {
     }
 
     @Override
-    protected void updateTransientActions() {
+    public void updateTransientActions() {
     }
 
     @Override

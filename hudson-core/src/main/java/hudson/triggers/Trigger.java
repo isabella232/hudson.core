@@ -72,8 +72,10 @@ public abstract class Trigger<J extends Item> implements Describable<Trigger<?>>
      * to the {@link Project}. False if this is invoked for a {@link Project}
      * loaded from disk.
      */
-    public void start(J project, boolean newInstance) {
-        this.job = project;
+    public void start(J job, boolean newInstance) {
+        if (!jobs.contains(job)){
+            jobs.add(job);
+        }
     }
 
     /**
@@ -112,7 +114,7 @@ public abstract class Trigger<J extends Item> implements Describable<Trigger<?>>
      * @return can be empty but never null
      * @since 1.341
      */
-    public Collection<? extends Action> getProjectActions() {
+    public Collection<? extends Action> getProjectActions(AbstractProject job) {
         // delegate to getJobAction (singular) for backward compatible behavior
         Action a = getProjectAction();
         if (a == null) {
@@ -126,7 +128,13 @@ public abstract class Trigger<J extends Item> implements Describable<Trigger<?>>
     }
     protected final String spec;
     protected transient CronTabList tabs;
-    protected transient J job;
+    
+    // Theorectically each trigger should contain only one job. But in a cascading environment
+    // if the tigger is defined in the parent, then this list represent the parent job and the
+    // children jobs.
+    protected transient List<J> jobs = new ArrayList<J>();
+    
+    
 
     /**
      * Creates a new {@link Trigger} that gets {@link #run() run} periodically.
@@ -144,7 +152,7 @@ public abstract class Trigger<J extends Item> implements Describable<Trigger<?>>
         this.spec = "";
         this.tabs = new CronTabList(Collections.<CronTab>emptyList());
     }
-
+    
     /**
      * Gets the crontab specification.
      *
@@ -162,7 +170,16 @@ public abstract class Trigger<J extends Item> implements Describable<Trigger<?>>
             x.initCause(e);
             throw x;
         }
+        jobs = new ArrayList<J>();
         return this;
+    }
+    
+    protected String getJobNames(){
+        String jobnames = "";
+        for (J job : jobs){
+            jobnames += job.getName() + " ";
+        }
+        return jobnames;
     }
 
     /**
@@ -213,7 +230,7 @@ public abstract class Trigger<J extends Item> implements Describable<Trigger<?>>
                     public void run(AbstractProject p) {
                         for (Trigger t : (Collection<Trigger>) p.getTriggers().values()) {
                             if (t instanceof SCMTrigger) {
-                                LOGGER.fine("synchronously triggering SCMTrigger for project " + t.job.getName());
+                                LOGGER.fine("synchronously triggering SCMTrigger for jobs " + t.getJobNames());
                                 t.run();
                             }
                         }
