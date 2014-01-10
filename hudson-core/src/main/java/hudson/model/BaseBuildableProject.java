@@ -352,31 +352,31 @@ public abstract class BaseBuildableProject<P extends BaseBuildableProject<P, B>,
     }
 
     protected void convertPublishersProperties() {
-        if (null != publishers) {
+        if ((null != publishers) && !publishers.isEmpty()) {
             putAllProjectProperties(DescribableListUtil.convertToProjectProperties(publishers, this), false);
-            publishers = null;
         }
+        publishers = null;
     }
 
     protected void convertBuildWrappersProperties() {
-        if (null != buildWrappers) {
+        if ((null != buildWrappers) && !buildWrappers.isEmpty() ) {
             putAllProjectProperties(DescribableListUtil.convertToProjectProperties(buildWrappers, this), false);
-            buildWrappers = null;
         }
+        buildWrappers = null;
     }
 
     protected void convertBuildersProperties() {
-        if (null != builders && null == getProperty(BUILDERS_PROPERTY_NAME)) {
+        if ((null != builders) && !builders.isEmpty() && (null == getProperty(BUILDERS_PROPERTY_NAME))) {
             putAllProjectProperties(DescribableListUtil.convertToProjectProperties(builders, this), false);
-            builders = null;
         }
+        builders = null;
     }
     
     protected void convertBuildersProjectProperty() {
-        if (null != builders && null == getProperty(BUILDERS_PROPERTY_NAME)) {
+        if ((null != builders) && !builders.isEmpty() && (null == getProperty(BUILDERS_PROPERTY_NAME))) {
             setBuilders(builders);
-            builders = null;
         }
+        builders = null;
     }
     
 }
