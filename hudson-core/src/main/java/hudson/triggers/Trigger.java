@@ -76,6 +76,7 @@ public abstract class Trigger<J extends Item> implements Describable<Trigger<?>>
         if (!jobs.contains(job)){
             jobs.add(job);
         }
+        this.job = job;
     }
 
     /**
@@ -129,13 +130,16 @@ public abstract class Trigger<J extends Item> implements Describable<Trigger<?>>
     protected final String spec;
     protected transient CronTabList tabs;
     
+    /**
+     *  @deprecated as of 3.1.2 use the list {@link #jobs} instead
+     */
+    protected transient J job;
+    
     // Theorectically each trigger should contain only one job. But in a cascading environment
     // if the tigger is defined in the parent, then this list represent the parent job and the
     // children jobs.
     protected transient List<J> jobs = new ArrayList<J>();
     
-    
-
     /**
      * Creates a new {@link Trigger} that gets {@link #run() run} periodically.
      * This is useful when your trigger does some polling work.
