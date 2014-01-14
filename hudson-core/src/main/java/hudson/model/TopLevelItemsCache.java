@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Hudson - initial API and implementation and/or initial documentation
+ *    Roy Varghese
  */
 package hudson.model;
 
@@ -19,8 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A cache for {@link TopLevelItems} object that are directly held by
@@ -33,9 +32,28 @@ import java.util.logging.Logger;
 class TopLevelItemsCache {
     
     // Cache parameters
-    private final static int EVICT_IN_SECONDS = 60;
-    private final static int INITIAL_CAPACITY = 1024;
-    private final static int MAX_ENTRIES = 1000;
+    // Seconds after which items in cache are removed. Time is reset on access.
+    private static int EVICT_IN_SECONDS;
+    
+    // Initial cache capacity
+    private static int INITIAL_CAPACITY;
+    
+    // Maximum number of cached entries.
+    private static int MAX_ENTRIES;
+    
+    // Initialize from system properties if available
+    {
+        Integer val;
+        
+        val = Integer.getInteger("hudson.jobs.cache.evict_in_seconds");
+        EVICT_IN_SECONDS = val == null? 60: val;
+        
+        val = Integer.getInteger("hudson.jobs.cache.initial_capacity");
+        INITIAL_CAPACITY = val == null ? 1024: val;
+        
+        val = Integer.getInteger("hudson.jobs.cache.max_entries");
+        MAX_ENTRIES = val == null ? 1024 : val;
+    }
     
     final LoadingCache<LazyTopLevelItem.Key, TopLevelItem> cache;
     
@@ -77,7 +95,7 @@ class TopLevelItemsCache {
         try {
             return cache.get(key);
         } catch (ExecutionException ex) {
-            Logger.getLogger(TopLevelItemsCache.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(TopLevelItemsCache.class.getName()).error("Error when retrieving item from cache", ex);
             return null;
         }
 

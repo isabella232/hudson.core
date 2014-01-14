@@ -736,14 +736,35 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
     private static class LazyRunValueCache {
         
         final private LoadingCache<LazyRunValue.Key, Run> cache;
-        final static int EVICT_BUILD_IN_SECONDS = 60;
-        final static int MAX_ENTRIES = 10000;
+        
+        // Seconds after which items in cache are removed. Time is reset on access.
+        private static int EVICT_IN_SECONDS;
+
+        // Initial cache capacity
+        private static int INITIAL_CAPACITY;
+
+        // Maximum number of cached entries.
+        private static int MAX_ENTRIES;
+
+        // Initialize from system properties if available
+        {
+            Integer val;
+
+            val = Integer.getInteger("hudson.job.builds.cache.evict_in_seconds");
+            EVICT_IN_SECONDS = val == null? 60: val;
+
+            val = Integer.getInteger("hudson.job.builds.cache.initial_capacity");
+            INITIAL_CAPACITY = val == null ? 512: val;
+
+            val = Integer.getInteger("hudson.job.builds.cache.max_entries");
+            MAX_ENTRIES = val == null ? 10 * 1024 : val;
+        }
         
         private LazyRunValueCache() {
             
             cache = CacheBuilder.newBuilder()
-                        .expireAfterAccess(EVICT_BUILD_IN_SECONDS, TimeUnit.SECONDS)
-                        .initialCapacity(1024)
+                        .expireAfterAccess(EVICT_IN_SECONDS, TimeUnit.SECONDS)
+                        .initialCapacity(INITIAL_CAPACITY)
                         .maximumSize(MAX_ENTRIES)
                         .softValues()
                         .build( new CacheLoader<LazyRunValue.Key, Run>() {
