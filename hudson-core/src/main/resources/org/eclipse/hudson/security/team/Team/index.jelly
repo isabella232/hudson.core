@@ -139,6 +139,7 @@
                                         <input type="hidden" value="${jobName}" name="hiddenJobId"/>
                                         <input type="hidden" value="${it.name}" name="hiddenTeamName"/>
                                         <input type="hidden" value="${it.findJob(jobName).visiblitiesAsString}" name="hiddenVisibilities"/>
+                                        <input type="hidden" value="${it.findJob(jobName).isAllowConfigView()}" name="hiddenAllowViewConfig"/>
                                         <span style="margin-left:10px; font-size:13px">
                                             <a href="${rootURL}/job/${jobName}">${jobName}</a>
                                         </span>

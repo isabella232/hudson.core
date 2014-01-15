@@ -134,6 +134,13 @@
                  
             </div>
             
+            <hr/>
+            
+            <div style="margin-top: 10px;">
+                <label>${%Allow selected teams to view Job Configuraton}:</label>
+                <input type="checkbox" style="margin-left:5px" id="allowViewConfig" />
+            </div>
+            
             <div style="margin-top:10px">
                 <span id="configureVisibilityMsg">
                     <!-- message goes here -->

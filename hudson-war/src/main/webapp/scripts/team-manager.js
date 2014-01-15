@@ -469,7 +469,8 @@ function configureJobVisibilityAction(configureJobItem) {
     var jobName = jQuery(trParent).find("input[name='hiddenJobId']").val();
     var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
     var teamNames = jQuery(trParent).find("input[name='hiddenVisibilities']").val();
-
+    var allowViewConfig = jQuery(trParent).find("input[name='hiddenAllowViewConfig']").val();
+     
     jQuery('#dialog-configure-visibility').dialog({
         resizable: false,
         height: 300,
@@ -485,14 +486,24 @@ function configureJobVisibilityAction(configureJobItem) {
                 if (jQuery('#publicVisibility').is(":checked")) {
                     teamNames += "public";
                 }
+ 
+                allowViewConfig = jQuery('#allowViewConfig').is(":checked");
+                    
                 jQuery(trParent).find("input[name='hiddenVisibilities']").val(teamNames);
-                configureJobVisibility(jobName, teamNames);
+                jQuery(trParent).find("input[name='hiddenAllowViewConfig']").val(allowViewConfig);
+                configureJobVisibility(jobName, teamNames, allowViewConfig);
             },
             Cancel: function() {
                 jQuery(this).dialog("close");
             }
         }
     });
+    
+    if ("true" == allowViewConfig){
+       jQuery("#allowViewConfig").prop('checked', true);
+    }else{
+       jQuery("#allowViewConfig").prop('checked', false);
+    }
 
     jQuery.getJSON('getAllTeamsJson', function(json) {
         jQuery('#configure-visibility-team-list').empty();
@@ -520,13 +531,14 @@ function configureJobVisibilityAction(configureJobItem) {
     });
 }
 
-function configureJobVisibility(jobName, teamNames) {
+function configureJobVisibility(jobName, teamNames, allowViewConfig) {
     jQuery.ajax({
         type: 'POST',
         url: "setJobVisibility",
         data: {
             jobName: jobName,
-            teamNames: teamNames
+            teamNames: teamNames,
+            canViewConfig: allowViewConfig
         },
         success: function() {
             jQuery('#dialog-configure-visibility').dialog("close");

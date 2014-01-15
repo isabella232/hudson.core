@@ -125,32 +125,50 @@ public class TeamBasedACL extends SidACL {
             }
             // Grant Read permission to Public Jobs and jobs based on visibility
             if (permission.getImpliedBy() == Permission.READ) {
-                try {
-                    Team publicTeam = teamManager.findTeam(PublicTeam.PUBLIC_TEAM_NAME);
-
-                    if (publicTeam.isJobOwner(job.getName())) {
-                        if (permission.getImpliedBy() == Permission.READ) {
+                 if (hasReadPermission(jobTeam, permission, userName)){
+                     return true;
+                 }
+            }
+            if (permission == Item.EXTENDED_READ) {
+                if (hasReadPermission(jobTeam, permission, userName)) {
+                    if (jobTeam != null) {
+                        TeamJob teamJob = jobTeam.findJob(job.getName());
+                        if (teamJob.isAllowConfigView()) {
                             return true;
                         }
-                    }
-                } catch (TeamNotFoundException ex) {
-                    logger.error("The public team must exists.", ex);
-                }
-
-                if (jobTeam != null) {
-                    TeamJob teamJob = jobTeam.findJob(job.getName());
-                    for (Team userTeam : teamManager.findUserTeams(userName)) {
-                        if (teamJob.isVisible(userTeam.getName())) {
-                            return true;
-                        }
-                    }
-                    if (teamJob.isVisible(PublicTeam.PUBLIC_TEAM_NAME)) {
-                        return true;
                     }
                 }
             }
         }
         return null;
+    }
+    
+    private boolean hasReadPermission(Team jobTeam, Permission permission, String userName) {
+        // Grant Read permission to Public Jobs and jobs based on visibility
+        try {
+            Team publicTeam = teamManager.findTeam(PublicTeam.PUBLIC_TEAM_NAME);
+
+            if (publicTeam.isJobOwner(job.getName())) {
+                if (permission.getImpliedBy() == Permission.READ) {
+                    return true;
+                }
+            }
+        } catch (TeamNotFoundException ex) {
+            logger.error("The public team must exists.", ex);
+        }
+
+        if (jobTeam != null) {
+            TeamJob teamJob = jobTeam.findJob(job.getName());
+            for (Team userTeam : teamManager.findUserTeams(userName)) {
+                if (teamJob.isVisible(userTeam.getName())) {
+                    return true;
+                }
+            }
+            if (teamJob.isVisible(PublicTeam.PUBLIC_TEAM_NAME)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isTeamAwareSecurityRealm() {

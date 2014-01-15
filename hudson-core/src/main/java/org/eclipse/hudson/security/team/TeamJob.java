@@ -28,7 +28,8 @@ import java.util.Set;
 public class TeamJob {
 
     private String id;
-    private Set<String> visibleToTeams = new HashSet<String>();
+    private final Set<String> visibleToTeams = new HashSet<String>();
+    private boolean allow_config_view;
 
     public TeamJob() {
     }
@@ -43,6 +44,14 @@ public class TeamJob {
 
     public void setId(String id) {
         this.id = id;
+    }
+    
+    public boolean isAllowConfigView() {
+        return allow_config_view;
+    }
+
+    public void setAllowConfigView(boolean allow_config_view) {
+        this.allow_config_view = allow_config_view;
     }
 
     void addVisibility(String teamName) {
@@ -105,6 +114,12 @@ public class TeamJob {
                 writer.setValue(strWriter.toString());
                 writer.endNode();
             }
+            
+            if (teamJob.isAllowConfigView()){
+                writer.startNode("allowConfigView");
+                writer.setValue("true");
+                writer.endNode();
+            }
         }
 
         @Override
@@ -119,6 +134,11 @@ public class TeamJob {
                     String teamNames = reader.getValue();
                     for (String teamName : teamNames.split(",")) {
                         teamJob.visibleToTeams.add(teamName);
+                    }
+                }
+                if ("allowConfigView".equals(reader.getNodeName())) {
+                    if ("true".equals(reader.getValue())) {
+                        teamJob.allow_config_view = true;
                     }
                 }
                 reader.moveUp();

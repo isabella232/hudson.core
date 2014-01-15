@@ -41,13 +41,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
@@ -462,7 +460,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
     }
 
-    public HttpResponse doSetJobVisibility(@QueryParameter String jobName, @QueryParameter String teamNames) throws IOException {
+    public HttpResponse doSetJobVisibility(@QueryParameter String jobName, @QueryParameter String teamNames, @QueryParameter boolean canViewConfig) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
             return new TeamUtils.ErrorHttpResponse("No permission to set job visibility.");
         }
@@ -478,6 +476,7 @@ public final class TeamManager implements Saveable, AccessControlled {
             for (String teamName : teamNames.split(":")) {
                 job.addVisibility(teamName);
             }
+            job.setAllowConfigView(canViewConfig); 
             save();
         }
         return HttpResponses.ok();
