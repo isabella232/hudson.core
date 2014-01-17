@@ -468,6 +468,8 @@ public abstract class AbstractBuild<P extends AbstractProject<P, R>, R extends A
          * Output/progress of this build goes here.
          */
         protected BuildListener listener;
+        
+        private Lease lease;
 
         /**
          * Returns the current {@link Node} on which we are buildling.
@@ -501,66 +503,61 @@ public abstract class AbstractBuild<P extends AbstractProject<P, R>, R extends A
                 listener.getLogger().println(node instanceof Hudson ? Messages.AbstractBuild_BuildingOnMaster() : Messages.AbstractBuild_BuildingRemotely(builtOn));
             }
 
-            final Lease lease = decideWorkspace(node, Computer.currentComputer().getWorkspaceList());
+            lease = decideWorkspace(node, Computer.currentComputer().getWorkspaceList());
 
-            try {
-                workspace = lease.path.getRemote();
-                node.getFileSystemProvisioner().prepareWorkspace(AbstractBuild.this, lease.path, listener);
+            workspace = lease.path.getRemote();
+            node.getFileSystemProvisioner().prepareWorkspace(AbstractBuild.this, lease.path, listener);
 
-                if (project.isCleanWorkspaceRequired()) {
-                    listener.getLogger().println("Cleaning the workspace because project is configured to clean the workspace before each build.");
-                    if (!project.cleanWorkspace()) {
-                        listener.getLogger().println("Workspace cleaning was attempted but SCM blocked the cleaning.");
-                    }
+            if (project.isCleanWorkspaceRequired()) {
+                listener.getLogger().println("Cleaning the workspace because project is configured to clean the workspace before each build.");
+                if (!project.cleanWorkspace()) {
+                    listener.getLogger().println("Workspace cleaning was attempted but SCM blocked the cleaning.");
                 }
+            }
 
-                checkout(listener);
+            checkout(listener);
 
-                if (!preBuild(listener, project.getProperties())) {
-                    return Result.FAILURE;
-                }
+            if (!preBuild(listener, project.getProperties())) {
+                return Result.FAILURE;
+            }
 
-                Result result = doRun(listener);
+            Result result = doRun(listener);
 
-                Computer c = node.toComputer();
-                if (c == null || c.isOffline()) {
+            Computer c = node.toComputer();
+            if (c == null || c.isOffline()) {
                     // As can be seen in HUDSON-5073, when a build fails because of the slave connectivity problem,
-                    // error message doesn't point users to the slave. So let's do it here.
-                    listener.hyperlink("/computer/" + builtOn + "/log", "Looks like the node went offline during the build. Check the slave log for the details.");
+                // error message doesn't point users to the slave. So let's do it here.
+                listener.hyperlink("/computer/" + builtOn + "/log", "Looks like the node went offline during the build. Check the slave log for the details.");
 
-                    if (c != null) {
+                if (c != null) {
                         // grab the end of the log file. This might not work very well if the slave already
-                        // starts reconnecting. Fixing this requires a ring buffer in slave logs.
-                        AnnotatedLargeText<Computer> log = c.getLogText();
-                        StringWriter w = new StringWriter();
-                        log.writeHtmlTo(Math.max(0, c.getLogFile().length() - 10240), w);
+                    // starts reconnecting. Fixing this requires a ring buffer in slave logs.
+                    AnnotatedLargeText<Computer> log = c.getLogText();
+                    StringWriter w = new StringWriter();
+                    log.writeHtmlTo(Math.max(0, c.getLogFile().length() - 10240), w);
 
-                        listener.getLogger().print(ExpandableDetailsNote.encodeTo("details", w.toString()));
-                        listener.getLogger().println();
-                    } else {
-                        listener.getLogger().println("No slave log available");
-                    }
+                    listener.getLogger().print(ExpandableDetailsNote.encodeTo("details", w.toString()));
+                    listener.getLogger().println();
+                } else {
+                    listener.getLogger().println("No slave log available");
                 }
+            }
 
                 // kill run-away processes that are left by build
-                // use multiple environment variables so that people can escape this massacre by overriding an environment
-                // variable for some processes
-                launcher.kill(getCharacteristicEnvVars());
+            // use multiple environment variables so that people can escape this massacre by overriding an environment
+            // variable for some processes
+            launcher.kill(getCharacteristicEnvVars());
 
                 // this is ugly, but for historical reason, if non-null value is returned
-                // it should become the final result.
-                if (result == null) {
-                    result = getResult();
-                }
-                if (result == null) {
-                    result = Result.SUCCESS;
-                }
-
-                return result;
-            } finally {
-                lease.release();
-                this.listener = null;
+            // it should become the final result.
+            if (result == null) {
+                result = getResult();
             }
+            if (result == null) {
+                result = Result.SUCCESS;
+            }
+
+            return result;
         }
 
         /**
@@ -673,6 +670,10 @@ public abstract class AbstractBuild<P extends AbstractProject<P, R>, R extends A
         }
 
         public void cleanUp(BuildListener listener) throws Exception {
+            if (lease != null) {
+                lease.release();
+                lease = null;
+            }
             BuildTrigger.execute(AbstractBuild.this, listener);
             buildEnvironments = null;
         }
