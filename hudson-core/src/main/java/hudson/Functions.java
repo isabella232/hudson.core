@@ -66,7 +66,6 @@ import org.eclipse.hudson.security.captcha.CaptchaSupport;
 import hudson.util.Secret;
 import hudson.views.MyViewsTabBar;
 import hudson.views.ViewsTabBar;
-import hudson.widgets.RenderOnDemandClosure;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.providers.anonymous.AnonymousAuthenticationToken;
 import org.apache.commons.jelly.JellyContext;
@@ -1532,10 +1531,4 @@ public class Functions {
         }
         return null;
     }
-    
-    public static String createRenderOnDemandProxy(JellyContext context, String attributesToCapture) {
-        return Stapler.getCurrentRequest().createJavaScriptProxy(new RenderOnDemandClosure(context,attributesToCapture));
-    }
-
-
 }

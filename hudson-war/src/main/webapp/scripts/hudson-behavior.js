@@ -506,25 +506,7 @@ function makeButton(e, onclick) {
 //    }
 //    return btn;
 }
-
-/**
- * Render the template captured by &lt;l:renderOnDemand> at the element 'e' and replace 'e' by the content.
- *
- * @param {HTMLElement} e
- *      The place holder element to be lazy-rendered.
- * @param {boolean} noBehaviour
- *      if specified, skip the application of behaviour rule.
- */
-function renderOnDemand(e,callback,noBehaviour) {
-    if (!e || !Element.hasClassName(e,"render-on-demand")) return;
-    var proxy = eval(e.getAttribute("proxy"));
-    proxy.render(function (t) {
-        Element.replace(e, t.responseText);
-        if (callback)   callback(t);
-        noBehaviour || Behaviour.applySubtree(e);
-    });
-}
-
+ 
 /*
     If we are inside 'to-be-removed' class, some HTML altering behaviors interact badly, because
     the behavior re-executes when the removed master copy gets reinserted later.
@@ -543,49 +525,45 @@ var hudsonRules = {
  
     "DIV.hetero-list-container" : function(e) {
         if(isInsideRemovable(e))    return;
-
+ 
         // components for the add button
         var menu = document.createElement("SELECT");
         var btns = findElementsBySelector(e,"INPUT.hetero-list-add"),
             btn = btns[btns.length-1]; // In case nested content also uses hetero-list
         YAHOO.util.Dom.insertAfter(menu,btn);
-
+ 
         var prototypes = e.lastChild;
         while(!Element.hasClassName(prototypes,"prototypes"))
             prototypes = prototypes.previousSibling;
         var insertionPoint = prototypes.previousSibling;    // this is where the new item is inserted.
-
+ 
         // extract templates
         var templates = []; var i=0;
         for(var n=prototypes.firstChild;n!=null;n=n.nextSibling,i++) {
             var name = n.getAttribute("name");
             var tooltip = n.getAttribute("tooltip");
-            var descriptorId = n.getAttribute("descriptorId");
             menu.options[i] = new Option(n.getAttribute("title"),""+i);
-            templates.push({html:n.innerHTML, name:name, tooltip:tooltip,descriptorId:descriptorId});
+            templates.push({html:n.innerHTML, name:name, tooltip:tooltip});
         }
         Element.remove(prototypes);
-
+ 
         var withDragDrop = initContainerDD(e);
-
+ 
         var menuButton = new YAHOO.widget.Button(btn, { type: "menu", menu: menu });
         menuButton.getMenu().clickEvent.subscribe(function(type,args,value) {
             var t = templates[parseInt(args[1].value)]; // where this args[1] comes is a real mystery
-
+ 
             var nc = document.createElement("div");
             nc.className = "repeated-chunk";
             nc.setAttribute("name",t.name);
             nc.innerHTML = t.html;
-
-            renderOnDemand(findElementsBySelector(nc,"TR.config-page")[0],function() {
-                insertionPoint.parentNode.insertBefore(nc, insertionPoint);
-                if(withDragDrop)    prepareDD(nc);
-
-                hudsonRules['DIV.repeated-chunk'](nc);  // applySubtree doesn't get nc itself
-                Behaviour.applySubtree(nc);
-            },true);
+            insertionPoint.parentNode.insertBefore(nc, insertionPoint);
+            if(withDragDrop)    prepareDD(nc);
+ 
+            hudsonRules['DIV.repeated-chunk'](nc);  // applySubtree doesn't get nc itself
+            Behaviour.applySubtree(nc);
         });
-
+ 
         menuButton.getMenu().renderEvent.subscribe(function(type,args,value) {
             // hook up tooltip for menu items
             var items = menuButton.getMenu().getItems();
@@ -1460,13 +1438,10 @@ function updateDropDownList(sel) {
         var tr = f.start;
         while (true) {
             tr.style.display = (show ? "" : "none");
-            if(show){
+            if(show)
                 tr.removeAttribute("field-disabled");
-                renderOnDemand(tr);
-            }else{
-                // buildFormData uses this attribute and ignores the contents
+            else    // buildFormData uses this attribute and ignores the contents
                 tr.setAttribute("field-disabled","true");
-            }
             if (tr == f.end) break;
             tr = tr.nextSibling;
         }
@@ -2255,55 +2230,11 @@ function createComboBox(idOrField,valueFunction) {
     // If an ID given, create when page has loaded (backward compatibility); otherwise now.
     if (typeof idOrField == "string") Behaviour.addLoadEvent(creator); else creator();
 }
-
-
-// bind tag takes care of the dependency as an adjunct
-function makeStaplerProxy(url, crumb, methods) {
-    if (url.substring(url.length - 1) !== '/')
-        url += '/';
-    var proxy = {};
-    var stringify;
-    if (Object.toJSON) // needs to use Prototype.js if it's present. See commit comment for discussion
-        stringify = Object.toJSON; // from prototype
-    else if (typeof(JSON) == "object" && JSON.stringify)
-        stringify = JSON.stringify; // standard
-    var genMethod = function(methodName) {
-        proxy[methodName] = function() {
-            var args = arguments;
-            // the final argument can be a callback that receives the return value
-            var callback = (function() {
-                if (args.length == 0)
-                    return null;
-                var tail = args[args.length - 1];
-                return (typeof(tail) == 'function') ? tail : null;
-            })();
-            // 'arguments' is not an array so we convert it into an array
-            var a = [];
-            for (var i = 0; i < args.length - (callback != null?1:0); i++)
-                a.push(args[i]);
-
-            new Ajax.Request(url + methodName, {
-                method: 'post',
-                requestHeaders: {'Content-type': 'application/x-stapler-method-invocation;charset=UTF-8', 'Crumb': crumb},
-                postBody: stringify(a),
-                onSuccess: function(t) {
-                    if (callback != null) {
-                        t.responseObject = function() {
-                            return eval('(' + this.responseText + ')');
-                        };
-                        callback(t);
-                    }
-                }
-            });
-        }
-    };
-    
-    for (var mi = 0; mi < methods.length; mi++) {
-        genMethod(methods[mi]);
+ 
+ 
+if (isRunAsTest) {
+    // during the unit test, make Ajax errors fatal
+    Ajax.Request.prototype.dispatchException = function(e) {
+        throw e;
     }
-    return proxy;
-}
-
-Ajax.Request.prototype.dispatchException = function(e) {
-    throw e;
 }
