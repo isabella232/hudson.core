@@ -19,11 +19,11 @@
   <parent>
     <groupId>org.eclipse.hudson</groupId>
     <artifactId>hudson-parent</artifactId>
-    <version> 3.1.2-SNAPSHOT</version>
+    <version> 3.1.2</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>hudson-cli</artifactId>
-  <version>3.1.2-SNAPSHOT</version>
+  <version>3.1.2</version>
   <name>Hudson :: CLI</name>
 
   <build>
