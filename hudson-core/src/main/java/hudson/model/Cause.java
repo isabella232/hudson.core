@@ -25,6 +25,9 @@ import hudson.util.XStream2;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 
 /**
@@ -234,7 +237,13 @@ public abstract class Cause {
         @Override
         public String getShortDescription() {
             if (note != null) {
-                return Messages.Cause_RemoteCause_ShortDescriptionWithNote(addr, note);
+                try {
+                    note =  Hudson.getInstance().getMarkupFormatter().translate(note);
+                    return Messages.Cause_RemoteCause_ShortDescriptionWithNote(addr, note);
+                } catch (IOException ex) {
+                    Logger.getLogger(Cause.class.getName()).log(Level.INFO, "Failed to Markup filter remote cause " + note , ex);
+                    return "Warning: Failed to Markup filter remote cause";
+                }
             } else {
                 return Messages.Cause_RemoteCause_ShortDescription(addr);
             }
