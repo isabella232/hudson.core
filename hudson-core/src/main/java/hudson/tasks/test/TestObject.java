@@ -324,19 +324,26 @@ public abstract class TestObject extends hudson.tasks.junit.TestObject {
     /**
      * #2988: uniquifies a {@link #getSafeName} amongst children of the parent.
      */
-    protected final synchronized String uniquifyName(
-            Collection<? extends TestObject> siblings, String base) {
-        String uniquified = base;
-        int sequence = 1;
-        for (TestObject sibling : siblings) {
-            if (sibling != this && uniquified.equals(UNIQUIFIED_NAMES.get(sibling))) {
-                uniquified = base + '_' + ++sequence;
+    protected final String uniquifyName(Collection<? extends TestObject> siblings, String base) {
+        synchronized (UNIQUIFIED_NAMES) {
+            String uniquified = base;
+            Set<TestObject> siblingsPrevUsed = UNIQUIFIED_NAMES.get(base);
+            if (siblingsPrevUsed == null) {
+                siblingsPrevUsed = Collections.newSetFromMap(new WeakHashMap<TestObject, Boolean>());
+                UNIQUIFIED_NAMES.put(base, siblingsPrevUsed);
+            } else {
+                Set<TestObject> tmpFilter = new HashSet<TestObject>(siblingsPrevUsed);
+                tmpFilter.retainAll(new HashSet<TestObject>(siblings));
+                if (!tmpFilter.isEmpty()) {
+                    uniquified = base + '_' + (tmpFilter.size() + 1);
+                }
             }
+            siblingsPrevUsed.add(this);
+            return uniquified;
         }
-        UNIQUIFIED_NAMES.put(this, uniquified);
-        return uniquified;
     }
-    private static final Map<TestObject, String> UNIQUIFIED_NAMES = new MapMaker().weakKeys().makeMap();
+    
+    private static final Map<String, Set<TestObject>> UNIQUIFIED_NAMES = new MapMaker().weakKeys().makeMap();
 
     /**
      * Replaces URL-unsafe characters.

@@ -40,6 +40,8 @@ public final class ClassResult extends TabulatedResult implements Comparable<Cla
     private int passCount, failCount, skipCount;
     private float duration;
     private final PackageResult parent;
+    
+    private transient String uniqueSafeName;
 
     ClassResult(PackageResult parent, String className) {
         this.parent = parent;
@@ -109,9 +111,13 @@ public final class ClassResult extends TabulatedResult implements Comparable<Cla
         }
     }
 
-    public @Override
-    String getSafeName() {
-        return uniquifyName(parent.getChildren(), safe(getName()));
+    @Override
+    public synchronized String getSafeName() {
+        if (uniqueSafeName != null){
+            return uniqueSafeName;
+        }
+        uniqueSafeName = uniquifyName(parent.getChildren(), safe(getName()));
+        return uniqueSafeName;
     }
 
     public CaseResult getCaseResult(String name) {

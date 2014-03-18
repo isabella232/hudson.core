@@ -40,6 +40,8 @@ public final class PackageResult extends MetaTabulatedResult implements Comparab
     private int passCount, failCount, skipCount;
     private final hudson.tasks.junit.TestResult parent;
     private float duration;
+    
+    private transient String uniqueSafeName;
 
     PackageResult(hudson.tasks.junit.TestResult parent, String packageName) {
         this.packageName = packageName;
@@ -61,11 +63,13 @@ public final class PackageResult extends MetaTabulatedResult implements Comparab
     }
 
     @Override
-    public String getSafeName() {
+    public synchronized String getSafeName() {
+        if (uniqueSafeName != null){
+            return uniqueSafeName;
+        }
         Collection<PackageResult> siblings = (parent == null ? Collections.EMPTY_LIST : parent.getChildren());
-        return uniquifyName(
-                siblings,
-                safe(getName()));
+        uniqueSafeName = uniquifyName(siblings, safe(getName()));
+        return  uniqueSafeName;
     }
 
     @Override

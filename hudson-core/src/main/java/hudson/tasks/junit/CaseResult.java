@@ -53,6 +53,9 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
     private final String errorDetails;
     private transient SuiteResult parent;
     private transient ClassResult classResult;
+    
+    private transient String uniqueSafeName;
+    
     /**
      * Some tools report stdout and stderr at testcase level (such as Maven
      * surefire plugin), others do so at the suite level (such as Ant JUnit
@@ -227,8 +230,11 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
     /**
      * Gets the version of {@link #getName()} that's URL-safe.
      */
-    public @Override
-    String getSafeName() {
+    @Override
+    public synchronized String getSafeName() {
+        if (uniqueSafeName != null){
+            return uniqueSafeName;
+        }
         StringBuilder buf = new StringBuilder(testName);
         for (int i = 0; i < buf.length(); i++) {
             char ch = buf.charAt(i);
@@ -237,7 +243,8 @@ public final class CaseResult extends TestResult implements Comparable<CaseResul
             }
         }
         Collection<CaseResult> siblings = (classResult == null ? Collections.<CaseResult>emptyList() : classResult.getChildren());
-        return uniquifyName(siblings, buf.toString());
+        uniqueSafeName = uniquifyName(siblings, buf.toString());
+        return uniqueSafeName;
     }
 
     /**

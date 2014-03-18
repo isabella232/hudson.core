@@ -30,8 +30,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,6 +66,8 @@ public final class SuiteResult implements Serializable {
      */
     private final List<CaseResult> cases = new ArrayList<CaseResult>();
     private transient hudson.tasks.junit.TestResult parent;
+    
+    private transient Map<String,CaseResult> caseResultNameMap;
 
     SuiteResult(String name, String stdout, String stderr) {
         this.name = name;
@@ -71,6 +75,7 @@ public final class SuiteResult implements Serializable {
         this.stdout = stdout;
         this.file = null;
     }
+    
 
     /**
      * Parses the JUnit XML file into {@link SuiteResult}s. This method returns
@@ -185,9 +190,22 @@ public final class SuiteResult implements Serializable {
         this.stdout = CaseResult.possiblyTrimStdio(cases, keepLongStdio, stdout);
         this.stderr = CaseResult.possiblyTrimStdio(cases, keepLongStdio, stderr);
     }
+    
+    //Workaround for XStream marshalling
+    private synchronized Map<String, CaseResult> getCaseResultNameMap() {
+        if (caseResultNameMap == null) {
+            caseResultNameMap = new HashMap<String, CaseResult>();
+            for (CaseResult c : cases) {
+                caseResultNameMap.put(c.getName(), c);
+            }
+        }
+        return caseResultNameMap;
+    }
+
 
     /*package*/ void addCase(CaseResult cr) {
         cases.add(cr);
+        getCaseResultNameMap().put(cr.getName(), cr);
         duration += cr.getDuration();
     }
 
@@ -262,12 +280,7 @@ public final class SuiteResult implements Serializable {
      * <p> Note that test name needs not be unique.
      */
     public CaseResult getCase(String name) {
-        for (CaseResult c : cases) {
-            if (c.getName().equals(name)) {
-                return c;
-            }
-        }
-        return null;
+        return getCaseResultNameMap().get(name);
     }
 
     public Set<String> getClassNames() {
