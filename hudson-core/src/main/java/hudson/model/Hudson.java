@@ -200,6 +200,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.antlr.runtime.RecognitionException;
 import org.eclipse.hudson.plugins.PluginCenter;
@@ -1908,20 +1909,36 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public String getRootUrl() {
         // for compatibility. the actual data is stored in Mailer
         String url = Mailer.descriptor().getUrl();
-		if (url != null) {
-			URL theUrl;
-			try {
-				theUrl = new URL(url);
-			} catch (MalformedURLException e) {
-				return url;
-			}
-            // Fix 414064 If Hudson URL is configured, the port is ignored
-            int port = theUrl.getPort();
-            String thePort = port == 80 || port == -1 ? "" : ":" + port;
-			String hostNamePart = theUrl.getProtocol() + "://"
-					+ theUrl.getHost() + thePort;
-			return hostNamePart + Functions.getRequestRootPath() + '/';
-		}
+        if (url != null) {
+            // Could be static.
+            Pattern slashTrimmer = Pattern.compile("/?(.*[^/])/?$");
+            // Trim leading and trailing slashes
+            String theRequestPath = Functions.getRequestRootPath();
+            theRequestPath = theRequestPath == null ? "" :theRequestPath;
+            Matcher matcher = slashTrimmer.matcher(theRequestPath);
+            theRequestPath = matcher.find() ? matcher.group(1): "";
+            
+            
+            try {
+                URL theUrl = new URL(url);
+                // Similar trim
+                String thePath = theUrl.getPath();
+                matcher.reset(thePath);
+                thePath = matcher.find() ? matcher.group(1) : "";
+                
+                // Put them back together
+                URL rootUrl = new URL (theUrl.getProtocol(), theUrl.getHost(),
+                                        theUrl.getPort(), String.format("%s%s%s%s/",
+                                                thePath.isEmpty()? "": "/",
+                                                thePath,
+                                                theRequestPath.isEmpty()? "":"/",
+                                                theRequestPath));
+                return rootUrl.toString();
+            } catch (MalformedURLException e) {
+                return url;
+            }
+
+        }
 
         StaplerRequest req = Stapler.getCurrentRequest();
         if (req != null) {
