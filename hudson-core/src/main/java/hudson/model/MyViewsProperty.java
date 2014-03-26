@@ -39,13 +39,13 @@ import javax.servlet.ServletException;
 
 import net.sf.json.JSONObject;
 
-import org.springframework.security.AccessDeniedException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.HttpRedirect;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * A UserProperty that remembers user-private views.

@@ -17,8 +17,8 @@
 package hudson.security;
 
 import java.io.IOException;
-import org.springframework.security.Authentication;
-import org.springframework.security.AuthenticationException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 
 /**
  * Handles authentication for CLI commands.

@@ -20,10 +20,10 @@ import hudson.model.Node;
 
 import java.util.List;
 
-import org.springframework.security.AccessDeniedException;
 import org.hudsonci.service.internal.NodeServiceImpl;
 
 import com.google.inject.ImplementedBy;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * {@link hudson.model.Node} related services.

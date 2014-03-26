@@ -18,8 +18,8 @@ package hudson.cli;
 import hudson.Extension;
 import hudson.model.Hudson;
 import org.eclipse.hudson.security.HudsonSecurityManager;
-import org.springframework.security.Authentication;
 import org.kohsuke.args4j.CmdLineException;
+import org.springframework.security.core.Authentication;
 
 /**
  * Saves the current credential to allow future commands to run without explicit

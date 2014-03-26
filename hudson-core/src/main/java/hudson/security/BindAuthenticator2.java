@@ -15,13 +15,13 @@
  *******************************************************************************/ 
 package hudson.security;
 
-import org.springframework.security.ldap.SpringSecurityContextSource;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import org.springframework.ldap.core.DirContextOperations;
-import org.springframework.security.Authentication;
-import org.springframework.security.providers.ldap.authenticator.BindAuthenticator;
+import org.springframework.ldap.core.support.BaseLdapPathContextSource;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.ldap.authentication.BindAuthenticator;
 
 /**
  * {@link BindAuthenticator} with improved diagnostics.
@@ -34,7 +34,7 @@ public class BindAuthenticator2 extends BindAuthenticator {
      */
     private boolean hadSuccessfulAuthentication;
 
-    public BindAuthenticator2(SpringSecurityContextSource springSecurityContextSource) {
+    public BindAuthenticator2(BaseLdapPathContextSource springSecurityContextSource) {
         super(springSecurityContextSource);
     }
 

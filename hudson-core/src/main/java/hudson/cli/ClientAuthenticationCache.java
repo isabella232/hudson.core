@@ -26,10 +26,6 @@ import hudson.remoting.Callable;
 import hudson.remoting.Channel;
 import hudson.remoting.VirtualChannel;
 import hudson.util.Secret;
-import org.springframework.security.Authentication;
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
-import org.springframework.security.userdetails.UserDetails;
 import org.springframework.dao.DataAccessException;
 
 import java.io.File;
@@ -40,6 +36,10 @@ import java.io.Serializable;
 import java.util.Properties;
 import org.eclipse.hudson.jna.NativeUtils;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * Represents the authentication credential store of the CLI client.

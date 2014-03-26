@@ -45,27 +45,26 @@ import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
-
-import org.springframework.security.Authentication;
-import org.springframework.security.AuthenticationManager;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.GrantedAuthorityImpl;
-import org.springframework.security.context.SecurityContext;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.ui.rememberme.RememberMeServices;
-import org.springframework.security.userdetails.UserDetails;
-import org.springframework.security.userdetails.UserDetailsService;
-import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.kohsuke.stapler.StaplerResponse;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.providers.anonymous.AnonymousProcessingFilter;
-import org.springframework.security.ui.ExceptionTranslationFilter;
-import org.springframework.security.ui.basicauth.BasicProcessingFilter;
-import org.springframework.security.ui.basicauth.BasicProcessingFilterEntryPoint;
-import org.springframework.security.ui.rememberme.RememberMeProcessingFilter;
-import org.springframework.security.userdetails.memory.UserAttribute;
-import org.springframework.security.ui.rememberme.TokenBasedRememberMeServices;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.memory.UserAttribute;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
+
 
 /**
  * Pluggable security realm that connects external user database to Hudson.
@@ -462,9 +461,9 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
         // respond with 401 with basic auth request, instead of redirecting the user to the login page,
         // since users of basic auth tends to be a program and won't see the redirection to the form
         // page as a failure
-        BasicProcessingFilter basicProcessingFilter = new BasicProcessingFilter();
-        basicProcessingFilter.setAuthenticationManager(sc.getManager());
-        BasicProcessingFilterEntryPoint basicProcessingFilterEntryPoint = new BasicProcessingFilterEntryPoint();
+        org.springframework.security.web.authentication.www.BasicAuthenticationFilter basicProcessingFilter = 
+                new org.springframework.security.web.authentication.www.BasicAuthenticationFilter(sc.getManager());
+        BasicAuthenticationEntryPoint basicProcessingFilterEntryPoint = new BasicAuthenticationEntryPoint();
         basicProcessingFilterEntryPoint.setRealmName("Hudson");
         basicProcessingFilter.setAuthenticationEntryPoint(basicProcessingFilterEntryPoint);
         filters.add(basicProcessingFilter);
@@ -472,14 +471,13 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
         AuthenticationProcessingFilter2 authenticationProcessingFilter = new AuthenticationProcessingFilter2();
         authenticationProcessingFilter.setAuthenticationManager(sc.getManager());
         authenticationProcessingFilter.setRememberMeServices(sc.getRememberMe());
-        authenticationProcessingFilter.setAuthenticationFailureUrl("/loginError");
-        authenticationProcessingFilter.setDefaultTargetUrl("/");
+//        authenticationProcessingFilter.setAuthenticationFailureUrl("/loginError");
+//        authenticationProcessingFilter.setDefaultTargetUrl("/");
         authenticationProcessingFilter.setFilterProcessesUrl("/j_spring_security_check");
         filters.add(authenticationProcessingFilter);
 
-        RememberMeProcessingFilter rememberMeProcessingFilter = new RememberMeProcessingFilter();
-        rememberMeProcessingFilter.setRememberMeServices(sc.getRememberMe());
-        rememberMeProcessingFilter.setAuthenticationManager(sc.getManager());
+        RememberMeAuthenticationFilter rememberMeProcessingFilter = new RememberMeAuthenticationFilter(sc.getManager(), sc.getRememberMe());
+        
         filters.add(rememberMeProcessingFilter);
 
         filters.addAll(Arrays.asList(getCommonFilters()));
@@ -488,8 +486,7 @@ public abstract class SecurityRealm extends AbstractDescribableImpl<SecurityReal
     }
 
     public Filter[] getCommonFilters() {
-        AnonymousProcessingFilter anonymousProcessingFilter = new AnonymousProcessingFilter();
-        anonymousProcessingFilter.setKey("anonymous"); // must match with the AnonymousProvider
+        AnonymousAuthenticationFilter anonymousProcessingFilter = new AnonymousAuthenticationFilter("anonymous");
         UserAttribute userAttribute = new UserAttribute();
         userAttribute.setPassword("anonymous");
         String authorities = "anonymous, ROLE_ANONYMOUS";

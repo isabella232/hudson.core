@@ -1,28 +1,24 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
  * Copyright (c) 2004-2009 Oracle Corporation.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * 
- *    Kohsuke Kawaguchi
+ *
+ * Kohsuke Kawaguchi
  *
  *
- *******************************************************************************/ 
-
+ ******************************************************************************
+ */
 package hudson.security;
-
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.ui.webapp.AuthenticationProcessingFilterEntryPoint;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
@@ -31,24 +27,29 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 /**
  * For anonymous requests to pages that require authentication, first respond
  * with {@link HttpServletResponse#SC_FORBIDDEN}, then redirect browsers
  * automatically to the login page.
  *
- * <p> This is a compromise to handle programmatic access and real browsers
- * equally well.
+ * <p>
+ * This is a compromise to handle programmatic access and real browsers equally
+ * well.
  *
- * <p> The page that programs see is entirely white, and it auto-redirects, so
+ * <p>
+ * The page that programs see is entirely white, and it auto-redirects, so
  * humans wouldn't notice it.
  *
  * @author Kohsuke Kawaguchi
  */
-public class HudsonAuthenticationEntryPoint extends AuthenticationProcessingFilterEntryPoint {
+public class HudsonAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
 
     @Override
-    public void commence(ServletRequest request, ServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
+            throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse rsp = (HttpServletResponse) response;
 

@@ -40,7 +40,6 @@ import java.io.IOException;
 
 import net.sf.json.JSONObject;
 
-import org.springframework.security.acls.sid.Sid;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.AncestorInPath;
@@ -53,6 +52,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 import javax.servlet.ServletException;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.springframework.security.acls.model.Sid;
 
 /**
  * {@link JobProperty} to associate ACL for each project.

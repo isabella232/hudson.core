@@ -157,7 +157,6 @@ import hudson.security.csrf.CrumbIssuer;
 import org.eclipse.hudson.WebAppController;
 import static javax.servlet.http.HttpServletResponse.*;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -198,7 +197,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -207,13 +205,12 @@ import org.eclipse.hudson.plugins.PluginCenter;
 import org.eclipse.hudson.script.ScriptSupport;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
-import org.eclipse.hudson.security.team.TeamBasedAuthorizationStrategy;
 import org.eclipse.hudson.security.team.TeamManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.AccessDeniedException;
-import org.springframework.security.Authentication;
-import org.springframework.security.ui.AbstractProcessingFilter;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
 /**
  * Root object of the system.
@@ -3029,13 +3026,14 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             return;
         }
 
-        String url = AbstractProcessingFilter.obtainFullSavedRequestUrl(req);
-        if (url != null) {
-            // if the login redirect is initiated by Spring Security
-            // this should send the user back to where s/he was from.
-            rsp.sendRedirect2(url);
-            return;
-        }
+        // Spring security 3.x will handle the URL redirect
+//        String url = AbstractAuthenticationProcessingFilter.obtainFullSavedRequestUrl(req);
+//        if (url != null) {
+//            // if the login redirect is initiated by Spring Security
+//            // this should send the user back to where s/he was from.
+//            rsp.sendRedirect2(url);
+//            return;
+//        }
 
         rsp.sendRedirect2(".");
     }

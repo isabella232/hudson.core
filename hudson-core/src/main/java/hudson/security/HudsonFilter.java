@@ -30,10 +30,9 @@ import org.eclipse.hudson.security.HudsonSecurityManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.springframework.security.AuthenticationManager;
-import org.springframework.security.ui.rememberme.RememberMeServices;
-import org.springframework.security.userdetails.UserDetailsService;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.RememberMeServices;
 
 /**
  * {@link Filter} that Hudson uses to implement security support.

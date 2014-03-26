@@ -57,9 +57,9 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.AccessDeniedException;
-import org.springframework.security.Authentication;
-import org.springframework.security.GrantedAuthority;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
 /**
  * Manager that manages the teams and their persistence
@@ -657,7 +657,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         return authentication.getName();
     }
 
-    private GrantedAuthority[] getCurrentUserRoles() {
+    private Collection<? extends GrantedAuthority> getCurrentUserRoles() {
         Authentication authentication = HudsonSecurityManager.getAuthentication();
         return authentication.getAuthorities();
     }
@@ -837,7 +837,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         
         Authentication authentication = HudsonSecurityManager.getAuthentication();
         List<Team> userTeams = findUserTeams(authentication.getName());
-        GrantedAuthority[] gas = authentication.getAuthorities();
+        Collection<? extends GrantedAuthority> gas = authentication.getAuthorities();
         if (gas == null) {
             throw new IllegalStateException("authentication.getAuthorities() returned null array");
         }

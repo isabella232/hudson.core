@@ -29,9 +29,6 @@ import hudson.remoting.Channel;
 import hudson.remoting.ChannelProperty;
 import hudson.security.CliAuthenticator;
 import hudson.security.SecurityRealm;
-import org.springframework.security.Authentication;
-import org.springframework.security.context.SecurityContext;
-import org.springframework.security.context.SecurityContextHolder;
 import org.jvnet.hudson.annotation_indexer.Index;
 import org.jvnet.tiger_types.Types;
 import org.kohsuke.args4j.ClassParser;
@@ -48,6 +45,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Base class for Hudson CLI.

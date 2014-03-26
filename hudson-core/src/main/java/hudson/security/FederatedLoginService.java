@@ -43,9 +43,6 @@ import hudson.ExtensionPoint;
 import hudson.model.Hudson;
 import hudson.model.User;
 import hudson.model.UserProperty;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
-import org.springframework.security.userdetails.UserDetails;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -53,6 +50,9 @@ import org.kohsuke.stapler.StaplerResponse;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * Abstraction for a login mechanism through external authenticator/identity

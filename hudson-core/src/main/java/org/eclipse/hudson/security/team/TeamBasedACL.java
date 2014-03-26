@@ -20,7 +20,7 @@ import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.acls.sid.Sid;
+import org.springframework.security.acls.model.Sid;
 
 /**
  * Team based authorization

@@ -16,10 +16,11 @@
 
 package hudson.security;
 
-import org.springframework.security.AuthenticationManager;
-import org.springframework.security.Authentication;
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.DisabledException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+
 
 /**
  * {@link AuthenticationManager} proxy that delegates to another instance.

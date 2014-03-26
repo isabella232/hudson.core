@@ -25,19 +25,6 @@ import hudson.model.User;
 import hudson.tasks.MailAddressResolver;
 import hudson.util.FormValidation;
 import hudson.util.Scrambler;
-import org.springframework.security.SpringSecurityException;
-import org.springframework.security.AuthenticationException;
-import org.springframework.ldap.core.ContextSource;
-import org.springframework.security.ldap.LdapUserSearch;
-import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
-import org.springframework.security.ldap.SpringSecurityLdapTemplate;
-import org.springframework.security.ldap.LdapAuthoritiesPopulator;
-import org.springframework.security.ldap.populator.DefaultLdapAuthoritiesPopulator;
-import org.springframework.security.userdetails.UserDetails;
-import org.springframework.security.userdetails.UserDetailsService;
-import org.springframework.security.userdetails.UsernameNotFoundException;
-import org.springframework.security.userdetails.ldap.LdapUserDetails;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -58,15 +45,29 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.DefaultDirObjectFactory;
+import org.springframework.security.authentication.AnonymousAuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.RememberMeAuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
-import org.springframework.security.providers.AuthenticationProvider;
-import org.springframework.security.providers.ProviderManager;
-import org.springframework.security.providers.anonymous.AnonymousAuthenticationProvider;
-import org.springframework.security.providers.ldap.LdapAuthenticationProvider;
-import org.springframework.security.providers.rememberme.RememberMeAuthenticationProvider;
-import org.springframework.security.userdetails.ldap.LdapUserDetailsService;
+import org.springframework.security.ldap.SpringSecurityLdapTemplate;
+import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
+import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
+import org.springframework.security.ldap.search.LdapUserSearch;
+import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator;
+import org.springframework.security.ldap.userdetails.InetOrgPerson;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
+import org.springframework.security.ldap.userdetails.LdapUserDetails;
+import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
+
 
 /**
  * {@link SecurityRealm} implementation that uses LDAP for authentication.
@@ -397,6 +398,9 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
 
     /**
      * {@inheritDoc}
+     * @param username
+     * @param password
+     * @return 
      */
     @Override
     protected UserDetails authenticate(String username, String password) throws AuthenticationException {
@@ -406,6 +410,8 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
 
     /**
      * {@inheritDoc}
+     * @param username
+     * @return 
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
@@ -417,6 +423,8 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
      * names in GROUP_SEARCH_FILTER of authoritiesPopulator entry. The defaults
      * are a prefix of "ROLE_" and using all uppercase. This method will not
      * return any data if the given name lacks the proper prefix and/or case.
+     * @param groupname
+     * @return 
      */
     @Override
     public GroupDetails loadGroupByGroupname(String groupname) throws UsernameNotFoundException, DataAccessException {
@@ -483,6 +491,7 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
     @Extension
     public static final class MailAdressResolverImpl extends MailAddressResolver {
 
+        @Override
         public String findMailAddressFor(User u) {
             // LDAP not active
             SecurityRealm realm = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm();
@@ -490,25 +499,20 @@ public class LDAPSecurityRealm extends AbstractPasswordBasedSecurityRealm {
                 return null;
             }
             try {
-                LdapUserDetails details = (LdapUserDetails) realm.getSecurityComponents().userDetails.loadUserByUsername(u.getId());
-                Attribute mail = details.getAttributes().get("mail");
-                if (mail == null) {
-                    return null;    // not found
+                UserDetails details =  realm.getSecurityComponents().userDetails.loadUserByUsername(u.getId());
+                if (details instanceof InetOrgPerson){
+                    InetOrgPerson inetOrgPerson = (InetOrgPerson) details;
+                    return inetOrgPerson.getMail();
                 }
-                return (String) mail.get();
+                
+                return null;
             } catch (UsernameNotFoundException e) {
                 LOGGER.log(Level.FINE, "Failed to look up LDAP for e-mail address", e);
                 return null;
             } catch (DataAccessException e) {
                 LOGGER.log(Level.FINE, "Failed to look up LDAP for e-mail address", e);
                 return null;
-            } catch (NamingException e) {
-                LOGGER.log(Level.FINE, "Failed to look up LDAP for e-mail address", e);
-                return null;
-            } catch (SpringSecurityException e) {
-                LOGGER.log(Level.FINE, "Failed to look up LDAP for e-mail address", e);
-                return null;
-            }
+            }  
         }
     }
 

@@ -16,13 +16,12 @@
 
 package hudson.security;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.acls.sid.Sid;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import static java.util.logging.Level.FINE;
+import org.springframework.security.acls.model.Sid;
+import org.springframework.security.core.Authentication;
 
 /**
  * Accses control list.

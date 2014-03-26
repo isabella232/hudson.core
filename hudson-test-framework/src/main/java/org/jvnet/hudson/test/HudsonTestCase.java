@@ -91,12 +91,6 @@ import junit.framework.TestCase;
 
 import net.sourceforge.htmlunit.corejs.javascript.Context;
 import net.sourceforge.htmlunit.corejs.javascript.ContextFactory.Listener;
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.BadCredentialsException;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.userdetails.UserDetails;
-import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -144,14 +138,18 @@ import java.util.concurrent.CountDownLatch;
 
 import hudson.maven.MavenEmbedder;
 import hudson.maven.MavenRequest;
-import hudson.security.*;
-import hudson.util.SecurityFailedToInit;
 import java.nio.charset.Charset;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.eclipse.hudson.HudsonServletContextListener;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * Base class for all Hudson test cases.
@@ -575,7 +573,7 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
 
             @Override
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
-                return new org.springframework.security.userdetails.User(username, "", true, true, true, true, new GrantedAuthority[]{AUTHENTICATED_AUTHORITY});
+                return new org.springframework.security.core.userdetails.User(username, "", true, true, true, true, Arrays.asList(new GrantedAuthority[]{AUTHENTICATED_AUTHORITY}));
             }
 
             @Override

@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Collection;
 import java.util.logging.Logger;
-import org.springframework.security.Authentication;
-import org.springframework.security.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Runs a job on all projects in the order of dependencies

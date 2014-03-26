@@ -26,7 +26,6 @@ import hudson.security.SecurityRealm;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -36,8 +35,8 @@ import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
-import org.springframework.security.AccessDeniedException;
-import org.springframework.security.Authentication;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 
 /**
  * A simple model to hold team members and name of jobs belong to the team

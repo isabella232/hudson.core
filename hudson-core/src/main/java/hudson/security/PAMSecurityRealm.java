@@ -21,29 +21,30 @@ import hudson.model.Descriptor;
 import hudson.Util;
 import hudson.Extension;
 import hudson.util.FormValidation;
+import java.util.ArrayList;
 import org.eclipse.hudson.jna.NativeAccessException;
 import org.eclipse.hudson.jna.NativeUtils;
 import java.util.Arrays;
+import java.util.List;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import java.util.Set;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
-
-import org.springframework.security.Authentication;
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.BadCredentialsException;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.GrantedAuthorityImpl;
-import org.springframework.security.providers.AuthenticationProvider;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
-import org.springframework.security.userdetails.UsernameNotFoundException;
-import org.springframework.security.userdetails.UserDetailsService;
-import org.springframework.security.userdetails.UserDetails;
-import org.springframework.security.userdetails.User;
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.providers.ProviderManager;
-import org.springframework.security.providers.anonymous.AnonymousAuthenticationProvider;
-import org.springframework.security.providers.rememberme.RememberMeAuthenticationProvider;
+import org.springframework.security.authentication.AnonymousAuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.RememberMeAuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * {@link SecurityRealm} that uses Unix PAM authentication.
@@ -79,10 +80,10 @@ public class PAMSecurityRealm extends SecurityRealm {
             try {
 
                 Set<String> grps = NativeUtils.getInstance().pamAuthenticate(serviceName, username, password);
-                GrantedAuthority[] groups = new GrantedAuthority[grps.size()];
+                List<GrantedAuthority> groups = new ArrayList<GrantedAuthority>();
                 int i = 0;
                 for (String g : grps) {
-                    groups[i++] = new GrantedAuthorityImpl(g);
+                    groups.add(new GrantedAuthorityImpl(g));
                 }
                 EnvVars.setHudsonUserEnvVar(username);
                 // I never understood why Spring Security insists on keeping the password...
@@ -93,11 +94,13 @@ public class PAMSecurityRealm extends SecurityRealm {
 
         }
 
+        @Override
         public boolean supports(Class clazz) {
             return true;
         }
     }
 
+    @Override
     public SecurityComponents createSecurityComponents() {
 
         // talk to PAM
@@ -135,7 +138,7 @@ public class PAMSecurityRealm extends SecurityRealm {
 
                 // return some dummy instance
                 return new User(username, "", true, true, true, true,
-                        new GrantedAuthority[]{AUTHENTICATED_AUTHORITY});
+                        Arrays.asList(new GrantedAuthority[]{AUTHENTICATED_AUTHORITY}));
             }
         };
 
@@ -164,6 +167,7 @@ public class PAMSecurityRealm extends SecurityRealm {
 
     public static final class DescriptorImpl extends Descriptor<SecurityRealm> {
 
+        @Override
         public String getDisplayName() {
             return Messages.PAMSecurityRealm_DisplayName();
         }

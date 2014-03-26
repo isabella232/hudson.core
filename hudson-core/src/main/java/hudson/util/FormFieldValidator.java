@@ -41,8 +41,8 @@ import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-import org.springframework.security.AccessDeniedException;
 import org.kohsuke.stapler.Stapler;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * Base class that provides the framework for doing on-the-fly form field

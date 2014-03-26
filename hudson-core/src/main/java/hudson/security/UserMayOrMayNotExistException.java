@@ -16,8 +16,8 @@
 
 package hudson.security;
 
-import org.springframework.security.userdetails.UsernameNotFoundException;
-import org.springframework.security.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * Thrown from {@link UserDetailsService#loadUserByUsername(String)} to indicate

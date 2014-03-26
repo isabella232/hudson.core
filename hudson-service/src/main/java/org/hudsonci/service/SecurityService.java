@@ -22,11 +22,11 @@ import hudson.security.Permission;
 
 import java.util.concurrent.Callable;
 
-import org.springframework.security.AccessDeniedException;
-import org.springframework.security.Authentication;
 import org.hudsonci.service.internal.SecurityServiceImpl;
 
 import com.google.inject.ImplementedBy;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 
 /**
  * Security services.

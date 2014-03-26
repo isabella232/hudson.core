@@ -16,13 +16,12 @@
 
 package hudson.security;
 
-import org.springframework.security.ui.rememberme.RememberMeServices;
-import org.springframework.security.Authentication;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import hudson.model.Hudson;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.RememberMeServices;
 
 /**
  * {@link RememberMeServices} proxy.

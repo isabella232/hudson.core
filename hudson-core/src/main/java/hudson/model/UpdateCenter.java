@@ -31,7 +31,6 @@ import hudson.model.UpdateSite.Data;
 import hudson.model.UpdateSite.Plugin;
 import hudson.model.listeners.SaveableListener;
 import hudson.util.*;
-import org.springframework.security.Authentication;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.kohsuke.stapler.StaplerResponse;
@@ -62,6 +61,7 @@ import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.springframework.security.core.Authentication;
 
 /**
  * Controls update center capability.

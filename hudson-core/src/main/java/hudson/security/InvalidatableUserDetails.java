@@ -16,11 +16,11 @@
 
 package hudson.security;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.context.SecurityContext;
-import org.springframework.security.userdetails.UserDetails;
 
 import javax.servlet.http.HttpSession;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * {@link UserDetails} that can mark {@link Authentication} invalid.

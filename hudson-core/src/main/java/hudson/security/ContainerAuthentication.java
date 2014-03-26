@@ -15,16 +15,16 @@
 
 package hudson.security;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.GrantedAuthorityImpl;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Collection;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
 
 /**
  * {@link Authentication} implementation for {@link Principal} given through
@@ -38,13 +38,14 @@ import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 public final class ContainerAuthentication implements Authentication {
 
     private final Principal principal;
-    private GrantedAuthority[] authorities;
+    private final List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();;
 
     /**
      * Servlet container can tie a {@link ServletRequest} to the request
      * handling thread, so we need to capture all the information upfront to
      * allow {@link Authentication} to be passed to other threads, like update
      * center does. See HUDSON-5382.
+     * @param request
      */
     public ContainerAuthentication(HttpServletRequest request) {
         this.principal = request.getUserPrincipal();
@@ -53,41 +54,47 @@ public final class ContainerAuthentication implements Authentication {
         }
         // Servlet API doesn't provide a way to list up all roles the current user
         // has, so we need to ask AuthorizationStrategy what roles it is going to check against.
-        List<GrantedAuthority> l = new ArrayList<GrantedAuthority>();
+         
         for (String g : HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy().getGroups()) {
             if (request.isUserInRole(g)) {
-                l.add(new GrantedAuthorityImpl(g));
+                authorities.add(new GrantedAuthorityImpl(g));
             }
         }
-        l.add(SecurityRealm.AUTHENTICATED_AUTHORITY);
-        authorities = l.toArray(new GrantedAuthority[l.size()]);
+        authorities.add(SecurityRealm.AUTHENTICATED_AUTHORITY);
     }
 
-    public GrantedAuthority[] getAuthorities() {
-        return authorities;
-    }
-
+    @Override
     public Object getCredentials() {
         return null;
     }
 
+    @Override
     public Object getDetails() {
         return null;
     }
 
+    @Override
     public String getPrincipal() {
         return principal.getName();
     }
 
+    @Override
     public boolean isAuthenticated() {
         return true;
     }
 
+    @Override
     public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
         // noop
     }
 
+    @Override
     public String getName() {
         return getPrincipal();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+         return authorities;
     }
 }

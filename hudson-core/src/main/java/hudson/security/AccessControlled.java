@@ -16,7 +16,8 @@
 
 package hudson.security;
 
-import org.springframework.security.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
+
 
 /**
  * Object that has an {@link ACL}

@@ -21,7 +21,7 @@ import java.util.Collection;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.eclipse.hudson.security.team.TeamManager;
 import org.kohsuke.args4j.Option;
-import org.springframework.security.Authentication;
+import org.springframework.security.core.Authentication;
 
 /**
  * Lists the teams and READ or CREATE job permissions of the current user.

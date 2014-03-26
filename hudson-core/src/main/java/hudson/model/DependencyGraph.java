@@ -18,8 +18,6 @@ package hudson.model;
 
 import hudson.security.ACL;
 import hudson.security.NotSerilizableSecurityContext;
-import org.springframework.security.context.SecurityContext;
-import org.springframework.security.context.SecurityContextHolder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +32,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
+
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Maintains the build dependencies between {@link AbstractProject}s for

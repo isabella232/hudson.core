@@ -19,8 +19,8 @@ package org.hudsonci.service;
 import com.google.inject.ImplementedBy;
 import hudson.model.Hudson;
 import hudson.model.Queue;
-import org.springframework.security.AccessDeniedException;
 import org.hudsonci.service.internal.QueueServiceImpl;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * Default implementation of {@link QueueService}

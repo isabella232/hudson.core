@@ -26,14 +26,13 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import org.eclipse.hudson.api.model.IJob;
 import org.eclipse.hudson.graph.Graph;
 import org.kohsuke.stapler.StaplerProxy;
-import org.springframework.security.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 
 
 /**

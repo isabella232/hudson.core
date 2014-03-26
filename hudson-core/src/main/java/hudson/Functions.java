@@ -67,7 +67,6 @@ import hudson.util.Secret;
 import hudson.views.MyViewsTabBar;
 import hudson.views.ViewsTabBar;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.providers.anonymous.AnonymousAuthenticationToken;
 import org.apache.commons.jelly.JellyContext;
 import org.apache.commons.jelly.JellyTagException;
 import org.apache.commons.jelly.Script;
@@ -124,7 +123,7 @@ import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
 import org.eclipse.hudson.script.ScriptSupport;
 import org.eclipse.hudson.security.HudsonSecurityManager;
-import org.eclipse.hudson.security.team.TeamManager;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
 /**
  * Utility functions used in views.

@@ -24,9 +24,6 @@ import hudson.cli.CloneableCLICommand;
 import hudson.model.Hudson;
 import hudson.remoting.Channel;
 import hudson.security.CliAuthenticator;
-import org.springframework.security.Authentication;
-import org.springframework.security.context.SecurityContext;
-import org.springframework.security.context.SecurityContextHolder;
 import org.jvnet.hudson.annotation_indexer.Index;
 import org.jvnet.localizer.ResourceBundleHolder;
 import org.kohsuke.args4j.ClassParser;
@@ -48,6 +45,9 @@ import java.util.Stack;
 import static java.util.logging.Level.SEVERE;
 import java.util.logging.Logger;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Discover {@link CLIMethod}s and register them as {@link CLICommand}

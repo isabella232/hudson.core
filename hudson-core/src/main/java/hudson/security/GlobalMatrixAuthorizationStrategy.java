@@ -31,8 +31,6 @@ import hudson.util.RobustReflectionConverter;
 import hudson.Functions;
 import hudson.Extension;
 import net.sf.json.JSONObject;
-import org.springframework.security.userdetails.UsernameNotFoundException;
-import org.springframework.security.acls.sid.Sid;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
@@ -54,6 +52,8 @@ import java.util.Collections;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.springframework.security.acls.model.Sid;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * Role-based authorization via a matrix.

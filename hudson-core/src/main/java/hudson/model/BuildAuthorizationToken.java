@@ -23,7 +23,7 @@ import org.kohsuke.stapler.StaplerResponse;
 
 import java.io.IOException;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
-import org.springframework.security.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * Authorization token to allow projects to trigger themselves under the secured

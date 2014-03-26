@@ -17,13 +17,9 @@
 package hudson.security;
 
 import hudson.model.Hudson;
-import org.springframework.security.AccessDeniedException;
-import org.springframework.security.ui.AccessDeniedHandler;
 import org.kohsuke.stapler.Stapler;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +27,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 /**
  * Handles {@link AccessDeniedException} happened during request processing.
@@ -40,7 +38,8 @@ import java.util.Vector;
  */
 public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
 
-    public void handle(ServletRequest request, ServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    @Override
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse rsp = (HttpServletResponse) response;
 
@@ -66,5 +65,5 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
         });
 
         stapler.invoke(req, rsp, Hudson.getInstance(), "/accessDenied");
-    }
+    } 
 }

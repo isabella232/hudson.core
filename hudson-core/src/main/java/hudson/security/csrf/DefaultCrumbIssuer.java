@@ -31,9 +31,9 @@ import javax.servlet.http.HttpServletRequest;
 import net.sf.json.JSONObject;
 import org.eclipse.hudson.security.HudsonSecurityManager;
 
-import org.springframework.security.Authentication;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
+import org.springframework.security.core.Authentication;
 
 /**
  * A crumb issuing algorithm based on the request principal and the remote

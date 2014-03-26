@@ -33,30 +33,23 @@ import hudson.util.XmlUtils;
 import java.io.File;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import javax.crypto.SecretKey;
 import javax.servlet.ServletException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.Authentication;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.GrantedAuthorityImpl;
-import org.springframework.security.SpringSecurityException;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.providers.anonymous.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * Manager that manages Hudson Security. The configuration is written to the
@@ -82,7 +75,7 @@ public class HudsonSecurityManager implements Saveable {
      * @since 1.343
      */
     public static final Authentication ANONYMOUS = new AnonymousAuthenticationToken(
-            "anonymous", "anonymous", new GrantedAuthority[]{new GrantedAuthorityImpl("anonymous")});
+            "anonymous", "anonymous", Arrays.asList(new GrantedAuthority[]{new GrantedAuthorityImpl("anonymous")}));
     /**
      * Controls a part of the <a
      * href="http://en.wikipedia.org/wiki/Authentication">authentication</a>
@@ -266,7 +259,7 @@ public class HudsonSecurityManager implements Saveable {
             }
         } catch (ServletException e) {
             // for binary compatibility, this method cannot throw a checked exception
-            throw new SpringSecurityException("Failed to configure filter", e) {
+            throw new RuntimeException("Failed to configure filter", e) {
             };
         }
     }

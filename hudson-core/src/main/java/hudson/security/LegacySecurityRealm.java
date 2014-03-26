@@ -15,9 +15,6 @@
 
 package hudson.security;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.AuthenticationManager;
-import org.springframework.security.AuthenticationException;
 import org.kohsuke.stapler.StaplerRequest;
 import hudson.model.Descriptor;
 import hudson.Extension;
@@ -28,6 +25,9 @@ import net.sf.json.JSONObject;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 
 /**
  * {@link SecurityRealm} that accepts {@link ContainerAuthentication} object

@@ -17,6 +17,7 @@
 package hudson.security;
 
 import hudson.Functions;
+import hudson.model.Hudson;
 import hudson.util.Scrambler;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -31,7 +32,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
-import org.springframework.security.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Implements the dual authentcation mechanism.

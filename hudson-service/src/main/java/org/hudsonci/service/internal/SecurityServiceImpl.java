@@ -19,9 +19,6 @@ package org.hudsonci.service.internal;
 import hudson.model.User;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
-import org.springframework.security.Authentication;
-import org.springframework.security.context.SecurityContext;
-import org.springframework.security.context.SecurityContextHolder;
 import org.hudsonci.service.SecurityService;
 
 import javax.inject.Inject;
@@ -30,6 +27,9 @@ import javax.inject.Singleton;
 import java.util.concurrent.Callable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Default {@link SecurityService} implementation.

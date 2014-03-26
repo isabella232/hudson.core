@@ -30,7 +30,7 @@ import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.eclipse.hudson.security.team.Team;
 import org.eclipse.hudson.security.team.TeamManager;
 import org.kohsuke.args4j.Option;
-import org.springframework.security.Authentication;
+import org.springframework.security.core.Authentication;
 
 /**
  * List the jobs in Hudson.

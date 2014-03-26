@@ -16,12 +16,13 @@
 
 package hudson.security;
 
-import org.springframework.security.GrantedAuthority;
-import org.springframework.ldap.core.ContextSource;
-import org.springframework.security.ldap.LdapAuthoritiesPopulator;
-import org.springframework.security.ldap.populator.DefaultLdapAuthoritiesPopulator;
 import hudson.security.SecurityRealm.SecurityComponents;
+import java.util.Collection;
+import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextOperations;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 
 /**
  * Implementation of {@link LdapAuthoritiesPopulator} that defers creation of a
@@ -33,7 +34,7 @@ import org.springframework.ldap.core.DirContextOperations;
  * {@link SecurityRealm} is created, so the initialization order issue that this
  * code was trying to address no longer exists.
  */
-public class DeferredCreationLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
+public final class DeferredCreationLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
 
     /**
      * A default role which will be assigned to all authenticated users if set.
@@ -43,7 +44,7 @@ public class DeferredCreationLdapAuthoritiesPopulator implements LdapAuthorities
      * An initial context source is only required if searching for groups is
      * required.
      */
-    private ContextSource contextSource;
+    private final ContextSource contextSource;
     /**
      * Controls used to determine whether group searches should be performed
      * over the full sub-tree from the base DN.
@@ -68,8 +69,7 @@ public class DeferredCreationLdapAuthoritiesPopulator implements LdapAuthorities
     /**
      * Constructor.
      *
-     * @param initialDirContextFactory supplies the contexts used to search for
-     * user roles.
+     * @param contextSource
      * @param groupSearchBase if this is an empty string the search will be
      * performed from the root DN of the context factory.
      */
@@ -77,10 +77,6 @@ public class DeferredCreationLdapAuthoritiesPopulator implements LdapAuthorities
             ContextSource contextSource, String groupSearchBase) {
         this.contextSource = contextSource;
         this.setGroupSearchBase(groupSearchBase);
-    }
-
-    public GrantedAuthority[] getGrantedAuthorities(DirContextOperations user, String username) {
-        return create().getGrantedAuthorities(user, username);
     }
 
     public void setConvertToUpperCase(boolean convertToUpperCase) {
@@ -128,5 +124,10 @@ public class DeferredCreationLdapAuthoritiesPopulator implements LdapAuthorities
         populator.setRolePrefix(rolePrefix);
         populator.setSearchSubtree(searchSubtree);
         return populator;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getGrantedAuthorities(DirContextOperations user, String username) {
+        return create().getGrantedAuthorities(user, username);
     }
 }

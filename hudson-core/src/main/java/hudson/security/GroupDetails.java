@@ -16,7 +16,7 @@
 
 package hudson.security;
 
-import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * Represents the details of a group.

@@ -15,13 +15,15 @@
 
 package hudson.security;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
-import org.springframework.security.acls.sid.PrincipalSid;
-import org.springframework.security.acls.sid.Sid;
 import hudson.model.Executor;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.hudson.security.HudsonSecurityManager;
-import org.springframework.security.GrantedAuthority;
+import org.springframework.security.acls.domain.PrincipalSid;
+import org.springframework.security.acls.model.Sid;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
 /**
  * Gate-keeper that controls access to Hudson's model objects.
@@ -89,7 +91,8 @@ public abstract class ACL {
      */
     public static final Sid ANONYMOUS = new PrincipalSid("anonymous");
     protected static final Sid[] AUTOMATIC_SIDS = new Sid[]{EVERYONE, ANONYMOUS};
-    public static final GrantedAuthority[] NO_AUTHORITIES = new GrantedAuthority[0];
+    public static final List<GrantedAuthority> NO_AUTHORITIES = new ArrayList<GrantedAuthority>();
+     
     /**
      * {@link Sid} that represents the Hudson itself. <p> This is used when
      * Hudson is performing computation for itself, instead of acting on behalf

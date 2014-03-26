@@ -32,16 +32,6 @@ import hudson.util.Scrambler;
 import hudson.util.XStream2;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.Authentication;
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.BadCredentialsException;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
-import org.springframework.security.providers.encoding.PasswordEncoder;
-import org.springframework.security.providers.encoding.ShaPasswordEncoder;
-import org.springframework.security.userdetails.UserDetails;
-import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.kohsuke.stapler.*;
 import org.springframework.dao.DataAccessException;
 
@@ -51,11 +41,23 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * {@link SecurityRealm} that performs authentication by looking up
@@ -375,6 +377,10 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
 
     /**
      * Creates a new user account by registering a password to the user.
+     * @param userName
+     * @param password
+     * @return 
+     * @throws java.io.IOException 
      */
     public User createAccount(String userName, String password) throws IOException {
         User user = User.get(userName);
@@ -385,25 +391,31 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
     /**
      * This is used primarily when the object is listed in the breadcrumb, in
      * the user management screen.
+     * @return 
      */
+    @Override
     public String getDisplayName() {
         return "User Database";
     }
 
+    @Override
     public ACL getACL() {
         return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getACL();
     }
 
+    @Override
     public void checkPermission(Permission permission) {
         HudsonSecurityEntitiesHolder.getHudsonSecurityManager().checkPermission(permission);
     }
 
+    @Override
     public boolean hasPermission(Permission permission) {
         return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().hasPermission(permission);
     }
 
     /**
      * All users who can login to the system.
+     * @return 
      */
     public List<User> getAllUsers() {
         List<User> r = new ArrayList<User>();
@@ -419,6 +431,8 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
     /**
      * This is to map users under the security realm URL. This in turn helps us
      * set up the right navigation breadcrumb.
+     * @param id
+     * @return 
      */
     public User getUser(String id) {
         return User.get(id);
@@ -514,11 +528,12 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
             return new Details(PASSWORD_ENCODER.encodePassword(rawPassword, null));
         }
 
-        public GrantedAuthority[] getAuthorities() {
-            // TODO
-            return TEST_AUTHORITY;
+         @Override
+        public Collection<? extends GrantedAuthority> getAuthorities() {
+            return Arrays.asList(TEST_AUTHORITY);
         }
 
+        @Override
         public String getPassword() {
             return passwordHash;
         }
@@ -528,6 +543,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
             return Protector.protect(Stapler.getCurrentRequest().getSession().getId() + ':' + getPassword());
         }
 
+        @Override
         public String getUsername() {
             return user.getId();
         }
@@ -536,22 +552,27 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
             return user;
         }
 
+        @Override
         public boolean isAccountNonExpired() {
             return true;
         }
 
+        @Override
         public boolean isAccountNonLocked() {
             return true;
         }
 
+        @Override
         public boolean isCredentialsNonExpired() {
             return true;
         }
 
+        @Override
         public boolean isEnabled() {
             return true;
         }
 
+        @Override
         public boolean isInvalid() {
             return user == null;
         }
@@ -575,6 +596,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
         @Extension
         public static final class DescriptorImpl extends UserPropertyDescriptor {
 
+            @Override
             public String getDisplayName() {
                 // this feature is only when HudsonPrivateSecurityRealm is enabled
                 if (isEnabled()) {
@@ -608,6 +630,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
                 return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm() instanceof HudsonPrivateSecurityRealm;
             }
 
+            @Override
             public UserProperty newInstance(User user) {
                 return null;
             }
@@ -621,6 +644,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
     @Extension
     public static final class ManageUserLinks extends ManagementLink {
 
+        @Override
         public String getIconFileName() {
             if (HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm() instanceof HudsonPrivateSecurityRealm) {
                 return "user.png";
@@ -629,10 +653,12 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
             }
         }
 
+        @Override
         public String getUrlName() {
             return "securityRealm/";
         }
 
+        @Override
         public String getDisplayName() {
             return Messages.HudsonPrivateSecurityRealm_ManageUserLinks_DisplayName();
         }
@@ -655,10 +681,12 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
     public static final PasswordEncoder PASSWORD_ENCODER = new PasswordEncoder() {
         private final PasswordEncoder passwordEncoder = new ShaPasswordEncoder(256);
 
+        @Override
         public String encodePassword(String rawPass, Object _) throws DataAccessException {
             return hash(rawPass);
         }
 
+        @Override
         public boolean isPasswordValid(String encPass, String rawPass, Object _) throws DataAccessException {
             // pull out the sale from the encoded password
             int i = encPass.indexOf(':');
@@ -698,6 +726,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
     @Extension
     public static final class DescriptorImpl extends Descriptor<SecurityRealm> {
 
+        @Override
         public String getDisplayName() {
             return Messages.HudsonPrivateSecurityRealm_DisplayName();
         }
@@ -708,9 +737,11 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
         }
     }
     private static final Filter CREATE_FIRST_USER_FILTER = new Filter() {
+        @Override
         public void init(FilterConfig config) throws ServletException {
         }
 
+        @Override
         public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
             HttpServletRequest req = (HttpServletRequest) request;
 
@@ -731,6 +762,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
                     && HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecurityRealm() instanceof HudsonPrivateSecurityRealm;
         }
 
+        @Override
         public void destroy() {
         }
     };

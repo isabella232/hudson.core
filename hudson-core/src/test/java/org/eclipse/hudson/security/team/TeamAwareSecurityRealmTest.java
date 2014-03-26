@@ -23,8 +23,8 @@ import org.eclipse.hudson.security.HudsonSecurityManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.acls.sid.PrincipalSid;
-import org.springframework.security.acls.sid.Sid;
+import org.springframework.security.acls.domain.PrincipalSid;
+import org.springframework.security.acls.model.Sid;
 
 /**
  * Test class for TeamAwareSecurityRealmTest
