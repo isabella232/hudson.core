@@ -16,7 +16,6 @@
 
 package hudson.security;
 
-import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.io.IOException;
@@ -27,8 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -56,7 +53,11 @@ public class AuthenticationProcessingFilter2 extends UsernamePasswordAuthenticat
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         SavedRequestAwareAuthenticationSuccessHandler handler = (SavedRequestAwareAuthenticationSuccessHandler) super.getSuccessHandler();
         String targetUrl = request.getParameter("from");
-        handler.setDefaultTargetUrl(targetUrl); 
+        if ((targetUrl != null) && !targetUrl.equals("")) {
+            handler.setDefaultTargetUrl(targetUrl);
+        }else{
+            handler.setDefaultTargetUrl("/");
+        }
         super.successfulAuthentication(request, response, chain, authResult); 
         LOGGER.log(Level.INFO, "Login attempt successful for user", authResult.getPrincipal());
     }

@@ -51,7 +51,7 @@
             <label for="j_password">${%Password}</label>
             <input  type="password" name="j_password" id="j_password"/>
             
-            <input type="hidden" name="from" value="${submitFrom}" />
+            <input type="hidden" name="from" value="${request.getParameter('from')}" />
             
             <j:if test="${app.security.name()=='SECURED'}">
                 <br/>

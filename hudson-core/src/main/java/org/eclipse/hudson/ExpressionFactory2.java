@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.acls.model.AclDataAccessException;
+import org.springframework.security.core.AuthenticationException;
 
 /**
  * {@link ExpressionFactory} so that security exception aborts the page
@@ -86,7 +89,16 @@ public final class ExpressionFactory2 implements ExpressionFactory {
                 CURRENT_CONTEXT.set(context);
                 JexlContext jexlContext = new JellyJexlContext(context);
                 return expression.evaluate(jexlContext);
-            } catch (Exception e) {
+            } catch (AccessDeniedException e) {
+                // let all Spring security exception pass through
+                throw e;
+            } catch (AclDataAccessException e) {
+                // let all Spring security exception pass through
+                throw e;
+            }catch (AuthenticationException e) {
+                // let all Spring security exception pass through
+                throw e;
+            }catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Caught exception evaluating: " + expression + ". Reason: " + e, e);
                 return null;
             } finally {

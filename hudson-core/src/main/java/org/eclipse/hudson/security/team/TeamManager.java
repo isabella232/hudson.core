@@ -163,8 +163,8 @@ public final class TeamManager implements Saveable, AccessControlled {
         if (getTeamAwareSecurityRealm() != null) {
             return getTeamAwareSecurityRealm().isCurrentUserSysAdmin();
         }else{
-            for (Object obj : sysAdmins) {
-                if (userName.equalsIgnoreCase((String) obj)) {
+            for (String admin : sysAdmins) {
+                if (userName.equalsIgnoreCase(admin)) {
                     return true;
                 }
             }
