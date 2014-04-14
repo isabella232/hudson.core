@@ -167,6 +167,15 @@ public final class XmlFile {
         file.delete();
     }
 
+	/**
+	 * Delete with return.
+	 * @since 3.2.0
+	 * @return true iff file is deleted
+	 */
+    public boolean doDelete() {
+        return file.delete();
+    }
+
     public void mkdirs() {
         file.getParentFile().mkdirs();
     }

@@ -335,8 +335,16 @@ public class Util {
         }
         return tmp;
     }
-    
-    public static void moveDirectory(File oldDir, File newDir) throws InterruptedException {
+	
+	/**
+	 * Attempt to rename (move) directory only; do not copy.
+	 * @param oldDir
+	 * @param newDir
+	 * @return true iff directory renamed
+	 * @throws InterruptedException 
+	 * @since 3.2.0
+	 */
+	public static boolean renameDirectory(File oldDir, File newDir) throws InterruptedException {
         boolean renamed = false;
         boolean interrupted = false;
 
@@ -360,8 +368,13 @@ public class Util {
         if (interrupted) {
             throw new InterruptedException();
         }
+		
+		return renamed;
+	}
+    
+    public static void moveDirectory(File oldDir, File newDir) throws InterruptedException {
 
-        if (!renamed) {
+        if (!renameDirectory(oldDir, newDir)) {
             // failed to rename. it must be that some lengthy
             // process is going on
             // to prevent a rename operation. So do a copy. Ideally

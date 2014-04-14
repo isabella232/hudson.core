@@ -52,8 +52,9 @@ import javax.xml.transform.stream.StreamSource;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
-import org.eclipse.hudson.security.team.Team;
 import org.eclipse.hudson.security.team.TeamManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Partial default implementation of {@link Item}.
@@ -65,6 +66,7 @@ import org.eclipse.hudson.security.team.TeamManager;
 @ExportedBean
 public abstract class AbstractItem extends Actionable implements Item, HttpDeletable, AccessControlled, DescriptorByNameOwner {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractItem.class);
     /**
      * Project name.
      */
@@ -408,13 +410,48 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     private void invokeOnDeleted() throws IOException {
         getParent().onDeleted(this);
     }
+	
+	private void sidelineJobDir() {
+		// Attempt to move directory out of jobs folder to tmp folder
+		File tmpDir = null;
+		try {
+			tmpDir = Util.createTempDir();
+		} catch (Exception ex) {
+			; // fall thru
+		}
+		if (tmpDir != null) {
+			File newDir = new File(tmpDir, getRootDir().getName());
+			try {
+				Util.renameDirectory(getRootDir(), newDir);
+				LOGGER.info("Job folder successfully moved to "+newDir.getAbsolutePath());
+				return;
+			} catch (Exception ex) {
+				; // fall thru
+			}
+		}
+		LOGGER.warn("Move deleted job folder unsuccessful "+getRootDir().getAbsolutePath());
+	}
 
     /**
      * Does the real job of deleting the item.
      */
     protected void performDelete() throws IOException, InterruptedException {
-        getConfigFile().delete();
-        Util.deleteRecursive(getRootDir());
+		// Bug 432569 - If folder can't be deleted, leaves job in half-deleted state
+        if (getConfigFile().doDelete()) {
+			// Job with no config.xml deleted even if folder remains
+			try {
+				Util.deleteRecursive(getRootDir());
+				LOGGER.info("Job deleted at "+getRootDir().getAbsolutePath());
+			} catch (Exception e) {
+				// Don't throw or job won't be fully deleted
+				LOGGER.warn("config.xml deleted but not job folder "+getRootDir().getAbsolutePath());
+				e.printStackTrace();
+				// Try to move the folder so it won't interfere with future job creation
+				sidelineJobDir();
+			}
+		} else {
+			throw new IOException(getRootDir().getAbsolutePath()+"/config.xml can't be deleted");
+		}
     }
 
     /**
