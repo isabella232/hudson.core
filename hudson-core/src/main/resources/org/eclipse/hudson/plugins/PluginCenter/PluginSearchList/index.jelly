@@ -32,12 +32,15 @@
                 <j:forEach var="p" items="${it.plugins}">
                     <tr>
                         <td class="column1">
-                            <j:if test="${!it.pluginCenter.isInstalled(p)}">
+                            <j:if test="${!(it.pluginCenter.isInstalled(p) || it.pluginCenter.isFailedtoLoad(p))}">
                                 <input class="install_cb_${p.name}" type="checkbox" value="${p.name}"/>
                                 <img class="install_img_${p.name}" style="display:none;"/>
                             </j:if>
                             <j:if test="${it.pluginCenter.isInstalled(p)}">
                                 <img src="${imagesURL}/green-check.jpg" alt=""/>
+                            </j:if>
+                            <j:if test="${it.pluginCenter.isFailedtoLoad(p)}">
+                                <img src="${imagesURL}/warning.png" title="Disabled or failed to load. Check Hudson log for more details."/>
                             </j:if>
                         </td>
                         <td class="column2">

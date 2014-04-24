@@ -172,12 +172,15 @@
                                                             <j:forEach var="p" items="${pluginsList}">
                                                                 <tr>
                                                                     <td class="column1">
-                                                                        <j:if test="${!it.isInstalled(p)}">
+                                                                        <j:if test="${!(it.isInstalled(p) || it.isFailedtoLoad(p))}">
                                                                             <input class="install_cb_${p.name}" type="checkbox" value="${p.name}"/>
                                                                             <img class="install_img_${p.name}" style="display:none;"/>
                                                                         </j:if>
                                                                         <j:if test="${it.isInstalled(p)}">
                                                                             <img src="${imagesURL}/green-check.jpg" alt=""/>
+                                                                        </j:if>
+                                                                        <j:if test="${it.isFailedtoLoad(p)}">
+                                                                            <img src="${imagesURL}/warning.png" title="Disabled or failed to load. Check Hudson log for more details."/>
                                                                         </j:if>
                                                                     </td>
                                                                     <td class="column2">
@@ -227,12 +230,15 @@
                                                             <j:forEach var="p" items="${pluginsList}">
                                                                 <tr>
                                                                     <td class="column1">
-                                                                        <j:if test="${!it.isInstalled(p)}">
+                                                                        <j:if test="${!(it.isInstalled(p)  || it.isFailedtoLoad(p))}">
                                                                             <input class="install_cb_${p.name}" type="checkbox" value="${p.name}"/>
                                                                             <img class="install_img_${p.name}" style="display:none;"/>
                                                                         </j:if>
                                                                         <j:if test="${it.isInstalled(p)}">
                                                                             <img src="${imagesURL}/green-check.jpg" alt=""/>
+                                                                        </j:if>
+                                                                        <j:if test="${it.isFailedtoLoad(p)}">
+                                                                            <img src="${imagesURL}/warning.png" title="Disabled or failed to load. Check Hudson log for more details."/>
                                                                         </j:if>
                                                                     </td>
                                                                     <td class="column2">
@@ -282,12 +288,15 @@
                                                             <j:forEach var="p" items="${pluginsList}">
                                                                 <tr>
                                                                     <td class="column1">
-                                                                        <j:if test="${!it.isInstalled(p)}">
+                                                                        <j:if test="${!(it.isInstalled(p) || it.isFailedtoLoad(p))}">
                                                                             <input class="install_cb_${p.name}" type="checkbox" value="${p.name}"/>
                                                                             <img class="install_img_${p.name}" style="display:none;"/>
                                                                         </j:if>
                                                                         <j:if test="${it.isInstalled(p)}">
                                                                             <img src="${imagesURL}/green-check.jpg" alt=""/>
+                                                                        </j:if>
+                                                                        <j:if test="${it.isFailedtoLoad(p)}">
+                                                                            <img src="${imagesURL}/warning.png" title="Disabled or failed to load. Check Hudson log for more details."/>
                                                                         </j:if>
                                                                     </td> 
                                                                     <td class="column2">
@@ -337,12 +346,15 @@
                                                             <j:forEach var="p" items="${pluginsList}">
                                                                 <tr>
                                                                     <td class="column1">
-                                                                        <j:if test="${!it.isInstalled(p)}">
+                                                                        <j:if test="${!(it.isInstalled(p) || it.isFailedtoLoad(p))}">
                                                                             <input class="install_cb_${p.name}" type="checkbox" value="${p.name}"/>
                                                                             <img class="install_img_${p.name}" style="display:none;"/>
                                                                         </j:if>
                                                                         <j:if test="${it.isInstalled(p)}">
                                                                             <img src="${imagesURL}/green-check.jpg" alt=""/>
+                                                                        </j:if>
+                                                                        <j:if test="${it.isFailedtoLoad(p)}">
+                                                                            <img src="${imagesURL}/warning.png" title="Disabled or failed to load. Check Hudson log for more details."/>
                                                                         </j:if>
                                                                     </td>
                                                                     <td class="column2">
@@ -432,7 +444,7 @@
                                                     </j:if>
                                                     <j:if test="${!it.getInstalled(p).isEnabled()}">
                                                         <td class="column1">
-                                                            <img class="installed_img_${p.name}" src="${imagesURL}/16x16/warning.png"/>
+                                                            <img class="installed_img_${p.name}" src="${imagesURL}/warning.png" title="Disabled or failed to load. Check Hudson log for more details."/>
                                                         </td>
                                                     </j:if>
                                             

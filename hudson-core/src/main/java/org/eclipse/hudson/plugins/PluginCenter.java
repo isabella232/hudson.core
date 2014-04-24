@@ -32,13 +32,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.eclipse.hudson.plugins.InstalledPluginManager.Dependency;
 import org.eclipse.hudson.plugins.InstalledPluginManager.InstalledPluginInfo;
 import org.eclipse.hudson.plugins.UpdateSiteManager.AvailablePluginInfo;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
@@ -63,13 +63,13 @@ final public class PluginCenter {
     private List<PluginInstallationJob> installationsJobs = new CopyOnWriteArrayList<PluginInstallationJob>();
     private ExecutorService installerService = Executors.newSingleThreadExecutor(
             new DaemonThreadFactory(new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r);
-            t.setName("Update center installer thread");
-            return t;
-        }
-    }));
+                @Override
+                public Thread newThread(Runnable r) {
+                    Thread t = new Thread(r);
+                    t.setName("Update center installer thread");
+                    return t;
+                }
+            }));
     private HudsonSecurityManager hudsonSecurityManager;
     private File hudsonHomeDir;
 
@@ -142,8 +142,21 @@ final public class PluginCenter {
     }
 
     public boolean isInstalled(AvailablePluginInfo availablePlugin) {
-        Set<String> installedPluginNames = installedPluginManager.getInstalledPluginNames();
-        return installedPluginNames.contains(availablePlugin.getName());
+        if (installedPluginManager.isInstalled(availablePlugin.getName())){
+            InstalledPluginInfo installedPluginInfo = installedPluginManager.getInstalledPlugin(availablePlugin.getName());
+            return !installedPluginInfo.isFailedToLoad();
+        }else{
+            return false;
+        }
+    }
+    
+    public boolean isFailedtoLoad(AvailablePluginInfo availablePlugin) {
+        if (installedPluginManager.isInstalled(availablePlugin.getName())){
+            InstalledPluginInfo installedPluginInfo = installedPluginManager.getInstalledPlugin(availablePlugin.getName());
+            return installedPluginInfo.isFailedToLoad();
+        }else{
+            return false;
+        }
     }
 
     public boolean isUpdatable(AvailablePluginInfo availablePlugin) {
@@ -227,33 +240,33 @@ final public class PluginCenter {
         }
         InstalledPluginInfo plugin = installedPluginManager.getInstalledPlugin(pluginName);
         try {
-           plugin.setEnable(enable);  
+            plugin.setEnable(enable);
         } catch (Exception ex) {
             return new ErrorHttpResponse("Plugin " + pluginName + " could not be enabled/disabled. " + ex.getLocalizedMessage());
         }
         return HttpResponses.ok();
     }
-    
+
     public HttpResponse doDowngradePlugin(@QueryParameter String pluginName) {
         if (!hudsonSecurityManager.hasPermission(Permission.HUDSON_ADMINISTER)) {
             return HttpResponses.forbidden();
         }
         InstalledPluginInfo plugin = installedPluginManager.getInstalledPlugin(pluginName);
         try {
-           plugin.downgade();  
+            plugin.downgade();
         } catch (Exception ex) {
             return new ErrorHttpResponse("Plugin " + pluginName + " could not be reverted to previous version. " + ex.getLocalizedMessage());
         }
         return HttpResponses.ok();
     }
-    
+
     public HttpResponse doUnpinPlugin(@QueryParameter String pluginName) {
         if (!hudsonSecurityManager.hasPermission(Permission.HUDSON_ADMINISTER)) {
             return HttpResponses.forbidden();
         }
         InstalledPluginInfo plugin = installedPluginManager.getInstalledPlugin(pluginName);
         try {
-           plugin.unpin();  
+            plugin.unpin();
         } catch (Exception ex) {
             return new ErrorHttpResponse("Plugin " + pluginName + " could not be unpinned. " + ex.getLocalizedMessage());
         }
@@ -274,6 +287,11 @@ final public class PluginCenter {
                     }
                     File uploadedPluginFile = new File(pluginsDir, fileName);
                     fileItem.write(uploadedPluginFile);
+                    InstalledPluginInfo uploadedPluginInfo = new InstalledPluginInfo(uploadedPluginFile);
+
+                    for (Dependency dep : uploadedPluginInfo.getDependencies()) {
+                        doInstallPlugin(dep.getShortName());
+                    }
                     return HttpResponses.plainText("Plugin " + fileName + " successfully uploaded.");
                 }
             }
@@ -290,10 +308,11 @@ final public class PluginCenter {
         try {
             Hudson.getInstance().safeRestart();
         } catch (RestartNotSupportedException ex) {
-            logger.error("Restart not supported", ex); 
+            logger.error("Restart not supported", ex);
         }
         rsp.forwardToPreviousPage(req);
     }
+
     public HttpResponse doSearchPlugins(@QueryParameter String searchStr, @QueryParameter boolean searchDescription) {
         PluginSearchList pluginSearchList = new PluginSearchList(this, searchStr, searchDescription);
         return HttpResponses.forwardToView(pluginSearchList, "index.jelly");
@@ -301,8 +320,8 @@ final public class PluginCenter {
 
     public static class PluginSearchList {
 
-        private Set<AvailablePluginInfo> searhcedPlugins;
-        private PluginCenter pluginCenter;
+        private final Set<AvailablePluginInfo> searhcedPlugins;
+        private final PluginCenter pluginCenter;
 
         public PluginSearchList(PluginCenter pluginCenter, String searchStr, boolean searchDescription) {
             this.pluginCenter = pluginCenter;
