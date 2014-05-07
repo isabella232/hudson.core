@@ -42,7 +42,7 @@ public final class UpdateSiteManager {
     public static final String FEATURED = "featured";
     public static final String RECOMMENDED = "recommended";
     private Map<String, AvailablePluginInfo> availablePluginInfos = new TreeMap<String, AvailablePluginInfo>(String.CASE_INSENSITIVE_ORDER);
-    private final String updateServer = System.getProperty("updateServer", "http://hudson-ci.org/update-center3/");
+    private final String updateServer = System.getProperty("updateServer", "http://hudson-ci.org/update-center3.2/");
     private String updateSiteUrl = updateServer + "update-center.json";
     private ProxyConfiguration proxyConfig;
     private final String id = "default";

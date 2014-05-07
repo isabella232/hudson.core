@@ -56,12 +56,12 @@ import org.slf4j.LoggerFactory;
 final public class PluginCenter {
 
     private Logger logger = LoggerFactory.getLogger(PluginCenter.class);
-    private File pluginsDir;
-    private UpdateSiteManager updateSiteManager;
-    private InstalledPluginManager installedPluginManager;
-    private ProxyConfiguration proxyConfig;
+    private final File pluginsDir;
+    private final UpdateSiteManager updateSiteManager;
+    private final InstalledPluginManager installedPluginManager;
+    private final ProxyConfiguration proxyConfig;
     private List<PluginInstallationJob> installationsJobs = new CopyOnWriteArrayList<PluginInstallationJob>();
-    private ExecutorService installerService = Executors.newSingleThreadExecutor(
+    private final ExecutorService installerService = Executors.newSingleThreadExecutor(
             new DaemonThreadFactory(new ThreadFactory() {
                 @Override
                 public Thread newThread(Runnable r) {
@@ -70,8 +70,8 @@ final public class PluginCenter {
                     return t;
                 }
             }));
-    private HudsonSecurityManager hudsonSecurityManager;
-    private File hudsonHomeDir;
+    private final HudsonSecurityManager hudsonSecurityManager;
+    private final File hudsonHomeDir;
 
     public PluginCenter(File homeDir) throws MalformedURLException, IOException {
         hudsonHomeDir = homeDir;

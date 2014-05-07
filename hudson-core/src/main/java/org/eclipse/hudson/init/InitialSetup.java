@@ -75,13 +75,13 @@ final public class InitialSetup {
     private ProxyConfiguration proxyConfig;
     private ExecutorService installerService = Executors.newSingleThreadExecutor(
             new DaemonThreadFactory(new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r);
-            t.setName("Update center installer thread");
-            return t;
-        }
-    }));
+                @Override
+                public Thread newThread(Runnable r) {
+                    Thread t = new Thread(r);
+                    t.setName("Update center installer thread");
+                    return t;
+                }
+            }));
     private HudsonSecurityManager hudsonSecurityManager;
     private XmlFile initSetupFile;
     private File hudsonHomeDir;
@@ -106,18 +106,23 @@ final public class InitialSetup {
         // This is only created once during startup, so is effectively a singleton
         INSTANCE = this;
     }
-    
+
     public static InitialSetup getLastInitialSetup() {
         return INSTANCE;
     }
 
-    public boolean needsInitSetup() {
+    public boolean needsInitSetup() throws IOException {
         if (initSetupFile.exists()) {
-            return false;
+            String str = FileUtils.readFileToString(initSetupFile.getFile());
+            if (str.trim().contains("Hudson 3.0")) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
             if (Boolean.getBoolean("skipInitSetup")) {
                 try {
-                    initSetupFile.write("Hudson 3.0 Initial Setup Done");
+                    initSetupFile.write("Hudson 3.2 Initial Setup Done");
                 } catch (IOException ex) {
                     logger.error(ex.getLocalizedMessage());
                 }
@@ -270,7 +275,7 @@ final public class InitialSetup {
 
     public HttpResponse doFinish() {
         try {
-            initSetupFile.write("Hudson 3.0 Initial Setup Done");
+            initSetupFile.write("Hudson 3.2 Initial Setup Done");
         } catch (IOException ex) {
             logger.error(ex.getLocalizedMessage());
         }
@@ -278,50 +283,50 @@ final public class InitialSetup {
 
         return HttpResponses.ok();
     }
-    
-   private class OuterClassLoader extends ClassLoader {
+
+    private class OuterClassLoader extends ClassLoader {
+
         OuterClassLoader(ClassLoader parent) {
             super(parent);
         }
     }
-   
-   public void invokeHudson() {
-       invokeHudson(false);
-   }
+
+    public void invokeHudson() {
+        invokeHudson(false);
+    }
 
     public void invokeHudson(boolean restart) {
         final WebAppController controller = WebAppController.get();
-        
+
         if (initialClassLoader == null) {
             initialClassLoader = getClass().getClassLoader();
         }
-        
+
         Class hudsonIsLoadingClass;
         try {
             outerClassLoader = new OuterClassLoader(initialClassLoader);
-            
+
             hudsonIsLoadingClass = outerClassLoader.loadClass("hudson.util.HudsonIsLoading");
             HudsonIsLoading hudsonIsLoading = (HudsonIsLoading) hudsonIsLoadingClass.newInstance();
             Class runnableClass = outerClassLoader.loadClass("org.eclipse.hudson.init.InitialRunnable");
             Constructor ctor = runnableClass.getDeclaredConstructors()[0];
             ctor.setAccessible(true);
             InitialRunnable initialRunnable = (InitialRunnable) ctor.newInstance(controller, logger, hudsonHomeDir, servletContext, restart);
- 
+
             controller.install(hudsonIsLoading);
-            Thread initThread = new Thread(initialRunnable, "hudson initialization thread "+(++highInitThreadNumber));
+            Thread initThread = new Thread(initialRunnable, "hudson initialization thread " + (++highInitThreadNumber));
             initThread.setContextClassLoader(outerClassLoader);
             initThread.start();
-            
+
         } catch (Exception ex) {
             logger.error("Hudson failed to load!!!", ex);
         }
-        
-        /** Above replaces these lines
-        controller.install(new HudsonIsLoading());
 
-        new Thread("hudson initialization thread") {
-        }.start();
-        */
+        /**
+         * Above replaces these lines controller.install(new HudsonIsLoading());
+         *
+         * new Thread("hudson initialization thread") { }.start();
+         */
     }
 
     private static class ErrorHttpResponse implements HttpResponse {
@@ -490,7 +495,6 @@ final public class InitialSetup {
             proxyNeeded = true;
             logger.info("Could not fetch update center metadata from " + updateSiteManager.getUpdateSiteUrl() + ". Using bundled update center metadata.");
         }
-
 
         URL updateCenterJsonUrl = servletContext.getResource("/WEB-INF/update-center.json");
         if (updateCenterJsonUrl != null) {

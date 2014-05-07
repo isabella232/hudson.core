@@ -51,7 +51,7 @@ public class UpdateCenterTest {
             return;
         }
 
-        URL url = new URL("http://hudson-ci.org/update-center3/update-center.json?version=build");
+        URL url = new URL("http://hudson-ci.org/update-center3.2/update-center.json?version=build");
         String jsonp = IOUtils.toString(url.openStream());
         String json = jsonp.substring(jsonp.indexOf('(')+1,jsonp.lastIndexOf(')'));
 

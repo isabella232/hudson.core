@@ -94,7 +94,7 @@
 
         <!--Libraries-->
         <localizer.version>1.10</localizer.version>
-        <aspectj.version>1.6.11</aspectj.version>
+        <aspectj.version>1.8.0</aspectj.version>
         <sisuGuice.version>3.0.3</sisuGuice.version>
         <sisuInject.version>2.2.3</sisuInject.version>
         <jetty.version>6.1.26</jetty.version>
@@ -126,7 +126,7 @@
         <maven-antrun-extended-plugin.version>1.42</maven-antrun-extended-plugin.version>
         <maven-hudson-dev-plugin.version>6.1.7-hudson-1</maven-hudson-dev-plugin.version>
         <build-helper-maven-plugin.version>1.5</build-helper-maven-plugin.version>
-        <aspectj-maven-plugin.version>1.3</aspectj-maven-plugin.version>
+        <aspectj-maven-plugin.version>1.6</aspectj-maven-plugin.version>
         <gwt-maven-plugin.version>2.3.0-1</gwt-maven-plugin.version>
         <plexus-component-metadata-plugin.version>1.5.4</plexus-component-metadata-plugin.version>
         <maven-jaxb2-plugin.version>0.7.4</maven-jaxb2-plugin.version>
