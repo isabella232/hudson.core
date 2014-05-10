@@ -248,9 +248,15 @@ public class Team implements AccessControlled {
     }
 
     void addJob(TeamJob job) throws IOException {
+         addJob(job, true);
+    }
+    
+    void addJob(TeamJob job, boolean save) throws IOException {
         if (!jobs.contains(job)) {
             jobs.add(job);
-            getTeamManager().save();
+            if (save) {
+                getTeamManager().save();
+            }
         }
     }
 
@@ -368,7 +374,7 @@ public class Team implements AccessControlled {
     // When the Team is unmarshalled it would not have Team Manager set
     private TeamManager getTeamManager() {
         if (teamManager == null) {
-            return Hudson.getInstance().getTeamManager();
+            return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getTeamManager();
         } else {
             return teamManager;
         }

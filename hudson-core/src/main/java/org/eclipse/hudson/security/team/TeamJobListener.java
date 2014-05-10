@@ -17,6 +17,7 @@ import hudson.model.Job;
 import hudson.model.listeners.ItemListener;
 import java.io.IOException;
 import java.util.List;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,7 @@ public class TeamJobListener extends ItemListener {
     @Override
     public void onCreated(Item item) {
         if (item instanceof Job<?, ?>) {
-            if (!Hudson.getInstance().isTeamManagementEnabled()) {
+            if (!HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getTeamManager().isTeamManagementEnabled()) {
                 addToPublicTeam(item.getName());
             } else if (getTeamManager().findJobOwnerTeam(item.getName()) == null) {
                 // Job going to other than default user team must already be added, else...
@@ -49,7 +50,7 @@ public class TeamJobListener extends ItemListener {
     public void onRenamed(Item item, String oldJobName, String newJobName) {
         if (item instanceof Job<?, ?>) {
             removeJob(oldJobName);
-            if (!Hudson.getInstance().isTeamManagementEnabled()) {
+            if (!HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getTeamManager().isTeamManagementEnabled()) {
                 addToPublicTeam(newJobName);
             } else if (getTeamManager().findJobOwnerTeam(newJobName) == null) {
                 // Job going to other than default user team must already be added, else...
@@ -107,6 +108,6 @@ public class TeamJobListener extends ItemListener {
     }
 
     private TeamManager getTeamManager() {
-        return Hudson.getInstance().getTeamManager();
+        return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getTeamManager();
     }
 }

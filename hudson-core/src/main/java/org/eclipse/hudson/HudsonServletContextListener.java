@@ -199,19 +199,22 @@ public final class HudsonServletContextListener implements ServletContextListene
 
             // Do the initial setup (if needed) before actually starting Hudson
             
+            boolean securityLoadFailed = false;
             try {
                 // Create the Security Manager temporarily. Since the plugins are not loaded yet
                 // all permissions may not be loaded. The Security manager will reload when Hudson
                 // fully starts later
                 HudsonSecurityEntitiesHolder.setHudsonSecurityManager(new HudsonSecurityManager(home));
             } catch (Exception ex) {
-                logger.info("Failed to load some Security information. ", ex.getLocalizedMessage() + ". Contnuing ..");
+                ex.printStackTrace();
+                securityLoadFailed = true;
+                logger.info("Failed to load Security. " + ex.getLocalizedMessage() + ". Disablbling security and continuing.. ");
             }
 
             InitialSetup initSetup = new InitialSetup(home, servletContext);
             if (initSetup.needsInitSetup()) {
                 logger.info("\n\n\n================>\n\nInitial setup required. Please go to the Hudson Dashboard and complete the setup.\n\n<================\n\n\n");
-                if (HudsonSecurityEntitiesHolder.getHudsonSecurityManager().isUseSecurity()) {
+                if (HudsonSecurityEntitiesHolder.getHudsonSecurityManager().isUseSecurity() && !securityLoadFailed) {
                     controller.install(new InitialSetupLogin(initSetup));
                 } else {
                     controller.install(initSetup);

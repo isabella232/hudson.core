@@ -26,6 +26,7 @@ import hudson.util.FormValidation;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.HttpResponses;
@@ -91,7 +92,7 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
         }
 
         public HttpResponse doAddSysAdmin(@QueryParameter String sysAdminSid) throws IOException {
-            if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
+            if (!HudsonSecurityEntitiesHolder.getHudsonSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
                 return HttpResponses.forbidden();
             }
 
@@ -99,7 +100,7 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
                 return new TeamUtils.ErrorHttpResponse("Sys admin name required");
             }
 
-            TeamManager teamManager = Hudson.getInstance().getTeamManager();
+            TeamManager teamManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getTeamManager();
             if (teamManager.getSysAdmins().contains(sysAdminSid)) {
                 return new TeamUtils.ErrorHttpResponse(sysAdminSid + " is already a System Administrator.");
             }
@@ -110,7 +111,7 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
         }
         
         public HttpResponse doRemoveSysAdmin(@QueryParameter String sysAdminSid) throws IOException {
-            if (!Hudson.getInstance().getSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
+            if (!HudsonSecurityEntitiesHolder.getHudsonSecurityManager().hasPermission(Permission.HUDSON_ADMINISTER)) {
                 return HttpResponses.forbidden();
             }
 
@@ -118,7 +119,7 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
                 return new TeamUtils.ErrorHttpResponse("Sys admin name required");
             }
 
-            TeamManager teamManager = Hudson.getInstance().getTeamManager();
+            TeamManager teamManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getTeamManager();
             if (teamManager.getSysAdmins().contains(sysAdminSid)) {
                 teamManager.removeSysAdmin(sysAdminSid);
                 return HttpResponses.ok();
@@ -150,6 +151,6 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
     }
 
     private TeamManager getTeamManager() {
-        return Hudson.getInstance().getTeamManager();
+        return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getTeamManager();
     }
 }

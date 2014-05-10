@@ -19,11 +19,13 @@ package org.eclipse.hudson.security;
 import com.thoughtworks.xstream.XStream;
 import hudson.BulkChange;
 import hudson.Functions;
+import hudson.TcpSlaveAgentListener;
 import hudson.Util;
 import hudson.XmlFile;
 import hudson.markup.MarkupFormatter;
 import hudson.markup.RawHtmlMarkupFormatter;
 import hudson.model.Descriptor.FormException;
+import hudson.model.Hudson;
 import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
 import hudson.security.*;
@@ -39,8 +41,10 @@ import javax.servlet.ServletException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import net.sf.json.JSONObject;
+import org.eclipse.hudson.security.team.TeamManager;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.export.Exported;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -109,6 +113,11 @@ public class HudsonSecurityManager implements Saveable {
     private Boolean useSecurity;
     private MarkupFormatter markupFormatter = RawHtmlMarkupFormatter.INSTANCE;
     private transient File hudsonHome;
+    
+    /**
+     * TCP slave agent port. 0 for random, -1 to disable.
+     */
+    private int slaveAgentPort = 0;
 
     static {
         XSTREAM.alias("hudsonSecurityManager", HudsonSecurityManager.class);
@@ -119,9 +128,12 @@ public class HudsonSecurityManager implements Saveable {
      * exposure.
      */
     private transient final String secretKey;
+    
+    private transient final TeamManager teamManager;
 
     public HudsonSecurityManager(File hudsonHome) throws IOException {
         this.hudsonHome = hudsonHome;
+        teamManager = new TeamManager(hudsonHome);
         // get or create the secret
         TextFile secretFile = new TextFile(new File(hudsonHome, "secret.key"));
 
@@ -136,6 +148,11 @@ public class HudsonSecurityManager implements Saveable {
         }
 
         load();
+    }
+    
+    @Exported
+    public int getSlaveAgentPort() {
+        return slaveAgentPort;
     }
 
     /**
@@ -307,6 +324,24 @@ public class HudsonSecurityManager implements Saveable {
                 if (security.has("markupFormatter")) {
                     markupFormatter = req.bindJSON(MarkupFormatter.class, security.getJSONObject("markupFormatter"));
                 }
+                
+                {
+                String v = req.getParameter("slaveAgentPortType");
+                if (!isUseSecurity() || v == null || v.equals("random")) {
+                    slaveAgentPort = 0;
+                } else if (v.equals("disable")) {
+                    slaveAgentPort = -1;
+                } else {
+                    try {
+                        slaveAgentPort = Integer.parseInt(req.getParameter("slaveAgentPort"));
+                    } catch (NumberFormatException e) {
+                        throw new FormException(hudson.model.Messages.Hudson_BadPortNumber(req.getParameter("slaveAgentPort")), "slaveAgentPort");
+                    }
+                }
+                if (Hudson.getInstance() != null){
+                    Hudson.getInstance().setSlaveAgentPort(slaveAgentPort);
+                }
+            }
             } else {
                 useSecurity = null;
                 setSecurityRealm(SecurityRealm.NO_AUTHENTICATION);
@@ -460,5 +495,9 @@ public class HudsonSecurityManager implements Saveable {
             exc.printStackTrace();
             return false;
         }
+    }
+
+    public TeamManager getTeamManager() {
+         return teamManager;
     }
 }
