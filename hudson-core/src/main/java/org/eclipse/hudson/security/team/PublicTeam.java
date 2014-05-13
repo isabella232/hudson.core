@@ -45,7 +45,7 @@ public final class PublicTeam extends Team{
         for (File file : jobRootFolders){
             TeamJob job = new TeamJob(file.getName());
             job.addVisibility(PUBLIC_TEAM_NAME); 
-            addJob(job);
+            addJob(job, false);
         }
     }
     

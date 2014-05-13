@@ -119,6 +119,9 @@ public class JettyLauncher {
         WebAppContext context = new WebAppContext();
 
         File tempDir = new File(getHomeDir(), "war");
+        if (tempDir.exists()){
+            tempDir.delete();
+        }
         tempDir.mkdirs();
         context.setTempDirectory(tempDir);
 
