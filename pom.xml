@@ -78,6 +78,8 @@
         <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
         <build.number />
+
+        <cbi-plugins.version>1.0.5</cbi-plugins.version>
         
         <jetty.server.version>8.1.7.v20120910</jetty.server.version>
         <jetty.javax.serverlet.version>3.0.0.v201112011016</jetty.javax.serverlet.version>
@@ -218,6 +220,13 @@
         <module>hudson-test-framework</module>
         <module>hudson-plugin-parent</module>
     </modules>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>eclipse-maven</id>
+            <url>https://repo.eclipse.org/content/repositories/releases/</url>
+        </pluginRepository>
+    </pluginRepositories>
   
     <build>
         
@@ -1062,6 +1071,27 @@
                 </pluginManagement>
             </build>
         </profile>
-    </profiles>
 
+        <profile>
+            <id>eclipse-sign</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.eclipse.cbi.maven.plugins</groupId>
+                        <artifactId>eclipse-jarsigner-plugin</artifactId>
+                        <version>${cbi-plugins.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
