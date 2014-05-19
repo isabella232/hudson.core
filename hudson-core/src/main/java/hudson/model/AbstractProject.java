@@ -2044,16 +2044,29 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     @Override
     protected void submit(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, FormException {
         super.submit(req, rsp);
+        
+        JSONObject json = req.getSubmittedForm();
 
-        makeDisabled(null != req.getParameter("disable"));
-        setJDK(req.getParameter("jdk"));
-        setQuietPeriod(null != req.getParameter(HAS_QUIET_PERIOD_PROPERTY_NAME)
-                ? req.getParameter("quiet_period") : null);
-        setScmCheckoutRetryCount(null != req.getParameter(HAS_SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME)
-                ? req.getParameter("scmCheckoutRetryCount") : null);
-        setBlockBuildWhenDownstreamBuilding(null != req.getParameter("blockBuildWhenDownstreamBuilding"));
-        setBlockBuildWhenUpstreamBuilding(null != req.getParameter("blockBuildWhenUpstreamBuilding"));
+        makeDisabled(json.has("disable"));
+        
+        setJDK(json.has("jdk") ?json.getString("jdk") : null);
+        
+        JSONObject hasQuietPeriod = json.has(HAS_QUIET_PERIOD_PROPERTY_NAME) ?
+                                    json.getJSONObject(HAS_QUIET_PERIOD_PROPERTY_NAME):null;
+        setQuietPeriod(hasQuietPeriod != null ? 
+                       hasQuietPeriod.getString("quiet_period") : null);
+        
+        JSONObject hasScmCheckoutRetryCount = json.has(HAS_SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME)?
+                   json.getJSONObject(HAS_SCM_CHECKOUT_RETRY_COUNT_PROPERTY_NAME):null;
+        setScmCheckoutRetryCount(hasScmCheckoutRetryCount != null ?
+                                 hasScmCheckoutRetryCount.getString("scmCheckoutRetryCount"): null);
+        
+        // Following values should be using a boolean property
+        // but keep using truthy test for now to preserve compatibility
+        setBlockBuildWhenDownstreamBuilding(json.has("blockBuildWhenDownstreamBuilding"));
+        setBlockBuildWhenUpstreamBuilding(json.has("blockBuildWhenUpstreamBuilding"));
 
+        // TODO: Convert to JSON property
         if (req.getParameter(APPOINTED_NODE_PROPERTY_NAME) != null) {
             // New logic for handling whether this choice came from the dropdown or textfield.
             if (BASIC_KEY.equals(req.getParameter(AFFINITY_CHO0SER_KEY))) {
@@ -2068,9 +2081,9 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
             setAppointedNode(null);
         }
 
-        setCleanWorkspaceRequired(null != req.getParameter("cleanWorkspaceRequired"));
 
-        setConcurrentBuild(req.getSubmittedForm().has("concurrentBuild"));
+        setCleanWorkspaceRequired(json.has("cleanWorkspaceRequired"));
+        setConcurrentBuild(json.has("concurrentBuild"));
 
         authToken = BuildAuthorizationToken.create(req);
 

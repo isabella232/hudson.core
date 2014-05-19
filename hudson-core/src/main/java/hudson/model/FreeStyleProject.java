@@ -17,15 +17,13 @@
 package hudson.model;
 
 import hudson.Extension;
-
 import hudson.util.CascadingUtil;
 import java.io.IOException;
-
+import javax.servlet.ServletException;
+import net.sf.json.JSONObject;
 import org.eclipse.hudson.api.model.IFreeStyleProject;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-
-import javax.servlet.ServletException;
 
 /**
  * Free-style software project.
@@ -78,8 +76,11 @@ public class FreeStyleProject extends Project<FreeStyleProject, FreeStyleBuild> 
     protected void submit(StaplerRequest req, StaplerResponse rsp)
             throws IOException, ServletException, Descriptor.FormException {
         super.submit(req, rsp);
-        setCustomWorkspace(
-                req.hasParameter("customWorkspace") ? req.getParameter("customWorkspace.directory") : null);
+        JSONObject json = req.getSubmittedForm();
+        JSONObject customWorkspace = json.has("customWorkspace")? 
+                                     json.getJSONObject("customWorkspace"):null;
+        setCustomWorkspace( customWorkspace != null? 
+                            customWorkspace.getString("directory") : null);
     }
 
     @Override

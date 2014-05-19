@@ -13,7 +13,7 @@
  *   Stephen Connolly, Tom Huybrechts, Anton Kozak, Nikita Levyankov,
  *   Roy Varghese
  *
- *******************************************************************************/ 
+ *******************************************************************************/
 
 package hudson.model;
 
@@ -142,10 +142,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     private volatile LogRotator logRotator;
     private transient ConcurrentMap<String, IProjectProperty> jobProperties = new ConcurrentHashMap<String, IProjectProperty>();
     /**
-     * This field is used for persisting only the overridenJobProperties in the config.xml 
+     * This field is used for persisting only the overridenJobProperties in the config.xml
      */
     private ConcurrentMap<String, IProjectProperty> persistableJobProperties = new ConcurrentHashMap<String, IProjectProperty>();
-    
+
     /**
      * Not all plugins are good at calculating their health report quickly.
      * These fields are used to cache the health reports to speed up rendering
@@ -206,17 +206,17 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     protected Job(ItemGroup parent, String name) {
         super(parent, name);
     }
-    
+
     public Object readResolve() {
         if (persistableJobProperties == null) {
             persistableJobProperties = new ConcurrentHashMap<String, IProjectProperty>();
         }
         return this;
     }
-    
+
     //Bug Fix: 406889 - Non overriden job properties or properties with no values should not be written to config.xml
     private Object writeReplace() throws ObjectStreamException, IOException {
-        
+
         persistableJobProperties.clear();
         for (String key : jobProperties.keySet()) {
             persistableJobProperties.put(key, jobProperties.get(key));
@@ -349,7 +349,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         cascadingChildrenNames.remove(cascadingChildName);
         save();
     }
-    
+
     //Cleanup any cascading mess (called during Hudson startup)
     public void cleanCascading() throws IOException{
         Set<String> cascadingChildrenToRemove = new HashSet();
@@ -456,7 +456,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
         save();
     }
-    
+
     protected void initAllowSave() {
 //        No need to init, ThreadLocal is now a final static variable
 //        allowSave = new ThreadLocal<Boolean>() {
@@ -651,7 +651,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     public boolean isNameEditable() {
         return true;
     }
-    
+
     /**
      * If team enabled, allow user to edit only the unqualified portion
      * of the job name; otherwise, edit the full name.
@@ -983,8 +983,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     protected HistoryWidget createHistoryWidget() {
         return new HistoryWidget(this, getBuildHistoryData(), HISTORY_ADAPTER);
     }
- 
-    protected static final HistoryWidget.Adapter<BuildHistory.Record> HISTORY_ADAPTER = 
+
+    protected static final HistoryWidget.Adapter<BuildHistory.Record> HISTORY_ADAPTER =
             new Adapter<BuildHistory.Record>() {
         public int compare(BuildHistory.Record record, String key) {
             try {
@@ -1190,9 +1190,9 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             return new File(getRootDir(), BUILDS_DIRNAME);
         }
     }
-    
+
     public abstract BuildHistory<JobT,RunT> getBuildHistoryData();
-    
+
     /**
      * Gets all the runs.
      *
@@ -1479,10 +1479,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
             String newName = req.getParameter("name");
             if (newName != null && !newName.equals(getEditableName())) {
-                
+
                 // check this error early to avoid HTTP response splitting.
                 newName = Hudson.checkGoodJobName(newName);
-                
+
                 if (Hudson.getInstance().isTeamManagementEnabled()) {
                     // Make the name qualified in the same team before confirm
                     TeamManager teamManager = Hudson.getInstance().getTeamManager();
@@ -1516,10 +1516,27 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     protected void submit(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, FormException {
         JSONObject json = req.getSubmittedForm();
-        description = req.getParameter("description");
-        keepDependencies = req.getParameter("keepDependencies") != null;
+
+        description = json.getString("description");
+
+        // Support both ways of setting dependencies
+        // 1. directly in the root of the json
+        // 2. within the fingerprinter section - for compatibility
+        keepDependencies = false;
+        if (json.has("keepDependencies")) {
+            keepDependencies = json.getBoolean("keepDependencies");
+        }
+        else {
+            if ( json.has("hudson-tasks-Fingerprinter")) {
+                JSONObject fingerPrinter = json.getJSONObject("hudson-tasks-Fingerprinter");
+                if ( fingerPrinter.has("keepDependencies")) {
+                    keepDependencies = fingerPrinter.getBoolean("keepDependencies");
+                }
+            }
+        }
+
         properties.clear();
-        setCascadingProjectName(StringUtils.trimToNull(req.getParameter("cascadingProjectName")));
+        setCascadingProjectName(StringUtils.trimToNull(json.getString("cascadingProjectName")));
         CopyOnWriteList parameterDefinitionProperties = new CopyOnWriteList();
         int i = 0;
         for (JobPropertyDescriptor d : JobPropertyDescriptor.getPropertyDescriptors(Job.this.getClass())) {
@@ -1549,7 +1566,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
         setParameterDefinitionProperties(parameterDefinitionProperties);
         LogRotator logRotator = null;
-        if (null != req.getParameter("logrotate")) {
+        if (json.has("logrotate")) {
             logRotator = LogRotator.DESCRIPTOR.newInstance(req, json.getJSONObject("logrotate"));
         }
         setLogRotator(logRotator);
@@ -1606,13 +1623,13 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
         String newName = req.getParameter("newName");
         String checkName = newName;
-        
+
         if (isBuilding()) {
             // redirect to page explaining that we can't rename now
             rsp.sendRedirect("rename?newName=" + URLEncoder.encode(newName, "UTF-8"));
             return;
         }
-        
+
         if (Hudson.getInstance().isTeamManagementEnabled()) {
             // Do this before rename or team will change to default for user
             TeamManager teamManager = Hudson.getInstance().getTeamManager();
@@ -1624,14 +1641,14 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                         throw new Failure("Job name "+newName+" is improperly qualified");
                     }
                     checkName = teamManager.getUnqualifiedJobName(team, newName);
-                    
+
                     teamManager.addJob(team, newName);
                 } catch (TeamManager.TeamNotFoundException ex) {
                     // Can't happen with non-null team
                 }
             }
         }
-        
+
         Hudson.checkGoodJobName(checkName);
 
         renameTo(newName);
@@ -1825,18 +1842,18 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         Graph graph = new Graph(getLastBuild().getTimestamp(), 500, 400);
 
         DataSet<String, ChartLabel> data = new DataSet<String, ChartLabel>();
-        
+
         StaplerRequest req = Stapler.getCurrentRequest();
 
         GraphSeries<String> xSeries = new GraphSeries<String>("Build No.");
         data.setXSeries(xSeries);
 
         GraphSeries<Number> ySeriesAborted = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Aborted", ColorPalette.GREY, false, false);
-        ySeriesAborted.setBaseURL(getRelPath(req) + "/${buildNo}"); 
+        ySeriesAborted.setBaseURL(getRelPath(req) + "/${buildNo}");
         data.addYSeries(ySeriesAborted);
 
         GraphSeries<Number> ySeriesFailed = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Failed", ColorPalette.RED, false, false);
-        ySeriesFailed.setBaseURL(getRelPath(req) + "/${buildNo}"); 
+        ySeriesFailed.setBaseURL(getRelPath(req) + "/${buildNo}");
         data.addYSeries(ySeriesFailed);
 
         GraphSeries<Number> ySeriesUnstable = new GraphSeries<Number>(GraphSeries.TYPE_AREA, "Unstable", ColorPalette.YELLOW, false, false);
@@ -1880,7 +1897,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             data.add(duration, "min",
                     new TimeTrendChartLabel(run));
         }
-        
+
         // We want to display the build result from older to latest
         data.reverseOrder();
         graph.setYAxisLabel(Messages.Job_minutes());
@@ -1889,7 +1906,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         return graph;
     }
 
-    
+
 
     // For backward compatibility with JFreechart
     private class TimeTrendChartLabel extends ChartLabel {
@@ -1957,7 +1974,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             return run.getDisplayName() + " : " + run.getDurationString();
         }
     }
-    
+
     private String getRelPath(StaplerRequest req) {
         String relPath = req.getParameter("rel");
         if (relPath == null) {
@@ -1965,5 +1982,5 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
         return relPath;
     }
-    
+
 }
