@@ -20,6 +20,7 @@ package hudson.model;
 import hudson.RelativePath;
 import hudson.XmlFile;
 import hudson.BulkChange;
+import hudson.Functions;
 import hudson.PluginWrapper;
 import hudson.Util;
 import static hudson.Util.singleQuote;
@@ -292,7 +293,7 @@ public abstract class Descriptor<T extends Describable<T>> implements Saveable {
     private String getCurrentDescriptorByNameUrl() {
         StaplerRequest req = Stapler.getCurrentRequest();
         Ancestor a = req.findAncestor(DescriptorByNameOwner.class);
-        return a.getUrl();
+        return Functions.getAncestorUrl(req, a);
     }
 
     /**
