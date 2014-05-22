@@ -29,6 +29,30 @@
         </j:if>
     </j:parse>
     <div id="buildHistoryDiv">
+        <script>
+            function loadAllBuildHistory() {
+                // first display the "loading..." icon
+                var box = $("loadAllBuildHistory");
+                box.innerHTML = '<img src="${imagesURL}/spinner.gif" alt=""/>';
+
+                // then actually fetch the HTML
+                new Ajax.Request("${it.baseUrl}/buildHistory/all",{
+                method: "get",
+                    onComplete: function(rsp,_) {
+                        <!-- neither outerHTML nor responseXML works in Firefox 2.0 -->
+                        var hist = $$("buildHistory");
+                        var p = hist.parentNode;
+                        var next = hist.nextSibling;
+                        p.removeChild(hist);
+
+                        var div = document.createElement('div');
+                        div.innerHTML = rsp.responseText;
+
+                        p.insertBefore(div,next);
+                    }
+                });
+            }
+        </script>
         <l:pane width="3" title="${h.runScript(paneTitle)}${it.displayName}" id="buildHistory">
 
             <!-- build history -->
@@ -41,31 +65,6 @@
             <j:if test="${it.trimmed}">
                 <tr class="build-row">
                     <td colspan="3" align="right">
-                        <script>
-                            function loadAllBuildHistory() {
-                            // first display the "loading..." icon
-                            var box = $("loadAllBuildHistory");
-                            box.innerHTML = '
-                            <img src="${imagesURL}/spinner.gif" alt=""/>';
-
-                            // then actually fetch the HTML
-                            new Ajax.Request("${it.baseUrl}/buildHistory/all",{
-                            method: "get",
-                            onComplete: function(rsp,_) {
-                           <!-- neither outerHTML nor responseXML works in Firefox 2.0 -->
-                            var hist = $$("buildHistory");
-                            var p = hist.parentNode;
-                            var next = hist.nextSibling;
-                            p.removeChild(hist);
-
-                            var div = document.createElement('div');
-                            div.innerHTML = rsp.responseText;
-
-                            p.insertBefore(div,next);
-                            }
-                            });
-                            }
-                        </script>
                         <div id="loadAllBuildHistory">
                             <!-- once clicked, this div will be replaced by the load icon -->
                             <a href="javascript:loadAllBuildHistory()">${%More ...}</a>
