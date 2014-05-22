@@ -24,7 +24,9 @@
     <p:matrix autoRefresh="true">
       <j:choose>
         <j:when test="${p==null}">
+          <!-- Do nothing. Clutters large sparse matrix
           <img src="${imagesURL}/24x24/grey.png" tooltip="${%Not configured}" alt="${%Not configured}"/>
+          -->
         </j:when>
         <j:otherwise>
           <a href="${p.shortUrl}">
