@@ -1948,6 +1948,10 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
      */
     public void doBuild(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         BuildAuthorizationToken.checkPermission(this, authToken, req, rsp);
+        
+        if (!isBuildable()) {
+            throw HttpResponses.error(SC_INTERNAL_SERVER_ERROR, new IOException(getFullName() + " is not buildable"));
+        }
 
         // if a build is parameterized, let that take over
         ParametersDefinitionProperty pp = getProperty(ParametersDefinitionProperty.class);
@@ -1955,10 +1959,6 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
             pp.setOwner(this);
             pp._doBuild(req, rsp);
             return;
-        }
-
-        if (!isBuildable()) {
-            throw HttpResponses.error(SC_INTERNAL_SERVER_ERROR, new IOException(getFullName() + " is not buildable"));
         }
 
         Hudson.getInstance().getQueue().schedule(this, getDelay(req), getBuildCause(req));
