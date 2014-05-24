@@ -1046,6 +1046,9 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
     }
 
     protected void _doScript(StaplerRequest req, StaplerResponse rsp, String view) throws IOException, ServletException {
+        if (!"POST".equals(req.getMethod())) {
+            throw HttpResponses.error(HttpURLConnection.HTTP_BAD_METHOD, "requires POST");
+        }
         // ability to run arbitrary script is dangerous,
         // so tie it to the admin access
         checkPermission(Hudson.ADMINISTER);
