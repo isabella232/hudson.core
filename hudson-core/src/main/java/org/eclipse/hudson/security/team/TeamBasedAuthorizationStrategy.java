@@ -16,9 +16,12 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import hudson.Extension;
+import hudson.model.Computer;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.model.Job;
+import hudson.model.Node;
+import hudson.model.View;
 import hudson.security.ACL;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.Permission;
@@ -63,6 +66,16 @@ public class TeamBasedAuthorizationStrategy extends AuthorizationStrategy {
     @Override
     public ACL getACL(Job<?, ?> job) {
         return new TeamBasedACL(getTeamManager(), TeamBasedACL.SCOPE.JOB, job);
+    }
+    
+    @Override
+    public ACL getACL(View view) {
+        return new TeamBasedACL(getTeamManager(), TeamBasedACL.SCOPE.VIEW, view);
+    }
+    
+    @Override
+    public ACL getACL(Computer computer) {
+         return new TeamBasedACL(getTeamManager(), TeamBasedACL.SCOPE.NODE, computer);
     }
 
     public ACL getACL(Team team) {

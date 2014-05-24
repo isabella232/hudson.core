@@ -15,9 +15,10 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import hudson.model.Hudson;
+import hudson.model.Computer;
 import hudson.model.Item;
 import hudson.model.Items;
+import hudson.model.View;
 import hudson.security.ACL;
 import hudson.security.AccessControlled;
 import hudson.security.AuthorizationStrategy;
@@ -47,8 +48,14 @@ import org.springframework.security.core.Authentication;
 public class Team implements AccessControlled {
 
     public static final String PUBLIC_TEAM_NAME = "public";
-    private List<TeamMember> teamMembers = new CopyOnWriteArrayList<TeamMember>();
-    private List<TeamJob> jobs = new CopyOnWriteArrayList<TeamJob>();
+    private final List<TeamMember> teamMembers = new CopyOnWriteArrayList<TeamMember>();
+
+    private final List<TeamJob> jobs = new CopyOnWriteArrayList<TeamJob>();
+
+    private final List<TeamNode> nodes = new CopyOnWriteArrayList<TeamNode>();
+
+    private final List<TeamView> views = new CopyOnWriteArrayList<TeamView>();
+
     private String name;
     protected static final String JOBS_FOLDER_NAME = "jobs";
     private String description;
@@ -66,7 +73,7 @@ public class Team implements AccessControlled {
     Team(String teamName, String description, TeamManager teamManager) {
         this(teamName, description, null, teamManager);
     }
-    
+
     Team(String teamName, String description, String customFolderName, TeamManager teamManager) {
         this.name = teamName;
         this.description = description;
@@ -86,7 +93,7 @@ public class Team implements AccessControlled {
         this.description = description;
         getTeamManager().save();
     }
-    
+
     String getCustomFolderName() {
         return customFolderName;
     }
@@ -122,11 +129,19 @@ public class Team implements AccessControlled {
     public List<TeamJob> getJobs() {
         return Collections.unmodifiableList(jobs);
     }
-    
-    public Set<String> getJobNames(){
+
+    public List<TeamNode> getNodes() {
+        return Collections.unmodifiableList(nodes);
+    }
+
+    public List<TeamView> getViews() {
+        return Collections.unmodifiableList(views);
+    }
+
+    public Set<String> getJobNames() {
         Set<String> jobNames = new TreeSet<String>();
-        for (TeamJob job : getJobs()){
-            jobNames.add(job.getId()); 
+        for (TeamJob job : getJobs()) {
+            jobNames.add(job.getId());
         }
         return jobNames;
     }
@@ -141,7 +156,9 @@ public class Team implements AccessControlled {
     }
 
     void addMember(String teamMemberSid, boolean isTeamAdmin, boolean canCreate,
-            boolean canDelete, boolean canConfigure, boolean canBuild) throws IOException {
+            boolean canDelete, boolean canConfigure, boolean canBuild,
+            boolean canCreateNode, boolean canDeleteNode, boolean canConfigureNode,
+            boolean canCreateView, boolean canDeleteView, boolean canConfigureView) throws IOException {
         TeamMember newMember = new TeamMember();
         newMember.setName(teamMemberSid);
         newMember.setAsTeamAdmin(isTeamAdmin);
@@ -160,13 +177,33 @@ public class Team implements AccessControlled {
         if (canBuild) {
             newMember.addPermission(Item.BUILD);
         }
+        if (canCreateNode) {
+            newMember.addPermission(Computer.CREATE);
+        }
+        if (canDeleteNode) {
+            newMember.addPermission(Computer.DELETE);
+        }
+        if (canConfigureNode) {
+            newMember.addPermission(Computer.CONFIGURE);
+        }
+        if (canCreateView) {
+            newMember.addPermission(View.CREATE);
+        }
+        if (canDeleteView) {
+            newMember.addPermission(View.DELETE);
+        }
+        if (canConfigureView) {
+            newMember.addPermission(View.CONFIGURE);
+        }
         newMember.addPermission(Item.READ);
         newMember.addPermission(Item.WORKSPACE);
         addMember(newMember);
     }
 
     void updateMember(String teamMemberSid, boolean isTeamAdmin, boolean canCreate,
-            boolean canDelete, boolean canConfigure, boolean canBuild) throws IOException {
+            boolean canDelete, boolean canConfigure, boolean canBuild,
+            boolean canCreateNode, boolean canDeleteNode, boolean canConfigureNode,
+            boolean canCreateView, boolean canDeleteView, boolean canConfigureView) throws IOException {
         TeamMember currentMember = findMember(teamMemberSid);
         if (currentMember != null) {
             currentMember.setAsTeamAdmin(isTeamAdmin);
@@ -200,6 +237,43 @@ public class Team implements AccessControlled {
             } else {
                 currentMember.removePermission(Item.BUILD);
             }
+
+            if (canCreateNode) {
+                currentMember.addPermission(Computer.CREATE);
+            } else {
+                currentMember.removePermission(Computer.CREATE);
+            }
+
+            if (canDeleteNode) {
+                currentMember.addPermission(Computer.DELETE);
+            } else {
+                currentMember.removePermission(Computer.DELETE);
+            }
+            
+            if (canConfigureNode) {
+                currentMember.addPermission(Computer.CONFIGURE);
+            }else {
+                currentMember.removePermission(Computer.CONFIGURE);
+            }
+
+            if (canCreateView) {
+                currentMember.addPermission(View.CREATE);
+            } else {
+                currentMember.removePermission(View.CREATE);
+            }
+
+            if (canDeleteView) {
+                currentMember.addPermission(View.DELETE);
+            } else {
+                currentMember.removePermission(View.DELETE);
+            }
+            
+            if (canConfigureView) {
+                currentMember.addPermission(View.CONFIGURE);
+            }else {
+                currentMember.removePermission(View.CONFIGURE);
+            }
+            
             getTeamManager().save();
         }
     }
@@ -218,7 +292,7 @@ public class Team implements AccessControlled {
             getTeamManager().save();
         }
     }
-    
+
     public boolean isMember(String userName) {
         HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
         SecurityRealm securityRealm = null;
@@ -238,6 +312,102 @@ public class Team implements AccessControlled {
         }
     }
 
+    public TeamView findView(String viewName) {
+        for (TeamView view : views) {
+            if (viewName.equals(view.getId())) {
+                return view;
+            }
+        }
+        return null;
+    }
+
+    void addView(TeamView view) throws IOException {
+        if (!views.contains(view)) {
+            views.add(view);
+            getTeamManager().save();
+        }
+    }
+
+    boolean removeView(String viewName) throws IOException {
+        for (TeamView view : views) {
+            if (viewName.equals(view.getId())) {
+                return removeView(view);
+            }
+        }
+        return false;
+    }
+
+    boolean removeView(TeamView view) throws IOException {
+        if (views.contains(view)) {
+            if (views.remove(view)) {
+                getTeamManager().save();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void renameView(String oldViewName, String newViewId) throws IOException {
+        TeamView view = findView(oldViewName);
+        if (view != null) {
+            view.setId(newViewId);
+            getTeamManager().save();
+        }
+
+    }
+
+    public boolean isViewOwner(String viewName) {
+        return findView(viewName) != null;
+    }
+
+    public TeamNode findNode(String nodeName) {
+        for (TeamNode node : nodes) {
+            if (nodeName.equals(node.getId())) {
+                return node;
+            }
+        }
+        return null;
+    }
+
+    void addNode(TeamNode node) throws IOException {
+        if (!nodes.contains(node)) {
+            nodes.add(node);
+            getTeamManager().save();
+        }
+    }
+
+    boolean removeNode(String nodeName) throws IOException {
+        for (TeamNode node : nodes) {
+            if (nodeName.equals(node.getId())) {
+                return removeNode(node);
+            }
+        }
+        return false;
+    }
+
+    boolean removeNode(TeamNode node) throws IOException {
+        if (nodes.contains(node)) {
+            if (nodes.remove(node)) {
+                getTeamManager().save();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void renameNode(String oldNodeName, String newNodeId) throws IOException {
+        TeamNode node = findNode(oldNodeName);
+        if (node != null) {
+            node.setId(newNodeId);
+            getTeamManager().save();
+        }
+
+    }
+
+    public boolean isNodeOwner(String nodeName) {
+        return findNode(nodeName) != null;
+    }
+
     public TeamJob findJob(String jobName) {
         for (TeamJob job : jobs) {
             if (jobName.equals(job.getId())) {
@@ -248,9 +418,9 @@ public class Team implements AccessControlled {
     }
 
     void addJob(TeamJob job) throws IOException {
-         addJob(job, true);
+        addJob(job, true);
     }
-    
+
     void addJob(TeamJob job, boolean save) throws IOException {
         if (!jobs.contains(job)) {
             jobs.add(job);
@@ -291,7 +461,7 @@ public class Team implements AccessControlled {
         }
 
     }
-    
+
     List<File> getJobsRootFolders(File teamsFolder) {
         return getJobsRootFolders(teamsFolder, false);
     }
@@ -321,9 +491,10 @@ public class Team implements AccessControlled {
         }
         return Collections.EMPTY_LIST;
     }
-    
+
     /**
      * Return the team folder.
+     *
      * @param teamsFolder the outer "teams" folder, or for public, hudson home
      * @return team folder that will contain "jobs" folder
      */
@@ -331,14 +502,15 @@ public class Team implements AccessControlled {
         if (PUBLIC_TEAM_NAME.equals(name)) {
             return teamsFolder;
         }
-        if ((customFolderName != null) && !"".equals(customFolderName.trim())){
+        if ((customFolderName != null) && !"".equals(customFolderName.trim())) {
             return new File(customFolderName);
         }
         return new File(teamsFolder, name);
     }
-    
+
     /**
      * The folder where all the jobs of this team are saved
+     *
      * @return File
      */
     File getJobsFolder(File teamsFolder) {
@@ -409,6 +581,16 @@ public class Team implements AccessControlled {
                 context.convertAnother(job);
                 writer.endNode();
             }
+            for (TeamNode node : team.getNodes()) {
+                writer.startNode("node");
+                context.convertAnother(node);
+                writer.endNode();
+            }
+            for (TeamView view : team.getViews()) {
+                writer.startNode("view");
+                context.convertAnother(view);
+                writer.endNode();
+            }
             for (TeamMember member : team.getMembers()) {
                 writer.startNode("member");
                 context.convertAnother(member);
@@ -428,14 +610,20 @@ public class Team implements AccessControlled {
                 if ("description".equals(reader.getNodeName())) {
                     team.description = reader.getValue();
                 }
-                 
+
                 if ("customFolderName".equals(reader.getNodeName())) {
                     team.customFolderName = reader.getValue();
                 }
-                
+
                 if ("job".equals(reader.getNodeName())) {
                     TeamJob teamJob = (TeamJob) uc.convertAnother(team, TeamJob.class);
                     team.jobs.add(teamJob);
+                } else if ("node".equals(reader.getNodeName())) {
+                    TeamNode teamSlave = (TeamNode) uc.convertAnother(team, TeamNode.class);
+                    team.nodes.add(teamSlave);
+                } else if ("view".equals(reader.getNodeName())) {
+                    TeamView teamView = (TeamView) uc.convertAnother(team, TeamView.class);
+                    team.views.add(teamView);
                 } else if ("member".equals(reader.getNodeName())) {
                     TeamMember teamMember = (TeamMember) uc.convertAnother(team, TeamMember.class);
                     team.teamMembers.add(teamMember);

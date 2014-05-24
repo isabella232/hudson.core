@@ -261,6 +261,7 @@ public class TeamManagerTest {
         Assert.assertFalse(team.isJobOwner("job1"));
         Assert.assertTrue(teamName.equals(jobTeam.getName()));
     }
+ 
 
     /**
      * Test of save method, of class TeamManager.
@@ -324,6 +325,8 @@ public class TeamManagerTest {
         member.addPermission(Permission.DELETE);
         team.addMember(member);
         team.addJob(new TeamJob("job1"));
+        team.addView(new TeamView("view1"));
+        team.addNode(new TeamNode("node1"));
 
         teamManager = new TeamManager(homeDir);
         teamManager.setUseBulkSaveFlag(false);
@@ -339,6 +342,12 @@ public class TeamManagerTest {
             }
             if (!team.isJobOwner("job1")) {
                 fail("The team Team1 must b ethe owner of job1");
+            }
+            if (!team.isViewOwner("view1")) {
+                fail("The team Team1 must be the owner of view1");
+            }
+            if (!team.isNodeOwner("node1")) {
+                fail("The team Team1 must be the owner of node1");
             }
             member = team.findMember("member1");
             if (member == null) {

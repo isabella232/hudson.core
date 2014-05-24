@@ -10,8 +10,11 @@
  */
 package org.eclipse.hudson.security.team;
 
+import hudson.model.Computer;
 import hudson.model.Item;
 import hudson.model.Job;
+import hudson.model.Node;
+import hudson.model.View;
 import hudson.security.Permission;
 import hudson.security.SecurityRealm;
 import hudson.security.SidACL;
@@ -33,11 +36,13 @@ public class TeamBasedACL extends SidACL {
     private transient Logger logger = LoggerFactory.getLogger(TeamBasedACL.class);
 
     public enum SCOPE {
-        GLOBAL, TEAM_MANAGEMENT, TEAM, JOB
+        GLOBAL, TEAM_MANAGEMENT, TEAM, JOB, VIEW, NODE
     };
     private final SCOPE scope;
     private final TeamManager teamManager;
     private Job job;
+    private View view;
+    private Computer node;
     private Team team;
 
     public TeamBasedACL(TeamManager teamManager, SCOPE scope) {
@@ -48,6 +53,16 @@ public class TeamBasedACL extends SidACL {
     public TeamBasedACL(TeamManager teamManager, SCOPE scope, Job job) {
         this(teamManager, scope);
         this.job = job;
+    }
+    
+    public TeamBasedACL(TeamManager teamManager, SCOPE scope, View view) {
+        this(teamManager, scope);
+        this.view = view;
+    }
+    
+    public TeamBasedACL(TeamManager teamManager, SCOPE scope, Computer node) {
+        this(teamManager, scope);
+        this.node = node;
     }
 
     public TeamBasedACL(TeamManager teamManager, SCOPE scope, Team team) {
@@ -140,6 +155,42 @@ public class TeamBasedACL extends SidACL {
                 }
             }
         }
+        
+        if (scope == SCOPE.VIEW) {
+            Team viewTeam = teamManager.findViewOwnerTeam(view.getViewName());
+
+            if (viewTeam != null) {
+                if (viewTeam.isMember(userName)) {
+                    TeamMember member = viewTeam.findMember(userName);
+                    return member.hasPermission(permission);
+                }
+            }
+            // Grant Read permission to Public Jobs and jobs based on visibility
+            if (permission == View.READ) {
+                 if (hasViewReadPermission(viewTeam, permission, userName)){
+                     return true;
+                 }
+            }
+           
+        }
+        
+        if (scope == SCOPE.NODE) {
+            Team nodeTeam = teamManager.findNodeOwnerTeam(node.getName());
+
+            if (nodeTeam != null) {
+                if (nodeTeam.isMember(userName)) {
+                    TeamMember member = nodeTeam.findMember(userName);
+                    return member.hasPermission(permission);
+                }
+            }
+            // Grant Read permission to Public Jobs and jobs based on visibility
+            if (permission == Computer.READ) {
+                 if (hasNodeReadPermission(nodeTeam, permission, userName)){
+                     return true;
+                 }
+            }
+           
+        }
         return null;
     }
     
@@ -165,6 +216,62 @@ public class TeamBasedACL extends SidACL {
                 }
             }
             if (teamJob.isVisible(PublicTeam.PUBLIC_TEAM_NAME)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean hasViewReadPermission(Team viewTeam, Permission permission, String userName) {
+        // Grant Read permission to Public Views and views based on visibility
+        try {
+            Team publicTeam = teamManager.findTeam(PublicTeam.PUBLIC_TEAM_NAME);
+
+            if (publicTeam.isViewOwner(view.getViewName())) {
+                if (permission == View.READ) {
+                    return true;
+                }
+            }
+        } catch (TeamNotFoundException ex) {
+            logger.error("The public team must exists.", ex);
+        }
+
+        if (viewTeam != null) {
+            TeamView teamView = viewTeam.findView(view.getViewName());
+            for (Team userTeam : teamManager.findUserTeams(userName)) {
+                if (teamView.isVisible(userTeam.getName())) {
+                    return true;
+                }
+            }
+            if (teamView.isVisible(PublicTeam.PUBLIC_TEAM_NAME)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean hasNodeReadPermission(Team nodeTeam, Permission permission, String userName) {
+        // Grant Read permission to Public Views and views based on visibility
+        try {
+            Team publicTeam = teamManager.findTeam(PublicTeam.PUBLIC_TEAM_NAME);
+
+            if (publicTeam.isNodeOwner(node.getName())) {
+                if (permission == Computer.READ) {
+                    return true;
+                }
+            }
+        } catch (TeamNotFoundException ex) {
+            logger.error("The public team must exists.", ex);
+        }
+
+        if (nodeTeam != null) {
+            TeamNode teamNode = nodeTeam.findNode(node.getName());
+            for (Team userTeam : teamManager.findUserTeams(userName)) {
+                if (teamNode.isVisible(userTeam.getName())) {
+                    return true;
+                }
+            }
+            if (teamNode.isVisible(PublicTeam.PUBLIC_TEAM_NAME)) {
                 return true;
             }
         }

@@ -15,7 +15,9 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import hudson.model.Computer;
 import hudson.model.Item;
+import hudson.model.View;
 import hudson.security.Permission;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -33,11 +35,13 @@ public class TeamMember {
 
     private String name;
     private boolean isTeamAdmin;
-    private Set<Permission> grantedPermissions = new HashSet<Permission>();
-    private Set<Permission> teamAdminGrantedPermissions = new HashSet<Permission>();
+    private final Set<Permission> grantedPermissions = new HashSet<Permission>();
+    private final Set<Permission> teamAdminGrantedPermissions = new HashSet<Permission>();
     
     public TeamMember(){
         setTeamAdminGrantedPermissions();
+        grantedPermissions.add(Item.READ);
+        grantedPermissions.add(Item.WORKSPACE);
     }
 
     public String getName() {
@@ -67,19 +71,16 @@ public class TeamMember {
             grantedPermissions.remove(permission);
         }
     }
+    
+    void removeAllPermissions() {
+       grantedPermissions.clear();
+    }
 
     public boolean hasPermission(Permission permission) {
         if (isTeamAdmin) {
             return teamAdminGrantedPermissions.contains(permission);
         }
         return grantedPermissions.contains(permission);
-    }
-
-    public boolean canConfigure() {
-        if (isTeamAdmin) {
-            return true;
-        }
-        return hasPermission(Item.CONFIGURE);
     }
 
     public boolean canCreate() {
@@ -95,12 +96,61 @@ public class TeamMember {
         }
         return hasPermission(Item.DELETE);
     }
+    
+    public boolean canConfigure() {
+        if (isTeamAdmin) {
+            return true;
+        }
+        return hasPermission(Item.CONFIGURE);
+    }
 
     public boolean canBuild() {
         if (isTeamAdmin) {
             return true;
         }
         return hasPermission(Item.BUILD);
+    }
+    
+    public boolean canCreateNode() {
+        if (isTeamAdmin) {
+            return true;
+        }
+        return hasPermission(Computer.CREATE);
+    }
+
+    public boolean canDeleteNode() {
+        if (isTeamAdmin) {
+            return true;
+        }
+        return hasPermission(Computer.DELETE);
+    }
+    
+    public boolean canConfigureNode() {
+        if (isTeamAdmin) {
+            return true;
+        }
+        return hasPermission(Computer.CONFIGURE);
+    }
+    
+    public boolean canCreateView() {
+        if (isTeamAdmin) {
+            return true;
+        }
+        return hasPermission(View.CREATE);
+    }
+
+    public boolean canDeleteView() {
+        if (isTeamAdmin) {
+            return true;
+        }
+        return hasPermission(View.DELETE);
+    }
+    
+    public boolean canConfigureView() {
+        if (isTeamAdmin) {
+            return true;
+        }
+        return hasPermission(View.CONFIGURE);
     }
 
     void addPermission(String permission) {
@@ -121,8 +171,27 @@ public class TeamMember {
         if ("build".equals(permission)) {
             grantedPermissions.add(Item.BUILD);
         }
-        grantedPermissions.add(Item.READ);
-        grantedPermissions.add(Item.WORKSPACE);
+        if ("build".equals(permission)) {
+            grantedPermissions.add(Item.BUILD);
+        }
+        if ("createNode".equals(permission)) {
+            grantedPermissions.add(Computer.CREATE);
+        }
+        if ("deleteNode".equals(permission)) {
+            grantedPermissions.add(Computer.DELETE);
+        }
+        if ("configureNode".equals(permission)) {
+            grantedPermissions.add(Computer.CONFIGURE);
+        }
+        if ("createView".equals(permission)) {
+            grantedPermissions.add(View.CREATE);
+        }
+        if ("deleteView".equals(permission)) {
+            grantedPermissions.add(View.DELETE);
+        }
+        if ("configureView".equals(permission)) {
+            grantedPermissions.add(View.CONFIGURE);
+        }
     }
     
     private void setTeamAdminGrantedPermissions() {
@@ -134,6 +203,14 @@ public class TeamMember {
         teamAdminGrantedPermissions.add(Item.CONFIGURE);
         teamAdminGrantedPermissions.add(Item.BUILD);
         teamAdminGrantedPermissions.add(Item.WORKSPACE);
+        
+        teamAdminGrantedPermissions.add(View.CREATE);
+        teamAdminGrantedPermissions.add(View.CONFIGURE);
+        teamAdminGrantedPermissions.add(View.DELETE);
+        
+        teamAdminGrantedPermissions.add(Computer.CREATE);
+        teamAdminGrantedPermissions.add(View.DELETE);
+        teamAdminGrantedPermissions.add(View.CONFIGURE);
     }
 
     List<String> getPermissions() {
@@ -147,7 +224,7 @@ public class TeamMember {
         }
         return permissionNames;
     }
-
+    
     public static class ConverterImpl implements Converter {
 
         @Override

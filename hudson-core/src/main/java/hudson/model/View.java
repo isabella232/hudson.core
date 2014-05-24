@@ -690,6 +690,7 @@ public abstract class View extends AbstractModelObject implements AccessControll
     /**
      * Permission to create new jobs.
      */
+    public static final Permission READ = new Permission(PERMISSIONS, "Read", Messages._View_ReadPermission_Description(), Permission.READ);
     public static final Permission CREATE = new Permission(PERMISSIONS, "Create", Messages._View_CreatePermission_Description(), Permission.CREATE);
     public static final Permission DELETE = new Permission(PERMISSIONS, "Delete", Messages._View_DeletePermission_Description(), Permission.DELETE);
     public static final Permission CONFIGURE = new Permission(PERMISSIONS, "Configure", Messages._View_ConfigurePermission_Description(), Permission.CONFIGURE);

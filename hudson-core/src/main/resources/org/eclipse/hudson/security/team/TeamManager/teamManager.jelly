@@ -23,9 +23,14 @@
                     <a href="#teamTab">Manage Teams</a>
                 </li>
                 <li>
-                    <a href="#jobsTab">Manage Team Jobs</a>
+                    <a href="#jobsTab">Manage Jobs</a>
                 </li>
-                         
+                <li>
+                    <a href="#viewsTab">Manage Views</a>
+                </li>
+                <li>
+                    <a href="#nodesTab">Manage Nodes</a>
+                </li>         
             </ul> 
             <div id="teamTab">
                 <div id="teamContainer">
@@ -89,7 +94,7 @@
                                         <input class="move_cb_${jobName}" type="checkbox" value="${jobName}"/>
                                     </td>
                                     <td class="column2">
-                                         <img src='${h.getJobStatusIcon(jobName).getImageOf("24x24")}'/>
+                                        <img src='${h.getJobStatusIcon(jobName).getImageOf("24x24")}'/>
                                     </td>
                                     <td class="column3">
                                         <a href="${rootURL}/job/${jobName}">${jobName}</a>
@@ -106,6 +111,88 @@
                 </div> 
                 <div style="padding-top: 5px;">
                     <input type="button" id="moveJobsButton" value="Move Jobs" />
+                </div>
+            </div>
+            <div id="viewsTab">
+                <j:if test="${app.views.size() == 0}">
+                    <h2>
+                        <img src="${imagesURL}/48x48/warning.png"/>
+                        This Hudson does not have any views!!
+                    </h2>
+                </j:if>
+               
+                <div id="teamViewsContainer">
+                    <table width="100%" border="0" id="teamViewsList" cellpadding="5"> 
+                        <tbody>
+                            <j:set var="headerVisibility" value='${(app.views.size() > 0) ? "visible" : "hidden"}'/>
+                            <tr class="header" id="ViewsListHeader" style='visibility:${headerVisibility}'>
+                                <th align="left">Select</th>
+                                <th align="left">View Name</th>
+                                <th align="left">Team Name</th>      
+                            </tr>      
+                            <j:forEach var="viewName" items="${it.currentSysAdminViews}">
+                                <tr>
+                                    <td class="column1">
+                                        <j:if test='${it.findView(viewName).isMoveAllowed()}'>
+                                            <input class="move_view_cb_${viewName}" type="checkbox" value="${viewName}"/>
+                                        </j:if>
+                                    </td>
+                                    <td class="column3">
+                                        <a href="${rootURL}/view/${viewName}">${viewName}</a>
+                                    </td>
+                                    <td class="column4">
+                                        <span id="view_colum3_span_${viewName}">
+                                            ${it.findViewOwnerTeam(viewName).name}
+                                        </span>
+                                    </td>
+                                </tr> 
+                            </j:forEach>
+                        </tbody>
+                    </table>
+                </div> 
+                <div style="padding-top: 5px;">
+                    <input type="button" id="moveViewsButton" value="Move Views" />
+                </div>
+            </div>
+            <div id="nodesTab">
+                <j:if test="${app.nodess.size() == 0}">
+                    <h2>
+                        <img src="${imagesURL}/48x48/warning.png"/>
+                        This Hudson does not have any nodes!!
+                    </h2>
+                </j:if>
+               
+                <div id="teamNodesContainer">
+                    <table width="100%" border="0" id="teamNodesList" cellpadding="5"> 
+                        <tbody>
+                            <j:set var="headerVisibility" value='${(app.computers.size() > 0) ? "visible" : "hidden"}'/>
+                            <tr class="header" id="NodesListHeader" style='visibility:${headerVisibility}'>
+                                <th align="left">Select</th>
+                                <th align="left">Node Name</th>
+                                <th align="left">Team Name</th>      
+                            </tr>      
+                            <j:forEach var="nodeName" items="${it.currentSysAdminNodes}">
+                                <tr>
+                                    <td class="column1">
+                                        <j:if test='${it.findNode(nodeName).isMoveAllowed()}'>
+                                            <input class="move_node_cb_${nodeName}" type="checkbox" value="${nodeName}"/>
+                                        </j:if>
+                                    </td>
+                                    <td class="column3">
+                                        <a href="${rootURL}/computer/${nodeName}">${nodeName}</a>
+                                    </td>
+                                    <td class="column4">
+                                        <span id="node_colum3_span_${nodeName}">
+                                            ${it.findNodeOwnerTeam(nodeName).name}
+                                        </span>
+                                    </td>
+                                </tr> 
+                            </j:forEach>
+                        </tbody>
+                    </table>
+                </div> 
+                <div style="padding-top: 5px;">
+                    <input type="button" id="moveNodesButton" value="Move Nodes" />
                 </div>
             </div>
         </div>

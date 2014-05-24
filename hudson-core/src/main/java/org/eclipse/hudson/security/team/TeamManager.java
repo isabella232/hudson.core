@@ -19,17 +19,20 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import hudson.BulkChange;
 import hudson.Util;
 import hudson.XmlFile;
+import hudson.model.AllView;
+import hudson.model.Computer;
 import hudson.model.Failure;
 import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Saveable;
 import hudson.model.TopLevelItem;
+import hudson.model.View;
 import hudson.model.listeners.SaveableListener;
 import hudson.security.ACL;
 import hudson.security.AccessControlled;
-import hudson.security.Permission;
 import hudson.security.AuthorizationStrategy;
+import hudson.security.Permission;
 import hudson.security.SecurityRealm;
 import hudson.util.FormValidation;
 import hudson.util.XStream2;
@@ -70,12 +73,12 @@ import org.springframework.security.core.GrantedAuthority;
 public final class TeamManager implements Saveable, AccessControlled {
 
     public static final String TEAM_SEPARATOR = ".";
-    private List<String> sysAdmins = new CopyOnWriteArrayList();
-    private List<Team> teams = new CopyOnWriteArrayList<Team>();
+    private final List<String> sysAdmins = new CopyOnWriteArrayList();
+    private final List<Team> teams = new CopyOnWriteArrayList<Team>();
     private transient final XStream xstream = new XStream2();
-    private transient Logger logger = LoggerFactory.getLogger(TeamManager.class);
-    private transient File hudsonHomeDir;
-    private transient File teamsFolder;
+    private final transient Logger logger = LoggerFactory.getLogger(TeamManager.class);
+    private final transient File hudsonHomeDir;
+    private final transient File teamsFolder;
     private transient final String teamsConfigFileName = "teams.xml";
     private transient PublicTeam publicTeam;
     private transient final String TEAMS_FOLDER_NAME = "teams";
@@ -90,6 +93,32 @@ public final class TeamManager implements Saveable, AccessControlled {
         load();
         ensurePublicTeam();
         ensureCustomFolders();
+    }
+
+    @Override
+    public ACL getACL() {
+        AuthorizationStrategy authorizationStrategy = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy();
+        if (authorizationStrategy instanceof TeamBasedAuthorizationStrategy) {
+            TeamBasedAuthorizationStrategy teamBasedAuthorizationStrategy = (TeamBasedAuthorizationStrategy) authorizationStrategy;
+            return teamBasedAuthorizationStrategy.getACL(this);
+        }
+        // Team will not be used if Team Based Authorization Strategy is not used
+        return new ACL() {
+            @Override
+            public boolean hasPermission(Authentication a, Permission permission) {
+                return false;
+            }
+        };
+    }
+
+    @Override
+    public boolean hasPermission(Permission permission) {
+        return getACL().hasPermission(permission);
+    }
+
+    @Override
+    public void checkPermission(Permission permission) throws AccessDeniedException {
+        getACL().checkPermission(permission);
     }
 
     public boolean isTeamManagementEnabled() {
@@ -119,6 +148,19 @@ public final class TeamManager implements Saveable, AccessControlled {
 
     public List<String> getSysAdmins() {
         return sysAdmins;
+    }
+
+    boolean isSysAdmin(String userName) {
+        if (getTeamAwareSecurityRealm() != null) {
+            return getTeamAwareSecurityRealm().isCurrentUserSysAdmin();
+        } else {
+            for (String admin : sysAdmins) {
+                if (userName.equalsIgnoreCase(admin)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public boolean isCurrentUserSysAdmin() {
@@ -159,19 +201,6 @@ public final class TeamManager implements Saveable, AccessControlled {
         return false;
     }
 
-    boolean isSysAdmin(String userName) {
-        if (getTeamAwareSecurityRealm() != null) {
-            return getTeamAwareSecurityRealm().isCurrentUserSysAdmin();
-        }else{
-            for (String admin : sysAdmins) {
-                if (userName.equalsIgnoreCase(admin)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
     //Used by TeamManager Jelly to display team details in master-details fashion
     public Map<String, Team> getTeams() {
         Map<String, Team> teamMap = new HashMap<String, Team>();
@@ -192,19 +221,19 @@ public final class TeamManager implements Saveable, AccessControlled {
     public Team createTeam(String teamName) throws IOException, TeamAlreadyExistsException {
         return createTeam(teamName, teamName, null);
     }
-    
+
     public Team createTeam(String teamName, String description, String customFolder) throws IOException, TeamAlreadyExistsException {
         try {
             Hudson.checkGoodTeamName(teamName);
             if (teamName.trim().length() > Hudson.TEAM_NAME_LIMIT) {
-                throw new Failure("Team name cannot exceed "+Hudson.TEAM_NAME_LIMIT+" characters.");
+                throw new Failure("Team name cannot exceed " + Hudson.TEAM_NAME_LIMIT + " characters.");
             }
         } catch (Failure ex) {
             throw new IOException(ex.getMessage());
         }
         return internalCreateTeam(teamName, description, customFolder);
     }
-    
+
     private Team internalCreateTeam(String teamName, String description, String customFolder) throws IOException, TeamAlreadyExistsException {
         for (Team team : teams) {
             if (teamName.equals(team.getName())) {
@@ -217,41 +246,15 @@ public final class TeamManager implements Saveable, AccessControlled {
         return newTeam;
     }
 
-    @Override
-    public ACL getACL() {
-        AuthorizationStrategy authorizationStrategy = HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getAuthorizationStrategy();
-        if (authorizationStrategy instanceof TeamBasedAuthorizationStrategy) {
-            TeamBasedAuthorizationStrategy teamBasedAuthorizationStrategy = (TeamBasedAuthorizationStrategy) authorizationStrategy;
-            return teamBasedAuthorizationStrategy.getACL(this);
-        }
-        // Team will not be used if Team Based Authorization Strategy is not used
-        return new ACL() {
-            @Override
-            public boolean hasPermission(Authentication a, Permission permission) {
-                return false;
-            }
-        };
-    }
-
-    @Override
-    public boolean hasPermission(Permission permission) {
-        return getACL().hasPermission(permission);
-    }
-
-    @Override
-    public void checkPermission(Permission permission) throws AccessDeniedException {
-        getACL().checkPermission(permission);
-    }
-
     private void addTeam(Team team) throws IOException {
         teams.add(team);
         save();
     }
-    
+
     public void deleteTeam(String teamName) throws TeamNotFoundException, IOException {
         deleteTeam(teamName, false);
     }
-    
+
     public void deleteTeam(String teamName, boolean deleteJobs) throws TeamNotFoundException, IOException {
         Team team = findTeam(teamName);
         if (Team.PUBLIC_TEAM_NAME.equals(team.getName())) {
@@ -264,7 +267,7 @@ public final class TeamManager implements Saveable, AccessControlled {
                     try {
                         item.delete();
                     } catch (InterruptedException e) {
-                        throw new IOException("Delete team "+team.getName()+" was interrupted");
+                        throw new IOException("Delete team " + team.getName() + " was interrupted");
                     }
                 } else {
                     // Make deleted team jobs public
@@ -274,12 +277,27 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         teams.remove(team);
         save();
-        
+
         File teamFolder = team.getTeamFolder(teamsFolder);
         if (teamFolder.exists() && teamFolder.isDirectory()) {
             Util.deleteContentsRecursive(teamFolder);
             Util.deleteFile(teamFolder);
         }
+    }
+
+    public Team findTeam(String teamName) throws TeamNotFoundException {
+        for (Team team : teams) {
+            if (teamName.equals(team.getName())) {
+                return team;
+            }
+        }
+        throw new TeamNotFoundException(teamName);
+    }
+
+    public void removeTeam(String teamName) throws IOException, TeamNotFoundException {
+        Team team = findTeam(teamName);
+        teams.remove(team);
+        save();
     }
 
     public HttpResponse doCreateTeam(@QueryParameter String teamName, @QueryParameter String description, @QueryParameter String customFolder) throws IOException {
@@ -298,7 +316,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         try {
             Hudson.checkGoodName(teamName);
             if (teamName.trim().length() > Hudson.TEAM_NAME_LIMIT) {
-                throw new Failure("Team name cannot exceed "+Hudson.TEAM_NAME_LIMIT+" characters.");
+                throw new Failure("Team name cannot exceed " + Hudson.TEAM_NAME_LIMIT + " characters.");
             }
         } catch (Failure ex) {
             return new TeamUtils.ErrorHttpResponse(ex.getMessage());
@@ -332,7 +350,14 @@ public final class TeamManager implements Saveable, AccessControlled {
             @QueryParameter boolean canCreate,
             @QueryParameter boolean canDelete,
             @QueryParameter boolean canConfigure,
-            @QueryParameter boolean canBuild) throws IOException {
+            @QueryParameter boolean canBuild,
+            @QueryParameter boolean canCreateNode,
+            @QueryParameter boolean canDeleteNode,
+            @QueryParameter boolean canConfigureNode,
+            @QueryParameter boolean canCreateView,
+            @QueryParameter boolean canDeleteView,
+            @QueryParameter boolean canConfigureView
+    ) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
             return new TeamUtils.ErrorHttpResponse("No permission to add team member.");
         }
@@ -346,7 +371,8 @@ public final class TeamManager implements Saveable, AccessControlled {
         try {
             team = findTeam(teamName);
             if (team.findMember(teamMemberSid) == null) {
-                team.addMember(teamMemberSid, isTeamAdmin, canCreate, canDelete, canConfigure, canBuild);
+                team.addMember(teamMemberSid, isTeamAdmin, canCreate, canDelete, canConfigure, canBuild,
+                        canCreateNode, canDeleteNode, canConfigureNode, canCreateView, canDeleteView, canConfigureView);
                 return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(teamMemberSid));
             } else {
                 return new TeamUtils.ErrorHttpResponse(teamMemberSid + " is already a team member.");
@@ -362,7 +388,13 @@ public final class TeamManager implements Saveable, AccessControlled {
             @QueryParameter boolean canCreate,
             @QueryParameter boolean canDelete,
             @QueryParameter boolean canConfigure,
-            @QueryParameter boolean canBuild) throws IOException {
+            @QueryParameter boolean canBuild,
+            @QueryParameter boolean canCreateNode,
+            @QueryParameter boolean canDeleteNode,
+            @QueryParameter boolean canConfigureNode,
+            @QueryParameter boolean canCreateView,
+            @QueryParameter boolean canDeleteView,
+            @QueryParameter boolean canConfigureView) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
             return new TeamUtils.ErrorHttpResponse("No permission to add team member.");
         }
@@ -377,7 +409,8 @@ public final class TeamManager implements Saveable, AccessControlled {
             team = findTeam(teamName);
             TeamMember currentMember = team.findMember(teamMemberSid);
             if (currentMember != null) {
-                team.updateMember(teamMemberSid, isTeamAdmin, canCreate, canDelete, canConfigure, canBuild);
+                team.updateMember(teamMemberSid, isTeamAdmin, canCreate, canDelete, canConfigure, canBuild,
+                        canCreateNode, canDeleteNode, canConfigureNode, canCreateView, canDeleteView, canConfigureView);
                 return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(teamMemberSid));
             } else {
                 return new TeamUtils.ErrorHttpResponse(teamMemberSid + " is not a team member.");
@@ -424,7 +457,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         if ((jobName == null) || "".equals(jobName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Job name required.");
         }
-        
+
         Team newTeam;
         try {
             newTeam = findTeam(teamName);
@@ -436,11 +469,11 @@ public final class TeamManager implements Saveable, AccessControlled {
         if (oldTeam == null) {
             return new TeamUtils.ErrorHttpResponse(jobName + " does not belong to any team.");
         }
-        
-        if (oldTeam == newTeam){
+
+        if (oldTeam == newTeam) {
             return new TeamUtils.ErrorHttpResponse(jobName + " is already in team " + oldTeam.getName());
         }
-        
+
         Item item = Hudson.getInstance().getItem(jobName);
         Job job;
         if (item instanceof Job<?, ?>) {
@@ -460,6 +493,68 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
     }
 
+    public HttpResponse doMoveView(@QueryParameter String viewName, @QueryParameter String teamName) throws IOException {
+        if (!isCurrentUserTeamAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to move view");
+        }
+        if ((teamName == null) || "".equals(teamName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team name required.");
+        }
+        if ((viewName == null) || "".equals(viewName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("View name required.");
+        }
+
+        Team newTeam;
+        try {
+            newTeam = findTeam(teamName);
+        } catch (TeamNotFoundException ex) {
+            return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
+        }
+
+        Team oldTeam = findViewOwnerTeam(viewName);
+        if (oldTeam == null) {
+            return new TeamUtils.ErrorHttpResponse(viewName + " does not belong to any team.");
+        }
+
+        if (oldTeam == newTeam) {
+            return new TeamUtils.ErrorHttpResponse(viewName + " is already in team " + oldTeam.getName());
+        }
+        oldTeam.removeView(viewName);
+        newTeam.addView(new TeamView(viewName));
+        return HttpResponses.ok();
+    }
+
+    public HttpResponse doMoveNode(@QueryParameter String nodeName, @QueryParameter String teamName) throws IOException {
+        if (!isCurrentUserTeamAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to move node");
+        }
+        if ((teamName == null) || "".equals(teamName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Team name required.");
+        }
+        if ((nodeName == null) || "".equals(nodeName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Node name required.");
+        }
+
+        Team newTeam;
+        try {
+            newTeam = findTeam(teamName);
+        } catch (TeamNotFoundException ex) {
+            return new TeamUtils.ErrorHttpResponse(teamName + " is not a valid team.");
+        }
+
+        Team oldTeam = findNodeOwnerTeam(nodeName);
+        if (oldTeam == null) {
+            return new TeamUtils.ErrorHttpResponse(nodeName + " does not belong to any team.");
+        }
+
+        if (oldTeam == newTeam) {
+            return new TeamUtils.ErrorHttpResponse(nodeName + " is already in team " + oldTeam.getName());
+        }
+        oldTeam.removeNode(nodeName);
+        newTeam.addNode(new TeamNode(nodeName));
+        return HttpResponses.ok();
+    }
+
     public HttpResponse doSetJobVisibility(@QueryParameter String jobName, @QueryParameter String teamNames, @QueryParameter boolean canViewConfig) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
             return new TeamUtils.ErrorHttpResponse("No permission to set job visibility.");
@@ -476,25 +571,70 @@ public final class TeamManager implements Saveable, AccessControlled {
             for (String teamName : teamNames.split(":")) {
                 job.addVisibility(teamName);
             }
-            job.setAllowConfigView(canViewConfig); 
+            job.setAllowConfigView(canViewConfig);
             save();
         }
         return HttpResponses.ok();
     }
-    
+
+    public HttpResponse doSetViewVisibility(@QueryParameter String viewName, @QueryParameter String teamNames) throws IOException {
+        if (!isCurrentUserTeamAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to set view visibility.");
+        }
+        if ((viewName == null) || "".equals(viewName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("View name required.");
+        }
+        Team ownerTeam = findViewOwnerTeam(viewName);
+        if (ownerTeam == null) {
+            return new TeamUtils.ErrorHttpResponse(viewName + " does not belong to any team.");
+        } else {
+            TeamView view = ownerTeam.findView(viewName);
+            view.removeAllVisibilities();
+            for (String teamName : teamNames.split(":")) {
+                view.addVisibility(teamName);
+            }
+            save();
+        }
+        return HttpResponses.ok();
+    }
+
+    public HttpResponse doSetNodeVisibility(@QueryParameter String nodeName, @QueryParameter String teamNames) throws IOException {
+        if (!isCurrentUserTeamAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to set node visibility.");
+        }
+        if ((nodeName == null) || "".equals(nodeName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Node name required.");
+        }
+        Team ownerTeam = findViewOwnerTeam(nodeName);
+        if (ownerTeam == null) {
+            return new TeamUtils.ErrorHttpResponse(nodeName + " does not belong to any team.");
+        } else {
+            TeamNode node = ownerTeam.findNode(nodeName);
+            node.removeAllVisibilities();
+            for (String teamName : teamNames.split(":")) {
+                node.addVisibility(teamName);
+            }
+            save();
+        }
+        return HttpResponses.ok();
+    }
+
     public HttpResponse doCheckSid(@QueryParameter String sid) throws IOException {
         return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(sid));
     }
 
     /**
-     * Copy jobs from old team to new team. Supplying the original name helps, when job is created
-     * for one team and then moved to another team (Ex. Create Job in a  team). When the job 
-     * is created in first team it may take a unique name different from the supplied original name.
+     * Copy jobs from old team to new team. Supplying the original name helps,
+     * when job is created for one team and then moved to another team (Ex.
+     * Create Job in a team). When the job is created in first team it may take
+     * a unique name different from the supplied original name.
+     *
      * @param job
      * @param oldTeam
      * @param newTeam
-     * @param originalName - original name with which the moved job should be created.
-     * @throws IOException 
+     * @param originalName - original name with which the moved job should be
+     * created.
+     * @throws IOException
      */
     private void moveJob(Job job, Team oldTeam, Team newTeam, String originalName) throws IOException {
         try {
@@ -525,15 +665,15 @@ public final class TeamManager implements Saveable, AccessControlled {
             throw new IOException(exc);
         }
     }
-    
+
     /**
      * Before a job is created in a team, it must be added to the team so the
      * correct location will be found.
-     * 
+     *
      * @param unqualifiedJobName job name with no team qualification
      * @param team team the job is to be created in
      * @return qualified job name to be used to create
-     * @throws IOException 
+     * @throws IOException
      */
     public String addJob(String unqualifiedJobName, Team team) throws IOException {
         String qualifiedNewJobName = getTeamQualifiedJobName(team, unqualifiedJobName);
@@ -543,7 +683,7 @@ public final class TeamManager implements Saveable, AccessControlled {
 
     /**
      * Strip team qualification from job name.
-     * 
+     *
      * @param team must not be null
      * @param jobName qualified job name
      * @return unqualified job name
@@ -569,7 +709,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         };
 
     }
-    
+
     /**
      * Get names of all teams in TeamManager as JSON
      *
@@ -583,7 +723,7 @@ public final class TeamManager implements Saveable, AccessControlled {
             }
         };
     }
-    
+
     private void writeJson(StaplerResponse rsp, List<String> teams) throws IOException {
         rsp.setStatus(HttpServletResponse.SC_OK);
         rsp.setContentType("application/json");
@@ -602,22 +742,7 @@ public final class TeamManager implements Saveable, AccessControlled {
     /* For Unit Test */
     void addUser(String teamName, String userName) throws TeamNotFoundException, IOException {
         Team team = findTeam(teamName);
-        team.addMember(userName, false, false, false, false, false);
-        save();
-    }
-
-    public Team findTeam(String teamName) throws TeamNotFoundException {
-        for (Team team : teams) {
-            if (teamName.equals(team.getName())) {
-                return team;
-            }
-        }
-        throw new TeamNotFoundException(teamName);
-    }
-
-    public void removeTeam(String teamName) throws IOException, TeamNotFoundException {
-        Team team = findTeam(teamName);
-        teams.remove(team);
+        team.addMember(userName, false, false, false, false, false, false, false, false, false, false, false);
         save();
     }
 
@@ -677,7 +802,7 @@ public final class TeamManager implements Saveable, AccessControlled {
     public boolean isCurrentUserAdminInMultipleTeams() {
         return getCurrentUserAdminTeams().size() > 1;
     }
-    
+
     /**
      * Get the team in the case where current user is admin of only one team.
      */
@@ -686,7 +811,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         if (teams.size() == 1) {
             return teams.get(0);
         }
-        throw new IllegalStateException("Current user is admin of "+teams.size()+" teams");
+        throw new IllegalStateException("Current user is admin of " + teams.size() + " teams");
     }
 
     /**
@@ -713,7 +838,9 @@ public final class TeamManager implements Saveable, AccessControlled {
         Collections.sort(list);
         return list;
     }
-    
+
+    //TODO: Used only by teamManager.jelly. Since SysAdmin has access to all
+    //jobs enough to send all jobs known to Hudson
     public Collection<String> getCurrentUserAdminJobs() {
         Hudson hudson = Hudson.getInstance();
         List<String> jobNames = new ArrayList<String>();
@@ -743,6 +870,52 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         Collections.sort(jobNames);
         return jobNames;
+    }
+
+    // Used only by teamManager.jelly. Since SysAdmin has access to all
+    // view enough to send all views known to Hudson
+    public Collection<String> getCurrentSysAdminViews() throws IOException {
+        Hudson hudson = Hudson.getInstance();
+        List<String> viewNames = new ArrayList<String>();
+        if (!isCurrentUserSysAdmin()) {
+            throw new RuntimeException(getCurrentUser() + "  is not a System Administrator");
+        }
+        for (View view : hudson.getViews()) {
+            String viewName = view.getViewName();
+            // Ensure views belong to public team if no other team own them
+            if (findViewOwnerTeam(viewName) == null){
+                publicTeam.addView(new TeamView(viewName)); 
+            }
+            viewNames.add(view.getViewName());
+        }
+
+        Collections.sort(viewNames);
+        return viewNames;
+    }
+
+    // Used only by teamManager.jelly. Since SysAdmin has access to all
+    // nodes enough to send all nodes known to Hudson
+    public Collection<String> getCurrentSysAdminNodes() throws IOException {
+        Hudson hudson = Hudson.getInstance();
+        List<String> nodeNames = new ArrayList<String>();
+        if (!isCurrentUserSysAdmin()) {
+            throw new RuntimeException(getCurrentUser() + " is not a System Administrator");
+        }
+        for (Computer node : hudson.getComputers()) {
+            String nodeName = node.getName();
+            if (node instanceof Hudson.MasterComputer) {
+                //Master node does not have a name!!
+                nodeName = "Master";
+            }
+            // Ensure nodes belong to public team if no other team own them
+            if (findNodeOwnerTeam(nodeName) == null){
+                publicTeam.addNode(new TeamNode(nodeName)); 
+            }
+            nodeNames.add(nodeName);
+        }
+
+        Collections.sort(nodeNames);
+        return nodeNames;
     }
 
     /**
@@ -775,19 +948,18 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return list;
     }
-    
-    
+
     // Used in hudson.model.view.newJob.jelly
     public Collection<String> getCurrentUserTeamsWithCreatePermission() {
         List<Team> teamsWithPermission;
-        if (isCurrentUserSysAdmin()){
+        if (isCurrentUserSysAdmin()) {
             teamsWithPermission = teams;
-        }else{
+        } else {
             teamsWithPermission = getCurrentUserTeamsWithPermission(Item.CREATE);
         }
         List<String> teamNames = new ArrayList<String>();
-        for (Team team : teamsWithPermission){
-            teamNames.add(team.getName()); 
+        for (Team team : teamsWithPermission) {
+            teamNames.add(team.getName());
         }
         return teamNames;
     }
@@ -807,16 +979,28 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return userTeams;
     }
-    
-    public Team findUserTeamForJob(String userName) {
+
+    public Team findUserTeamForItem(String userName) {
         List<Team> userTeams = findUserTeams(userName);
         if (userTeams.isEmpty()) {
             return publicTeam;
         }
         return userTeams.get(0);
     }
-    
-    private TeamAwareSecurityRealm getTeamAwareSecurityRealm(){
+
+    public Team findUserTeamForJob(String userName) {
+        return findUserTeamForItem(userName);
+    }
+
+    public Team findUserTeamForView(String userName) {
+        return findUserTeamForItem(userName);
+    }
+
+    public Team findUserTeamForNode(String userName) {
+        return findUserTeamForItem(userName);
+    }
+
+    private TeamAwareSecurityRealm getTeamAwareSecurityRealm() {
         HudsonSecurityManager hudsonSecurityManager = HudsonSecurityEntitiesHolder.getHudsonSecurityManager();
         if (hudsonSecurityManager != null) {
             SecurityRealm securityRealm = hudsonSecurityManager.getSecurityRealm();
@@ -826,15 +1010,15 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return null;
     }
-    
+
     // this could be private
     public List<Team> findCurrentUserTeams() {
-        
+
         //Check if we have to use TeamAwareSecurityRealm
         if (getTeamAwareSecurityRealm() != null) {
             return Arrays.asList(getTeamAwareSecurityRealm().GetCurrentUserTeam());
         }
-        
+
         Authentication authentication = HudsonSecurityManager.getAuthentication();
         List<Team> userTeams = findUserTeams(authentication.getName());
         Collection<? extends GrantedAuthority> gas = authentication.getAuthorities();
@@ -857,6 +1041,14 @@ public final class TeamManager implements Saveable, AccessControlled {
         return null;
     }
 
+    public TeamJob findJob(String jobName) {
+        Team jobTeam = findJobOwnerTeam(jobName);
+        if (jobTeam != null) {
+            return jobTeam.findJob(jobName);
+        }
+        return null;
+    }
+
     public void addJob(Team team, String jobName) throws IOException, TeamNotFoundException {
         if (team != null) {
             team.addJob(new TeamJob(jobName));
@@ -865,30 +1057,30 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         save();
     }
-    
+
     public void renameJob(Team team, String oldJobName, String newJobName) throws IOException {
         if (team != null) {
             team.renameJob(oldJobName, newJobName);
             save();
         }
     }
-    
+
     public void removeJob(Team team, String jobName) throws IOException {
         if (team != null) {
             team.removeJob(jobName);
             save();
         }
     }
-    
+
     public void removeJob(String jobName) throws IOException {
         removeJob(findJobOwnerTeam(jobName), jobName);
     }
 
     public void addJobToUserTeam(String userName, String jobName) throws IOException, TeamNotFoundException {
         // Fix bug in hudson.model.listeners.ItemListenerTest - no team found for user
-        addJob(findUserTeamForJob(userName), jobName); 
+        addJob(findUserTeamForJob(userName), jobName);
     }
-    
+
     public void addJobToCurrentUserTeam(String jobName) throws IOException, TeamNotFoundException {
         addJobToUserTeam(getCurrentUser(), jobName);
     }
@@ -897,10 +1089,136 @@ public final class TeamManager implements Saveable, AccessControlled {
         // Used only in tests
         removeJob(findUserTeams(userName).get(0), jobName);
     }
-    
+
     void renameJobInUserTeam(String userName, String oldJobName, String newJobName) throws IOException {
         // Used only in tests
         renameJob(findUserTeams(userName).get(0), oldJobName, newJobName);
+    }
+
+    public Team findNodeOwnerTeam(String nodeName) {
+        for (Team team : teams) {
+            if (team.isNodeOwner(nodeName)) {
+                return team;
+            }
+        }
+        return null;
+    }
+
+    public void addNode(Team team, String nodeName) throws IOException, TeamNotFoundException {
+        if (team != null) {
+            team.addNode(new TeamNode(nodeName));
+        } else {
+            findTeam(Team.PUBLIC_TEAM_NAME).addNode(new TeamNode(nodeName));
+        }
+        save();
+    }
+
+    public void renameNode(Team team, String oldNodeName, String newNodeName) throws IOException {
+        if (team != null) {
+            team.renameNode(oldNodeName, newNodeName);
+            save();
+        }
+    }
+
+    public void removeNode(Team team, String nodeName) throws IOException {
+        if (team != null) {
+            team.removeNode(nodeName);
+            save();
+        }
+    }
+
+    public TeamNode findNode(String nodeName) {
+        Team nodeTeam = findNodeOwnerTeam(nodeName);
+        if (nodeTeam != null) {
+            return nodeTeam.findNode(nodeName);
+        }
+        return null;
+    }
+
+    public void removeNode(String nodeName) throws IOException {
+        removeNode(findNodeOwnerTeam(nodeName), nodeName);
+    }
+
+    public void addNodeToUserTeam(String userName, String nodeName) throws IOException, TeamNotFoundException {
+        // Fix bug in hudson.model.listeners.ItemListenerTest - no team found for user
+        addNode(findUserTeamForNode(userName), nodeName);
+    }
+
+    public void addNodeToCurrentUserTeam(String nodeName) throws IOException, TeamNotFoundException {
+        addNodeToUserTeam(getCurrentUser(), nodeName);
+    }
+
+    void removeNodeFromUserTeam(String userName, String nodeName) throws IOException {
+        // Used only in tests
+        removeNode(findUserTeams(userName).get(0), nodeName);
+    }
+
+    void renameNodeInUserTeam(String userName, String oldNodeName, String newNodeName) throws IOException {
+        // Used only in tests
+        renameNode(findUserTeams(userName).get(0), oldNodeName, newNodeName);
+    }
+
+    public Team findViewOwnerTeam(String viewName) {
+        for (Team team : teams) {
+            if (team.isViewOwner(viewName)) {
+                return team;
+            }
+        }
+        return null;
+    }
+
+    public TeamView findView(String viewName) {
+        Team viewTeam = findViewOwnerTeam(viewName);
+        if (viewTeam != null) {
+            return viewTeam.findView(viewName);
+        }
+        return null;
+    }
+
+    public void addView(Team team, String viewName) throws IOException, TeamNotFoundException {
+        if (team != null) {
+            team.addView(new TeamView(viewName));
+        } else {
+            findTeam(Team.PUBLIC_TEAM_NAME).addView(new TeamView(viewName));
+        }
+        save();
+    }
+
+    public void renameView(Team team, String oldViewName, String newViewName) throws IOException {
+        if (team != null) {
+            team.renameView(oldViewName, newViewName);
+            save();
+        }
+    }
+
+    public void removeView(Team team, String viewName) throws IOException {
+        if (team != null) {
+            team.removeView(viewName);
+            save();
+        }
+    }
+
+    public void removeView(String viewName) throws IOException {
+        removeView(findViewOwnerTeam(viewName), viewName);
+    }
+
+    public void addViewToUserTeam(String userName, String viewName) throws IOException, TeamNotFoundException {
+        // Fix bug in hudson.model.listeners.ItemListenerTest - no team found for user
+        addView(findUserTeamForView(userName), viewName);
+    }
+
+    public void addViewToCurrentUserTeam(String viewName) throws IOException, TeamNotFoundException {
+        addViewToUserTeam(getCurrentUser(), viewName);
+    }
+
+    void removeViewFromUserTeam(String userName, String viewName) throws IOException {
+        // Used only in tests
+        removeView(findUserTeams(userName).get(0), viewName);
+    }
+
+    void renameViewInUserTeam(String userName, String oldViewName, String newViewName) throws IOException {
+        // Used only in tests
+        renameView(findUserTeams(userName).get(0), oldViewName, newViewName);
     }
 
     /**
@@ -918,8 +1236,8 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     /**
-     * Get the current user team qualified Id for the job name
-     * If the user is member of multiple teams use the first team
+     * Get the current user team qualified Id for the job name If the user is
+     * member of multiple teams use the first team
      *
      * @param jobName
      * @return String, Qualified Job ID
@@ -931,10 +1249,11 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return jobName;
     }
-    
+
     /**
-     * Called to check duplicate job name before create.
-     * For this purpose, we want a job name that is not necessarily unique.
+     * Called to check duplicate job name before create. For this purpose, we
+     * want a job name that is not necessarily unique.
+     *
      * @param jobName requested job name
      * @return qualified name to check
      */
@@ -945,10 +1264,11 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return jobName;
     }
-    
+
     /**
-     * Called to check duplicate job name before create.
-     * For this purpose, we want a job name that is not necessarily unique.
+     * Called to check duplicate job name before create. For this purpose, we
+     * want a job name that is not necessarily unique.
+     *
      * @param team requested team
      * @param jobName requested job name
      * @return qualified name to check
@@ -959,11 +1279,11 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return team.getName() + TEAM_SEPARATOR + jobName;
     }
-    
+
     /**
-     * 
+     *
      * @return the implicit team for the current user
-     * @throws TeamNotFoundException 
+     * @throws TeamNotFoundException
      */
     public Team findCurrentUserTeamForNewJob() throws TeamNotFoundException {
         // This will only find explicit team members with create permission
@@ -976,7 +1296,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         throw new TeamNotFoundException("User does not have create permission in any team");
     }
-    
+
     /**
      * Get the current user team qualified Id for the job name
      *
@@ -1003,16 +1323,16 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return sb.toString();
     }
-    
+
     /**
-     * Check that jobName is properly qualified for the team.
-     * The check fails if:
+     * Check that jobName is properly qualified for the team. The check fails
+     * if:
      * <pre>
      *  - The team is public but the name is qualified (contains a '.')
      *  - The team is not public, but the name is not qualified
      *    by team name
      * </pre>
-     * 
+     *
      * @param team must not be null
      * @param jobName
      * @return true if check succeeds
@@ -1021,7 +1341,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         if (isPublicTeam(team)) {
             return jobName.indexOf('.') < 0;
         }
-        return jobName.startsWith(team.getName()+TEAM_SEPARATOR);
+        return jobName.startsWith(team.getName() + TEAM_SEPARATOR);
     }
 
     /**
@@ -1037,7 +1357,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         Team team = findJobOwnerTeam(jobName);
         if (team == null) {
             if (!findCurrentUserTeams().isEmpty()) {
-                team = findCurrentUserTeams().get(0); 
+                team = findCurrentUserTeams().get(0);
             }
         }
         if (team != null) {
@@ -1050,19 +1370,19 @@ public final class TeamManager implements Saveable, AccessControlled {
      * The Folder where all the jobs of the team to which this jobName belongs
      * to are stored.
      *
-     * <p>This method should be called to determine the jobs folder whether or
-     * not team management is enabled, as team manager alone knows where team
-     * jobs are.
+     * <p>
+     * This method should be called to determine the jobs folder whether or not
+     * team management is enabled, as team manager alone knows where team jobs
+     * are.
      *
      * @param jobName
      * @return File, team jobs folder
      */
-     
     public File getRootFolderForJob(String jobName) {
         Team team = findJobOwnerTeam(jobName);
         // May be just created job, get the job folder from the first 
         // team the current user or user role has create permission
-         
+
         if ((team == null) && isTeamManagementEnabled()) {
             if (getTeamAwareSecurityRealm() != null) {
                 team = getTeamAwareSecurityRealm().GetCurrentUserTeam();
@@ -1079,11 +1399,12 @@ public final class TeamManager implements Saveable, AccessControlled {
             } else {
                 return new File(team.getJobsFolder(teamsFolder), jobName);
             }
-        }else{
+        } else {
             // May be just created by sys admin who does not belong to any team
             return new File(publicTeam.getJobsFolder(hudsonHomeDir), jobName);
         }
     }
+
     /**
      * Get the root folders of all the jobs known to this Team manager
      *
@@ -1100,14 +1421,14 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return jobsRootFolders.toArray(new File[jobsRootFolders.size()]);
     }
-    
+
     List<Team> getCurrentUserTeamsWithPermission(Permission permission) {
-        
-         //Check if we have to use TeamAwareSecurityRealm
+
+        //Check if we have to use TeamAwareSecurityRealm
         if (getTeamAwareSecurityRealm() != null) {
             return Arrays.asList(getTeamAwareSecurityRealm().GetCurrentUserTeam());
         }
-        
+
         List<Team> userTeamsWithPermission = new ArrayList<Team>();
         Authentication authentication = HudsonSecurityManager.getAuthentication();
         List<Team> userTeams = findCurrentUserTeams();
@@ -1129,9 +1450,11 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     public static final String ADMIN = "Admin";
-    
-    /** All team permissions in sorted order */
-    public static String[] ALL_TEAM_PERMISSIONS = new String[] {
+
+    /**
+     * All team permissions in sorted order
+     */
+    public static String[] ALL_TEAM_PERMISSIONS = new String[]{
         ADMIN, // not a real permission, but needed to distinguish admins
         Item.BUILD.getName(),
         Item.CONFIGURE.getName(),
@@ -1140,9 +1463,8 @@ public final class TeamManager implements Saveable, AccessControlled {
         Item.EXTENDED_READ.getName(),
         Item.READ.getName(),
         Item.WIPEOUT.getName(),
-        Item.WORKSPACE.getName(),
-    };
-    
+        Item.WORKSPACE.getName(),};
+
     // Used in org.cli.ListTeamsCommand
     public List<String> getCurrentUserVisibleTeams() {
         List<String> teams = (List<String>) getCurrentUserTeams();
@@ -1151,7 +1473,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return teams;
     }
-    
+
     // Used by ListTeamsCommand
     public boolean isUserHasAccessToTeam(String user, String team) {
         if (Team.PUBLIC_TEAM_NAME.equals(team)) {
@@ -1202,17 +1524,27 @@ public final class TeamManager implements Saveable, AccessControlled {
             return permissions;
         } else if (Team.PUBLIC_TEAM_NAME.equals(teamName)) {
             // Even anonymous can read
-            return new String[] {Item.READ.getName()};
+            return new String[]{Item.READ.getName()};
         }
         return new String[0];
     }
 
-     // Used in org.cli.ListTeamsCommand?
+    // Used in org.cli.ListTeamsCommand?
     public String[] getCurrentUserTeamPermissions(String teamName) throws TeamNotFoundException {
         return getUserTeamPermissions(getCurrentUser(), teamName);
     }
-    
-   public static class TeamNotFoundException extends Exception {
+
+    public boolean canNodeExecuteJob(String nodeName, String jobName) {
+        Team nodeTeam = findNodeOwnerTeam(nodeName);
+        Team jobTeam = findJobOwnerTeam(nodeName);
+        if (nodeTeam == jobTeam) {
+            return true;
+        }
+        TeamNode teamNode = nodeTeam.findNode(nodeName);
+        return teamNode.isVisible(jobTeam.getName());
+    }
+
+    public static class TeamNotFoundException extends Exception {
 
         public TeamNotFoundException(String teamName) {
             super("Team " + teamName + " does not exist.");
@@ -1257,7 +1589,7 @@ public final class TeamManager implements Saveable, AccessControlled {
             logger.error("Failed to load " + config, e);
         }
     }
-    
+
     private void ensureCustomFolders() {
         // NB: It would be best to clean up jobs at any of the logger calls below
         // but we're in the TeamManager constructor so it can't be called from
@@ -1280,14 +1612,14 @@ public final class TeamManager implements Saveable, AccessControlled {
                                     try {
                                         Util.moveDirectory(oldJobDir, newJobDir);
                                     } catch (InterruptedException e) {
-                                        logger.error("Failed to move "+oldJobDir.getAbsolutePath());
+                                        logger.error("Failed to move " + oldJobDir.getAbsolutePath());
                                     }
                                 } else {
-                                    logger.error("Job folder not found "+oldJobDir.getAbsolutePath());
+                                    logger.error("Job folder not found " + oldJobDir.getAbsolutePath());
                                 }
                             }
                         } else {
-                            logger.error("Can't create "+jobsDir.getAbsolutePath());
+                            logger.error("Can't create " + jobsDir.getAbsolutePath());
                         }
                     }
                 }
@@ -1305,6 +1637,30 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         try {
             publicTeam.loadExistingJobs(hudsonHomeDir);
+            Hudson hudson = Hudson.getInstance();
+            //Null during initial setup 
+            if (hudson != null) {
+                for (View view : hudson.getViews()) {
+                    TeamView teamView = new TeamView(view.getViewName());
+                    if (view instanceof AllView) {
+                        teamView.setMoveAllowed(false);
+                        publicTeam.addView(teamView);
+                    } else if (findViewOwnerTeam(view.getViewName()) == null) {
+                        publicTeam.addView(teamView);
+                    }
+                }
+                for (Computer node : hudson.getComputers()) {
+                    TeamNode teamNode = new TeamNode(node.getName());
+                    if (node instanceof Hudson.MasterComputer) {
+                        //Master node does not have a name!!
+                        teamNode.setId("Master");
+                        teamNode.setMoveAllowed(false);
+                        publicTeam.addNode(teamNode);
+                    } else if (findNodeOwnerTeam(node.getName()) == null) {
+                        publicTeam.addNode(teamNode);
+                    }
+                }
+            }
         } catch (IOException ex) {
             logger.error("Failed to load existing jobs", ex);
         }
