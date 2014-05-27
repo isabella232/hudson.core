@@ -31,9 +31,11 @@
       <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Main Dashboard}" />
       <l:task icon="images/24x24/search.png"  href="${url}/" title="${%Status}" />
       <l:task icon="images/24x24/notepad.png" href="${url}/changes" title="${%Changes}" />
-      <l:task icon="images/24x24/folder.png"  href="${url}/ws/" title="${%Workspace}" permission="${it.WORKSPACE}">
-        <l:task icon="images/24x24/folder-delete.png"  href="${url}/wipeOutWorkspace" title="${%Wipe Out Workspace}" permission="${h.isWipeOutPermissionEnabled() ? it.WIPEOUT : it.BUILD}" />
-      </l:task>
+      <j:if test="${it.workspace != null}">
+        <l:task icon="images/24x24/folder.png"  href="${url}/ws/" title="${%Workspace}" permission="${it.WORKSPACE}">
+          <l:task icon="images/24x24/folder-delete.png"  href="${url}/wipeOutWorkspace" title="${%Wipe Out Workspace}" permission="${h.isWipeOutPermissionEnabled() ? it.WIPEOUT : it.BUILD}" />
+        </l:task>
+      </j:if>
       <j:if test="${it.configurable}">
         <j:if test="${it.buildable}">
           <l:task icon="images/24x24/clock.png" href="${url}/build?delay=0sec" title="${%Build Now}"
