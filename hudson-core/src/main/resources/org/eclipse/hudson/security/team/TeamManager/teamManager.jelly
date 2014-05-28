@@ -86,7 +86,8 @@
                                 <th align="left">Select</th>
                                 <th align="left">Status</th>
                                 <th align="left">Job Name</th>
-                                <th align="left">Team Name</th>      
+                                <th align="left">Team Name</th>   
+                                <th> </th>   
                             </tr>      
                             <j:forEach var="jobName" items="${it.currentUserAdminJobs}">
                                 <tr>
@@ -104,6 +105,7 @@
                                             ${it.findJobOwnerTeam(jobName).name}
                                         </span>
                                     </td>
+                                    <td width="50%"> </td>
                                 </tr> 
                             </j:forEach>
                         </tbody>
@@ -128,7 +130,8 @@
                             <tr class="header" id="ViewsListHeader" style='visibility:${headerVisibility}'>
                                 <th align="left">Select</th>
                                 <th align="left">View Name</th>
-                                <th align="left">Team Name</th>      
+                                <th align="left">Team Name</th>   
+                                <th></th>   
                             </tr>      
                             <j:forEach var="viewName" items="${it.currentSysAdminViews}">
                                 <tr>
@@ -145,6 +148,7 @@
                                             ${it.findViewOwnerTeam(viewName).name}
                                         </span>
                                     </td>
+                                    <td width="50%"> </td>
                                 </tr> 
                             </j:forEach>
                         </tbody>
@@ -169,7 +173,8 @@
                             <tr class="header" id="NodesListHeader" style='visibility:${headerVisibility}'>
                                 <th align="left">Select</th>
                                 <th align="left">Node Name</th>
-                                <th align="left">Team Name</th>      
+                                <th align="left">Team Name</th>   
+                                <th> </th>   
                             </tr>      
                             <j:forEach var="nodeName" items="${it.currentSysAdminNodes}">
                                 <tr>
@@ -186,6 +191,7 @@
                                             ${it.findNodeOwnerTeam(nodeName).name}
                                         </span>
                                     </td>
+                                    <td width="50%"> </td>
                                 </tr> 
                             </j:forEach>
                         </tbody>
@@ -198,62 +204,7 @@
         </div>
     </div>
     
-    <st:include page="teamTemplates.jelly"/>
-              
-    <!-- Dialog template for creating team -->
-    <div style="margin-top: 10px; display: none" id="dialog-create-team" title="Create New Team">
-        <div>
-            <label for="teamName">Name:</label> 
-            <input type="text" name="teamName" id="teamName" size="25"/>
-            <br/>
-            <label for="teamDesc">Description:</label> 
-            <input type="text" name="teamDesc" id="teamDesc" size="65"/>
-            <label for="teamDesc">Custom team folder:</label> 
-            <input type="text" name="customFolder" id="teamCustomFolder" size="65"/>
-            <br/>
-            <span>(Provide absolute path or leave it empty)</span>
-        </div>
-        <div style="margin-top:10px">
-            <span id="teamAddMsg">
-                <!-- message goes here -->
-            </span>
-        </div>
-    </div>
-    
-    <!-- Dialog template for deleting team -->
-    <div style="margin-top: 10px; display: none" id="dialog-delete-team">
-        <div>
-            <span>
-                The team will be permanently deleted and any team jobs will become public. Do you really want to delete the team?
-            </span>
-            <div style="margin-top:10px">
-                <span id="teamDeleteMsg">
-                    <!-- message goes here -->
-                </span>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Dialog template for moving jobs -->
-    <div style="margin-top: 10px; display: none" id="dialog-move-jobs">
-        <div>
-            <span>
-                Following jobs will be moved to the selected Team. <br/> 
-                Before moving the jobs make sure they are not building and not used.
-            </span>
-            <ul id="selectedJobs">
-                <!-- dynamically filled  -->
-            </ul> 
-            <select id="teamChoice">
-                <option value="loading">Loading ..</option>
-            </select>
-            <div style="margin-top:10px">
-                <span id="moveJobMsg">
-                    <!-- dynamically inserted -->
-                </span>
-            </div>
-        </div>
-    </div>
-            
+    <st:include page="templates.jelly"/>
+               
 </j:jelly>            
             

@@ -605,7 +605,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         if ((nodeName == null) || "".equals(nodeName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Node name required.");
         }
-        Team ownerTeam = findViewOwnerTeam(nodeName);
+        Team ownerTeam = findNodeOwnerTeam(nodeName);
         if (ownerTeam == null) {
             return new TeamUtils.ErrorHttpResponse(nodeName + " does not belong to any team.");
         } else {

@@ -1,0 +1,352 @@
+<!-- **************************************************************************
+#
+# Copyright  (c) 2013 Oracle Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors: 
+#
+#  Winston Prakash
+#        
+#************************************************************************** --> 
+
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout">
+    
+    <!-- Dialog template for creating team -->
+    <div style="margin-top: 10px; display: none" id="dialog-create-team" title="Create New Team">
+        <div>
+            <label for="teamName">Name:</label> 
+            <input type="text" name="teamName" id="teamName" size="25"/>
+            <br/>
+            <label for="teamDesc">Description:</label> 
+            <input type="text" name="teamDesc" id="teamDesc" size="65"/>
+            <label for="teamDesc">Custom team folder:</label> 
+            <input type="text" name="customFolder" id="teamCustomFolder" size="65"/>
+            <br/>
+            <span>(Provide absolute path or leave it empty)</span>
+        </div>
+        <div style="margin-top:10px">
+            <span id="teamAddMsg">
+                <!-- message goes here -->
+            </span>
+        </div>
+    </div>
+    
+    <!-- Dialog template for deleting team -->
+    <div style="margin-top: 10px; display: none" id="dialog-delete-team">
+        <div>
+            <span>
+                The team will be permanently deleted and any team jobs will become public. Do you really want to delete the team?
+            </span>
+            <div style="margin-top:10px">
+                <span id="teamDeleteMsg">
+                    <!-- message goes here -->
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dialog template for moving jobs -->
+    <div style="margin-top: 10px; display: none" id="dialog-move-jobs">
+        <div>
+            <span>
+                Following jobs will be moved to the selected Team. <br/> 
+                Before moving the jobs make sure they are not building and not used.
+            </span>
+            <ul id="selectedJobs">
+                <!-- dynamically filled  -->
+            </ul> 
+            <select id="teamChoice">
+                <option value="loading">Loading ..</option>
+            </select>
+            <div style="margin-top:10px">
+                <span id="moveJobMsg">
+                    <!-- dynamically inserted -->
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dialog template for moving views -->
+    <div style="margin-top: 10px; display: none" id="dialog-move-views">
+        <div>
+            <span>
+                Following views will be moved to the selected Team.
+            </span>
+            <ul id="selectedViews">
+                <!-- dynamically filled  -->
+            </ul> 
+            <select id="teamChoiceForViews">
+                <option value="loading">Loading ..</option>
+            </select>
+            <div style="margin-top:10px">
+                <span id="moveViewsMsg">
+                    <!-- dynamically inserted -->
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dialog template for moving nodes -->
+    <div style="margin-top: 10px; display: none" id="dialog-move-nodes">
+        <div>
+            <span>
+                Following nodes will be moved to the selected Team.
+            </span>
+            <ul id="selectedNodes">
+                <!-- dynamically filled  -->
+            </ul> 
+            <select id="teamChoiceForNodes">
+                <option value="loading">Loading ..</option>
+            </select>
+            <div style="margin-top:10px">
+                <span id="moveNodesMsg">
+                    <!-- dynamically inserted -->
+                </span>
+            </div>
+        </div>
+    </div>
+               
+    <!-- Template for Team member info -->
+    <div style="margin-top: 10px; display: none" id="userTemplate">
+        <table>
+            <tr>
+                <td align="center" width="20px">
+                    <img name="typeIcon"/>
+                </td>
+                <td width="200px">
+                    <input type="hidden" value="${teamMember}" name="hiddenUserName"/>
+                    <input type="hidden" value="${it.name}" name="hiddenTeamName"/>
+                    <span style="margin-left:10px; font-size:13px">
+                    </span>
+                </td>
+                <td align="center"> 
+                    <img  style="visibility:hidden" src="${imagesURL}/16x16/check.png" name="adminIcon"/>
+                </td >
+                <td width="40px">    
+                </td>
+                <td align="center"> 
+                    <img  style="visibility:hidden" src="${imagesURL}/16x16/check.png" name="createIcon"/>
+                </td>
+                <td align="center"> 
+                    <img  style="visibility:hidden" src="${imagesURL}/16x16/check.png" name="deleteIcon"/>
+                </td>
+                <td align="center"> 
+                    <img  style="visibility:hidden" src="${imagesURL}/16x16/check.png" name="configureIcon"/>
+                </td>
+                <td align="center"> 
+                    <img  style="visibility:hidden" src="${imagesURL}/16x16/check.png" name="buildIcon"/>
+                </td>
+                
+                <td width="40px">                    
+                </td>
+                <td align="center"> 
+                    <img  style="visibility:hidden" src="${imagesURL}/16x16/check.png" name="viewCreateIcon"/>
+                </td>
+                <td align="center"> 
+                    <img  style="visibility:hidden" src="${imagesURL}/16x16/check.png" name="viewDeleteIcon"/>
+                </td>
+                <td align="center"> 
+                    <img  style="visibility:hidden" src="${imagesURL}/16x16/check.png" name="viewConfigureIcon"/>
+                </td>
+                
+                <td width="40px">                    
+                </td>
+                <td align="center"> 
+                    <img  style="visibility:hidden" src="${imagesURL}/16x16/check.png" name="nodeCreateIcon"/>
+                </td>
+                <td align="center"> 
+                    <img  style="visibility:hidden" src="${imagesURL}/16x16/check.png" name="nodeDeleteIcon"/>
+                </td>
+                <td align="center"> 
+                    <img  style="visibility:hidden" src="${imagesURL}/16x16/check.png" name="nodeConfigureIcon"/>
+                </td>
+                
+                <td width="40px">    
+                </td>
+                
+                <td align="center"> 
+                    <img style="cursor:pointer" class="teamMemberUpdate" src="${imagesURL}/16x16/notepad.png" name="updateIcon"/>
+                </td>
+                <td align="center"> 
+                    <img style="cursor:pointer" class="teamMemberRemove" src="${imagesURL}/16x16/delete.png" name="removeIcon"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+            
+    <!-- Dialog template for adding member -->
+    <div style="margin-top: 10px; display: none" id="dialog-add-modify-user">
+        <div>
+            <div>
+                <label>${%User or Group Name}:</label>
+                <input style="margin-left:5px" size="35" type="text" id="text_sidName" />
+                <span id="label_sidName"> </span>
+            </div>
+             
+            <div style="margin-top: 10px;">
+                <label>${%Is Admin}:</label>
+                <input type="checkbox" style="margin-left:5px"  id="cb_adminFlag" />
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <label style="display:inline-block; width:130px"> Job Permissions: </label>
+                <input type="checkbox" style="margin-left:5px" id="cb_createFlag"/>
+                <label>${%Create}</label>
+                <input type="checkbox" style="margin-left:5px" id="cb_deleteFlag"/>
+                <label>${%Delete}</label>
+             
+                <input type="checkbox" style="margin-left:5px" id="cb_configureFlag"/>
+                <label>${%Configure}</label>
+            
+                <input type="checkbox" style="margin-left:5px" id="cb_buildFlag"/>
+                <label>${%Build}</label>
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <label style="display:inline-block; width:130px"> View Permissions: </label>
+                <input type="checkbox" style="margin-left:5px" id="cb_viewCreateFlag"/>
+                <label>${%Create}</label>
+                <input type="checkbox" style="margin-left:5px" id="cb_viewDeleteFlag"/>
+                <label>${%Delete}</label>
+             
+                <input type="checkbox" style="margin-left:5px" id="cb_viewConfigureFlag" />
+                <label>${%Configure}</label>
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <label style="display:inline-block; width:130px"> Node Permissions: </label>
+                <input type="checkbox" style="margin-left:5px" id="cb_nodeCreateFlag"/>
+                <label>${%Create}</label>
+                <input type="checkbox" style="margin-left:5px" id="cb_nodeDeleteFlag"/>
+                <label>${%Delete}</label>
+             
+                <input type="checkbox" style="margin-left:5px" id="cb_nodeConfigureFlag"/>
+                <label>${%Configure}</label>
+            </div>
+             
+            <div style="margin-top:10px">
+                <span id="userAddMsg">
+                    <!-- message goes here -->
+                </span>
+            </div>
+        </div>
+    </div>
+            
+    <!-- Dialog template for removing member -->
+    <div style="margin-top: 10px; display: none" id="dialog-remove-user">
+        <div>
+            <span>
+                Do you really want to remove the member from the team?
+            </span>
+            <div style="margin-top:10px">
+                <span id="userRemoveMsg">
+                    <!-- message goes here -->
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dialog template for configuring Job Visibility -->
+    <div style="margin-top: 10px; display: none" id="dialog-configure-visibility">
+        <div>
+            <span>
+                Configure the visibility of the job. Publicly visible jobs can be viewed by anyone.
+            </span>
+            
+            <div style="margin-top: 10px;">
+                <label>${%Publicly visible}:</label>
+                <input type="checkbox" style="margin-left:5px" id="publicVisibility" value="public"/>
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <span style="font-weight: bold;">${%Visible to team(s)}:</span>
+            </div>
+            
+            <div id="configure-visibility-team-list">
+                 
+            </div>
+            
+            <hr/>
+            
+            <div style="margin-top: 10px;">
+                <label>${%Allow selected teams to view Job Configuraton}:</label>
+                <input type="checkbox" style="margin-left:5px" id="allowViewConfig" />
+            </div>
+            
+            <div style="margin-top:10px">
+                <span id="configureVisibilityMsg">
+                    <!-- message goes here -->
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dialog template for configuring View Visibility -->
+    <div style="margin-top: 10px; display: none" id="dialog-configure-view-visibility">
+        <div>
+            <span>
+                Configure the visibility of the view. Public views are visible to anyone.
+            </span>
+            
+            <div style="margin-top: 10px;">
+                <label>${%Publicly visible}:</label>
+                <input type="checkbox" style="margin-left:5px" id="viewPublicVisibility" value="public"/>
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <span style="font-weight: bold;">${%Visible to team(s)}:</span>
+            </div>
+            
+            <div id="configure-view-visibility-team-list">
+                 
+            </div>
+            
+            <div style="margin-top:10px">
+                <span id="configureViewVisibilityMsg">
+                    <!-- message goes here -->
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dialog template for configuring Node Visibility -->
+    <div style="margin-top: 10px; display: none" id="dialog-configure-node-visibility">
+        <div>
+            <span>
+                Configure the visibility of the node. Public nodes are visible to anyone.
+            </span>
+            
+            <div style="margin-top: 10px;">
+                <label>${%Publicly visible}:</label>
+                <input type="checkbox" style="margin-left:5px" id="nodePublicVisibility" value="public"/>
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <span style="font-weight: bold;">${%Visible to team(s)}:</span>
+            </div>
+            
+            <div id="configure-node-visibility-team-list">
+                 
+            </div>
+            
+            <div style="margin-top:10px">
+                <span id="configureNodeVisibilityMsg">
+                    <!-- message goes here -->
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <div style="display: none" id="team-visibility-item-template">
+        <div style="margin-top: 5px;">
+            <label></label>
+            <input type="checkbox" style="margin-left:5px" value="public"/>
+        </div>
+    </div>
+</j:jelly>            
+            

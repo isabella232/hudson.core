@@ -24,7 +24,8 @@
     
     <div style="margin:5px">
         <j:if test="${app.teamManager.isCurrentUserSysAdmin()}">
-            <button style="float:right; color: #C6223A;" value="${it.name}" class="teamDeleteButton">${%Delete Team}</button>        </j:if>
+            <button style="float:right; color: #C6223A;" value="${it.name}" class="teamDeleteButton">${%Delete Team}</button>        
+        </j:if>
         <h3>${it.name}</h3>
         <p class="description" style="margin-top: 5px; margin-bottom: 5px;">
             ${it.description}
@@ -37,6 +38,12 @@
             </li>
             <li>
                 <a href="#teamJobsTab">Jobs</a>
+            </li>
+            <li>
+                <a href="#teamViewsTab">Views</a>
+            </li>
+            <li>
+                <a href="#teamNodesTab">Nodes</a>
             </li>
                          
         </ul> 
@@ -55,16 +62,29 @@
                     <table id="teamMemberList_${it.name}" width="100%"> 
                         <tbody>
                             <tr class="header" id="teamMemberListHeader1_${it.name}" style='visibility:${headerVisibility}'>
-                                <th colspan="2"></th>
-                                <th colspan="4">Permissions</th>             
+                                <th colspan="4"></th>
+                                <th colspan="4">Job Permissions</th>
+                                <th ></th>     
+                                <th colspan="3">View Permissions</th>  
+                                <th ></th>     
+                                <th colspan="3">Node Permissions</th>      
                             </tr>
                             <tr class="header" id="teamMemberListHeader2_${it.name}" style='visibility:${headerVisibility}'>
                                 <th colspan="2"></th>
                                 <th>Admin</th>
+                                <th></th>
                                 <th>Create</th>
                                 <th>Delete</th>
                                 <th>Configure</th>
                                 <th>Build</th>
+                                <th></th>
+                                <th>Create</th>
+                                <th>Delete</th>
+                                <th>Configure</th>
+                                <th></th>
+                                <th>Create</th>
+                                <th>Delete</th>
+                                <th>Configure</th>
                             </tr>
                             <j:forEach var="member" items="${it.members}">
                                 <tr >
@@ -81,7 +101,10 @@
                                     <td align="center"> 
                                         <j:set var="teamAdminIconVisibility" value='${member.isTeamAdmin() ? "visible" : "hidden"}'/>
                                         <img style="visibility:${teamAdminIconVisibility}" src="${imagesURL}/16x16/check.png" name="adminIcon"/>
-                                    </td >
+                                    </td>
+                                    <td width="40px">    
+                                    </td>
+                                    
                                     <td align="center"> 
                                         <j:set var="createIconVisibility" value='${member.canCreate() ? "visible" : "hidden"}'/>
                                         <img style="visibility:${createIconVisibility}" src="${imagesURL}/16x16/check.png" name="createIcon"/>
@@ -98,9 +121,39 @@
                                         <j:set var="buildIconVisibility" value='${member.canBuild() ? "visible" : "hidden"}'/>
                                         <img  style="visibility:${buildIconVisibility}" src="${imagesURL}/16x16/check.png" name="buildIcon"/>
                                     </td>
-                                    <td width="40px">
-                                        
+                                    <td width="40px">    
                                     </td>
+                                    
+                                    <td align="center"> 
+                                        <j:set var="viewCreateIconVisibility" value='${member.canCreateView() ? "visible" : "hidden"}'/>
+                                        <img style="visibility:${viewCreateIconVisibility}" src="${imagesURL}/16x16/check.png" name="viewCreateIcon"/>
+                                    </td>
+                                    <td align="center"> 
+                                        <j:set var="viewDeleteIconVisibility" value='${member.canDeleteView() ? "visible" : "hidden"}'/>
+                                        <img style="visibility:${viewDeleteIconVisibility}" src="${imagesURL}/16x16/check.png" name="viewDeleteIcon"/>
+                                    </td>
+                                    <td align="center"> 
+                                        <j:set var="viewConfigureIconVisibility" value='${member.canConfigureView() ? "visible" : "hidden"}'/>
+                                        <img  style="visibility:${viewConfigureIconVisibility}" src="${imagesURL}/16x16/check.png" name="viewConfigureIcon"/>
+                                    </td>
+                                    <td width="40px">    
+                                    </td>
+                                    
+                                    <td align="center"> 
+                                        <j:set var="nodeCreateIconVisibility" value='${member.canCreateNode() ? "visible" : "hidden"}'/>
+                                        <img style="visibility:${nodeCreateIconVisibility}" src="${imagesURL}/16x16/check.png" name="nodeCreateIcon"/>
+                                    </td>
+                                    <td align="center"> 
+                                        <j:set var="nodeDeleteIconVisibility" value='${member.canDeleteNode() ? "visible" : "hidden"}'/>
+                                        <img style="visibility:${nodeDeleteIconVisibility}" src="${imagesURL}/16x16/check.png" name="nodeDeleteIcon"/>
+                                    </td>
+                                    <td align="center"> 
+                                        <j:set var="nodeConfigureIconVisibility" value='${member.canConfigureNode() ? "visible" : "hidden"}'/>
+                                        <img  style="visibility:${nodeConfigureIconVisibility}" src="${imagesURL}/16x16/check.png" name="nodeConfigureIcon"/>
+                                    </td>
+                                    <td width="40px">    
+                                    </td>
+                                    
                                     <td > 
                                         <img style="cursor:pointer" class="teamMemberUpdate" src="${imagesURL}/16x16/notepad.png" name="updateIcon"/>
                                     </td>
@@ -119,7 +172,7 @@
                 <div class="jobList">
                     <j:if test="${it.jobs.size() == 0}">
                         <p id="teamJobNone_${it.name}">
-                            Team does not have any jobs!
+                            Team does not own any jobs!
                         </p>
                     </j:if>
                     <j:set var="headerVisibility" value='${(it.jobs.size() > 0) ? "visible" : "hidden"}'/>
@@ -129,11 +182,12 @@
                                 <th align="left" class="column1">Status</th>
                                 <th align="left" style="padding-left: 10px;" class="column2">Job Name</th>
                                 <th align="left" class="column3">Configure<br/>Visibility</th>
+                                <th></th>
                             </tr>
                             <j:forEach var="jobName" items="${it.jobNames}">
                                 <tr >
                                     <td class="column1">
-                                         <img src='${h.getJobStatusIcon(jobName).getImageOf("24x24")}'/>
+                                        <img src='${h.getJobStatusIcon(jobName).getImageOf("24x24")}'/>
                                     </td>
                                     <td class="column2">
                                         <input type="hidden" value="${jobName}" name="hiddenJobId"/>
@@ -147,6 +201,89 @@
                                         
                                     <td class="column3"> 
                                         <img style="cursor:pointer" class="configureJobVisibility" src="${imagesURL}/16x16/notepad.png" name="configureIcon"/>
+                                    </td>
+                                    <td width="300px">
+                                        
+                                    </td>
+                                </tr>
+                            </j:forEach>
+                        </tbody> 
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="teamViewsTab">
+            <div class="itemsContainer">
+                <div class="viewList">
+                    <j:if test="${it.views.size() == 0}">
+                        <p id="teamViewNone_${it.name}">
+                            Team does not have own views
+                        </p>
+                    </j:if>
+                    <j:set var="headerVisibility" value='${(it.views.size() > 0) ? "visible" : "hidden"}'/>
+                    <table id="teamViewList_${it.name}" width="100%"> 
+                        <tbody>
+                            <tr height="25px" class="header" id="teamViewListHeader_${it.name}" style='visibility:${headerVisibility}'>
+                                <th align="left" style="padding-left: 10px;" class="column2">View Name</th>
+                                <th align="left" class="column3">Configure<br/>Visibility</th>
+                                <th></th>
+                            </tr>
+                            <j:forEach var="viewName" items="${it.viewNames}">
+                                <tr >
+                                    <td class="column2">
+                                        <input type="hidden" value="${viewName}" name="hiddenViewId"/>
+                                        <input type="hidden" value="${it.name}" name="hiddenTeamName"/>
+                                        <input type="hidden" value="${it.findView(viewName).visiblitiesAsString}" name="hiddenViewVisibilities"/>
+                                        <span style="margin-left:10px; font-size:13px">
+                                            <a href="${rootURL}/view/${viewName}">${viewName}</a>
+                                        </span>
+                                    </td>
+                                        
+                                    <td class="column3"> 
+                                        <img style="cursor:pointer" class="configureViewVisibility" src="${imagesURL}/16x16/notepad.png" name="viewConfigureIcon"/>
+                                    </td>
+                                    <td width="300px">
+                                        
+                                    </td>
+                                </tr>
+                            </j:forEach>
+                        </tbody> 
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="teamNodesTab">
+            <div class="itemsContainer">
+                <div class="nodeList">
+                    <j:if test="${it.nodes.size() == 0}">
+                        <p id="teamNodeNone_${it.name}">
+                            Team does not own any nodes
+                        </p>
+                    </j:if>
+                    <j:set var="headerVisibility" value='${(it.nodes.size() > 0) ? "visible" : "hidden"}'/>
+                    <table id="teamNodeList_${it.name}" width="100%"> 
+                        <tbody>
+                            <tr height="25px" class="header" id="teamNodeListHeader_${it.name}" style='visibility:${headerVisibility}'>
+                                <th align="left" style="padding-left: 10px;" class="column2">Node Name</th>
+                                <th align="left" class="column3">Configure<br/>Visibility</th>
+                                <th></th>
+                            </tr>
+                            <j:forEach var="nodeName" items="${it.nodeNames}">
+                                <tr >
+                                    <td class="column2">
+                                        <input type="hidden" value="${nodeName}" name="hiddenNodeId"/>
+                                        <input type="hidden" value="${it.name}" name="hiddenTeamName"/>
+                                        <input type="hidden" value="${it.findNode(nodeName).visiblitiesAsString}" name="hiddenNodeVisibilities"/>
+                                        <span style="margin-left:10px; font-size:13px">
+                                            <a href="${rootURL}/computer/${nodeName}">${nodeName}</a>
+                                        </span>
+                                    </td>
+                                        
+                                    <td class="column3"> 
+                                        <img style="cursor:pointer" class="configureNodeVisibility" src="${imagesURL}/16x16/notepad.png" name="nodeConfigureIcon"/>
+                                    </td>
+                                    <td width="300px">
+                                        
                                     </td>
                                 </tr>
                             </j:forEach>

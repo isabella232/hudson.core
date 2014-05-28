@@ -73,6 +73,18 @@ jQuery(document).ready(function() {
         moveJobsButtonAction();
     });
 
+    var moveViewsButton = jQuery('#moveViewsButton');
+    moveViewsButton.button();
+    moveViewsButton.unbind("click").click(function() {
+        moveViewsButtonAction();
+    });
+
+    var moveNodesButton = jQuery('#moveNodesButton');
+    moveNodesButton.button();
+    moveNodesButton.unbind("click").click(function() {
+        moveNodesButtonAction();
+    });
+
     if (typeof currentUserTeam !== 'undefined') {
         jQuery("#teamInfo").load('teams/' + currentUserTeam, function() {
             onTeamDetailsLoad();
@@ -117,6 +129,18 @@ function onTeamDetailsLoad() {
         });
     });
 
+    jQuery('#teamInfo img.configureViewVisibility').each(function() {
+        jQuery(this).unbind("click").click(function() {
+            configureViewVisibilityAction(this);
+        });
+    });
+
+    jQuery('#teamInfo img.configureNodeVisibility').each(function() {
+        jQuery(this).unbind("click").click(function() {
+            configureNodeVisibilityAction(this);
+        });
+    });
+
     jQuery('#teamMemberTab tr').each(function() {
         verifySid(this);
     });
@@ -133,11 +157,12 @@ function selectSelectableElement(selectableContainer, elementToSelect) {
 }
 
 function  createTeamButtonAction() {
-    jQuery("#teamDesc").attr('value', ""); 
+    jQuery("#teamDesc").attr('value', "");
     showMessage("", false, jQuery('#teamAddMsg'));
     jQuery('#dialog-create-team').dialog({
         resizable: false,
-        height: 250,
+        //height: 250,
+        autoResize: true,
         width: 600,
         modal: true,
         buttons: {
@@ -146,7 +171,7 @@ function  createTeamButtonAction() {
                 var teamDesc = jQuery("#teamDesc").val();
                 var teamFolder = jQuery("#teamCustomFolder").val();
                 if (!/^[-_a-zA-Z0-9]+$/.test(teamName)) {
-                   showMessage("Only alphanumeric characters, - or _ allowed in team name.", true, jQuery('#teamAddMsg'));
+                    showMessage("Only alphanumeric characters, - or _ allowed in team name.", true, jQuery('#teamAddMsg'));
                 } else if (teamName.length > 64) {
                     // Must be same as Hudson.TEAM_NAME_LIMIT
                     showMessage("Team name may not exceed 64 characters.", true, jQuery('#teamAddMsg'));
@@ -192,7 +217,8 @@ function  deleteTeamButtonAction(deleteButton) {
     var teamName = jQuery(deleteButton).val();
     jQuery('#dialog-delete-team').dialog({
         resizable: false,
-        height: 150,
+        //height: 150,
+        autoResize: true,
         width: 450,
         modal: true,
         title: "Delete Team - " + teamName,
@@ -244,11 +270,20 @@ function teamMemberAddButtonAction(teamName) {
     jQuery("#cb_configureFlag").prop('checked', true);
     jQuery("#cb_buildFlag").prop('checked', true);
 
+    jQuery("#cb_viewCreateFlag").prop('checked', false);
+    jQuery("#cb_viewDeleteFlag").prop('checked', false);
+    jQuery("#cb_viewConfigureFlag").prop('checked', false);
+
+    jQuery("#cb_nodeCreateFlag").prop('checked', false);
+    jQuery("#cb_nodeDeleteFlag").prop('checked', false);
+    jQuery("#cb_nodeConfigureFlag").prop('checked', false);
+
     jQuery("#text_sidName").show();
     jQuery("#label_sidName").hide();
     jQuery('#dialog-add-modify-user').dialog({
         resizable: false,
-        height: 300,
+        autoResize: true,
+//      height: 300,
         width: 450,
         modal: true,
         title: "Add Team Member",
@@ -260,7 +295,14 @@ function teamMemberAddButtonAction(teamName) {
                 var deleteFlag = jQuery("#cb_deleteFlag").is(':checked');
                 var configureFlag = jQuery("#cb_configureFlag").val();
                 var buildFlag = jQuery("#cb_buildFlag").val();
-                addTeamMember(teamName, sid, adminFlag, createFlag, deleteFlag, configureFlag, buildFlag);
+                var viewCreateFlag = jQuery("#cb_viewCreateFlag").is(':checked');
+                var viewDeleteFlag = jQuery("#cb_viewDeleteFlag").is(':checked');
+                var viewConfigureFlag = jQuery("#cb_viewConfigureFlag").val();
+                var nodeCreateFlag = jQuery("#cb_nodeCreateFlag").is(':checked');
+                var nodeDeleteFlag = jQuery("#cb_nodeDeleteFlag").is(':checked');
+                var nodeConfigureFlag = jQuery("#cb_nodeConfigureFlag").val();
+                addTeamMember(teamName, sid, adminFlag, createFlag, deleteFlag, configureFlag, buildFlag,
+                        viewCreateFlag, viewDeleteFlag, viewConfigureFlag, nodeCreateFlag, nodeDeleteFlag, nodeConfigureFlag);
             },
             Cancel: function() {
                 jQuery(this).dialog("close");
@@ -269,7 +311,8 @@ function teamMemberAddButtonAction(teamName) {
     });
 }
 
-function addTeamMember(teamName, member, adminFlag, createFlag, deleteFlag, configureFlag, buildFlag) {
+function addTeamMember(teamName, member, adminFlag, createFlag, deleteFlag, configureFlag, buildFlag,
+        viewCreateFlag, viewDeleteFlag, viewConfigureFlag, nodeCreateFlag, nodeDeleteFlag, nodeConfigureFlag) {
     jQuery.ajax({
         type: 'POST',
         url: "addTeamMember",
@@ -280,7 +323,13 @@ function addTeamMember(teamName, member, adminFlag, createFlag, deleteFlag, conf
             canCreate: createFlag,
             canDelete: deleteFlag,
             canConfigure: configureFlag,
-            canBuild: buildFlag
+            canBuild: buildFlag,
+            canCreateNode: nodeCreateFlag,
+            canDeleteNode: nodeDeleteFlag,
+            canConfigureNode: nodeConfigureFlag,
+            canCreateView: viewCreateFlag,
+            canDeleteView: viewDeleteFlag,
+            canConfigureView: viewConfigureFlag
         },
         success: function(iconNameResponse) {
             jQuery('#teamMemberNone_' + teamName).remove();
@@ -294,16 +343,19 @@ function addTeamMember(teamName, member, adminFlag, createFlag, deleteFlag, conf
             jQuery(icon).attr("src", imageRoot + "/16x16/" + iconNameResponse);
             jQuery("span", userTemplate).text(member);
 
-            var adminIcon = jQuery(userTemplate).find("img[name='adminIcon']");
-            adminIcon.css('visibility', adminFlag ? 'visible' : 'hidden');
-            var createIcon = jQuery(userTemplate).find("img[name='createIcon']");
-            createIcon.css('visibility', createFlag ? 'visible' : 'hidden');
-            var deleteIcon = jQuery(userTemplate).find("img[name='deleteIcon']");
-            deleteIcon.css('visibility', deleteFlag ? 'visible' : 'hidden');
-            var configureIcon = jQuery(userTemplate).find("img[name='configureIcon']");
-            configureIcon.css('visibility', configureFlag ? 'visible' : 'hidden');
-            var buildIcon = jQuery(userTemplate).find("img[name='buildIcon']");
-            buildIcon.css('visibility', buildFlag ? 'visible' : 'hidden');
+            setIconVisibility(userTemplate, "adminIcon", adminFlag);
+            setIconVisibility(userTemplate, "createIcon", createFlag);
+            setIconVisibility(userTemplate, "deleteIcon", deleteFlag);
+            setIconVisibility(userTemplate, "configureIcon", configureFlag);
+            setIconVisibility(userTemplate, "buildIcon", buildFlag);
+
+            setIconVisibility(userTemplate, "viewCreateIcon", viewCreateFlag);
+            setIconVisibility(userTemplate, "viewDeleteIcon", viewDeleteFlag);
+            setIconVisibility(userTemplate, "viewConfigureIcon", viewConfigureFlag);
+
+            setIconVisibility(userTemplate, "nodeCreateIcon", nodeCreateFlag);
+            setIconVisibility(userTemplate, "nodeDeleteIcon", nodeDeleteFlag);
+            setIconVisibility(userTemplate, "nodeConfigureIcon", nodeConfigureFlag);
 
             var updateIcon = jQuery(userTemplate).find("img[name='updateIcon']");
             jQuery(updateIcon).addClass("teamMemberUpdate");
@@ -329,30 +381,29 @@ function addTeamMember(teamName, member, adminFlag, createFlag, deleteFlag, conf
     });
 }
 
+function setIconVisibility(template, iconName, flag) {
+    var icon = jQuery(template).find("img[name=" + iconName + "]");
+    icon.css('visibility', flag ? 'visible' : 'hidden');
+}
+
 function updateTeamMemberAction(updateItem) {
     var trParent = jQuery(updateItem).parents("tr:first");
     var memberName = jQuery(trParent).find("input[name='hiddenUserName']").val();
     var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
 
-    var adminIcon = jQuery(trParent).find("img[name='adminIcon']");
-    var adminFlag = jQuery(adminIcon).css("visibility") == "visible";
-    jQuery("#cb_adminFlag").prop('checked', adminFlag)
+    setSelection(trParent, "adminIcon", "cb_adminFlag");
+    setSelection(trParent, "createIcon", "cb_createFlag");
+    setSelection(trParent, "deleteIcon", "cb_deleteFlag");
+    setSelection(trParent, "configureIcon", "cb_configureFlag");
+    setSelection(trParent, "buildIcon", "cb_buildFlag");
 
-    var createIcon = jQuery(trParent).find("img[name='createIcon']");
-    var createFlag = jQuery(createIcon).css("visibility") == "visible";
-    jQuery("#cb_createFlag").prop('checked', createFlag);
+    setSelection(trParent, "viewCreateIcon", "cb_viewCreateFlag");
+    setSelection(trParent, "viewDeleteIcon", "cb_viewDeleteFlag");
+    setSelection(trParent, "viewConfigureIcon", "cb_viewConfigureFlag");
 
-    var deleteIcon = jQuery(trParent).find("img[name='deleteIcon']");
-    var deleteFlag = jQuery(deleteIcon).css("visibility") == "visible";
-    jQuery("#cb_deleteFlag").prop('checked', deleteFlag);
-
-    var configureIcon = jQuery(trParent).find("img[name='configureIcon']");
-    var configureFlag = jQuery(configureIcon).css("visibility") == "visible";
-    jQuery("#cb_configureFlag").prop('checked', configureFlag);
-
-    var buildIcon = jQuery(trParent).find("img[name='buildIcon']");
-    var buildFlag = jQuery(buildIcon).css("visibility") == "visible";
-    jQuery("#cb_buildFlag").prop('checked', buildFlag);
+    setSelection(trParent, "nodeCreateIcon", "cb_nodeCreateFlag");
+    setSelection(trParent, "nodeDeleteIcon", "cb_nodeDeleteFlag");
+    setSelection(trParent, "nodeConfigureIcon", "cb_nodeConfigureFlag");
 
     jQuery("#text_sidName").hide();
     jQuery("#label_sidName").show();
@@ -360,18 +411,28 @@ function updateTeamMemberAction(updateItem) {
 
     jQuery('#dialog-add-modify-user').dialog({
         resizable: false,
-        height: 300,
-        width: 350,
+        autoResize: true,
+//      height: 300,
+        width: 450,
         modal: true,
         title: "Update Team Member",
         buttons: {
             'Update': function() {
-                adminFlag = jQuery("#cb_adminFlag").is(':checked');
-                createFlag = jQuery("#cb_createFlag").is(':checked');
-                deleteFlag = jQuery("#cb_deleteFlag").is(':checked');
-                configureFlag = jQuery("#cb_configureFlag").is(':checked');
-                buildFlag = jQuery("#cb_buildFlag").is(':checked');
-                updateTeamMember(trParent, teamName, memberName, adminFlag, createFlag, deleteFlag, configureFlag, buildFlag);
+                var adminFlag = jQuery("#cb_adminFlag").is(':checked');
+                var createFlag = jQuery("#cb_createFlag").is(':checked');
+                var deleteFlag = jQuery("#cb_deleteFlag").is(':checked');
+                var configureFlag = jQuery("#cb_configureFlag").is(':checked');
+                var buildFlag = jQuery("#cb_buildFlag").is(':checked');
+                var viewCreateFlag = jQuery("#cb_viewCreateFlag").is(':checked');
+                var viewDeleteFlag = jQuery("#cb_viewDeleteFlag").is(':checked');
+                var viewConfigureFlag = jQuery("#cb_viewConfigureFlag").is(':checked');
+                var nodeCreateFlag = jQuery("#cb_nodeCreateFlag").is(':checked');
+                var nodeDeleteFlag = jQuery("#cb_nodeDeleteFlag").is(':checked');
+                var nodeConfigureFlag = jQuery("#cb_nodeConfigureFlag").is(':checked');
+                updateTeamMember(trParent, teamName, memberName, adminFlag,
+                        createFlag, deleteFlag, configureFlag, buildFlag,
+                        viewCreateFlag, viewDeleteFlag, viewConfigureFlag,
+                        nodeCreateFlag, nodeDeleteFlag, nodeConfigureFlag);
             },
             Cancel: function() {
                 jQuery(this).dialog("close");
@@ -380,7 +441,14 @@ function updateTeamMemberAction(updateItem) {
     });
 }
 
-function updateTeamMember(trParent, teamName, member, adminFlag, createFlag, deleteFlag, configureFlag, buildFlag) {
+function setSelection(parent, iconName, checkboxId) {
+    var icon = jQuery(parent).find("img[name=" + iconName + "]");
+    var flag = jQuery(icon).css("visibility") === "visible";
+    jQuery("#" + checkboxId).prop('checked', flag);
+}
+
+function updateTeamMember(trParent, teamName, member, adminFlag, createFlag, deleteFlag, configureFlag, buildFlag,
+        viewCreateFlag, viewDeleteFlag, viewConfigureFlag, nodeCreateFlag, nodeDeleteFlag, nodeConfigureFlag) {
     jQuery.ajax({
         type: 'POST',
         url: "updateTeamMember",
@@ -391,7 +459,13 @@ function updateTeamMember(trParent, teamName, member, adminFlag, createFlag, del
             canCreate: createFlag,
             canDelete: deleteFlag,
             canConfigure: configureFlag,
-            canBuild: buildFlag
+            canBuild: buildFlag,
+            canCreateNode: nodeCreateFlag,
+            canDeleteNode: nodeDeleteFlag,
+            canConfigureNode: nodeConfigureFlag,
+            canCreateView: viewCreateFlag,
+            canDeleteView: viewDeleteFlag,
+            canConfigureView: viewConfigureFlag
         },
         success: function(iconNameResponse) {
             jQuery('#teamMemberNone_' + teamName).remove();
@@ -400,16 +474,19 @@ function updateTeamMember(trParent, teamName, member, adminFlag, createFlag, del
             jQuery(icon).attr("src", imageRoot + "/16x16/" + iconNameResponse);
             jQuery("span", trParent).text(member);
 
-            var adminIcon = jQuery(trParent).find("img[name='adminIcon']");
-            adminIcon.css('visibility', adminFlag ? 'visible' : 'hidden');
-            var createIcon = jQuery(trParent).find("img[name='createIcon']");
-            createIcon.css('visibility', createFlag ? 'visible' : 'hidden');
-            var deleteIcon = jQuery(trParent).find("img[name='deleteIcon']");
-            deleteIcon.css('visibility', deleteFlag ? 'visible' : 'hidden');
-            var configureIcon = jQuery(trParent).find("img[name='configureIcon']");
-            configureIcon.css('visibility', configureFlag ? 'visible' : 'hidden');
-            var buildIcon = jQuery(trParent).find("img[name='buildIcon']");
-            buildIcon.css('visibility', buildFlag ? 'visible' : 'hidden');
+            setIconVisibility(trParent, "adminIcon", adminFlag);
+            setIconVisibility(trParent, "createIcon", createFlag);
+            setIconVisibility(trParent, "deleteIcon", deleteFlag);
+            setIconVisibility(trParent, "configureIcon", configureFlag);
+            setIconVisibility(trParent, "buildIcon", buildFlag);
+
+            setIconVisibility(trParent, "viewCreateIcon", viewCreateFlag);
+            setIconVisibility(trParent, "viewDeleteIcon", viewDeleteFlag);
+            setIconVisibility(trParent, "viewConfigureIcon", viewConfigureFlag);
+
+            setIconVisibility(trParent, "nodeCreateIcon", nodeCreateFlag);
+            setIconVisibility(trParent, "nodeDeleteIcon", nodeDeleteFlag);
+            setIconVisibility(trParent, "nodeConfigureIcon", nodeConfigureFlag);
 
             jQuery('#dialog-add-modify-user').dialog("close");
         },
@@ -426,7 +503,8 @@ function removeTeamMemberAction(deleteItem) {
     var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
     jQuery('#dialog-remove-user').dialog({
         resizable: false,
-        height: 165,
+        autoResize: true,
+//      height: 165,
         width: 400,
         modal: true,
         title: "Remove Team Member - " + memberName,
@@ -467,13 +545,13 @@ function removeTeamMember(teamName, memberName, parent) {
 function configureJobVisibilityAction(configureJobItem) {
     var trParent = jQuery(configureJobItem).parents("tr:first");
     var jobName = jQuery(trParent).find("input[name='hiddenJobId']").val();
-    var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
     var teamNames = jQuery(trParent).find("input[name='hiddenVisibilities']").val();
     var allowViewConfig = jQuery(trParent).find("input[name='hiddenAllowViewConfig']").val();
-     
+
     jQuery('#dialog-configure-visibility').dialog({
         resizable: false,
-        height: 300,
+        autoResize: true,
+//        height: 300,
         width: 350,
         modal: true,
         title: "Update Job Visibility - " + jobName,
@@ -486,9 +564,9 @@ function configureJobVisibilityAction(configureJobItem) {
                 if (jQuery('#publicVisibility').is(":checked")) {
                     teamNames += "public";
                 }
- 
+
                 allowViewConfig = jQuery('#allowViewConfig').is(":checked");
-                    
+
                 jQuery(trParent).find("input[name='hiddenVisibilities']").val(teamNames);
                 jQuery(trParent).find("input[name='hiddenAllowViewConfig']").val(allowViewConfig);
                 configureJobVisibility(jobName, teamNames, allowViewConfig);
@@ -498,16 +576,21 @@ function configureJobVisibilityAction(configureJobItem) {
             }
         }
     });
-    
-    if ("true" == allowViewConfig){
-       jQuery("#allowViewConfig").prop('checked', true);
-    }else{
-       jQuery("#allowViewConfig").prop('checked', false);
+
+    if ("true" === allowViewConfig) {
+        jQuery("#allowViewConfig").prop('checked', true);
+    } else {
+        jQuery("#allowViewConfig").prop('checked', false);
     }
 
+    fillConfigureTeamList("configure-visibility-team-list", "publicVisibility", teamNames);
+}
+
+function fillConfigureTeamList(teamListId, publicTeamId, teamNames) {
+
     jQuery.getJSON('getAllTeamsJson', function(json) {
-        jQuery('#configure-visibility-team-list').empty();
-        var publicItem = jQuery('#publicVisibility');
+        jQuery("#" + teamListId).empty();
+        var publicItem = jQuery("#" + publicTeamId);
         if (teamNames.indexOf("public") >= 0) {
             jQuery(publicItem).prop('checked', true);
         } else {
@@ -525,7 +608,7 @@ function configureJobVisibilityAction(configureJobItem) {
                 } else {
                     jQuery(input).prop('checked', (teamNames.indexOf(key) >= 0));
                 }
-                jQuery(item).appendTo(jQuery('#configure-visibility-team-list'));
+                jQuery(item).appendTo(jQuery("#" + teamListId));
             }
         });
     });
@@ -550,6 +633,111 @@ function configureJobVisibility(jobName, teamNames, allowViewConfig) {
     });
 }
 
+function configureViewVisibilityAction(configureViewItem) {
+    var trParent = jQuery(configureViewItem).parents("tr:first");
+    var viewName = jQuery(trParent).find("input[name='hiddenViewId']").val();
+    var teamNames = jQuery(trParent).find("input[name='hiddenViewVisibilities']").val();
+
+    jQuery('#dialog-configure-view-visibility').dialog({
+        resizable: false,
+        autoResize: true,
+//        height: 300,
+        width: 350,
+        modal: true,
+        title: "Update View Visibility - " + viewName,
+        buttons: {
+            'Update': function() {
+                teamNames = "";
+                jQuery('#configure-view-visibility-team-list input[@type=checkbox]:checked').each(function() {
+                    teamNames += (jQuery(this).val() + ":");
+                });
+                if (jQuery('#viewPublicVisibility').is(":checked")) {
+                    teamNames += "public";
+                }
+
+                jQuery(trParent).find("input[name='hiddenViewVisibilities']").val(teamNames);
+                configureViewVisibility(viewName, teamNames);
+            },
+            Cancel: function() {
+                jQuery(this).dialog("close");
+            }
+        }
+    });
+
+    fillConfigureTeamList("configure-view-visibility-team-list", "viewPublicVisibility", teamNames);
+
+}
+
+function configureViewVisibility(viewName, teamNames) {
+    jQuery.ajax({
+        type: 'POST',
+        url: "setViewVisibility",
+        data: {
+            viewName: viewName,
+            teamNames: teamNames
+        },
+        success: function() {
+            jQuery('#dialog-configure-view-visibility').dialog("close");
+        },
+        error: function(msg) {
+            showMessage(msg.responseText, true, jQuery('#configureViewVisibilityMsg'));
+        },
+        dataType: "html"
+    });
+}
+
+function configureNodeVisibilityAction(configureNodeItem) {
+    var trParent = jQuery(configureNodeItem).parents("tr:first");
+    var nodeName = jQuery(trParent).find("input[name='hiddenNodeId']").val();
+    var teamNames = jQuery(trParent).find("input[name='hiddenNodeVisibilities']").val();
+
+    jQuery('#dialog-configure-node-visibility').dialog({
+        resizable: false,
+        autoResize: true,
+//        height: 300,
+        width: 350,
+        modal: true,
+        title: "Update Node Visibility - " + nodeName,
+        buttons: {
+            'Update': function() {
+                teamNames = "";
+                jQuery('#configure-node-visibility-team-list input[@type=checkbox]:checked').each(function() {
+                    teamNames += (jQuery(this).val() + ":");
+                });
+                if (jQuery('#nodePublicVisibility').is(":checked")) {
+                    teamNames += "public";
+                }
+
+                jQuery(trParent).find("input[name='hiddenNodeVisibilities']").val(teamNames);
+                configureNodeVisibility(nodeName, teamNames);
+            },
+            Cancel: function() {
+                jQuery(this).dialog("close");
+            }
+        }
+    });
+
+    fillConfigureTeamList("configure-node-visibility-team-list", "nodePublicVisibility", teamNames);
+}
+
+function configureNodeVisibility(nodeName, teamNames) {
+    jQuery.ajax({
+        type: 'POST',
+        url: "setNodeVisibility",
+        data: {
+            nodeName: nodeName,
+            teamNames: teamNames
+        },
+        success: function() {
+            jQuery('#dialog-configure-node-visibility').dialog("close");
+        },
+        error: function(msg) {
+            showMessage(msg.responseText, true, jQuery('#configureNodeVisibilityMsg'));
+        },
+        dataType: "html"
+    });
+}
+
 var moveCount;
 var jobsToMove;
 function moveJobsButtonAction() {
@@ -564,7 +752,8 @@ function moveJobsButtonAction() {
 
     jQuery('#dialog-move-jobs').dialog({
         resizable: false,
-        height: 200 + moveCount * 25,
+        //height: 200 + moveCount * 25,
+        autoResize: true,
         width: 400,
         modal: true,
         title: "Move Jobs to another Team",
@@ -617,7 +806,7 @@ function moveJobs(jobName, teamName, img) {
         },
         success: function() {
             jQuery(img).attr('src', imageRoot + '/green-check.jpg');
-            jQuery("#job_colum3_span_" + jobName.replace(".","\\.")).text(teamName);
+            jQuery("#job_colum3_span_" + jobName.replace(".", "\\.")).text(teamName);
             moveCount--;
             if (moveCount === 0) {
                 jQuery('#dialog-move-jobs').dialog("close");
@@ -630,6 +819,178 @@ function moveJobs(jobName, teamName, img) {
             });
             jQuery(img).attr('src', imageRoot + '/16x16/error.png');
             showMessage(msg.responseText, true, jQuery('#moveJobMsg'));
+        },
+        dataType: "html"
+    });
+}
+
+var viewMoveCount;
+var viewsToMove;
+function moveViewsButtonAction() {
+    jQuery("#selectedViews").empty();
+    jQuery('#moveViewMsg').hide();
+    viewsToMove = getViewsToMove();
+    viewMoveCount = viewsToMove.length;
+    for (var i = 0; i < viewsToMove.length; i++) {
+        var item = '<li value="' + viewsToMove[i] + '">' + viewsToMove[i] + ' <img style="display: none"/></li>';
+        jQuery(item).appendTo(jQuery("#selectedViews"));
+    }
+
+    jQuery('#dialog-move-views').dialog({
+        resizable: false,
+        //height: 200 + viewMoveCount * 25,
+        autoResize: true,
+        width: 400,
+        modal: true,
+        title: "Move Views to another Team",
+        buttons: {
+            'Move': function() {
+                if (viewMoveCount > 0) {
+                    var teamName = jQuery("#teamChoiceForViews option:selected").val();
+                    for (var i = 0; i < viewsToMove.length; i++) {
+                        var img = jQuery("#selectedViewss li[value='" + viewsToMove[i] + "']").children('img');
+                        jQuery(img).attr('src', imageRoot + '/spinner.gif');
+                        jQuery(img).show();
+                        moveView(viewsToMove[i], teamName, img);
+                    }
+                }
+            },
+            Cancel: function() {
+                jQuery(this).dialog("close");
+            }
+        }
+    });
+
+    jQuery.getJSON('getTeamsJson', function(json) {
+        jQuery('#teamChoiceForViews').empty();
+        jQuery.each(json, function(key, val) {
+            var item = '<option value="' + key + '">' + val + '</option>';
+            jQuery(item).appendTo(jQuery('#teamChoiceForViews'));
+        });
+    });
+
+}
+
+function getViewsToMove() {
+    var viewss = [];
+    jQuery('#teamViewsContainer input[@type=checkbox]:checked').each(function() {
+        viewss.push(jQuery(this).val());
+    });
+    return viewss;
+}
+
+function moveView(viewName, teamName, img) {
+    jQuery('#teamViewsContainer input[@type=checkbox]:checked').each(function() {
+        jQuery(this).prop('checked', false);
+    });
+    jQuery.ajax({
+        type: 'POST',
+        url: "moveView",
+        data: {
+            viewName: viewName,
+            teamName: teamName
+        },
+        success: function() {
+            jQuery(img).attr('src', imageRoot + '/green-check.jpg');
+            jQuery("#view_colum3_span_" + viewName.replace(".", "\\.")).text(teamName);
+            viewMoveCount--;
+            if (viewMoveCount === 0) {
+                jQuery('#dialog-move-views').dialog("close");
+            }
+        },
+        error: function(msg) {
+            var originalHeight = jQuery('#dialog-move-views').height();
+            jQuery('#dialog-move-views').css({
+                height: originalHeight + 50
+            });
+            jQuery(img).attr('src', imageRoot + '/16x16/error.png');
+            showMessage(msg.responseText, true, jQuery('#moveViewMsg'));
+        },
+        dataType: "html"
+    });
+}
+
+var nodeMoveCount;
+var nodesToMove;
+function moveNodesButtonAction() {
+    jQuery("#selectedNodes").empty();
+    jQuery('#moveNodeMsg').hide();
+    nodesToMove = getNodesToMove();
+    nodeMoveCount = nodesToMove.length;
+    for (var i = 0; i < nodesToMove.length; i++) {
+        var item = '<li value="' + nodesToMove[i] + '">' + nodesToMove[i] + ' <img style="display: none"/></li>';
+        jQuery(item).appendTo(jQuery("#selectedNodes"));
+    }
+
+    jQuery('#dialog-move-nodes').dialog({
+        resizable: false,
+        //height: 200 + nodeMoveCount * 25,
+        autoResize: true,
+        width: 400,
+        modal: true,
+        title: "Move Nodes to another Team",
+        buttons: {
+            'Move': function() {
+                if (nodeMoveCount > 0) {
+                    var teamName = jQuery("#teamChoiceForNodes option:selected").val();
+                    for (var i = 0; i < nodesToMove.length; i++) {
+                        var img = jQuery("#selectedNodes li[value='" + nodesToMove[i] + "']").children('img');
+                        jQuery(img).attr('src', imageRoot + '/spinner.gif');
+                        jQuery(img).show();
+                        moveNode(nodesToMove[i], teamName, img);
+                    }
+                }
+            },
+            Cancel: function() {
+                jQuery(this).dialog("close");
+            }
+        }
+    });
+
+    jQuery.getJSON('getTeamsJson', function(json) {
+        jQuery('#teamChoiceForNodes').empty();
+        jQuery.each(json, function(key, val) {
+            var item = '<option value="' + key + '">' + val + '</option>';
+            jQuery(item).appendTo(jQuery('#teamChoiceForNodes'));
+        });
+    });
+
+}
+
+function getNodesToMove() {
+    var nodes = [];
+    jQuery('#teamNodesContainer input[@type=checkbox]:checked').each(function() {
+        nodes.push(jQuery(this).val());
+    });
+    return nodes;
+}
+
+function moveNode(nodeName, teamName, img) {
+    jQuery('#teamNodesContainer input[@type=checkbox]:checked').each(function() {
+        jQuery(this).prop('checked', false);
+    });
+    jQuery.ajax({
+        type: 'POST',
+        url: "moveNode",
+        data: {
+            nodeName: nodeName,
+            teamName: teamName
+        },
+        success: function() {
+            jQuery(img).attr('src', imageRoot + '/green-check.jpg');
+            jQuery("#node_colum3_span_" + nodeName.replace(".", "\\.")).text(teamName);
+            nodeMoveCount--;
+            if (nodeMoveCount === 0) {
+                jQuery('#dialog-move-nodes').dialog("close");
+            }
+        },
+        error: function(msg) {
+            var originalHeight = jQuery('#dialog-move-nodes').height();
+            jQuery('#dialog-move-nodes').css({
+                height: originalHeight + 50
+            });
+            jQuery(img).attr('src', imageRoot + '/16x16/error.png');
+            showMessage(msg.responseText, true, jQuery('#moveNodeMsg'));
         },
         dataType: "html"
     });

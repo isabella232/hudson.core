@@ -145,6 +145,22 @@ public class Team implements AccessControlled {
         }
         return jobNames;
     }
+    
+    public Set<String> getViewNames() {
+        Set<String> viewNames = new TreeSet<String>();
+        for (TeamView view : getViews()) {
+            viewNames.add(view.getId());
+        }
+        return viewNames;
+    }
+    
+     public Set<String> getNodeNames() {
+        Set<String> nodeNames = new TreeSet<String>();
+        for (TeamNode node : getNodes()) {
+            nodeNames.add(node.getId());
+        }
+        return nodeNames;
+    }
 
     public TeamMember findMember(String userName) {
         for (TeamMember member : teamMembers) {

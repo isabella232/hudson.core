@@ -44,7 +44,7 @@ p {
 #container {
     padding-left: 0px;
     padding-bottom: 20px;
-    width: 600px;
+    width: 800px;
 }
 
 #container h3 {
@@ -188,12 +188,12 @@ ul.team .teamList {
     display: none;
 }
 
-#dialog-add-modify-user label{
+/*#dialog-add-modify-user label{
     display:inline-block;
     font-weight: bold;
     margin-top: 10px;
     width: 140px;
-}
+}*/
 
 
 #dialog-configure-visibility label{
@@ -212,6 +212,10 @@ ul.team .teamList {
     margin-bottom: 5px;
     margin-top: 5px;
     margin-left: 10px;
+}
+
+#teamMemberTab th{
+    font-weight: lighter;
 }
 
 .teamMemberAdd{
