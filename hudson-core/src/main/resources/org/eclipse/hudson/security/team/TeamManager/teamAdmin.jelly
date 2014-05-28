@@ -27,6 +27,6 @@
         </div>
     </div>
     
-    <st:include page="teamTemplates.jelly"/>   
+    <st:include page="templates.jelly"/>   
 </j:jelly>            
             

@@ -293,14 +293,14 @@ function teamMemberAddButtonAction(teamName) {
                 var adminFlag = jQuery("#cb_adminFlag").is(':checked');
                 var createFlag = jQuery("#cb_createFlag").is(':checked');
                 var deleteFlag = jQuery("#cb_deleteFlag").is(':checked');
-                var configureFlag = jQuery("#cb_configureFlag").val();
-                var buildFlag = jQuery("#cb_buildFlag").val();
+                var configureFlag = jQuery("#cb_configureFlag").is(':checked');
+                var buildFlag = jQuery("#cb_buildFlag").is(':checked');
                 var viewCreateFlag = jQuery("#cb_viewCreateFlag").is(':checked');
                 var viewDeleteFlag = jQuery("#cb_viewDeleteFlag").is(':checked');
-                var viewConfigureFlag = jQuery("#cb_viewConfigureFlag").val();
+                var viewConfigureFlag = jQuery("#cb_viewConfigureFlag").is(':checked');
                 var nodeCreateFlag = jQuery("#cb_nodeCreateFlag").is(':checked');
                 var nodeDeleteFlag = jQuery("#cb_nodeDeleteFlag").is(':checked');
-                var nodeConfigureFlag = jQuery("#cb_nodeConfigureFlag").val();
+                var nodeConfigureFlag = jQuery("#cb_nodeConfigureFlag").is(':checked');
                 addTeamMember(teamName, sid, adminFlag, createFlag, deleteFlag, configureFlag, buildFlag,
                         viewCreateFlag, viewDeleteFlag, viewConfigureFlag, nodeCreateFlag, nodeDeleteFlag, nodeConfigureFlag);
             },
