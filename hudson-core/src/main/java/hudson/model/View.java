@@ -15,12 +15,12 @@
 
 package hudson.model;
 
-import static hudson.model.Hudson.checkGoodName;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.Util;
 import hudson.model.Descriptor.FormException;
+import static hudson.model.Hudson.checkGoodName;
 import hudson.model.Node.Mode;
 import hudson.scm.ChangeLogSet.Entry;
 import hudson.search.CollectionSearchIndex;
@@ -31,7 +31,6 @@ import hudson.util.BuildHistoryList;
 import hudson.util.DescriptorList;
 import hudson.util.RunList;
 import hudson.widgets.Widget;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,10 +43,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.ServletException;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
-
+import org.eclipse.hudson.security.team.Team;
+import org.eclipse.hudson.security.team.TeamManager;
+import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
@@ -613,6 +613,7 @@ public abstract class View extends AbstractModelObject implements AccessControll
         checkPermission(DELETE);
 
         owner.deleteView(this);
+        removeFromTeam(getViewName());
 
         rsp.sendRedirect2(req.getContextPath() + "/" + owner.getUrl());
     }
@@ -716,10 +717,49 @@ public abstract class View extends AbstractModelObject implements AccessControll
         // create a view
         View v = all().findByName(mode).newInstance(req, req.getSubmittedForm());
         v.owner = owner;
+        
+        //TODO: Get teamname to add from view creation UI
+        addToTeam(v.getViewName(), null);
 
         // redirect to the config screen
         rsp.sendRedirect2(req.getContextPath() + '/' + v.getUrl() + v.getPostConstructLandingPage());
 
         return v;
+    }
+    
+    private static void addToTeam(String name, String teamName) throws IOException {
+        TeamManager teamManager = Hudson.getInstance().getTeamManager();
+        if (!teamManager.isTeamManagementEnabled()) {
+            if (teamName != null) {
+                throw new IOException("Team management is not enabled");
+            }
+        }
+        Team team = null;
+        if (teamName == null) {
+            try {
+                team = teamManager.findCurrentUserTeamForNewView();
+            } catch (TeamNotFoundException ex) {
+                // Shouldn't happen, as user is already confirmed for Job.CREATE
+
+            }
+        } else {
+            try {
+                team = teamManager.findTeam(teamName);
+            } catch (TeamNotFoundException e) {
+                throw new IOException("Team " + teamName + " does not exist");
+            }
+        }
+        try {
+            teamManager.addView(team, name);
+        } catch (TeamNotFoundException ex) {
+            throw new IOException("Team " + teamName + " does not exist");
+        }
+    }
+    
+    private void removeFromTeam(String name) throws IOException {
+        TeamManager teamManager = Hudson.getInstance().getTeamManager();
+        if (teamManager.isTeamManagementEnabled()) {
+             teamManager.removeView(name);
+        }
     }
 }

@@ -155,6 +155,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -176,6 +177,7 @@ import org.eclipse.hudson.plugins.PluginCenter;
 import org.eclipse.hudson.script.ScriptSupport;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.eclipse.hudson.security.team.Team;
 import org.eclipse.hudson.security.team.TeamManager;
 import org.jvnet.hudson.reactor.Executable;
 import org.jvnet.hudson.reactor.Milestone;
@@ -1443,7 +1445,23 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Gets the read-only list of all {@link View}s.
      */
     @Exported
+    @Override
     public synchronized Collection<View> getViews() {
+        List<View> copy = new ArrayList<View>();
+        if (this.isTeamManagementEnabled()) {
+            for (View view : views) {
+                if (view.hasPermission(View.READ)) {
+                    copy.add(view);
+                }
+            }
+        } else {
+            copy.addAll(views);
+        }
+        Collections.sort(copy, View.SORTER);
+        return copy;
+    }
+
+    public synchronized Collection<View> getAllViews() {
         List<View> copy = new ArrayList<View>(views);
         Collections.sort(copy, View.SORTER);
         return copy;
@@ -1847,6 +1865,15 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     public void onViewRenamed(View view, String oldName, String newName) {
         // implementation of Hudson is immune to view name change.
+        TeamManager teamManager = Hudson.getInstance().getTeamManager();
+        if (!teamManager.isTeamManagementEnabled()) {
+            try {
+                Team team = teamManager.findViewOwnerTeam(oldName);
+                teamManager.renameView(team, oldName, newName);
+            } catch (IOException ex) {
+                 logger.warn("Failed to rename view in team.", ex);
+            }
+        }
     }
 
     @Override

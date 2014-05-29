@@ -880,7 +880,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         if (!isCurrentUserSysAdmin()) {
             throw new RuntimeException(getCurrentUser() + "  is not a System Administrator");
         }
-        for (View view : hudson.getViews()) {
+        for (View view : hudson.getAllViews()) {
             String viewName = view.getViewName();
             // Ensure views belong to public team if no other team own them
             if (findViewOwnerTeam(viewName) == null){
@@ -1296,6 +1296,18 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         throw new TeamNotFoundException("User does not have create permission in any team");
     }
+    
+    public Team findCurrentUserTeamForNewView() throws TeamNotFoundException {
+        // This will only find explicit team members with create permission
+        List<Team> currentUserTeamsWithPermission = getCurrentUserTeamsWithPermission(View.CREATE);
+        if (!currentUserTeamsWithPermission.isEmpty()) {
+            return currentUserTeamsWithPermission.get(0);
+        }
+        if (isCurrentUserSysAdmin()) {
+            return publicTeam;
+        }
+        throw new TeamNotFoundException("User does not have create permission in any team");
+    }
 
     /**
      * Get the current user team qualified Id for the job name
@@ -1640,7 +1652,7 @@ public final class TeamManager implements Saveable, AccessControlled {
             Hudson hudson = Hudson.getInstance();
             //Null during initial setup 
             if (hudson != null) {
-                for (View view : hudson.getViews()) {
+                for (View view : hudson.getAllViews()) {
                     TeamView teamView = new TeamView(view.getViewName());
                     if (view instanceof AllView) {
                         teamView.setMoveAllowed(false);

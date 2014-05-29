@@ -13,7 +13,6 @@ package org.eclipse.hudson.security.team;
 import hudson.model.Computer;
 import hudson.model.Item;
 import hudson.model.Job;
-import hudson.model.Node;
 import hudson.model.View;
 import hudson.security.Permission;
 import hudson.security.SecurityRealm;
@@ -103,6 +102,15 @@ public class TeamBasedACL extends SidACL {
                     }
                 }
             }
+            // Member of any of the team with View CREATE Permission can create View
+            if (permission == View.CREATE) {
+                for (Team userTeam : teamManager.findUserTeams(userName)) {
+                    TeamMember member = userTeam.findMember(userName);
+                    if ((member != null) && member.hasPermission(View.CREATE)) {
+                        return true;
+                    }
+                }
+            }
         }
         if (scope == SCOPE.TEAM) {
             // Sysadmin gets to do all team maintenance operations
@@ -158,9 +166,23 @@ public class TeamBasedACL extends SidACL {
         
         if (scope == SCOPE.VIEW) {
             Team viewTeam = teamManager.findViewOwnerTeam(view.getViewName());
+            
+            // Member of any of the team with View CREATE Permission can create View
+            if (permission == View.CREATE) {
+                for (Team userTeam : teamManager.findUserTeams(userName)) {
+                    TeamMember member = userTeam.findMember(userName);
+                    if ((member != null) && member.hasPermission(View.CREATE)) {
+                        return true;
+                    }
+                }
+            }
 
             if (viewTeam != null) {
                 if (viewTeam.isMember(userName)) {
+                    // All members of the team get read permission
+                    if (permission == View.READ) {
+                        return true;
+                    }
                     TeamMember member = viewTeam.findMember(userName);
                     return member.hasPermission(permission);
                 }
@@ -179,6 +201,10 @@ public class TeamBasedACL extends SidACL {
 
             if (nodeTeam != null) {
                 if (nodeTeam.isMember(userName)) {
+                    // All members of the team get read permission
+                    if (permission == View.READ) {
+                        return true;
+                    }
                     TeamMember member = nodeTeam.findMember(userName);
                     return member.hasPermission(permission);
                 }

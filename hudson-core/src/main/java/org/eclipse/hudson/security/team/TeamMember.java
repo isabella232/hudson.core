@@ -204,13 +204,15 @@ public class TeamMember {
         teamAdminGrantedPermissions.add(Item.BUILD);
         teamAdminGrantedPermissions.add(Item.WORKSPACE);
         
+        teamAdminGrantedPermissions.add(View.READ);
         teamAdminGrantedPermissions.add(View.CREATE);
         teamAdminGrantedPermissions.add(View.CONFIGURE);
         teamAdminGrantedPermissions.add(View.DELETE);
         
+        teamAdminGrantedPermissions.add(Computer.READ);
         teamAdminGrantedPermissions.add(Computer.CREATE);
-        teamAdminGrantedPermissions.add(View.DELETE);
-        teamAdminGrantedPermissions.add(View.CONFIGURE);
+        teamAdminGrantedPermissions.add(Computer.DELETE);
+        teamAdminGrantedPermissions.add(Computer.CONFIGURE);
     }
 
     List<String> getPermissions() {
