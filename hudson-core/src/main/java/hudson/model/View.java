@@ -739,8 +739,7 @@ public abstract class View extends AbstractModelObject implements AccessControll
             try {
                 team = teamManager.findCurrentUserTeamForNewView();
             } catch (TeamNotFoundException ex) {
-                // Shouldn't happen, as user is already confirmed for Job.CREATE
-
+                // Shouldn't happen, as user is already confirmed for View.CREATE
             }
         } else {
             try {

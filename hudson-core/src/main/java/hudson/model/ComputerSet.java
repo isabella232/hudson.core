@@ -42,6 +42,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.eclipse.hudson.security.team.Team;
+import org.eclipse.hudson.security.team.TeamManager;
+import org.eclipse.hudson.security.team.TeamManager.TeamNotFoundException;
 
 /**
  * Serves as the top of {@link Computer}s in the URL hierarchy. <p> Getter
@@ -208,7 +211,12 @@ public final class ComputerSet extends AbstractModelObject {
             @QueryParameter String name, @QueryParameter String mode,
             @QueryParameter String from) throws IOException, ServletException {
         final Hudson app = Hudson.getInstance();
-        app.checkPermission(Hudson.ADMINISTER);  // TODO: new permission?
+        
+        if (app.getTeamManager().isTeamManagementEnabled()) {
+            app.checkPermission(Computer.CREATE);
+        } else {
+            app.checkPermission(Hudson.ADMINISTER);  // TODO: new permission?
+        }
 
         if (mode != null && mode.equals("copy")) {
             name = checkName(name);
@@ -231,6 +239,8 @@ public final class ComputerSet extends AbstractModelObject {
             result.holdOffLaunchUntilSave = true;
 
             app.addNode(result);
+            
+            addToTeam(result.getNodeName(), null);
 
             // send the browser to the config page
             rsp.sendRedirect2(result.getNodeName() + "/configure");
@@ -253,11 +263,16 @@ public final class ComputerSet extends AbstractModelObject {
             @QueryParameter String name,
             @QueryParameter String type) throws IOException, ServletException, FormException {
         final Hudson app = Hudson.getInstance();
-        app.checkPermission(Hudson.ADMINISTER);  // TODO: new permission?
+        if (app.getTeamManager().isTeamManagementEnabled()) {
+            app.checkPermission(Computer.CREATE);
+        } else {
+            app.checkPermission(Hudson.ADMINISTER);  // TODO: new permission?
+        }
         checkName(name);
 
         Node result = NodeDescriptor.all().find(type).newInstance(req, req.getSubmittedForm());
         app.addNode(result);
+        addToTeam(result.getNodeName(), null);
 
         // take the user back to the slave list top page
         rsp.sendRedirect2(".");
@@ -288,7 +303,13 @@ public final class ComputerSet extends AbstractModelObject {
      * Makes sure that the given name is good as a slave name.
      */
     public FormValidation doCheckName(@QueryParameter String value) throws IOException, ServletException {
-        Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
+        
+        TeamManager teamManager = Hudson.getInstance().getTeamManager();
+        if (teamManager.isTeamManagementEnabled()) {
+            Hudson.getInstance().checkPermission(Computer.CREATE);
+        } else {
+            Hudson.getInstance().checkPermission(Hudson.ADMINISTER);
+        }
 
         if (Util.fixEmpty(value) == null) {
             return FormValidation.ok();
@@ -382,5 +403,33 @@ public final class ComputerSet extends AbstractModelObject {
             LOGGER.log(Level.SEVERE, "Failed to instanciate " + d.clazz, e);
         }
         return null;
+    }
+    
+    private void addToTeam(String name, String teamName) throws IOException {
+        TeamManager teamManager = Hudson.getInstance().getTeamManager();
+        if (!teamManager.isTeamManagementEnabled()) {
+            if (teamName != null) {
+                throw new IOException("Team management is not enabled");
+            }
+        }
+        Team team = null;
+        if (teamName == null) {
+            try {
+                team = teamManager.findCurrentUserTeamForNewNode();
+            } catch (TeamNotFoundException ex) {
+                // Shouldn't happen, as user is already confirmed for Computer.CREATE
+            }
+        } else {
+            try {
+                team = teamManager.findTeam(teamName);
+            } catch (TeamNotFoundException e) {
+                throw new IOException("Team " + teamName + " does not exist");
+            }
+        }
+        try {
+            teamManager.addNode(team, name);
+        } catch (TeamNotFoundException ex) {
+            throw new IOException("Team " + teamName + " does not exist");
+        }
     }
 }

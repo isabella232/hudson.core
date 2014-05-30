@@ -24,16 +24,23 @@
 -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:s="/lib/form">
-  <l:layout norefresh="true" permission="${app.ADMINISTER}">
-    <st:include page="sidepanel.jelly" />
-    <l:main-panel>
-       <h1>
-          <img width="48" height="48" src="${imagesURL}/48x48/computer.png" alt="" style="margin: 2px;"/>
-          ${%New Node}
-      </h1>
-      <j:invokeStatic var="slaves" className="hudson.slaves.NodeDescriptor" method="allInstantiable" />
-      <n:form nameTitle="${%Node name}" copyTitle="${%Copy Existing Node}" copyNames="${it._slaveNames}"
-              descriptors="${slaves}" checkUrl="computer/checkName" xmlns:n="/lib/hudson/newFromList" />
-    </l:main-panel>
-  </l:layout>
+  
+    <j:if test="${app.isTeamManagementEnabled()}">
+        <j:getStatic var="permission" className="hudson.model.Computer" field="CREATE"/>
+    </j:if>
+    <j:if test="${!app.isTeamManagementEnabled()}">
+        <j:set var="permission" value="${app.ADMINISTER}" />
+    </j:if>
+    <l:layout norefresh="true" permission="${permission}">
+        <st:include page="sidepanel.jelly" />
+        <l:main-panel>
+            <h1>
+                <img width="48" height="48" src="${imagesURL}/48x48/computer.png" alt="" style="margin: 2px;"/>
+                ${%New Node}
+            </h1>
+            <j:invokeStatic var="slaves" className="hudson.slaves.NodeDescriptor" method="allInstantiable" />
+            <n:form nameTitle="${%Node name}" copyTitle="${%Copy Existing Node}" copyNames="${it._slaveNames}"
+                descriptors="${slaves}" checkUrl="computer/checkName" xmlns:n="/lib/hudson/newFromList" />
+        </l:main-panel>
+    </l:layout>
 </j:jelly>

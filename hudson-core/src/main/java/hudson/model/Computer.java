@@ -76,6 +76,7 @@ import java.net.Inet4Address;
 import java.util.Collection;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.eclipse.hudson.security.team.TeamManager;
 
 /**
  * Represents the running state of a remote computer that holds
@@ -1116,6 +1117,7 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
     public HttpResponse doDoDelete() throws IOException {
         checkPermission(DELETE);
         Hudson.getInstance().removeNode(getNode());
+        removeFromTeam(getName());
         return new HttpRedirect("..");
     }
 
@@ -1144,7 +1146,15 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
             }
         }
         Hudson.getInstance().removeNode(getNode());
+        removeFromTeam(getName());
         return new HttpRedirect("..");
+    }
+    
+     private void removeFromTeam(String name) throws IOException {
+        TeamManager teamManager = Hudson.getInstance().getTeamManager();
+        if (teamManager.isTeamManagementEnabled()) {
+             teamManager.removeNode(name);
+        }
     }
 
     /**

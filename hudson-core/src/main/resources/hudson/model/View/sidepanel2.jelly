@@ -19,7 +19,11 @@
 -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:s="/lib/form">
-  <j:if test="${it.hasPermission(it.CREATE)}">
-    <l:task icon="images/32x32/folder.png" href="${rootURL}/newView" title="${%New View}" permission="${it.CONFIGURE}"/>
-  </j:if>
+    <j:if test="${it.hasPermission(it.CREATE)}">
+        <l:task icon="images/32x32/folder.png" href="${rootURL}/newView" title="${%New View}" permission="${it.CONFIGURE}"/>
+    </j:if>
+    <j:if test="${app.isTeamManagementEnabled()}">
+         <j:getStatic var="permission" className="hudson.model.Computer" field="CREATE"/>
+        <l:task icon="images/24x24/new-computer.png" href="${rootURL}/computer/new" title="${%New Node}" permission="${permission}" />
+    </j:if>
 </j:jelly>

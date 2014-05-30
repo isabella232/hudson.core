@@ -253,13 +253,37 @@ public class TeamMember {
                 strWriter.append(",");
                 strWriter.append("delete");
             }
+            if (teamMember.canConfigure()) {
+                strWriter.append(",");
+                strWriter.append("configure");
+            }
             if (teamMember.canBuild()) {
                 strWriter.append(",");
                 strWriter.append("build");
             }
-            if (teamMember.canConfigure()) {
+            if (teamMember.canCreateView()) {
                 strWriter.append(",");
-                strWriter.append("configure");
+                strWriter.append("createView");
+            }
+            if (teamMember.canDeleteView()) {
+                strWriter.append(",");
+                strWriter.append("deleteView");
+            }
+            if (teamMember.canConfigureView()) {
+                strWriter.append(",");
+                strWriter.append("configureView");
+            }
+            if (teamMember.canCreateNode()) {
+                strWriter.append(",");
+                strWriter.append("createNode");
+            }
+            if (teamMember.canDeleteNode()) {
+                strWriter.append(",");
+                strWriter.append("deleteNode");
+            }
+            if (teamMember.canConfigureNode()) {
+                strWriter.append(",");
+                strWriter.append("configureNode");
             }
             writer.startNode("permissions");
             writer.setValue(strWriter.toString());

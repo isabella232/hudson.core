@@ -14,20 +14,25 @@
 #
 #************************************************************************** --> 
 
-
 <!--
   Side panel
 -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:s="/lib/form">
-  <l:header />
-  <l:side-panel>
-    <l:tasks>
-      <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Main Dashboard}" />
-      <l:task icon="images/24x24/new-computer.png" href="new" title="${%New Node}" permission="${app.ADMINISTER}" />
-      <l:task icon="images/24x24/setting.png" href="configure" title="${%Configure}" permission="${app.ADMINISTER}" />
-    </l:tasks>
-    <t:queue items="${app.queue.items}" />
-    <t:executors />
-  </l:side-panel>
+    <l:header />
+    <l:side-panel>
+        <l:tasks>
+            <l:task icon="images/24x24/up.png" href="${rootURL}/" title="${%Back to Main Dashboard}" />
+            <j:if test="${app.isTeamManagementEnabled()}">
+                  <j:getStatic var="permission" className="hudson.model.Computer" field="CREATE"/>
+                 <l:task icon="images/24x24/new-computer.png" href="new" title="${%New Node}" permission="${permission}" />
+            </j:if>
+            <j:if test="${!app.isTeamManagementEnabled()}">
+                 <l:task icon="images/24x24/new-computer.png" href="new" title="${%New Node}" permission="${app.ADMINISTER}" />
+            </j:if>
+            <l:task icon="images/24x24/setting.png" href="configure" title="${%Configure}" permission="${app.ADMINISTER}" />
+        </l:tasks>
+        <t:queue items="${app.queue.items}" />
+        <t:executors />
+    </l:side-panel>
 </j:jelly>

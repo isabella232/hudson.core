@@ -11,6 +11,7 @@
 package org.eclipse.hudson.security.team;
 
 import hudson.model.Computer;
+import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.View;
@@ -35,6 +36,7 @@ public class TeamBasedACL extends SidACL {
     private transient Logger logger = LoggerFactory.getLogger(TeamBasedACL.class);
 
     public enum SCOPE {
+
         GLOBAL, TEAM_MANAGEMENT, TEAM, JOB, VIEW, NODE
     };
     private final SCOPE scope;
@@ -53,12 +55,12 @@ public class TeamBasedACL extends SidACL {
         this(teamManager, scope);
         this.job = job;
     }
-    
+
     public TeamBasedACL(TeamManager teamManager, SCOPE scope, View view) {
         this(teamManager, scope);
         this.view = view;
     }
-    
+
     public TeamBasedACL(TeamManager teamManager, SCOPE scope, Computer node) {
         this(teamManager, scope);
         this.node = node;
@@ -77,14 +79,14 @@ public class TeamBasedACL extends SidACL {
         if (teamManager.isSysAdmin(userName)) {
             return true;
         }
-        
+
         if (scope == SCOPE.TEAM_MANAGEMENT) {
             //Only Sysadmin gets to do Team Management
             if (teamManager.isSysAdmin(userName)) {
                 return true;
             }
         }
-        
+
         if (scope == SCOPE.GLOBAL) {
             //All non team members gets only READ Permission
             if (permission.getImpliedBy() == Permission.READ) {
@@ -111,13 +113,22 @@ public class TeamBasedACL extends SidACL {
                     }
                 }
             }
+            // Member of any of the team with Node CREATE Permission can create Node
+            if (permission == Computer.CREATE) {
+                for (Team userTeam : teamManager.findUserTeams(userName)) {
+                    TeamMember member = userTeam.findMember(userName);
+                    if ((member != null) && member.hasPermission(Computer.CREATE)) {
+                        return true;
+                    }
+                }
+            }
         }
         if (scope == SCOPE.TEAM) {
             // Sysadmin gets to do all team maintenance operations
             if (teamManager.isSysAdmin(userName)) {
                 return true;
             }
-            
+
             for (Team userTeam : teamManager.findUserTeams(userName)) {
                 if (userTeam == team) {
                     // Team admin gets to do all team maintenance operations
@@ -148,9 +159,9 @@ public class TeamBasedACL extends SidACL {
             }
             // Grant Read permission to Public Jobs and jobs based on visibility
             if (permission.getImpliedBy() == Permission.READ) {
-                 if (hasReadPermission(jobTeam, permission, userName)){
-                     return true;
-                 }
+                if (hasReadPermission(jobTeam, permission, userName)) {
+                    return true;
+                }
             }
             if (permission == Item.EXTENDED_READ) {
                 if (hasReadPermission(jobTeam, permission, userName)) {
@@ -163,10 +174,10 @@ public class TeamBasedACL extends SidACL {
                 }
             }
         }
-        
+
         if (scope == SCOPE.VIEW) {
             Team viewTeam = teamManager.findViewOwnerTeam(view.getViewName());
-            
+
             // Member of any of the team with View CREATE Permission can create View
             if (permission == View.CREATE) {
                 for (Team userTeam : teamManager.findUserTeams(userName)) {
@@ -189,20 +200,34 @@ public class TeamBasedACL extends SidACL {
             }
             // Grant Read permission to Public Jobs and jobs based on visibility
             if (permission == View.READ) {
-                 if (hasViewReadPermission(viewTeam, permission, userName)){
-                     return true;
-                 }
+                if (hasViewReadPermission(viewTeam, permission, userName)) {
+                    return true;
+                }
             }
-           
+
         }
-        
+
         if (scope == SCOPE.NODE) {
-            Team nodeTeam = teamManager.findNodeOwnerTeam(node.getName());
+            String nodeName = node.getName();
+            if (node instanceof Hudson.MasterComputer) {
+                nodeName = "Master";
+            }
+            Team nodeTeam = teamManager.findNodeOwnerTeam(nodeName);
+
+            // Member of any of the team with Node CREATE Permission can create Node
+            if (permission == Computer.CREATE) {
+                for (Team userTeam : teamManager.findUserTeams(userName)) {
+                    TeamMember member = userTeam.findMember(userName);
+                    if ((member != null) && member.hasPermission(Computer.CREATE)) {
+                        return true;
+                    }
+                }
+            }
 
             if (nodeTeam != null) {
                 if (nodeTeam.isMember(userName)) {
                     // All members of the team get read permission
-                    if (permission == View.READ) {
+                    if (permission == Computer.READ) {
                         return true;
                     }
                     TeamMember member = nodeTeam.findMember(userName);
@@ -211,15 +236,15 @@ public class TeamBasedACL extends SidACL {
             }
             // Grant Read permission to Public Jobs and jobs based on visibility
             if (permission == Computer.READ) {
-                 if (hasNodeReadPermission(nodeTeam, permission, userName)){
-                     return true;
-                 }
+                if (hasNodeReadPermission(nodeTeam, permission, userName)) {
+                    return true;
+                }
             }
-           
+
         }
         return null;
     }
-    
+
     private boolean hasReadPermission(Team jobTeam, Permission permission, String userName) {
         // Grant Read permission to Public Jobs and jobs based on visibility
         try {
@@ -247,7 +272,7 @@ public class TeamBasedACL extends SidACL {
         }
         return false;
     }
-    
+
     private boolean hasViewReadPermission(Team viewTeam, Permission permission, String userName) {
         // Grant Read permission to Public Views and views based on visibility
         try {
@@ -275,13 +300,17 @@ public class TeamBasedACL extends SidACL {
         }
         return false;
     }
-    
+
     private boolean hasNodeReadPermission(Team nodeTeam, Permission permission, String userName) {
+        String nodeName = node.getName();
+        if (node instanceof Hudson.MasterComputer) {
+            nodeName = "Master";
+        }
         // Grant Read permission to Public Views and views based on visibility
         try {
             Team publicTeam = teamManager.findTeam(PublicTeam.PUBLIC_TEAM_NAME);
 
-            if (publicTeam.isNodeOwner(node.getName())) {
+            if (publicTeam.isNodeOwner(nodeName)) {
                 if (permission == Computer.READ) {
                     return true;
                 }
@@ -291,7 +320,7 @@ public class TeamBasedACL extends SidACL {
         }
 
         if (nodeTeam != null) {
-            TeamNode teamNode = nodeTeam.findNode(node.getName());
+            TeamNode teamNode = nodeTeam.findNode(nodeName);
             for (Team userTeam : teamManager.findUserTeams(userName)) {
                 if (teamNode.isVisible(userTeam.getName())) {
                     return true;

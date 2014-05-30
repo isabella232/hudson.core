@@ -112,18 +112,11 @@
             <br/>
             <j:forEach var="c" items="${computers}">
                 <table width="100%">
-                    <tr>
+                    <tr>                      
                         <j:choose>
-                            <j:when test="${c.node==app or computers.size()==1}">
+                            <j:when test="${c.node==app}">
                                 <th class="pane" colspan="2">
-                                    <j:choose>
-                                        <j:when test="${empty(app.slaves) or computers.size()==1}">
-                                            <local:computerCaption title="Status"/>
-                                        </j:when>
-                                        <j:otherwise>
-                                            <local:computerCaption title="Master"/>
-                                        </j:otherwise>
-                                    </j:choose>
+                                    <local:computerCaption title="Master"/>
                                 </th>
                             </j:when>
                             <j:otherwise>

@@ -901,7 +901,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         if (!isCurrentUserSysAdmin()) {
             throw new RuntimeException(getCurrentUser() + " is not a System Administrator");
         }
-        for (Computer node : hudson.getComputers()) {
+        for (Computer node : hudson.getAllComputers()) {
             String nodeName = node.getName();
             if (node instanceof Hudson.MasterComputer) {
                 //Master node does not have a name!!
@@ -1294,7 +1294,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         if (isCurrentUserSysAdmin()) {
             return publicTeam;
         }
-        throw new TeamNotFoundException("User does not have create permission in any team");
+        throw new TeamNotFoundException("User does not have Job create permission in any team");
     }
     
     public Team findCurrentUserTeamForNewView() throws TeamNotFoundException {
@@ -1306,7 +1306,19 @@ public final class TeamManager implements Saveable, AccessControlled {
         if (isCurrentUserSysAdmin()) {
             return publicTeam;
         }
-        throw new TeamNotFoundException("User does not have create permission in any team");
+        throw new TeamNotFoundException("User does not have View create permission in any team");
+    }
+    
+    public Team findCurrentUserTeamForNewNode() throws TeamNotFoundException {
+        // This will only find explicit team members with create permission
+        List<Team> currentUserTeamsWithPermission = getCurrentUserTeamsWithPermission(Computer.CREATE);
+        if (!currentUserTeamsWithPermission.isEmpty()) {
+            return currentUserTeamsWithPermission.get(0);
+        }
+        if (isCurrentUserSysAdmin()) {
+            return publicTeam;
+        }
+        throw new TeamNotFoundException("User does not have Node create permission in any team");
     }
 
     /**
@@ -1661,7 +1673,7 @@ public final class TeamManager implements Saveable, AccessControlled {
                         publicTeam.addView(teamView);
                     }
                 }
-                for (Computer node : hudson.getComputers()) {
+                for (Computer node : hudson.getAllComputers()) {
                     TeamNode teamNode = new TeamNode(node.getName());
                     if (node instanceof Hudson.MasterComputer) {
                         //Master node does not have a name!!

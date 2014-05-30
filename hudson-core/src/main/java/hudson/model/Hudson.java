@@ -1527,6 +1527,23 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Gets the read-only list of all {@link Computer}s.
      */
     public Computer[] getComputers() {
+        Computer[] allComputers = getAllComputers();
+        
+        List<Computer> copy = new ArrayList<Computer>();
+        
+        if (this.isTeamManagementEnabled()) {
+            for (Computer computer : allComputers) {
+                if (computer.hasPermission(Computer.READ)) {
+                    copy.add(computer);
+                }
+            }
+            return copy.toArray(new Computer[copy.size()]);
+        } else {
+            return allComputers;
+        }
+    }
+    
+    public Computer[] getAllComputers() {
         Computer[] r = computers.values().toArray(new Computer[computers.size()]);
         Arrays.sort(r, new Comparator<Computer>() {
             final Collator collator = Collator.getInstance();

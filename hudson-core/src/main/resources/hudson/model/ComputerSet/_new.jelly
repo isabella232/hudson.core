@@ -21,28 +21,35 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  <l:layout norefresh="true" permission="${app.ADMINISTER}">
-    <st:include page="sidepanel.jelly"/>
-    <l:main-panel>
-      <h1>
-         <img width="48" height="48" src="${imagesURL}/48x48/setting.png" alt="" style="margin-right:10px"/>
-         ${%Node Configurations}
-      </h1>
-      <f:form method="post" action="doCreateItem">
-        <f:entry title="${%Name}" help="/help/system-config/master-slave/name.html">
-          <f:textbox name="name" value="${request.getParameter('name')}" clazz="required" checkMessage="${%Name is mandatory}"/>
-        </f:entry>
+    <j:if test="${app.isTeamManagementEnabled()}">
+        <j:getStatic var="permission" className="hudson.model.Computer" field="CREATE"/>
+    </j:if>
+    <j:if test="${!app.isTeamManagementEnabled()}">
+        <j:set var="permission" value="${app.ADMINISTER}" />
+    </j:if>
+    <l:layout norefresh="true" permission="${permission}">
+  
+        <st:include page="sidepanel.jelly"/>
+        <l:main-panel>
+            <h1>
+                <img width="48" height="48" src="${imagesURL}/48x48/setting.png" alt="" style="margin-right:10px"/>
+                ${%Node Configurations}
+            </h1>
+            <f:form method="post" action="doCreateItem">
+                <f:entry title="${%Name}" help="/help/system-config/master-slave/name.html">
+                    <f:textbox name="name" value="${request.getParameter('name')}" clazz="required" checkMessage="${%Name is mandatory}"/>
+                </f:entry>
 
-        <!-- main body of the configuration -->
-        <j:set var="it" value="${null}" />
-        <st:include class="${requestScope.descriptor.clazz}" page="configure-entries.jelly" />
+                <!-- main body of the configuration -->
+                <j:set var="it" value="${null}" />
+                <st:include class="${requestScope.descriptor.clazz}" page="configure-entries.jelly" />
         
-        <f:block>
-          <input type="hidden" name="type" value="${request.getParameter('mode')}"/>
+                <f:block>
+                    <input type="hidden" name="type" value="${request.getParameter('mode')}"/>
 
-          <f:submit value="${%Save}"/>
-        </f:block>
-      </f:form>
-    </l:main-panel>
-  </l:layout>
+                    <f:submit value="${%Save}"/>
+                </f:block>
+            </f:form>
+        </l:main-panel>
+    </l:layout>
 </j:jelly>
