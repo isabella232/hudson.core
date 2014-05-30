@@ -1530,4 +1530,11 @@ public class Functions {
         }
         return null;
     }
+    
+    public static boolean isBrokenItem(Item item) {
+        if ( item instanceof hudson.model.BrokenTopLevelItem) {
+            return true;
+        }
+        return false;
+    }
 }

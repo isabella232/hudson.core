@@ -48,6 +48,9 @@ final class LazyTopLevelItem implements TopLevelItem, IJob, StaplerProxy {
         final XmlFile configFile;
         final ItemGroup parent;
         final String name;
+        
+        private boolean loadError = false;
+        
         Key(XmlFile configFile, ItemGroup parent, String name) {
             this.configFile = configFile;
             this.parent = parent;
@@ -70,6 +73,13 @@ final class LazyTopLevelItem implements TopLevelItem, IJob, StaplerProxy {
         @Override
         public int hashCode() {
             return name.hashCode();
+        }
+        
+        public void setLoadErrorFlag() {
+            loadError = true;
+        }
+        public void clearLoadErrorFlag() {
+            loadError = false;
         }
     }
     
@@ -170,7 +180,12 @@ final class LazyTopLevelItem implements TopLevelItem, IJob, StaplerProxy {
 
     @Override
     public String getName() {
-        return key.name;
+        if ( key.loadError ) {
+            return key.name +"[In Error]";
+        }
+        else {
+            return key.name;
+        }
     }
 
     @Override

@@ -21,7 +21,13 @@
         style="${indenter.getCss(job)}"
         onmouseover="this.className='jobDescription hover';return true;"
         onmouseout="this.className='jobDescription';return true;">
-        <a href="${jobBaseUrl}${job.shortUrl}">${job.displayName}</a>
+        <j:if test="${h.isBrokenItem(job)}">
+            <a class="redbold" href="#${job.displayName}">${job.displayName}</a>
+        </j:if>
+
+        <j:if test="${!h.isBrokenItem(job)}">
+            <a href="${jobBaseUrl}${job.shortUrl}">${job.displayName}</a>
+        </j:if>
         <j:if test="${!empty(job.description)}">
             <div class="jobDescriptionDetails">
                 <table border="0">

@@ -15,6 +15,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -78,9 +79,16 @@ class TopLevelItemsCache {
 
                     @Override
                     public TopLevelItem load(LazyTopLevelItem.Key key) throws Exception {
-                        TopLevelItem item = (TopLevelItem) key.configFile.read();
-                        item.onLoad(key.parent, key.name);
-                        return item;
+                        try {
+                            TopLevelItem item = (TopLevelItem) key.configFile.read();
+                            item.onLoad(key.parent, key.name);
+                            key.clearLoadErrorFlag();
+                            return item;
+                        }
+                        catch (IOException ex) {
+                            key.setLoadErrorFlag();
+                            return new BrokenTopLevelItem(key, ex);
+                        }
                     }
                     
                 });
