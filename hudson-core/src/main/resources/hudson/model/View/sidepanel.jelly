@@ -43,7 +43,7 @@
         <j:when test="${it.class.name=='hudson.model.AllView'}">
           <l:task icon="images/24x24/user.png" href="${rootURL}/people/" title="${%People}" />
         </j:when>
-        <j:when test="${it.isDefault() or it.hasPeople()}">
+        <j:when test="${it.isDefault()}">
           <l:task icon="images/24x24/user.png" href="${rootURL}/${it.viewUrl}people/" title="${%People}" />
         </j:when>
       </j:choose>
