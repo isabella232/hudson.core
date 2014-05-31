@@ -17,19 +17,12 @@
 
 package hudson.model;
 
-import hudson.util.CascadingUtil;
-import java.util.concurrent.CopyOnWriteArraySet;
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.collections.MapUtils;
-import hudson.widgets.Widget;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Sets;
 import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.PermalinkList;
 import hudson.cli.declarative.CLIResolver;
+import hudson.model.BuildHistory.Record;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Fingerprint.Range;
 import hudson.model.Fingerprint.RangeSet;
@@ -42,18 +35,16 @@ import hudson.search.SearchItems;
 import hudson.security.*;
 import hudson.tasks.LogRotator;
 import hudson.util.BuildHistoryList;
+import hudson.util.CascadingUtil;
 import hudson.util.CopyOnWriteList;
 import hudson.util.DescribableList;
-
 import hudson.util.IOException2;
 import hudson.util.RunList;
 import hudson.util.TextFile;
-
 import hudson.widgets.HistoryWidget;
 import hudson.widgets.HistoryWidget.Adapter;
-
+import hudson.widgets.Widget;
 import java.awt.Color;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectStreamException;
@@ -72,35 +63,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
+
+import static javax.servlet.http.HttpServletResponse.*;
 import net.sf.json.JSONException;
-
 import net.sf.json.JSONObject;
-
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.hudson.api.model.ICascadingJob;
 import org.eclipse.hudson.api.model.IJob;
 import org.eclipse.hudson.api.model.IProjectProperty;
+import org.eclipse.hudson.graph.*;
 import org.eclipse.hudson.model.project.property.BaseProjectProperty;
+import org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty;
+import org.eclipse.hudson.model.project.property.DescribableListProjectProperty;
 import org.eclipse.hudson.model.project.property.ExternalProjectProperty;
+import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.eclipse.hudson.security.team.Team;
+import org.eclipse.hudson.security.team.TeamManager;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
-
-import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerOverridable;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
-
-import static javax.servlet.http.HttpServletResponse.*;
-import org.eclipse.hudson.graph.*;
-import org.eclipse.hudson.model.project.property.CopyOnWriteListProjectProperty;
-import org.eclipse.hudson.model.project.property.DescribableListProjectProperty;
-import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
-import org.eclipse.hudson.security.team.Team;
-import org.eclipse.hudson.security.team.TeamManager;
 
 /**
  * A job is an runnable entity under the monitoring of Hudson.
@@ -1308,23 +1302,24 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     public final long getEstimatedDuration() {
-        List<RunT> builds = getLastBuildsOverThreshold(3, Result.UNSTABLE);
+        //List<RunT> builds = getLastBuildsOverThreshold(3, Result.UNSTABLE);
+        
+        List<Record<JobT, RunT>> records = getBuildHistoryData().getLastRecordsOverThreshold(3, Result.UNSTABLE);
 
-
-        if (builds.isEmpty()) {
+        if (records.isEmpty()) {
             return -1;
         }
 
 
         long totalDuration = 0;
-        for (RunT b : builds) {
+        for (Record b : records) {
             totalDuration += b.getDuration();
         }
         if (totalDuration == 0) {
             return -1;
         }
 
-        return Math.round((double) totalDuration / builds.size());
+        return Math.round((double) totalDuration / records.size());
     }
 
     /**
