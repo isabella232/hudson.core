@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory;
 @ExportedBean
 public abstract class AbstractItem extends Actionable implements Item, HttpDeletable, AccessControlled, DescriptorByNameOwner {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractItem.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(AbstractItem.class);
     /**
      * Project name.
      */

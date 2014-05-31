@@ -59,11 +59,11 @@ public class InitialRunnable  implements Runnable {
                 // trigger the loading of changelogs in the background,
                 // but give the system 10 seconds so that the first page
                 // can be served quickly
-                Trigger.timer.schedule(new SafeTimerTask() {
-                    public void doRun() {
-                        User.getUnknown().getBuilds();
-                    }
-                }, 1000 * 10);
+//                Trigger.timer.schedule(new SafeTimerTask() {
+//                    public void doRun() {
+//                        User.getUnknown().getBuilds();
+//                    }
+//                }, 1000 * 10);
             } catch (Error e) {
                 logger.error("Failed to initialize Hudson", e);
                 controller.install(new HudsonFailedToLoad(e));
