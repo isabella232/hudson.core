@@ -1301,7 +1301,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         return getBuildHistoryData().getLastBuildsOverThreshold(numberOfBuilds, threshold);
     }
 
-    public final long getEstimatedDuration() {
+    public long getEstimatedDuration() {
         //List<RunT> builds = getLastBuildsOverThreshold(3, Result.UNSTABLE);
         
         List<Record<JobT, RunT>> records = getBuildHistoryData().getLastRecordsOverThreshold(3, Result.UNSTABLE);
