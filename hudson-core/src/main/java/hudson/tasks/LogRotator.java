@@ -1,35 +1,38 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
  * Copyright (c) 2004-2009 Oracle Corporation.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * 
- *    Kohsuke Kawaguchi, Martin Eigenbrodt
+ *
+ * Kohsuke Kawaguchi, Martin Eigenbrodt
  *
  *
- *******************************************************************************/ 
-
+ ******************************************************************************
+ */
 package hudson.tasks;
 
+import hudson.model.BuildHistory;
+import hudson.model.BuildHistory.Record;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.Run;
 import hudson.scm.SCM;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.logging.Logger;
-import org.kohsuke.stapler.DataBoundConstructor;
-
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
+import java.util.logging.Logger;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Deletes old log files.
@@ -83,6 +86,8 @@ public class LogRotator implements Describable<LogRotator> {
     }
 
     /**
+     * @param daysToKeep
+     * @param numToKeep
      * @deprecated since 1.350. Use {@link #LogRotator(int, int, int, int)}
      */
     public LogRotator(int daysToKeep, int numToKeep) {
@@ -99,13 +104,16 @@ public class LogRotator implements Describable<LogRotator> {
 
     public void perform(Job<?, ?> job) throws IOException, InterruptedException {
 
-        LOGGER.log(FINE, "Running the log rotation for " + job.getFullDisplayName());
+        LOGGER.log(FINE, "Running the log rotation for {0}", job.getFullDisplayName());
+
+        BuildHistory bh = job.getBuildHistoryData();
+        List<Record> allRecords = bh.allRecords();
+
+        Record lsb = bh.getLastSuccessful();
+        Record lstb = bh.getLastStable();
 
         // keep the last successful build regardless of the status
-        Run lsb = job.getLastSuccessfulBuild();
-        Run lstb = job.getLastStableBuild();
-
-        List<? extends Run<?, ?>> builds = job.getBuilds();
+        List<Record> subrecords = new ArrayList(allRecords);
         Calendar cal = null;
         //Delete builds
         if (-1 != numToKeep || -1 != daysToKeep) {
@@ -114,14 +122,13 @@ public class LogRotator implements Describable<LogRotator> {
                 cal.add(Calendar.DAY_OF_YEAR, -daysToKeep);
             }
             if (-1 != numToKeep) {
-                builds = builds.subList(Math.min(builds.size(), numToKeep), builds.size());
+                subrecords = allRecords.subList(Math.min(allRecords.size(), numToKeep), allRecords.size());
             }
             //Delete builds based on configured values. See http://issues.hudson-ci.org/browse/HUDSON-3650
-            deleteBuilds(builds, lsb, lstb, cal);
+            deleteBuilds(subrecords, lsb, lstb, cal);
         }
 
         cal = null;
-        builds = job.getBuilds();
         //Delete build artifacts
         if (-1 != artifactNumToKeep || -1 != artifactDaysToKeep) {
             if (-1 != artifactDaysToKeep) {
@@ -129,10 +136,10 @@ public class LogRotator implements Describable<LogRotator> {
                 cal.add(Calendar.DAY_OF_YEAR, -artifactDaysToKeep);
             }
             if (-1 != artifactNumToKeep) {
-                builds = builds.subList(Math.min(builds.size(), artifactNumToKeep), builds.size());
+                subrecords = allRecords.subList(Math.min(allRecords.size(), artifactNumToKeep), allRecords.size());
             }
             //Delete build artifacts based on configured values. See http://issues.hudson-ci.org/browse/HUDSON-3650
-            deleteBuildArtifacts(builds, lsb, lstb, cal);
+            deleteBuildArtifacts(subrecords, lsb, lstb, cal);
         }
     }
 
@@ -145,12 +152,17 @@ public class LogRotator implements Describable<LogRotator> {
      * @param cal calendar if configured
      * @throws IOException if configured
      */
-    private void deleteBuilds(List<? extends Run<?, ?>> builds, Run lastSuccessBuild, Run lastStableBuild, Calendar cal)
+    private void deleteBuilds(List<Record> subrecords, Record lastSuccessBuild, Record lastStableBuild, Calendar cal)
             throws IOException {
-        for (Run currentBuild : builds) {
+        for (Record currentBuild : subrecords) {
             if (allowDeleteBuild(lastSuccessBuild, lastStableBuild, currentBuild, cal)) {
-                LOGGER.log(FINER, currentBuild.getFullDisplayName() + " is to be removed");
-                currentBuild.delete();
+                Run currentRun = currentBuild.getBuild();
+                if (currentRun.isKeepLog()) {
+                    LOGGER.log(FINER, "{0} is not GC-ed because it''s marked as a keeper", currentBuild.getFullDisplayName());
+                } else {
+                    LOGGER.log(FINER, "{0} is to be removed", currentBuild.getFullDisplayName());
+                    currentRun.delete();
+                }
             }
         }
     }
@@ -167,22 +179,17 @@ public class LogRotator implements Describable<LogRotator> {
      * @param cal {@link Calendar}
      * @return true - if deletion is allowed, false - otherwise.
      */
-    private boolean allowDeleteBuild(Run lastSuccessBuild, Run lastStableBuild, Run currentBuild, Calendar cal) {
-        if (currentBuild.isKeepLog()) {
-            LOGGER.log(FINER, currentBuild.getFullDisplayName() + " is not GC-ed because it's marked as a keeper");
-            return false;
-        }
+    private boolean allowDeleteBuild(Record lastSuccessBuild, Record lastStableBuild, Record currentBuild, Calendar cal) {
         if (currentBuild == lastSuccessBuild) {
-            LOGGER.log(FINER,
-                    currentBuild.getFullDisplayName() + " is not GC-ed because it's the last successful build");
+            LOGGER.log(FINER, "{0} is not GC-ed because it''s the last successful build", currentBuild.getFullDisplayName());
             return false;
         }
         if (currentBuild == lastStableBuild) {
-            LOGGER.log(FINER, currentBuild.getFullDisplayName() + " is not GC-ed because it's the last stable build");
+            LOGGER.log(FINER, "{0} is not GC-ed because it''s the last stable build", currentBuild.getFullDisplayName());
             return false;
         }
         if (null != cal && !currentBuild.getTimestamp().before(cal)) {
-            LOGGER.log(FINER, currentBuild.getFullDisplayName() + " is not GC-ed because it's still new");
+            LOGGER.log(FINER, "{0} is not GC-ed because it''s still new", currentBuild.getFullDisplayName());
             return false;
         }
         return true;
@@ -197,11 +204,17 @@ public class LogRotator implements Describable<LogRotator> {
      * @param cal calendar if configured
      * @throws IOException if configured
      */
-    private void deleteBuildArtifacts(List<? extends Run<?, ?>> builds, Run lastSuccessBuild, Run lastStableBuild,
+    private void deleteBuildArtifacts(List<Record> subrecords, Record lastSuccessBuild, Record lastStableBuild,
             Calendar cal) throws IOException {
-        for (Run currentBuild : builds) {
+        for (Record currentBuild : subrecords) {
             if (allowDeleteArtifact(lastSuccessBuild, lastStableBuild, currentBuild, cal)) {
-                currentBuild.deleteArtifacts();
+                Run currentRun = currentBuild.getBuild();
+                if (currentRun.isKeepLog()) {
+                    LOGGER.log(FINER, "{0} is not purged of artifacts because it''s marked as a keeper", currentBuild.getFullDisplayName());
+                } else {
+                    LOGGER.log(FINER, "Artifacts of {0} to be removed", currentBuild.getFullDisplayName());
+                    currentRun.deleteArtifacts();
+                }
             }
         }
     }
@@ -218,24 +231,18 @@ public class LogRotator implements Describable<LogRotator> {
      * @param cal {@link Calendar}
      * @return true - if deletion is allowed, false - otherwise.
      */
-    private boolean allowDeleteArtifact(Run lastSuccessBuild, Run lastStableBuild, Run currentBuild, Calendar cal) {
-        if (currentBuild.isKeepLog()) {
-            LOGGER.log(FINER,
-                    currentBuild.getFullDisplayName() + " is not purged of artifacts because it's marked as a keeper");
-            return false;
-        }
+    private boolean allowDeleteArtifact(Record lastSuccessBuild, Record lastStableBuild, Record currentBuild, Calendar cal) {
+
         if (currentBuild == lastSuccessBuild) {
-            LOGGER.log(FINER, currentBuild.getFullDisplayName()
-                    + " is not purged of artifacts because it's the last successful build");
+            LOGGER.log(FINER, "{0} is not purged of artifacts because it''s the last successful build", currentBuild.getFullDisplayName());
             return false;
         }
         if (currentBuild == lastStableBuild) {
-            LOGGER.log(FINER,
-                    currentBuild.getFullDisplayName() + " is not purged of artifacts because it's the last stable build");
+            LOGGER.log(FINER, "{0} is not purged of artifacts because it''s the last stable build", currentBuild.getFullDisplayName());
             return false;
         }
         if (null != cal && !currentBuild.getTimestamp().before(cal)) {
-            LOGGER.log(FINER, currentBuild.getFullDisplayName() + " is not purged of artifacts because it's still new");
+            LOGGER.log(FINER, "{0} is not purged of artifacts because it''s still new", currentBuild.getFullDisplayName());
             return false;
         }
         return true;
@@ -284,6 +291,7 @@ public class LogRotator implements Describable<LogRotator> {
         return String.valueOf(i);
     }
 
+    @Override
     public LRDescriptor getDescriptor() {
         return DESCRIPTOR;
     }
@@ -291,6 +299,7 @@ public class LogRotator implements Describable<LogRotator> {
 
     public static final class LRDescriptor extends Descriptor<LogRotator> {
 
+        @Override
         public String getDisplayName() {
             return "Log Rotation";
         }
@@ -317,12 +326,8 @@ public class LogRotator implements Describable<LogRotator> {
                 : that.artifactDaysToKeep != null) {
             return false;
         }
-        if (artifactNumToKeep != null ? !artifactNumToKeep.equals(that.artifactNumToKeep)
-                : that.artifactNumToKeep != null) {
-            return false;
-        }
-
-        return true;
+        return !(artifactNumToKeep != null ? !artifactNumToKeep.equals(that.artifactNumToKeep)
+                : that.artifactNumToKeep != null);
     }
 
     @Override
