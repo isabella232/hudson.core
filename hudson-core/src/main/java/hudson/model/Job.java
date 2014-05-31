@@ -72,6 +72,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.logging.Level;
 import javax.servlet.ServletException;
 import net.sf.json.JSONException;
 
@@ -1042,6 +1043,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     @Exported
     public RunList<RunT> getBuilds() {
+       LOGGER.info("Job.getBuilds() API should be avoided for performance reason");
+        Thread.dumpStack();
         return RunList.fromRuns(_getRuns().values());
     }
 
