@@ -20,38 +20,39 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import hudson.Extension;
+import hudson.Functions;
 import hudson.diagnosis.OldDataMonitor;
+import hudson.model.Computer;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.model.Item;
+import hudson.model.View;
 import hudson.util.FormValidation;
 import hudson.util.FormValidation.Kind;
-import hudson.util.VersionNumber;
 import hudson.util.RobustReflectionConverter;
-import hudson.Functions;
-import hudson.Extension;
-import net.sf.json.JSONObject;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.QueryParameter;
-import org.springframework.dao.DataAccessException;
-
-import javax.servlet.ServletException;
+import hudson.util.VersionNumber;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.io.IOException;
-import java.util.Collections;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.ServletException;
+import net.sf.json.JSONObject;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -291,6 +292,16 @@ public class GlobalMatrixAuthorizationStrategy extends AuthorizationStrategy {
         }
 
         public boolean showPermission(Permission p) {
+            // These three are only used by Team Authorization
+            if (p == Computer.READ){
+                return false;
+            }
+            if (p == Computer.CREATE){
+                return false;
+            }
+            if (p == View.READ){
+                return false;
+            }
             return p.getEnabled();
         }
 

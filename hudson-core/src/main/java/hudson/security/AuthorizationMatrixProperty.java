@@ -49,6 +49,8 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import hudson.model.Computer;
+import hudson.model.View;
 
 import javax.servlet.ServletException;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
@@ -168,6 +170,16 @@ public class AuthorizationMatrixProperty extends JobProperty<Job<?, ?>> {
         }
 
         public boolean showPermission(Permission p) {
+            // These three are only used by Team Authorization
+            if (p == Computer.READ){
+                return false;
+            }
+            if (p == Computer.CREATE){
+                return false;
+            }
+            if (p == View.READ){
+                return false;
+            }
             return p.getEnabled() && p != Item.CREATE;
         }
 

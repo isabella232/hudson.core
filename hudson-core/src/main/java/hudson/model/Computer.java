@@ -1189,10 +1189,9 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
     /**
      * Permission to configure slaves.
      */
-    public static final Permission READ = new Permission(PERMISSIONS, "Create", Messages._Computer_ReadPermission_Description(), Permission.READ);
+    public static final Permission READ = new Permission(PERMISSIONS, "Read", Messages._Computer_ReadPermission_Description(), Permission.READ);
     public static final Permission CREATE = new Permission(PERMISSIONS, "Create", Messages._Computer_CreatePermission_Description(), Permission.CREATE);
     public static final Permission CONFIGURE = new Permission(PERMISSIONS, "Configure", Messages._Computer_ConfigurePermission_Description(), Permission.CONFIGURE);
     public static final Permission DELETE = new Permission(PERMISSIONS, "Delete", Messages._Computer_DeletePermission_Description(), Permission.DELETE);
-     public static final Permission EXECUTE = new Permission(PERMISSIONS, "Execute", Messages._Computer_ExecutePermission_Description(), Permission.DELETE);
     private static final Logger LOGGER = Logger.getLogger(Computer.class.getName());
 }
