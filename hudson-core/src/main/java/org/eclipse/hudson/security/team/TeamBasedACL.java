@@ -177,6 +177,26 @@ public class TeamBasedACL extends SidACL {
 
         if (scope == SCOPE.VIEW) {
             Team viewTeam = teamManager.findViewOwnerTeam(view.getViewName());
+            
+            // Member with Item.CREATE Permissions can create Job from this View scope
+            if (permission == Item.CREATE) {
+                for (Team userTeam : teamManager.findUserTeams(userName)) {
+                    TeamMember member = userTeam.findMember(userName);
+                    if ((member != null) && member.hasPermission(Item.CREATE)) {
+                        return true;
+                    }
+                }
+            }
+            
+            // Member with Computer.CREATE Permissions can create Node from this View scope
+            if (permission == Computer.CREATE) {
+                for (Team userTeam : teamManager.findUserTeams(userName)) {
+                    TeamMember member = userTeam.findMember(userName);
+                    if ((member != null) && member.hasPermission(Computer.CREATE)) {
+                        return true;
+                    }
+                }
+            }
 
             // Member of any of the team with View CREATE Permission can create View
             if (permission == View.CREATE) {

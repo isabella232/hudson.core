@@ -1428,14 +1428,24 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     public synchronized View getView(String name) {
         for (View v : views) {
             if (v.getViewName().equals(name)) {
-                return v;
+                //return v;
+                if (isTeamManagementEnabled()) {
+                    return v.hasPermission(View.READ)? v : null;
+                } else {
+                    return v;
+                }
             }
         }
         if (name != null && !name.equals(primaryView)) {
             // Fallback to subview of primary view if it is a ViewGroup
             View pv = getPrimaryView();
             if (pv instanceof ViewGroup) {
-                return ((ViewGroup) pv).getView(name);
+                View view = ((ViewGroup) pv).getView(name);
+                if (isTeamManagementEnabled()) {
+                    return view.hasPermission(View.READ)? view : null;
+                } else {
+                    return view;
+                }
             }
         }
         return null;
@@ -1573,7 +1583,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
         for (Computer c : computers.values()) {
             if (c.getName().equals(name)) {
-                return c;
+                if (isTeamManagementEnabled()) {
+                    return c.hasPermission(Computer.READ)? c : null;
+                } else {
+                    return c;
+                }
             }
         }
         return null;

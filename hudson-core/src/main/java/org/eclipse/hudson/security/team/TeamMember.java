@@ -42,6 +42,8 @@ public class TeamMember {
         setTeamAdminGrantedPermissions();
         grantedPermissions.add(Item.READ);
         grantedPermissions.add(Item.WORKSPACE);
+        grantedPermissions.add(Computer.READ);
+        grantedPermissions.add(View.READ);
     }
 
     public String getName() {
@@ -176,6 +178,7 @@ public class TeamMember {
         }
         if ("createNode".equals(permission)) {
             grantedPermissions.add(Computer.CREATE);
+            grantedPermissions.add(Computer.CONFIGURE);
         }
         if ("deleteNode".equals(permission)) {
             grantedPermissions.add(Computer.DELETE);
@@ -185,6 +188,7 @@ public class TeamMember {
         }
         if ("createView".equals(permission)) {
             grantedPermissions.add(View.CREATE);
+            grantedPermissions.add(Computer.CONFIGURE);
         }
         if ("deleteView".equals(permission)) {
             grantedPermissions.add(View.DELETE);
