@@ -184,7 +184,12 @@
                                         </j:if>
                                     </td>
                                     <td class="column3">
-                                        <a href="${rootURL}/computer/${nodeName}">${nodeName}</a>
+                                        <j:if test='${nodeName == "Master"}'>
+                                            <a href="${rootURL}/computer/(master)">${nodeName}</a>
+                                        </j:if>
+                                        <j:if test='${!(nodeName == "Master")}'>
+                                            <a href="${rootURL}/computer/${nodeName}">${nodeName}</a>
+                                        </j:if>
                                     </td>
                                     <td class="column4">
                                         <span id="node_colum3_span_${nodeName}">

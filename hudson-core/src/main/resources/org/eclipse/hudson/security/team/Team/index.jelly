@@ -275,7 +275,12 @@
                                         <input type="hidden" value="${it.name}" name="hiddenTeamName"/>
                                         <input type="hidden" value="${it.findNode(nodeName).visiblitiesAsString}" name="hiddenNodeVisibilities"/>
                                         <span style="margin-left:10px; font-size:13px">
-                                            <a href="${rootURL}/computer/${nodeName}">${nodeName}</a>
+                                            <j:if test='${nodeName == "Master"}'>
+                                                <a href="${rootURL}/computer/(master)">${nodeName}</a>
+                                            </j:if>
+                                            <j:if test='${!(nodeName == "Master")}'>
+                                                <a href="${rootURL}/computer/${nodeName}">${nodeName}</a>
+                                            </j:if>
                                         </span>
                                     </td>
                                         
