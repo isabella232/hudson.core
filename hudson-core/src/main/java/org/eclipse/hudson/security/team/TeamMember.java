@@ -82,6 +82,15 @@ public class TeamMember {
         if (isTeamAdmin) {
             return teamAdminGrantedPermissions.contains(permission);
         }
+        if (permission == Item.CONFIGURE){
+            return grantedPermissions.contains(permission) || grantedPermissions.contains(Item.CREATE);
+        }
+        if (permission == View.CONFIGURE){
+            return grantedPermissions.contains(permission) || grantedPermissions.contains(View.CREATE);
+        }
+        if (permission == Computer.CONFIGURE){
+            return grantedPermissions.contains(permission) || grantedPermissions.contains(Computer.CREATE);
+        }
         return grantedPermissions.contains(permission);
     }
 
@@ -103,7 +112,7 @@ public class TeamMember {
         if (isTeamAdmin) {
             return true;
         }
-        return hasPermission(Item.CONFIGURE);
+        return canCreate() || hasPermission(Item.CONFIGURE);
     }
 
     public boolean canBuild() {
@@ -131,7 +140,7 @@ public class TeamMember {
         if (isTeamAdmin) {
             return true;
         }
-        return hasPermission(Computer.CONFIGURE);
+        return canCreateNode() || hasPermission(Computer.CONFIGURE);
     }
     
     public boolean canCreateView() {
@@ -152,7 +161,7 @@ public class TeamMember {
         if (isTeamAdmin) {
             return true;
         }
-        return hasPermission(View.CONFIGURE);
+        return canCreateView() || hasPermission(View.CONFIGURE);
     }
 
     void addPermission(String permission) {
