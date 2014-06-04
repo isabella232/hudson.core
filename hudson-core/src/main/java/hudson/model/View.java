@@ -718,8 +718,10 @@ public abstract class View extends AbstractModelObject implements AccessControll
         View v = all().findByName(mode).newInstance(req, req.getSubmittedForm());
         v.owner = owner;
         
-        //TODO: Get teamname to add from view creation UI
-        addToTeam(v.getViewName(), null);
+        if (!(owner instanceof MyViewsProperty)) {
+            //TODO: Get teamname to add from view creation UI
+            addToTeam(v.getViewName(), null);
+        }
 
         // redirect to the config screen
         rsp.sendRedirect2(req.getContextPath() + '/' + v.getUrl() + v.getPostConstructLandingPage());

@@ -14,6 +14,7 @@ import hudson.model.Computer;
 import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.model.Job;
+import hudson.model.MyViewsProperty;
 import hudson.model.View;
 import hudson.security.Permission;
 import hudson.security.SecurityRealm;
@@ -176,6 +177,7 @@ public class TeamBasedACL extends SidACL {
         }
 
         if (scope == SCOPE.VIEW) {
+            
             Team viewTeam = teamManager.findViewOwnerTeam(view.getViewName());
             
             // Member with Item.CREATE Permissions can create Job from this View scope
@@ -207,7 +209,20 @@ public class TeamBasedACL extends SidACL {
                     }
                 }
             }
-
+            
+            // In case of My Views the view is not managed by Team, so just check if the 
+            // user has appropriate permission
+            if (view.getOwner() instanceof MyViewsProperty) {
+                if ((permission == View.CONFIGURE) || (permission == View.DELETE)) {
+                    for (Team userTeam : teamManager.findUserTeams(userName)) {
+                        TeamMember member = userTeam.findMember(userName);
+                        if ((member != null) && member.hasPermission(permission)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            
             if (viewTeam != null) {
                 if (viewTeam.isMember(userName)) {
                     // All members of the team get read permission
