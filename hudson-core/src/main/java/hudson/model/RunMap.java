@@ -773,7 +773,15 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
                             public Run load(LazyRunValue.Key key) throws Exception {
 
                                 LazyRunValue.Key k = (LazyRunValue.Key)key;
+                                // Load the data from storage
+                                // This may not succeed, so set the cached values in a
+                                // thread context variable for Run to retrieve it. This way
+                                // we don't throw, but end up with a placehold build object for 
+                                // unloadable builds.
+                                LazyRunValue.setCurrentKey(k);
                                 Run r = k.ctor.create(k.referenced.buildDir());
+                                LazyRunValue.setCurrentKey(null);
+                                
                                 if ( r instanceof BuildNavigable) {
                                     ((BuildNavigable)r).setBuildNavigator(k.referenced);
                                 }
@@ -1504,11 +1512,11 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
         extends RunValue<J,R> {
 
 
-        private static class Key {
+        static class Key {
             private String buildDir;
             private File buildsDir;
             private transient RunMap.Constructor ctor;
-            private final LazyRunValue referenced;
+            final LazyRunValue referenced;
             private volatile boolean refreshed;
             
             Key(File buildsDir, String buildDir, RunMap.Constructor ctor, LazyRunValue ref) {
@@ -1536,6 +1544,8 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
         }
         
         private final Key key;
+        
+        static private ThreadLocal<Key> currentKey = new ThreadLocal<Key>();
         
         private LazyRunValue(RunMap runMap) {
             // Used when loaded from file
@@ -1565,6 +1575,14 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
                 v.onLoad();
             }
             return v;
+        }
+        
+        static Key getCurrentKey() {
+            return currentKey.get();
+        }
+        
+        static void setCurrentKey(Key key) {
+            currentKey.set(key);
         }
 
         

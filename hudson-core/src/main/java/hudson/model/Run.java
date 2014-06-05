@@ -147,7 +147,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     /**
      * When the build is scheduled.
      */
-    protected transient final long timestamp;
+    protected transient long timestamp;
     /**
      * The build result. This value may change while the state is in
      * {@link State#BUILDING}.
@@ -267,6 +267,10 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         catch (IOException ex) {
             LOGGER.log(Level.SEVERE, "Unable to load Run object.", ex);
             dataFileLoadException = ex;
+            RunMap.LazyRunValue.Key key = RunMap.LazyRunValue.getCurrentKey();
+            if ( key != null ) {
+                loadCachedValues(key);
+            }
         }
 
     }
@@ -358,6 +362,22 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     
     final State getState() {
         return state;
+    }
+    
+    final void loadCachedValues(RunMap.LazyRunValue.Key key) {
+        this.number = key.referenced.buildNumber;
+        this.description = String.format("%s\n%s",
+                           this.dataFileLoadException.getMessage(),
+                           key.referenced.description == null? "":
+                                   key.referenced.description);
+        
+        this.displayName = String.format("%s [In Error]",key.referenced.displayName);
+        this.duration = key.referenced.duration;
+        this.nextBuild = (RunT)key.referenced.getNextBuild();
+        this.previousBuild = (RunT)key.referenced.getPreviousBuild();
+        this.result = key.referenced.result;
+        this.state = key.referenced.state;
+        this.timestamp = key.referenced.timeInMillis;
     }
 
     /**
@@ -1585,6 +1605,11 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Save the settings to a file.
      */
     public synchronized void save() throws IOException {
+        // Don't save if load didn't succeed.
+        if (hasLoadFailure()) {
+            return;
+        }
+        
         if (BulkChange.contains(this)) {
             return;
         }
