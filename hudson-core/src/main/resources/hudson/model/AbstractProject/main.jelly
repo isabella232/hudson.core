@@ -26,9 +26,11 @@
         ${act.displayName}
       </t:summary>
     </j:forEach>
-    <t:summary icon="folder.png" href="ws/" permission="${it.WORKSPACE}">
-      ${%Workspace}
-    </t:summary>
+    <j:if test="${it.workspace != null}">
+      <t:summary icon="folder.png" href="ws/" permission="${it.WORKSPACE}">
+        ${%Workspace}
+      </t:summary>
+    </j:if>
 
     <t:artifactList caption="${%Last Successful Artifacts}"
         build="${it.lastSuccessfulBuild}" baseURL="lastSuccessfulBuild/"
