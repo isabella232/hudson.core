@@ -219,7 +219,7 @@ public final class TcpSlaveAgentListener extends Thread {
             }
 
             final String nodeName = in.readUTF();
-            SlaveComputer computer = (SlaveComputer) Hudson.getInstance().getComputer(nodeName);
+            SlaveComputer computer = (SlaveComputer) Hudson.getInstance().getComputer(nodeName, true);
             if (computer == null) {
                 error(out, "No such slave: " + nodeName);
                 return;
@@ -248,7 +248,7 @@ public final class TcpSlaveAgentListener extends Thread {
             }
 
             final String nodeName = request.getProperty("Node-Name");
-            SlaveComputer computer = (SlaveComputer) Hudson.getInstance().getComputer(nodeName);
+            SlaveComputer computer = (SlaveComputer) Hudson.getInstance().getComputer(nodeName, true);
             if (computer == null) {
                 error(out, "No such slave: " + nodeName);
                 return;

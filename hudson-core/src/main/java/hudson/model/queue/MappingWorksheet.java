@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import hudson.model.Computer;
 import hudson.model.Executor;
+import hudson.model.Hudson;
 import hudson.model.Label;
 import hudson.model.LoadBalancer;
 import hudson.model.Node;
@@ -28,6 +29,7 @@ import hudson.model.Queue.Executable;
 import hudson.model.Queue.JobOffer;
 import hudson.model.Queue.Task;
 import hudson.model.labels.LabelAssignmentAction;
+import java.io.IOException;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static java.lang.Math.*;
+import org.eclipse.hudson.security.team.TeamManager;
 
 /**
  * Defines a mapping problem for answering "where do we execute this task?"
@@ -342,11 +345,22 @@ public class MappingWorksheet {
         Map<Computer, List<ExecutorSlot>> j = new HashMap<Computer, List<ExecutorSlot>>();
         for (ExecutorSlot o : offers) {
             Computer c = o.getExecutor().getOwner();
+            boolean canBuildInNode = true;
+            TeamManager teamManager = Hudson.getInstance().getTeamManager();
+            if (teamManager.isTeamManagementEnabled()) {
+                String name = c.getName();
+                if (c instanceof Hudson.MasterComputer){
+                    name = "Master";
+                }
+                canBuildInNode = teamManager.canNodeExecuteJob(name, item.task.getName());
+            }
             List<ExecutorSlot> l = j.get(c);
             if (l == null) {
                 j.put(c, l = new ArrayList<ExecutorSlot>());
             }
-            l.add(o);
+            if (canBuildInNode) {
+                l.add(o);
+            }
         }
 
         {// take load prediction into account and reduce the available executor pool size accordingly

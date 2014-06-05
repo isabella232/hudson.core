@@ -1430,7 +1430,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             if (v.getViewName().equals(name)) {
                 //return v;
                 if (isTeamManagementEnabled()) {
-                    return v.hasPermission(View.READ)? v : null;
+                    return v.hasPermission(View.READ) ? v : null;
                 } else {
                     return v;
                 }
@@ -1442,7 +1442,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             if (pv instanceof ViewGroup) {
                 View view = ((ViewGroup) pv).getView(name);
                 if (isTeamManagementEnabled()) {
-                    return view.hasPermission(View.READ)? view : null;
+                    return view.hasPermission(View.READ) ? view : null;
                 } else {
                     return view;
                 }
@@ -1538,9 +1538,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     public Computer[] getComputers() {
         Computer[] allComputers = getAllComputers();
-        
+
         List<Computer> copy = new ArrayList<Computer>();
-        
+
         if (this.isTeamManagementEnabled()) {
             for (Computer computer : allComputers) {
                 if (computer.hasPermission(Computer.READ)) {
@@ -1552,7 +1552,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             return allComputers;
         }
     }
-    
+
     public Computer[] getAllComputers() {
         Computer[] r = computers.values().toArray(new Computer[computers.size()]);
         Arrays.sort(r, new Comparator<Computer>() {
@@ -1577,14 +1577,18 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     @CLIResolver
     public Computer getComputer(@Argument(required = true, metaVar = "NAME", usage = "Node name") String name) {
+        return getComputer(name, false);
+    }
+    
+    public Computer getComputer(String name, boolean system) {
         if (name.equals("(master)")) {
             name = "";
         }
 
         for (Computer c : computers.values()) {
             if (c.getName().equals(name)) {
-                if (isTeamManagementEnabled()) {
-                    return c.hasPermission(Computer.READ)? c : null;
+                if (isTeamManagementEnabled() && !system) {
+                    return c.hasPermission(Computer.READ) ? c : null;
                 } else {
                     return c;
                 }
@@ -1902,7 +1906,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                 Team team = teamManager.findViewOwnerTeam(oldName);
                 teamManager.renameView(team, oldName, newName);
             } catch (IOException ex) {
-                 logger.warn("Failed to rename view in team.", ex);
+                logger.warn("Failed to rename view in team.", ex);
             }
         }
     }
@@ -1975,33 +1979,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         // for compatibility. the actual data is stored in Mailer
         String url = Mailer.descriptor().getUrl();
         if (url != null) {
-            // Could be static.
-            Pattern slashTrimmer = Pattern.compile("/?(.*[^/])/?$");
-            // Trim leading and trailing slashes
-            String theRequestPath = Functions.getRequestRootPath();
-            theRequestPath = theRequestPath == null ? "" : theRequestPath;
-            Matcher matcher = slashTrimmer.matcher(theRequestPath);
-            theRequestPath = matcher.find() ? matcher.group(1) : "";
-
-            try {
-                URL theUrl = new URL(url);
-                // Similar trim
-                String thePath = theUrl.getPath();
-                matcher.reset(thePath);
-                thePath = matcher.find() ? matcher.group(1) : "";
-
-                // Put them back together
-                URL rootUrl = new URL(theUrl.getProtocol(), theUrl.getHost(),
-                        theUrl.getPort(), String.format("%s%s%s%s/",
-                                thePath.isEmpty() ? "" : "/",
-                                thePath,
-                                theRequestPath.isEmpty() ? "" : "/",
-                                theRequestPath));
-                return rootUrl.toString();
-            } catch (MalformedURLException e) {
-                return url;
+            url = url.trim();
+            if (!url.endsWith("/")){
+                url = url + "/";
             }
-
+            return url;
         }
 
         StaplerRequest req = Stapler.getCurrentRequest();
@@ -2863,6 +2845,20 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             return doQuietDown(false, 0);
         } catch (InterruptedException e) {
             throw new AssertionError(); // impossible
+        }
+    }
+
+    public void doSlaveJnlp(StaplerRequest req, StaplerResponse rsp, @QueryParameter String name) throws ServletException, IOException {
+        Computer slave = null;
+        for (Computer c : computers.values()) {
+            if (c.getName().equals(name)) {
+                slave = c;
+            }
+        }
+        if (slave != null) {
+            req.getView(slave, "slave-agent.jnlp.jelly").forward(req, rsp);
+        }else{
+            req.getView(this, "jnlp-error.jelly").forward(req, rsp);
         }
     }
 
@@ -3834,6 +3830,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                     || rest.startsWith("/accessDenied")
                     || rest.startsWith("/signup")
                     || rest.startsWith("/jnlpJars/")
+                    || rest.startsWith("/slaveAgent/")
                     || rest.startsWith("/tcpSlaveAgentListener")
                     || rest.startsWith("/cli")
                     || rest.startsWith("/whoAmI")

@@ -1560,12 +1560,18 @@ public final class TeamManager implements Saveable, AccessControlled {
 
     public boolean canNodeExecuteJob(String nodeName, String jobName) {
         Team nodeTeam = findNodeOwnerTeam(nodeName);
-        Team jobTeam = findJobOwnerTeam(nodeName);
-        if (nodeTeam == jobTeam) {
-            return true;
+        Team jobTeam = findJobOwnerTeam(jobName);
+        if ((nodeTeam != null) && (jobTeam != null)) {
+            if (nodeTeam == jobTeam) {
+                return true;
+            } else {
+                TeamNode teamNode = nodeTeam.findNode(nodeName);
+                if (teamNode != null) {
+                    return teamNode.isVisible(jobTeam.getName());
+                }
+            }
         }
-        TeamNode teamNode = nodeTeam.findNode(nodeName);
-        return teamNode.isVisible(jobTeam.getName());
+        return false;
     }
 
     public static class TeamNotFoundException extends Exception {

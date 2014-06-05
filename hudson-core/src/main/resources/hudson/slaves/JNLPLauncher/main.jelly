@@ -17,7 +17,8 @@
 
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-  <j:choose>
+    <j:set var="jnlpRootURL" value="${app.rootUrl}" />
+    <j:choose>
     <j:when test="${app.slaveAgentPort==-1}">
       <div class="error">
         ${%slaveAgentPort.disabled}
@@ -25,14 +26,15 @@
       </div>
     </j:when>
     <j:when test="${it.offline and !it.temporarilyOffline}">
-      <l:isAdmin><!-- TODO: we need a permission to launch a slave -->
-        <p>
+ 
+    <j:if test="${app.teamManagementEnabled ? it.hasPermission(it.CONFIGURE) : h.hasPermission(app.ADMINISTER)}">  
+       <p>
           ${%Connect slave to Hudson one of these ways:}
         </p>
         <ul>
           <li>
             <p>
-              <a href="slave-agent.jnlp" id="jnlp-link">
+              <a href="${jnlpRootURL}slaveJnlp?name=${it.name}" id="jnlp-link">
                 <img src="${imagesURL}/webstart.gif" alt="${%launch agent}" />
               </a>
               ${%Launch agent from browser on slave}
@@ -42,13 +44,13 @@
             <p>
               ${%Run from slave command line:}
             </p>
-            <pre>javaws ${h.inferHudsonURL(request)}${it.url}slave-agent.jnlp</pre>
+            <pre>javaws ${jnlpRootURL}slaveJnlp?name=${it.name}</pre>
           </li>
           <li>
             <p>
               ${%Or if the slave is headless:}
             </p>
-            <pre>java -jar <a href="${rootURL}/jnlpJars/slave.jar">slave.jar</a> -jnlpUrl ${h.inferHudsonURL(request)}${it.url}slave-agent.jnlp</pre>
+            <pre>java -jar <a href="${rootURL}/jnlpJars/slave.jar">slave.jar</a> -jnlpUrl ${jnlpRootURL}slaveJnlp?name=${it.name}</pre>
           </li>
         </ul>
         <!--
@@ -57,8 +59,8 @@
             (tweak launch parameters)
           </a>
         </p>
-        -->
-      </l:isAdmin>
+       -->   
+      </j:if>
     </j:when>
     <j:otherwise>
       <p>
