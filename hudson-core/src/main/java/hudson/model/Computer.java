@@ -76,6 +76,7 @@ import java.net.Inet4Address;
 import java.util.Collection;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.eclipse.hudson.security.team.Team;
 import org.eclipse.hudson.security.team.TeamManager;
 
 /**
@@ -1078,7 +1079,7 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
         final Hudson app = Hudson.getInstance();
 
         Node result = getNode().getDescriptor().newInstance(req, req.getSubmittedForm());
-
+        
         // replace the old Node object by the new one
         synchronized (app) {
             List<Node> nodes = new ArrayList<Node>(app.getNodes());
@@ -1089,15 +1090,29 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
                 return;
             }
             
-            // Check if the Appointed node of a job is same as node that is renamed, if so modify it
-            // See https://bugs.eclipse.org/bugs/show_bug.cgi?id=401683
-            for (Job job : Hudson.getInstance().getAllItems(Job.class)){
-                if (job instanceof AbstractProject){
-                    AbstractProject project = (AbstractProject) job;
-                    AppointedNode appointedNode = project.getAppointedNode();
-                    if ((appointedNode != null) && prevNode.getNodeName().equals(appointedNode.getNodeName())){
-                        appointedNode.setNodeName(result.getNodeName()); 
-                        job.save();
+            String oldName = prevNode.getNodeName();
+            String newName = result.getNodeName();
+            if (!newName.equals(oldName)) {
+                // Check if the Appointed node of a job is same as node that is renamed, if so modify it
+                // See https://bugs.eclipse.org/bugs/show_bug.cgi?id=401683
+                for (Job job : Hudson.getInstance().getAllItems(Job.class)) {
+                    if (job instanceof AbstractProject) {
+                        AbstractProject project = (AbstractProject) job;
+                        AppointedNode appointedNode = project.getAppointedNode();
+                        if ((appointedNode != null) && oldName.equals(appointedNode.getNodeName())) {
+                            appointedNode.setNodeName(newName);
+                            job.save();
+                        }
+                    }
+                }
+
+                TeamManager teamManager = Hudson.getInstance().getTeamManager();
+                if (teamManager.isTeamManagementEnabled()) {
+                    try {
+                        Team team = teamManager.findNodeOwnerTeam(oldName);
+                        teamManager.renameNode(team, oldName, newName);
+                    } catch (IOException ex) {
+                        LOGGER.log(Level.WARNING, "Failed to rename node in team.", ex);
                     }
                 }
             }
@@ -1105,7 +1120,7 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
             nodes.set(i, result);
             app.setNodes(nodes);
         }
-
+        
         // take the user back to the slave top page.
         rsp.sendRedirect2("../" + result.getNodeName() + '/');
     }

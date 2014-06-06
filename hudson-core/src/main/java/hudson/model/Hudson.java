@@ -1899,9 +1899,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
 
     public void onViewRenamed(View view, String oldName, String newName) {
-        // implementation of Hudson is immune to view name change.
         TeamManager teamManager = Hudson.getInstance().getTeamManager();
-        if (!teamManager.isTeamManagementEnabled()) {
+        if (teamManager.isTeamManagementEnabled()) {
             try {
                 Team team = teamManager.findViewOwnerTeam(oldName);
                 teamManager.renameView(team, oldName, newName);
