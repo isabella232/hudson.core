@@ -54,6 +54,18 @@ p {
     color: #863566;
 }
 
+#container hr {
+    background-color: #D4BDE6; 
+    height: 3px; 
+    color: #D4BDE6;
+}
+
+#container th {
+    background: #FAF7FD;
+    color: #7B5395;
+    font-weight: normal;
+}
+
 #container td {
     border-bottom-style: dotted;
     border-bottom-width: 1px;
@@ -212,10 +224,6 @@ ul.team .teamList {
     margin-bottom: 5px;
     margin-top: 5px;
     margin-left: 10px;
-}
-
-#teamMemberTab th{
-    font-weight: lighter;
 }
 
 .teamMemberAdd{

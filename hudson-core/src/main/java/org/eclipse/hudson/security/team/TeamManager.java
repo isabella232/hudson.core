@@ -598,7 +598,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         return HttpResponses.ok();
     }
 
-    public HttpResponse doSetNodeVisibility(@QueryParameter String nodeName, @QueryParameter String teamNames) throws IOException {
+    public HttpResponse doSetNodeVisibility(@QueryParameter String nodeName, @QueryParameter String teamNames, @QueryParameter(value="false") boolean disabled) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
             return new TeamUtils.ErrorHttpResponse("No permission to set node visibility.");
         }
@@ -615,6 +615,11 @@ public final class TeamManager implements Saveable, AccessControlled {
                 node.addVisibility(teamName);
             }
             save();
+        }
+        if (disabled) {
+            ownerTeam.addToDisabledNodes(nodeName);
+        } else {
+            ownerTeam.removeFromDisabledNodes(nodeName);
         }
         return HttpResponses.ok();
     }
@@ -1094,7 +1099,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         // Used only in tests
         renameJob(findUserTeams(userName).get(0), oldJobName, newJobName);
     }
-
+    
     public Team findNodeOwnerTeam(String nodeName) {
         for (Team team : teams) {
             if (team.isNodeOwner(nodeName)) {
@@ -1157,7 +1162,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         // Used only in tests
         renameNode(findUserTeams(userName).get(0), oldNodeName, newNodeName);
     }
-
+    
     public Team findViewOwnerTeam(String viewName) {
         for (Team team : teams) {
             if (team.isViewOwner(viewName)) {
@@ -1220,9 +1225,10 @@ public final class TeamManager implements Saveable, AccessControlled {
         // Used only in tests
         renameView(findUserTeams(userName).get(0), oldViewName, newViewName);
     }
-
+    
     /**
      * Save the settings to the configuration file.
+     * @throws java.io.IOException
      */
     @Override
     public synchronized void save() throws IOException {
@@ -1563,11 +1569,11 @@ public final class TeamManager implements Saveable, AccessControlled {
         Team jobTeam = findJobOwnerTeam(jobName);
         if ((nodeTeam != null) && (jobTeam != null)) {
             if (nodeTeam == jobTeam) {
-                return true;
+                return !nodeTeam.isNodeDisabled(nodeName); 
             } else {
                 TeamNode teamNode = nodeTeam.findNode(nodeName);
                 if (teamNode != null) {
-                    return teamNode.isVisible(jobTeam.getName());
+                    return teamNode.isVisible(jobTeam.getName()) && !jobTeam.isNodeDisabled(nodeName);
                 }
             }
         }

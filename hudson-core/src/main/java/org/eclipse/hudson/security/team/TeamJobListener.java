@@ -11,7 +11,6 @@
 package org.eclipse.hudson.security.team;
 
 import hudson.Extension;
-import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.listeners.ItemListener;

@@ -16,7 +16,9 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -33,7 +35,7 @@ public class TeamItem {
      * their jobs
      */
     protected Set<String> visibilityToTeams = new HashSet<String>();
-    
+
     private transient boolean moveAllowed = true;
 
     public TeamItem() {
@@ -70,14 +72,16 @@ public class TeamItem {
     Set<String> getVisiblities() {
         return visibilityToTeams;
     }
-    
 
     public String getVisiblitiesAsString() {
         if (!visibilityToTeams.isEmpty()) {
             StringWriter strWriter = new StringWriter();
-            for (String teamName : visibilityToTeams) {
-                strWriter.append(teamName);
-                strWriter.append(":");
+            Iterator iterator = visibilityToTeams.iterator();
+            while (iterator.hasNext()) {
+                strWriter.append((String) iterator.next());
+                if (iterator.hasNext()) {
+                    strWriter.append(":");
+                };
             }
             return strWriter.toString();
         }
@@ -87,7 +91,7 @@ public class TeamItem {
     public Boolean isVisible(String name) {
         return visibilityToTeams.contains(name);
     }
-    
+
     public boolean isMoveAllowed() {
         return moveAllowed;
     }
@@ -132,9 +136,7 @@ public class TeamItem {
                 }
                 if ("visibility".equals(reader.getNodeName())) {
                     String teamNames = reader.getValue();
-                    for (String teamName : teamNames.split(",")) {
-                        teamItem.visibilityToTeams.add(teamName);
-                    }
+                    teamItem.visibilityToTeams.addAll(Arrays.asList(teamNames.split(",")));
                 }
                 reader.moveUp();
             }

@@ -27,6 +27,8 @@ import hudson.security.SecurityRealm;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -61,6 +63,13 @@ public class Team implements AccessControlled {
     private String description;
     private transient TeamManager teamManager;
     private String customFolderName;
+    
+    /**
+     * List of nodes known to this team but are disabled.
+     * When nodes are disabled, jobs can not be scheduled 
+     * on those nodes
+     */
+    protected Set<String> disabledNodes = new HashSet<String>();
 
     //Used for unmarshalling
     Team() {
@@ -548,6 +557,58 @@ public class Team implements AccessControlled {
             }
         };
     }
+    
+    void addToDisabledNodes(String nodeName){
+        disabledNodes.add(nodeName);
+    }
+    
+    void removeFromDisabledNodes(String nodeName){
+        disabledNodes.remove(nodeName);
+    }
+    
+    boolean isNodeDisabled(String nodeName){
+        return disabledNodes.contains(nodeName);
+    }
+    
+    // Used in Jelly
+    public List<TeamJob> getVisibleJobs(){
+        List<TeamJob> visibleJobs = new ArrayList<TeamJob>();
+        for (Team team : getTeamManager().getTeams().values()) {
+            for (TeamJob teamJob : team.getJobs()) {
+                if (teamJob.isVisible(name)){
+                   visibleJobs.add(teamJob);
+                }
+            }
+        }
+        return visibleJobs;
+    }
+    
+    // Used in Jelly
+    public List<TeamNode> getVisibleNodes(){
+        List<TeamNode> visibleNodes = new ArrayList<TeamNode>();
+        for (Team team : getTeamManager().getTeams().values()) {
+            for (TeamNode teamNode : team.getNodes()) {
+                if (teamNode.isVisible(name)){
+                   visibleNodes.add(teamNode);
+                }
+            }
+        }
+        return visibleNodes;
+    }
+    
+    // Used in Jelly
+    public List<TeamView> getVisibleViews(){
+        List<TeamView> visibleViews = new ArrayList<TeamView>(); 
+        for (Team team : getTeamManager().getTeams().values()) {
+            for (TeamView teamView : team.getViews()) {
+                if (teamView.isVisible(name)){
+                   visibleViews.add(teamView);
+                }
+            }
+        }
+        return visibleViews;
+    }
+
 
     @Override
     public void checkPermission(Permission permission) throws AccessDeniedException {
@@ -560,7 +621,8 @@ public class Team implements AccessControlled {
     }
 
     // When the Team is unmarshalled it would not have Team Manager set
-    private TeamManager getTeamManager() {
+    // used in the jelly
+    public TeamManager getTeamManager() {
         if (teamManager == null) {
             return HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getTeamManager();
         } else {
@@ -612,6 +674,16 @@ public class Team implements AccessControlled {
                 context.convertAnother(member);
                 writer.endNode();
             }
+            StringWriter strWriter = new StringWriter();
+            if (team.disabledNodes.size() > 0) {
+                for (String nodeName : team.disabledNodes) {
+                    strWriter.append(nodeName);
+                    strWriter.append(",");
+                }
+                writer.startNode("disabledNodes");
+                writer.setValue(strWriter.toString());
+                writer.endNode();
+            }
         }
 
         @Override
@@ -643,6 +715,9 @@ public class Team implements AccessControlled {
                 } else if ("member".equals(reader.getNodeName())) {
                     TeamMember teamMember = (TeamMember) uc.convertAnother(team, TeamMember.class);
                     team.teamMembers.add(teamMember);
+                }else if ("disabledNodes".equals(reader.getNodeName())) {
+                    String nodeNames = reader.getValue();
+                    team.disabledNodes.addAll(Arrays.asList(nodeNames.split(",")));
                 }
 
                 reader.moveUp();
