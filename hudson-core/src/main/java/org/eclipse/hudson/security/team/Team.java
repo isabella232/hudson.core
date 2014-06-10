@@ -69,7 +69,7 @@ public class Team implements AccessControlled {
      * When nodes are disabled, jobs can not be scheduled 
      * on those nodes
      */
-    protected Set<String> disabledNodes = new HashSet<String>();
+    protected Set<String> enabledVisibleNodes = new HashSet<String>();
 
     //Used for unmarshalling
     Team() {
@@ -558,16 +558,19 @@ public class Team implements AccessControlled {
         };
     }
     
-    void addToDisabledNodes(String nodeName){
-        disabledNodes.add(nodeName);
+    void addToEnabledVisibleNodes(String nodeName) throws IOException{
+        enabledVisibleNodes.add(nodeName);
+        getTeamManager().save();
     }
     
-    void removeFromDisabledNodes(String nodeName){
-        disabledNodes.remove(nodeName);
+    void removeFromEnabledVisibleNodes(String nodeName) throws IOException{
+        enabledVisibleNodes.remove(nodeName);
+        getTeamManager().save();
     }
     
-    boolean isNodeDisabled(String nodeName){
-        return disabledNodes.contains(nodeName);
+    // Called from jelly also
+    public boolean isVisibleNodeEnabled(String nodeName){
+        return enabledVisibleNodes.contains(nodeName);
     }
     
     // Used in Jelly
@@ -675,12 +678,12 @@ public class Team implements AccessControlled {
                 writer.endNode();
             }
             StringWriter strWriter = new StringWriter();
-            if (team.disabledNodes.size() > 0) {
-                for (String nodeName : team.disabledNodes) {
+            if (team.enabledVisibleNodes.size() > 0) {
+                for (String nodeName : team.enabledVisibleNodes) {
                     strWriter.append(nodeName);
                     strWriter.append(",");
                 }
-                writer.startNode("disabledNodes");
+                writer.startNode("enabledNodes");
                 writer.setValue(strWriter.toString());
                 writer.endNode();
             }
@@ -715,9 +718,9 @@ public class Team implements AccessControlled {
                 } else if ("member".equals(reader.getNodeName())) {
                     TeamMember teamMember = (TeamMember) uc.convertAnother(team, TeamMember.class);
                     team.teamMembers.add(teamMember);
-                }else if ("disabledNodes".equals(reader.getNodeName())) {
+                }else if ("enabledNodes".equals(reader.getNodeName())) {
                     String nodeNames = reader.getValue();
-                    team.disabledNodes.addAll(Arrays.asList(nodeNames.split(",")));
+                    team.enabledVisibleNodes.addAll(Arrays.asList(nodeNames.split(",")));
                 }
 
                 reader.moveUp();

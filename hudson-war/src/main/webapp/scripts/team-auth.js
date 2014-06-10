@@ -63,6 +63,8 @@ function verifySid(sidElement) {
 }
 
 function sysAdminAddButtonAction(teamName) {
+    clearMessage(jQuery('#userAddMsg'));
+    
     jQuery('#dialog-add-user').dialog({
         resizable: false,
         height: 165,
@@ -110,6 +112,7 @@ function addSysAdmin(adminSid) {
 }
 
 function removeSysAdminAction(deleteItem) {
+    clearMessage(jQuery('#userRemoveMsg'));
     var adminName = jQuery(deleteItem).siblings("input[name='hiddenUserName']").val();
     var parent = jQuery(deleteItem).parent();
     jQuery('#dialog-remove-user').dialog({
@@ -155,4 +158,10 @@ function showMessage(msg, error, infoTxt) {
         infoTxt.css("color", "green");
     }
     infoTxt.show();
+}
+
+function clearMessage(infoTxt) {
+    infoTxt.text("");
+    infoTxt.css("color", "black");
+    infoTxt.hide();
 }

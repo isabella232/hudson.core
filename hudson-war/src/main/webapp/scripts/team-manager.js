@@ -141,6 +141,12 @@ function onTeamDetailsLoad() {
         });
     });
 
+    jQuery('#teamInfo img.configureVisibleNodeEnable').each(function() {
+        jQuery(this).unbind("click").click(function() {
+            configureVisibleNodeEnableAction(this);
+        });
+    });
+
     jQuery('#teamMemberTab tr').each(function() {
         verifySid(this);
     });
@@ -158,7 +164,7 @@ function selectSelectableElement(selectableContainer, elementToSelect) {
 
 function  createTeamButtonAction() {
     jQuery("#teamDesc").attr('value', "");
-    showMessage("", false, jQuery('#teamAddMsg'));
+    clearMessage(jQuery('#teamAddMsg'));
     jQuery('#dialog-create-team').dialog({
         resizable: false,
         //height: 250,
@@ -214,6 +220,7 @@ function createTeam(teamName, teamDesc, teamFolder) {
 }
 
 function  deleteTeamButtonAction(deleteButton) {
+    clearMessage(jQuery('#teamDeleteMsg'));
     var teamName = jQuery(deleteButton).val();
     jQuery('#dialog-delete-team').dialog({
         resizable: false,
@@ -264,6 +271,7 @@ function deleteTeam(deleteButton) {
 }
 
 function teamMemberAddButtonAction(teamName) {
+    clearMessage(jQuery('#userAddMsg'));
     jQuery("#cb_adminFlag").prop('checked', false);
     jQuery("#cb_createFlag").prop('checked', true);
     jQuery("#cb_deleteFlag").prop('checked', true);
@@ -498,6 +506,7 @@ function updateTeamMember(trParent, teamName, member, adminFlag, createFlag, del
 }
 
 function removeTeamMemberAction(deleteItem) {
+    clearMessage(jQuery('#userRemoveMsg'));
     var trParent = jQuery(deleteItem).parents("tr:first");
     var memberName = jQuery(trParent).find("input[name='hiddenUserName']").val();
     var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
@@ -543,8 +552,12 @@ function removeTeamMember(teamName, memberName, parent) {
 }
 
 function configureJobVisibilityAction(configureJobItem) {
+
+    clearMessage(jQuery('#configureVisibilityMsg'));
+
     var trParent = jQuery(configureJobItem).parents("tr:first");
     var jobName = jQuery(trParent).find("input[name='hiddenJobId']").val();
+    var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
     var teamNames = jQuery(trParent).find("input[name='hiddenVisibilities']").val();
     var allowViewConfig = jQuery(trParent).find("input[name='hiddenAllowViewConfig']").val();
 
@@ -569,6 +582,14 @@ function configureJobVisibilityAction(configureJobItem) {
 
                 jQuery(trParent).find("input[name='hiddenVisibilities']").val(teamNames);
                 jQuery(trParent).find("input[name='hiddenAllowViewConfig']").val(allowViewConfig);
+                var teamNamesStr = teamNames;
+                if (teamNames.trim().length === 0) {
+                    teamNamesStr = "None";
+                } else {
+                    teamNamesStr = teamNamesStr.replace(/:/g, ",");
+                    teamNamesStr = teamNamesStr.substring(0, teamNamesStr.length - 1);
+                }
+                jQuery(trParent).find("span[name='visibilitySpanName']").text(teamNamesStr);
                 configureJobVisibility(jobName, teamNames, allowViewConfig);
             },
             Cancel: function() {
@@ -583,10 +604,10 @@ function configureJobVisibilityAction(configureJobItem) {
         jQuery("#allowViewConfig").prop('checked', false);
     }
 
-    fillConfigureTeamList("configure-visibility-team-list", "publicVisibility", teamNames);
+    fillConfigureTeamList("configure-visibility-team-list", "publicVisibility", teamNames, teamName);
 }
 
-function fillConfigureTeamList(teamListId, publicTeamId, teamNames) {
+function fillConfigureTeamList(teamListId, publicTeamId, teamNames, teamName) {
 
     jQuery.getJSON('getAllTeamsJson', function(json) {
         jQuery("#" + teamListId).empty();
@@ -597,7 +618,7 @@ function fillConfigureTeamList(teamListId, publicTeamId, teamNames) {
             jQuery(publicItem).prop('checked', false);
         }
         jQuery.each(json, function(key, val) {
-            if (key !== "public") {
+            if ((key !== "public") && (key !== teamName)) {
                 var item = jQuery("#team-visibility-item-template div").clone();
                 jQuery(item).find("label").text(key);
                 var input = jQuery(item).find("input");
@@ -634,8 +655,12 @@ function configureJobVisibility(jobName, teamNames, allowViewConfig) {
 }
 
 function configureViewVisibilityAction(configureViewItem) {
+
+    clearMessage(jQuery('#configureViewVisibilityMsg'));
+
     var trParent = jQuery(configureViewItem).parents("tr:first");
     var viewName = jQuery(trParent).find("input[name='hiddenViewId']").val();
+    var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
     var teamNames = jQuery(trParent).find("input[name='hiddenViewVisibilities']").val();
 
     jQuery('#dialog-configure-view-visibility').dialog({
@@ -656,6 +681,14 @@ function configureViewVisibilityAction(configureViewItem) {
                 }
 
                 jQuery(trParent).find("input[name='hiddenViewVisibilities']").val(teamNames);
+                var teamNamesStr = teamNames;
+                if (teamNames.trim().length === 0) {
+                    teamNamesStr = "None";
+                } else {
+                    teamNamesStr = teamNamesStr.replace(/:/g, ",");
+                    teamNamesStr = teamNamesStr.substring(0, teamNamesStr.length - 1);
+                }
+                jQuery(trParent).find("span[name='visibilitySpanName']").text(teamNamesStr);
                 configureViewVisibility(viewName, teamNames);
             },
             Cancel: function() {
@@ -664,7 +697,7 @@ function configureViewVisibilityAction(configureViewItem) {
         }
     });
 
-    fillConfigureTeamList("configure-view-visibility-team-list", "viewPublicVisibility", teamNames);
+    fillConfigureTeamList("configure-view-visibility-team-list", "viewPublicVisibility", teamNames, teamName);
 
 }
 
@@ -687,8 +720,12 @@ function configureViewVisibility(viewName, teamNames) {
 }
 
 function configureNodeVisibilityAction(configureNodeItem) {
+
+    clearMessage(jQuery('#configureNodeVisibilityMsg'));
+
     var trParent = jQuery(configureNodeItem).parents("tr:first");
     var nodeName = jQuery(trParent).find("input[name='hiddenNodeId']").val();
+    var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
     var teamNames = jQuery(trParent).find("input[name='hiddenNodeVisibilities']").val();
 
     jQuery('#dialog-configure-node-visibility').dialog({
@@ -709,6 +746,15 @@ function configureNodeVisibilityAction(configureNodeItem) {
                 }
 
                 jQuery(trParent).find("input[name='hiddenNodeVisibilities']").val(teamNames);
+
+                var teamNamesStr = teamNames;
+                if (teamNames.trim().length === 0) {
+                    teamNamesStr = "None";
+                } else {
+                    teamNamesStr = teamNamesStr.replace(/:/g, ",");
+                    teamNamesStr = teamNamesStr.substring(0, teamNamesStr.length - 1);
+                }
+                jQuery(trParent).find("span[name='visibilitySpanName']").text(teamNamesStr);
                 configureNodeVisibility(nodeName, teamNames);
             },
             Cancel: function() {
@@ -717,7 +763,7 @@ function configureNodeVisibilityAction(configureNodeItem) {
         }
     });
 
-    fillConfigureTeamList("configure-node-visibility-team-list", "nodePublicVisibility", teamNames);
+    fillConfigureTeamList("configure-node-visibility-team-list", "nodePublicVisibility", teamNames, teamName);
 }
 
 function configureNodeVisibility(nodeName, teamNames) {
@@ -733,6 +779,58 @@ function configureNodeVisibility(nodeName, teamNames) {
         },
         error: function(msg) {
             showMessage(msg.responseText, true, jQuery('#configureNodeVisibilityMsg'));
+        },
+        dataType: "html"
+    });
+}
+
+function configureVisibleNodeEnableAction(configureNodeItem) {
+
+    clearMessage(jQuery('#configureEnableVisibleNodeMsg'));
+
+    var trParent = jQuery(configureNodeItem).parents("tr:first");
+    var nodeName = jQuery(trParent).find("input[name='hiddenNodeId']").val();
+    var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
+
+    setSelection(trParent, "nodeEnabledIcon", "enableVisibleNode");
+
+    jQuery('#dialog-configure-visible-node-enable').dialog({
+        resizable: false,
+        autoResize: true,
+//        height: 300,
+        width: 350,
+        modal: true,
+        title: "Enable Node - " + nodeName,
+        buttons: {
+            'Update': function() {
+                var enabled = false;
+                if (jQuery('#enableVisibleNode').is(":checked")) {
+                    enabled = true;
+                }
+                configureVisibleNodeEnable(nodeName, teamName, enabled);
+                setIconVisibility(trParent, "nodeEnabledIcon", enabled);
+            },
+            Cancel: function() {
+                jQuery(this).dialog("close");
+            }
+        }
+    });
+}
+
+function configureVisibleNodeEnable(nodeName, teamName, enabled) {
+    jQuery.ajax({
+        type: 'POST',
+        url: "setNodeEnabled",
+        data: {
+            nodeName: nodeName,
+            teamName: teamName,
+            enabled: enabled
+        },
+        success: function() {
+            jQuery('#dialog-configure-visible-node-enable').dialog("close");
+        },
+        error: function(msg) {
+            showMessage(msg.responseText, true, jQuery('#configureEnableVisibleNodeMsg'));
         },
         dataType: "html"
     });
@@ -1023,4 +1121,10 @@ function showMessage(msg, error, infoTxt) {
         infoTxt.css("color", "green");
     }
     infoTxt.show();
+}
+
+function clearMessage(infoTxt) {
+    infoTxt.text("");
+    infoTxt.css("color", "black");
+    infoTxt.hide();
 }

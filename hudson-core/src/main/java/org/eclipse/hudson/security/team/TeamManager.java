@@ -598,7 +598,7 @@ public final class TeamManager implements Saveable, AccessControlled {
         return HttpResponses.ok();
     }
 
-    public HttpResponse doSetNodeVisibility(@QueryParameter String nodeName, @QueryParameter String teamNames, @QueryParameter(value="false") boolean disabled) throws IOException {
+    public HttpResponse doSetNodeVisibility(@QueryParameter String nodeName, @QueryParameter String teamNames) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
             return new TeamUtils.ErrorHttpResponse("No permission to set node visibility.");
         }
@@ -616,14 +616,26 @@ public final class TeamManager implements Saveable, AccessControlled {
             }
             save();
         }
-        if (disabled) {
-            ownerTeam.addToDisabledNodes(nodeName);
+        return HttpResponses.ok();
+    }
+    
+    public HttpResponse doSetNodeEnabled(@QueryParameter String nodeName, @QueryParameter String teamName, @QueryParameter boolean enabled) throws IOException, TeamNotFoundException {
+        if (!isCurrentUserTeamAdmin()) {
+            return new TeamUtils.ErrorHttpResponse("No permission to enable disable node.");
+        }
+        if ((nodeName == null) || "".equals(nodeName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("Node name required.");
+        }
+        Team nodeVisibleTeam = findTeam(teamName);
+         
+        if (!enabled) {
+            nodeVisibleTeam.removeFromEnabledVisibleNodes(nodeName);
         } else {
-            ownerTeam.removeFromDisabledNodes(nodeName);
+            nodeVisibleTeam.addToEnabledVisibleNodes(nodeName);
         }
         return HttpResponses.ok();
     }
-
+    
     public HttpResponse doCheckSid(@QueryParameter String sid) throws IOException {
         return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(sid));
     }
@@ -1569,11 +1581,11 @@ public final class TeamManager implements Saveable, AccessControlled {
         Team jobTeam = findJobOwnerTeam(jobName);
         if ((nodeTeam != null) && (jobTeam != null)) {
             if (nodeTeam == jobTeam) {
-                return !nodeTeam.isNodeDisabled(nodeName); 
+                return true; 
             } else {
                 TeamNode teamNode = nodeTeam.findNode(nodeName);
                 if (teamNode != null) {
-                    return teamNode.isVisible(jobTeam.getName()) && !jobTeam.isNodeDisabled(nodeName);
+                    return teamNode.isVisible(jobTeam.getName()) && jobTeam.isVisibleNodeEnabled(nodeName);
                 }
             }
         }

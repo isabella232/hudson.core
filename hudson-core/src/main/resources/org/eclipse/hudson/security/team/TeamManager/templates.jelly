@@ -342,6 +342,27 @@
         </div>
     </div>
     
+    
+    <!-- Dialog template to allow Node to build team jobs -->
+    <div style="margin-top: 10px; display: none" id="dialog-configure-visible-node-enable">
+        <div>
+            <span>
+                Allow this Node to build team jobs.
+            </span>
+            
+            <div style="margin-top: 10px;">
+                <label>${%Enable Node}:</label>
+                <input type="checkbox" style="margin-left:5px" id="enableVisibleNode"/>
+            </div>
+            
+            <div style="margin-top:10px">
+                <span id="configureEnableVisibleNodeMsg">
+                    <!-- message goes here -->
+                </span>
+            </div>
+        </div>
+    </div>
+    
     <div style="display: none" id="team-visibility-item-template">
         <div style="margin-top: 5px;">
             <label></label>
