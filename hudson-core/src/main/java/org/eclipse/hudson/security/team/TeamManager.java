@@ -683,13 +683,17 @@ public final class TeamManager implements Saveable, AccessControlled {
             return new TeamUtils.ErrorHttpResponse("Node name required.");
         }
         Team nodeVisibleTeam = findTeam(teamName);
-         
-        if (!enabled) {
-            nodeVisibleTeam.removeFromEnabledVisibleNodes(nodeName);
-        } else {
-            nodeVisibleTeam.addToEnabledVisibleNodes(nodeName);
-        }
+        
+        setNodeEnabled(nodeName, nodeVisibleTeam, enabled);
         return HttpResponses.ok();
+    }
+    
+    public void setNodeEnabled(String nodeName, Team team, boolean enabled) throws IOException {
+        if (!enabled) {
+            team.removeFromEnabledVisibleNodes(nodeName);
+        } else {
+            team.addToEnabledVisibleNodes(nodeName);
+        }
     }
     
     public void addNodeVisibility(TeamNode node, String teamName) {
