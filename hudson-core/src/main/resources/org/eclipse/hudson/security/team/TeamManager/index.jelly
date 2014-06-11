@@ -34,7 +34,7 @@
                 <st:include page="teamAdmin.jelly"/>
             </j:if>        
         
-            <j:if test='${!it.isCurrentUserSysAdmin() &amp;&amp; !it.isCurrentUserTeamAdmin()}'>
+            <j:if test='${!it.isCurrentUserSysAdmin() &amp;&amp; !it.isCurrentUserAnyTeamAdmin()}'>
                 <h2>You do not have permission to manage teams!</h2>
             </j:if>
         </l:main-panel>

@@ -133,7 +133,7 @@
                                 <th align="left">Team Name</th>   
                                 <th></th>   
                             </tr>      
-                            <j:forEach var="viewName" items="${it.currentSysAdminViews}">
+                            <j:forEach var="viewName" items="${it.currentUserAdminViews}">
                                 <tr>
                                     <td class="column1">
                                         <j:if test='${it.findView(viewName).isMoveAllowed()}'>
@@ -176,7 +176,7 @@
                                 <th align="left">Team Name</th>   
                                 <th> </th>   
                             </tr>      
-                            <j:forEach var="nodeName" items="${it.currentSysAdminNodes}">
+                            <j:forEach var="nodeName" items="${it.currentUserAdminNodes}">
                                 <tr>
                                     <td class="column1">
                                         <j:if test='${it.findNode(nodeName).isMoveAllowed()}'>

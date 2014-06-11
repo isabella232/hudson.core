@@ -49,6 +49,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
@@ -179,12 +180,13 @@ public final class TeamManager implements Saveable, AccessControlled {
         return false;
     }
 
-    public boolean isCurrentUserTeamAdmin() {
+    public boolean isCurrentUserTeamAdmin(String teamName) {
         if (isCurrentUserSysAdmin()) {
             return true;
         }
         String user = getCurrentUser();
-        for (Team team : teams) {
+        try {
+            Team team = findTeam(teamName);
             if (team.isAdmin(user)) {
                 return true;
             } else {
@@ -196,6 +198,18 @@ public final class TeamManager implements Saveable, AccessControlled {
                         return true;
                     }
                 }
+            }
+        } catch (TeamNotFoundException ex) {
+            logger.info(ex.getLocalizedMessage(), ex);
+        }
+        return false;
+    }
+    
+    // Used in Jelly
+    public boolean isCurrentUserAnyTeamAdmin(){
+        for (Team team : teams) {
+            if (isCurrentUserTeamAdmin(team.getName())){
+                return true;
             }
         }
         return false;
@@ -358,7 +372,7 @@ public final class TeamManager implements Saveable, AccessControlled {
             @QueryParameter boolean canDeleteView,
             @QueryParameter boolean canConfigureView
     ) throws IOException {
-        if (!isCurrentUserTeamAdmin()) {
+        if (!isCurrentUserTeamAdmin(teamName)) {
             return new TeamUtils.ErrorHttpResponse("No permission to add team member.");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
@@ -395,7 +409,7 @@ public final class TeamManager implements Saveable, AccessControlled {
             @QueryParameter boolean canCreateView,
             @QueryParameter boolean canDeleteView,
             @QueryParameter boolean canConfigureView) throws IOException {
-        if (!isCurrentUserTeamAdmin()) {
+        if (!isCurrentUserTeamAdmin(teamName)) {
             return new TeamUtils.ErrorHttpResponse("No permission to add team member.");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
@@ -423,7 +437,7 @@ public final class TeamManager implements Saveable, AccessControlled {
 
     public HttpResponse doRemoveTeamMember(@QueryParameter String teamName,
             @QueryParameter String teamMemberSid) throws IOException {
-        if (!isCurrentUserTeamAdmin()) {
+        if (!isCurrentUserTeamAdmin(teamName)) {
             return new TeamUtils.ErrorHttpResponse("No permission to remove team member");
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
@@ -448,8 +462,15 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     public HttpResponse doMoveJob(@QueryParameter String jobName, @QueryParameter String teamName) throws IOException {
-        if (!isCurrentUserTeamAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to move job");
+        
+        Team jobTeam = findJobOwnerTeam(jobName);
+        
+        if (!isCurrentUserTeamAdmin(jobTeam.getName())) {
+            return new TeamUtils.ErrorHttpResponse("No permission to move job from team - " + jobTeam.getName());
+        }
+        
+        if (!isCurrentUserTeamAdmin(teamName)) {
+            return new TeamUtils.ErrorHttpResponse("No permission to move job to team - " + teamName);
         }
         if ((teamName == null) || "".equals(teamName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Team name required.");
@@ -494,9 +515,16 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     public HttpResponse doMoveView(@QueryParameter String viewName, @QueryParameter String teamName) throws IOException {
-        if (!isCurrentUserTeamAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to move view");
+        Team viewTeam = findViewOwnerTeam(viewName);
+        
+        if (!isCurrentUserTeamAdmin(viewTeam.getName())) {
+            return new TeamUtils.ErrorHttpResponse("No permission to move view from team - " + viewTeam.getName());
         }
+        
+        if (!isCurrentUserTeamAdmin(teamName)) {
+            return new TeamUtils.ErrorHttpResponse("No permission to move view to team - " + teamName);
+        }
+        
         if ((teamName == null) || "".equals(teamName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Team name required.");
         }
@@ -532,9 +560,16 @@ public final class TeamManager implements Saveable, AccessControlled {
 
 
     public HttpResponse doMoveNode(@QueryParameter String nodeName, @QueryParameter String teamName) throws IOException {
-        if (!isCurrentUserTeamAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to move node");
+         Team nodeTeam = findNodeOwnerTeam(nodeName);
+        
+        if (!isCurrentUserTeamAdmin(nodeTeam.getName())) {
+            return new TeamUtils.ErrorHttpResponse("No permission to move node from team - " + nodeTeam.getName());
         }
+        
+        if (!isCurrentUserTeamAdmin(teamName)) {
+            return new TeamUtils.ErrorHttpResponse("No permission to move node to team - " + teamName);
+        }
+        
         if ((teamName == null) || "".equals(teamName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Team name required.");
         }
@@ -569,8 +604,10 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     public HttpResponse doSetJobVisibility(@QueryParameter String jobName, @QueryParameter String teamNames, @QueryParameter boolean canViewConfig) throws IOException {
-        if (!isCurrentUserTeamAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to set job visibility.");
+        Team jobTeam = findJobOwnerTeam(jobName);
+        
+        if (!isCurrentUserTeamAdmin(jobTeam.getName())) {
+            return new TeamUtils.ErrorHttpResponse("No permission to set job visibility. Job name - " + jobName + " Team Name - " + jobTeam.getName());
         }
         if ((jobName == null) || "".equals(jobName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Job id required.");
@@ -591,8 +628,9 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     public HttpResponse doSetViewVisibility(@QueryParameter String viewName, @QueryParameter String teamNames) throws IOException {
-        if (!isCurrentUserTeamAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to set view visibility.");
+        Team viewTeam = findViewOwnerTeam(viewName);
+        if (!isCurrentUserTeamAdmin(viewTeam.getName())) {
+            return new TeamUtils.ErrorHttpResponse("No permission to set view visibility. View name - " + viewName + " Team Name - " + viewTeam.getName());
         }
         if ((viewName == null) || "".equals(viewName.trim())) {
             return new TeamUtils.ErrorHttpResponse("View name required.");
@@ -616,8 +654,9 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
 
     public HttpResponse doSetNodeVisibility(@QueryParameter String nodeName, @QueryParameter String teamNames) throws IOException {
-        if (!isCurrentUserTeamAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to set node visibility.");
+        Team nodeTeam = findNodeOwnerTeam(nodeName);
+        if (!isCurrentUserTeamAdmin(nodeTeam.getName())) {
+            return new TeamUtils.ErrorHttpResponse("No permission to set node visibility. Node name - " + nodeName + " Team Name - " + nodeTeam.getName());
         }
         if ((nodeName == null) || "".equals(nodeName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Node name required.");
@@ -637,8 +676,8 @@ public final class TeamManager implements Saveable, AccessControlled {
     }
     
     public HttpResponse doSetNodeEnabled(@QueryParameter String nodeName, @QueryParameter String teamName, @QueryParameter boolean enabled) throws IOException, TeamNotFoundException {
-        if (!isCurrentUserTeamAdmin()) {
-            return new TeamUtils.ErrorHttpResponse("No permission to enable disable node.");
+        if (!isCurrentUserTeamAdmin(teamName)) {
+            return new TeamUtils.ErrorHttpResponse("No permission to enable node. Node name - " + nodeName + " Team Name - " + teamName);
         }
         if ((nodeName == null) || "".equals(nodeName.trim())) {
             return new TeamUtils.ErrorHttpResponse("Node name required.");
@@ -858,46 +897,22 @@ public final class TeamManager implements Saveable, AccessControlled {
      */
     public Collection<String> getCurrentUserAdminTeams() {
         List<String> list = new ArrayList<String>();
-        boolean admin = isCurrentUserSysAdmin();
-        String user = getCurrentUser();
         for (Team team : teams) {
-            if (admin || team.isAdmin(user)) {
+            if (isCurrentUserTeamAdmin(team.getName())){
                 list.add(team.getName());
-            } else {
-                // Check if any of the group the user is a memmber, has given Team Admin Role
-                for (GrantedAuthority ga : getCurrentUserRoles()) {
-                    logger.debug("Checking if the principal's role " + ga.toString() + " is a Team Admin Role");
-                    if (team.isAdmin(ga.getAuthority())) {
-                        list.add(team.getName());
-                    }
-                }
             }
         }
         Collections.sort(list);
         return list;
     }
 
-    //TODO: Used only by teamManager.jelly. Since SysAdmin has access to all
-    //jobs enough to send all jobs known to Hudson
+    //Used by teamManager.jelly. 
     public Collection<String> getCurrentUserAdminJobs() {
         Hudson hudson = Hudson.getInstance();
         List<String> jobNames = new ArrayList<String>();
-        boolean sysAdmin = isCurrentUserSysAdmin();
-        String user = getCurrentUser();
         for (Team team : teams) {
-            boolean teamAdmin = false;
-            if (team.isAdmin(user)) {
-                teamAdmin = true;
-            } else {
-                // Check if any of the group the user is a memmber, has Team Admin Role
-                // and 
-                for (GrantedAuthority ga : getCurrentUserRoles()) {
-                    if (team.isAdmin(ga.getAuthority())) {
-                        teamAdmin = true;
-                    }
-                }
-            }
-            if (sysAdmin || teamAdmin) {
+             boolean teamAdmin = isCurrentUserTeamAdmin(team.getName());
+            if (teamAdmin) {
                 for (TeamJob teamJob : team.getJobs()) {
                     TopLevelItem item = hudson.getItem(teamJob.getId());
                     if (item != null && (item instanceof Job)) {
@@ -910,48 +925,32 @@ public final class TeamManager implements Saveable, AccessControlled {
         return jobNames;
     }
 
-    // Used only by teamManager.jelly. Since SysAdmin has access to all
-    // view enough to send all views known to Hudson
-    public Collection<String> getCurrentSysAdminViews() throws IOException {
-        Hudson hudson = Hudson.getInstance();
+    //Used by teamManager.jelly. 
+    public Collection<String> getCurrentUserAdminViews() throws IOException {
         List<String> viewNames = new ArrayList<String>();
-        if (!isCurrentUserSysAdmin()) {
-            throw new RuntimeException(getCurrentUser() + "  is not a System Administrator");
-        }
-        for (View view : hudson.getAllViews()) {
-            String viewName = view.getViewName();
-            // Ensure views belong to public team if no other team own them
-            if (findViewOwnerTeam(viewName) == null){
-                publicTeam.addView(new TeamView(viewName)); 
+        for (Team team : teams) {
+            boolean teamAdmin = isCurrentUserTeamAdmin(team.getName());
+            if (teamAdmin) {
+                for (TeamView teamView : team.getViews()) {
+                    viewNames.add(teamView.getId());
+                }
             }
-            viewNames.add(view.getViewName());
         }
-
         Collections.sort(viewNames);
         return viewNames;
     }
 
-    // Used only by teamManager.jelly. Since SysAdmin has access to all
-    // nodes enough to send all nodes known to Hudson
-    public Collection<String> getCurrentSysAdminNodes() throws IOException {
-        Hudson hudson = Hudson.getInstance();
+    //Used by teamManager.jelly. 
+    public Collection<String> getCurrentUserAdminNodes() throws IOException {
         List<String> nodeNames = new ArrayList<String>();
-        if (!isCurrentUserSysAdmin()) {
-            throw new RuntimeException(getCurrentUser() + " is not a System Administrator");
-        }
-        for (Computer node : hudson.getAllComputers()) {
-            String nodeName = node.getName();
-            if (node instanceof Hudson.MasterComputer) {
-                //Master node does not have a name!!
-                nodeName = "Master";
+        for (Team team : teams) {
+            boolean teamAdmin = isCurrentUserTeamAdmin(team.getName());
+            if (teamAdmin) {
+                for (TeamNode teamNode : team.getNodes()) {
+                    nodeNames.add(teamNode.getId());
+                }
             }
-            // Ensure nodes belong to public team if no other team own them
-            if (findNodeOwnerTeam(nodeName) == null){
-                publicTeam.addNode(new TeamNode(nodeName)); 
-            }
-            nodeNames.add(nodeName);
         }
-
         Collections.sort(nodeNames);
         return nodeNames;
     }
