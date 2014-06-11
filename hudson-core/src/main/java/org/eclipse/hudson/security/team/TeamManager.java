@@ -519,10 +519,17 @@ public final class TeamManager implements Saveable, AccessControlled {
         if (oldTeam == newTeam) {
             return new TeamUtils.ErrorHttpResponse(viewName + " is already in team " + oldTeam.getName());
         }
-        oldTeam.removeView(viewName);
-        newTeam.addView(new TeamView(viewName));
+        moveView(oldTeam, newTeam, viewName);
         return HttpResponses.ok();
     }
+    
+    public void moveView(Team oldTeam, Team newTeam, String viewName) throws IOException {
+        if (!oldTeam.removeView(viewName)) {
+            throw new IOException("View "+viewName+" is not a member of team "+oldTeam.getName());
+        }
+        newTeam.addView(new TeamView(viewName));
+    }
+
 
     public HttpResponse doMoveNode(@QueryParameter String nodeName, @QueryParameter String teamName) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
@@ -550,9 +557,15 @@ public final class TeamManager implements Saveable, AccessControlled {
         if (oldTeam == newTeam) {
             return new TeamUtils.ErrorHttpResponse(nodeName + " is already in team " + oldTeam.getName());
         }
-        oldTeam.removeNode(nodeName);
-        newTeam.addNode(new TeamNode(nodeName));
+        moveNode(oldTeam, newTeam, nodeName);
         return HttpResponses.ok();
+    }
+    
+    public void moveNode(Team oldTeam, Team newTeam, String nodeName) throws IOException {
+        if (!oldTeam.removeNode(nodeName)) {
+            throw new IOException("Node "+nodeName+" is not a member of team "+oldTeam.getName());
+        }
+        newTeam.addNode(new TeamNode(nodeName));
     }
 
     public HttpResponse doSetJobVisibility(@QueryParameter String jobName, @QueryParameter String teamNames, @QueryParameter boolean canViewConfig) throws IOException {
@@ -597,6 +610,10 @@ public final class TeamManager implements Saveable, AccessControlled {
         }
         return HttpResponses.ok();
     }
+    
+    public void addViewVisibility(TeamView view, String teamName) {
+        view.addVisibility(teamName);
+    }
 
     public HttpResponse doSetNodeVisibility(@QueryParameter String nodeName, @QueryParameter String teamNames) throws IOException {
         if (!isCurrentUserTeamAdmin()) {
@@ -636,6 +653,10 @@ public final class TeamManager implements Saveable, AccessControlled {
         return HttpResponses.ok();
     }
     
+    public void addNodeVisibility(TeamNode node, String teamName) {
+        node.addVisibility(teamName);
+    }
+
     public HttpResponse doCheckSid(@QueryParameter String sid) throws IOException {
         return FormValidation.respond(FormValidation.Kind.OK, TeamUtils.getIcon(sid));
     }
