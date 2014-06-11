@@ -21,23 +21,24 @@
     <st:include page="sidepanel.jelly" />
     <l:main-panel>
       <!-- temporarily offline switch -->
-      <l:isAdmin>
-      <div style="float:right">
-        <j:choose>
-          <j:when test="${it.temporarilyOffline}">
-            <form method="post" action="toggleOffline">
-              <f:submit value="${%submit.temporarilyOffline}"  />
-            </form>
-          </j:when>
-          <j:otherwise>
-            <form method="post" action="markOffline">
-              <f:submit value="${%submit.not.temporarilyOffline}"  />
-            </form>
-          </j:otherwise>
-        </j:choose>
-      </div>
-      </l:isAdmin>
-
+      <j:choose>
+        <j:when test="${h.hasPermission(it,it.CONFIGURE)}">
+            <div style="float:right">
+                <j:choose>
+                    <j:when test="${it.temporarilyOffline}">
+                        <form method="post" action="toggleOffline">
+                            <f:submit value="${%submit.temporarilyOffline}"  />
+                        </form>
+                    </j:when>
+                    <j:otherwise>
+                        <form method="post" action="markOffline">
+                            <f:submit value="${%submit.not.temporarilyOffline}"  />
+                        </form>
+                    </j:otherwise>
+                </j:choose>
+            </div>
+        </j:when>
+      </j:choose>
       <h1>
         <img src="${imagesURL}/48x48/${it.icon}" width="48" height="48" alt=""/>
         ${it.caption}

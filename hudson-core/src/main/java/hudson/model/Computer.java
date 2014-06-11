@@ -344,13 +344,13 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
      */
     @CLIMethod(name = "offline-node")
     public void cliOffline(@Option(name = "-m", usage = "Record the note about why you are disconnecting this node") String cause) throws ExecutionException, InterruptedException {
-        checkPermission(Hudson.ADMINISTER);
+        checkPermission(CONFIGURE);
         setTemporarilyOffline(true, new ByCLI(cause));
     }
 
     @CLIMethod(name = "online-node")
     public void cliOnline() throws ExecutionException, InterruptedException {
-        checkPermission(Hudson.ADMINISTER);
+        checkPermission(CONFIGURE);
         setTemporarilyOffline(false, null);
     }
 
@@ -982,7 +982,7 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
     }
 
     public HttpResponse doToggleOffline(@QueryParameter String offlineMessage) throws IOException, ServletException {
-        checkPermission(Hudson.ADMINISTER);
+        checkPermission(CONFIGURE);
         if (!temporarilyOffline) {
             offlineMessage = Util.fixEmptyAndTrim(offlineMessage);
             setTemporarilyOffline(!temporarilyOffline,
