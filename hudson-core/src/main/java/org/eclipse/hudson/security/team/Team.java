@@ -578,7 +578,7 @@ public class Team implements AccessControlled {
         List<TeamJob> visibleJobs = new ArrayList<TeamJob>();
         for (Team team : getTeamManager().getTeams().values()) {
             for (TeamJob teamJob : team.getJobs()) {
-                if (teamJob.isVisible(name)){
+                if (teamJob.isVisible(name) || Team.PUBLIC_TEAM_NAME.equals(team.name)){ 
                    visibleJobs.add(teamJob);
                 }
             }
@@ -591,7 +591,7 @@ public class Team implements AccessControlled {
         List<TeamNode> visibleNodes = new ArrayList<TeamNode>();
         for (Team team : getTeamManager().getTeams().values()) {
             for (TeamNode teamNode : team.getNodes()) {
-                if (teamNode.isVisible(name)){
+                if (teamNode.isVisible(name) || Team.PUBLIC_TEAM_NAME.equals(team.name)){
                    visibleNodes.add(teamNode);
                 }
             }
@@ -604,7 +604,7 @@ public class Team implements AccessControlled {
         List<TeamView> visibleViews = new ArrayList<TeamView>(); 
         for (Team team : getTeamManager().getTeams().values()) {
             for (TeamView teamView : team.getViews()) {
-                if (teamView.isVisible(name)){
+                if (teamView.isVisible(name) || Team.PUBLIC_TEAM_NAME.equals(team.name)){
                    visibleViews.add(teamView);
                 }
             }

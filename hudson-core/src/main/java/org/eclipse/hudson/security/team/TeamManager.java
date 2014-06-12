@@ -1604,6 +1604,11 @@ public final class TeamManager implements Saveable, AccessControlled {
         Team nodeTeam = findNodeOwnerTeam(nodeName);
         Team jobTeam = findJobOwnerTeam(jobName);
         if ((nodeTeam != null) && (jobTeam != null)) {
+            //If the node belongs to public then all teams can build
+            //their job, unless the team admin disables it
+            if (Team.PUBLIC_TEAM_NAME.equals(nodeTeam.getName()) && jobTeam.isVisibleNodeEnabled(nodeName)) {
+                return true;
+            }
             if (nodeTeam == jobTeam) {
                 return true; 
             } else {
