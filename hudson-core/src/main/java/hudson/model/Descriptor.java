@@ -625,8 +625,11 @@ public abstract class Descriptor<T extends Describable<T>> implements Saveable {
             } catch (IOException e) {
                 throw new Error(e);
             }
+            
+            InputStream helpStream = getHelpStream(c, suffix);
 
-            if (getHelpStream(c, suffix) != null) {
+            if (helpStream != null) {
+                IOUtils.closeQuietly(helpStream);
                 return page;
             }
         }
