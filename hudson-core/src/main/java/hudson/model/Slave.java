@@ -251,6 +251,9 @@ public abstract class Slave extends Node implements Serializable {
         private final String fileName;
 
         public JnlpJar(String fileName) {
+            if (fileName.startsWith("/")){
+                fileName =  fileName.substring(1);
+            }
             this.fileName = fileName;
         }
 
