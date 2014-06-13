@@ -1048,9 +1048,6 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
     }
 
     protected void _doScript(StaplerRequest req, StaplerResponse rsp, String view) throws IOException, ServletException {
-        if (!"POST".equals(req.getMethod())) {
-            throw HttpResponses.error(HttpURLConnection.HTTP_BAD_METHOD, "requires POST");
-        }
         // ability to run arbitrary script is dangerous,
         // so tie it to the admin access
         checkPermission(Hudson.ADMINISTER);
@@ -1058,7 +1055,14 @@ public /*transient*/ abstract class Computer extends Actionable implements Acces
         if (Hudson.getInstance().getScriptSupport() != null) {
             String text = req.getParameter("script");
             if (text != null) {
+                if (!"POST".equals(req.getMethod())) {
+                    throw HttpResponses.error(HttpURLConnection.HTTP_BAD_METHOD, "requires POST");
+                }
                 try {
+                    if (getChannel() == null){
+                         rsp.getWriter().println("Failed to run the script. Is node online?");
+                         return;
+                    }
                     req.setAttribute("output",
                             RemotingDiagnostics.executeScript(text, getChannel(), Hudson.getInstance().getScriptSupport()));
                 } catch (InterruptedException e) {

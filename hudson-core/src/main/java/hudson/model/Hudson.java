@@ -3502,20 +3502,19 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
     private void doScript(StaplerRequest req, StaplerResponse rsp, RequestDispatcher view) throws IOException, ServletException {
         // ability to run arbitrary script is dangerous
-        if (!"POST".equals(req.getMethod())) {
-            throw HttpResponses.error(HttpURLConnection.HTTP_BAD_METHOD, "requires POST");
-        }
+        // So allow only Admin to run script
         checkPermission(ADMINISTER);
 
-//        if ("post".equals(req.getMethod().toLowerCase())) {
-//            JSONObject json = req.getSubmittedForm();
-//
-//            if (json.has("scriptSupport")) {
-//                scriptSupport = req.bindJSON(ScriptSupport.class, json.getJSONObject("scriptSupport"));
-//            }
         String text = req.getParameter("script");
         if (text != null) {
+            if (!"POST".equals(req.getMethod())) {
+                throw HttpResponses.error(HttpURLConnection.HTTP_BAD_METHOD, "requires POST");
+            }
             try {
+                if (getChannel() == null) {
+                    rsp.getWriter().println("Failed to run the script. Is node online?");
+                    return;
+                }
                 req.setAttribute("output",
                         RemotingDiagnostics.executeScript(text, MasterComputer.localChannel, scriptSupport));
             } catch (InterruptedException e) {
@@ -3523,7 +3522,6 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             }
         }
 
-//        }
         view.forward(req, rsp);
     }
 
