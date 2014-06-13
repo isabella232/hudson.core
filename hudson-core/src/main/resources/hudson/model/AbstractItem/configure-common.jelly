@@ -61,7 +61,7 @@
                           isPropertyOverridden="${isNodeOverridden}">
                 <f:entry title="${%Node}" isPropertyOverridden="${isNodeOverridden}">
                     <select class="setting-input" name="${it.SLAVE_KEY}">
-                        <j:forEach var="s" items="${app.labels}">
+                        <j:forEach var="s" items="${app.getBuildableLabels(it)}">
                             <j:if test="${s.isAssignable()}">
                                 <f:option selected="${s==it.assignedLabel}" value="${s.name}">${s.name}
                                     <j:if test="${!empty(s.description)}">(${s.description})</j:if>

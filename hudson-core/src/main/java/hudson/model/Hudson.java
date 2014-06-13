@@ -1664,6 +1664,31 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         }
         return r;
     }
+    
+    public Set<Label> getBuildableLabels(AbstractProject job) {
+        if (isTeamManagementEnabled()) {
+            Set<Label> availableLabels = getLabels();
+            Set<Label> buildableLabels = new TreeSet<Label>();
+            for (Label availableLabel : availableLabels) {
+                boolean buildable = true;
+                for (Node node : availableLabel.getNodes()) {
+                    String name = node.getNodeName();
+                    if (node instanceof Hudson) {
+                        name = "Master";
+                    }
+                    if (!getTeamManager().canNodeExecuteJob(name, job.getName())) {
+                        buildable = false;
+                    }
+                }
+                if (buildable) {
+                    buildableLabels.add(availableLabel);
+                }
+            }
+            return buildableLabels;
+        } else {
+            return getLabels();
+        }
+    }
 
     public Set<LabelAtom> getLabelAtoms() {
         Set<LabelAtom> r = new TreeSet<LabelAtom>();
