@@ -122,6 +122,10 @@
       <f:optionalBlock name="useBlueBall" checked="${it.useBlueBall()}"
                        title="${%useBlueBallBlurb}"
                        help="/help/system-config/use-blue-ball.html" />
+      
+      <f:optionalBlock name="allowUnsecuredAction" checked="${it.allowUnsecuredAction()}"
+                       title="${%allowUnsecuredActionBlurb}"
+                       help="/help/system-config/allow-unsecured-action.html" />
 
         <f:descriptorList title="${%Global properties}"
                           name="globalNodeProperties"

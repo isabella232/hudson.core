@@ -319,6 +319,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * Script support (if available)
      */
     private volatile ScriptSupport scriptSupport;
+    
+    private Boolean allowUnsecuredAction = false;
+    
     /**
      * All {@link ExtensionList} keyed by their
      * {@link ExtensionList#extensionType}.
@@ -2600,6 +2603,12 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                         actions.add(a);
                     }
                 }
+                // auto register unsecured root actions
+                for (Action a : getExtensionList(UnsecuredRootAction.class)) {
+                    if (!actions.contains(a)) {
+                        actions.add(a);
+                    }
+                }
             }
         });
 
@@ -2689,10 +2698,19 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Should Hudson use blue ball instead of default green ball for success
      *
-     * @return
+     * @return boolean
      */
     public boolean useBlueBall() {
         return useBlueBall.booleanValue();
+    }
+    
+    /**
+     * Should Hudson use blue ball instead of default green ball for success
+     *
+     * @return boolean
+     */
+    public boolean allowUnsecuredAction() {
+        return allowUnsecuredAction;
     }
 
     public void setSlaveAgentPort(int slaveAgentPort) throws IOException {
@@ -2749,7 +2767,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
 
             primaryView = json.has("primaryView") ? json.getString("primaryView") : getViews().iterator().next().getViewName();
 
-            useBlueBall = json.has("useBlueBall") ? true : false;
+            useBlueBall = json.has("useBlueBall");
+            
+            allowUnsecuredAction = json.has("allowUnsecuredAction");
 
             noUsageStatistics = json.has("usageStatisticsCollected") ? null : true;
 
@@ -3859,6 +3879,16 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                     || rest.startsWith("/federatedLoginService/")
                     || rest.startsWith("/securityRealm")) {
                 return this;    // URLs that are always visible without READ permission
+            }
+            // For those "unsecured" actions outside of Hudson security envelop
+            if (allowUnsecuredAction) {
+                for (Action action : getActions()) {
+                    if (action instanceof UnsecuredRootAction) {
+                        if (rest.startsWith("/" + action.getUrlName() + "/")) {
+                            return this;
+                        }
+                    }
+                }
             }
             throw e;
         }
