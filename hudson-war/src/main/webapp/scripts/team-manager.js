@@ -356,6 +356,10 @@ function addTeamMember(teamName, member, adminFlag, createFlag, deleteFlag, conf
             jQuery("span", userTemplate).text(member);
 
             setIconVisibility(userTemplate, "adminIcon", adminFlag);
+            if (adminFlag) {
+                createFlag = deleteFlag = configureFlag = buildFlag = viewCreateFlag =
+                        viewDeleteFlag = viewConfigureFlag = nodeCreateFlag = nodeDeleteFlag = nodeConfigureFlag = true;
+            }
             setIconVisibility(userTemplate, "createIcon", createFlag);
             setIconVisibility(userTemplate, "deleteIcon", deleteFlag);
             setIconVisibility(userTemplate, "configureIcon", configureFlag);
@@ -487,6 +491,10 @@ function updateTeamMember(trParent, teamName, member, adminFlag, createFlag, del
             jQuery("span", trParent).text(member);
 
             setIconVisibility(trParent, "adminIcon", adminFlag);
+            if (adminFlag) {
+                createFlag = deleteFlag = configureFlag = buildFlag = viewCreateFlag =
+                        viewDeleteFlag = viewConfigureFlag = nodeCreateFlag = nodeDeleteFlag = nodeConfigureFlag = true;
+            }
             setIconVisibility(trParent, "createIcon", createFlag);
             setIconVisibility(trParent, "deleteIcon", deleteFlag);
             setIconVisibility(trParent, "configureIcon", configureFlag);
