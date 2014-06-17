@@ -274,7 +274,7 @@
             <hr/>
             
             <div style="margin-top: 10px;">
-                <label>${%Allow selected teams to view Job Configuraton}:</label>
+                <label>${%Allow selected teams to view Job Configuration}:</label>
                 <input type="checkbox" style="margin-left:5px" id="allowViewConfig" />
             </div>
             
