@@ -51,6 +51,10 @@
                             </div>
                             <div class="excerpt" style="padding-top: 5px;">
                                 <j:out value="${it.pluginCenter.markupFormatter.translate(p.description)}" />
+                                <j:if test="${it.pluginCenter.isNewerCoreRequired(p)}">
+                                    <br/>
+                                    <span class="warning"> This plugin requires newer version of Hudson - ${p.requiredCore}</span>
+                                </j:if>
                             </div>
                         </td>
                         <td class="column3" style="white-space:nowrap">

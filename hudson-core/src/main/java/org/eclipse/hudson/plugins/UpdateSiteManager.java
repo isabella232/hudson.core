@@ -19,6 +19,7 @@ package org.eclipse.hudson.plugins;
 import hudson.ProxyConfiguration;
 import hudson.model.Messages;
 import hudson.util.TextFile;
+import hudson.util.VersionNumber;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -280,6 +281,13 @@ public final class UpdateSiteManager {
 
         public String getRequiredCore() {
             return requiredCore;
+        }
+        
+        VersionNumber getRequiredCoreVersion(){
+            if ((requiredCore != null) && !"".equals(requiredCore)) {
+                return new VersionNumber(requiredCore);
+            }
+            return null;
         }
 
         public String getCompatibleSinceVersion() {

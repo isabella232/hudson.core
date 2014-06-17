@@ -158,6 +158,13 @@ final public class PluginCenter {
             return false;
         }
     }
+    
+    public boolean isNewerCoreRequired(AvailablePluginInfo availablePlugin) {
+        if (availablePlugin.getRequiredCoreVersion() != null) {
+            return Hudson.getVersion().isOlderThan(availablePlugin.getRequiredCoreVersion());
+        }
+        return false;
+    }
 
     public boolean isUpdatable(AvailablePluginInfo availablePlugin) {
         Set<String> installedPluginNames = installedPluginManager.getInstalledPluginNames();
