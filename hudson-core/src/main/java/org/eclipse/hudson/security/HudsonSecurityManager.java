@@ -318,9 +318,7 @@ public class HudsonSecurityManager implements Saveable {
             if (json.has("use_security")) {
                 useSecurity = true;
                 JSONObject security = json.getJSONObject("use_security");
-                setSecurityRealm(SecurityRealm.all().newInstanceFromRadioList(security, "realm"));
-                setAuthorizationStrategy(AuthorizationStrategy.all().newInstanceFromRadioList(security, "authorization"));
-
+                
                 if (security.has("markupFormatter")) {
                     markupFormatter = req.bindJSON(MarkupFormatter.class, security.getJSONObject("markupFormatter"));
                 }
@@ -341,6 +339,8 @@ public class HudsonSecurityManager implements Saveable {
                 if (Hudson.getInstance() != null){
                     Hudson.getInstance().setSlaveAgentPort(slaveAgentPort);
                 }
+                setSecurityRealm(SecurityRealm.all().newInstanceFromRadioList(security, "realm"));
+                setAuthorizationStrategy(AuthorizationStrategy.all().newInstanceFromRadioList(security, "authorization"));
             }
             } else {
                 useSecurity = null;
