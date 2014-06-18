@@ -493,8 +493,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     void convertJobProperties() {
-        if (null != properties && null == cascadingJobProperties) {
-            cascadingJobProperties = new CopyOnWriteArraySet<String>();
+        if (null != properties) {
             convertCascadingJobProperties(properties);
         }
     }
@@ -760,7 +759,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                     property.getDescriptor().getJsonSafeClassName());
             addCascadingJobProperty(projectProperty);
         }
-        if (null == getProperty(PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME)) {
+        if ((null == getProperty(PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME))
+                && !parameterDefinitionProperties.isEmpty()) {
             setParameterDefinitionProperties(parameterDefinitionProperties);
         }
     }

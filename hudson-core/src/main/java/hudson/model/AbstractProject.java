@@ -110,6 +110,8 @@ import org.kohsuke.stapler.export.Exported;
 
 import static hudson.scm.PollingResult.BUILD_NOW;
 import static hudson.scm.PollingResult.NO_CHANGES;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import org.antlr.runtime.RecognitionException;
 
@@ -1943,6 +1945,9 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
 // actions
 //
 //
+    
+    static final Object buildSchedulelock = new Object();
+    static final Object cliBuildSchedulelock = new Object();
     /**
      * Schedules a new build command.
      */
@@ -1956,15 +1961,17 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
         // if a build is parameterized, let that take over
         ParametersDefinitionProperty pp = getProperty(ParametersDefinitionProperty.class);
         if (pp != null) {
-            pp.setOwner(this);
-            pp._doBuild(req, rsp);
+            synchronized(buildSchedulelock) {
+                pp.setOwner(this);
+                pp._doBuild(req, rsp);
+            }
             return;
         }
 
         Hudson.getInstance().getQueue().schedule(this, getDelay(req), getBuildCause(req));
         rsp.forwardToPreviousPage(req);
     }
-
+    
     /**
      * Computes the build cause, using RemoteCause or UserCause as appropriate.
      */
@@ -2015,7 +2022,10 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
 
         ParametersDefinitionProperty pp = getProperty(ParametersDefinitionProperty.class);
         if (pp != null) {
-            pp.buildWithParameters(req, rsp);
+            synchronized(cliBuildSchedulelock) {
+                pp.setOwner(this);
+                pp.buildWithParameters(req, rsp);
+            } 
         } else {
             throw new IllegalStateException("This build is not parameterized!");
         }
