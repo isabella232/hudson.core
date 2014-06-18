@@ -503,8 +503,8 @@ public final class TeamManager implements Saveable, AccessControlled {
                 return new TeamUtils.ErrorHttpResponse(job.getName() + " is building.");
             }
             try {
-                moveJob(job, oldTeam, newTeam, null);
-                return HttpResponses.ok();
+                String newJobName = moveJob(job, oldTeam, newTeam, null);
+                return HttpResponses.plainText(newJobName); 
             } catch (IOException ex) {
                 return new TeamUtils.ErrorHttpResponse("Faile to move the job " + jobName
                         + " to the team " + teamName + ". " + ex.getLocalizedMessage());
@@ -717,7 +717,7 @@ public final class TeamManager implements Saveable, AccessControlled {
      * created.
      * @throws IOException
      */
-    private void moveJob(Job job, Team oldTeam, Team newTeam, String originalName) throws IOException {
+    private String moveJob(Job job, Team oldTeam, Team newTeam, String originalName) throws IOException {
         try {
             String oldJobName = job.getName();
             String unqualifiedJobName = originalName;
@@ -742,6 +742,7 @@ public final class TeamManager implements Saveable, AccessControlled {
             oldTeam.removeJob(oldJobName);
 
             Hudson.getInstance().replaceItem(job.getName(), qualifiedNewJobName);
+            return qualifiedNewJobName;
         } catch (Exception exc) {
             throw new IOException(exc);
         }

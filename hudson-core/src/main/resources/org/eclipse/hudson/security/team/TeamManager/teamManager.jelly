@@ -98,10 +98,14 @@
                                         <img src='${h.getJobStatusIcon(jobName).getImageOf("24x24")}'/>
                                     </td>
                                     <td class="column3">
-                                        <a href="${rootURL}/job/${jobName}">${jobName}</a>
+                                        <a name="job_colum3_link_${jobName}" href="${rootURL}/job/${jobName}">
+                                            <span name="job_colum3_span_${jobName}">
+                                                ${jobName}
+                                            </span> 
+                                        </a>
                                     </td>
                                     <td class="column4">
-                                        <span id="job_colum3_span_${jobName}">
+                                        <span name="job_colum4_span_${jobName}">
                                             ${it.findJobOwnerTeam(jobName).name}
                                         </span>
                                     </td>

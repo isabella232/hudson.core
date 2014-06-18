@@ -875,7 +875,7 @@ function moveJobsButtonAction() {
                         var img = jQuery("#selectedJobs li[value='" + jobsToMove[i] + "']").children('img');
                         jQuery(img).attr('src', imageRoot + '/spinner.gif');
                         jQuery(img).show();
-                        moveJobs(jobsToMove[i], teamName, img);
+                        moveJob(jobsToMove[i], teamName, img);
                     }
                 }
             },
@@ -903,7 +903,7 @@ function getJobsToMove() {
     return jobs;
 }
 
-function moveJobs(jobName, teamName, img) {
+function moveJob(jobName, teamName, img) {
     jQuery('#teamJobsContainer input[@type=checkbox]:checked').each(function() {
         jQuery(this).prop('checked', false);
     });
@@ -914,9 +914,24 @@ function moveJobs(jobName, teamName, img) {
             jobName: jobName,
             teamName: teamName
         },
-        success: function() {
+        success: function(newJobNameResponse) {
             jQuery(img).attr('src', imageRoot + '/green-check.jpg');
-            jQuery("#job_colum3_span_" + jobName.replace(".", "\\.")).text(teamName);
+            
+            var column3 = "job_colum3_span_" + jobName.replace(".", "\\.");
+            var nameColumn = jQuery('#teamJobsContainer').find("span[name=" + column3 + "]");
+            jQuery(nameColumn).text(newJobNameResponse);
+            var newColumn3 = "job_colum3_span_" + newJobNameResponse;
+            jQuery(nameColumn).attr('name', newColumn3);
+            var column3Link = "job_colum3_link_" + jobName.replace(".", "\\.");
+            var nameColumnLink = jQuery('#teamJobsContainer').find("a[name=" + column3Link + "]");
+            jQuery(nameColumnLink).attr('href', rootUrl + '/job/' + newJobNameResponse );
+            
+            var column4 = "job_colum4_span_" + jobName.replace(".", "\\.");
+            var teamColumn = jQuery('#teamJobsContainer').find("span[name=" + column4 + "]");
+            jQuery(teamColumn).text(teamName);
+            var newColumn4 = "job_colum4_span_" + newJobNameResponse;
+            jQuery(teamColumn).attr('name', newColumn4);
+            
             moveCount--;
             if (moveCount === 0) {
                 jQuery('#dialog-move-jobs').dialog("close");
