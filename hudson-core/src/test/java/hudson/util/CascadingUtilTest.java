@@ -180,13 +180,16 @@ public class CascadingUtilTest {
         List<Job> jobs = new ArrayList<Job>();
         FreeStyleProject project1 = new FreeStyleProjectMock(oldName);
         FreeStyleProjectMock project2 = new FreeStyleProjectMock("child");
+        FreeStyleProjectMock project3 = new FreeStyleProjectMock(newName);
         project2.setCascadingProject(project1);
         jobs.add(project1);
         jobs.add(project2);
+        jobs.add(project3);
         mockStatic(Hudson.class);
         Hudson hudson = createMock(Hudson.class);
         expect(hudson.getAllItems(Job.class)).andReturn(jobs);
-        expect(Hudson.getInstance()).andReturn(hudson);
+        expect(hudson.getItem("newCascadingProject")).andReturn(project3).anyTimes();
+        expect(Hudson.getInstance()).andReturn(hudson).anyTimes();
         replay(Hudson.class, hudson);
         CascadingUtil.renameCascadingParentLinks(oldName, newName);
         verify(Hudson.class, hudson);

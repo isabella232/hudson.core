@@ -45,9 +45,11 @@ import hudson.widgets.HistoryWidget;
 import hudson.widgets.HistoryWidget.Adapter;
 import hudson.widgets.Widget;
 import java.awt.Color;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectStreamException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URLEncoder;
@@ -66,7 +68,6 @@ import java.util.SortedMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.logging.Level;
 import javax.servlet.ServletException;
 
 import static javax.servlet.http.HttpServletResponse.*;
@@ -390,12 +391,8 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             holdOffBuildUntilSave = false;
         }
     }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void onLoad(ItemGroup<? extends Item> parent, String name)
-            throws IOException {
-        super.onLoad(parent, name);
+    
+    private synchronized void setCascadingProject(){
         if ((cascadingProjectName  != null) && StringUtils.isNotBlank(cascadingProjectName)) {
             TopLevelItem tlItem = Hudson.getInstance().getItem(cascadingProjectName);
             //Fix: 413184. Gaurd against null, the job may be externally deleted or moved
@@ -403,6 +400,14 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 cascadingProject = (JobT) tlItem;
             }
         }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onLoad(ItemGroup<? extends Item> parent, String name)
+            throws IOException {
+        super.onLoad(parent, name);
+        setCascadingProject();
         TextFile f = getNextBuildNumberFile();
         if (f.exists()) {
             try {
@@ -1037,8 +1042,10 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     @Exported
     public RunList<RunT> getBuilds() {
-       LOGGER.info("Job.getBuilds() API should be avoided for performance reason");
-        Thread.dumpStack();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(os);
+        new Exception("Stack trace").printStackTrace(ps);
+        LOGGER.debug("Job.getBuilds() API should be avoided for performance reason. " + os.toString());
         return RunList.fromRuns(_getRuns().values());
     }
 
@@ -1763,6 +1770,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * @throws java.io.IOException if configuration couldn't be saved.
      */
     @SuppressWarnings("unchecked")
+    @Override
     public synchronized void setCascadingProjectName(String cascadingProjectName) throws IOException {
         if (StringUtils.isBlank(cascadingProjectName)) {
             clearCascadingProject();
@@ -1791,7 +1799,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     @Override
     public void renameCascadingProjectNameTo(String cascadingProjectName) throws IOException{
         this.cascadingProjectName = cascadingProjectName;
-        getCascadingProject();
+        setCascadingProject();
         save();
     }
 
@@ -1801,12 +1809,14 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * @return cascading project.
      */
     @SuppressWarnings({"unchecked"})
-    public synchronized JobT getCascadingProject() {
-        if (StringUtils.isNotBlank(cascadingProjectName) && cascadingProject == null) {
-            TopLevelItem tlItem = Hudson.getInstance().getItem(cascadingProjectName);
-            //Fix: 413184. Gaurd against null, the job may be externally deleted or moved
-            if ((tlItem != null) && this.getClass().isAssignableFrom(tlItem.getClass())) {
-                cascadingProject = (JobT) tlItem;
+    @Override
+    public JobT getCascadingProject() {
+        // This is only for debugging. Do not set the instance to avoid thread contention, the cascadingProject must be set when
+        // cascadingProjectname is set
+        if ((cascadingProjectName != null) && StringUtils.isNotBlank(cascadingProjectName) && (cascadingProject == null)) {
+            TopLevelItem item = Hudson.getInstance().getItem(cascadingProjectName);
+            if (item instanceof Job) {
+               LOGGER.error("Cascading job name set but the instance is not set. Job name: " + getName() + " Cascading parent name: " + cascadingProjectName);
             }
         }
         return cascadingProject;
@@ -1827,7 +1837,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      *
      * @throws java.io.IOException if configuration couldn't be saved.
      */
-    private void clearCascadingProject() throws IOException {
+    private synchronized void clearCascadingProject() throws IOException {
         CascadingUtil.unlinkProjectFromCascadingParents(cascadingProject, name);
         this.cascadingProject = null;
         this.cascadingProjectName = null;
