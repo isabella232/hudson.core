@@ -213,6 +213,9 @@
                                                             <j:choose>
                                                                 <j:when test="${!h.isAnonymous()}">
                                                                     <span style="white-space:nowrap">
+                                                                        <j:if test="${app.teamManager.isTeamManagementEnabled() &amp;&amp; app.teamManager.isCurrentUserSysAdmin()}">
+                                                                             <img style="margin-right: 10px;" src="${imagesURL}/24x24/sysadmin.png" title="System Administrator" alt="System Admin" />
+                                                                        </j:if>
                                                                         <a href="${rootURL}/user/${app.authentication.name}">
                                                                             <b>${app.authentication.name}</b>
                                                                         </a>
