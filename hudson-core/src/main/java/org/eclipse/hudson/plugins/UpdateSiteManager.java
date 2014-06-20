@@ -42,6 +42,7 @@ public final class UpdateSiteManager {
     public static final String COMPATIBILITY = "compatibility";
     public static final String FEATURED = "featured";
     public static final String RECOMMENDED = "recommended";
+    public static final String OBSOLETE = "obsolete";
     private Map<String, AvailablePluginInfo> availablePluginInfos = new TreeMap<String, AvailablePluginInfo>(String.CASE_INSENSITIVE_ORDER);
     private final String updateServer = System.getProperty("updateServer", "http://hudson-ci.org/update-center3.2/");
     private String updateSiteUrl = updateServer + "update-center.json";
@@ -73,14 +74,14 @@ public final class UpdateSiteManager {
                 String displayName = availablePlugin.getDisplayName();
                 if ((displayName != null) && !"".equals(displayName)) {
                     matcher = pattern.matcher(displayName);
-                    if (matcher.find()) {
+                    if (matcher.find() && !availablePlugin.isObsolete()) {
                         availablePlugins.add(availablePlugin);
                     }
                 }
                 String description = availablePlugin.getDescription();
                 if (searchDescription && (description != null) && !"".equals(description)) {
                     matcher = pattern.matcher(description);
-                    if (matcher.find()) {
+                    if (matcher.find() && !availablePlugin.isObsolete()) {
                         availablePlugins.add(availablePlugin);
                     }
                 }
@@ -95,7 +96,7 @@ public final class UpdateSiteManager {
         for (String pluginName : availablePluginNames) {
             AvailablePluginInfo availablePlugin = getAvailablePlugin(pluginName);
             String type = availablePlugin.getType();
-            if (pluginType.equals(type)) {
+            if (pluginType.equals(type) && !availablePlugin.isObsolete()) {
                 availablePlugins.add(availablePlugin);
             }
         }
@@ -105,7 +106,7 @@ public final class UpdateSiteManager {
     public List<AvailablePluginInfo> getCategorizedAvailablePlugins(String pluginType, String category) {
         List<AvailablePluginInfo> availablePlugins = new ArrayList<AvailablePluginInfo>();
         for (AvailablePluginInfo plugin : getAvailablePlugins(pluginType)) {
-            if (plugin.isBelongToCategory(category)) {
+            if (plugin.isBelongToCategory(category) && !plugin.isObsolete()) {
                 availablePlugins.add(plugin);
             }
         }
@@ -277,6 +278,10 @@ public final class UpdateSiteManager {
 
         public String getType() {
             return type;
+        }
+        
+        public boolean isObsolete(){
+            return OBSOLETE.equals(type);
         }
 
         public String getRequiredCore() {

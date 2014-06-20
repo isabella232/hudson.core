@@ -115,7 +115,14 @@ final public class PluginCenter {
         for (String pluginName : installedPluginNames) {
             AvailablePluginInfo availablePlugin = updateSiteManager.getAvailablePlugin(pluginName);
             if (availablePlugin != null) {
-                installedPlugins.add(availablePlugin);
+                if (availablePlugin.isObsolete()) {
+                    InstalledPluginInfo installedPluginInfo = installedPluginManager.getInstalledPlugin(pluginName);
+                    if (installedPluginInfo.isEnabled()) {
+                        installedPlugins.add(availablePlugin);
+                    }
+                } else {
+                    installedPlugins.add(availablePlugin);
+                }
             } else {
                 InstalledPluginInfo installedPluginInfo = installedPluginManager.getInstalledPlugin(pluginName);
                 availablePlugin = updateSiteManager.createAvailablePluginInfo(installedPluginInfo.getShortName(), installedPluginInfo.getVersion(), installedPluginInfo.getLongName(), installedPluginInfo.getWikiUrl());
@@ -133,7 +140,7 @@ final public class PluginCenter {
             AvailablePluginInfo availablePlugin = updateSiteManager.getAvailablePlugin(pluginName);
             if (installedPluginNames.contains(pluginName)) {
                 InstalledPluginInfo installedPlugin = installedPluginManager.getInstalledPlugin(pluginName);
-                if (isNewerThan(availablePlugin.getVersion(), installedPlugin.getVersion())) {
+                if (!availablePlugin.isObsolete() && isNewerThan(availablePlugin.getVersion(), installedPlugin.getVersion())) {
                     updatablePlugins.add(availablePlugin);
                 }
             }

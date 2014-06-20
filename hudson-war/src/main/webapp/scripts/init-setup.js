@@ -19,6 +19,7 @@ jQuery.noConflict();
 var loggedIn = false;
 
 var installCount = 0;
+var obsoleteCount = 0;
 
 var finish = false;
 var forProxy = false;
@@ -41,8 +42,8 @@ function installPlugin(selected) {
             icon.attr('src', imageRoot + '/green-check.jpg');
             jQuery(selected).attr("checked", false);
             installCount--;
-            if (installCount == 0) {
-                if (finish == true) {
+            if (installCount === 0) {
+                if (finish === true) {
                     doFinish();
                 }
                 jQuery("#buttonBar").show();
@@ -54,7 +55,7 @@ function installPlugin(selected) {
             icon.attr('src', imageRoot + '/error.png');
             showMessage(jQuery('#infoMsg'), msg.responseText, "red");
             installCount--;
-            if (installCount == 0) {
+            if (installCount === 0) {
                 jQuery("#buttonBar").show();
                 jQuery("#installProgress").hide();
             }
@@ -70,14 +71,16 @@ function installPlugin(selected) {
 
 
 function checkPermissionAndinstallPlugins() {
-    if (needsAdminLogin == true) {
-        if (loggedIn == false) {
+    if (needsAdminLogin === true) {
+        if (loggedIn === false) {
             forInstall = true;
             showLoginDialog();
         } else {
+            disableObsoletePlugins();
             installSelectedPlugins();
         }
     } else {
+        disableObsoletePlugins();
         installSelectedPlugins();
     }
 }
@@ -91,6 +94,13 @@ function installSelectedPlugins() {
         jQuery(installables).each(function() {
             installPlugin(this);
         });
+    }else{
+        if (finish === true) {
+            doFinish();
+        } else {
+            jQuery("#buttonBar").show();
+            jQuery("#installProgress").hide();
+        }
     }
 }
 
@@ -110,6 +120,56 @@ function getInstallables() {
     });
     return installables;
 }
+
+function disablePlugin(selected) {
+    jQuery('#errorMessage').hide();
+    jQuery(selected).hide();
+    var icon = jQuery("#" + jQuery(selected).val());
+    jQuery(icon).show();
+    icon.attr('src', imageRoot + '/progressbar.gif');
+    jQuery.ajax({
+        type: 'POST',
+        url: "disablePlugin",
+        data: {
+            pluginName: jQuery(selected).val()
+        },
+        success: function() {
+            icon.attr('src', imageRoot + '/warning.png');
+            jQuery(selected).attr("checked", false);
+        },
+        error: function(msg) {
+            icon.attr('src', imageRoot + '/error.png');
+            showMessage(jQuery('#infoMsg'), msg.responseText, "red");
+        },
+        statusCode: {
+            403: function() {
+                showLoginDialog();
+            }
+        },
+        dataType: "html"
+    });
+}
+
+function getObsoletePlugins () {
+    var obsoletePlugins = [];
+    jQuery('#obsoletePlugins input[@type=checkbox]:checked').each(function() {
+        obsoletePlugins.push(this);
+    });
+    return obsoletePlugins;
+}
+
+function disableObsoletePlugins() {
+    var obsoletePlugins = getObsoletePlugins();
+    var obsoleteCount = obsoletePlugins.length;
+    if (obsoleteCount > 0) {
+        jQuery("#buttonBar").hide();
+        jQuery("#installProgress").show();
+        jQuery(obsoletePlugins).each(function() {
+            disablePlugin(this);
+        });
+    }
+}
+
 
 function showLoginDialog() {
     jQuery('#loginMsg').hide();
@@ -174,13 +234,13 @@ function submitLoginForm() {
         success: function() {
             jQuery('#loginDialog').dialog("close");
             loggedIn = true;
-            if (forProxy == true) {
+            if (forProxy === true) {
                 submitPoxyForm();
             }
-            if (forInstall == true) {
+            if (forInstall === true) {
                 checkPermissionAndinstallPlugins();
             }
-            if (forContinue == true) {
+            if (forContinue === true) {
                 doContinue("continue");
             }
             jQuery('#loginNeededMsg').hide();
@@ -256,13 +316,13 @@ jQuery(document).ready(function() {
     });
 
     jQuery('#j_username').keypress(function(e) {
-        if (e.which == 13) {
+        if (e.which === 13) {
             submitLoginForm();
         }
     });
 
     jQuery('#j_password').keypress(function(e) {
-        if (e.which == 13) {
+        if (e.which === 13) {
             submitLoginForm();
         }
     });
@@ -287,20 +347,14 @@ jQuery(document).ready(function() {
 
     jQuery('#installButton').button();
     jQuery('#installButton').unbind("click").click(function() {
-        if (getInstallables().length > 0) {
-            checkPermissionAndinstallPlugins();
-        }
+        checkPermissionAndinstallPlugins();
     });
 
 
     jQuery('#finishButton').button();
     jQuery('#finishButton').unbind("click").click(function() {
-        if (getInstallables().length > 0) {
-            finish = true;
-            checkPermissionAndinstallPlugins();
-        } else {
-            doFinish();
-        }
+        finish = true;
+        checkPermissionAndinstallPlugins();
     });
 
     jQuery('#proxyUser').hide();
@@ -311,7 +365,7 @@ jQuery(document).ready(function() {
         refreshProxyUser();
     });
 
-    if (proxyNeeded == true) {
+    if (proxyNeeded === true) {
         var proxySubmitButton = jQuery('#proxySubmitButton');
         proxySubmitButton.button();
         proxySubmitButton.click(function() {
@@ -321,14 +375,14 @@ jQuery(document).ready(function() {
         jQuery('#proxySetup').hide();
     }
 
-    if (needsAdminLogin == true) {
+    if (needsAdminLogin === true) {
         jQuery('#loginNeededMsg').show();
     }
 
     jQuery('#continueButton').button();
     jQuery('#continueButton').click(function() {
-        if (securitySet == true) {
-            if (loggedIn == false) {
+        if (securitySet === true) {
+            if (loggedIn === false) {
                 forContinue = true;
                 showLoginDialog();
             } else {
@@ -341,7 +395,7 @@ jQuery(document).ready(function() {
 
     jQuery('#fpFinishButton').button();
     jQuery('#fpFinishButton').click(function() {
-        doContinue("finish")
+        doContinue("finish");
     });
 
     jQuery('#fpFinishButton').show();

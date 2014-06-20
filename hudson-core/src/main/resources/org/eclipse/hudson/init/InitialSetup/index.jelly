@@ -144,6 +144,47 @@
                                     </div>
                                 </div>
                             </li>
+                            <j:if test="${it.obsoletePlugins.size() > 0}">
+                                <li class="obsoletes">
+                                    <h3>
+                                        Obsolete Plugins
+                                    </h3>
+                                    <p class="description">
+                                        Following plugins are obsolete for this version of Hudson, we highly recommend to disable these plugins.
+                                    </p>
+                                    <div class="body">
+                                        <div class="items-container">
+                                        
+                                            <table width="100%" border="0" id="obsoletePlugins" cellpadding="10">
+                                                <j:forEach var="p" items="${it.obsoletePlugins}">
+                                                    <tr>
+                                                        <td class="column1">
+                                                            <input type="checkbox" checked="true"  value="${p.name}"/>
+                                                            <img id="${p.name}" title="Disabled because obsolete" style="display:none;"/>
+                                                        </td>
+                                                        <td class="column2">
+                                                            <div>
+                                                                <a href="${p.wikiUrl}" target="_blank">
+                                                                    ${p.displayName}
+                                                                </a>
+                                                            </div>
+                                                            <div class="excerpt" style="padding-top: 5px;">
+                                                                <j:out value="${it.markupFormatter.translate(p.description)}" />
+                                                            </div>
+                                                        </td>
+                                                        <td class="column3" style="white-space:nowrap">
+                                                            ${p.version}
+                                                        </td>
+                                                        <td class="column4" style="white-space:nowrap">
+                                                              ${it.getInstalled(p).version} (Installed)
+                                                        </td>
+                                                    </tr>
+                                                </j:forEach>                
+                                            </table>
+                                        </div>
+                                    </div>
+                                </li>
+                            </j:if>
                             <j:if test="${it.updatablePlugins.size() > 0}">
                                 <li class="updates">
                                     <h3>

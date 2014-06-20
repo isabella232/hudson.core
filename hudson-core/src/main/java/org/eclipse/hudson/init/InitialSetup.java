@@ -59,10 +59,11 @@ import org.slf4j.LoggerFactory;
 final public class InitialSetup {
 
     private Logger logger = LoggerFactory.getLogger(InitialSetup.class);
-    private File pluginsDir;
-    private ServletContext servletContext;
-    private UpdateSiteManager updateSiteManager;
-    private InstalledPluginManager installedPluginManager;
+    private final File pluginsDir;
+    private final ServletContext servletContext;
+    private final UpdateSiteManager updateSiteManager;
+    private final InstalledPluginManager installedPluginManager;
+    private List<AvailablePluginInfo> installedObsoletePlugins = new ArrayList<AvailablePluginInfo>();
     private List<AvailablePluginInfo> installedRecommendedPlugins = new ArrayList<AvailablePluginInfo>();
     private List<AvailablePluginInfo> installableRecommendedPlugins = new ArrayList<AvailablePluginInfo>();
     private List<AvailablePluginInfo> updatableRecommendedPlugins = new ArrayList<AvailablePluginInfo>();
@@ -82,11 +83,11 @@ final public class InitialSetup {
                     return t;
                 }
             }));
-    private HudsonSecurityManager hudsonSecurityManager;
-    private XmlFile initSetupFile;
-    private File hudsonHomeDir;
+    private final HudsonSecurityManager hudsonSecurityManager;
+    private final XmlFile initSetupFile;
+    private final File hudsonHomeDir;
     private boolean proxyNeeded = false;
-    private List<PluginInstallationJob> installationsJobs = new CopyOnWriteArrayList<PluginInstallationJob>();
+    private final List<PluginInstallationJob> installationsJobs = new CopyOnWriteArrayList<PluginInstallationJob>();
     private static ClassLoader outerClassLoader;
     private static ClassLoader initialClassLoader;
     private static int highInitThreadNumber = 0;
@@ -148,6 +149,10 @@ final public class InitialSetup {
     public MarkupFormatter getMarkupFormatter() {
         return hudsonSecurityManager.getMarkupFormatter();
     }
+    
+    public List<AvailablePluginInfo> getObsoletePlugins() {
+        return installedObsoletePlugins;
+    }
 
     public List<AvailablePluginInfo> getInstalledRecommendedPlugins() {
         return installedRecommendedPlugins;
@@ -197,7 +202,7 @@ final public class InitialSetup {
             AvailablePluginInfo availablePlugin = updateSiteManager.getAvailablePlugin(pluginName);
             if (installedPluginNames.contains(pluginName)) {
                 InstalledPluginInfo installedPlugin = installedPluginManager.getInstalledPlugin(pluginName);
-                if (isNewerThan(availablePlugin.getVersion(), installedPlugin.getVersion())) {
+                if (!availablePlugin.isObsolete() && isNewerThan(availablePlugin.getVersion(), installedPlugin.getVersion())) {
                     updatablePlugins.add(availablePlugin);
                 }
             }
@@ -244,6 +249,19 @@ final public class InitialSetup {
             return new ErrorHttpResponse("Plugin " + pluginName + " could not be installed. " + ex.getLocalizedMessage());
         }
         reCheck();
+        return HttpResponses.ok();
+    }
+    
+    public HttpResponse doDisablePlugin(@QueryParameter String pluginName) {
+        if (!hudsonSecurityManager.hasPermission(Permission.HUDSON_ADMINISTER)) {
+            return HttpResponses.forbidden();
+        }
+        InstalledPluginInfo plugin = installedPluginManager.getInstalledPlugin(pluginName);
+        try {
+            plugin.setEnable(false);
+        } catch (Exception ex) {
+            return new ErrorHttpResponse("Plugin " + pluginName + " could not be disabled. " + ex.getLocalizedMessage());
+        }
         return HttpResponses.ok();
     }
 
@@ -391,6 +409,7 @@ final public class InitialSetup {
     }
 
     void reCheck() {
+        installedObsoletePlugins.clear();
         installedRecommendedPlugins.clear();
         installableRecommendedPlugins.clear();
         updatableRecommendedPlugins.clear();
@@ -432,7 +451,10 @@ final public class InitialSetup {
                         //Installed featured Plugin. No updates available
                         installedFeaturedPlugins.add(availablePlugin);
                     }
-                } else if (availablePlugin.getType().equals(UpdateSiteManager.RECOMMENDED)) {
+                } else if (availablePlugin.getType().equals(UpdateSiteManager.OBSOLETE)) {
+                        //Installed obsolete Plugin.
+                        installedObsoletePlugins.add(availablePlugin);
+                }else if (availablePlugin.getType().equals(UpdateSiteManager.RECOMMENDED)) {
                     if (isNewerThan(availablePlugin.getVersion(), installedPlugin.getVersion())) {
                         //Updatabale recommended Plugin update needed
                         updatableRecommendedPlugins.add(availablePlugin);

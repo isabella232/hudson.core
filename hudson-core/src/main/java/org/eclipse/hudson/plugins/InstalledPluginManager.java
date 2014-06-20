@@ -17,10 +17,8 @@
 package org.eclipse.hudson.plugins;
 
 import hudson.PluginManager.FailedPlugin;
-import hudson.PluginWrapper;
 import hudson.Util;
 import hudson.model.Hudson;
-import hudson.util.IOException2;
 import hudson.util.VersionNumber;
 import java.io.BufferedReader;
 import java.io.File;
@@ -227,7 +225,7 @@ public final class InstalledPluginManager {
             return false;
         }
 
-        public boolean isEnabled() {
+        boolean isEnabled() {
             File disabledMarker = new File(hpiArchive.getPath() + ".disabled");
             return !disabledMarker.exists() && !isFailedToLoad();
         }
