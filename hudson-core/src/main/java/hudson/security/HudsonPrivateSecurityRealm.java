@@ -309,6 +309,13 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
         // form field validation
         // this pattern needs to be generalized and moved to stapler
         SignupInfo si = new SignupInfo(req);
+        
+        if ((si.username == null) || (si.username.trim().length() == 0)) {
+            si.errorMessage = "User name required!";
+            req.setAttribute("data", si);
+            req.getView(this, formView).forward(req, rsp);
+            return null;
+        }
 
         if (selfRegistration && !validateCaptcha(si.captcha)) {
             si.errorMessage = "Text didn't match the word shown in the image";
@@ -322,9 +329,10 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
             si.errorMessage = "Password is required";
         }
 
+        String username = si.username.trim();
         try {
-            Hudson.checkGoodName(si.username);
-            User user = User.get(si.username);
+            Hudson.checkGoodName(username);
+            User user = User.get(username);
             if (user.getProperty(Details.class) != null) {
                 si.errorMessage = "User name is already taken. Did you forget the password?";
             }
@@ -333,7 +341,7 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
         }
 
         if (si.fullname == null || si.fullname.length() == 0) {
-            si.fullname = si.username;
+            si.fullname = username;
         }
 
         if (si.email == null || !si.email.contains("@")) {
@@ -348,12 +356,12 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
         }
 
         // register the user
-        final User user = createAccount(si.username, si.password1);
+        final User user = createAccount(username, si.password1);
         user.addProperty(new Mailer.UserProperty(si.email));
         user.setFullName(si.fullname);
         user.save();
         if (notifyUser && StringUtils.isNotEmpty(si.email)) {
-            notifyUser(si.username, si.email, si.fullname, si.password1);
+            notifyUser(username, si.email, si.fullname, si.password1);
         }
         return user;
     }
