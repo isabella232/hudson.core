@@ -175,7 +175,7 @@
                     <h2>Owned by this team</h2>
                     <j:if test="${it.jobs.size() == 0}">
                         <p id="teamJobNone_${it.name}">
-                            Team does not own any jobs!
+                            This team does not own any jobs!
                         </p>
                     </j:if>
                     <j:set var="headerVisibility" value='${(it.jobs.size() > 0) ? "visible" : "hidden"}'/>
@@ -269,10 +269,35 @@
         <div id="teamViewsTab">
             <div class="itemsContainer">
                 <div class="viewList">
+                    <p >
+                        <input type="hidden" value="${it.primaryView}" name="hiddenPrimaryViewId"/>
+                        <input type="hidden" value="${it.name}" name="hiddenTeamName"/>
+                        <span style="margin-right: 5px; font-weight: bolder; color: #7b5395; font-size: 14px;"> 
+                            Default View: 
+                        </span>
+                        <j:if test="${it.primaryView == null}">
+                            <span id="teamPrimaryView_${it.name}">
+                                All
+                            </span>
+                        </j:if>
+                        <j:if test="${it.primaryView != null}">
+                            <span id="teamPrimaryView_${it.name}">
+                                ${it.primaryView}
+                            </span>
+                        </j:if>
+                        <img style="cursor: pointer; margin-left: 20px; margin-top: -5px;" class="configurePrimaryView" src="${imagesURL}/16x16/notepad.png" name="primaryViewConfigureIcon"/>
+                    </p>
+                    
+                    <j:if test="${it.views.size() == 0}">
+                        <p id="teamViewNone_${it.name}">
+                            This team does not own any views!
+                        </p>
+                    </j:if>
+                    
                     <h2>Owned by this team</h2>
                     <j:if test="${it.views.size() == 0}">
                         <p id="teamViewNone_${it.name}">
-                            Team does not have own views
+                            This team does not own any views!
                         </p>
                     </j:if>
                     <j:set var="headerVisibility" value='${(it.views.size() > 0) ? "visible" : "hidden"}'/>
@@ -360,7 +385,7 @@
                     <h2>Owned by this team</h2>
                     <j:if test="${it.nodes.size() == 0}">
                         <p id="teamNodeNone_${it.name}">
-                            Team does not own any nodes
+                            This team does not own any nodes!
                         </p>
                     </j:if>
                     <j:set var="headerVisibility" value='${(it.nodes.size() > 0) ? "visible" : "hidden"}'/>
@@ -387,7 +412,7 @@
                                         </span>
                                     </td>
                                     
-                                     <td class="column3">
+                                    <td class="column3">
                                         <span name="visibilitySpanName" style="margin-left:10px;">
                                             ${it.findNode(nodeName).visiblitiesAsString}
                                             <j:if test='${it.findNode(nodeName).visiblitiesAsString.equals("")}'> 
@@ -410,7 +435,7 @@
                     <j:set var="headerVisibility" value='${(it.visibleNodes.size() > 0) ? "visible" : "hidden"}'/>
                     <hr/>
                     <h2>Visible from other teams</h2>
-                     <j:if test="${it.visibleNodes.size() == 0}">
+                    <j:if test="${it.visibleNodes.size() == 0}">
                         <p id="teamJobNone_${it.name}">
                             None!
                         </p>

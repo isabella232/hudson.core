@@ -1976,6 +1976,12 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     @Exported
     public View getPrimaryView() {
         View v = getView(primaryView);
+        if (getTeamManager().isTeamManagementEnabled()) {
+          String teamPrimaryView = getTeamManager().getCurrentUserPrimaryView();
+          if (teamPrimaryView != null){
+              v = getView(teamPrimaryView);
+          } 
+        }
         // fallback
         if (v == null) {
             v = views.get(0);

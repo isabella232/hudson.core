@@ -38,6 +38,8 @@ import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 
@@ -63,13 +65,16 @@ public class Team implements AccessControlled {
     private String description;
     private transient TeamManager teamManager;
     private String customFolderName;
-    
+
+    private String primaryView;
+
     /**
-     * List of nodes known to this team but are disabled.
-     * When nodes are disabled, jobs can not be scheduled 
-     * on those nodes
+     * List of nodes known to this team but are disabled. When nodes are
+     * disabled, jobs can not be scheduled on those nodes
      */
     protected Set<String> enabledVisibleNodes = new HashSet<String>();
+
+    private transient Logger logger = LoggerFactory.getLogger(Team.class);
 
     //Used for unmarshalling
     Team() {
@@ -154,7 +159,7 @@ public class Team implements AccessControlled {
         }
         return jobNames;
     }
-    
+
     public Set<String> getViewNames() {
         Set<String> viewNames = new TreeSet<String>();
         for (TeamView view : getViews()) {
@@ -162,8 +167,8 @@ public class Team implements AccessControlled {
         }
         return viewNames;
     }
-    
-     public Set<String> getNodeNames() {
+
+    public Set<String> getNodeNames() {
         Set<String> nodeNames = new TreeSet<String>();
         for (TeamNode node : getNodes()) {
             nodeNames.add(node.getId());
@@ -274,10 +279,10 @@ public class Team implements AccessControlled {
             } else {
                 currentMember.removePermission(Computer.DELETE);
             }
-            
+
             if (canConfigureNode) {
                 currentMember.addPermission(Computer.CONFIGURE);
-            }else {
+            } else {
                 currentMember.removePermission(Computer.CONFIGURE);
             }
 
@@ -292,13 +297,13 @@ public class Team implements AccessControlled {
             } else {
                 currentMember.removePermission(View.DELETE);
             }
-            
+
             if (canConfigureView) {
                 currentMember.addPermission(View.CONFIGURE);
-            }else {
+            } else {
                 currentMember.removePermission(View.CONFIGURE);
             }
-            
+
             getTeamManager().save();
         }
     }
@@ -557,61 +562,71 @@ public class Team implements AccessControlled {
             }
         };
     }
-    
-    void addToEnabledVisibleNodes(String nodeName) throws IOException{
+
+    void addToEnabledVisibleNodes(String nodeName) throws IOException {
         enabledVisibleNodes.add(nodeName);
         getTeamManager().save();
     }
-    
-    void removeFromEnabledVisibleNodes(String nodeName) throws IOException{
+
+    void removeFromEnabledVisibleNodes(String nodeName) throws IOException {
         enabledVisibleNodes.remove(nodeName);
         getTeamManager().save();
     }
-    
+
     // Called from jelly also
-    public boolean isVisibleNodeEnabled(String nodeName){
+    public boolean isVisibleNodeEnabled(String nodeName) {
         return enabledVisibleNodes.contains(nodeName);
     }
-    
+
     // Used in Jelly
-    public List<TeamJob> getVisibleJobs(){
+    public List<TeamJob> getVisibleJobs() {
         List<TeamJob> visibleJobs = new ArrayList<TeamJob>();
         for (Team team : getTeamManager().getTeams().values()) {
             for (TeamJob teamJob : team.getJobs()) {
-                if (teamJob.isVisible(name) || Team.PUBLIC_TEAM_NAME.equals(team.name)){ 
-                   visibleJobs.add(teamJob);
+                if (teamJob.isVisible(name) || Team.PUBLIC_TEAM_NAME.equals(team.name)) {
+                    visibleJobs.add(teamJob);
                 }
             }
         }
         return visibleJobs;
     }
-    
+
     // Used in Jelly
-    public List<TeamNode> getVisibleNodes(){
+    public List<TeamNode> getVisibleNodes() {
         List<TeamNode> visibleNodes = new ArrayList<TeamNode>();
         for (Team team : getTeamManager().getTeams().values()) {
             for (TeamNode teamNode : team.getNodes()) {
-                if (teamNode.isVisible(name) || Team.PUBLIC_TEAM_NAME.equals(team.name)){
-                   visibleNodes.add(teamNode);
+                if (teamNode.isVisible(name) || Team.PUBLIC_TEAM_NAME.equals(team.name)) {
+                    visibleNodes.add(teamNode);
                 }
             }
         }
         return visibleNodes;
     }
-    
+
     // Used in Jelly
-    public List<TeamView> getVisibleViews(){
-        List<TeamView> visibleViews = new ArrayList<TeamView>(); 
+    public List<TeamView> getVisibleViews() {
+        List<TeamView> visibleViews = new ArrayList<TeamView>();
         for (Team team : getTeamManager().getTeams().values()) {
             for (TeamView teamView : team.getViews()) {
-                if (teamView.isVisible(name) || Team.PUBLIC_TEAM_NAME.equals(team.name)){
-                   visibleViews.add(teamView);
+                if (teamView.isVisible(name) || Team.PUBLIC_TEAM_NAME.equals(team.name)) {
+                    visibleViews.add(teamView);
                 }
             }
         }
         return visibleViews;
     }
 
+    List<String> getAllViewNames() {
+        List<String> viewNames = new ArrayList<String>();
+        for (TeamView teamView : getVisibleViews()) {
+            viewNames.add(teamView.getId());
+        }
+        for (TeamView teamView : views) {
+            viewNames.add(teamView.getId());
+        }
+        return viewNames;
+    }
 
     @Override
     public void checkPermission(Permission permission) throws AccessDeniedException {
@@ -633,6 +648,35 @@ public class Team implements AccessControlled {
         }
     }
 
+    public String getPrimaryView() {
+        if (primaryView != null) {
+            if (findView(primaryView) != null) {
+                return primaryView;
+            }
+            for (TeamView view : this.getVisibleViews()) {
+                if (primaryView.equals(view.getId())) {
+                    return primaryView;
+                }
+            }
+            primaryView = null;
+            try {
+                getTeamManager().save();
+            } catch (IOException ex) {
+                logger.error(ex.getLocalizedMessage());
+            }
+        }
+        return primaryView;
+    }
+
+    void setPrimaryView(String viewName) {
+        primaryView = viewName;
+        try {
+            getTeamManager().save();
+        } catch (IOException ex) {
+            logger.error(ex.getLocalizedMessage());
+        }
+    }
+
     public static class ConverterImpl implements Converter {
 
         @Override
@@ -651,9 +695,16 @@ public class Team implements AccessControlled {
                 writer.setValue(team.getDescription());
                 writer.endNode();
             }
+
             if ((team.getCustomFolderName() != null) && !"".equals(team.getCustomFolderName().trim())) {
                 writer.startNode("customFolderName");
                 writer.setValue(team.getCustomFolderName());
+                writer.endNode();
+            }
+
+            if ((team.getPrimaryView() != null) && !"".equals(team.getPrimaryView().trim())) {
+                writer.startNode("primaryView");
+                writer.setValue(team.getPrimaryView());
                 writer.endNode();
             }
 
@@ -706,6 +757,10 @@ public class Team implements AccessControlled {
                     team.customFolderName = reader.getValue();
                 }
 
+                if ("primaryView".equals(reader.getNodeName())) {
+                    team.primaryView = reader.getValue();
+                }
+
                 if ("job".equals(reader.getNodeName())) {
                     TeamJob teamJob = (TeamJob) uc.convertAnother(team, TeamJob.class);
                     team.jobs.add(teamJob);
@@ -718,7 +773,7 @@ public class Team implements AccessControlled {
                 } else if ("member".equals(reader.getNodeName())) {
                     TeamMember teamMember = (TeamMember) uc.convertAnother(team, TeamMember.class);
                     team.teamMembers.add(teamMember);
-                }else if ("enabledNodes".equals(reader.getNodeName())) {
+                } else if ("enabledNodes".equals(reader.getNodeName())) {
                     String nodeNames = reader.getValue();
                     team.enabledVisibleNodes.addAll(Arrays.asList(nodeNames.split(",")));
                 }

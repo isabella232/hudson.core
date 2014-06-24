@@ -314,6 +314,25 @@
         </div>
     </div>
     
+    <!-- Dialog template for setting primary view -->
+    <div style="margin-top: 10px; display: none" id="dialog-set-primary-view">
+        <div>
+            <span>
+                Select the default job group view for this team
+            </span>
+            <br/>
+            <br/>
+            <select id="viewChoice">
+                <option value="loading">Loading ..</option>
+            </select>
+            <div style="margin-top:10px">
+                <span id="setPrimaryViewMsg">
+                    <!-- dynamically inserted -->
+                </span>
+            </div>
+        </div>
+    </div>
+    
     <!-- Dialog template for configuring Node Visibility -->
     <div style="margin-top: 10px; display: none" id="dialog-configure-node-visibility">
         <div>

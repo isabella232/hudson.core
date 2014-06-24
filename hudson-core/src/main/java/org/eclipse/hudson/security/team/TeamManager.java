@@ -649,6 +649,22 @@ public final class TeamManager implements Saveable, AccessControlled {
         return HttpResponses.ok();
     }
     
+    public HttpResponse doSetPrimaryView(@QueryParameter String viewName, @QueryParameter String teamName) throws IOException, TeamNotFoundException {
+        Team viewTeam = findViewOwnerTeam(viewName);
+        if (!isCurrentUserTeamAdmin(teamName)) {
+            return new TeamUtils.ErrorHttpResponse("No permission to set primary view. View name - " + viewName + " Team Name - " + viewTeam.getName());
+        }
+        if ((viewName == null) || "".equals(viewName.trim())) {
+            return new TeamUtils.ErrorHttpResponse("View name required.");
+        }
+        
+        Team viewVisibleTeam = findTeam(teamName);
+        
+        viewVisibleTeam.setPrimaryView(viewName);
+       
+        return HttpResponses.ok();
+    }
+    
     public void addViewVisibility(TeamView view, String teamName) {
         view.addVisibility(teamName);
     }
@@ -805,15 +821,36 @@ public final class TeamManager implements Saveable, AccessControlled {
             }
         };
     }
+    
+    /**
+     * Get the name of the views visible to the team as JSON
+     *
+     * @param teamName
+     * @return HttpResponse with JSON as content type
+     */
+    public HttpResponse doGetViewsJson(@QueryParameter final String teamName) {
+        return new HttpResponse() {
+            @Override
+            public void generateResponse(StaplerRequest sr, StaplerResponse rsp, Object o) throws IOException, ServletException {
+                try {
+                    Team team = findTeam(teamName);
+                    writeJson(rsp, (List<String>) team.getAllViewNames());
+                } catch (TeamNotFoundException ex) {
+                     
+                }
+            }
+        };
 
-    private void writeJson(StaplerResponse rsp, List<String> teams) throws IOException {
+    }
+
+    private void writeJson(StaplerResponse rsp, List<String> data) throws IOException {
         rsp.setStatus(HttpServletResponse.SC_OK);
         rsp.setContentType("application/json");
         PrintWriter w = new PrintWriter(rsp.getWriter());
         w.println("{");
-        for (int i = 0; i < teams.size(); i++) {
-            w.print("\"" + teams.get(i) + "\":\"" + teams.get(i) + "\"");
-            if (i < teams.size() - 1) {
+        for (int i = 0; i < data.size(); i++) {
+            w.print("\"" + data.get(i) + "\":\"" + data.get(i) + "\"");
+            if (i < data.size() - 1) {
                 w.println(",");
             }
         }
@@ -1362,6 +1399,15 @@ public final class TeamManager implements Saveable, AccessControlled {
             return publicTeam;
         }
         throw new TeamNotFoundException("User does not have Node create permission in any team");
+    }
+    
+    public String getCurrentUserPrimaryView() {
+        List<Team> currentUserTeams = findCurrentUserTeams();
+        if (!currentUserTeams.isEmpty()) {
+            Team team = currentUserTeams.get(0);
+            return team.getPrimaryView();
+        }
+        return null;
     }
 
     /**

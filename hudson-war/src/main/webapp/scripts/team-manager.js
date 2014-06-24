@@ -87,11 +87,11 @@ jQuery(document).ready(function() {
 
     // currentUserTeam is set by jelly
     refreshTeamInfo(currentUserTeam);
-    
+
 });
 
 function refreshTeamInfo(teamName) {
-   if (teamName !== undefined) {
+    if (teamName !== undefined) {
         jQuery("#teamInfo").load('teams/' + teamName, function() {
             onTeamDetailsLoad();
         });
@@ -138,6 +138,12 @@ function onTeamDetailsLoad() {
     jQuery('#teamInfo img.configureViewVisibility').each(function() {
         jQuery(this).unbind("click").click(function() {
             configureViewVisibilityAction(this);
+        });
+    });
+
+    jQuery('#teamInfo img.configurePrimaryView').each(function() {
+        jQuery(this).unbind("click").click(function() {
+            setPrimaryViewAction(this);
         });
     });
 
@@ -731,6 +737,68 @@ function configureViewVisibility(viewName, teamNames) {
     });
 }
 
+function setPrimaryViewAction(configureViewItem) {
+
+    clearMessage(jQuery('#setPrimaryViewMsg'));
+
+    var trParent = jQuery(configureViewItem).parents("p:first");
+    var viewName = jQuery(trParent).find("input[name='hiddenPrimaryViewId']").val();
+    var teamName = jQuery(trParent).find("input[name='hiddenTeamName']").val();
+
+    jQuery('#dialog-set-primary-view').dialog({
+        resizable: false,
+        autoResize: true,
+//        height: 300,
+        width: 350,
+        modal: true,
+        title: "Set Default View ",
+        buttons: {
+            'Set': function() {
+                var viewName = jQuery("#viewChoice option:selected").val();
+                setPrimaryView(viewName, teamName);
+                jQuery("#teamPrimaryView_" + teamName).text(viewName);
+                jQuery(this).dialog("close");
+            },
+            Cancel: function() {
+                jQuery(this).dialog("close");
+            }
+        }
+    });
+
+    var data = {
+        teamName: teamName
+    };
+
+    jQuery.getJSON('getViewsJson', data, function(json) {
+        jQuery('#viewChoice').empty();
+        jQuery.each(json, function(key, val) {
+            var item = '<option value="' + key + '">' + val + '</option>';
+            if (key === viewName) {
+                item = '<option selected="true" value="' + key + '">' + val + '</option>';
+            }
+            jQuery(item).appendTo(jQuery('#viewChoice'));
+        });
+    });
+}
+
+function setPrimaryView(viewName, teamName) {
+    jQuery.ajax({
+        type: 'POST',
+        url: "setPrimaryView",
+        data: {
+            viewName: viewName,
+            teamName: teamName
+        },
+        success: function() {
+            jQuery('#dialog-set-primary-view').dialog("close");
+        },
+        error: function(msg) {
+            showMessage(msg.responseText, true, jQuery('#setPrimaryViewMsg'));
+        },
+        dataType: "html"
+    });
+}
+
 function configureNodeVisibilityAction(configureNodeItem) {
 
     clearMessage(jQuery('#configureNodeVisibilityMsg'));
@@ -916,7 +984,7 @@ function moveJob(jobName, teamName, img) {
         },
         success: function(newJobNameResponse) {
             jQuery(img).attr('src', imageRoot + '/green-check.jpg');
-            
+
             var column3 = "job_colum3_span_" + jobName.replace(".", "\\.");
             var nameColumn = jQuery('#teamJobsContainer').find("span[name=" + column3 + "]");
             jQuery(nameColumn).text(newJobNameResponse);
@@ -924,14 +992,14 @@ function moveJob(jobName, teamName, img) {
             jQuery(nameColumn).attr('name', newColumn3);
             var column3Link = "job_colum3_link_" + jobName.replace(".", "\\.");
             var nameColumnLink = jQuery('#teamJobsContainer').find("a[name=" + column3Link + "]");
-            jQuery(nameColumnLink).attr('href', rootUrl + '/job/' + newJobNameResponse );
-            
+            jQuery(nameColumnLink).attr('href', rootUrl + '/job/' + newJobNameResponse);
+
             var column4 = "job_colum4_span_" + jobName.replace(".", "\\.");
             var teamColumn = jQuery('#teamJobsContainer').find("span[name=" + column4 + "]");
             jQuery(teamColumn).text(teamName);
             var newColumn4 = "job_colum4_span_" + newJobNameResponse;
             jQuery(teamColumn).attr('name', newColumn4);
-            
+
             moveCount--;
             if (moveCount === 0) {
                 jQuery('#dialog-move-jobs').dialog("close");
