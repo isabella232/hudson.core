@@ -225,7 +225,7 @@ public final class InstalledPluginManager {
             return false;
         }
 
-        boolean isEnabled() {
+        public boolean isEnabled() {
             File disabledMarker = new File(hpiArchive.getPath() + ".disabled");
             return !disabledMarker.exists() && !isFailedToLoad();
         }
