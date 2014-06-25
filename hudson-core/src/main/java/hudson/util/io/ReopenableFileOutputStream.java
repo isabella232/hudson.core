@@ -1,17 +1,19 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
  * Copyright (c) 2010, CloudBees, Inc.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *
  *
  *
- *******************************************************************************/ 
+ ******************************************************************************
+ */
 
 /*
  * The MIT License
@@ -45,11 +47,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * {@link OutputStream} that writes to a file.
  *
- * <p> Unlike regular {@link FileOutputStream}, this implementation allows the
+ * <p>
+ * Unlike regular {@link FileOutputStream}, this implementation allows the
  * caller to close, and then keep writing.
  *
  * @author Kohsuke Kawaguchi
@@ -59,9 +64,15 @@ public class ReopenableFileOutputStream extends OutputStream {
     private final File out;
     private OutputStream current;
     private boolean appendOnNextOpen = false;
+    private int rotateCount;
 
     public ReopenableFileOutputStream(File out) {
+        this(out, 0);
+    }
+
+    public ReopenableFileOutputStream(File out, int rotateCount) {
         this.out = out;
+        this.rotateCount = rotateCount;
     }
 
     private synchronized OutputStream current() throws IOException {
@@ -77,7 +88,12 @@ public class ReopenableFileOutputStream extends OutputStream {
 
     @Override
     public void write(int b) throws IOException {
+        byte newlineCharacter = (byte) 0x0A;
+        byte byteWritten = (byte) b;
         current().write(b);
+        if (byteWritten == newlineCharacter) {
+            writeTimestamp();
+        }
     }
 
     @Override
@@ -87,12 +103,24 @@ public class ReopenableFileOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
+        byte newlineCharacter = (byte) 0x0A;
+        byte byteWritten = (byte) b[0];
+        if ((len > 1) && (byteWritten != newlineCharacter)) {
+            writeTimestamp();
+        }
         current().write(b, off, len);
     }
 
     @Override
     public void flush() throws IOException {
         current().flush();
+    }
+
+    private void writeTimestamp() throws IOException {
+        Date dNow = new Date();
+        SimpleDateFormat ft
+                = new SimpleDateFormat("'['yyyy-MM-dd hh:mm:ss']' ' '");
+        current().write(ft.format(dNow).getBytes());
     }
 
     @Override
@@ -107,9 +135,26 @@ public class ReopenableFileOutputStream extends OutputStream {
     /**
      * In addition to close, ensure that the next "open" would truncate the
      * file.
+     *
+     * @throws java.io.IOException
      */
     public synchronized void rewind() throws IOException {
         close();
         appendOnNextOpen = false;
+        for (int i = rotateCount - 1; i >= 0; i--) {
+            File rotateFile = getRotateFileName(i);
+            if (rotateFile.exists()) {
+                File nextRotateFile = getRotateFileName(i + 1);
+                nextRotateFile.delete();
+                rotateFile.renameTo(nextRotateFile);
+            }
+        }
+    }
+
+    private File getRotateFileName(int rotatedNumber) {
+        if (rotatedNumber == 0) {
+            return out;
+        }
+        return new File(out.getPath() + "." + rotatedNumber);
     }
 }

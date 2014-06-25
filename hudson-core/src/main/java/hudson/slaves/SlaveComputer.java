@@ -103,7 +103,7 @@ public class SlaveComputer extends Computer {
 
     public SlaveComputer(Slave slave) {
         super(slave);
-        this.log = new ReopenableFileOutputStream(getLogFile());
+        this.log = new ReopenableFileOutputStream(getLogFile(), 5);
         this.taskListener = new StreamTaskListener(log);
     }
 
@@ -389,7 +389,7 @@ public class SlaveComputer extends Computer {
     public HttpResponse doDoDisconnect(@QueryParameter String offlineMessage) throws IOException, ServletException {
         if (channel != null) {
             //does nothing in case computer is already disconnected
-            checkPermission(Hudson.ADMINISTER);
+            checkPermission(CONFIGURE);
             offlineMessage = Util.fixEmptyAndTrim(offlineMessage);
             disconnect(OfflineCause.create(Messages._SlaveComputer_DisconnectedBy(
                     HudsonSecurityManager.getAuthentication().getName(),
