@@ -9,7 +9,7 @@
 #
 # Contributors: 
 #
-#  Winston Prakash
+#  Winston Prakash, Duncan Mills
 #        
 #************************************************************************** --> 
 
@@ -492,7 +492,7 @@
                                                             <j:if test="${it.getInstalled(p).isPinned()}">
                                                                 <span>
                                                                     <button class="unpin" style="margin-right: 3px;" value="${p.name}">Unpin</button>
-                                                                    <a href="http://wiki.hudson-ci.org/display/HUDSON/Pinned+Plugins" target="_blank"> 
+                                                                    <a href="https://wiki.eclipse.org/Hudson-ci/Using_Hudson/Pinned_Plugins" target="_blank"> 
                                                                         <img src="${imagesURL}/16x16/help.png"/>
                                                                     </a>
                                                                 </span>
