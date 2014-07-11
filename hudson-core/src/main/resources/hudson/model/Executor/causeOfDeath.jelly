@@ -9,7 +9,7 @@
 #
 # Contributors: 
 #
-#    Kohsuke Kawaguchi, Winston Prakash
+#    Kohsuke Kawaguchi, Winston Prakash, Duncan Mills
 #        
 #************************************************************************** --> 
 
@@ -44,7 +44,7 @@
           </h1>
           <pre>${h.printThrowable(it.causeOfDeath)}</pre>
           <pre>
-            <a href="http://wiki.hudson-ci.org/display/HUDSON/Dead+Executor">${%more info}</a>
+            <a href="https://wiki.eclipse.org/Hudson-ci/Using_Hudson/Dead_Executors">${%more info}</a>
           </pre>
           <form method="post" action="yank" name="yank">
             <f:submit value="${%Restart this thread}"/>
