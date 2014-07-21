@@ -331,7 +331,7 @@
                             	<div id="footer"/>
                             </td>
                             <td id="footer-husonversion-panel" class="footerArea">
-                                <a href="http://hudson-ci.org/">Hudson: ${h.version}</a>
+                                <a href="https://www.eclipse.org/hudson/">Hudson: ${h.version}</a>
                             </td>
                         </tr>
                     </table>
