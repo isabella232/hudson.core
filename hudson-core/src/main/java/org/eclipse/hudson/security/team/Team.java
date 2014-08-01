@@ -69,10 +69,17 @@ public class Team implements AccessControlled {
     private String primaryView;
 
     /**
-     * List of nodes known to this team but are disabled. When nodes are
-     * disabled, jobs can not be scheduled on those nodes
+     * List of nodes visible to this team that are enabled. All visible nodes (except public) are
+     * disabled by default. When a node is disabled, jobs can not be scheduled on that node
      */
     protected Set<String> enabledVisibleNodes = new HashSet<String>();
+
+    /**
+     * List of public nodes that are disabled. Public nodes are visible to any
+     * team and are enabled by default. They need to be explicitly disabled to 
+     * stop jobs being scheduled on those nodes.
+     */
+    protected Set<String> disabledPublicNodes = new HashSet<String>();
 
     private transient Logger logger = LoggerFactory.getLogger(Team.class);
 
@@ -564,18 +571,31 @@ public class Team implements AccessControlled {
     }
 
     void addToEnabledVisibleNodes(String nodeName) throws IOException {
-        enabledVisibleNodes.add(nodeName);
+        if (!getTeamManager().getPublicTeam().isNodeOwner(nodeName)) {
+            enabledVisibleNodes.add(nodeName);
+        }else{
+            disabledPublicNodes.remove(nodeName);
+        }
         getTeamManager().save();
     }
 
     void removeFromEnabledVisibleNodes(String nodeName) throws IOException {
-        enabledVisibleNodes.remove(nodeName);
+        if (!getTeamManager().getPublicTeam().isNodeOwner(nodeName)) {
+            enabledVisibleNodes.remove(nodeName);
+        }else{
+            disabledPublicNodes.add(nodeName);
+        }
         getTeamManager().save();
     }
 
     // Called from jelly also
     public boolean isVisibleNodeEnabled(String nodeName) {
-        return enabledVisibleNodes.contains(nodeName);
+        if (enabledVisibleNodes.contains(nodeName)) {
+            return true;
+        } else if (getTeamManager().getPublicTeam().isNodeOwner(nodeName)) {
+            return !disabledPublicNodes.contains(nodeName);
+        }
+        return false;
     }
 
     // Used in Jelly
@@ -738,6 +758,16 @@ public class Team implements AccessControlled {
                 writer.setValue(strWriter.toString());
                 writer.endNode();
             }
+            StringWriter strWriter2 = new StringWriter();
+            if (team.disabledPublicNodes.size() > 0) {
+                for (String nodeName : team.disabledPublicNodes) {
+                    strWriter2.append(nodeName);
+                    strWriter2.append(",");
+                }
+                writer.startNode("disabledPublicNodes");
+                writer.setValue(strWriter2.toString());
+                writer.endNode();
+            }
         }
 
         @Override
@@ -776,6 +806,9 @@ public class Team implements AccessControlled {
                 } else if ("enabledNodes".equals(reader.getNodeName())) {
                     String nodeNames = reader.getValue();
                     team.enabledVisibleNodes.addAll(Arrays.asList(nodeNames.split(",")));
+                }else if ("disabledPublicNodes".equals(reader.getNodeName())) {
+                    String nodeNames = reader.getValue();
+                    team.disabledPublicNodes.addAll(Arrays.asList(nodeNames.split(",")));
                 }
 
                 reader.moveUp();
