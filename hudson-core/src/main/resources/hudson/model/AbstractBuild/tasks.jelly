@@ -52,13 +52,13 @@
           <l:task icon="images/24x24/terminal.png" href="${buildUrl.baseUrl}/console" title="${%Console Output}" />
         </j:otherwise>
       </j:choose>
-      <l:task icon="images/24x24/setting.png" href="${buildUrl.baseUrl}/configure" title="${h.hasPermission(it,it.UPDATE)?'%Configure':'%View Configuration'}"/>
+      <l:task icon="images/24x24/setting.png" href="${buildUrl.baseUrl}/configure" title="${h.hasPermission(it,it.UPDATE)?'%Configure Build':'%View Build Configuration'}"/>
       <j:choose>
-        <j:when test="${h.hasPermission(it,it.CONFIGURE)}">
+        <j:when test="${h.hasPermission(it.parent,it.parent.CONFIGURE)}">
           <l:task icon="images/24x24/setting.png" href="${it.upUrl}configure" title="${%Configure Job}" />
         </j:when>
-        <j:when test="${h.hasPermission(it,it.EXTENDED_READ)}">
-          <l:task icon="images/24x24/setting.png" href="${it.upUrl}configure" title="${%ViewJob Configuration}" />
+        <j:when test="${h.hasPermission(it.parent,it.parent.EXTENDED_READ)}">
+          <l:task icon="images/24x24/setting.png" href="${it.upUrl}configure" title="${%View Job Configuration}" />
         </j:when>
       </j:choose>
 </j:jelly>

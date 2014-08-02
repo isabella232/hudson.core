@@ -17,6 +17,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import hudson.model.Computer;
 import hudson.model.Item;
+import hudson.model.Run;
 import hudson.model.View;
 import hudson.security.Permission;
 import java.io.StringWriter;
@@ -81,6 +82,13 @@ public class TeamMember {
     public boolean hasPermission(Permission permission) {
         if (isTeamAdmin) {
             return teamAdminGrantedPermissions.contains(permission);
+        }
+        if (permission == Run.UPDATE){
+            return grantedPermissions.contains(Item.CONFIGURE) || grantedPermissions.contains(Item.CREATE);
+        }
+        if (permission == Run.DELETE){
+            return grantedPermissions.contains(Item.CONFIGURE) || grantedPermissions.contains(Item.CREATE)
+                    || grantedPermissions.contains(Item.DELETE);
         }
         if (permission == Item.CONFIGURE){
             return grantedPermissions.contains(permission) || grantedPermissions.contains(Item.CREATE);
