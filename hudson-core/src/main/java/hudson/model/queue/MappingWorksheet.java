@@ -18,6 +18,7 @@ package hudson.model.queue;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import hudson.matrix.MatrixConfiguration;
 import hudson.model.Computer;
 import hudson.model.Executor;
 import hudson.model.Hudson;
@@ -31,6 +32,8 @@ import hudson.model.Queue.Task;
 import hudson.model.labels.LabelAssignmentAction;
 import java.io.IOException;
 
+
+import static java.lang.Math.*;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,8 +42,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import static java.lang.Math.*;
 import org.eclipse.hudson.security.team.TeamManager;
 
 /**
@@ -352,7 +353,12 @@ public class MappingWorksheet {
                 if (c instanceof Hudson.MasterComputer){
                     name = "Master";
                 }
-                canBuildInNode = teamManager.canNodeExecuteJob(name, item.task.getName());
+                String jobName = item.task.getName();
+                if (item.task instanceof MatrixConfiguration){
+                    MatrixConfiguration matrixConfiguration = (MatrixConfiguration) item.task;
+                    jobName = matrixConfiguration.getParent().getName();
+                }
+                canBuildInNode = teamManager.canNodeExecuteJob(name, jobName);
             }
             List<ExecutorSlot> l = j.get(c);
             if (l == null) {
