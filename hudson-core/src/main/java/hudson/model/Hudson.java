@@ -1319,7 +1319,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         return viewableItems;
     }
 
-    @Exported(name = "securedJobs")
+    // Bug HUDSON/api/xml and HUDSON/api/json return names of jobs user not entitled to see
+    //@Exported(name = "securedJobs")
     public List<TopLevelItem> getSecuredItems() {
         List<TopLevelItem> viewableItems = new ArrayList<TopLevelItem>();
         for (TopLevelItem item : items.values()) {
