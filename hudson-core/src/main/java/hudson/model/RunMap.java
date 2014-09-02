@@ -800,7 +800,7 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
             try {
                 return cache.get(key);
             } catch (ExecutionException ex) {
-                LOGGER.log(Level.SEVERE,"Unable to load build", ex);
+                LOGGER.log(Level.SEVERE,"Unable to load build: " + ex.getMessage());
                 return null;
             }
 

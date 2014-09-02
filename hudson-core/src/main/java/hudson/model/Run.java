@@ -225,6 +225,17 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                     return new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
                 }
             };
+    
+    /**
+     * State when a Run is being created from cached values.
+     */
+    private static final ThreadLocal<Boolean> IS_LOADING_CACHED_VALUES = 
+            new ThreadLocal<Boolean>() {
+                @Override
+                protected Boolean initialValue() {
+                    return false;
+                }                
+            };
 
     /**
      * Creates a new {@link Run}.
@@ -264,8 +275,8 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         try {
         getDataFile().unmarshal(this); // load the rest of the data
     }
-        catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Unable to load Run object.", ex);
+        catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Unable to load Run object: " + ex.getMessage());
             dataFileLoadException = ex;
             RunMap.LazyRunValue.Key key = RunMap.LazyRunValue.getCurrentKey();
             if ( key != null ) {
@@ -373,11 +384,23 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         
         this.displayName = String.format("%s [In Error]",key.referenced.displayName);
         this.duration = key.referenced.duration;
-        this.nextBuild = (RunT)key.referenced.getNextBuild();
-        this.previousBuild = (RunT)key.referenced.getPreviousBuild();
         this.result = key.referenced.result;
         this.state = key.referenced.state;
         this.timestamp = key.referenced.timeInMillis;
+        
+        // Try to load other builds only if not already processing another
+        // cached build
+        if (! IS_LOADING_CACHED_VALUES.get()) {
+            try {
+                IS_LOADING_CACHED_VALUES.set(true);
+                
+                this.nextBuild = (RunT)key.referenced.getNextBuild();
+                this.previousBuild = (RunT)key.referenced.getPreviousBuild();
+            }
+            finally {
+                IS_LOADING_CACHED_VALUES.set(false);
+            }
+        }
     }
 
     /**
