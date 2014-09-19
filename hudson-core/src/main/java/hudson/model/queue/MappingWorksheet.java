@@ -19,9 +19,12 @@ package hudson.model.queue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import hudson.matrix.MatrixConfiguration;
+import hudson.model.AbstractProject;
 import hudson.model.Computer;
 import hudson.model.Executor;
 import hudson.model.Hudson;
+import hudson.model.ItemGroup;
+import hudson.model.JobProperty;
 import hudson.model.Label;
 import hudson.model.LoadBalancer;
 import hudson.model.Node;
@@ -42,6 +45,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.eclipse.hudson.security.team.Team;
 import org.eclipse.hudson.security.team.TeamManager;
 
 /**
@@ -350,13 +354,48 @@ public class MappingWorksheet {
             TeamManager teamManager = Hudson.getInstance().getTeamManager();
             if (teamManager.isTeamManagementEnabled()) {
                 String name = c.getName();
-                if (c instanceof Hudson.MasterComputer){
+                if (c instanceof Hudson.MasterComputer) {
                     name = "Master";
                 }
                 String jobName = item.task.getName();
-                if (item.task instanceof MatrixConfiguration){
-                    MatrixConfiguration matrixConfiguration = (MatrixConfiguration) item.task;
-                    jobName = matrixConfiguration.getParent().getName();
+                //All jobs must be part of a team, if not this task item may be a sub-job.
+                //Try to find the parent job that belongs to the team
+                Team jobTeam = teamManager.findJobOwnerTeam(jobName);
+                if (jobTeam == null) {
+                    AbstractProject jobTask = null;
+                    if (item.task instanceof AbstractProject) {
+                        jobTask = (AbstractProject) item.task;
+                    }
+                    if (jobTask != null) {
+                        do {
+                            // Check if the parent of this sub-job is a team job
+                            if (jobTask.getParent() instanceof AbstractProject) {
+                                jobTask = (AbstractProject) jobTask.getParent();
+                                jobName = jobTask.getName();
+                                jobTeam = teamManager.findJobOwnerTeam(jobName);
+                            } else if (jobTask.getParent() instanceof ItemGroup) {
+                                ItemGroup itemGroup = (ItemGroup) jobTask.getParent();
+                                // This item group may be added as Job property to parent
+                                if (itemGroup instanceof JobProperty) {
+                                    JobProperty property = (JobProperty) itemGroup;
+                                    if (property.getOwner() instanceof AbstractProject) {
+                                        jobTask = (AbstractProject) property.getOwner();
+                                        jobName = jobTask.getName();
+                                        jobTeam = teamManager.findJobOwnerTeam(jobName);
+                                    }
+                                }
+                            } else {
+                                break;
+                            }
+                        } while (jobTeam == null);
+                    }
+                }
+                // If job team is still null do a last ditch test
+                if (jobTeam == null) {
+                    if (item.task instanceof MatrixConfiguration) {
+                        MatrixConfiguration matrixConfiguration = (MatrixConfiguration) item.task;
+                        jobName = matrixConfiguration.getParent().getName();
+                    }
                 }
                 canBuildInNode = teamManager.canNodeExecuteJob(name, jobName);
             }

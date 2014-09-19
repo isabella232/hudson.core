@@ -78,6 +78,15 @@ public abstract class JobProperty<J extends Job<?, ?>> implements Describable<Jo
     protected void setOwner(J owner) {
         this.owner = owner;
     }
+    
+    /**
+     * Get the owner of this property
+     * @since 3.2.1
+     * @return owner 
+     */
+    public J getOwner() {
+         return owner;
+    }
 
     /**
      * {@inheritDoc}
