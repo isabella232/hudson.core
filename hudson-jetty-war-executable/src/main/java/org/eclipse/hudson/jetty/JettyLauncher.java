@@ -10,7 +10,7 @@
  *
  * Contributors:
  *
- * Winston Prakash
+ * Winston Prakash, Duncan Mills
  *
  ******************************************************************************
  */
@@ -26,6 +26,7 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.ssl.SslSocketConnector;
+import org.eclipse.jetty.http.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 /**
@@ -103,14 +104,23 @@ public class JettyLauncher {
 
         // HTTPS (SSL) connector
         if (httpsPort != -1) {
-            SslSocketConnector httpsConnector = new SslSocketConnector();
-            httpsConnector.setPort(httpsPort);
+            // Switch to using a ContextFactory this helps us to 
+            // address 447469 - disable SSL3 to prevent Poodle attacks
+            SslContextFactory sslContextFactory = new SslContextFactory();
+            sslContextFactory.addExcludeProtocols("SSLv3");
+            
+            //KeyStore path and password now injected via this new context rather 
+            //than being added directly to the connection (those APIs are deprecated
+            // in any case so this is the better approach
             if (keyStorePath != null) {
-                httpsConnector.setKeystore(keyStorePath);
+                sslContextFactory.setKeyStore(keyStorePath);
             }
             if (keyStorePassword != null) {
-                httpsConnector.setKeyPassword(keyStorePassword);
+                sslContextFactory.setKeyManagerPassword(keyStorePassword);
             }
+        
+            SslSocketConnector httpsConnector = new SslSocketConnector(sslContextFactory);
+            httpsConnector.setPort(httpsPort);
             connectors.add(httpsConnector);
         }
 
