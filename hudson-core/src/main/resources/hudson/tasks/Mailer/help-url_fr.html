@@ -14,11 +14,13 @@
 
 ﻿<div>
   Spécifie optionnellement l'adresse HTTP de l'installation de Hudson,
-  comme <tt>http://yourhost.yourdomain/hudson/</tt>.
-  Cette valeur est utilisée pour mettre des liens dans les emails envoyés
-  par Hudson.
+  comme <tt>http://yourhost.yourdomain/hudson/</tt>. Cela est nécessaire dans certaines 
+  configurations parce que Hudson ne peut pas détecter de façon fiable sa propre URL.
+  
+  <p>Cette valeur est utilisée pour mettre des liens dans les e-mails envoyés par Hudson 
+  <b>et interne lorsque Hudson envoie des requêtes à lui-même</b>. Par conséquent, si 
+  une mauvaise adresse est indiquée, certaines fonctionnalités de Hudson seront brisés.
 
   <p>
-  Cela est nécessaire parce que Hudson ne peut pas détecter de façon
-  fiable sa propre URL.
+  
 </div>

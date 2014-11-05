@@ -14,11 +14,14 @@
 
 <div>
   Optional: Geben Sie hier die HTTP-Adresse der Hudson-Instanz an, z.B:
-  <tt>http://yourhost.yourdomain/hudson/</tt>. Dieser Wert wird verwendet,
-  um Links in E-Mail-Benachrichtigungen einzufügen.
-
+  <tt>http://yourhost.yourdomain/hudson/</tt>. Dies ist notwendig, weil Hudson nicht 
+  zuverlässig seine eigene URL feststellen kann.
+  
+  <p>Dieser Wert wird verwendet, um Links in E-Mail-Benachrichtigungen einzufügen, 
+  und <b>wenn Hudson sendet Anforderungen an sich selbst<b>. 
+  Folglich, wenn eine falsche Adresse eingegeben wurde, werden einige 
+  Hudson Funktionen gebrochen werden.
   <p>
 
-  Dies ist notwendig, weil Hudson nicht zuverlässig seine eigene URL 
-  feststellen kann.
+  
 </div>
