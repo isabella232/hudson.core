@@ -34,7 +34,7 @@ import org.springframework.security.acls.model.Sid;
  */
 public class TeamBasedACL extends SidACL {
 
-    private transient Logger logger = LoggerFactory.getLogger(TeamBasedACL.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(TeamBasedACL.class);
 
     public enum SCOPE {
 
@@ -291,7 +291,7 @@ public class TeamBasedACL extends SidACL {
                 }
             }
         } catch (TeamNotFoundException ex) {
-            logger.error("The public team must exists.", ex);
+            LOGGER.error("The public team must exists.", ex);
         }
 
         if (jobTeam != null) {
@@ -319,7 +319,7 @@ public class TeamBasedACL extends SidACL {
                 }
             }
         } catch (TeamNotFoundException ex) {
-            logger.error("The public team must exists.", ex);
+            LOGGER.error("The public team must exists.", ex);
         }
 
         if (viewTeam != null) {
@@ -351,7 +351,7 @@ public class TeamBasedACL extends SidACL {
                 }
             }
         } catch (TeamNotFoundException ex) {
-            logger.error("The public team must exists.", ex);
+            LOGGER.error("The public team must exists.", ex);
         }
 
         if (nodeTeam != null) {
