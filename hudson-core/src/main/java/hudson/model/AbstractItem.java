@@ -15,44 +15,41 @@
 
 package hudson.model;
 
-import hudson.XmlFile;
-import hudson.Util;
-import hudson.Functions;
 import hudson.BulkChange;
+import hudson.Functions;
+import hudson.Util;
+import hudson.XmlFile;
 import hudson.cli.declarative.CLIMethod;
 import hudson.cli.declarative.CLIResolver;
 import hudson.model.listeners.ItemListener;
 import hudson.model.listeners.SaveableListener;
+import hudson.security.ACL;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
-import hudson.security.ACL;
 import hudson.util.AtomicFileWriter;
 import hudson.util.IOException2;
-import org.kohsuke.stapler.WebMethod;
-import org.kohsuke.stapler.export.Exported;
-import org.kohsuke.stapler.export.ExportedBean;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.HttpDeletable;
-import org.kohsuke.args4j.Argument;
-import org.kohsuke.args4j.CmdLineException;
-
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.servlet.ServletException;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.team.TeamManager;
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.stapler.HttpDeletable;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.WebMethod;
+import org.kohsuke.stapler.export.Exported;
+import org.kohsuke.stapler.export.ExportedBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -411,8 +408,11 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
         getParent().onDeleted(this);
     }
 	
+    /**
+     * Attempt to move directory out of jobs folder to tmp folder.
+     * Must not throw.
+     */
 	private void sidelineJobDir() {
-		// Attempt to move directory out of jobs folder to tmp folder
 		File tmpDir = null;
 		try {
 			tmpDir = Util.createTempDir();
@@ -431,27 +431,101 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
 		}
 		LOGGER.warn("Move deleted job folder unsuccessful "+getRootDir().getAbsolutePath());
 	}
+    
+    /**
+     * Mutual exclusion when adding/deleting files in job directory.
+     */
+    private final ReentrantReadWriteLock deleteLock = new ReentrantReadWriteLock();
+    /**
+     * True iff config.xml has been deleted on disk.
+     */
+    private boolean deleted;
+    
+    /**
+     * Lock the item against delete, ensuring safe access while lock is held.
+     * 
+     * <p>For use by threads that might otherwise read/write/delete files in the
+     * local workspace or job root directory while the root directory is being
+     * deleted.
+     * 
+     * <p>Does two things: First, (always) obtains the lock. Second, returns
+     * true if the job has not been deleted. 
+     * 
+     * <p>The delete lock is not exclusive; multiple threads may hold it at the
+     * same time. Thus, it allows concurrent access to the root directory or 
+     * workspace, unlike the workspace lease. It may be used in combination
+     * with the workspace lease to further restrict access.
+     * 
+     * <p>Any use of deleteLock() must be balanced by a call to
+     * deleteUnlock() as shown below.
+     * 
+     * <p>Usage:
+     * <pre>
+     *     try {
+     *       boolean safe = [project.]deleteLock();
+     *       if (safe) {
+     *         // Do some I/O in workspace or elsewhere in job directory.
+     *       }
+     *     } finally {
+     *       [project.]deleteUnlock();
+     *     }
+     * </pre>
+     * 
+     * @return true if job has not been deleted; true or false, lock is held
+     * 
+     * @see #deleteUnlock() 
+     * 
+     * @since 3.2.2
+     */
+    public boolean deleteLock() {
+        deleteLock.readLock().lock();
+        return !deleted;
+    }
+    
+    /**
+     * Unlock the item, allowing delete.
+     * 
+     * <p>Any use of deleteUnlock() must be balanced by a preceding call to
+     * deleteLock().
 
+     * @see #deleteLock()
+     * 
+     * @since 3.2.2
+     */
+    public void deleteUnlock() {
+        deleteLock.readLock().unlock();
+    }
+    
     /**
      * Does the real job of deleting the item.
      */
     protected void performDelete() throws IOException, InterruptedException {
-		// Bug 432569 - If folder can't be deleted, leaves job in half-deleted state
-        if (getConfigFile().doDelete()) {
-			// Job with no config.xml deleted even if folder remains
-			try {
-				Util.deleteRecursive(getRootDir());
-				LOGGER.info("Job deleted at "+getRootDir().getAbsolutePath());
-			} catch (Exception e) {
-				// Don't throw or job won't be fully deleted
-				LOGGER.warn("config.xml deleted but not job folder "+getRootDir().getAbsolutePath());
-				e.printStackTrace();
-				// Try to move the folder so it won't interfere with future job creation
-				sidelineJobDir();
-			}
-		} else {
-			throw new IOException(getRootDir().getAbsolutePath()+"/config.xml can't be deleted");
-		}
+        try {
+            deleteLock.writeLock().lock();
+            if (!getConfigFile().doDelete()) {
+                throw new IOException(getRootDir().getAbsolutePath()+"/config.xml can't be deleted");
+            }
+            // Delete must succeed
+            deleted = true;
+        } finally {
+            deleteLock.writeLock().unlock();
+        }
+        
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Util.deleteRecursive(getRootDir());
+                    LOGGER.info("Job deleted at "+getRootDir().getAbsolutePath());
+                } catch (Exception e) {
+                    // Bug 432569 - If folder can't be deleted, leaves job in half-deleted state
+                    LOGGER.warn("config.xml deleted but not job folder "+getRootDir().getAbsolutePath());
+                    e.printStackTrace();
+                    // Try to move the folder so it won't interfere with future job creation
+                    sidelineJobDir();
+                }
+            }
+        }, "Deleting "+getName()).start();
     }
 
     /**
