@@ -31,6 +31,7 @@ import hudson.util.IOException2;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.servlet.ServletException;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
@@ -73,6 +74,16 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
      */
     protected volatile String description;
     private transient ItemGroup parent;
+    
+    /**
+     * Mutual exclusion when adding/deleting files in job directory.
+     */
+    private volatile ReentrantReadWriteLock deleteLock = new ReentrantReadWriteLock();
+    
+    /**
+     * True iff config.xml has been deleted on disk.
+     */
+    private volatile boolean deleted;
     
     protected AbstractItem(ItemGroup parent, String name) {
         this.parent = parent;
@@ -433,15 +444,6 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
 	}
     
     /**
-     * Mutual exclusion when adding/deleting files in job directory.
-     */
-    private final ReentrantReadWriteLock deleteLock = new ReentrantReadWriteLock();
-    /**
-     * True iff config.xml has been deleted on disk.
-     */
-    private boolean deleted;
-    
-    /**
      * Lock the item against delete, ensuring safe access while lock is held.
      * 
      * <p>For use by threads that might otherwise read/write/delete files in the
@@ -478,7 +480,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
      * @since 3.2.2
      */
     public boolean deleteLock() {
-        deleteLock.readLock().lock();
+        getDeleteLock().readLock().lock();
         return !deleted;
     }
     
@@ -493,7 +495,15 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
      * @since 3.2.2
      */
     public void deleteUnlock() {
-        deleteLock.readLock().unlock();
+        getDeleteLock().readLock().unlock();
+    }
+    
+    private ReentrantReadWriteLock getDeleteLock() {
+        // deleteLock is not serialized
+        if (deleteLock == null) {
+            deleteLock = new ReentrantReadWriteLock();
+        }
+        return deleteLock;
     }
     
     /**
@@ -501,14 +511,14 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
      */
     protected void performDelete() throws IOException, InterruptedException {
         try {
-            deleteLock.writeLock().lock();
+            getDeleteLock().writeLock().lock();
             if (!getConfigFile().doDelete()) {
                 throw new IOException(getRootDir().getAbsolutePath()+"/config.xml can't be deleted");
             }
             // Delete must succeed
             deleted = true;
         } finally {
-            deleteLock.writeLock().unlock();
+            getDeleteLock().writeLock().unlock();
         }
         
         new Thread(new Runnable() {
