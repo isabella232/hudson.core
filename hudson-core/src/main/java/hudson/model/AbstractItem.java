@@ -15,44 +15,41 @@
 
 package hudson.model;
 
-import hudson.XmlFile;
-import hudson.Util;
-import hudson.Functions;
 import hudson.BulkChange;
+import hudson.Functions;
+import hudson.Util;
+import hudson.XmlFile;
 import hudson.cli.declarative.CLIMethod;
 import hudson.cli.declarative.CLIResolver;
 import hudson.model.listeners.ItemListener;
 import hudson.model.listeners.SaveableListener;
+import hudson.security.ACL;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
-import hudson.security.ACL;
 import hudson.util.AtomicFileWriter;
 import hudson.util.IOException2;
-import org.kohsuke.stapler.WebMethod;
-import org.kohsuke.stapler.export.Exported;
-import org.kohsuke.stapler.export.ExportedBean;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.HttpDeletable;
-import org.kohsuke.args4j.Argument;
-import org.kohsuke.args4j.CmdLineException;
-
+import java.util.Random;
 import javax.servlet.ServletException;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.team.TeamManager;
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.stapler.HttpDeletable;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.WebMethod;
+import org.kohsuke.stapler.export.Exported;
+import org.kohsuke.stapler.export.ExportedBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -411,47 +408,65 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
         getParent().onDeleted(this);
     }
 	
-	private void sidelineJobDir() {
-		// Attempt to move directory out of jobs folder to tmp folder
-		File tmpDir = null;
-		try {
-			tmpDir = Util.createTempDir();
-		} catch (Exception ex) {
-			; // fall thru
+    /**
+     * Attempt to move root directory out of the way of new job creation
+     * but within the same parent dir. Leaves a better diagnostic trace
+     * and stays within current file system.
+     * Must not throw.
+     * @return File; moved root dir if successful, otherwise original root dir
+     */
+	private File trySidelineJobDir() throws InterruptedException {
+		File newDir = null;
+        
+        for (int retry = 0; retry < 5; retry++) {
+            Random r = new Random();
+            int n = r.nextInt();
+            StringBuilder sb = new StringBuilder("tmp#"); // Can't be a job name
+            sb.append(n);
+            sb.append('_');
+            sb.append(getRootDir().getName());
+            if (sb.length() > 255) {
+                sb.setLength(255);
+            }
+            newDir = new File(getRootDir().getParentFile(), sb.toString());
+            if (!newDir.exists()) {
+                break;
+            }
+        }
+
+        if (newDir != null && Util.renameDirectory(getRootDir(), newDir)) {
+            LOGGER.info("Job folder successfully moved to "+newDir.getAbsolutePath());
+        } else {
+            LOGGER.warn("Move job folder unsuccessful "+getRootDir().getAbsolutePath());
+            newDir = getRootDir();
 		}
-		if (tmpDir != null) {
-			File newDir = new File(tmpDir, getRootDir().getName());
-			try {
-				Util.renameDirectory(getRootDir(), newDir);
-				LOGGER.info("Job folder successfully moved to "+newDir.getAbsolutePath());
-				return;
-			} catch (Exception ex) {
-				; // fall thru
-			}
-		}
-		LOGGER.warn("Move deleted job folder unsuccessful "+getRootDir().getAbsolutePath());
+        return newDir;
 	}
 
     /**
      * Does the real job of deleting the item.
      */
     protected void performDelete() throws IOException, InterruptedException {
-		// Bug 432569 - If folder can't be deleted, leaves job in half-deleted state
-        if (getConfigFile().doDelete()) {
-			// Job with no config.xml deleted even if folder remains
-			try {
-				Util.deleteRecursive(getRootDir());
-				LOGGER.info("Job deleted at "+getRootDir().getAbsolutePath());
-			} catch (Exception e) {
-				// Don't throw or job won't be fully deleted
-				LOGGER.warn("config.xml deleted but not job folder "+getRootDir().getAbsolutePath());
-				e.printStackTrace();
-				// Try to move the folder so it won't interfere with future job creation
-				sidelineJobDir();
-			}
-		} else {
-			throw new IOException(getRootDir().getAbsolutePath()+"/config.xml can't be deleted");
-		}
+        if (!getConfigFile().doDelete()) {
+            throw new IOException(getRootDir().getAbsolutePath()+"/config.xml can't be deleted");
+        }
+        // delete must succeed beyond this point
+        
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // Bug 432569 - If folder can't be deleted, leaves job in half-deleted state
+                    File rootDir = trySidelineJobDir();
+                    Util.deleteRecursive(rootDir);
+                    LOGGER.info("Job deleted at "+getRootDir().getAbsolutePath());
+                } catch (Exception e) {
+                    // Bug 432569 - If folder can't be deleted, leaves job in half-deleted state
+                    LOGGER.warn("config.xml deleted but not job folder "+getRootDir().getAbsolutePath());
+                    e.printStackTrace();
+                }
+            }
+        }, "Deleting "+getName()).start();
     }
 
     /**

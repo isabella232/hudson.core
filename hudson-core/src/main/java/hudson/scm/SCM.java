@@ -358,19 +358,24 @@ public abstract class SCM implements Describable<SCM>, ExtensionPoint {
      * between pre 1.345 SCMs.
      */
     public final PollingResult poll(AbstractProject<?, ?> project, Launcher launcher, FilePath workspace, TaskListener listener, SCMRevisionState baseline) throws IOException, InterruptedException {
-        if (is1_346OrLater()) {
-            // This is to work around HUDSON-5827 in a general way.
-            // don't let the SCM.compareRemoteRevisionWith(...) see SCMRevisionState that it didn't produce.
-            SCMRevisionState baseline2;
-            if (baseline != SCMRevisionState.NONE) {
-                baseline2 = baseline;
-            } else {
-                baseline2 = _calcRevisionsFromBuild(project.getLastBuild(), launcher, listener);
-            }
+        // Ensure poll can't run during project delete.
+        synchronized (project.getParent()) {
+            synchronized (project) {
+                if (is1_346OrLater()) {
+                    // This is to work around HUDSON-5827 in a general way.
+                    // don't let the SCM.compareRemoteRevisionWith(...) see SCMRevisionState that it didn't produce.
+                    SCMRevisionState baseline2;
+                    if (baseline != SCMRevisionState.NONE) {
+                        baseline2 = baseline;
+                    } else {
+                        baseline2 = _calcRevisionsFromBuild(project.getLastBuild(), launcher, listener);
+                    }
 
-            return _compareRemoteRevisionWith(project, launcher, workspace, listener, baseline2);
-        } else {
-            return pollChanges(project, launcher, workspace, listener) ? PollingResult.SIGNIFICANT : PollingResult.NO_CHANGES;
+                    return _compareRemoteRevisionWith(project, launcher, workspace, listener, baseline2);
+                } else {
+                    return pollChanges(project, launcher, workspace, listener) ? PollingResult.SIGNIFICANT : PollingResult.NO_CHANGES;
+                }
+            }
         }
     }
 
