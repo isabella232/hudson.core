@@ -208,7 +208,11 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
                 callOnRenamed(newName, parent, oldName);
 
                 for (ItemListener l : ItemListener.all()) {
-                    l.onRenamed(this, oldName, newName);
+                    try {
+                        l.onRenamed(this, oldName, newName);
+                    } catch (Exception e) {
+                        LOGGER.warn("Exception in ItemListener.onRename", e);
+                    }
                 }
                 save();
             }

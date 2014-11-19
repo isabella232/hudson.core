@@ -2461,7 +2461,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         items.put(newName, job);
 
         for (View v : views) {
-            v.onJobRenamed(job, oldName, newName);
+            try {
+                v.onJobRenamed(job, oldName, newName);
+            } catch (Exception e) {
+                logger.warn("Exception from View", e);
+            }
         }
         save();
     }
@@ -2472,12 +2476,22 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     public void onDeleted(TopLevelItem item) throws IOException {
         for (ItemListener l : ItemListener.all()) {
-            l.onDeleted(item);
+            try {
+                l.onDeleted(item);
+            } catch (Exception e) {
+                // Bug 452400 - Flaky ItemListener can leave job in half-deleted state
+                logger.warn("Exception from ItemListener", e);
+            }
         }
 
         items.remove(item.getName());
+        
         for (View v : views) {
-            v.onJobRenamed(item, item.getName(), null);
+            try {
+                v.onJobRenamed(item, item.getName(), null);
+            } catch (Exception e) {
+                logger.warn("Exception from View", e);
+            }
         }
         save();
     }
