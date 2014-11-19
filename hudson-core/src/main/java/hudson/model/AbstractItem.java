@@ -442,6 +442,12 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
 		}
         return newDir;
 	}
+    
+    private transient volatile boolean deleted;
+    
+    public boolean isDeleted() {
+        return deleted;
+    }
 
     /**
      * Does the real job of deleting the item.
@@ -451,6 +457,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
             throw new IOException(getRootDir().getAbsolutePath()+"/config.xml can't be deleted");
         }
         // delete must succeed beyond this point
+        deleted = true;
         
         new Thread(new Runnable() {
             @Override

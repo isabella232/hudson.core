@@ -361,19 +361,23 @@ public abstract class SCM implements Describable<SCM>, ExtensionPoint {
         // Ensure poll can't run during project delete.
         synchronized (project.getParent()) {
             synchronized (project) {
-                if (is1_346OrLater()) {
-                    // This is to work around HUDSON-5827 in a general way.
-                    // don't let the SCM.compareRemoteRevisionWith(...) see SCMRevisionState that it didn't produce.
-                    SCMRevisionState baseline2;
-                    if (baseline != SCMRevisionState.NONE) {
-                        baseline2 = baseline;
-                    } else {
-                        baseline2 = _calcRevisionsFromBuild(project.getLastBuild(), launcher, listener);
-                    }
+                if (!project.isDeleted()) {
+                    if (is1_346OrLater()) {
+                        // This is to work around HUDSON-5827 in a general way.
+                        // don't let the SCM.compareRemoteRevisionWith(...) see SCMRevisionState that it didn't produce.
+                        SCMRevisionState baseline2;
+                        if (baseline != SCMRevisionState.NONE) {
+                            baseline2 = baseline;
+                        } else {
+                            baseline2 = _calcRevisionsFromBuild(project.getLastBuild(), launcher, listener);
+                        }
 
-                    return _compareRemoteRevisionWith(project, launcher, workspace, listener, baseline2);
+                        return _compareRemoteRevisionWith(project, launcher, workspace, listener, baseline2);
+                    } else {
+                        return pollChanges(project, launcher, workspace, listener) ? PollingResult.SIGNIFICANT : PollingResult.NO_CHANGES;
+                    }
                 } else {
-                    return pollChanges(project, launcher, workspace, listener) ? PollingResult.SIGNIFICANT : PollingResult.NO_CHANGES;
+                    return PollingResult.NO_CHANGES;
                 }
             }
         }
