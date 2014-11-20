@@ -29,7 +29,7 @@ public class BrokenTopLevelItem extends Job implements TopLevelItem {
     
     BrokenTopLevelItem(LazyTopLevelItem.Key key,
                        Exception exception) {
-        super(key.parent, key.name + " [In Error]");
+        super(key.parent, key.name);
         
         this.key = key;
         this.exception = exception;
