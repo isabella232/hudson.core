@@ -93,7 +93,7 @@ public class HudsonFilter implements Filter {
         try {
             SecurityRealm securityRealm = hudsonSecurityManager.getSecurityRealm();
             reset(securityRealm);
-            logger.debug("securityRealm is " + securityRealm);
+            logger.debug("securityRealm is {}", securityRealm);
             logger.debug("Security initialized");
         } catch (Exception exc) {
             // see HUDSON-4592. In some containers this happens before

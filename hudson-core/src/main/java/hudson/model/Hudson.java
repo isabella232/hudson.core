@@ -737,11 +737,11 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
         List<ReactorListener> r = (List) Service.loadInstances(Thread.currentThread().getContextClassLoader(), InitReactorListener.class);
         r.add(new ReactorListener() {
             public void onTaskStarted(Task t) {
-                logger.debug("Started " + t.getDisplayName());
+                logger.debug("Started {}", t.getDisplayName());
             }
 
             public void onTaskCompleted(Task t) {
-                logger.debug("Completed " + t.getDisplayName());
+                logger.debug("Completed {}", t.getDisplayName());
             }
 
             public void onTaskFailed(Task t, Throwable err, boolean fatal) {

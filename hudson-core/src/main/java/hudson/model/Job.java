@@ -1045,7 +1045,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(os);
         new Exception("Stack trace").printStackTrace(ps);
-        LOGGER.debug("Job.getBuilds() API should be avoided for performance reason. " + os.toString());
+        LOGGER.debug("Job.getBuilds() API should be avoided for performance reason. {}", os.toString());
         return RunList.fromRuns(_getRuns().values());
     }
 

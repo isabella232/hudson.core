@@ -187,7 +187,7 @@ public final class ProxyConfiguration implements Saveable {
                 urlConnection.connect();
                 connected = true;
             } catch (SocketTimeoutException exc) {
-                logger.debug("Connection timed out. trying again " + count);
+                logger.debug("Connection timed out. trying again {}", count);
                 if (++count > TIME_OUT_RETRY_COUNT) {
                     throw new IOException(
                             "Could not connect to " + urlConnection.getURL().toExternalForm() + ". Connection timed out after " + TIME_OUT_RETRY_COUNT + " tries.");

@@ -166,12 +166,12 @@ public final class TeamManager implements Saveable, AccessControlled {
 
     public boolean isCurrentUserSysAdmin() {
         String user = getCurrentUser();
-        logger.debug("Checking if principal " + user + " is a System Admin");
+        logger.debug("Checking if principal {} is a System Admin", user);
         if (isSysAdmin(user)) {
             return true;
         } else {
             for (GrantedAuthority ga : getCurrentUserRoles()) {
-                logger.debug("Checking if the principal's role " + ga.toString() + " is a System Admin Role");
+                logger.debug("Checking if the principal's role {} is a System Admin Role", ga.toString());
                 if (isSysAdmin(ga.getAuthority())) {
                     return true;
                 }
@@ -193,7 +193,7 @@ public final class TeamManager implements Saveable, AccessControlled {
                 // Check if any of the group the user is a memmber has given
                 // Team Admin Role
                 for (GrantedAuthority ga : getCurrentUserRoles()) {
-                    logger.debug("Checking if the principal's role " + ga.toString() + " is a Team Admin Role");
+                    logger.debug("Checking if the principal's role {} is a Team Admin Role", ga.toString());
                     if (team.isAdmin(ga.getAuthority())) {
                         return true;
                     }
@@ -1018,7 +1018,7 @@ public final class TeamManager implements Saveable, AccessControlled {
             } else {
                 // Check if any of the group the user is a memmber, is also a member of the team
                 for (GrantedAuthority ga : getCurrentUserRoles()) {
-                    logger.debug("Checking if the principal's role " + ga.toString() + " is a Team Admin Role");
+                    logger.debug("Checking if the principal's role {} is a Team Admin Role", ga.toString());
                     if (team.isMember(ga.getAuthority())) {
                         list.add(team.getName());
                     }

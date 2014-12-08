@@ -38,13 +38,15 @@ public abstract class SidACL extends ACL {
     @Override
     public boolean hasPermission(Authentication a, Permission permission) {
         if (a == SYSTEM) {
-            LOGGER.debug("hasPermission(" + a + "," + permission + ")=>SYSTEM user has full access");
+            LOGGER.debug("hasPermission({},{})=>SYSTEM user has full access", a, permission);
             return true;
         }
         Boolean b = _hasPermission(a, permission);
 
-        LOGGER.debug("hasPermission(" + a + "," + permission + ")=>" + (b == null ? "null, thus false" : b));
-
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("hasPermission(" + a + "," + permission + ")=>" + (b == null ? "null, thus false" : b));
+        }
+        
         if (b == null) {
             b = false;    // default to rejection
         }
@@ -61,10 +63,12 @@ public abstract class SidACL extends ACL {
      */
     protected Boolean _hasPermission(Authentication a, Permission permission) {
         // ACL entries for this principal takes precedence
-        LOGGER.debug("Checking if principal " + a.getName() + " has " + permission);
+        LOGGER.debug("Checking if principal {} has {}", a.getName(), permission);
         Boolean b = hasPermission(new PrincipalSid(a), permission);
         if (b != null) {
-            LOGGER.debug("hasPermission(PrincipalSID:" + a.getPrincipal() + "," + permission + ")=>" + b);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("hasPermission(PrincipalSID:" + a.getPrincipal() + "," + permission + ")=>" + b);
+            }
             return b;
         }
 
@@ -72,10 +76,12 @@ public abstract class SidACL extends ACL {
         // has any ACL entries.
         // here we are using GrantedAuthority as a group
         for (GrantedAuthority ga : a.getAuthorities()) {
-            LOGGER.debug("Checking if principal's role " + ga.getAuthority() + " has " + permission);
+            LOGGER.debug("Checking if principal's role {} has {}", ga.getAuthority(), permission);
             b = hasPermission(new GrantedAuthoritySid(ga), permission);
             if (b != null) {
-                LOGGER.debug("hasPermission(GroupSID:" + ga.getAuthority() + "," + permission + ")=>" + b);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("hasPermission(GroupSID:" + ga.getAuthority() + "," + permission + ")=>" + b);
+                }
                 return b;
             }
         }
@@ -84,7 +90,9 @@ public abstract class SidACL extends ACL {
         for (Sid sid : AUTOMATIC_SIDS) {
             b = hasPermission(sid, permission);
             if (b != null) {
-                LOGGER.debug("hasPermission(" + sid + "," + permission + ")=>" + b);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("hasPermission(" + sid + "," + permission + ")=>" + b);
+                }
                 return b;
             }
         }
