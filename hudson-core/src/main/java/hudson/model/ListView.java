@@ -131,8 +131,10 @@ public class ListView extends View implements Saveable {
     public synchronized List<TopLevelItem> getItems() {
         SortedSet<String> names = new TreeSet<String>(jobNames);
 
+        List<TopLevelItem> allItems = Hudson.getInstance().getItems();
+
         if (includePattern != null) {
-            for (TopLevelItem item : Hudson.getInstance().getItems()) {
+            for (TopLevelItem item : allItems) {
                 String itemName = item.getName();
                 if (includePattern.matcher(itemName).matches()) {
                     names.add(itemName);
@@ -152,7 +154,6 @@ public class ListView extends View implements Saveable {
 
         // check the filters
         Iterable<ViewJobFilter> jobFilters = getJobFilters();
-        List<TopLevelItem> allItems = Hudson.getInstance().getItems();
         for (ViewJobFilter jobFilter : jobFilters) {
             items = jobFilter.filter(items, allItems, this);
         }
