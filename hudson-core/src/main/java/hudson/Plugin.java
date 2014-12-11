@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * 
+ *
  *    Kohsuke Kawaguchi
  *
  *
@@ -16,24 +16,23 @@
 
 package hudson;
 
-import hudson.model.Hudson;
+import com.thoughtworks.xstream.XStream;
 import hudson.model.Descriptor;
+import hudson.model.Descriptor.FormException;
+import hudson.model.Hudson;
 import hudson.model.Saveable;
 import hudson.model.listeners.ItemListener;
 import hudson.model.listeners.SaveableListener;
-import hudson.model.Descriptor.FormException;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-
+import hudson.util.TimeUnit2;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.File;
-import java.net.URL;
-
 import net.sf.json.JSONObject;
-import com.thoughtworks.xstream.XStream;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * Base class of Hudson plugin.
@@ -175,21 +174,22 @@ public abstract class Plugin implements Saveable {
      * This method serves static resources in the plugin under
      * <tt>hudson/plugin/SHORTNAME</tt>.
      */
-    public void doDynamic(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+    public void doDynamic(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, URISyntaxException {
         String path = req.getRestOfPath();
 
         if (path.length() == 0) {
             path = "/";
         }
 
-        if (path.indexOf("..") != -1 || path.length() < 1) {
-            // don't serve anything other than files in the sub directory.
-            rsp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
+        String requestPath = req.getRequestURI().substring(req.getContextPath().length());
+        boolean staticLink = requestPath.startsWith("/static/");
+        long expires = staticLink ? TimeUnit2.DAYS.toMillis(365) : -1;
 
-        // use serveLocalizedFile to support automatic locale selection
-        rsp.serveLocalizedFile(req, new URL(wrapper.baseResourceURL, '.' + path));
+        try {
+            rsp.serveLocalizedFile(req, wrapper.baseResourceURL.toURI().resolve(new URI(null, '.' + path, null)).toURL(), expires);
+        } catch (URISyntaxException x) {
+            throw new IOException(x);
+        }
     }
 
 //
