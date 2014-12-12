@@ -43,15 +43,6 @@ import hudson.util.DescribableList;
 import hudson.util.DescribableListUtil;
 import hudson.util.FormValidation;
 import hudson.util.FormValidation.Kind;
-import net.sf.json.JSONObject;
-import org.apache.commons.collections.CollectionUtils;
-import org.eclipse.hudson.api.matrix.IMatrixProject;
-import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.TokenList;
-
-import javax.servlet.ServletException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -67,6 +58,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.ServletException;
+import net.sf.json.JSONObject;
+import org.apache.commons.collections.CollectionUtils;
+import org.eclipse.hudson.api.matrix.IMatrixProject;
+import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.TokenList;
 
 /**
  * {@link Job} that allows you to run multiple different configurations from a
@@ -570,9 +569,12 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
         }
         return super.getDynamic(token, req, rsp);
     }
+    
+    private boolean configSubmit = false;
 
     @Override
     protected void submit(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, FormException {
+        configSubmit = true;
         super.submit(req, rsp);
 
         JSONObject json = req.getSubmittedForm();
@@ -600,6 +602,7 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
         setRunSequentially(json.has(RUN_SEQUENTIALLY_PROPERTY_NAME));
 
         rebuildConfigurations();
+        configSubmit = false;
     }
 
     /**
@@ -675,7 +678,10 @@ public class MatrixProject extends BaseBuildableProject<MatrixProject, MatrixBui
     public void setCascadingProjectName(String cascadingProjectName) throws IOException {
         super.setCascadingProjectName(cascadingProjectName);
         try {
-            rebuildConfigurations();
+            // Config submit will rebuild configuration, so do not do it here
+            if (!configSubmit) {
+                rebuildConfigurations();
+            }
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Failed to rebuild matrix configuration", e);
         }
