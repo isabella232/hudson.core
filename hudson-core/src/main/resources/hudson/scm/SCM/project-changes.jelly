@@ -41,7 +41,7 @@
 
           <ol>
             <j:forEach var="c" items="${b.changeSet.iterator()}" varStatus="loop">
-              <li value="${c.revision}">
+              <li value="${c.revision.class.name == 'java.lang.Integer' ? c.revision : null}">
                 <j:out value="${c.msgAnnotated}"/>
 
                 &#8212;
