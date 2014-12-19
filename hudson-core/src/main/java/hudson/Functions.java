@@ -32,6 +32,7 @@ import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.Items;
+import hudson.model.JDK;
 import hudson.model.Job;
 import hudson.model.JobPropertyDescriptor;
 import hudson.model.ModelObject;
@@ -44,8 +45,14 @@ import hudson.model.Run;
 import hudson.model.TopLevelItem;
 import hudson.model.User;
 import hudson.model.View;
-import hudson.model.JDK;
+import hudson.scm.SCM;
+import hudson.scm.SCMDescriptor;
 import hudson.search.SearchableModelObject;
+import hudson.security.AccessControlled;
+import hudson.security.AuthorizationStrategy;
+import hudson.security.Permission;
+import hudson.security.SecurityRealm;
+import hudson.security.csrf.CrumbIssuer;
 import hudson.slaves.Cloud;
 import hudson.slaves.ComputerLauncher;
 import hudson.slaves.NodeProperty;
@@ -58,33 +65,9 @@ import hudson.tasks.Builder;
 import hudson.tasks.Publisher;
 import hudson.util.Area;
 import hudson.util.Iterators;
-import hudson.scm.SCM;
-import hudson.scm.SCMDescriptor;
-import hudson.security.*;
-import hudson.security.csrf.CrumbIssuer;
-import org.eclipse.hudson.security.captcha.CaptchaSupport;
 import hudson.util.Secret;
 import hudson.views.MyViewsTabBar;
 import hudson.views.ViewsTabBar;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.jelly.JellyContext;
-import org.apache.commons.jelly.JellyTagException;
-import org.apache.commons.jelly.Script;
-import org.apache.commons.jelly.XMLOutput;
-import org.apache.commons.jexl.parser.ASTSizeFunction;
-import org.apache.commons.jexl.util.Introspector;
-import org.jvnet.tiger_types.Types;
-import org.kohsuke.stapler.Ancestor;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerProxy;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.jelly.InternationalizedStringExpression;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -95,8 +78,8 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
-import java.lang.reflect.Type;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -107,22 +90,42 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Date;
-import java.util.Locale;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import org.apache.commons.jelly.JellyContext;
+import org.apache.commons.jelly.JellyTagException;
+import org.apache.commons.jelly.Script;
+import org.apache.commons.jelly.XMLOutput;
+import org.apache.commons.jexl.parser.ASTSizeFunction;
+import org.apache.commons.jexl.util.Introspector;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.hudson.script.ScriptSupport;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.eclipse.hudson.security.captcha.CaptchaSupport;
+import org.jvnet.tiger_types.Types;
+import org.kohsuke.stapler.Ancestor;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerProxy;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.jelly.InternationalizedStringExpression;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
 /**
@@ -1536,5 +1539,21 @@ public class Functions {
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Get an attribute stored in a session with out actually creating the session
+     * @param req
+     * @param attrName
+     * @return 
+     * @since 3.2.2
+     */
+    public static Object getSessionAttribute(StaplerRequest req, String attrName){
+        HttpSession session = req.getSession(false);
+        if (session != null){
+             return session.getAttribute(attrName); 
+        }else{
+           return null; 
+        }
     }
 }
