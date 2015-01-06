@@ -43,10 +43,10 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <st:statusCode value="403" />
-  <l:layout title="${%loginError(it.identifier.pronoun)}">
+  <l:layout title="${%loginError(it.identity.pronoun)}">
     <l:main-panel>
-      <h1>${%loginError(it.identifier.pronoun)}</h1>
-      <p>${%blurb(it.identifier.pronoun, it.identifier.identifier)}</p>
+      <h1>${%loginError(it.identity.pronoun)}</h1>
+      <p>${%blurb(it.identity.pronoun, it.identity.identifier)}</p>
     </l:main-panel>
   </l:layout>
 </j:jelly>
