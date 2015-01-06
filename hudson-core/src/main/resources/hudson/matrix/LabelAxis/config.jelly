@@ -26,7 +26,7 @@
       <j:forEach var="l" items="${app.labelAtoms}">
         <j:if test="${!l.isSelfLabel()}">
           <div class="axis-child">
-            <f:checkbox name="values" json="${l.name}" checked="${instance.indexOf(l.name) != -1}" title="${h.jsStringEscape(l.name)} (${h.jsStringEscape(l.description)})"/>
+            <f:checkbox name="values" json="${l.name}" checked="${instance != null and instance.indexOf(l.name) != -1}" title="${h.jsStringEscape(l.name)} (${h.jsStringEscape(l.description)})"/>
           </div>
         </j:if>
       </j:forEach>
@@ -34,7 +34,7 @@
       <j:forEach var="l" items="${app.labelAtoms}">
         <j:if test="${l.isSelfLabel()}">
           <div class="axis-child">
-            <f:checkbox name="values" json="${l.name}" checked="${instance.indexOf(l.name) != -1}" title="${h.jsStringEscape(l.name)} (${h.jsStringEscape(l.description)})"/>
+            <f:checkbox name="values" json="${l.name}" checked="${instance != null and instance.indexOf(l.name) != -1}" title="${h.jsStringEscape(l.name)} (${h.jsStringEscape(l.description)})"/>
           </div>
         </j:if>
       </j:forEach>
