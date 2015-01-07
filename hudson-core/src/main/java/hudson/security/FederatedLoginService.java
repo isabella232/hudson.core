@@ -49,6 +49,7 @@ import org.kohsuke.stapler.StaplerResponse;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.io.Serializable;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -120,7 +121,9 @@ public abstract class FederatedLoginService implements ExtensionPoint {
     /**
      * Identity information as obtained from {@link FederatedLoginService}.
      */
-    public abstract class FederatedIdentity {
+    public static abstract class FederatedIdentity implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         /**
          * Gets the string representation of the identity in the form that makes
