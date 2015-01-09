@@ -1156,6 +1156,8 @@ public class Functions {
                 case RED:
                 case YELLOW:
                     return "Failure";
+                case GREEN:
+                    return "Success";
                 case BLUE:
                     return "Success";
                 case DISABLED:
