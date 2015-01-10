@@ -391,7 +391,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             holdOffBuildUntilSave = false;
         }
     }
-    
+
     private synchronized void setCascadingProject(){
         if ((cascadingProjectName  != null) && StringUtils.isNotBlank(cascadingProjectName)) {
             TopLevelItem tlItem = Hudson.getInstance().getItem(cascadingProjectName);
@@ -1310,7 +1310,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     public long getEstimatedDuration() {
         //List<RunT> builds = getLastBuildsOverThreshold(3, Result.UNSTABLE);
-        
+
         List<Record<JobT, RunT>> records = getBuildHistoryData().getLastRecordsOverThreshold(3, Result.UNSTABLE);
 
         if (records.isEmpty()) {
@@ -1506,7 +1506,12 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             pw.println("Failed to parse form data. Please report this problem as a bug");
-            pw.println("JSON=" + req.getSubmittedForm());
+            try {
+                pw.println("JSON=" + getSubmittedForm(req));
+            }
+            catch (Exception ex) {
+                pw.println("Unknown form exception while getting submitted form");
+            }
             pw.println();
             e.printStackTrace(pw);
 
@@ -1515,12 +1520,21 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         }
     }
 
+    protected JSONObject getSubmittedForm(StaplerRequest request) throws FormException, ServletException {
+        try {
+            return request.getSubmittedForm();
+        }
+        catch (IllegalStateException ex) {
+            throw new FormException(ex.getMessage(), "unknown");
+        }
+    }
+
     /**
      * Derived class can override this to perform additional config submission
      * work.
      */
     protected void submit(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, FormException {
-        JSONObject json = req.getSubmittedForm();
+        JSONObject json = getSubmittedForm(req);
 
         description = json.getString("description");
 
