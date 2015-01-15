@@ -18,11 +18,11 @@ package hudson.triggers;
 
 import hudson.DependencyRunner;
 import hudson.DependencyRunner.ProjectRunnable;
-import hudson.ExtensionPoint;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
-import hudson.init.Initializer;
+import hudson.ExtensionPoint;
 import static hudson.init.InitMilestone.JOB_LOADED;
+import hudson.init.Initializer;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Build;
@@ -30,28 +30,29 @@ import hudson.model.ComputerSet;
 import hudson.model.Describable;
 import hudson.model.Hudson;
 import hudson.model.Item;
-import hudson.model.Project;
 import hudson.model.PeriodicWork;
+import hudson.model.Project;
 import hudson.model.TopLevelItem;
 import hudson.model.TopLevelItemDescriptor;
 import hudson.scheduler.CronTab;
 import hudson.scheduler.CronTabList;
+import hudson.util.CascadingUtil;
 import hudson.util.DoubleLaunchChecker;
-
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.Timer;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Timer;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.runtime.RecognitionException;
+import org.eclipse.hudson.model.project.property.TriggerProjectProperty;
 
 /**
  * Triggers a {@link Build}.
@@ -248,6 +249,13 @@ public abstract class Trigger<J extends Item> implements Describable<Trigger<?>>
         // Process all triggers, except SCMTriggers when synchronousPolling is set
         for (AbstractProject<?, ?> p : inst.getAllItems(AbstractProject.class)) {
             for (Trigger t : p.getTriggers().values()) {
+                //Fix: 457113 - Unnecessary calls of Trigger.run()
+                if (p.hasCascadingProject()){
+                    TriggerProjectProperty triggerProjectProperty = CascadingUtil.getTriggerProjectProperty(p, t.getDescriptor().getJsonSafeClassName());
+                    if (!triggerProjectProperty.isOverridden()){
+                        continue;
+                    }
+                }
                 if (!(t instanceof SCMTrigger && scmd.synchronousPolling)) {
                     LOGGER.fine("cron checking " + p.getName());
 
