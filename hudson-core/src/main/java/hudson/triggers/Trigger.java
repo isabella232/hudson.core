@@ -99,6 +99,38 @@ public abstract class Trigger<J extends Item> implements Describable<Trigger<?>>
      */
     public void stop() {
     }
+    
+    /**
+     * Add the job if it should  be part of the job list in this trigger
+     * @param job 
+     * @since 3.2.2
+     */
+    public void addJob(J job){
+        if (!jobs.contains(job)){
+            jobs.add(job);
+        }
+    }
+    
+    /**
+     * Remove the job if it should not be part of the job list in this trigger
+     * @param job 
+     * @since 3.2.2
+     */
+    public void removeJob(J job){
+        if (jobs.contains(job)){
+            jobs.remove(job);
+        }
+    }
+    
+    /**
+     * Check if the job list in this trigger contains this particular job
+     * @param job 
+     * @return boolean 
+     * @since 3.2.2
+     */
+    public boolean hasJob(J job){
+        return jobs.contains(job);
+    }
 
     /**
      * Returns an action object if this {@link Trigger} has an action to

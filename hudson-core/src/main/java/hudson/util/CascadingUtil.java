@@ -1,20 +1,21 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
  * Copyright (c) 2011 Oracle Corporation.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *
- *    Nikita Levyankov
+ * Nikita Levyankov
  *
- *******************************************************************************/
+ ******************************************************************************
+ */
 package hudson.util;
 
-import hudson.Functions;
 import hudson.model.AbstractProject;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
@@ -498,6 +499,22 @@ public class CascadingUtil {
             trigger.start(job, true);
         }
         property.setValue(trigger);
+
+        if (property.isOverridden()) {
+            //Trigger value is overriden, so remove the job from the cascading parent trigger (see 457650)
+            Trigger parentTrigger = findCascadingParentTrigger(job.getCascadingProject(), key);
+            if (parentTrigger != null) {
+                parentTrigger.removeJob(job);
+            }
+        } else {
+            //Make sure the job is in the parent job trigger (if exists) (see 457654)
+            Trigger parentTrigger = findCascadingParentTrigger(job.getCascadingProject(), key);
+            if (parentTrigger != null) {
+                if (!parentTrigger.hasJob(job)) {
+                    parentTrigger.addJob(job);
+                }
+            }
+        }
         Set<String> cascadingChildrenNames = job.getCascadingChildrenNames();
         if (null != cascadingChildrenNames) {
             for (String childName : cascadingChildrenNames) {
@@ -515,6 +532,19 @@ public class CascadingUtil {
                 }
             }
         }
+    }
+
+    private static Trigger findCascadingParentTrigger(Job parent, String propertyKey) {
+        Trigger parentTrigger = null;
+        if (parent != null) {
+            TriggerProjectProperty parentTriggerProperty = CascadingUtil.getTriggerProjectProperty(parent, propertyKey);
+            if (parentTriggerProperty.getValue() != null) {
+                parentTrigger = parentTriggerProperty.getValue();
+            } else {
+                parentTrigger = findCascadingParentTrigger(parent.getCascadingProject(), propertyKey);
+            }
+        }
+        return parentTrigger;
     }
 
     /**
