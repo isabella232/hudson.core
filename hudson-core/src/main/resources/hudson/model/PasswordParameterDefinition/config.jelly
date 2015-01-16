@@ -23,7 +23,17 @@
 		<f:textbox name="parameter.name" value="${instance.name}" />
 	</f:entry>
 	<f:entry title="${%Default Value}" help="/help/parameter/string-default.html">
-		<f:password name="parameter.defaultValue" value="${instance.defaultValue}" />
+            <j:getStatic var="confPermission" className="hudson.model.Item" field="CONFIGURE"/>
+
+            <j:choose>
+                 <j:when test="${h.hasPermission(confPermission)}">
+                     <f:password name="parameter.defaultValue" value="${instance.defaultValue}" />
+                 </j:when>
+                 <j:otherwise>
+                     <!-- Only user with configure permission may see default password (453797)-->
+                     <f:password name="parameter.defaultValue" value="*******" />
+                 </j:otherwise>
+            </j:choose>
 	</f:entry>
     <f:entry title="${%Description}" help="/help/parameter/description.html">
         <f:textarea name="parameter.description" value="${instance.description}" />
