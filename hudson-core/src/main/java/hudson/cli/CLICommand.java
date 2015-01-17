@@ -19,8 +19,8 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
-import hudson.cli.declarative.CLIMethod;
 import hudson.ExtensionPoint.LegacyInstancesAreScopedToHudson;
+import hudson.cli.declarative.CLIMethod;
 import hudson.cli.declarative.OptionHandlerExtension;
 import hudson.cli.handlers.RequiresAuthenticationOptionHandler;
 import hudson.model.Hudson;
@@ -29,13 +29,6 @@ import hudson.remoting.Channel;
 import hudson.remoting.ChannelProperty;
 import hudson.security.CliAuthenticator;
 import hudson.security.SecurityRealm;
-import org.jvnet.hudson.annotation_indexer.Index;
-import org.jvnet.tiger_types.Types;
-import org.kohsuke.args4j.ClassParser;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.spi.OptionHandler;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +38,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.jvnet.hudson.annotation_indexer.Index;
+import org.jvnet.tiger_types.Types;
+import org.kohsuke.args4j.ClassParser;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.spi.OptionHandler;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -172,6 +171,10 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
                 auth = loadStoredAuthentication();
             }
             sc.setAuthentication(auth); // run the CLI with the right credential
+            
+            // Re-authenticate to make sure the user still exists (see bug 454550)
+            authenticator.authenticate();
+            
             // parse again to deal with arguments that require authentication
             parseArguments(p, args, true);
             if (!(this instanceof LoginCommand || this instanceof HelpCommand)) {
