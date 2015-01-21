@@ -73,6 +73,36 @@
             <archive>http://dev.eclipse.org/mhonarc/lists/hudson-dev/</archive>
         </mailingList>
     </mailingLists>
+    
+    <repositories>
+        <repository>
+            <id>sonatype-nexus-releases</id>
+            <name>Sonatype Nexus Releases</name>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>  
+    </repositories>
+    
+    <pluginRepositories>
+        <pluginRepository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>sonatype-nexus-releases</id>
+            <name>Sonatype Nexus Releases</name>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        </pluginRepository>
+        
+        <pluginRepository>
+            <id>eclipse-maven</id>
+            <url>https://repo.eclipse.org/content/repositories/releases/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <properties>
         <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
@@ -135,7 +165,7 @@
         <maven-enunciate-plugin.version>1.26.2</maven-enunciate-plugin.version>
         <cobertura-maven-plugin.version>2.5.1</cobertura-maven-plugin.version>
         
-        <hudson-remoting.version>3.0.2</hudson-remoting.version>
+        <hudson-remoting.version>3.0.3</hudson-remoting.version>
         
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- by default only check remote repositories once per week -->
@@ -221,13 +251,6 @@
         <module>hudson-plugin-parent</module>
     </modules>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>eclipse-maven</id>
-            <url>https://repo.eclipse.org/content/repositories/releases/</url>
-        </pluginRepository>
-    </pluginRepositories>
-  
     <build>
         
         <defaultGoal>install</defaultGoal>
@@ -928,9 +951,9 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-pmd-plugin</artifactId>
                         <configuration>
-                        <!--rulesets>
-                        <ruleset>ruleset.xml</ruleset>
-                        </rulesets-->
+                            <!--rulesets>
+                            <ruleset>ruleset.xml</ruleset>
+                            </rulesets-->
                             <targetJdk>1.5</targetJdk>
                         </configuration>
                     </plugin>
