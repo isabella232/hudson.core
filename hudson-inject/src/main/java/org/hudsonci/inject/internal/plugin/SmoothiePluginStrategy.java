@@ -65,7 +65,7 @@ public class SmoothiePluginStrategy
     @Inject
     public SmoothiePluginStrategy(final SmoothieContainer container,
                                   final PluginWrapperFactory pluginFactory,
-                                  final @Named("default") ExtensionLocator extensionLocator,
+                                  final @Named("defaultExtensionLocator") ExtensionLocator extensionLocator,
                                   final List<ExtensionFinder> extensionFinders) {
         this.container = checkNotNull(container);
         this.pluginFactory = checkNotNull(pluginFactory);

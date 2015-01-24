@@ -133,7 +133,7 @@ public class SmoothieContainerImpl
         @Override
         protected void configure() {
             bind(PluginStrategy.class).annotatedWith(Names.named("default")).to(SmoothiePluginStrategy.class);
-            bind(ExtensionLocator.class).annotatedWith(Names.named("default")).to(SmoothieExtensionLocator.class);
+            bind(ExtensionLocator.class).annotatedWith(Names.named("defaultExtensionLocator")).to(SmoothieExtensionLocator.class);
             super.configure();
         }
     }

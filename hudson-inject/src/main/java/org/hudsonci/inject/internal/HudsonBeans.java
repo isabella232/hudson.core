@@ -56,7 +56,7 @@ public class HudsonBeans {
     }
 
     @Produces
-    @Named("default")
+    @Named("defaultExtensionLocator")
     private ExtensionLocator getDefaultExtensionLocator() {
         throw new RuntimeException("CDI is not supported");
     }
