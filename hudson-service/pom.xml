@@ -9,7 +9,7 @@
 #
 # Contributors: 
 #
-#   Jason Dillon, Winston Prakash 
+#   Jason Dillon, Winston Prakash, Kaz Nishimura
 #        
 #************************************************************************** --> 
 
@@ -28,6 +28,12 @@
   <name>Hudson :: Service</name>
 
   <dependencies>
+    <dependency>
+      <groupId>javax.enterprise</groupId>
+      <artifactId>cdi-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hudson-plugin-utils</artifactId>

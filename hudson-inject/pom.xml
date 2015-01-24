@@ -9,7 +9,7 @@
 #
 # Contributors: 
 #
-#  Jason Dillon, Winston Prakash 
+#  Jason Dillon, Winston Prakash, Kaz Nishimura
 #        
 #************************************************************************** --> 
 
@@ -66,6 +66,12 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

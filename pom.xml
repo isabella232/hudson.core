@@ -9,7 +9,7 @@
 #
 # Contributors: 
 #
-#    Kohsuke Kawaguchi, Winston Prakash
+#    Kohsuke Kawaguchi, Winston Prakash, Kaz Nishimura
 #        
 #************************************************************************** --> 
 
@@ -133,6 +133,7 @@
         <wagon-http.version>1.0-beta-7</wagon-http.version>
         <test-annotations.version>1.0</test-annotations.version>
         <servlet-api.version>2.4</servlet-api.version>
+        <cdi-api.version>1.0-SP4</cdi-api.version>
         <slf4j.version>1.6.1</slf4j.version>
         <logback-classic.version>0.9.28</logback-classic.version>
         <guava.version>14.0.1</guava.version>
@@ -677,6 +678,12 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
                 <version>${servlet-api.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.enterprise</groupId>
+                <artifactId>cdi-api</artifactId>
+                <version>${cdi-api.version}</version>
             </dependency>
 
             <dependency>
