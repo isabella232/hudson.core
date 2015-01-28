@@ -17,37 +17,35 @@
 package hudson.util;
 
 import com.thoughtworks.xstream.converters.ConversionException;
-import com.thoughtworks.xstream.converters.SingleValueConverter;
-import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.SingleValueConverter;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.converters.reflection.NonExistentFieldException;
+import com.thoughtworks.xstream.converters.reflection.ObjectAccessException;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
 import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
 import com.thoughtworks.xstream.converters.reflection.SerializationMethodInvoker;
-import com.thoughtworks.xstream.converters.reflection.ObjectAccessException;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import com.thoughtworks.xstream.converters.reflection.NonExistentFieldException;
 import com.thoughtworks.xstream.core.util.Primitives;
+import com.thoughtworks.xstream.io.ExtendedHierarchicalStreamWriterHelper;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import com.thoughtworks.xstream.io.ExtendedHierarchicalStreamWriterHelper;
-import com.thoughtworks.xstream.mapper.Mapper;
 import com.thoughtworks.xstream.mapper.CannotResolveClassException;
-
+import com.thoughtworks.xstream.mapper.Mapper;
 import hudson.diagnosis.OldDataMonitor;
 import hudson.model.Saveable;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.logging.Logger;
+import static java.util.logging.Level.FINE;
 
-import static java.util.logging.Level.WARNING;
+import java.util.logging.Logger;
 
 /**
  * Custom {@link ReflectionConverter} that handle errors more gracefully.
@@ -246,13 +244,13 @@ public class RobustReflectionConverter implements Converter {
                     }
                 }
             } catch (NonExistentFieldException e) {
-                LOGGER.log(WARNING, "Skipping a non-existent field " + e.getFieldName());
+                LOGGER.log(FINE, "Skipping a non-existent field " + e.getFieldName());
                 addErrorInContext(context, e);
             } catch (CannotResolveClassException e) {
-                LOGGER.log(WARNING, "Skipping a non-existent type " + e.getMessage());
+                LOGGER.log(FINE, "Skipping a non-existent type " + e.getMessage());
                 addErrorInContext(context, e);
             } catch (LinkageError e) {
-                LOGGER.log(WARNING, "Failed to resolve a type " + e.getMessage());
+                LOGGER.log(FINE, "Failed to resolve a type " + e.getMessage());
                 addErrorInContext(context, e);
             }
 
@@ -272,7 +270,23 @@ public class RobustReflectionConverter implements Converter {
         if (list == null) {
             context.put("ReadError", list = new ArrayList<Throwable>());
         }
-        list.add(e);
+		// Suppress multiple reports for same field
+		boolean shouldAdd = true;
+		if (e instanceof NonExistentFieldException) {
+			String fieldName = ((NonExistentFieldException)e).getFieldName();
+			for (Throwable t : list) {
+				if (t instanceof NonExistentFieldException) {
+					String name = ((NonExistentFieldException)e).getFieldName();
+					if (name.equals(fieldName)) {
+						shouldAdd = false;
+						break;
+					}
+				}
+			}
+		}
+		if (shouldAdd) {
+			list.add(e);
+		}
     }
 
     private boolean fieldDefinedInClass(Object result, String attrName) {
