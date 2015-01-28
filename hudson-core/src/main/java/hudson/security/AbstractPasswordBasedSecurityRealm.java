@@ -82,7 +82,7 @@ public abstract class AbstractPasswordBasedSecurityRealm extends SecurityRealm i
 
         ProviderManager providerManager = new ProviderManager();
         providerManager.setProviders(Arrays.asList(authenticationProvider));
-        return new SecurityComponents(providerManager);
+        return new SecurityComponents(providerManager, this);
 
     }
 
