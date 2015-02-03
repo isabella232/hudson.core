@@ -25,7 +25,7 @@
 
     <groupId>org.eclipse.hudson</groupId>
     <artifactId>hudson-parent</artifactId>
-    <version>3.2.2-SNAPSHOT</version>
+    <version>3.2.2</version>
     <packaging>pom</packaging>
 
     <name>Hudson</name>
@@ -864,71 +864,71 @@
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-test-utils</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.2.2</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-utils</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.2.2</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-core</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.2.2</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-inject</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.2.2</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-inject</artifactId>
                 <classifier>tests</classifier>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.2.2</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-service</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.2.2</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-plugin-utils</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.2.2</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-cli</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.2.2</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-cli</artifactId>
                 <classifier>jar-with-dependencies</classifier>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.2.2</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-war</artifactId>
                 <type>war</type>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.2.2</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-test-framework</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.2.2</version>
             </dependency>
 
         </dependencies>
