@@ -129,8 +129,8 @@ public class JettyLauncher {
         WebAppContext context = new WebAppContext();
 
         File tempDir = new File(getHomeDir(), "war");
-        if (tempDir.exists()){
-            tempDir.delete();
+        if (tempDir.exists()) {
+            deleteFileRecursively(tempDir);
         }
         tempDir.mkdirs();
         context.setTempDirectory(tempDir);
@@ -190,5 +190,19 @@ public class JettyLauncher {
 
         // Default hudson home 
         return new File(new File(System.getProperty("user.home")), ".hudson");
+    }
+
+    private static boolean deleteFileRecursively(File path) {
+        if (path.isDirectory()) {
+            File[] files = path.listFiles();
+            for (File file : files) {
+                deleteFileRecursively(file);
+            }
+        }
+        boolean deleted = path.delete();
+        if (!deleted){
+            System.out.println("Failed to delete - " + path);
+        }
+        return deleted;
     }
 }
