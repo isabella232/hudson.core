@@ -16,11 +16,12 @@
 
 package hudson.matrix;
 
+import hudson.EnvVars;
+import hudson.FilePath;
 import hudson.Util;
-import hudson.security.ACL;
-import hudson.util.DescribableList;
 import hudson.model.AbstractBuild;
 import hudson.model.Cause;
+import hudson.model.Cause.LegacyCodeCause;
 import hudson.model.CauseAction;
 import hudson.model.DependencyGraph;
 import hudson.model.Descriptor;
@@ -31,15 +32,16 @@ import hudson.model.JDK;
 import hudson.model.Label;
 import hudson.model.ParametersAction;
 import hudson.model.Project;
-import hudson.model.SCMedItem;
 import hudson.model.Queue.NonBlockingTask;
-import hudson.model.Cause.LegacyCodeCause;
+import hudson.model.SCMedItem;
 import hudson.scm.SCM;
+import hudson.security.ACL;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.Builder;
 import hudson.tasks.LogRotator;
 import hudson.tasks.Publisher;
-
+import hudson.util.DescribableList;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -80,6 +82,32 @@ public class MatrixConfiguration extends Project<MatrixConfiguration, MatrixRun>
         this.digestName = c.digest().substring(0, 8);
     }
 
+	@Override
+	protected long calculateWorkspaceDiskUsage() {
+		// like MatrixRun.RunnerImpl.decideWorkspace, for master only
+		File workspace = Hudson.getInstance().getWorkspaceDir(getParent());
+		String customWorkspace = getParent().getCustomWorkspace();
+		if (customWorkspace != null) {
+			EnvVars vars = new EnvVars(EnvVars.masterEnvVars);
+			FilePath ws = Hudson.getInstance().getRootPath().child(vars.expand(customWorkspace));
+			workspace = new File(ws.getRemote());
+		}
+		
+		if (useShortWorkspaceName) {
+			workspace = new File(workspace, getDigestName());
+		} else {
+			String combinationPath = combination.toString('/', '/');
+			String[] dirs = combinationPath.split("/");
+			for (String dir : dirs) {
+				workspace = new File(workspace, dir);
+			}
+		}
+		if (workspace.exists() && workspace.isDirectory()) {
+			return Util.calculateDiskUsage(workspace);
+		}
+		return 0;
+	}
+	
     /**
      * Build numbers are always synchronized with the parent.
      *

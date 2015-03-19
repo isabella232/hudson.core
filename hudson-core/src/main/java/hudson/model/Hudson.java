@@ -274,7 +274,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      */
     private String instanceTag;
 
-    private static transient final String HUDSON_WORKSPACES_PROPERTY_KEY = "HUDSON_WORKSPACES";
+    /* package private */ static transient final String HUDSON_WORKSPACES_PROPERTY_KEY = "HUDSON_WORKSPACES";
     /**
      * Workspace root dir which could be configured by setting HUDSON_WORKSPACES
      * property.
@@ -2065,13 +2065,23 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
      * based on property value.
      */
     public FilePath getWorkspaceFor(TopLevelItem item) {
+		return new FilePath(getWorkspaceDir(item));
+    }
+	
+	/**
+	 * Get the workspace directory on master. May not exist.
+	 * 
+	 * @param item top level item (job)
+	 * @return 
+	 */
+	public File getWorkspaceDir(TopLevelItem item) {
         String workspaceRoot = getConfiguredWorkspaceRoot();
         if (StringUtils.isNotBlank(workspaceRoot)) {
-            return new FilePath(new File(workspaceRoot + "/" + item.getName(), WORKSPACE_DIRNAME));
+            return new File(workspaceRoot + "/" + item.getName(), WORKSPACE_DIRNAME);
         } else {
-            return new FilePath(new File(item.getRootDir(), WORKSPACE_DIRNAME));
+            return new File(item.getRootDir(), WORKSPACE_DIRNAME);
         }
-    }
+	}
 
     /**
      * Checks jndi,environment properties and system properties for
@@ -4209,7 +4219,7 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     /**
      * Switch to enable people to use a shorter workspace name.
      */
-    private static final String WORKSPACE_DIRNAME = System.getProperty(Hudson.class.getName() + ".workspaceDirName", "workspace");
+    /* package privage */ static final String WORKSPACE_DIRNAME = System.getProperty(Hudson.class.getName() + ".workspaceDirName", "workspace");
     /**
      * Automatically try to launch a slave when Hudson is initialized or a new
      * slave is created.

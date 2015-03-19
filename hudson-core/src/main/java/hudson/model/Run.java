@@ -200,6 +200,10 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Number of milli-seconds it took to run this build.
      */
     protected long duration;
+	/**
+	 * Disk usage of build in bytes.
+	 */
+	protected long diskUsage;
     /**
      * Charset in which the log file is written. For compatibility reason, this
      * field may be null. For persistence, this field is string and not
@@ -384,6 +388,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
         
         this.displayName = String.format("%s [In Error]",key.referenced.displayName);
         this.duration = key.referenced.duration;
+		this.diskUsage = key.referenced.diskUsage;
         this.result = key.referenced.result;
         this.state = key.referenced.state;
         this.timestamp = key.referenced.timeInMillis;
@@ -671,6 +676,10 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     public long getDuration() {
         return duration;
     }
+	
+	public long getDiskUsage() {
+		return diskUsage;
+	}
 
     /**
      * Gets the icon color for display.
@@ -1524,6 +1533,9 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
             } finally {
                 long end = System.currentTimeMillis();
                 duration = Math.max(end - start, 0);  // @see HUDSON-5844
+				
+				diskUsage = Util.calculateDiskUsage(getRootDir());
+				getParent().calculateDiskUsage();
 
                 // advance the state.
                 // the significance of doing this is that Hudson

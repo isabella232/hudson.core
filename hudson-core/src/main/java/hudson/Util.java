@@ -15,50 +15,40 @@
  *******************************************************************************/
 package hudson;
 
-import hudson.model.TaskListener;
+import hudson.Proc.LocalProc;
+import hudson.matrix.MatrixProject;
+import hudson.model.FreeStyleProject;
 import hudson.model.Hudson;
-
+import hudson.model.Job;
+import hudson.model.TaskListener;
+import hudson.model.TopLevelItem;
 import hudson.util.IOException2;
 import hudson.util.QuotedStringTokenizer;
 import hudson.util.VariableResolver;
-import hudson.Proc.LocalProc;
-import org.eclipse.hudson.jna.NativeAccessException;
-
-import org.eclipse.hudson.jna.NativeUtils;
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.types.FileSet;
-import org.apache.tools.ant.taskdefs.Chmod;
-import org.apache.tools.ant.taskdefs.Copy;
-import org.apache.commons.lang3.time.FastDateFormat;
-import org.apache.commons.io.IOUtils;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.Writer;
-import java.io.PrintStream;
-import java.io.InputStreamReader;
-import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -66,23 +56,33 @@ import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.StringTokenizer;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.nio.charset.Charset;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.taskdefs.Chmod;
+import org.apache.tools.ant.taskdefs.Copy;
+import org.apache.tools.ant.types.FileSet;
+import org.eclipse.hudson.jna.NativeAccessException;
+import org.eclipse.hudson.jna.NativeUtils;
 
 /**
  * Various utility methods that don't have more proper home.
@@ -1205,6 +1205,54 @@ public class Util {
 
         return null;
     }
+	
+	private static long calculateDiskUsage(File dir, long usage) {
+		File[] children = dir.listFiles();
+		for (File child : children) {
+			if (child.isDirectory()) {
+				usage += calculateDiskUsage(child, usage);
+			} else {
+				usage += child.length();
+			}
+		}
+		return usage;
+	}
+	
+	/**
+	 * Return the sum of the lengths of the files recursively in directory.
+	 * 
+	 * @param dir directory path
+	 * @return total disk usage
+	 */
+	public static long calculateDiskUsage(File dir) {
+		if (dir.exists() && dir.isDirectory()) {
+			return calculateDiskUsage(dir, 0);
+		}
+		return 0;
+	}
+	
+	public static long calculateWorkspaceDiskUsage(Job job) {
+		File workspace = null;
+		try {
+			String customWorkspace = job instanceof FreeStyleProject ? ((FreeStyleProject)job).getCustomWorkspace() :
+					(job instanceof MatrixProject ? ((MatrixProject)job).getCustomWorkspace() : null);
+			if (customWorkspace != null) {
+				EnvVars vars = new EnvVars(EnvVars.masterEnvVars);
+				FilePath ws = Hudson.getInstance().getRootPath().child(vars.expand(customWorkspace));
+				workspace = new File(ws.getRemote());
+			}
+		
+		} catch (IOException e) {
+		}
+		if (workspace == null && job instanceof TopLevelItem) {
+			TopLevelItem item = (TopLevelItem) job;
+			workspace = Hudson.getInstance().getWorkspaceDir(item);
+		}
+		if (workspace != null && workspace.exists() && workspace.isDirectory()) {
+			return calculateDiskUsage(workspace);
+		}
+		return 0;
+	}
 
     /**
      * Encodes the URL by RFC 2396.

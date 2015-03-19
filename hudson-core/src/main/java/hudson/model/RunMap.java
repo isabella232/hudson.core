@@ -814,6 +814,7 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
         
         long timeInMillis;
         long duration;
+		long diskUsage;
         String fullDisplayName;
         String displayName;
         String description;
@@ -863,6 +864,7 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
             setDisplayName( build.getDisplayName());
             setDescription( build.getDescription());
             setDuration( build.getDuration());
+			setDiskUsage( build.getDiskUsage() );
             
             if ( build instanceof AbstractBuild) {
                 setBuiltOnNodeName(((AbstractBuild)build).getBuiltOnStr());
@@ -908,6 +910,14 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
             this.duration = duration;
             markDirty(true);
         }
+		
+		void setDiskUsage(long diskUsage) {
+			if ( this.diskUsage == diskUsage) {
+				return;
+			}
+			this.diskUsage = diskUsage;
+			markDirty(true);
+		}
         
         void setDisplayName(String name) {
             if ( StringUtils.equals(this.displayName, name)) {
@@ -1051,6 +1061,11 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
         @Override
         public long getDuration() {
             return duration;
+        }
+        
+        @Override
+        public long getDiskUsage() {
+            return diskUsage;
         }
         
         @Override

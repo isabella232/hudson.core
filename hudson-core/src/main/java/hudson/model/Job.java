@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.PermalinkList;
+import hudson.Util;
 import hudson.cli.declarative.CLIResolver;
 import hudson.model.BuildHistory.Record;
 import hudson.model.Descriptor.FormException;
@@ -111,9 +112,9 @@ import org.kohsuke.stapler.export.Exported;
 public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, RunT>>
         extends AbstractItem implements ExtensionPoint, StaplerOverridable, IJob, ICascadingJob {
 
-    private static transient final String HUDSON_BUILDS_PROPERTY_KEY = "HUDSON_BUILDS";
+    static transient final String HUDSON_BUILDS_PROPERTY_KEY = "HUDSON_BUILDS";
     private static transient final String PROJECT_PROPERTY_KEY_PREFIX = "has";
-    private static transient final String BUILDS_DIRNAME = "builds";
+    static transient final String BUILDS_DIRNAME = "builds";
     public static final String PROPERTY_NAME_SEPARATOR = ";";
     public static final String LOG_ROTATOR_PROPERTY_NAME = "logRotator";
     public static final String PARAMETERS_DEFINITION_JOB_PROPERTY_PROPERTY_NAME = "parametersDefinitionProperties";
@@ -188,6 +189,19 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * @since 2.2.0
      */
     private Set<String> cascadingJobProperties = new CopyOnWriteArraySet<String>();
+	/**
+	 * Disk usage of workspace directory on master.
+	 * 
+	 * @since 3.3.0
+	 */
+	private long workspaceDiskUsage;
+	/**
+	 * Disk usage of build directories on master.
+	 * 
+	 * @since 3.3.0
+	 */
+	private long buildsDiskUsage;
+	
     /**
      * Selected cascadingProject for this job.
      */
@@ -732,6 +746,59 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     public boolean supportsLogRotator() {
         return true;
     }
+	
+	public long getWorkspaceDiskUsage() {
+		return workspaceDiskUsage;
+	}
+	
+	public long getBuildsDiskUsage() {
+		return buildsDiskUsage;
+	}
+	
+	protected void setWorkspaceDiskUsage(long usage) {
+		workspaceDiskUsage = usage;
+	}
+	
+	protected void setBuildsDiskUsage(long usage) {
+		buildsDiskUsage = usage;
+	}
+	
+	/**
+	 * Calculate disk usage.
+	 * 
+	 * @see #calculateBuildsDiskUsage() 
+	 * @see #calculateWorkspaceDiskUsage() 
+	 */
+	public void calculateDiskUsage() {
+		setWorkspaceDiskUsage(calculateWorkspaceDiskUsage());
+		setBuildsDiskUsage(calculateBuildsDiskUsage());
+		
+	}
+	
+	/**
+	 * Calculate the disk space used for workspace on master.
+	 * 
+	 * The default implementation works only for TopLevelItems.
+	 * @return disk usage
+	 */
+	protected long calculateWorkspaceDiskUsage() {
+		return Util.calculateWorkspaceDiskUsage(this);
+	}
+	
+	/**
+	 * Calculate the disk space used by builds on master.
+	 * 
+	 * @return disk usage
+	 */
+	protected long calculateBuildsDiskUsage() {
+		BuildHistory buildHistory = getBuildHistoryData();
+		long buildsUsage = 0;
+		List<BuildHistory.Record> records = buildHistory.allRecords();
+		for (BuildHistory.Record record : records) {
+			buildsUsage += record.getDiskUsage();
+		}
+		return buildsUsage;
+	}
 
     /**
      * Method converts JobProperties to cascading values.

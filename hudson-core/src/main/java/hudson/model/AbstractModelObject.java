@@ -96,8 +96,9 @@ public abstract class AbstractModelObject implements SearchableModelObject {
      * @param key - the name of the configured property.
      * @return the string value of the configured property, or null if there is
      * no property with that key.
+	 * @since 3.3.0 
      */
-    protected String getConfiguredHudsonProperty(String key) {
+    public static String getHudsonProperty(String key) {
         if (StringUtils.isNotBlank(key)) {
             String resultValue;
             try {
@@ -130,6 +131,14 @@ public abstract class AbstractModelObject implements SearchableModelObject {
         }
         return null;
     }
+	
+	/**
+	 * For compatibility with pre-3.3.0.
+	 * @see #getHudsonProperty(java.lang.String) 
+	 */
+	protected String getConfiguredHudsonProperty(String key) {
+		return getHudsonProperty(key);
+	}
 
     /**
      * Default implementation that returns empty index.

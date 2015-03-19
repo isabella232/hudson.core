@@ -1215,6 +1215,18 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
     public BuildHistory<P,R> getBuildHistoryData() {
         return builds;
     }
+	
+	@Override
+	public void calculateDiskUsage() {
+		setWorkspaceDiskUsage(Util.calculateWorkspaceDiskUsage(this));
+		long buildsUsage = 0;
+		BuildHistory history = getBuildHistoryData();
+		for (BuildHistory.Record build : history) {
+			buildsUsage += build.getDiskUsage();
+		}
+		
+	}
+
     
     /**
      * Determines Class&lt;R>.
