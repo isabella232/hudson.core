@@ -16,12 +16,20 @@ package org.eclipse.hudson.war;
  *
  ******************************************************************************
  */
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.ProtectionDomain;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -47,24 +55,20 @@ public class Executable {
         "libs/hudson-jetty-war-executable.jar"
     };
     private List<String> arguments;
+    
+    public static final int MIN_REQUIRED_JAVA_VERSION = 7;
 
     public static void main(String[] args) throws Exception {
 
-        String javaVersion = System.getProperty("java.version");
+        String javaVersionStr = System.getProperty("java.version");
+        String[] javaVersionElements = javaVersionStr.split("\\.");
+        int major = Integer.parseInt(javaVersionElements[1]);
 
-        StringTokenizer tokens = new StringTokenizer(javaVersion, ".-_");
-
-        int majorVersion = Integer.parseInt(tokens.nextToken());
-        int minorVersion = Integer.parseInt(tokens.nextToken());
-
-        // Make sure Java version is 1.6 or later
-        if (majorVersion < 2) {
-            if (minorVersion < 6) {
-                System.err.println("Hudson requires Java 6 or later.");
-                System.err.println("Your java version is " + javaVersion);
-                System.err.println("Java Home:  " + System.getProperty("java.home"));
-                System.exit(0);
-            }
+        if (major < MIN_REQUIRED_JAVA_VERSION) {
+            System.err.println("Hudson 3.3.x and above requires JDK " + MIN_REQUIRED_JAVA_VERSION + " or later.");
+            System.err.println("Your java version is " + javaVersionStr);
+            System.err.println("Java Home:  " + System.getProperty("java.home"));
+            System.exit(0);
         }
 
         Executable executable = new Executable();

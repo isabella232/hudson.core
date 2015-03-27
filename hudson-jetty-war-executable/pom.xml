@@ -32,8 +32,25 @@
     <description>
         Class needed for Jetty server based executable war
     </description>
-    
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- 
+                    Though JDK 7 is required to build Hudson 3.x,
+                    launcher itself is built with source level 1.5
+                    so if run with JDK 5 or 6, the launcher class will 
+                    load but will exit with warning JDK 7 and above is 
+                    required to run Hudson
+                    -->
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
