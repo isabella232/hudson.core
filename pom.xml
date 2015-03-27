@@ -112,7 +112,7 @@
         <cbi-plugins.version>1.0.5</cbi-plugins.version>
         
         <jetty.server.version>9.2.10.v20150310</jetty.server.version>
-        <jetty.javax.serverlet.version>3.0.0.v201112011016</jetty.javax.serverlet.version>
+        <jetty.javax.serverlet.version>3.1.0</jetty.javax.serverlet.version>
         
         <maven-hpi-plugin.version>3.0.2</maven-hpi-plugin.version>
         <stapler.version>3.0.2</stapler.version>

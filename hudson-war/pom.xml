@@ -138,7 +138,7 @@
                                     <version>${jetty.server.version}</version>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/libs</outputDirectory>
-                                    <destFileName>jetty.jar</destFileName>
+                                    <destFileName>jetty-server.jar</destFileName>
                                 </artifactItem>
                                 <dependency>
                                     <groupId>org.eclipse.jetty</groupId>
@@ -205,12 +205,12 @@
                                     <destFileName>jetty-servlet.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.eclipse.jetty.orbit</groupId>
-                                    <artifactId>javax.servlet</artifactId>
+                                    <groupId>javax.servlet</groupId>
+                                    <artifactId>javax.servlet-api</artifactId>
                                     <version>${jetty.javax.serverlet.version}</version>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/generated-resources/libs</outputDirectory>
-                                    <destFileName>jetty-servlet-api.jar</destFileName>
+                                    <destFileName>javax-servlet-api.jar</destFileName>
                                 </artifactItem>
                                 
                                 <!-- dependencies that goes to WEB-INF for unusual usage -->

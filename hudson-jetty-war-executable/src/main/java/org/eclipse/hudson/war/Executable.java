@@ -42,16 +42,16 @@ import java.util.jar.Manifest;
 public class Executable {
 
     private final String[] jettyJars = {
-        "libs/jetty.jar",
+        "libs/jetty-server.jar",
         "libs/jetty-web-app.jar",
         "libs/jetty-continuation.jar",
-        "libs/jetty-util.jar",
         "libs/jetty-http.jar",
         "libs/jetty-io.jar",
         "libs/jetty-security.jar",
         "libs/jetty-servlet.jar",
-        "libs/jetty-servlet-api.jar",
+        "libs/jetty-util.jar",
         "libs/jetty-xml.jar",
+        "libs/javax-servlet-api.jar",
         "libs/hudson-jetty-war-executable.jar"
     };
     private List<String> arguments;
@@ -103,17 +103,18 @@ public class Executable {
                 + "Usage: java -jar hudson.war [--option=value] [--option=value] ... \n"
                 + "\n"
                 + "Options:\n"
-                + "   --version                        Show Hudson version and quit\n"
-                + "   --logfile=<filename>             Send the output log to this file\n"
-                + "   --prefix=<prefix-string>         Add this prefix to all URLs (eg http://localhost:8080/prefix/resource). Default is none\n\n"
-                + "   --httpPort=<value>               HTTP listening port. Default value is 8080\n\n"
-                + "   --httpsPort=<value>              HTTPS listening port. Disabled by default\n"
-                + "   --httpsKeyStore=<filepath>       Location of the SSL KeyStore file.\n"
-                + "   --httpsKeyStorePassword=<value>  Password for the SSL KeyStore file\n\n"
-                + "   --updateServer=<your server>     Specify your own update server (eg http://updates.mycompany.com/).\n"
-                + "                                    For details see http://wiki.hudson-ci.org/Alternate+Update+Server\n\n"
-                + "   --disableUpdateCenterSwitch      Disable the ability to specify alternate Update Center URL via Plugin Manager Advanced tab\n\n"
-                + "   --skipInitSetup                  Skip the initial setup screen and start Hudson directly";
+                + "   --version                          Show Hudson version and quit\n"
+                + "   --logfile=<filename>               Send the output log to this file\n"
+                + "   --prefix=<prefix-string>           Add this prefix to all URLs (eg http://localhost:8080/prefix/resource). Default is none\n\n"
+                + "   --httpPort=<value>                 HTTP listening port. Default value is 8080\n\n"
+                + "   --httpsPort=<value>                HTTPS listening port. Disabled by default\n"
+                + "   --httpsKeyStore=<filepath>         Location of the SSL KeyStore file.\n"
+                + "   --httpsKeyStorePassword=<value>    Password for the SSL KeyStore file\n\n"
+                + "   --httpsKeyManagerPassword=<value>  Manager Password for the trustStore \n\n"
+                + "   --updateServer=<your server>       Specify your own update server (eg http://updates.mycompany.com/).\n"
+                + "                                      For details see http://wiki.hudson-ci.org/Alternate+Update+Server\n\n"
+                + "   --disableUpdateCenterSwitch        Disable the ability to specify alternate Update Center URL via Plugin Manager Advanced tab\n\n"
+                + "   --skipInitSetup                    Skip the initial setup screen and start Hudson directly";
         
         System.out.println(usageStr);
         System.exit(0);
