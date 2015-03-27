@@ -953,7 +953,7 @@
                             <!--rulesets>
                             <ruleset>ruleset.xml</ruleset>
                             </rulesets-->
-                            <targetJdk>1.5</targetJdk>
+                            <targetJdk>1.7</targetJdk>
                         </configuration>
                     </plugin>
 
