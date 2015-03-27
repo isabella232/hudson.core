@@ -23,10 +23,13 @@ import java.util.List;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.server.ssl.SslSocketConnector;
-import org.eclipse.jetty.http.ssl.SslContextFactory;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 /**
@@ -45,6 +48,7 @@ public class JettyLauncher {
 
         String keyStorePath = null;
         String keyStorePassword = null;
+        String keyManagerPassword = null;
 
         String updateServer = null;
 
@@ -70,6 +74,10 @@ public class JettyLauncher {
                 keyStorePassword = args[i].substring("--httpsKeyStorePassword=".length());
             }
 
+            if (args[i].startsWith("--httpsKeyManagerPassword=")) {
+                keyManagerPassword = args[i].substring("--httpsKeyManagerPassword=".length());
+            }
+
             if (args[i].startsWith("--prefix=")) {
                 String prefix = args[i].substring("--prefix=".length());
                 if (prefix.startsWith("/")) {
@@ -85,7 +93,7 @@ public class JettyLauncher {
             if (args[i].startsWith("--disableUpdateCenterSwitch")) {
                 disableUpdateCenterSwitch = true;
             }
-            
+
             if (args[i].startsWith("--skipInitSetup")) {
                 skipInitSetup = true;
             }
@@ -95,32 +103,41 @@ public class JettyLauncher {
 
         List<Connector> connectors = new ArrayList<Connector>();
 
-        // HTTP  connector
-        if (httpPort != -1) {
-            SelectChannelConnector httpConnector = new SelectChannelConnector();
-            httpConnector.setPort(httpPort);
-            connectors.add(httpConnector);
-        }
+        HttpConfiguration http_config = new HttpConfiguration();
+        http_config.setOutputBufferSize(32768);
 
-        // HTTPS (SSL) connector
+        ServerConnector httpConnector = new ServerConnector(server,
+                new HttpConnectionFactory(http_config));
+        httpConnector.setPort(httpPort);
+        httpConnector.setIdleTimeout(30000);
+
+        connectors.add(httpConnector);
+
         if (httpsPort != -1) {
-            // Switch to using a ContextFactory this helps us to 
-            // address 447469 - disable SSL3 to prevent Poodle attacks
+
             SslContextFactory sslContextFactory = new SslContextFactory();
-            sslContextFactory.addExcludeProtocols("SSLv3");
-            
-            //KeyStore path and password now injected via this new context rather 
-            //than being added directly to the connection (those APIs are deprecated
-            // in any case so this is the better approach
+
             if (keyStorePath != null) {
-                sslContextFactory.setKeyStore(keyStorePath);
+                sslContextFactory.setKeyStorePath(keyStorePath);
             }
             if (keyStorePassword != null) {
-                sslContextFactory.setKeyManagerPassword(keyStorePassword);
+                sslContextFactory.setKeyStorePassword(keyStorePassword);
             }
-        
-            SslSocketConnector httpsConnector = new SslSocketConnector(sslContextFactory);
+
+            if (keyManagerPassword != null) {
+                sslContextFactory.setKeyManagerPassword(keyManagerPassword);
+            }
+
+            HttpConfiguration https_config = new HttpConfiguration(http_config);
+            https_config.addCustomizer(new SecureRequestCustomizer());
+            https_config.setOutputBufferSize(32768);
+
+            ServerConnector httpsConnector = new ServerConnector(server,
+                    new SslConnectionFactory(sslContextFactory, "http/1.1"),
+                    new HttpConnectionFactory(https_config));
             httpsConnector.setPort(httpsPort);
+            httpsConnector.setIdleTimeout(500000);
+
             connectors.add(httpsConnector);
         }
 
@@ -139,8 +156,8 @@ public class JettyLauncher {
         context.setDescriptor(warUrl.toExternalForm() + "/WEB-INF/web.xml");
         context.setServer(server);
         context.setWar(warUrl.toExternalForm());
-        
-        LoginService loginService =  new HashLoginService("defaultLoginService");
+
+        LoginService loginService = new HashLoginService("defaultLoginService");
         context.getSecurityHandler().setLoginService(loginService);
 
         // This is used by Windows Service Installer in Hudson Management 
@@ -154,7 +171,7 @@ public class JettyLauncher {
         if (disableUpdateCenterSwitch) {
             System.setProperty("hudson.pluginManager.disableUpdateCenterSwitch", "true");
         }
-        
+
         if (skipInitSetup) {
             System.setProperty("skipInitSetup", "true");
         }
@@ -200,7 +217,7 @@ public class JettyLauncher {
             }
         }
         boolean deleted = path.delete();
-        if (!deleted){
+        if (!deleted) {
             System.out.println("Failed to delete - " + path);
         }
         return deleted;
