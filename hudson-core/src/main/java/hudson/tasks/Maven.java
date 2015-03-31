@@ -12,7 +12,7 @@
  *    Kohsuke Kawaguchi, Jene Jasper, Stephen Connolly, Tom Huybrechts, Yahoo! Inc., Nikita Levyankov
  *
  *
- *******************************************************************************/ 
+ *******************************************************************************/
 
 package hudson.tasks;
 
@@ -296,7 +296,15 @@ public class Maven extends Builder {
 
         String jvmOptions = env.expand(this.jvmOptions);
         if (jvmOptions != null) {
-            env.put("MAVEN_OPTS", jvmOptions.replaceAll("[\t\r\n]+", " "));
+            final jvmOptionsOneLine = jvmOptions.replaceAll("[\t\r\n]+", " ");
+            final String envMavenOpts = env.expand("MAVEN_OPTS");
+            final String mavenOpts;
+            if (envMavenOpts != null) {
+              mavenOpts = envMavenOpts + " " + jvmOptionsOneLine;
+            } else {
+              mavenOpts = jvmOptionsOneLine;
+            }
+            env.put("MAVEN_OPTS", mavenOpts);
         }
     }
 
@@ -404,8 +412,8 @@ public class Maven extends Builder {
          * - constants defined above.
          */
         public boolean meetsMavenReqVersion(Launcher launcher, int mavenReqVersion) throws IOException, InterruptedException {
-            // FIXME using similar stuff as in the maven plugin could be better 
-            // olamy : but will add a dependency on maven in core -> so not so good 
+            // FIXME using similar stuff as in the maven plugin could be better
+            // olamy : but will add a dependency on maven in core -> so not so good
             String mavenVersion = launcher.getChannel().call(new Callable<String, IOException>() {
                 public String call() throws IOException {
                     File[] jars = new File(getHomeDir(), "lib").listFiles();
