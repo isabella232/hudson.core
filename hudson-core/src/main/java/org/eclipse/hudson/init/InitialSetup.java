@@ -79,7 +79,7 @@ final public class InitialSetup {
                 @Override
                 public Thread newThread(Runnable r) {
                     Thread t = new Thread(r);
-                    t.setName("Update center installer thread");
+                    t.setName("Initial setup installer thread");
                     return t;
                 }
             }));
@@ -297,6 +297,9 @@ final public class InitialSetup {
         } catch (IOException ex) {
             logger.error(ex.getLocalizedMessage());
         }
+
+        installerService.shutdownNow();
+
         invokeHudson();
 
         return HttpResponses.ok();

@@ -713,6 +713,13 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
         }
     }
 
+    public void shutdown() {
+        List<Runnable> running = installerService.shutdownNow();
+        if (!running.isEmpty()) {
+            LOGGER.warning("shutdown with "+running.size()+" jobs pending");
+        }
+    }
+
     /**
      * Tests the internet connectivity.
      */

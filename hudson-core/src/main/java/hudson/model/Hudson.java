@@ -2697,6 +2697,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             }
         }
 
+        updateCenter.shutdown();
+        pluginCenter.shutdown();
+
         LogFactory.releaseAll();
 
         theInstance = null;
