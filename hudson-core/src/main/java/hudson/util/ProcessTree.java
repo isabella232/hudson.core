@@ -24,14 +24,8 @@ import hudson.remoting.Channel;
 import hudson.remoting.VirtualChannel;
 import hudson.slaves.SlaveComputer;
 import hudson.util.ProcessTree.OSProcess;
-
 import hudson.util.ProcessTreeRemoting.IOSProcess;
 import hudson.util.ProcessTreeRemoting.IProcessTree;
-import org.eclipse.hudson.jna.NativeAccessException;
-import org.eclipse.hudson.jna.NativeUtils;
-import org.eclipse.hudson.jna.NativeProcess;
-import org.apache.commons.io.FileUtils;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -45,6 +39,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -53,8 +48,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
-import java.util.Arrays;
 import java.util.StringTokenizer;
+import org.apache.commons.io.FileUtils;
+import org.eclipse.hudson.jna.NativeAccessException;
+import org.eclipse.hudson.jna.NativeProcess;
+import org.eclipse.hudson.jna.NativeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -563,7 +561,7 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
             try {
                 int pid = getPid();
                 logger.debug("Killing pid=" + pid);
-                UnixReflection.DESTROY_PROCESS.invoke(null, pid);
+                UnixReflection.destroyProcesses(pid);
             } catch (IllegalAccessException e) {
                 // this is impossible
                 IllegalAccessError x = new IllegalAccessError();
@@ -616,8 +614,13 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                 Class<?> clazz = Class.forName("java.lang.UNIXProcess");
                 PID_FIELD = clazz.getDeclaredField("pid");
                 PID_FIELD.setAccessible(true);
-
-                DESTROY_PROCESS = clazz.getDeclaredMethod("destroyProcess", int.class);
+                
+                if (isJava8OrLater()) {
+                    // In JDK 8, the signature changed to destroyProcess(int pid, boolean force);
+                    DESTROY_PROCESS = clazz.getDeclaredMethod("destroyProcess", int.class, boolean.class);
+                } else {
+                    DESTROY_PROCESS = clazz.getDeclaredMethod("destroyProcess", int.class);
+                }
                 DESTROY_PROCESS.setAccessible(true);
             } catch (ClassNotFoundException e) {
                 LinkageError x = new LinkageError();
@@ -632,6 +635,21 @@ public abstract class ProcessTree implements Iterable<OSProcess>, IProcessTree, 
                 x.initCause(e);
                 throw x;
             }
+        }
+        
+        static void destroyProcesses(int pid) throws IllegalAccessException, InvocationTargetException {
+            if (isJava8OrLater()) {
+                DESTROY_PROCESS.invoke(null, pid, true);
+            } else {
+                DESTROY_PROCESS.invoke(null, pid);
+            }
+        }
+        
+        private static boolean isJava8OrLater(){
+            String javaVersionStr = System.getProperty("java.version");
+            String[] javaVersionElements = javaVersionStr.split("\\.");
+            int majorJavaVersion = Integer.parseInt(javaVersionElements[1]);
+            return majorJavaVersion > 7;
         }
     }
 
