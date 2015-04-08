@@ -16,20 +16,18 @@
 
 package hudson;
 
+import hudson.Plugin.DummyImpl;
 import hudson.PluginWrapper.Dependency;
 import hudson.model.Hudson;
 import hudson.util.IOException2;
 import hudson.util.MaskingClassLoader;
-import hudson.util.VersionNumber;
-import hudson.Plugin.DummyImpl;
-
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.Closeable;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -39,15 +37,14 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.jar.Manifest;
 import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.apache.commons.io.IOUtils;
+import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.taskdefs.Expand;
 import org.apache.tools.ant.types.FileSet;
 
@@ -161,9 +158,6 @@ public class ClassicPluginStrategy implements PluginStrategy {
                 }
             }
         }
-        for (DetachedPlugin detached : DETACHED_LIST) {
-            detached.fix(atts, optionalDependencies);
-        }
 
         ClassLoader dependencyLoader = new DependencyClassLoader(getBaseClassLoader(atts), archive, Util.join(dependencies, optionalDependencies));
 
@@ -206,40 +200,6 @@ public class ClassicPluginStrategy implements PluginStrategy {
             return new URLClassLoader(urls.toArray(new URL[urls.size()]), parent);
         }
     }
-
-    /**
-     * Information about plugins that were originally in the core.
-     */
-    private static final class DetachedPlugin {
-
-        private final String shortName;
-        private final VersionNumber splitWhen;
-        private final String requireVersion;
-
-        private DetachedPlugin(String shortName, String splitWhen, String requireVersion) {
-            this.shortName = shortName;
-            this.splitWhen = new VersionNumber(splitWhen);
-            this.requireVersion = requireVersion;
-        }
-
-        private void fix(Attributes atts, List<PluginWrapper.Dependency> optionalDependencies) {
-            // don't fix the dependency for yourself, or else we'll have a cycle
-            String yourName = atts.getValue("Short-Name");
-            if (shortName.equals(yourName)) {
-                return;
-            }
-
-            // some earlier versions of maven-hpi-plugin apparently puts "null" as a literal in Hudson-Version. watch out for them.
-            String hudsonVersion = atts.getValue("Hudson-Version");
-            if (hudsonVersion == null || hudsonVersion.equals("null") || new VersionNumber(hudsonVersion).compareTo(splitWhen) <= 0) {
-                optionalDependencies.add(new PluginWrapper.Dependency(shortName + ':' + requireVersion));
-            }
-        }
-    }
-    private static final List<DetachedPlugin> DETACHED_LIST = Arrays.asList(
-            new DetachedPlugin("maven-plugin", "1.296", "1.296"),
-            new DetachedPlugin("subversion", "1.310", "1.0"),
-            new DetachedPlugin("cvs", "1.340", "0.1"));
 
     /**
      * Computes the classloader that takes the class masking into account.
