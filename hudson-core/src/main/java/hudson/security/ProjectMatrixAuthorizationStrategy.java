@@ -16,16 +16,16 @@
 
 package hudson.security;
 
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.core.JVM;
+import com.thoughtworks.xstream.io.ExtendedHierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.mapper.Mapper;
+import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.model.Job;
 import hudson.util.RobustReflectionConverter;
-import hudson.Extension;
-import com.thoughtworks.xstream.io.HierarchicalStreamReader;
-import com.thoughtworks.xstream.converters.UnmarshallingContext;
-import com.thoughtworks.xstream.mapper.Mapper;
-import com.thoughtworks.xstream.core.JVM;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -88,7 +88,10 @@ public class ProjectMatrixAuthorizationStrategy extends GlobalMatrixAuthorizatio
 
         @Override
         public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-            String name = reader.peekNextChild();
+            String name = null;
+            if (reader instanceof ExtendedHierarchicalStreamReader) {
+                name = ((ExtendedHierarchicalStreamReader) reader).peekNextChild();
+            }
             if (name != null && (name.equals("permission") || name.equals("useProjectSecurity"))) // the proper serialization form
             {
                 return super.unmarshal(reader, context);

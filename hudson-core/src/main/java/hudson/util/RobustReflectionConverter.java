@@ -21,7 +21,7 @@ import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
-import com.thoughtworks.xstream.converters.reflection.NonExistentFieldException;
+import com.thoughtworks.xstream.converters.reflection.MissingFieldException;
 import com.thoughtworks.xstream.converters.reflection.ObjectAccessException;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
@@ -44,7 +44,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import static java.util.logging.Level.FINE;
-
 import java.util.logging.Logger;
 
 /**
@@ -243,7 +242,7 @@ public class RobustReflectionConverter implements Converter {
                         implicitCollectionsForCurrentObject = writeValueToImplicitCollection(context, value, implicitCollectionsForCurrentObject, result, fieldName);
                     }
                 }
-            } catch (NonExistentFieldException e) {
+            } catch (MissingFieldException e) {
                 LOGGER.log(FINE, "Skipping a non-existent field " + e.getFieldName());
                 addErrorInContext(context, e);
             } catch (CannotResolveClassException e) {

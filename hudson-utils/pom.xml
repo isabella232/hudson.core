@@ -59,7 +59,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.hudsonci.tools</groupId>
+      <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
 

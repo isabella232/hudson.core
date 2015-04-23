@@ -16,52 +16,51 @@
 
 package hudson.tasks;
 
-import hudson.Extension;
-import hudson.Launcher;
-import hudson.Functions;
-import hudson.EnvVars;
-import hudson.Util;
 import hudson.CopyOnWrite;
-import hudson.Launcher.LocalLauncher;
+import hudson.EnvVars;
+import hudson.Extension;
 import hudson.FilePath.FileCallable;
+import hudson.Functions;
+import hudson.Launcher;
+import hudson.Launcher.LocalLauncher;
+import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Computer;
 import hudson.model.EnvironmentSpecific;
-import hudson.model.Node;
 import hudson.model.Hudson;
+import hudson.model.Node;
 import hudson.model.TaskListener;
 import hudson.remoting.Callable;
 import hudson.remoting.VirtualChannel;
 import hudson.slaves.NodeSpecific;
 import hudson.tasks._maven.MavenConsoleAnnotator;
+import hudson.tools.DownloadFromUrlInstaller;
 import hudson.tools.ToolDescriptor;
 import hudson.tools.ToolInstallation;
-import hudson.tools.DownloadFromUrlInstaller;
 import hudson.tools.ToolInstaller;
 import hudson.tools.ToolProperty;
 import hudson.util.ArgumentListBuilder;
+import hudson.util.FormValidation;
 import hudson.util.NullStream;
 import hudson.util.StreamTaskListener;
 import hudson.util.VariableResolver;
-import hudson.util.FormValidation;
 import hudson.util.XStream2;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.List;
-import java.util.Collections;
-import java.util.Set;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Build by using Maven.
