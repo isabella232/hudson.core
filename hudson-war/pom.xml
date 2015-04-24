@@ -33,7 +33,7 @@
     </description>
 
     <properties>
-        <HUDSON_HOME>${basedir}/work</HUDSON_HOME>
+        <HUDSON_HOME>/Users/wjprakash/hudson-homes/latha-hudson-hudson2</HUDSON_HOME>
         <contextPath>/hudson</contextPath><!-- context path during test -->
         <port>8080</port><!-- HTTP listener port -->
     </properties>

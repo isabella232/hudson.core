@@ -17,6 +17,7 @@
  */
 package hudson.util;
 
+import com.google.common.collect.ImmutableMap;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.ConverterMatcher;
@@ -29,7 +30,9 @@ import com.thoughtworks.xstream.core.JVM;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import com.thoughtworks.xstream.mapper.CannotResolveClassException;
 import com.thoughtworks.xstream.mapper.Mapper;
+import com.thoughtworks.xstream.mapper.MapperWrapper;
 import hudson.diagnosis.OldDataMonitor;
 import hudson.model.Hudson;
 import hudson.model.Label;
@@ -97,23 +100,24 @@ public class XStream2 extends XStream {
         reflectionConverter = new RobustReflectionConverter(getMapper(), new JVM().bestReflectionProvider());
         registerConverter(reflectionConverter, XStream.PRIORITY_VERY_LOW);
     }
-
-//    @Override
-//    protected MapperWrapper wrapMapper(MapperWrapper next) {
-//        Mapper m = new CompatibilityMapper(new MapperWrapper(next) {
-//            @Override
-//            public String serializedClass(Class type) {
-//                if (type != null && ImmutableMap.class.isAssignableFrom(type)) {
-//                    return super.serializedClass(ImmutableMap.class);
-//                } else {
-//                    return super.serializedClass(type);
-//                }
-//            }
-//        });
+     
+    @Override
+    protected MapperWrapper wrapMapper(MapperWrapper next) {
+        MapperWrapper m = new CompatibilityMapper(new MapperWrapper(next) {
+            @Override
+            public String serializedClass(Class type) {
+                if (type != null && ImmutableMap.class.isAssignableFrom(type)) {
+                    return super.serializedClass(ImmutableMap.class);
+                } else {
+                    return super.serializedClass(type);
+                }
+            }
+        });
+        // XStream already sets it in 1.4.8
 //        AnnotationMapper a = new AnnotationMapper(m, getConverterRegistry(), getClassLoader(), getReflectionProvider(), getJvm());
 //        a.autodetectAnnotations(true);
-//        return a;
-//    }
+        return m;
+    }
     /**
      * Prior to Hudson 1.106, XStream 1.1.x was used which encoded "$" in class
      * names as "-" instead of "_-" that is used now. Up through Hudson 1.348
@@ -122,31 +126,31 @@ public class XStream2 extends XStream {
      * that this caused fields with "__" to fail deserialization due to double
      * decoding. Now this class is used for compatibility.
      */
-//    private class CompatibilityMapper extends MapperWrapper {
-//
-//        private CompatibilityMapper(Mapper wrapped) {
-//            super(wrapped);
-//        }
-//
-//        @Override
-//        public Class realClass(String elementName) {
-//            try {
-//                return super.realClass(elementName);
-//            } catch (CannotResolveClassException e) {
-//                // If a "-" is found, retry with mapping this to "$"
-//                if (elementName.indexOf('-') >= 0) {
-//                    try {
-//                        Class c = super.realClass(elementName.replace('-', '$'));
-//                        oldData.set(Boolean.TRUE);
-//                        return c;
-//                    } catch (CannotResolveClassException e2) {
-//                    }
-//                }
-//                // Throw original exception
-//                throw e;
-//            }
-//        }
-//    }
+    private class CompatibilityMapper extends MapperWrapper {
+
+        private CompatibilityMapper(Mapper wrapped) {
+            super(wrapped);
+        }
+
+        @Override
+        public Class realClass(String elementName) {
+            try {
+                return super.realClass(elementName);
+            } catch (CannotResolveClassException e) {
+                // If a "-" is found, retry with mapping this to "$"
+                if (elementName.indexOf('-') >= 0) {
+                    try {
+                        Class c = super.realClass(elementName.replace('-', '$'));
+                        oldData.set(Boolean.TRUE);
+                        return c;
+                    } catch (CannotResolveClassException e2) {
+                    }
+                }
+                // Throw original exception
+                throw e;
+            }
+        }
+    }
     /**
      * If a class defines a nested {@code ConverterImpl} subclass, use that as a
      * {@link Converter}. Its constructor may have XStream/XStream2 and/or
