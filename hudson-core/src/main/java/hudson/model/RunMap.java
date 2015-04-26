@@ -590,7 +590,7 @@ public final class RunMap<J extends Job<J, R>, R extends Run<J, R>>
         
         if ( !loadFromRunMapXml(job, cons)) {
         
-            final SimpleDateFormat formatter = Run.ID_FORMATTER.get();
+            final Hudson.HudsonDateFormat formatter = Run.ID_FORMATTER;
 
             TreeMap<Integer, RunValue<J,R>> m = new TreeMap<Integer, RunValue<J,R>>(BUILD_TIME_COMPARATOR);
             

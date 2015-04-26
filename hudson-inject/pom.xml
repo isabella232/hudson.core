@@ -48,7 +48,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.guava</groupId>
+            <groupId>${guava.groupid}</groupId>
             <artifactId>guava</artifactId>
             <exclusions>
                 <exclusion>

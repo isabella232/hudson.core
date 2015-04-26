@@ -115,8 +115,10 @@
         <jetty.javax.serverlet.version>3.1.0</jetty.javax.serverlet.version>
         
         <maven-hpi-plugin.version>3.0.2</maven-hpi-plugin.version>
-        <stapler.version>3.0.2</stapler.version>
-        <maven-stapler-plugin.version>3.0.1</maven-stapler-plugin.version>
+        <!--stapler.version>3.0.2</stapler.version>
+        <maven-stapler-plugin.version>3.0.1</maven-stapler-plugin.version-->
+        <stapler.version>3.0.3-SNAPSHOT</stapler.version>
+        <maven-stapler-plugin.version>3.0.2-SNAPSHOT</maven-stapler-plugin.version>
 
         <!--GWT properties-->
         <gwt.draftCompile>false</gwt.draftCompile>
@@ -136,10 +138,12 @@
         <slf4j.version>1.6.1</slf4j.version>
         <logback-classic.version>0.9.28</logback-classic.version>
         <guava.version>14.0.1</guava.version>
+        <!--guava.groupid>com.google.guava</guava.groupid-->
+        <guava.groupid>org.hudsonci.lib</guava.groupid>
         <ant.version>1.8.2</ant.version>
         <xstream.version>1.4.8</xstream.version>
         <jsr305.version>1.3.9</jsr305.version>
-        <commons-lang.version>3.0.1</commons-lang.version>
+        <commons-lang.version>3.4</commons-lang.version>
         <commons-io.version>2.0.1</commons-io.version>
         <commons-codec.version>1.4</commons-codec.version>
         <aether.version>1.11</aether.version>
@@ -708,7 +712,7 @@
             </dependency>
 
             <dependency>
-                <groupId>com.google.guava</groupId>
+                <groupId>${guava.groupid}</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
             </dependency>
