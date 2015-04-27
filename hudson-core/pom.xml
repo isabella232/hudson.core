@@ -427,13 +427,11 @@
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang.version}</version>
         </dependency>
-        <!-- Plugins that depend on old versions of commons-lang will need to
-             update or add the older dependency -->
-        <!--dependency>
+        <dependency><!-- Not used by Hudson, kept for plugin compatibility -->
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>2.4</version>
-        </dependency-->
+        </dependency>
 
         <dependency><!-- Left for backward compatibility-->
             <groupId>commons-digester</groupId>
