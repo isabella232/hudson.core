@@ -30,8 +30,16 @@ import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -44,7 +52,11 @@ import org.eclipse.hudson.plugins.UpdateSiteManager;
 import org.eclipse.hudson.plugins.UpdateSiteManager.AvailablePluginInfo;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.eclipse.hudson.security.HudsonSecurityManager;
-import org.kohsuke.stapler.*;
+import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.HttpResponses;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,15 +127,11 @@ final public class InitialSetup {
     public boolean needsInitSetup() throws IOException {
         if (initSetupFile.exists()) {
             String str = FileUtils.readFileToString(initSetupFile.getFile());
-            if (str.trim().contains("Hudson 3.0")) {
-                return true;
-            } else {
-                return false;
-            }
+            return !str.trim().contains("Hudson 3.3");
         } else {
             if (Boolean.getBoolean("skipInitSetup")) {
                 try {
-                    initSetupFile.write("Hudson 3.2 Initial Setup Done");
+                    initSetupFile.write("Hudson 3.3 Initial Setup Done");
                 } catch (IOException ex) {
                     logger.error(ex.getLocalizedMessage());
                 }
@@ -293,7 +301,7 @@ final public class InitialSetup {
 
     public HttpResponse doFinish() {
         try {
-            initSetupFile.write("Hudson 3.2 Initial Setup Done");
+            initSetupFile.write("Hudson 3.3 Initial Setup Done");
         } catch (IOException ex) {
             logger.error(ex.getLocalizedMessage());
         }
