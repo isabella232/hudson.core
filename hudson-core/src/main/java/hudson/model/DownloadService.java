@@ -25,11 +25,9 @@ import hudson.util.IOUtils;
 import hudson.util.QuotedStringTokenizer;
 import hudson.util.TextFile;
 import hudson.util.TimeUnit2;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
-
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -119,7 +117,7 @@ public class DownloadService extends PageDecorator {
          *
          * @param url URL relative to {@link UpdateCenter#getUrl()}. So if this
          * string is "foo.json", the ultimate URL will be something like
-         * "https://hudson-ci.org/update-center3.2/foo.json"
+         * "https://hudson-ci.org/update-center3.3/foo.json"
          *
          * For security and privacy reasons, we don't allow the retrieval from
          * random locations.

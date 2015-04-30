@@ -262,7 +262,7 @@
                         </goals>
                         <configuration>
                             <url>http://hudson-ci.org</url>
-                            <fromFile>update-center3.2/update-center.json</fromFile>
+                            <fromFile>update-center3.3/update-center.json</fromFile>
                             <toDir>target/generated-resources/WEB-INF</toDir>
                         </configuration>
                     </execution>
