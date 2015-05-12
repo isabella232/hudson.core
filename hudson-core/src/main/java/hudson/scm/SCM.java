@@ -359,26 +359,25 @@ public abstract class SCM implements Describable<SCM>, ExtensionPoint {
      */
     public final PollingResult poll(AbstractProject<?, ?> project, Launcher launcher, FilePath workspace, TaskListener listener, SCMRevisionState baseline) throws IOException, InterruptedException {
         // Ensure poll can't run during project delete.
-        synchronized (project.getParent()) {
-            synchronized (project) {
-                if (!project.isDeleted()) {
-                    if (is1_346OrLater()) {
-                        // This is to work around HUDSON-5827 in a general way.
-                        // don't let the SCM.compareRemoteRevisionWith(...) see SCMRevisionState that it didn't produce.
-                        SCMRevisionState baseline2;
-                        if (baseline != SCMRevisionState.NONE) {
-                            baseline2 = baseline;
-                        } else {
-                            baseline2 = _calcRevisionsFromBuild(project.getLastBuild(), launcher, listener);
-                        }
-
-                        return _compareRemoteRevisionWith(project, launcher, workspace, listener, baseline2);
+        // Fix Bug 460866 - SCM polling appears to hang Hudson
+        synchronized (project.getDeleteLock()) {
+            if (!project.isDeleted()) {
+                if (is1_346OrLater()) {
+                    // This is to work around HUDSON-5827 in a general way.
+                    // don't let the SCM.compareRemoteRevisionWith(...) see SCMRevisionState that it didn't produce.
+                    SCMRevisionState baseline2;
+                    if (baseline != SCMRevisionState.NONE) {
+                        baseline2 = baseline;
                     } else {
-                        return pollChanges(project, launcher, workspace, listener) ? PollingResult.SIGNIFICANT : PollingResult.NO_CHANGES;
+                        baseline2 = _calcRevisionsFromBuild(project.getLastBuild(), launcher, listener);
                     }
+
+                    return _compareRemoteRevisionWith(project, launcher, workspace, listener, baseline2);
                 } else {
-                    return PollingResult.NO_CHANGES;
+                    return pollChanges(project, launcher, workspace, listener) ? PollingResult.SIGNIFICANT : PollingResult.NO_CHANGES;
                 }
+            } else {
+                return PollingResult.NO_CHANGES;
             }
         }
     }
