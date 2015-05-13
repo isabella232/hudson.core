@@ -57,7 +57,11 @@ public abstract class AbstractCloudSlave extends Slave {
             _terminate(new StreamTaskListener(System.out, Charset.defaultCharset()));
         } finally {
             try {
-                Hudson.getInstance().removeNode(this);
+                Hudson hudson = Hudson.getInstance();
+                hudson.removeNode(this);
+                if (hudson.isTeamManagementEnabled()) {
+                    hudson.getTeamManager().removeNode(getNodeName());
+                }
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "Failed to remove " + name, e);
             }

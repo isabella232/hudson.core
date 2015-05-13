@@ -123,7 +123,16 @@ public class NodeProvisioner {
             PlannedNode f = itr.next();
             if (f.future.isDone()) {
                 try {
-                    hudson.addNode(f.future.get());
+                    Node node = f.future.get();
+                    // Add to public team
+                    hudson.addNode(node);
+                    if (hudson.isTeamManagementEnabled()) {
+                        try {
+                            hudson.getTeamManager().addNode(null, node.getNodeName());
+                        } catch (Exception e) {
+                            LOGGER.log(Level.SEVERE, "Node cannot be added to public team", e);
+                        }
+                    }
                     LOGGER.info(f.displayName + " provisioning successfully completed. We have now " + hudson.getComputers().length + " computer(s)");
                 } catch (InterruptedException e) {
                     throw new AssertionError(e); // since we confirmed that the future is already done
