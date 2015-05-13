@@ -115,10 +115,8 @@
         <jetty.javax.serverlet.version>3.1.0</jetty.javax.serverlet.version>
         
         <maven-hpi-plugin.version>3.0.2</maven-hpi-plugin.version>
-        <stapler.version>3.0.2</stapler.version>
-        <maven-stapler-plugin.version>3.0.1</maven-stapler-plugin.version>
-        <!--stapler.version>3.0.3-SNAPSHOT</stapler.version>
-        <maven-stapler-plugin.version>3.0.2-SNAPSHOT</maven-stapler-plugin.version-->
+        <stapler.version>3.0.3</stapler.version>
+        <maven-stapler-plugin.version>3.0.2</maven-stapler-plugin.version>
 
         <!--GWT properties-->
         <gwt.draftCompile>false</gwt.draftCompile>
