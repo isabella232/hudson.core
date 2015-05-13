@@ -15,10 +15,9 @@
  *******************************************************************************/
 package hudson.tasks;
 
-import org.junit.Test;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
+import org.junit.Test;
 
 /**
  * Verify equals and hashCode methods for Ant object.
@@ -28,18 +27,18 @@ import static junit.framework.Assert.assertFalse;
  * @author Nikita Levyankov
  */
 public class AntEqualsHashCodeTest {
-    private Ant ant = new Ant("targets", "antName", "antOpts", "buildFile", "properties");
+    private Ant ant = new Ant("targets", "antName", "antOpts", "buildFile", "properties", false);
 
     @Test
     public void testHashCode() {
-        assertEquals(ant.hashCode(), new Ant("targets", "antName", "antOpts", "buildFile", "properties").hashCode());
-        assertFalse(ant.hashCode() == new Ant("targets", "antName", "antOpts", "buildFile", "properties1").hashCode());
-        assertFalse(ant.hashCode() == new Ant("targets", "antName", "antOpts", "buildFile1", "properties").hashCode());
-        assertFalse(ant.hashCode() == new Ant("targets", "antName", "antOpts1", "buildFile", "properties").hashCode());
-        assertFalse(ant.hashCode() == new Ant("targets", "antName1", "antOpts", "buildFile", "properties").hashCode());
-        assertFalse(ant.hashCode() == new Ant("targets1", "antName", "antOpts", "buildFile", "properties").hashCode());
+        assertEquals(ant.hashCode(), new Ant("targets", "antName", "antOpts", "buildFile", "properties", false).hashCode());
+        assertFalse(ant.hashCode() == new Ant("targets", "antName", "antOpts", "buildFile", "properties1", false).hashCode());
+        assertFalse(ant.hashCode() == new Ant("targets", "antName", "antOpts", "buildFile1", "properties", false).hashCode());
+        assertFalse(ant.hashCode() == new Ant("targets", "antName", "antOpts1", "buildFile", "properties", false).hashCode());
+        assertFalse(ant.hashCode() == new Ant("targets", "antName1", "antOpts", "buildFile", "properties", false).hashCode());
+        assertFalse(ant.hashCode() == new Ant("targets1", "antName", "antOpts", "buildFile", "properties", false).hashCode());
         assertFalse(
-            ant.hashCode() == new Ant("targets1", "antName1", "antOpts1", "buildFile1", "properties1").hashCode());
+            ant.hashCode() == new Ant("targets1", "antName1", "antOpts1", "buildFile1", "properties1", false).hashCode());
     }
 
     @Test
@@ -47,12 +46,12 @@ public class AntEqualsHashCodeTest {
         assertEquals(ant, ant);
         assertFalse(ant.equals(null));
         assertFalse(ant.equals(new Object()));
-        assertEquals(ant, new Ant("targets", "antName", "antOpts", "buildFile", "properties"));
-        assertFalse(ant.equals(new Ant("targets", "antName", "antOpts", "buildFile", "properties1")));
-        assertFalse(ant.equals(new Ant("targets", "antName", "antOpts", "buildFile1", "properties")));
-        assertFalse(ant.equals(new Ant("targets", "antName", "antOpts1", "buildFile", "properties")));
-        assertFalse(ant.equals(new Ant("targets", "antName1", "antOpts", "buildFile", "properties")));
-        assertFalse(ant.equals(new Ant("targets1", "antName", "antOpts", "buildFile", "properties")));
-        assertFalse(ant.equals(new Ant("targets1", "antName1", "antOpts1", "buildFile1", "properties1")));
+        assertEquals(ant, new Ant("targets", "antName", "antOpts", "buildFile", "properties", false));
+        assertFalse(ant.equals(new Ant("targets", "antName", "antOpts", "buildFile", "properties1", false)));
+        assertFalse(ant.equals(new Ant("targets", "antName", "antOpts", "buildFile1", "properties", false)));
+        assertFalse(ant.equals(new Ant("targets", "antName", "antOpts1", "buildFile", "properties", false)));
+        assertFalse(ant.equals(new Ant("targets", "antName1", "antOpts", "buildFile", "properties", false)));
+        assertFalse(ant.equals(new Ant("targets1", "antName", "antOpts", "buildFile", "properties", false)));
+        assertFalse(ant.equals(new Ant("targets1", "antName1", "antOpts1", "buildFile1", "properties1", false)));
     }
 }

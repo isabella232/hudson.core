@@ -16,14 +16,13 @@
 
 package hudson.tasks;
 
+import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
-import hudson.EnvVars;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.TaskListener;
-
 import java.io.IOException;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -51,10 +50,18 @@ public abstract class CommandInterpreter extends Builder {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException {
+        if (isDisabled()){
+            listener.getLogger().print("\nThe command interpreter builder is temporarily disabled.\n");
+            return true;
+        }
         return perform(build, launcher, (TaskListener) listener);
     }
 
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, TaskListener listener) throws InterruptedException {
+        if (isDisabled()){
+            // just continue, this builder is disabled temporarily
+            return true;
+        }
         FilePath ws = build.getWorkspace();
         FilePath script = null;
         try {

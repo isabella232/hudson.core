@@ -108,21 +108,22 @@ public class Maven extends Builder {
     private final static String MAVEN_2_INSTALLATION_COMMON_FILE = "bin/mvn";
 
     public Maven(String targets, String name) {
-        this(targets, name, null, null, null, false);
+        this(targets, name, null, null, null, false, false);
     }
 
     public Maven(String targets, String name, String pom, String properties, String jvmOptions) {
-        this(targets, name, pom, properties, jvmOptions, false);
+        this(targets, name, pom, properties, jvmOptions, false, false);
     }
 
     @DataBoundConstructor
-    public Maven(String targets, String name, String pom, String properties, String jvmOptions, boolean usePrivateRepository) {
+    public Maven(String targets, String name, String pom, String properties, String jvmOptions, boolean usePrivateRepository, boolean disabled) {
         this.targets = targets;
         this.mavenName = name;
         this.pom = StringUtils.trimToNull(pom);
         this.properties = StringUtils.trimToNull(properties);
         this.jvmOptions = StringUtils.trimToNull(jvmOptions);
         this.usePrivateRepository = usePrivateRepository;
+        setDisabled(disabled);
     }
 
     public String getTargets() {
@@ -196,6 +197,11 @@ public class Maven extends Builder {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+        if (isDisabled()){
+            listener.getLogger().print("\nThe legacy maven2 builder is temporarily disabled\n"); 
+            // just continue, this builder is disabled temporarily
+            return true;
+        }
         VariableResolver<String> vr = build.getBuildVariableResolver();
 
         EnvVars env = build.getEnvironment(listener);

@@ -16,8 +16,8 @@
 
 package hudson.tasks;
 
-import hudson.FilePath;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.model.AbstractProject;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -31,8 +31,9 @@ import org.kohsuke.stapler.StaplerRequest;
 public class BatchFile extends CommandInterpreter {
 
     @DataBoundConstructor
-    public BatchFile(String command) {
+    public BatchFile(String command, boolean disabled) {
         super(command);
+        setDisabled(disabled);
     }
 
     public String[] buildCommandLine(FilePath script) {
@@ -61,7 +62,7 @@ public class BatchFile extends CommandInterpreter {
 
         @Override
         public Builder newInstance(StaplerRequest req, JSONObject data) {
-            return new BatchFile(data.getString("command"));
+            return new BatchFile(data.getString("command"), data.getBoolean("disabled"));
         }
 
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {

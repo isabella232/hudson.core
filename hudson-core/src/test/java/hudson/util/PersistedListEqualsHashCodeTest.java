@@ -21,11 +21,10 @@ import hudson.model.Saveable;
 import hudson.tasks.Shell;
 import java.io.IOException;
 import java.util.Arrays;
-import org.junit.Before;
-import org.junit.Test;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Verify equals and hashCode methods for PersistedList object.
@@ -55,13 +54,13 @@ public class PersistedListEqualsHashCodeTest {
         assertEquals(new PersistedList().hashCode(), new PersistedList().hashCode());
         assertEquals(persistedList1.hashCode(), new PersistedList(owner1).hashCode());
         assertFalse(persistedList1.hashCode() == persistedList2.hashCode());
-        persistedList1.add(new Shell("echo 'test1'"));
+        persistedList1.add(new Shell("echo 'test1'", false));
         assertFalse(persistedList1.hashCode() == persistedList2.hashCode());
-        persistedList2.add(new Shell("echo 'test1'"));
+        persistedList2.add(new Shell("echo 'test1'", false));
         assertFalse(persistedList1.hashCode() == persistedList2.hashCode());
-        persistedList3.add(new Shell("echo 'test1'"));
+        persistedList3.add(new Shell("echo 'test1'", false));
         assertEquals(persistedList1.hashCode(), persistedList3.hashCode());
-        persistedList3.replaceBy(Arrays.asList(new Shell("echo 'test2'")));
+        persistedList3.replaceBy(Arrays.asList(new Shell("echo 'test2'", false)));
         assertFalse(persistedList1.hashCode() == persistedList3.hashCode());
     }
 
@@ -72,16 +71,16 @@ public class PersistedListEqualsHashCodeTest {
         assertFalse(persistedList1.equals(new Object()));
         assertFalse(persistedList1.equals(persistedList2));
         assertEquals(persistedList1, persistedList3);
-        persistedList1.add(new Shell("echo 'test1'"));
-        persistedList3.add(new Shell("echo 'test1'"));
+        persistedList1.add(new Shell("echo 'test1'", false));
+        persistedList3.add(new Shell("echo 'test1'", false));
         assertEquals(persistedList1, persistedList3);
-        persistedList1.add(new Shell("echo 'test3'"));
-        persistedList1.add(new Shell("echo 'test2'"));
-        persistedList3.add(new Shell("echo 'test2'"));
-        persistedList3.add(new Shell("echo 'test3'"));
+        persistedList1.add(new Shell("echo 'test3'", false));
+        persistedList1.add(new Shell("echo 'test2'", false));
+        persistedList3.add(new Shell("echo 'test2'", false));
+        persistedList3.add(new Shell("echo 'test3'", false));
         assertEquals(persistedList1, persistedList3);
 
-        persistedList3.replaceBy(Arrays.asList(new Shell("echo 'test2'")));
+        persistedList3.replaceBy(Arrays.asList(new Shell("echo 'test2'", false)));
         assertFalse(persistedList1.equals(persistedList3));
     }
 }

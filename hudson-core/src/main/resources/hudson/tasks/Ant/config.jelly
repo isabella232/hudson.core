@@ -27,6 +27,10 @@
       </select>
     </f:entry>
   </j:if>
+  <f:entry title="" help="/help/disable-builder.html">
+      <f:checkbox name="disabled" checked="${instance.disabled}"
+              title="${%Temporarily disable this builder}"/>
+  </f:entry>
   <f:entry title="${%Targets}" help="/help/ant/ant-targets.html">
     <f:expandableTextbox name="ant.targets" value="${instance.targets}" />
   </f:entry>

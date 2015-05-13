@@ -19,14 +19,13 @@ import hudson.model.FreeStyleProjectMock;
 import hudson.tasks.Shell;
 import hudson.util.DescribableList;
 import java.util.Arrays;
-import org.junit.Before;
-import org.junit.Test;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Contains test-cases for {@link DescribableListProjectProperty}.
@@ -120,9 +119,9 @@ public class DescribableListProjectPropertyTest {
         assertFalse(property.allowOverrideValue(new DescribableList(project), new DescribableList(project)));
         assertFalse(property.allowOverrideValue(new DescribableList(project), new DescribableList(parent)));
         DescribableList describableList1 = new DescribableList(project,
-            Arrays.asList(new Shell("echo 'test3'"), new Shell("echo 'test2'")));
+            Arrays.asList(new Shell("echo 'test3'", false), new Shell("echo 'test2'", false)));
         DescribableList describableList2 = new DescribableList(project,
-            Arrays.asList(new Shell("echo 'test2'"), new Shell("echo 'test3'")));
+            Arrays.asList(new Shell("echo 'test2'", false), new Shell("echo 'test3'", false)));
         assertFalse(property.allowOverrideValue(describableList1, describableList2));
 
         DescribableList describableList3 = new DescribableList(parent, describableList2.toList());
@@ -137,8 +136,8 @@ public class DescribableListProjectPropertyTest {
         assertTrue(property.allowOverrideValue(new DescribableList(project), null));
 
         assertTrue(property.allowOverrideValue(new DescribableList(project),
-            new DescribableList(project, Arrays.asList(new Shell("echo 'test1'")))));
-        assertTrue(property.allowOverrideValue(new DescribableList(project, Arrays.asList(new Shell("echo 'test1'"))),
+            new DescribableList(project, Arrays.asList(new Shell("echo 'test1'", false)))));
+        assertTrue(property.allowOverrideValue(new DescribableList(project, Arrays.asList(new Shell("echo 'test1'", false))),
             new DescribableList(project)));
     }
 
