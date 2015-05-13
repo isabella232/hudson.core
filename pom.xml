@@ -114,7 +114,7 @@
         <jetty.server.version>9.2.10.v20150310</jetty.server.version>
         <jetty.javax.serverlet.version>3.1.0</jetty.javax.serverlet.version>
         
-        <maven-hpi-plugin.version>3.0.2</maven-hpi-plugin.version>
+        <maven-hpi-plugin.version>3.0.3</maven-hpi-plugin.version>
         <stapler.version>3.0.3</stapler.version>
         <maven-stapler-plugin.version>3.0.2</maven-stapler-plugin.version>
 
@@ -384,9 +384,6 @@
                     <groupId>org.eclipse.hudson.tools</groupId>
                     <artifactId>maven-hpi-plugin</artifactId>
                     <version>${maven-hpi-plugin.version}</version>
-                    <configuration>
-                        <showDeprecation>true</showDeprecation>
-                    </configuration>
                 </plugin>
 
                 <plugin>
