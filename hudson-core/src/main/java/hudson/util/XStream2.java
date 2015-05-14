@@ -96,7 +96,6 @@ public class XStream2 extends XStream {
         // this should come after all the XStream's default simpler converters,
         // but before reflection-based one kicks in.
         registerConverter(new AssociatedConverterImpl(this), XStream.PRIORITY_LOW);
-        registerConverter(new RobustReflectionConverter(getMapper(), new JVM().bestReflectionProvider()), XStream.PRIORITY_VERY_LOW);
         reflectionConverter = new RobustReflectionConverter(getMapper(), new JVM().bestReflectionProvider());
         registerConverter(reflectionConverter, XStream.PRIORITY_VERY_LOW);
     }
