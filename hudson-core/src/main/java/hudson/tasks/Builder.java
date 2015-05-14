@@ -54,6 +54,22 @@ public abstract class Builder extends BuildStepCompatibilityLayer implements Bui
     }
     
     /**
+     * @since 3.3.0
+     * Description of what this builder does as documentation
+     * (see https://bugs.eclipse.org/bugs/show_bug.cgi?id=414876)
+     */
+    
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
+    /**
      * Default implementation that does nothing.
      */
     public boolean prebuild(Build build, BuildListener listener) {

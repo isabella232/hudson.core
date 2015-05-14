@@ -108,15 +108,21 @@ public class Maven extends Builder {
     private final static String MAVEN_2_INSTALLATION_COMMON_FILE = "bin/mvn";
 
     public Maven(String targets, String name) {
-        this(targets, name, null, null, null, false, false);
+        this(targets, name, null, null, null, false, false, "");
     }
 
     public Maven(String targets, String name, String pom, String properties, String jvmOptions) {
-        this(targets, name, pom, properties, jvmOptions, false, false);
+        this(targets, name, pom, properties, jvmOptions, false, false, "");
+    }
+    
+    public Maven(String targets, String name, String pom, String properties, 
+            String jvmOptions, boolean usePrivateRepository) {
+        this(targets, name, pom, properties, jvmOptions, usePrivateRepository, false, "");
     }
 
     @DataBoundConstructor
-    public Maven(String targets, String name, String pom, String properties, String jvmOptions, boolean usePrivateRepository, boolean disabled) {
+    public Maven(String targets, String name, String pom, String properties, 
+            String jvmOptions, boolean usePrivateRepository, boolean disabled, String description) {
         this.targets = targets;
         this.mavenName = name;
         this.pom = StringUtils.trimToNull(pom);
@@ -124,6 +130,7 @@ public class Maven extends Builder {
         this.jvmOptions = StringUtils.trimToNull(jvmOptions);
         this.usePrivateRepository = usePrivateRepository;
         setDisabled(disabled);
+        setDescription(description);
     }
 
     public String getTargets() {

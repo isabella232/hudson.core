@@ -30,23 +30,23 @@ import org.junit.Test;
 public class BatchFileEqualsHashCodeTest {
     @Test
     public void testHashCode() {
-        assertEquals(new BatchFile(null, false).hashCode(), new BatchFile(null, false).hashCode());
-        assertEquals(new BatchFile("", false).hashCode(), new BatchFile("", false).hashCode());
-        assertEquals(new BatchFile("echo", false).hashCode(), new BatchFile("echo", false).hashCode());
-        assertFalse(new BatchFile("echo 'test'", false).hashCode() == new BatchFile("echo '123'", false).hashCode());
-        assertFalse(new BatchFile(null, false).hashCode() == new BatchFile("echo '123'", false).hashCode());
+        assertEquals(new BatchFile(null).hashCode(), new BatchFile(null).hashCode());
+        assertEquals(new BatchFile("").hashCode(), new BatchFile("").hashCode());
+        assertEquals(new BatchFile("echo").hashCode(), new BatchFile("echo").hashCode());
+        assertFalse(new BatchFile("echo 'test'").hashCode() == new BatchFile("echo '123'").hashCode());
+        assertFalse(new BatchFile(null).hashCode() == new BatchFile("echo '123'").hashCode());
     }
 
     @Test
     public void testEqual() {
-        BatchFile echo = new BatchFile("echo", false);
+        BatchFile echo = new BatchFile("echo");
         assertEquals(echo, echo);
-        assertFalse(new BatchFile("echo", false).equals(null));
+        assertFalse(new BatchFile("echo").equals(null));
         assertFalse(echo.equals(new Object()));
-        assertEquals(echo, new BatchFile("echo", false));
-        assertEquals(new BatchFile(null, false), new BatchFile(null, false));
-        assertEquals(new BatchFile("", false), new BatchFile("", false));
-        assertFalse(new BatchFile("echo 'test'", false).equals(new BatchFile("echo '123'", false)));
-        assertFalse(new BatchFile(null, false).equals(new BatchFile("echo '123'", false)));
+        assertEquals(echo, new BatchFile("echo"));
+        assertEquals(new BatchFile(null), new BatchFile(null));
+        assertEquals(new BatchFile(""), new BatchFile(""));
+        assertFalse(new BatchFile("echo 'test'").equals(new BatchFile("echo '123'")));
+        assertFalse(new BatchFile(null).equals(new BatchFile("echo '123'")));
     }
 }

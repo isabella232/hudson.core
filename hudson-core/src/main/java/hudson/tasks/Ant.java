@@ -88,15 +88,21 @@ public class Ant extends Builder {
      * syntax.
      */
     private final String properties;
+    
+    public Ant(String targets, String antName, String antOpts, String buildFile, String properties) {
+      this(targets,  antName,  antOpts,  buildFile,  properties, false, "");
+    }
+       
 
     @DataBoundConstructor
-    public Ant(String targets, String antName, String antOpts, String buildFile, String properties, boolean disabled) {
+    public Ant(String targets, String antName, String antOpts, String buildFile, String properties, boolean disabled, String description) {
         this.targets = targets;
         this.antName = antName;
         this.antOpts = StringUtils.trimToNull(antOpts);
         this.buildFile = StringUtils.trimToNull(buildFile);
         this.properties = StringUtils.trimToNull(properties);
         setDisabled(disabled);
+        setDescription(description);
     }
 
     public String getBuildFile() {

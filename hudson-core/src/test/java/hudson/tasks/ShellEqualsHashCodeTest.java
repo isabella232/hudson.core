@@ -30,23 +30,23 @@ public class ShellEqualsHashCodeTest {
 
     @Test
     public void testHashCode() {
-        assertEquals(new Shell(null, false).hashCode(), new Shell(null, false).hashCode());
-        assertEquals(new Shell("", false).hashCode(), new Shell("", false).hashCode());
-        assertEquals(new Shell("echo", false).hashCode(), new Shell("echo", false).hashCode());
-        assertFalse(new Shell("echo 'test'", false).hashCode() == new Shell("echo '123'", false).hashCode());
-        assertFalse(new Shell(null, false).hashCode() == new Shell("echo '123'", false).hashCode());
+        assertEquals(new Shell(null).hashCode(), new Shell(null).hashCode());
+        assertEquals(new Shell("").hashCode(), new Shell("").hashCode());
+        assertEquals(new Shell("echo").hashCode(), new Shell("echo").hashCode());
+        assertFalse(new Shell("echo 'test'").hashCode() == new Shell("echo '123'").hashCode());
+        assertFalse(new Shell(null).hashCode() == new Shell("echo '123'").hashCode());
     }
 
     @Test
     public void testEqual() {
-        Shell echo = new Shell("echo", false);
+        Shell echo = new Shell("echo");
         assertEquals(echo, echo);
-        assertFalse(new Shell("echo", false).equals(null));
+        assertFalse(new Shell("echo").equals(null));
         assertFalse(echo.equals(new Object()));
-        assertEquals(echo, new Shell("echo", false));
-        assertEquals(new Shell(null, false), new Shell(null, false));
-        assertEquals(new Shell("", false), new Shell("", false));
-        assertFalse(new Shell("echo 'test'", false).equals(new Shell("echo '123'", false)));
-        assertFalse(new Shell(null, false).equals(new Shell("echo '123'", false)));
+        assertEquals(echo, new Shell("echo"));
+        assertEquals(new Shell(null), new Shell(null));
+        assertEquals(new Shell(""), new Shell(""));
+        assertFalse(new Shell("echo 'test'").equals(new Shell("echo '123'")));
+        assertFalse(new Shell(null).equals(new Shell("echo '123'")));
     }
 }

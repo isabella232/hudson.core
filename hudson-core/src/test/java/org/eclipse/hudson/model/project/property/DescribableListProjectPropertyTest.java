@@ -119,9 +119,9 @@ public class DescribableListProjectPropertyTest {
         assertFalse(property.allowOverrideValue(new DescribableList(project), new DescribableList(project)));
         assertFalse(property.allowOverrideValue(new DescribableList(project), new DescribableList(parent)));
         DescribableList describableList1 = new DescribableList(project,
-            Arrays.asList(new Shell("echo 'test3'", false), new Shell("echo 'test2'", false)));
+            Arrays.asList(new Shell("echo 'test3'"), new Shell("echo 'test2'")));
         DescribableList describableList2 = new DescribableList(project,
-            Arrays.asList(new Shell("echo 'test2'", false), new Shell("echo 'test3'", false)));
+            Arrays.asList(new Shell("echo 'test2'"), new Shell("echo 'test3'")));
         assertFalse(property.allowOverrideValue(describableList1, describableList2));
 
         DescribableList describableList3 = new DescribableList(parent, describableList2.toList());
@@ -136,8 +136,8 @@ public class DescribableListProjectPropertyTest {
         assertTrue(property.allowOverrideValue(new DescribableList(project), null));
 
         assertTrue(property.allowOverrideValue(new DescribableList(project),
-            new DescribableList(project, Arrays.asList(new Shell("echo 'test1'", false)))));
-        assertTrue(property.allowOverrideValue(new DescribableList(project, Arrays.asList(new Shell("echo 'test1'", false))),
+            new DescribableList(project, Arrays.asList(new Shell("echo 'test1'")))));
+        assertTrue(property.allowOverrideValue(new DescribableList(project, Arrays.asList(new Shell("echo 'test1'"))),
             new DescribableList(project)));
     }
 

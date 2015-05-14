@@ -38,13 +38,13 @@ public class CopyOnWriteListEqualsHashCodeTest {
     @Before
     public void setUp() {
         data1 = new ArrayList<Builder>();
-        data1.add(new Shell("echo 'test'", false));
-        data1.add(new Shell("echo 'test1'", false));
-        data1.add(new Shell("echo 'test2'", false));
+        data1.add(new Shell("echo 'test'"));
+        data1.add(new Shell("echo 'test1'"));
+        data1.add(new Shell("echo 'test2'"));
 
         data2 = new ArrayList<Builder>();
-        data2.add(new Shell("echo 'test1'", false));
-        data2.add(new Shell("echo 'test'", false));
+        data2.add(new Shell("echo 'test1'"));
+        data2.add(new Shell("echo 'test'"));
     }
 
     @Test
@@ -52,7 +52,7 @@ public class CopyOnWriteListEqualsHashCodeTest {
         assertEquals(new CopyOnWriteList(data1).hashCode(), new CopyOnWriteList(data1).hashCode());
 
         assertFalse(new CopyOnWriteList(data1).hashCode() == new CopyOnWriteList(data2).hashCode());
-        data2.add(new Shell("echo 'test2'", false));
+        data2.add(new Shell("echo 'test2'"));
         assertFalse(new CopyOnWriteList(data1).hashCode() == new CopyOnWriteList(data2).hashCode());
     }
 
@@ -66,7 +66,7 @@ public class CopyOnWriteListEqualsHashCodeTest {
 
         assertFalse(new CopyOnWriteList(data1).equals(new CopyOnWriteList(data2)));
         assertEquals(new CopyOnWriteList(data1), new CopyOnWriteList(data1));
-        data2.add(new Shell("echo 'test2'", false));
+        data2.add(new Shell("echo 'test2'"));
         assertEquals(new CopyOnWriteList(data1), new CopyOnWriteList(data2));
     }
 }

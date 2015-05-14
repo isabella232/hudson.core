@@ -43,10 +43,14 @@ public class Shell extends CommandInterpreter {
 
     private static final Logger LOGGER = Logger.getLogger(Shell.class.getName());
     
+    public Shell(String command){
+        this(command, false, "");
+    }
     @DataBoundConstructor
-    public Shell(String command, boolean disabled) {
+    public Shell(String command, boolean disabled, String description) {
         super(fixCrLf(command));
         this.setDisabled(disabled); 
+        setDescription(description);
     }
 
     /**
@@ -165,7 +169,7 @@ public class Shell extends CommandInterpreter {
 
         @Override
         public Builder newInstance(StaplerRequest req, JSONObject data) {
-            return new Shell(data.getString("command"), data.getBoolean("disabled"));
+            return new Shell(data.getString("command"), data.getBoolean("disabled"), data.getString("description"));
         }
 
         @Override
