@@ -29,21 +29,13 @@ import java.util.List;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import java.util.Set;
-import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.authentication.AnonymousAuthenticationProvider;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.RememberMeAuthenticationProvider;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
@@ -52,7 +44,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  * @author Kohsuke Kawaguchi
  * @since 1.282
  */
-public class PAMSecurityRealm extends SecurityRealm {
+public class PAMSecurityRealm extends AbstractPasswordBasedSecurityRealm {
 
     public final String serviceName;
 
@@ -65,85 +57,37 @@ public class PAMSecurityRealm extends SecurityRealm {
         this.serviceName = serviceName;
     }
 
-    public static class PAMAuthenticationProvider implements AuthenticationProvider {
+    @Override
+    protected UserDetails authenticate(String username, String password) throws AuthenticationException {
+        try {
 
-        private String serviceName;
-
-        public PAMAuthenticationProvider(String serviceName) {
-            this.serviceName = serviceName;
-        }
-
-        public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-            String username = authentication.getPrincipal().toString();
-            String password = authentication.getCredentials().toString();
-
-            try {
-
-                Set<String> grps = NativeUtils.getInstance().pamAuthenticate(serviceName, username, password);
-                List<GrantedAuthority> groups = new ArrayList<GrantedAuthority>();
-                int i = 0;
-                for (String g : grps) {
-                    groups.add(new GrantedAuthorityImpl(g));
-                }
-                EnvVars.setHudsonUserEnvVar(username);
-                // I never understood why Spring Security insists on keeping the password...
-                return new UsernamePasswordAuthenticationToken(username, password, groups);
-            } catch (NativeAccessException exc) {
-                throw new BadCredentialsException(exc.getMessage(), exc);
+            Set<String> grps = NativeUtils.getInstance().pamAuthenticate(serviceName, username, password);
+            List<GrantedAuthority> groups = new ArrayList<GrantedAuthority>();
+            for (String g : grps) {
+                groups.add(new GrantedAuthorityImpl(g));
             }
-
-        }
-
-        @Override
-        public boolean supports(Class clazz) {
-            return true;
+            groups.add(AUTHENTICATED_AUTHORITY);
+            EnvVars.setHudsonUserEnvVar(username);
+            return new User(username, "", true, true, true, true, groups);
+        } catch (NativeAccessException exc) {
+            throw new BadCredentialsException(exc.getMessage(), exc);
         }
     }
 
     @Override
-    public SecurityComponents createSecurityComponents() {
-
-        // talk to PAM
-        PAMAuthenticationProvider PamAuthenticationProvider = new PAMAuthenticationProvider(serviceName);
-
-        // these providers apply everywhere
-        RememberMeAuthenticationProvider rememberMeAuthenticationProvider = new RememberMeAuthenticationProvider();
-        rememberMeAuthenticationProvider.setKey(HudsonSecurityEntitiesHolder.getHudsonSecurityManager().getSecretKey());
-
-        // this doesn't mean we allow anonymous access.
-        // we just authenticate anonymous users as such,
-        // so that later authorization can reject them if so configured
-        AnonymousAuthenticationProvider anonymousAuthenticationProvider = new AnonymousAuthenticationProvider();
-        anonymousAuthenticationProvider.setKey("anonymous");
-
-        AuthenticationProvider[] authenticationProvider = {
-            PamAuthenticationProvider,
-            rememberMeAuthenticationProvider,
-            anonymousAuthenticationProvider
-        };
-
-        ProviderManager providerManager = new ProviderManager();
-        providerManager.setProviders(Arrays.asList(authenticationProvider));
-
-        UserDetailsService userDetailsService = new UserDetailsService() {
-            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
-                try {
-                    if (!NativeUtils.getInstance().checkUnixUser(username)) {
-                        throw new UsernameNotFoundException("No such Unix user: " + username);
-                    }
-                } catch (NativeAccessException exc) {
-                    throw new DataAccessException("Failed to find Unix User", exc) {
-                    };
-                }
-
-                // return some dummy instance
-                return new User(username, "", true, true, true, true,
-                        Arrays.asList(new GrantedAuthority[]{AUTHENTICATED_AUTHORITY}));
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
+        try {
+            if (!NativeUtils.getInstance().checkUnixUser(username)) {
+                throw new UsernameNotFoundException("No such Unix user: " + username);
             }
-        };
+        } catch (NativeAccessException exc) {
+            throw new DataAccessException("Failed to find Unix User", exc) {
+            };
+        }
 
-        return new SecurityComponents(providerManager, userDetailsService);
-
+        // return some dummy instance
+        return new User(username, "", true, true, true, true,
+                Arrays.asList(new GrantedAuthority[]{AUTHENTICATED_AUTHORITY}));
     }
 
     @Override
