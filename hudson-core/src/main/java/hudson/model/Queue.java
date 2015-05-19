@@ -1428,7 +1428,7 @@ public class Queue extends ResourceController implements Saveable {
             future.setAsCancelled();
         }
 
-        private Object readResolve() {
+        public Object readResolve() {
             this.future = new FutureImpl(task);
             return this;
         }
