@@ -86,7 +86,7 @@ public class ListView extends View implements Saveable {
         }
     }
 
-    private Object readResolve() {
+    public Object readResolve() {
         if (includeRegex != null) {
             includePattern = Pattern.compile(includeRegex);
         }
