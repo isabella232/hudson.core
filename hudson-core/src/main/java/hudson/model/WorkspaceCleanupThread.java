@@ -94,9 +94,23 @@ public class WorkspaceCleanupThread extends AsyncPeriodicWork {
         // One remoting can execute "exists", "lastModified", and "delete" all at once.
         TopLevelItem item = Hudson.getInstance().getItem(jobName);
         if (item == null) {
-            // no such project anymore
-            LOGGER.fine("Directory " + dir + " is not owned by any project");
-            return true;
+            //bug fix https://bugs.eclipse.org/bugs/show_bug.cgi?id=434000
+            // Workspace directories for concurrent jobs removed before build completion
+            // Since _<number> is added to job name, it has to be stripped before checking
+            int index = jobName.lastIndexOf("_");
+            if (index > 0) {
+                jobName = jobName.substring(0, index);
+                item = Hudson.getInstance().getItem(jobName);
+                if (item == null) {
+                    // no such project anymore
+                    LOGGER.fine("Directory " + dir + " is not owned by any project");
+                    return true;
+                }
+            } else {
+                // no such project anymore
+                LOGGER.fine("Directory " + dir + " is not owned by any project");
+                return true;
+            }
         }
 
         if (!dir.exists()) {
