@@ -292,7 +292,7 @@ public abstract class PluginManager extends AbstractModelObject {
                                 @Override
                                 public void run(Reactor session) throws Exception {
                                     try {
-                                        LOGGER.info("Loading plugin - " + p.getShortName());
+                                        LOGGER.info("Loading plugin - " + p.getShortName() + " " + p.getVersion());
                                         p.resolvePluginDependencies();
                                         strategy.load(p);
                                     } catch (Exception e) {
