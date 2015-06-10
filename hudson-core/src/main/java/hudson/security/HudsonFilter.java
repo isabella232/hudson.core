@@ -16,6 +16,7 @@
  */
 package hudson.security;
 
+import hudson.util.ThreadLocalUtils;
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -155,6 +156,7 @@ public class HudsonFilter implements Filter {
         } else {
             f.doFilter(request, response, chain);
         }
+        ThreadLocalUtils.removeThreadLocals();
     }
 
     public void destroy() {
