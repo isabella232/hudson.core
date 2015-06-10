@@ -24,6 +24,7 @@ import hudson.security.Permission;
 import hudson.util.DaemonThreadFactory;
 import hudson.util.HudsonIsLoading;
 import hudson.util.VersionNumber;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,9 +42,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.hudson.WebAppController;
@@ -98,12 +101,13 @@ final public class InitialSetup {
                 }
             }));
     private final HudsonSecurityManager hudsonSecurityManager;
-    private final XmlFile initSetupFile;
+    private static XmlFile initSetupFile;
     private final File hudsonHomeDir;
     private boolean proxyNeeded = false;
     private final List<PluginInstallationJob> installationsJobs = new CopyOnWriteArrayList<PluginInstallationJob>();
     private static ClassLoader outerClassLoader;
     private static ClassLoader initialClassLoader;
+    private static Thread initThread;
     private static int highInitThreadNumber = 0;
     private static InitialSetup INSTANCE;
 
@@ -315,7 +319,7 @@ final public class InitialSetup {
         return HttpResponses.ok();
     }
 
-    private class OuterClassLoader extends ClassLoader {
+    private static class OuterClassLoader extends ClassLoader {
 
         OuterClassLoader(ClassLoader parent) {
             super(parent);
@@ -345,7 +349,7 @@ final public class InitialSetup {
             InitialRunnable initialRunnable = (InitialRunnable) ctor.newInstance(controller, logger, hudsonHomeDir, servletContext, restart);
 
             controller.install(hudsonIsLoading);
-            Thread initThread = new Thread(initialRunnable, "hudson initialization thread " + (++highInitThreadNumber));
+            initThread = new Thread(initialRunnable, "hudson initialization thread " + (++highInitThreadNumber));
             initThread.setContextClassLoader(outerClassLoader);
             initThread.start();
 
@@ -358,6 +362,10 @@ final public class InitialSetup {
          *
          * new Thread("hudson initialization thread") { }.start();
          */
+    }
+
+    public static ClassLoader getHudsonContextClassLoader() {
+        return outerClassLoader;
     }
 
     private static class ErrorHttpResponse implements HttpResponse {

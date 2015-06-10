@@ -86,7 +86,11 @@ public final class DependencyGraph implements Comparator<AbstractProject> {
             built = true;
             alreadyComputedProjects.clear();
         } finally {
-            SecurityContextHolder.setContext(saveCtx);
+            if (saveCtx.getAuthentication() == null) {
+                SecurityContextHolder.clearContext();
+            } else {
+                SecurityContextHolder.setContext(saveCtx);
+            }
         }
     }
 

@@ -15,20 +15,21 @@
 
 package org.eclipse.hudson;
 
+import com.google.common.base.internal.Finalizer;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.core.JVM;
+
 import hudson.EnvVars;
 import hudson.model.Hudson;
 import hudson.util.*;
+
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.Reference;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.Security;
 import java.util.Locale;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -38,6 +39,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.ServletResponse;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+
 import org.apache.tools.ant.types.FileSet;
 import org.eclipse.hudson.WebAppController.DefaultInstallStrategy;
 import org.eclipse.hudson.graph.ChartUtil;
@@ -197,6 +199,8 @@ public final class HudsonServletContextListener implements ServletContextListene
                 }
             }
 
+            com.google.inject.util.GuiceRuntime.setExecutorClassName(TrackedDaemonExecutor.NonInterruptableExecutor.class.getName());
+
             installExpressionFactory(event);
 
             // Do the initial setup (if needed) before actually starting Hudson
@@ -223,6 +227,8 @@ public final class HudsonServletContextListener implements ServletContextListene
                 }
             } else {
                 initSetup.invokeHudson();
+
+                ThreadLocalUtils.removeThreadLocals();
             }
 
         } catch (Exception exc) {
@@ -303,59 +309,24 @@ public final class HudsonServletContextListener implements ServletContextListene
             instance.cleanUp();
         }
 
-        cleanThreadLocals();
+        ClassLoader loader = InitialSetup.getHudsonContextClassLoader();
+
+        try {
+            Finalizer.cleanupThreads(loader);
+        } catch (Throwable t) {
+            logger.error("Finalizer cleanup unsuccessful", t);
+        }
+
+        try {
+            TrackedDaemonExecutor.shutdownAll(loader);
+        } catch (Throwable t) {
+            logger.error("Executor shutdown unsuccessful", t);
+        }
+
+        ThreadLocalUtils.removeThreadLocals();
 
         // Logger is in the system classloader, so if we don't do this
         // the whole web app will never be undepoyed.
         java.util.logging.Logger.getLogger("hudson").removeHandler(handler);
-    }
-
-    private void cleanThreadLocals() {
-        String threadName = Thread.currentThread().getName();
-        try {
-            logger.info("Cleaning ThreadLocals in thread "+threadName);
-            // Get a reference to the thread locals table of the current thread
-            Thread thread = Thread.currentThread();
-            Field threadLocalsField = Thread.class.getDeclaredField("threadLocals");
-            threadLocalsField.setAccessible(true);
-            Object threadLocalTable = threadLocalsField.get(thread);
-
-            // Get a reference to the array holding the thread local variables inside the
-            // ThreadLocalMap of the current thread
-            Class threadLocalMapClass = Class.forName("java.lang.ThreadLocal$ThreadLocalMap");
-            Field tableField = threadLocalMapClass.getDeclaredField("table");
-            tableField.setAccessible(true);
-            Object table = tableField.get(threadLocalTable);
-
-            if (table == null) {
-                logger.info("No ThreadLocalMap in thread "+threadName);
-                return;
-            }
-
-            // The key to the ThreadLocalMap is a WeakReference object. The referent field of this object
-            // is a reference to the actual ThreadLocal variable
-            Field referentField = Reference.class.getDeclaredField("referent");
-            referentField.setAccessible(true);
-
-            int numRemoved = 0;
-            for (int i=0; i < Array.getLength(table); i++) {
-                // Each entry in the table array of ThreadLocalMap is an Entry object
-                // representing the thread local reference and its value
-                Object entry = Array.get(table, i);
-                if (entry != null) {
-                    // Get a reference to the thread local object and remove it from the table
-                    ThreadLocal threadLocal = (ThreadLocal)referentField.get(entry);
-                    if (threadLocal != null) {
-                        threadLocal.remove();
-                        numRemoved++;
-                    }
-                }
-            }
-            logger.info("Removed "+numRemoved+" ThreadLocals from thread "+threadName);
-        } catch(Exception e) {
-            // We will tolerate an exception here and just log it
-            logger.warn("Exception cleaning ThreadLocals in thread "+threadName);
-            throw new IllegalStateException(e);
-        }
     }
 }

@@ -396,4 +396,9 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
     public static CLICommand getCurrent() {
         return CURRENT_COMMAND.get();
     }
+
+    /*package*/ static void removeCurrent() {
+        CURRENT_COMMAND.remove();
+    }
+
 }

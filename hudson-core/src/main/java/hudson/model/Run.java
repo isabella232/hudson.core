@@ -397,8 +397,10 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
                 this.previousBuild = (RunT)key.referenced.getPreviousBuild();
             }
             finally {
-                IS_LOADING_CACHED_VALUES.set(false);
+                IS_LOADING_CACHED_VALUES.remove();
             }
+        } else {
+            IS_LOADING_CACHED_VALUES.remove();
         }
     }
 
