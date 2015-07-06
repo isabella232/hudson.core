@@ -947,7 +947,7 @@ public class Queue extends ResourceController implements Saveable {
             WaitingItem top = peek();
 
             if (!top.timestamp.before(new GregorianCalendar())) {
-                return; // finished moving all ready items from queue
+                break; // finished moving all ready items from queue
             }
             waitingList.remove(top);
             Task p = top.task;
