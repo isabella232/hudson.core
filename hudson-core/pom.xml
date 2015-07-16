@@ -10,7 +10,7 @@
 # Contributors:
 #
 #   Kohsuke Kawaguchi, Winston Prakash
-#        
+#
 #************************************************************************** -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -36,8 +36,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
                 <executions>
                     <execution>
@@ -391,7 +391,7 @@
         <dependency>
             <groupId>org.jvnet.localizer</groupId>
             <artifactId>localizer</artifactId>
-        </dependency>     
+        </dependency>
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
@@ -406,8 +406,8 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
-        
+
+
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
@@ -444,7 +444,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-digester3</artifactId>
@@ -470,7 +470,7 @@
             <artifactId>mail</artifactId>
             <version>${javax-mail.version}</version>
         </dependency>
-        
+
         <!-- Switch to xercesImpl 2.8.1 - Eclipse approved -->
         <dependency>
             <groupId>xerces</groupId>
@@ -599,7 +599,7 @@
             <artifactId>spring-jdbc</artifactId>
             <version>${spring.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
@@ -615,13 +615,13 @@
             <artifactId>spring-security-config</artifactId>
             <version>${spring-security.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-acl</artifactId>
             <version>${spring-security.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-ldap</artifactId>
@@ -643,12 +643,12 @@
             <artifactId>commons-logging</artifactId>
             <version>${commons-logging.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>${guava.groupid}</groupId>
             <artifactId>guava</artifactId>
         </dependency>
-            
+
         <!--
         | these are now optional in commons-logging:1.1.1,
         | keeping them around in case any plugins use them
@@ -691,7 +691,7 @@
             <artifactId>xpp3</artifactId>
             <version>${xpp3.version}</version>
         </dependency>
-        
+
         <dependency>
             <artifactId>xmlpull</artifactId>
             <groupId>xmlpull</groupId>

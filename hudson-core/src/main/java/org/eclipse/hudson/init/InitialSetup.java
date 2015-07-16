@@ -26,6 +26,7 @@ import hudson.util.HudsonIsLoading;
 import hudson.util.VersionNumber;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
@@ -535,7 +536,10 @@ final public class InitialSetup {
             File localCacheFile = new File(hudsonHomeDir, "updates/default.json");
 
             if (!localCacheFile.exists() || (localCacheFile.lastModified() < lastModified)) {
-                String jsonStr = org.apache.commons.io.IOUtils.toString(updateCenterJsonUrl.openStream());
+                String jsonStr = null;
+                try (InputStream urlStream = updateCenterJsonUrl.openStream()) {
+                    jsonStr = org.apache.commons.io.IOUtils.toString(urlStream);
+                }
                 jsonStr = jsonStr.trim();
                 if (jsonStr.startsWith("updateCenter.post(")) {
                     jsonStr = jsonStr.substring("updateCenter.post(".length());
