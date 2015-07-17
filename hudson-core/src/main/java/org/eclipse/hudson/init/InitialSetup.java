@@ -45,6 +45,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.hudson.WebAppController;
 import org.eclipse.hudson.plugins.InstalledPluginManager;
 import org.eclipse.hudson.plugins.InstalledPluginManager.InstalledPluginInfo;
@@ -536,9 +537,13 @@ final public class InitialSetup {
             File localCacheFile = new File(hudsonHomeDir, "updates/default.json");
 
             if (!localCacheFile.exists() || (localCacheFile.lastModified() < lastModified)) {
+                InputStream urlStream = null;
                 String jsonStr = null;
-                try (InputStream urlStream = updateCenterJsonUrl.openStream()) {
+                try {
+                    urlStream = updateCenterJsonUrl.openStream();
                     jsonStr = org.apache.commons.io.IOUtils.toString(urlStream);
+                } finally {
+                    IOUtils.closeQuietly(urlStream);
                 }
                 jsonStr = jsonStr.trim();
                 if (jsonStr.startsWith("updateCenter.post(")) {
