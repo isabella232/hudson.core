@@ -50,6 +50,7 @@ import hudson.tasks.Maven.MavenInstallation;
 import hudson.util.PersistedList;
 import hudson.util.ReflectionUtils;
 import hudson.util.StreamTaskListener;
+import hudson.util.PluginServletFilter;
 
 import hudson.model.Node.Mode;
 
@@ -133,11 +134,17 @@ import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebRequestSettings;
 import com.gargoylesoftware.htmlunit.xml.XmlPage;
 import com.gargoylesoftware.htmlunit.html.*;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 import hudson.slaves.ComputerListener;
 import java.util.concurrent.CountDownLatch;
 
 import hudson.maven.MavenEmbedder;
 import hudson.maven.MavenRequest;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.nio.charset.Charset;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
@@ -316,6 +323,7 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
             clients.clear();
         } finally {
             server.stop();
+            
             for (LenientRunnable r : tearDowns) {
                 r.run();
             }
@@ -328,6 +336,15 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
             // Force the container bits to reset
             SmoothieUtil.reset();
 
+            // Clear hudson refrence
+            
+            hudson = null;
+            server = null;
+            
+            // Clear any filters stored in this singlton
+            
+            PluginServletFilter.clearFilters();
+            
             // Hudson creates ClassLoaders for plugins that hold on to file descriptors of its jar files,
             // but because there's no explicit dispose method on ClassLoader, they won't get GC-ed until
             // at some later point, leading to possible file descriptor overflow. So encourage GC now.
@@ -1295,7 +1312,27 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
                     if (shortName == null) {
                         throw new Error(hpl + " doesn't have the Short-Name attribute");
                     }
-                    FileUtils.copyURLToFile(hpl, new File(home, "plugins/" + shortName + ".hpl"));
+                    final File targetLocation = new File(home, "plugins/" + shortName + ".hpl");
+                    FileUtils.copyURLToFile(hpl, targetLocation);
+                    
+                    // Clear libraries and resource-path to prevent duplicate classes
+                    //
+                    
+                    {
+                        Manifest copied = null;
+                        try (FileInputStream fis = new FileInputStream(targetLocation))
+                        {
+                            copied = new Manifest(fis);
+                            copied.getMainAttributes().putValue("Libraries", "");
+                            copied.getMainAttributes().putValue("Resource-Path", "");
+                            
+                        }
+
+                        try (FileOutputStream fos = new FileOutputStream(targetLocation))
+                        {
+                            copied.write(fos);
+                        }
+                    }
 
                     // make dependency plugins available
                     // TODO: probably better to read POM, but where to read from?
@@ -1435,7 +1472,27 @@ public abstract class HudsonTestCase extends TestCase implements RootAction {
     private Object writeReplace() {
         throw new AssertionError("HudsonTestCase " + getName() + " is not supposed to be serialized");
     }
+    
+    /**
+     * @return A resource that allows testing of REST services, at the root
+     *   of the application
+     */
+    public WebResource createJaxRSClient() {
+         
+        Client client = Client.create(customizeJaxRSClient(new DefaultClientConfig()));
+        return client.resource("http://localhost:" + localPort + contextPath + "/");
+    }
+    
+    /**
+     * All sub classes to customize the client configuration
+     * @param client 
+     */
+    protected ClientConfig customizeJaxRSClient(ClientConfig client) {
+        // To be overridden
+        return client;
+    }
 
+    
     /**
      * This is to assist Groovy test clients who are incapable of instantiating
      * the inner classes properly.
