@@ -261,6 +261,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     public void onLoad(ItemGroup<? extends Item> parent, String name) throws IOException {
         this.parent = parent;
         doSetName(name);
+        deleteLock = new Object();
     }
 
     /**
@@ -381,25 +382,50 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
             throw new ServletException(e);
         }
     }
+    
+    private transient Object deleteLock = new Object();
+    
+    /**
+     * Get delete lock. Used as follows:
+     *
+     * <pre>
+     *   synchronized(project.getDeleteLock()) {
+     *     if (!project.isDeleted()) {
+     *       // do something with project root folder
+     *     }
+     *   }
+     * </pre>
+     * @return delete lock that can be used to prevent deletion while performing
+     * operations requiring access to item (job) folder. Should be obtained
+     * before any other lock/synchronized to avoid deadlock.
+     * @since 3.3.0
+     * @see #isDeleted
+     */
+    public Object getDeleteLock() {
+        return deleteLock;
+    }
 
     /**
      * Deletes this item.
      */
     public void delete() throws IOException, InterruptedException {
         final ItemGroup group = getParent();
-        // Lock parent, and then 'this' before deleting.
-        synchronized (group) {
-            synchronized (this) {
-                checkPermission(DELETE);
-                performDelete();
+        // Obtain delete lock
+        synchronized (getDeleteLock()) {
+            // Lock parent, and then 'this' before deleting.
+            synchronized (group) {
+                synchronized (this) {
+                    checkPermission(DELETE);
+                    performDelete();
 
-                try {
-                    invokeOnDeleted();
-                } catch (AbstractMethodError e) {
-                    // ignore
+                    try {
+                        invokeOnDeleted();
+                    } catch (AbstractMethodError e) {
+                        // ignore
+                    }
+
+                    Hudson.getInstance().rebuildDependencyGraph();
                 }
-
-                Hudson.getInstance().rebuildDependencyGraph();
             }
         }
     }

@@ -15,45 +15,40 @@
 
 package hudson.security;
 
-import hudson.diagnosis.OldDataMonitor;
-import hudson.model.AbstractProject;
-import hudson.model.Item;
-import hudson.model.Job;
-import hudson.model.JobProperty;
-import hudson.model.JobPropertyDescriptor;
-import hudson.model.Run;
-import hudson.Extension;
-import hudson.util.FormValidation;
-import hudson.util.RobustReflectionConverter;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Collections;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.io.IOException;
-
-import net.sf.json.JSONObject;
-
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.AncestorInPath;
-
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import hudson.Extension;
+import hudson.diagnosis.OldDataMonitor;
+import hudson.model.AbstractProject;
 import hudson.model.Computer;
+import hudson.model.Item;
+import hudson.model.Job;
+import hudson.model.JobProperty;
+import hudson.model.JobPropertyDescriptor;
+import hudson.model.Run;
 import hudson.model.View;
-
+import hudson.util.FormValidation;
+import hudson.util.RobustReflectionConverter;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
+import net.sf.json.JSONObject;
 import org.eclipse.hudson.security.HudsonSecurityEntitiesHolder;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerRequest;
 import org.springframework.security.acls.model.Sid;
 
 /**
@@ -266,16 +261,17 @@ public class AuthorizationMatrixProperty extends JobProperty<Job<?, ?>> {
                 final UnmarshallingContext context) {
             AuthorizationMatrixProperty as = new AuthorizationMatrixProperty();
 
-            String prop = reader.peekNextChild();
-            if (prop != null && prop.equals("useProjectSecurity")) {
-                reader.moveDown();
-                reader.getValue(); // we used to use this but not any more.
-                reader.moveUp();
-            }
             while (reader.hasMoreChildren()) {
                 reader.moveDown();
                 try {
-                    as.add(reader.getValue());
+                    String prop = reader.getValue();
+                    if (prop != null) {
+                        if (prop.equals("useProjectSecurity")) {
+                            // Do nothing, we no longer use it
+                        } else {
+                            as.add(prop);
+                        }
+                    }
                 } catch (IllegalArgumentException ex) {
                     Logger.getLogger(AuthorizationMatrixProperty.class.getName())
                             .log(Level.WARNING, "Skipping a non-existent permission", ex);

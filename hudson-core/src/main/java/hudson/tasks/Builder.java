@@ -16,9 +16,9 @@
 
 package hudson.tasks;
 
-import hudson.ExtensionPoint;
-import hudson.Extension;
 import hudson.DescriptorExtensionList;
+import hudson.Extension;
+import hudson.ExtensionPoint;
 import hudson.model.Build;
 import hudson.model.BuildListener;
 import hudson.model.Describable;
@@ -37,7 +37,38 @@ public abstract class Builder extends BuildStepCompatibilityLayer implements Bui
 
 //
 // these two methods need to remain to keep binary compatibility with plugins built with Hudson < 1.150
-//
+    
+    /**
+     * @since 3.3.0
+     * Ability to temporarily disable a builder with out deleting it 
+     * (see https://bugs.eclipse.org/bugs/show_bug.cgi?id=386082)
+     */
+    private boolean disabled = false;
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+    
+    /**
+     * @since 3.3.0
+     * Description of what this builder does as documentation
+     * (see https://bugs.eclipse.org/bugs/show_bug.cgi?id=414876)
+     */
+    
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
     /**
      * Default implementation that does nothing.
      */

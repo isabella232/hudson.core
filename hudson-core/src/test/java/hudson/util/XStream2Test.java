@@ -17,11 +17,10 @@
 package hudson.util;
 
 import com.google.common.collect.ImmutableMap;
-import junit.framework.TestCase;
 import hudson.model.Result;
 import hudson.model.Run;
-
 import java.util.Map;
+import junit.framework.TestCase;
 
 /**
  * Tests for XML serialization of java objects.
@@ -44,16 +43,7 @@ public class XStream2Test extends TestCase {
     private static class Bar {
         String s;
     }
-
-    /**
-     * Test ability to read old XML from Hudson 1.105 or older.
-     */
-    public void testXStream11Compatibility() {
-        Bar b = (Bar)new XStream2().fromXML(
-                "<hudson.util.XStream2Test-Bar><s>foo</s></hudson.util.XStream2Test-Bar>");
-        assertEquals("foo", b.s);
-    }
-
+    
     public static final class __Foo_Bar$Class {
         String under_1 = "1", under__2 = "2",
                _leadUnder1 = "L1", __leadUnder2 = "L2",

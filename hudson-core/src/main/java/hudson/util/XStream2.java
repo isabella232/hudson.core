@@ -1,26 +1,24 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
  * Copyright (c) 2004-2010 Oracle Corporation.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *
- *    Kohsuke Kawaguchi, Alan Harder
+ * Kohsuke Kawaguchi, Alan Harder
  *
  *
- *******************************************************************************/ 
-
+ ******************************************************************************
+ */
 package hudson.util;
 
 import com.google.common.collect.ImmutableMap;
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.mapper.AnnotationMapper;
-import com.thoughtworks.xstream.mapper.Mapper;
-import com.thoughtworks.xstream.mapper.MapperWrapper;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.ConverterMatcher;
 import com.thoughtworks.xstream.converters.DataHolder;
@@ -33,13 +31,14 @@ import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.CannotResolveClassException;
+import com.thoughtworks.xstream.mapper.Mapper;
+import com.thoughtworks.xstream.mapper.MapperWrapper;
 import hudson.diagnosis.OldDataMonitor;
 import hudson.model.Hudson;
 import hudson.model.Label;
 import hudson.model.Result;
 import hudson.model.Saveable;
 import hudson.util.xstream.ImmutableMapConverter;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -83,32 +82,27 @@ public class XStream2 extends XStream {
         return o;
     }
 
-    @Override
-    protected Converter createDefaultConverter() {
-        // replace default reflection converter
-        reflectionConverter = new RobustReflectionConverter(getMapper(), new JVM().bestReflectionProvider());
-        return reflectionConverter;
-    }
-
     private void init() {
         // list up types that should be marshalled out like a value, without referencial integrity tracking.
         addImmutableType(Result.class);
 
-        registerConverter(new RobustCollectionConverter(getMapper(), getReflectionProvider()), 10);
-        registerConverter(new ImmutableMapConverter(getMapper(), getReflectionProvider()), 10);
-        registerConverter(new ConcurrentHashMapConverter(getMapper(), getReflectionProvider()), 10);
-        registerConverter(new CopyOnWriteMap.Tree.ConverterImpl(getMapper()), 10); // needs to override MapConverter
-        registerConverter(new DescribableList.ConverterImpl(getMapper()), 10); // explicitly added to handle subtypes
-        registerConverter(new Label.ConverterImpl(), 10);
+        registerConverter(new RobustCollectionConverter(getMapper(), getReflectionProvider()), XStream.PRIORITY_NORMAL);
+        registerConverter(new ImmutableMapConverter(getMapper(), getReflectionProvider()), XStream.PRIORITY_NORMAL);
+        registerConverter(new ConcurrentHashMapConverter(getMapper(), getReflectionProvider()), XStream.PRIORITY_NORMAL);
+        registerConverter(new CopyOnWriteMap.Tree.ConverterImpl(getMapper()), XStream.PRIORITY_NORMAL); // needs to override MapConverter
+        registerConverter(new DescribableList.ConverterImpl(getMapper()), XStream.PRIORITY_NORMAL); // explicitly added to handle subtypes
+        registerConverter(new Label.ConverterImpl(), XStream.PRIORITY_NORMAL);
 
         // this should come after all the XStream's default simpler converters,
         // but before reflection-based one kicks in.
-        registerConverter(new AssociatedConverterImpl(this), -10);
+        registerConverter(new AssociatedConverterImpl(this), XStream.PRIORITY_LOW);
+        reflectionConverter = new RobustReflectionConverter(getMapper(), new JVM().bestReflectionProvider());
+        registerConverter(reflectionConverter, XStream.PRIORITY_VERY_LOW);
     }
-
+     
     @Override
     protected MapperWrapper wrapMapper(MapperWrapper next) {
-        Mapper m = new CompatibilityMapper(new MapperWrapper(next) {
+        MapperWrapper m = new CompatibilityMapper(new MapperWrapper(next) {
             @Override
             public String serializedClass(Class type) {
                 if (type != null && ImmutableMap.class.isAssignableFrom(type)) {
@@ -118,11 +112,11 @@ public class XStream2 extends XStream {
                 }
             }
         });
-        AnnotationMapper a = new AnnotationMapper(m, getConverterRegistry(), getClassLoader(), getReflectionProvider(), getJvm());
-        a.autodetectAnnotations(true);
-        return a;
+        // XStream already sets it in 1.4.8
+//        AnnotationMapper a = new AnnotationMapper(m, getConverterRegistry(), getClassLoader(), getReflectionProvider(), getJvm());
+//        a.autodetectAnnotations(true);
+        return m;
     }
-
     /**
      * Prior to Hudson 1.106, XStream 1.1.x was used which encoded "$" in class
      * names as "-" instead of "_-" that is used now. Up through Hudson 1.348
@@ -156,7 +150,6 @@ public class XStream2 extends XStream {
             }
         }
     }
-
     /**
      * If a class defines a nested {@code ConverterImpl} subclass, use that as a
      * {@link Converter}. Its constructor may have XStream/XStream2 and/or
@@ -165,8 +158,8 @@ public class XStream2 extends XStream {
     private static final class AssociatedConverterImpl implements Converter {
 
         private final XStream xstream;
-        private final ConcurrentHashMap<Class, Converter> cache =
-                new ConcurrentHashMap<Class, Converter>();
+        private final ConcurrentHashMap<Class, Converter> cache
+                = new ConcurrentHashMap<Class, Converter>();
 
         private AssociatedConverterImpl(XStream xstream) {
             this.xstream = xstream;

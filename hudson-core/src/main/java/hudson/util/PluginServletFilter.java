@@ -74,6 +74,16 @@ public class PluginServletFilter implements Filter, ExtensionPoint {
         }
     }
 
+    /**
+     * All the clearing of filters between test, was causing a leakage
+     * breaking all subsequent tests.
+     */
+    public static void clearFilters() throws ServletException {
+        synchronized (LIST) {
+            LIST.clear();
+        }
+    }
+
     public void doFilter(ServletRequest request, ServletResponse response, final FilterChain chain) throws IOException, ServletException {
         new FilterChain() {
             private int position = 0;

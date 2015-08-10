@@ -25,7 +25,7 @@
 
     <groupId>org.eclipse.hudson</groupId>
     <artifactId>hudson-parent</artifactId>
-    <version>3.2.2-SNAPSHOT</version>
+    <version>3.3.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Hudson</name>
@@ -111,12 +111,12 @@
 
         <cbi-plugins.version>1.0.5</cbi-plugins.version>
         
-        <jetty.server.version>8.1.7.v20120910</jetty.server.version>
-        <jetty.javax.serverlet.version>3.0.0.v201112011016</jetty.javax.serverlet.version>
+        <jetty.server.version>9.2.10.v20150310</jetty.server.version>
+        <jetty.javax.serverlet.version>3.1.0</jetty.javax.serverlet.version>
         
-        <maven-hpi-plugin.version>3.0.2</maven-hpi-plugin.version>
-        <stapler.version>3.0.0</stapler.version>
-        <maven-stapler-plugin.version>3.0.1</maven-stapler-plugin.version>
+        <maven-hpi-plugin.version>3.0.3</maven-hpi-plugin.version>
+        <stapler.version>3.0.3</stapler.version>
+        <maven-stapler-plugin.version>3.0.2</maven-stapler-plugin.version>
 
         <!--GWT properties-->
         <gwt.draftCompile>false</gwt.draftCompile>
@@ -129,7 +129,7 @@
         <aspectj.version>1.8.0</aspectj.version>
         <sisuGuice.version>3.0.3</sisuGuice.version>
         <sisuInject.version>2.2.3</sisuInject.version>
-        <jetty.version>6.1.26</jetty.version>
+   
         <wagon-http.version>1.0-beta-7</wagon-http.version>
         <test-annotations.version>1.0</test-annotations.version>
         <servlet-api.version>2.4</servlet-api.version>
@@ -137,10 +137,12 @@
         <slf4j.version>1.6.1</slf4j.version>
         <logback-classic.version>0.9.28</logback-classic.version>
         <guava.version>14.0.1</guava.version>
+        <guava.groupid>com.google.guava</guava.groupid>
+        <!--guava.groupid>org.hudsonci.lib</guava.groupid-->
         <ant.version>1.8.2</ant.version>
-        <xstream.version>1.4.1-hudson-2</xstream.version>
+        <xstream.version>1.4.8</xstream.version>
         <jsr305.version>1.3.9</jsr305.version>
-        <commons-lang.version>3.0.1</commons-lang.version>
+        <commons-lang.version>3.4</commons-lang.version>
         <commons-io.version>2.0.1</commons-io.version>
         <commons-codec.version>1.4</commons-codec.version>
         <aether.version>1.11</aether.version>
@@ -153,7 +155,6 @@
         <aspectjVersion>${aspectj.version}</aspectjVersion>
         <sisuGuiceVersion>${sisuGuice.version}</sisuGuiceVersion>
         <sisuInjectVersion>${sisuInject.version}</sisuInjectVersion>
-        <jetty-version>${jetty.version}</jetty-version>
 
         <!--Plugins-->
         <maven-antrun-extended-plugin.version>1.42</maven-antrun-extended-plugin.version>
@@ -176,7 +177,7 @@
         <maven-pmd-plugin.version>2.5</maven-pmd-plugin.version>
         <maven-release-plugin.version>2.1</maven-release-plugin.version>
         <maven-remote-resources-plugin.version>1.1</maven-remote-resources-plugin.version>
-        <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
         <maven-enforcer-plugin.version>1.0</maven-enforcer-plugin.version>
         <maven-deploy-plugin.version>2.5</maven-deploy-plugin.version>
         <maven-install-plugin.version>2.3.1</maven-install-plugin.version>
@@ -280,8 +281,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
-                        <source>1.5</source>
-                        <target>1.5</target>
+                        <source>1.7</source>
+                        <target>1.7</target>
                     </configuration>
                 </plugin>
 
@@ -384,9 +385,6 @@
                     <groupId>org.eclipse.hudson.tools</groupId>
                     <artifactId>maven-hpi-plugin</artifactId>
                     <version>${maven-hpi-plugin.version}</version>
-                    <configuration>
-                        <showDeprecation>true</showDeprecation>
-                    </configuration>
                 </plugin>
 
                 <plugin>
@@ -524,8 +522,8 @@
                     <configuration>
                         <Xlint>ignore</Xlint>
                         <XaddSerialVersionUID>true</XaddSerialVersionUID>
-                        <source>1.5</source>
-                        <target>1.5</target>
+                        <source>1.7</source>
+                        <target>1.7</target>
                     </configuration>
                 </plugin>
 
@@ -596,9 +594,8 @@
                         </goals>
                         <configuration>
                             <rules>
-                                <!-- There is a bug in JDK 1.5's compiler therefore need to compile with 1.6 -->
                                 <requireJavaVersion>
-                                    <version>[1.6.0,]</version>
+                                    <version>[1.7.0,]</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
                                     <version>[3.0.0,]</version>
@@ -717,7 +714,7 @@
             </dependency>
 
             <dependency>
-                <groupId>com.google.guava</groupId>
+                <groupId>${guava.groupid}</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
             </dependency>
@@ -765,7 +762,7 @@
             </dependency>   
 
             <dependency>
-                <groupId>org.hudsonci.tools</groupId>
+                <groupId>com.thoughtworks.xstream</groupId>
                 <artifactId>xstream</artifactId>
                 <version>${xstream.version}</version>
             </dependency>
@@ -786,12 +783,6 @@
                 <groupId>args4j</groupId>
                 <artifactId>args4j</artifactId>
                 <version>${args4j.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jetty</artifactId>
-                <version>${jetty.version}</version>
             </dependency>
 
             <dependency>
@@ -871,71 +862,71 @@
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-test-utils</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.3.1-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-utils</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.3.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-core</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.3.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-inject</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.3.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-inject</artifactId>
                 <classifier>tests</classifier>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.3.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-service</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.3.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-plugin-utils</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.3.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-cli</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.3.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-cli</artifactId>
                 <classifier>jar-with-dependencies</classifier>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.3.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-war</artifactId>
                 <type>war</type>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.3.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.hudson</groupId>
                 <artifactId>hudson-test-framework</artifactId>
-                <version>3.2.2-SNAPSHOT</version>
+                <version>3.3.1-SNAPSHOT</version>
             </dependency>
 
         </dependencies>
@@ -961,7 +952,7 @@
                             <!--rulesets>
                             <ruleset>ruleset.xml</ruleset>
                             </rulesets-->
-                            <targetJdk>1.5</targetJdk>
+                            <targetJdk>1.7</targetJdk>
                         </configuration>
                     </plugin>
 

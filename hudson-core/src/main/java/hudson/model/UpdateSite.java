@@ -15,55 +15,52 @@
 
 package hudson.model;
 
-import hudson.PluginWrapper;
 import hudson.PluginManager;
-import hudson.model.UpdateCenter.UpdateCenterJob;
+import hudson.PluginWrapper;
 import hudson.lifecycle.Lifecycle;
+import hudson.model.UpdateCenter.UpdateCenterJob;
+import hudson.util.CertificateUtil;
 import hudson.util.IOUtils;
 import hudson.util.JSONCanonicalUtils;
-import hudson.util.TextFile;
-import hudson.util.VersionNumber;
-import hudson.util.CertificateUtil;
 import hudson.util.SignatureOutputStream;
+import hudson.util.TextFile;
 import static hudson.util.TimeUnit2.DAYS;
-
-import net.sf.json.JSONObject;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.apache.commons.io.output.NullOutputStream;
-import org.apache.commons.io.output.TeeOutputStream;
-
+import hudson.util.VersionNumber;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.ByteArrayInputStream;
 import java.io.OutputStreamWriter;
+import java.security.DigestOutputStream;
+import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.cert.CertificateFactory;
+import java.security.cert.TrustAnchor;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.HashMap;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.security.GeneralSecurityException;
-import java.security.MessageDigest;
-import java.security.DigestOutputStream;
-import java.security.Signature;
-import java.security.cert.X509Certificate;
-import java.security.cert.CertificateFactory;
-import java.security.cert.TrustAnchor;
-
 import javax.servlet.ServletContext;
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.output.NullOutputStream;
+import org.apache.commons.io.output.TeeOutputStream;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * Source of the update center information, like
- * "http://hudson-ci.org/update-center3.2/update-center.json"
+ * "http://hudson-ci.org/update-center3.3/update-center.json"
  *
  * <p> Hudson can have multiple {@link UpdateSite}s registered in the system, so
  * that it can pick up plugins from different locations.
@@ -92,7 +89,7 @@ public class UpdateSite {
     private final String id;
     /**
      * Path to <tt>update-center.json</tt>, like
-     * <tt>http://hudson-ci.org/update-center3.2/update-center.json</tt>.
+     * <tt>http://hudson-ci.org/update-center3.3/update-center.json</tt>.
      */
     private final String url;
 

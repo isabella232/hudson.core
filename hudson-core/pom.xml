@@ -10,7 +10,7 @@
 # Contributors:
 #
 #   Kohsuke Kawaguchi, Winston Prakash
-#        
+#
 #************************************************************************** -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -18,12 +18,12 @@
     <parent>
         <groupId>org.eclipse.hudson</groupId>
         <artifactId>hudson-parent</artifactId>
-        <version> 3.2.2-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>hudson-core</artifactId>
-    <version>3.2.2-SNAPSHOT</version>
+    <version>3.3.1-SNAPSHOT</version>
     <name>Hudson :: Core</name>
     <description>
         Contains the core Hudson code and view files to render HTML.
@@ -391,9 +391,9 @@
         <dependency>
             <groupId>org.jvnet.localizer</groupId>
             <artifactId>localizer</artifactId>
-        </dependency>     
+        </dependency>
         <dependency>
-            <groupId>org.hudsonci.tools</groupId>
+            <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
             <exclusions>
                 <exclusion>
@@ -406,8 +406,8 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
-        
+
+
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
@@ -422,11 +422,12 @@
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
-            <!-- hudson doesn't use this directly, but some plugins wanted to use the latest -->
+            <!-- hudson now uses this directly -->
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang.version}</version>
         </dependency>
-        <dependency><!-- Left for backward compatibility-->
+        <dependency><!-- Not used by Hudson, kept for plugin compatibility -->
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>2.4</version>
@@ -443,7 +444,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-digester3</artifactId>
@@ -469,7 +470,7 @@
             <artifactId>mail</artifactId>
             <version>${javax-mail.version}</version>
         </dependency>
-        
+
         <!-- Switch to xercesImpl 2.8.1 - Eclipse approved -->
         <dependency>
             <groupId>xerces</groupId>
@@ -598,7 +599,7 @@
             <artifactId>spring-jdbc</artifactId>
             <version>${spring.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
@@ -614,13 +615,13 @@
             <artifactId>spring-security-config</artifactId>
             <version>${spring-security.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-acl</artifactId>
             <version>${spring-security.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-ldap</artifactId>
@@ -642,12 +643,12 @@
             <artifactId>commons-logging</artifactId>
             <version>${commons-logging.version}</version>
         </dependency>
-        
+
         <dependency>
-            <groupId>com.google.guava</groupId>
+            <groupId>${guava.groupid}</groupId>
             <artifactId>guava</artifactId>
         </dependency>
-            
+
         <!--
         | these are now optional in commons-logging:1.1.1,
         | keeping them around in case any plugins use them
@@ -690,7 +691,7 @@
             <artifactId>xpp3</artifactId>
             <version>${xpp3.version}</version>
         </dependency>
-        
+
         <dependency>
             <artifactId>xmlpull</artifactId>
             <groupId>xmlpull</groupId>
@@ -793,7 +794,7 @@
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
-            <version>2.7.1</version>
+            <version>2.7.2</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>

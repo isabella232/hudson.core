@@ -16,24 +16,23 @@
 
 package hudson.tasks;
 
+import hudson.Extension;
 import hudson.FilePath;
 import hudson.Functions;
 import hudson.Util;
-import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.remoting.Callable;
 import hudson.remoting.VirtualChannel;
 import hudson.util.FormValidation;
 import java.io.IOException;
-import net.sf.json.JSONObject;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.QueryParameter;
-
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
+import net.sf.json.JSONObject;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Executes a series of commands by using a shell.
@@ -44,9 +43,14 @@ public class Shell extends CommandInterpreter {
 
     private static final Logger LOGGER = Logger.getLogger(Shell.class.getName());
     
+    public Shell(String command){
+        this(command, false, "");
+    }
     @DataBoundConstructor
-    public Shell(String command) {
+    public Shell(String command, boolean disabled, String description) {
         super(fixCrLf(command));
+        this.setDisabled(disabled); 
+        setDescription(description);
     }
 
     /**
@@ -165,7 +169,7 @@ public class Shell extends CommandInterpreter {
 
         @Override
         public Builder newInstance(StaplerRequest req, JSONObject data) {
-            return new Shell(data.getString("command"));
+            return new Shell(data.getString("command"), data.getBoolean("disabled"), data.getString("description"));
         }
 
         @Override

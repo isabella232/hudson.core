@@ -19,6 +19,7 @@ import hudson.model.Computer;
 import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.View;
+import hudson.scm.SCM;
 import hudson.security.Permission;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -179,6 +180,7 @@ public class TeamMember {
         if ("create".equals(permission)) {
             grantedPermissions.add(Item.CREATE);
             grantedPermissions.add(Item.EXTENDED_READ);
+            grantedPermissions.add(SCM.TAG);
         }
         if ("delete".equals(permission)) {
             grantedPermissions.add(Item.DELETE);
@@ -186,6 +188,7 @@ public class TeamMember {
         }
         if ("configure".equals(permission)) {
             grantedPermissions.add(Item.CONFIGURE);
+            grantedPermissions.add(SCM.TAG);
         }
         if ("build".equals(permission)) {
             grantedPermissions.add(Item.BUILD);
@@ -234,6 +237,9 @@ public class TeamMember {
         teamAdminGrantedPermissions.add(Computer.CREATE);
         teamAdminGrantedPermissions.add(Computer.DELETE);
         teamAdminGrantedPermissions.add(Computer.CONFIGURE);
+        
+        teamAdminGrantedPermissions.add(SCM.TAG);
+        
     }
 
     List<String> getPermissions() {

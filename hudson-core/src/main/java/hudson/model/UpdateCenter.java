@@ -30,13 +30,11 @@ import hudson.lifecycle.Lifecycle;
 import hudson.model.UpdateSite.Data;
 import hudson.model.UpdateSite.Plugin;
 import hudson.model.listeners.SaveableListener;
-import hudson.util.*;
-import org.apache.commons.io.input.CountingInputStream;
-import org.apache.commons.io.output.NullOutputStream;
-import org.kohsuke.stapler.StaplerResponse;
-
-import javax.net.ssl.SSLHandshakeException;
-import javax.servlet.ServletException;
+import hudson.util.DaemonThreadFactory;
+import hudson.util.IOException2;
+import hudson.util.IOUtils;
+import hudson.util.PersistedList;
+import hudson.util.XStream2;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -60,7 +58,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.SSLHandshakeException;
+import javax.servlet.ServletException;
+import org.apache.commons.io.input.CountingInputStream;
+import org.apache.commons.io.output.NullOutputStream;
 import org.eclipse.hudson.security.HudsonSecurityManager;
+import org.kohsuke.stapler.StaplerResponse;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -471,7 +474,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
     @SuppressWarnings({"UnusedDeclaration"})
     public static class UpdateCenterConfiguration implements ExtensionPoint {
 
-        private final String updateServer = System.getProperty("updateServer", "http://hudson-ci.org/update-center3.2/");
+        private final String updateServer = System.getProperty("updateServer", "http://hudson-ci.org/update-center3.3/");
 
         /**
          * Creates default update center configuration - uses settings for
@@ -710,6 +713,13 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
             LOGGER.fine("Scheduling " + this + " to installerService");
             jobs.add(this);
             return installerService.submit(this, this);
+        }
+    }
+
+    public void shutdown() {
+        List<Runnable> running = installerService.shutdownNow();
+        if (!running.isEmpty()) {
+            LOGGER.warning("shutdown with "+running.size()+" jobs pending");
         }
     }
 

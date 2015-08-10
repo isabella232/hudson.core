@@ -19,6 +19,7 @@
 package hudson.model;
 
 import com.thoughtworks.xstream.XStream;
+
 import hudson.BulkChange;
 import hudson.DNSMultiCast;
 import hudson.DescriptorExtensionList;
@@ -50,7 +51,6 @@ import hudson.cli.CliManagerImpl;
 import hudson.cli.declarative.CLIMethod;
 import hudson.cli.declarative.CLIResolver;
 import hudson.init.InitMilestone;
-
 import static hudson.init.InitMilestone.*;
 import hudson.init.InitReactorListener;
 import hudson.init.InitStrategy;
@@ -113,6 +113,7 @@ import hudson.views.DefaultViewsTabBar;
 import hudson.views.MyViewsTabBar;
 import hudson.views.ViewsTabBar;
 import hudson.widgets.Widget;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -136,6 +137,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
@@ -159,18 +161,22 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.crypto.SecretKey;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+
 import static javax.servlet.http.HttpServletResponse.*;
 import net.sf.json.JSONObject;
+
 import org.antlr.runtime.RecognitionException;
 import org.apache.commons.jelly.JellyException;
 import org.apache.commons.jelly.Script;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.hudson.WebAppController;
 import org.eclipse.hudson.plugins.PluginCenter;
@@ -523,6 +529,12 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             return redirect;
         }
     };
+    
+    public static class HudsonDateFormat extends FastDateFormat {
+    	public HudsonDateFormat(String format) {
+    		super(format, TimeZone.getDefault(), Locale.getDefault());
+    	}
+    }
 
     @CLIResolver
     public static Hudson getInstance() {
@@ -2696,6 +2708,9 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
                 logger.warn("Failed to shut down properly", e);
             }
         }
+
+        updateCenter.shutdown();
+        pluginCenter.shutdown();
 
         LogFactory.releaseAll();
 

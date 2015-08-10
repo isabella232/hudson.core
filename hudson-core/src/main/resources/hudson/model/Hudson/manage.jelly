@@ -88,7 +88,9 @@
                     </j:if>
                 </local:feature>
                 
+                <!--
                 <local:feature icon="plugin.png" href="pluginManager/" title="${%Manage Plugins using Classic Plugin Manager}"/>
+                -->
                 
                 <local:feature icon="computer.png" href="systemInfo" title="${%System Information}">
                     ${%Displays various environmental information to assist trouble-shooting.}

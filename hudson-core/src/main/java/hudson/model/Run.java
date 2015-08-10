@@ -79,6 +79,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -87,9 +88,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
+
 import org.apache.commons.io.input.NullInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.jelly.XMLOutput;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.HttpResponses;
 import org.kohsuke.stapler.QueryParameter;
@@ -99,6 +102,7 @@ import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
 import com.thoughtworks.xstream.XStream;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -218,13 +222,8 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * This field is not persisted.
      */
     private volatile transient Runner runner;
-    protected static final ThreadLocal<SimpleDateFormat> ID_FORMATTER =
-            new ThreadLocal<SimpleDateFormat>() {
-                @Override
-                protected SimpleDateFormat initialValue() {
-                    return new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-                }
-            };
+    
+    protected static final Hudson.HudsonDateFormat ID_FORMATTER = new Hudson.HudsonDateFormat("yyyy-MM-dd_HH-mm-ss");
     
     /**
      * State when a Run is being created from cached values.
@@ -316,7 +315,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
 
     /*package*/ static long parseTimestampFromBuildDir(File buildDir) throws IOException {
         try {
-            return ID_FORMATTER.get().parse(buildDir.getName()).getTime();
+            return ID_FORMATTER.parse(buildDir.getName()).getTime();
         } catch (ParseException e) {
             throw new IOException2("Invalid directory name " + buildDir, e);
         } catch (NumberFormatException e) {
@@ -908,16 +907,17 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      */
     @Exported
     public String getId() {
-        return ID_FORMATTER.get().format(new Date(timestamp));
+        return ID_FORMATTER.format(new Date(timestamp));
     }
 
     /**
      * Get the date formatter used to convert the directory name in to a
      * timestamp This is nasty exposure of private data, but needed all the time
      * the directory containing the build is used as it's timestamp.
+     * @since 3.3.0 creates new DateFormat on each call to eliminate ThreadLocal
      */
     public static DateFormat getIDFormatter() {
-        return ID_FORMATTER.get();
+        return new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
     }
 
     public Descriptor getDescriptorByName(String className) {

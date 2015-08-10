@@ -16,21 +16,20 @@
 
 package hudson.util;
 
-import com.thoughtworks.xstream.mapper.CannotResolveClassException;
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
 import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
 import com.thoughtworks.xstream.converters.reflection.SerializableConverter;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.mapper.CannotResolveClassException;
 import com.thoughtworks.xstream.mapper.Mapper;
-import com.thoughtworks.xstream.XStream;
-
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.logging.Logger;
+import static java.util.logging.Level.FINE;
 
-import static java.util.logging.Level.WARNING;
+import java.util.logging.Logger;
 
 /**
  * {@link CollectionConverter} that ignores {@link CannotResolveClassException}.
@@ -79,10 +78,10 @@ public class RobustCollectionConverter extends CollectionConverter {
                 Object item = readItem(reader, context, collection);
                 collection.add(item);
             } catch (CannotResolveClassException e) {
-                LOGGER.log(WARNING, "Failed to resolve class " + e.getMessage());
+                LOGGER.log(FINE, "Failed to resolve class " + e.getMessage());
                 RobustReflectionConverter.addErrorInContext(context, e);
             } catch (LinkageError e) {
-                LOGGER.log(WARNING, "Failed to resolve class " + e.getMessage());
+                LOGGER.log(FINE, "Failed to resolve class " + e.getMessage());
                 RobustReflectionConverter.addErrorInContext(context, e);
             }
             reader.moveUp();

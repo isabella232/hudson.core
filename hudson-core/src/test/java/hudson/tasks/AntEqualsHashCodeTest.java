@@ -15,10 +15,9 @@
  *******************************************************************************/
 package hudson.tasks;
 
-import org.junit.Test;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
+import org.junit.Test;
 
 /**
  * Verify equals and hashCode methods for Ant object.

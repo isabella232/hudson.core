@@ -19,14 +19,13 @@ import hudson.model.FreeStyleProjectMock;
 import hudson.tasks.Shell;
 import hudson.util.DescribableList;
 import java.util.Arrays;
-import org.junit.Before;
-import org.junit.Test;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Contains test-cases for {@link DescribableListProjectProperty}.

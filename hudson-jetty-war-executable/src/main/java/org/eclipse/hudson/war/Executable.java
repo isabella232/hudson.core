@@ -16,12 +16,20 @@ package org.eclipse.hudson.war;
  *
  ******************************************************************************
  */
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.ProtectionDomain;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -34,37 +42,33 @@ import java.util.jar.Manifest;
 public class Executable {
 
     private final String[] jettyJars = {
-        "libs/jetty.jar",
+        "libs/jetty-server.jar",
         "libs/jetty-web-app.jar",
         "libs/jetty-continuation.jar",
-        "libs/jetty-util.jar",
         "libs/jetty-http.jar",
         "libs/jetty-io.jar",
         "libs/jetty-security.jar",
         "libs/jetty-servlet.jar",
-        "libs/jetty-servlet-api.jar",
+        "libs/jetty-util.jar",
         "libs/jetty-xml.jar",
+        "libs/javax-servlet-api.jar",
         "libs/hudson-jetty-war-executable.jar"
     };
     private List<String> arguments;
+    
+    public static final int MIN_REQUIRED_JAVA_VERSION = 7;
 
     public static void main(String[] args) throws Exception {
 
-        String javaVersion = System.getProperty("java.version");
+        String javaVersionStr = System.getProperty("java.version");
+        String[] javaVersionElements = javaVersionStr.split("\\.");
+        int major = Integer.parseInt(javaVersionElements[1]);
 
-        StringTokenizer tokens = new StringTokenizer(javaVersion, ".-_");
-
-        int majorVersion = Integer.parseInt(tokens.nextToken());
-        int minorVersion = Integer.parseInt(tokens.nextToken());
-
-        // Make sure Java version is 1.6 or later
-        if (majorVersion < 2) {
-            if (minorVersion < 6) {
-                System.err.println("Hudson requires Java 6 or later.");
-                System.err.println("Your java version is " + javaVersion);
-                System.err.println("Java Home:  " + System.getProperty("java.home"));
-                System.exit(0);
-            }
+        if (major < MIN_REQUIRED_JAVA_VERSION) {
+            System.err.println("Hudson 3.3.x and above requires JDK " + MIN_REQUIRED_JAVA_VERSION + " or later.");
+            System.err.println("Your java version is " + javaVersionStr);
+            System.err.println("Java Home:  " + System.getProperty("java.home"));
+            System.exit(0);
         }
 
         Executable executable = new Executable();
@@ -99,17 +103,18 @@ public class Executable {
                 + "Usage: java -jar hudson.war [--option=value] [--option=value] ... \n"
                 + "\n"
                 + "Options:\n"
-                + "   --version                        Show Hudson version and quit\n"
-                + "   --logfile=<filename>             Send the output log to this file\n"
-                + "   --prefix=<prefix-string>         Add this prefix to all URLs (eg http://localhost:8080/prefix/resource). Default is none\n\n"
-                + "   --httpPort=<value>               HTTP listening port. Default value is 8080\n\n"
-                + "   --httpsPort=<value>              HTTPS listening port. Disabled by default\n"
-                + "   --httpsKeyStore=<filepath>       Location of the SSL KeyStore file.\n"
-                + "   --httpsKeyStorePassword=<value>  Password for the SSL KeyStore file\n\n"
-                + "   --updateServer=<your server>     Specify your own update server (eg http://updates.mycompany.com/).\n"
-                + "                                    For details see http://wiki.hudson-ci.org/Alternate+Update+Server\n\n"
-                + "   --disableUpdateCenterSwitch      Disable the ability to specify alternate Update Center URL via Plugin Manager Advanced tab\n\n"
-                + "   --skipInitSetup                  Skip the initial setup screen and start Hudson directly";
+                + "   --version                          Show Hudson version and quit\n"
+                + "   --logfile=<filename>               Send the output log to this file\n"
+                + "   --prefix=<prefix-string>           Add this prefix to all URLs (eg http://localhost:8080/prefix/resource). Default is none\n\n"
+                + "   --httpPort=<value>                 HTTP listening port. Default value is 8080\n\n"
+                + "   --httpsPort=<value>                HTTPS listening port. Disabled by default\n"
+                + "   --httpsKeyStore=<filepath>         Location of the SSL KeyStore file.\n"
+                + "   --httpsKeyStorePassword=<value>    Password for the SSL KeyStore file\n\n"
+                + "   --httpsKeyManagerPassword=<value>  Manager Password for the trustStore \n\n"
+                + "   --updateServer=<your server>       Specify your own update server (eg http://updates.mycompany.com/).\n"
+                + "                                      For details see http://wiki.hudson-ci.org/Alternate+Update+Server\n\n"
+                + "   --disableUpdateCenterSwitch        Disable the ability to specify alternate Update Center URL via Plugin Manager Advanced tab\n\n"
+                + "   --skipInitSetup                    Skip the initial setup screen and start Hudson directly";
         
         System.out.println(usageStr);
         System.exit(0);

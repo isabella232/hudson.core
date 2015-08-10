@@ -16,22 +16,25 @@
 
 package hudson.tools;
 
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import hudson.DescriptorExtensionList;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.diagnosis.OldDataMonitor;
-import hudson.model.*;
+import hudson.model.AbstractDescribableImpl;
+import hudson.model.EnvironmentSpecific;
+import hudson.model.Hudson;
+import hudson.model.Node;
+import hudson.model.Saveable;
+import hudson.model.TaskListener;
 import hudson.slaves.NodeSpecific;
 import hudson.util.DescribableList;
 import hudson.util.XStream2;
-
-import java.io.Serializable;
+import hudson.util.XStreamSerializable;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
-
-import com.thoughtworks.xstream.annotations.XStreamSerializable;
-import com.thoughtworks.xstream.converters.UnmarshallingContext;
 
 /**
  * Formalization of a tool installed in nodes used for builds (examples include
@@ -140,7 +143,7 @@ public abstract class ToolInstallation extends AbstractDescribableImpl<ToolInsta
     /**
      * Invoked by XStream when this object is read into memory.
      */
-    private Object readResolve() {
+    public Object readResolve() {
         if (properties == null) {
             properties = new DescribableList<ToolProperty<?>, ToolPropertyDescriptor>(Saveable.NOOP);
         }

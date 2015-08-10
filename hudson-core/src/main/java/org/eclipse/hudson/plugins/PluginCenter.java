@@ -66,7 +66,7 @@ final public class PluginCenter {
                 @Override
                 public Thread newThread(Runnable r) {
                     Thread t = new Thread(r);
-                    t.setName("Update center installer thread");
+                    t.setName("Plugin center installer thread");
                     return t;
                 }
             }));
@@ -467,6 +467,13 @@ final public class PluginCenter {
         PluginInstallationJob newJob = new PluginInstallationJob(plugin, pluginsDir, proxyConfig);
         installationsJobs.add(newJob);
         return installerService.submit(newJob, newJob);
+    }
+
+    public void shutdown() {
+        List<Runnable> running = installerService.shutdownNow();
+        if (!running.isEmpty()) {
+            logger.warn("shutdown with "+running.size()+" jobs pending");
+        }
     }
 
     private boolean isNewerThan(String availableVersion, String installedVersion) {

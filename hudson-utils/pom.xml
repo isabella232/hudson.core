@@ -19,12 +19,12 @@
   <parent>
     <groupId>org.eclipse.hudson</groupId>
     <artifactId>hudson-parent</artifactId>
-    <version> 3.2.2-SNAPSHOT</version>
+    <version> 3.3.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>hudson-utils</artifactId>
-  <version>3.2.2-SNAPSHOT</version>
+  <version>3.3.1-SNAPSHOT</version>
   <name>Hudson :: Common Utilities</name>
 
   <description>
@@ -48,7 +48,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.google.guava</groupId>
+      <groupId>${guava.groupid}</groupId>
       <artifactId>guava</artifactId>
     </dependency>
 
@@ -59,7 +59,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.hudsonci.tools</groupId>
+      <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
 

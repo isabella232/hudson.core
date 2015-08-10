@@ -211,7 +211,7 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     }
 
     //Bug Fix: 406889 - Non overriden job properties or properties with no values should not be written to config.xml
-    private Object writeReplace() throws ObjectStreamException, IOException {
+    public Object writeReplace() throws ObjectStreamException, IOException {
 
         persistableJobProperties.clear();
         for (String key : jobProperties.keySet()) {

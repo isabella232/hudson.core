@@ -34,30 +34,29 @@ import hudson.model.TaskListener;
 import hudson.remoting.Callable;
 import hudson.slaves.NodeSpecific;
 import hudson.tasks._ant.AntConsoleAnnotator;
+import hudson.tools.DownloadFromUrlInstaller;
 import hudson.tools.ToolDescriptor;
 import hudson.tools.ToolInstallation;
-import hudson.tools.DownloadFromUrlInstaller;
 import hudson.tools.ToolInstaller;
 import hudson.tools.ToolProperty;
 import hudson.util.ArgumentListBuilder;
-import hudson.util.VariableResolver;
 import hudson.util.FormValidation;
+import hudson.util.VariableResolver;
 import hudson.util.XStream2;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Properties;
-import java.util.List;
-import java.util.Collections;
-import java.util.Set;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Ant launcher.
@@ -89,14 +88,21 @@ public class Ant extends Builder {
      * syntax.
      */
     private final String properties;
+    
+    public Ant(String targets, String antName, String antOpts, String buildFile, String properties) {
+      this(targets,  antName,  antOpts,  buildFile,  properties, false, "");
+    }
+       
 
     @DataBoundConstructor
-    public Ant(String targets, String antName, String antOpts, String buildFile, String properties) {
+    public Ant(String targets, String antName, String antOpts, String buildFile, String properties, boolean disabled, String description) {
         this.targets = targets;
         this.antName = antName;
         this.antOpts = StringUtils.trimToNull(antOpts);
         this.buildFile = StringUtils.trimToNull(buildFile);
         this.properties = StringUtils.trimToNull(properties);
+        setDisabled(disabled);
+        setDescription(description);
     }
 
     public String getBuildFile() {
@@ -132,6 +138,11 @@ public class Ant extends Builder {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+        if (isDisabled()){
+            listener.getLogger().println("\nThe Ant builder is temporarily disabled.\n"); 
+            // just continue, this builder is disabled temporarily
+            return true;
+        }
         ArgumentListBuilder args = new ArgumentListBuilder();
 
         EnvVars env = build.getEnvironment(listener);

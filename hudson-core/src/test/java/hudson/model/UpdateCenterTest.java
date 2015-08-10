@@ -19,11 +19,10 @@ package hudson.model;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import static junit.framework.Assert.assertTrue;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-
-import static junit.framework.Assert.assertTrue;
 
 /**
  * Quick test for {@link UpdateCenter}.
@@ -51,7 +50,7 @@ public class UpdateCenterTest {
             return;
         }
 
-        URL url = new URL("http://hudson-ci.org/update-center3.2/update-center.json?version=build");
+        URL url = new URL("http://hudson-ci.org/update-center3.3/update-center.json?version=build");
         String jsonp = IOUtils.toString(url.openStream());
         String json = jsonp.substring(jsonp.indexOf('(')+1,jsonp.lastIndexOf(')'));
 

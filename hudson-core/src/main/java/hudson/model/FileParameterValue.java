@@ -20,6 +20,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemHeaders;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -36,6 +37,8 @@ import java.io.UnsupportedEncodingException;
 import java.io.OutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import javax.servlet.ServletException;
 
 /**
@@ -179,6 +182,28 @@ public class FileParameterValue extends ParameterValue {
     public static final class FileItemImpl implements FileItem {
 
         private final File file;
+        /** FileItemHeaders with dummy initial value */
+        private FileItemHeaders headers = new FileItemHeaders() {
+            public String getHeader(String name) {
+                return null;
+            }
+            public Iterator<String> getHeaderNames() {
+                return new Iterator<String>() {
+                    public boolean hasNext() {
+                        return false;
+                    }
+                    public String next() {
+                        throw new NoSuchElementException();
+                    }
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+            public Iterator<String> getHeaders(String name) {
+                return getHeaderNames();
+            }
+        };
 
         public FileItemImpl(File file) {
             if (file == null) {
@@ -247,6 +272,14 @@ public class FileParameterValue extends ParameterValue {
 
         public OutputStream getOutputStream() throws IOException {
             return new FileOutputStream(file);
+        }
+        
+        public FileItemHeaders getHeaders() {
+            return headers;
+        }
+        
+        public void setHeaders(FileItemHeaders headers) {
+            this.headers = headers;
         }
     }
 }

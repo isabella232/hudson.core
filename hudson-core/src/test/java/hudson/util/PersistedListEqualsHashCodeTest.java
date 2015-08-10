@@ -21,11 +21,10 @@ import hudson.model.Saveable;
 import hudson.tasks.Shell;
 import java.io.IOException;
 import java.util.Arrays;
-import org.junit.Before;
-import org.junit.Test;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Verify equals and hashCode methods for PersistedList object.

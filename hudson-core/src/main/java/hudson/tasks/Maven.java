@@ -12,56 +12,55 @@
  *    Kohsuke Kawaguchi, Jene Jasper, Stephen Connolly, Tom Huybrechts, Yahoo! Inc., Nikita Levyankov
  *
  *
- *******************************************************************************/ 
+ *******************************************************************************/
 
 package hudson.tasks;
 
-import hudson.Extension;
-import hudson.Launcher;
-import hudson.Functions;
-import hudson.EnvVars;
-import hudson.Util;
 import hudson.CopyOnWrite;
-import hudson.Launcher.LocalLauncher;
+import hudson.EnvVars;
+import hudson.Extension;
 import hudson.FilePath.FileCallable;
+import hudson.Functions;
+import hudson.Launcher;
+import hudson.Launcher.LocalLauncher;
+import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Computer;
 import hudson.model.EnvironmentSpecific;
-import hudson.model.Node;
 import hudson.model.Hudson;
+import hudson.model.Node;
 import hudson.model.TaskListener;
 import hudson.remoting.Callable;
 import hudson.remoting.VirtualChannel;
 import hudson.slaves.NodeSpecific;
 import hudson.tasks._maven.MavenConsoleAnnotator;
+import hudson.tools.DownloadFromUrlInstaller;
 import hudson.tools.ToolDescriptor;
 import hudson.tools.ToolInstallation;
-import hudson.tools.DownloadFromUrlInstaller;
 import hudson.tools.ToolInstaller;
 import hudson.tools.ToolProperty;
 import hudson.util.ArgumentListBuilder;
+import hudson.util.FormValidation;
 import hudson.util.NullStream;
 import hudson.util.StreamTaskListener;
 import hudson.util.VariableResolver;
-import hudson.util.FormValidation;
 import hudson.util.XStream2;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.List;
-import java.util.Collections;
-import java.util.Set;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Build by using Maven.
@@ -109,21 +108,29 @@ public class Maven extends Builder {
     private final static String MAVEN_2_INSTALLATION_COMMON_FILE = "bin/mvn";
 
     public Maven(String targets, String name) {
-        this(targets, name, null, null, null, false);
+        this(targets, name, null, null, null, false, false, "");
     }
 
     public Maven(String targets, String name, String pom, String properties, String jvmOptions) {
-        this(targets, name, pom, properties, jvmOptions, false);
+        this(targets, name, pom, properties, jvmOptions, false, false, "");
+    }
+    
+    public Maven(String targets, String name, String pom, String properties, 
+            String jvmOptions, boolean usePrivateRepository) {
+        this(targets, name, pom, properties, jvmOptions, usePrivateRepository, false, "");
     }
 
     @DataBoundConstructor
-    public Maven(String targets, String name, String pom, String properties, String jvmOptions, boolean usePrivateRepository) {
+    public Maven(String targets, String name, String pom, String properties, 
+            String jvmOptions, boolean usePrivateRepository, boolean disabled, String description) {
         this.targets = targets;
         this.mavenName = name;
         this.pom = StringUtils.trimToNull(pom);
         this.properties = StringUtils.trimToNull(properties);
         this.jvmOptions = StringUtils.trimToNull(jvmOptions);
         this.usePrivateRepository = usePrivateRepository;
+        setDisabled(disabled);
+        setDescription(description);
     }
 
     public String getTargets() {
@@ -197,6 +204,11 @@ public class Maven extends Builder {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+        if (isDisabled()){
+            listener.getLogger().print("\nThe legacy maven2 builder is temporarily disabled\n"); 
+            // just continue, this builder is disabled temporarily
+            return true;
+        }
         VariableResolver<String> vr = build.getBuildVariableResolver();
 
         EnvVars env = build.getEnvironment(listener);
@@ -296,7 +308,15 @@ public class Maven extends Builder {
 
         String jvmOptions = env.expand(this.jvmOptions);
         if (jvmOptions != null) {
-            env.put("MAVEN_OPTS", jvmOptions.replaceAll("[\t\r\n]+", " "));
+            final String jvmOptionsOneLine = jvmOptions.replaceAll("[\t\r\n]+", " ");
+            final String envMavenOpts = env.expand("MAVEN_OPTS");
+            final String mavenOpts;
+            if (envMavenOpts != null) {
+              mavenOpts = envMavenOpts + " " + jvmOptionsOneLine;
+            } else {
+              mavenOpts = jvmOptionsOneLine;
+            }
+            env.put("MAVEN_OPTS", mavenOpts);
         }
     }
 
@@ -404,8 +424,8 @@ public class Maven extends Builder {
          * - constants defined above.
          */
         public boolean meetsMavenReqVersion(Launcher launcher, int mavenReqVersion) throws IOException, InterruptedException {
-            // FIXME using similar stuff as in the maven plugin could be better 
-            // olamy : but will add a dependency on maven in core -> so not so good 
+            // FIXME using similar stuff as in the maven plugin could be better
+            // olamy : but will add a dependency on maven in core -> so not so good
             String mavenVersion = launcher.getChannel().call(new Callable<String, IOException>() {
                 public String call() throws IOException {
                     File[] jars = new File(getHomeDir(), "lib").listFiles();

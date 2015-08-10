@@ -121,8 +121,8 @@ public class InitStrategy {
         }
 
         public boolean accept(File dir, String name) {
-            return name.endsWith(extension) // plugin jar file
-                    || name.endsWith(".hpl");       // linked plugin. for debugging.
+            return name.endsWith(extension); // plugin jar file
+                    // result in duplicate plugin loading during testing || name.endsWith(".hpl");       // linked plugin. for debugging.
         }
     }
 }

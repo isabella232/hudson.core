@@ -19,12 +19,12 @@
     <parent>
         <groupId>org.eclipse.hudson</groupId>
         <artifactId>hudson-parent</artifactId>
-        <version> 3.2.2-SNAPSHOT</version>
+        <version> 3.3.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>hudson-inject</artifactId>
-    <version>3.2.2-SNAPSHOT</version>
+    <version>3.3.1-SNAPSHOT</version>
     <name>Hudson :: Inject (JSR-330 Strategy)</name>
 
     <description>
@@ -48,7 +48,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.guava</groupId>
+            <groupId>${guava.groupid}</groupId>
             <artifactId>guava</artifactId>
             <exclusions>
                 <exclusion>
@@ -98,7 +98,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
                 <configuration>
-                    <complianceLevel>1.6</complianceLevel>
+                    <complianceLevel>1.7</complianceLevel>
                     <includes>
                         <include>**/*.java</include>
                         <include>**/*.aj</include>
