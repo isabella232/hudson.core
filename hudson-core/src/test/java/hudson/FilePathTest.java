@@ -51,7 +51,21 @@ public class FilePathTest extends ChannelTestCase {
             f.copyTo(f2);
 
             f.delete();
-            f2.delete();
+            // Windows may fail to delete a file immediately after its
+            // creation due to antivirus-like software so retries this
+            // deletion several times.
+            int retries = 5;
+            while (retries-- != 0) {
+                try {
+                    f2.delete();
+                } catch (IOException e) {
+                    if (retries == 0) {
+                        throw e;
+                    }
+                    // Makes an interval.
+                    Thread.sleep(500);
+                }
+            }
         }
     }
 
