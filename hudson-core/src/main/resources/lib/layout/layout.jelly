@@ -46,7 +46,6 @@
     <st:header name="Expires" value="0" />
     <st:header name="X-Hudson-Theme" value="default" />
     <st:header name="X-Frame-Options" value="sameorigin" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <st:contentType value="text/html;charset=UTF-8" />
     <!-- The path starts with a "/" character but does not end with a "/" character. -->
     <j:new var="h" className="hudson.Functions" /><!-- instead of JSP functions -->
@@ -64,6 +63,7 @@
     <j:set var="imagesURL"  value="${rootURL}${h.resourcePath}/images" />
     <j:set var="cssURL"  value="${rootURL}${h.resourcePath}/css" />
     <j:set var="scriptsURL"  value="${rootURL}${h.resourcePath}/scripts" />
+    <j:expr value="&lt;!DOCTYPE html&gt;" escapeText="false"/>
     <html>
         <head>
             ${h.checkPermission(it,permission)}
