@@ -29,7 +29,7 @@
         codebase="${rootURL}/computer/${h.encode(it.node.nodeName)}/">
 
       <information>
-        <title>Slave Agent for ${it.displayName}</title>
+        <title>Hudson Slave Agent for ${it.displayName}</title>
         <vendor>Hudson job</vendor>
         <homepage href="https://hudson-ci.org/"/>
       </information>
