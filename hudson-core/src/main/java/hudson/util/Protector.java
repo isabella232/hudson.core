@@ -35,13 +35,13 @@ import org.apache.commons.codec.binary.Base64;
  */
 public class Protector {
 
-    private static final String ALGORITHM = "DES";
+    private static final String ALGORITHM = "AES";
     private static final String MAGIC = ":::";
 
     public static String protect(String secret) {
         try {
             Cipher cipher = Secret.getCipher(ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, DES_KEY);
+            cipher.init(Cipher.ENCRYPT_MODE, AES_KEY);
             return new String(Base64.encodeBase64(cipher.doFinal((secret + MAGIC).getBytes("UTF-8"))));
         } catch (GeneralSecurityException e) {
             throw new Error(e); // impossible
@@ -59,7 +59,7 @@ public class Protector {
         }
         try {
             Cipher cipher = Secret.getCipher(ALGORITHM);
-            cipher.init(Cipher.DECRYPT_MODE, DES_KEY);
+            cipher.init(Cipher.DECRYPT_MODE, AES_KEY);
             String plainText = new String(cipher.doFinal(Base64.decodeBase64(data)), "UTF-8");
             if (plainText.endsWith(MAGIC)) {
                 return plainText.substring(0, plainText.length() - 3);
@@ -73,11 +73,11 @@ public class Protector {
             return null;
         }
     }
-    private static final SecretKey DES_KEY;
+    private static final SecretKey AES_KEY;
 
     static {
         try {
-            DES_KEY = KeyGenerator.getInstance(ALGORITHM).generateKey();
+            AES_KEY = KeyGenerator.getInstance(ALGORITHM).generateKey();
         } catch (NoSuchAlgorithmException e) {
             throw new Error(e);
         }
