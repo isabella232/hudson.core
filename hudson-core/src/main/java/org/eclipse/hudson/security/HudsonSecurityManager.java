@@ -10,7 +10,7 @@
  *
  * Contributors:
  *
- *   Winston Prakash
+ * Winston Prakash
  *
  ******************************************************************************
  */
@@ -19,7 +19,6 @@ package org.eclipse.hudson.security;
 import com.thoughtworks.xstream.XStream;
 import hudson.BulkChange;
 import hudson.Functions;
-import hudson.TcpSlaveAgentListener;
 import hudson.Util;
 import hudson.XmlFile;
 import hudson.markup.MarkupFormatter;
@@ -65,10 +64,7 @@ import org.w3c.dom.Element;
 public class HudsonSecurityManager implements Saveable {
 
     private transient final String securityConfigFileName = "hudson-security.xml";
-    /**
-     * Used to load/save Security configuration.
-     */
-    private static final XStream XSTREAM = new XStream2();
+
     private transient Logger logger = LoggerFactory.getLogger(HudsonSecurityManager.class);
     /**
      * {@link Authentication} object that represents the anonymous user. Because
@@ -79,12 +75,13 @@ public class HudsonSecurityManager implements Saveable {
      * @since 1.343
      */
     public static final Authentication ANONYMOUS = new AnonymousAuthenticationToken(
-            "anonymous", "anonymous", Arrays.asList(new GrantedAuthority[]{new GrantedAuthorityImpl("anonymous")}));
+        "anonymous", "anonymous", Arrays.asList(new GrantedAuthority[]{new GrantedAuthorityImpl("anonymous")}));
     /**
      * Controls a part of the <a
      * href="http://en.wikipedia.org/wiki/Authentication">authentication</a>
-     * handling in Hudson. <p> Intuitively, this corresponds to the user
-     * database.
+     * handling in Hudson.
+     * <p>
+     * Intuitively, this corresponds to the user database.
      *
      * See {@link HudsonFilter} for the concrete authentication protocol.
      *
@@ -98,7 +95,9 @@ public class HudsonSecurityManager implements Saveable {
     /**
      * Controls how the <a
      * href="http://en.wikipedia.org/wiki/Authorization">authorization</a> is
-     * handled in Hudson. <p> This ultimately controls who has access to what.
+     * handled in Hudson.
+     * <p>
+     * This ultimately controls who has access to what.
      *
      * Never null.
      */
@@ -113,22 +112,19 @@ public class HudsonSecurityManager implements Saveable {
     private Boolean useSecurity;
     private MarkupFormatter markupFormatter = RawHtmlMarkupFormatter.INSTANCE;
     private transient File hudsonHome;
-    
+
     /**
      * TCP slave agent port. 0 for random, -1 to disable.
      */
     private int slaveAgentPort = 0;
 
-    static {
-        XSTREAM.alias("hudsonSecurityManager", HudsonSecurityManager.class);
-    }
     /**
      * Secrete key generated once and used for a long time, beyond container
      * start/stop. Persisted outside <tt>config.xml</tt> to avoid accidental
      * exposure.
      */
     private transient final String secretKey;
-    
+
     private transient final TeamManager teamManager;
 
     public HudsonSecurityManager(File hudsonHome) throws IOException {
@@ -149,7 +145,7 @@ public class HudsonSecurityManager implements Saveable {
 
         load();
     }
-    
+
     @Exported
     public int getSlaveAgentPort() {
         return slaveAgentPort;
@@ -202,8 +198,9 @@ public class HudsonSecurityManager implements Saveable {
     }
 
     /**
-     * Returns a secret key that survives across container start/stop. <p> This
-     * value is useful for implementing some of the security features.
+     * Returns a secret key that survives across container start/stop.
+     * <p>
+     * This value is useful for implementing some of the security features.
      */
     public String getSecretKey() {
         return secretKey;
@@ -318,30 +315,30 @@ public class HudsonSecurityManager implements Saveable {
             if (json.has("use_security")) {
                 useSecurity = true;
                 JSONObject security = json.getJSONObject("use_security");
-                
+
                 if (security.has("markupFormatter")) {
                     markupFormatter = req.bindJSON(MarkupFormatter.class, security.getJSONObject("markupFormatter"));
                 }
-                
+
                 {
-                String v = req.getParameter("slaveAgentPortType");
-                if (!isUseSecurity() || v == null || v.equals("random")) {
-                    slaveAgentPort = 0;
-                } else if (v.equals("disable")) {
-                    slaveAgentPort = -1;
-                } else {
-                    try {
-                        slaveAgentPort = Integer.parseInt(req.getParameter("slaveAgentPort"));
-                    } catch (NumberFormatException e) {
-                        throw new FormException(hudson.model.Messages.Hudson_BadPortNumber(req.getParameter("slaveAgentPort")), "slaveAgentPort");
+                    String v = req.getParameter("slaveAgentPortType");
+                    if (!isUseSecurity() || v == null || v.equals("random")) {
+                        slaveAgentPort = 0;
+                    } else if (v.equals("disable")) {
+                        slaveAgentPort = -1;
+                    } else {
+                        try {
+                            slaveAgentPort = Integer.parseInt(req.getParameter("slaveAgentPort"));
+                        } catch (NumberFormatException e) {
+                            throw new FormException(hudson.model.Messages.Hudson_BadPortNumber(req.getParameter("slaveAgentPort")), "slaveAgentPort");
+                        }
                     }
+                    if (Hudson.getInstance() != null) {
+                        Hudson.getInstance().setSlaveAgentPort(slaveAgentPort);
+                    }
+                    setSecurityRealm(SecurityRealm.all().newInstanceFromRadioList(security, "realm"));
+                    setAuthorizationStrategy(AuthorizationStrategy.all().newInstanceFromRadioList(security, "authorization"));
                 }
-                if (Hudson.getInstance() != null){
-                    Hudson.getInstance().setSlaveAgentPort(slaveAgentPort);
-                }
-                setSecurityRealm(SecurityRealm.all().newInstanceFromRadioList(security, "realm"));
-                setAuthorizationStrategy(AuthorizationStrategy.all().newInstanceFromRadioList(security, "authorization"));
-            }
             } else {
                 useSecurity = null;
                 setSecurityRealm(SecurityRealm.NO_AUTHENTICATION);
@@ -371,7 +368,9 @@ public class HudsonSecurityManager implements Saveable {
      * The file where the Security settings are saved.
      */
     protected final XmlFile getConfigFile() {
-        return new XmlFile(XSTREAM, new File(hudsonHome, securityConfigFileName));
+        XStream xstream = new XStream2();
+        xstream.alias("hudsonSecurityManager", HudsonSecurityManager.class);
+        return new XmlFile(xstream, new File(hudsonHome, securityConfigFileName));
     }
 
     /**
@@ -498,6 +497,6 @@ public class HudsonSecurityManager implements Saveable {
     }
 
     public TeamManager getTeamManager() {
-         return teamManager;
+        return teamManager;
     }
 }
