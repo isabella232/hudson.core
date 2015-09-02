@@ -192,13 +192,12 @@ public abstract class Job<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
      * Selected cascadingProject for this job.
      */
     protected transient JobT cascadingProject;
-    private static class BooleanThreadLocal extends ThreadLocal<Boolean> {
+    private final static transient ThreadLocal<Boolean> allowSave = new ThreadLocal<Boolean>() {
         @Override
         protected Boolean initialValue() {
             return true;
         }
-    }
-    private final static transient ThreadLocal<Boolean> allowSave = new BooleanThreadLocal();
+    };
 
     protected Job(ItemGroup parent, String name) {
         super(parent, name);
