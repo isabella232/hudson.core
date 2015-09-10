@@ -43,6 +43,9 @@ public class JettyLauncher {
 
     public static void start(String[] args, URL warUrl) throws Exception {
 
+        String httpListenAddress = "0.0.0.0";
+        String httpsListenAddress = "0.0.0.0";
+
         int httpPort = 8080;
         int httpsPort = -1;
 
@@ -56,6 +59,14 @@ public class JettyLauncher {
         boolean skipInitSetup = false;
 
         for (int i = 0; i < args.length; i++) {
+            if (args[i].startsWith("--httpListenAddress=")) {
+                httpListenAddress = args[i].substring("--httpListenAddress=".length());
+            }
+
+            if (args[i].startsWith("--httpsListenAddress=")) {
+                httpsListenAddress = args[i].substring("--httpsListenAddress=".length());
+            }
+
             if (args[i].startsWith("--httpPort=")) {
                 String portStr = args[i].substring("--httpPort=".length());
                 httpPort = Integer.parseInt(portStr);
@@ -108,6 +119,7 @@ public class JettyLauncher {
 
         ServerConnector httpConnector = new ServerConnector(server,
                 new HttpConnectionFactory(http_config));
+        httpConnector.setHost(httpListenAddress);
         httpConnector.setPort(httpPort);
         httpConnector.setIdleTimeout(30000);
 
@@ -135,6 +147,7 @@ public class JettyLauncher {
             ServerConnector httpsConnector = new ServerConnector(server,
                     new SslConnectionFactory(sslContextFactory, "http/1.1"),
                     new HttpConnectionFactory(https_config));
+            httpsConnector.setHost(httpsListenAddress);
             httpsConnector.setPort(httpsPort);
             httpsConnector.setIdleTimeout(500000);
 
