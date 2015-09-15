@@ -24,7 +24,7 @@
     query parameter <tt>name=<i>JOBNAME</i></tt>.<br/>
     You'll get 200 status code if the creation is successful,
     or 4xx/5xx code if it fails. <tt>config.xml</tt> is the format Hudson uses to store the job
-    in the file system, so you can see examples of them in <tt>${app.rootDir}</tt>.
+    in the file system, so you can see examples of them in the Hudson Home directory.
   </p>
 
   <h3>Copy Job</h3>
