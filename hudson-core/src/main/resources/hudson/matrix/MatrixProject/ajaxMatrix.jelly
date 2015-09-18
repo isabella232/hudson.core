@@ -30,7 +30,13 @@
         </j:when>
         <j:otherwise>
           <a href="${p.shortUrl}">
-            <img src="${imagesURL}/24x24/${p.buildStatusUrl}" tooltip="${p.iconColor.description}" alt="${p.iconColor.description}"/>
+            <j:if test="${p.isBuilding()}">
+                  <img src="${imagesURL}/24x24/grey_anime.gif" tooltip="Building" alt="Building"/>
+            </j:if>
+            <j:if test="${!p.isBuilding()}">
+                  <img src="${imagesURL}/24x24/${p.buildStatusUrl}" tooltip="${p.iconColor.description}" alt="${p.iconColor.description}"/>
+            </j:if>
+             
             <j:if test="${empty(o.x) and empty(o.y)}">
               ${p.combination.toString(o.z)}
             </j:if>
