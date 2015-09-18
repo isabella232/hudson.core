@@ -62,14 +62,14 @@ final public class PluginCenter {
     private final ProxyConfiguration proxyConfig;
     private List<PluginInstallationJob> installationsJobs = new CopyOnWriteArrayList<PluginInstallationJob>();
     private final ExecutorService installerService = Executors.newSingleThreadExecutor(
-            new DaemonThreadFactory(new ThreadFactory() {
-                @Override
-                public Thread newThread(Runnable r) {
-                    Thread t = new Thread(r);
-                    t.setName("Plugin center installer thread");
-                    return t;
-                }
-            }));
+        new DaemonThreadFactory(new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread t = new Thread(r);
+                t.setName("Plugin center installer thread");
+                return t;
+            }
+        }));
     private final HudsonSecurityManager hudsonSecurityManager;
     private final File hudsonHomeDir;
 
@@ -149,23 +149,23 @@ final public class PluginCenter {
     }
 
     public boolean isInstalled(AvailablePluginInfo availablePlugin) {
-        if (installedPluginManager.isInstalled(availablePlugin.getName())){
+        if (installedPluginManager.isInstalled(availablePlugin.getName())) {
             InstalledPluginInfo installedPluginInfo = installedPluginManager.getInstalledPlugin(availablePlugin.getName());
             return !installedPluginInfo.isFailedToLoad();
-        }else{
+        } else {
             return false;
         }
     }
-    
+
     public boolean isFailedtoLoad(AvailablePluginInfo availablePlugin) {
-        if (installedPluginManager.isInstalled(availablePlugin.getName())){
+        if (installedPluginManager.isInstalled(availablePlugin.getName())) {
             InstalledPluginInfo installedPluginInfo = installedPluginManager.getInstalledPlugin(availablePlugin.getName());
             return installedPluginInfo.isFailedToLoad();
-        }else{
+        } else {
             return false;
         }
     }
-    
+
     public boolean isNewerCoreRequired(AvailablePluginInfo availablePlugin) {
         if (availablePlugin.getRequiredCoreVersion() != null) {
             return Hudson.getVersion().isOlderThan(availablePlugin.getRequiredCoreVersion());
@@ -370,12 +370,12 @@ final public class PluginCenter {
     }
 
     public HttpResponse doProxyConfigure(
-            @QueryParameter("proxy.server") String server,
-            @QueryParameter("proxy.port") String port,
-            @QueryParameter("proxy.noProxyFor") String noProxyFor,
-            @QueryParameter("proxy.userName") String userName,
-            @QueryParameter("proxy.password") String password,
-            @QueryParameter("proxy.authNeeded") String authNeeded) throws IOException {
+        @QueryParameter("proxy.server") String server,
+        @QueryParameter("proxy.port") String port,
+        @QueryParameter("proxy.noProxyFor") String noProxyFor,
+        @QueryParameter("proxy.userName") String userName,
+        @QueryParameter("proxy.password") String password,
+        @QueryParameter("proxy.authNeeded") String authNeeded) throws IOException {
 
         if (!hudsonSecurityManager.hasPermission(Permission.HUDSON_ADMINISTER)) {
             return HttpResponses.forbidden();
@@ -396,7 +396,7 @@ final public class PluginCenter {
     }
 
     private boolean setProxy(String server, String port, String noProxyFor,
-            String userName, String password, String authNeeded) throws IOException {
+        String userName, String password, String authNeeded) throws IOException {
         server = Util.fixEmptyAndTrim(server);
 
         if ((server != null) && !"".equals(server)) {
@@ -413,12 +413,12 @@ final public class PluginCenter {
             }
 
             proxyConfig.configure(server, portNumber, Util.fixEmptyAndTrim(noProxyFor),
-                    Util.fixEmptyAndTrim(userName), Util.fixEmptyAndTrim(password), "on".equals(Util.fixNull(authNeeded)));
+                Util.fixEmptyAndTrim(userName), Util.fixEmptyAndTrim(password), "on".equals(Util.fixNull(authNeeded)));
             return true;
 
         } else {
             proxyConfig.getXmlFile().delete();
-            proxyConfig.name = null;
+            proxyConfig.configure(null, -1, null, null, null, false);
             return false;
         }
     }
@@ -452,7 +452,7 @@ final public class PluginCenter {
             proxyConfig.openUrl(updateCenterRemoteUrl);
         } catch (Exception exc) {
             return new ErrorHttpResponse("Could not connect to  " + updateSiteManager.getUpdateSiteUrl() + ". "
-                    + "If you are behind a firewall set HTTP proxy and try again.");
+                + "If you are behind a firewall set HTTP proxy and try again.");
         }
 
         try {
@@ -472,7 +472,7 @@ final public class PluginCenter {
     public void shutdown() {
         List<Runnable> running = installerService.shutdownNow();
         if (!running.isEmpty()) {
-            logger.warn("shutdown with "+running.size()+" jobs pending");
+            logger.warn("shutdown with " + running.size() + " jobs pending");
         }
     }
 

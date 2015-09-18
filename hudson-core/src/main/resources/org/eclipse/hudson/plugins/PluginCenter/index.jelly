@@ -44,19 +44,19 @@
                         <span>
                             Hudson must be restarted for the plugin changes to take effect.<br/>
                             <j:invokeStatic var="lifecycle"
-                              className="hudson.lifecycle.Lifecycle"
-                              method="get" />
+                                            className="hudson.lifecycle.Lifecycle"
+                                            method="get" />
                             <j:choose>
-                              <j:when test="${lifecycle.safeRestartable}">
-                                <f:form method="post" action="restart" name="restart">
-                                   <f:submit value="Restart" />
-                                </f:form>
-                              </j:when>
-                              <j:otherwise>
-                                <span>
-                                    Manual restart required. See <a href="http://wiki.eclipse.org/Hudson-ci/features/Restart_Within_Hudson">Restart Within Hudson</a>.
-                                </span>
-                              </j:otherwise>
+                                <j:when test="${lifecycle.safeRestartable}">
+                                    <f:form method="post" action="restart" name="restart">
+                                        <f:submit value="Restart" />
+                                    </f:form>
+                                </j:when>
+                                <j:otherwise>
+                                    <span>
+                                        Manual restart required. See <a href="http://wiki.eclipse.org/Hudson-ci/features/Restart_Within_Hudson">Restart Within Hudson</a>.
+                                    </span>
+                                </j:otherwise>
                             </j:choose>
                         </span>                              
                     </div>
@@ -130,7 +130,7 @@
                         </j:if>
                         <br/>
                         <span id="pluginUpdateMsg">
-                              <!-- Plugin update operation message injected -->
+                            <!-- Plugin update operation message injected -->
                         </span>
                         <br style="clear:both"/>
                     </div>
@@ -254,7 +254,7 @@
                                                                         <div class="excerpt" style="padding-top: 5px;">
                                                                             <j:out value="${it.markupFormatter.translate(p.description)}" />
                                                                             <j:if test="${it.isNewerCoreRequired(p)}">
-                                                                                 <br/>
+                                                                                <br/>
                                                                                 <span class="warning"> This plugin requires newer version of Hudson - ${p.requiredCore}</span>
                                                                             </j:if>
                                                                         </div>
@@ -316,7 +316,7 @@
                                                                         <div class="excerpt" style="padding-top: 5px;">
                                                                             <j:out value="${it.markupFormatter.translate(p.description)}" />
                                                                             <j:if test="${it.isNewerCoreRequired(p)}">
-                                                                                 <br/>
+                                                                                <br/>
                                                                                 <span class="warning"> This plugin requires newer version of Hudson - ${p.requiredCore}</span>
                                                                             </j:if>
                                                                         </div>
@@ -378,7 +378,7 @@
                                                                         <div class="excerpt" style="padding-top: 5px;">
                                                                             <j:out value="${it.markupFormatter.translate(p.description)}" />
                                                                             <j:if test="${it.isNewerCoreRequired(p)}">
-                                                                                 <br/>
+                                                                                <br/>
                                                                                 <span class="warning"> This plugin requires newer version of Hudson - ${p.requiredCore}</span>
                                                                             </j:if>
                                                                         </div>
@@ -431,7 +431,7 @@
                         </div>
                         <br/>
                         <span id="pluginInstallMsg">
-                                  <!-- Plugin install operation message injected -->
+                            <!-- Plugin install operation message injected -->
                         </span>
                         
                         <br style="clear:both"/>
@@ -509,7 +509,7 @@
                         </ul> 
                         <br/>
                         <span id="pluginActionMsg">
-                                  <!-- Plugin Enable/Disable operation message injected -->
+                            <!-- Plugin Enable/Disable operation message injected -->
                         </span>
                     </div>
                     <div id="advancedTab">
@@ -530,15 +530,27 @@
                                                 <input type="text" name="proxy.server" value="${it.proxyConfig.name}" />
                                                 <br/>
                                     
+                                                 
                                                 <label for="proxy.port">Proxy Port</label>
-                                                <input type="text" name="proxy.port" value="${it.proxyConfig.port}" />
+                                                <j:if test="${it.proxyConfig.port &gt; 0}">
+                                                    <input type="text" name="proxy.port" value="${it.proxyConfig.port}" />
+                                                </j:if>
+                                                <j:if test="${it.proxyConfig.port &lt; 1}">
+                                                    <input type="text" name="proxy.port" />
+                                                </j:if>
                                                 <br/>
                                     
                                                 <label for="proxy.noProxyFor">No Proxy for</label>
                                                 <input type="text" name="proxy.noProxyFor" value="${it.proxyConfig.noProxyFor}" /> 
                                                 <br/>
                                     
-                                                <input style="width: 10px;" id="proxyAuth" name="proxy.authNeeded" type="checkbox" checked="${it.proxyConfig.authNeeded}"/>
+                                                
+                                                <j:if test="${it.proxyConfig.authNeeded}">
+                                                    <input style="width: 10px;" id="proxyAuth" name="proxy.authNeeded" type="checkbox" checked="true"/>
+                                                </j:if>
+                                                <j:if test="${!it.proxyConfig.authNeeded}">
+                                                    <input style="width: 10px;" id="proxyAuth" name="proxy.authNeeded" type="checkbox"/>
+                                                </j:if>
                                                 Proxy Needs Authorization
                                                 <br/>
                                      
@@ -559,7 +571,7 @@
                                                 </div>
                                                 <br style="clear:both"/>
                                                 <span id="proxyMsg">
-                                                <!-- Proxy operation message injected here -->
+                                                    <!-- Proxy operation message injected here -->
                                                 </span>
                   
                                             </form>   
@@ -592,7 +604,7 @@
                                             <div id="progressbar"></div>
     
                                             <span id="pluginUploadMsg">
-                                            <!-- Plugin upload operation message injected -->
+                                                <!-- Plugin upload operation message injected -->
                                             </span>
                                 
                                             <br style="clear:both"/>
