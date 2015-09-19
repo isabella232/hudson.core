@@ -954,6 +954,7 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
                 continue;
             }
             boolean isUpstream = upstream.contains(p);
+            boolean upstreamSaveNeeded = false;
             synchronized (p) {
                 // does 'p' include us in its BuildTrigger?
                 DescribableList<Publisher, Descriptor<Publisher>> pl = p.getPublishersList();
@@ -962,46 +963,53 @@ public abstract class AbstractProject<P extends AbstractProject<P, R>, R extends
                 if (isUpstream) {
                     if (!newChildProjects.contains(this)) {
                         newChildProjects.add(this);
+                        upstreamSaveNeeded = true;
                     }
                 } else {
-                    newChildProjects.remove(this);
+                    if (newChildProjects.contains(this)) {
+                        newChildProjects.remove(this);
+                        upstreamSaveNeeded = true;
+                    }
                 }
 
-                if (newChildProjects.isEmpty()) {
-                    pl.remove(BuildTrigger.class);
-                } else {
+                if (upstreamSaveNeeded) {
+                    if (newChildProjects.isEmpty()) {
+                        pl.remove(BuildTrigger.class);
+                    } else {
                     // here, we just need to replace the old one with the new one,
-                    // but there was a regression (we don't know when it started) that put multiple BuildTriggers
-                    // into the list.
-                    // for us not to lose the data, we need to merge them all.
-                    List<BuildTrigger> existingList = pl.getAll(BuildTrigger.class);
-                    BuildTrigger existing;
-                    switch (existingList.size()) {
-                        case 0:
-                            existing = null;
-                            break;
-                        case 1:
-                            existing = existingList.get(0);
-                            break;
-                        default:
-                            pl.removeAll(BuildTrigger.class);
-                            Set<AbstractProject> combinedChildren = new HashSet<AbstractProject>();
-                            for (BuildTrigger bt : existingList) {
-                                combinedChildren.addAll(bt.getChildProjects());
-                            }
-                            existing = new BuildTrigger(new ArrayList<AbstractProject>(combinedChildren), existingList.get(0).getThreshold());
-                            pl.add(existing);
-                            break;
-                    }
+                        // but there was a regression (we don't know when it started) that put multiple BuildTriggers
+                        // into the list.
+                        // for us not to lose the data, we need to merge them all.
+                        List<BuildTrigger> existingList = pl.getAll(BuildTrigger.class);
+                        BuildTrigger existing;
+                        switch (existingList.size()) {
+                            case 0:
+                                existing = null;
+                                break;
+                            case 1:
+                                existing = existingList.get(0);
+                                break;
+                            default:
+                                pl.removeAll(BuildTrigger.class);
+                                Set<AbstractProject> combinedChildren = new HashSet<AbstractProject>();
+                                for (BuildTrigger bt : existingList) {
+                                    combinedChildren.addAll(bt.getChildProjects());
+                                }
+                                existing = new BuildTrigger(new ArrayList<AbstractProject>(combinedChildren), existingList.get(0).getThreshold());
+                                pl.add(existing);
+                                break;
+                        }
 
-                    if (existing != null && existing.hasSame(newChildProjects)) {
-                        continue;   // no need to touch
-                    }
-                    pl.replace(new BuildTrigger(newChildProjects,
+                        if (existing != null && existing.hasSame(newChildProjects)) {
+                            continue;   // no need to touch
+                        }
+                        pl.replace(new BuildTrigger(newChildProjects,
                             existing == null ? Result.SUCCESS : existing.getThreshold()));
+                    }
+                    BuildTrigger buildTrigger = pl.get(BuildTrigger.class);
+                    CascadingUtil.getExternalProjectProperty(p, BUILD_TRIGGER_PROPERTY_NAME).setValue(buildTrigger);
+                    p.save();
                 }
-                BuildTrigger buildTrigger = pl.get(BuildTrigger.class);
-                CascadingUtil.getExternalProjectProperty(p, BUILD_TRIGGER_PROPERTY_NAME).setValue(buildTrigger);
             }
         }
 
