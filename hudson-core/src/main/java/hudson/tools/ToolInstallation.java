@@ -68,7 +68,7 @@ public abstract class ToolInstallation extends AbstractDescribableImpl<ToolInsta
      * {@link ToolProperty}s that are associated with this tool.
      */
     @XStreamSerializable
-    private transient /*almost final*/ DescribableList<ToolProperty<?>, ToolPropertyDescriptor> properties = new DescribableList<ToolProperty<?>, ToolPropertyDescriptor>(Saveable.NOOP);
+    private /*almost final*/ DescribableList<ToolProperty<?>, ToolPropertyDescriptor> properties = new DescribableList<ToolProperty<?>, ToolPropertyDescriptor>(Saveable.NOOP);
 
     /**
      * @deprecated as of 1.302. Use
