@@ -29,7 +29,7 @@ public class ThreadLocalUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreadLocalUtils.class);
 
-    private static final boolean VERBOSE = true;
+    private static final boolean VERBOSE = false;
 
     /**
      * Remove thread locals created by instance class loaders.
