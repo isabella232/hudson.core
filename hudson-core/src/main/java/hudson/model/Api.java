@@ -38,6 +38,7 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
+import org.hudsonci.xpath.XFunctionFilter;
 import org.hudsonci.xpath.XPathException;
 
 /**
@@ -56,6 +57,15 @@ public class Api extends AbstractModelObject {
      */
     //TODO: review and check whether we can do it private
     public final Object bean;
+    
+    private static class ApiFunctionFilter implements XFunctionFilter {
+        public boolean accept(String namespaceURI, String prefix, String localName) {
+            if ("document".equals(localName)) {
+                return false;
+            }
+            return true;
+        }
+    }
 
     public Api(Object bean) {
         this.bean = bean;
@@ -93,7 +103,7 @@ public class Api extends AbstractModelObject {
         // first write to String
         Model p = MODEL_BUILDER.get(bean.getClass());
         p.writeTo(bean, depth, Flavor.XML.createDataWriter(bean, sw));
-
+        
         // apply XPath
         Object result;
         try {
@@ -102,7 +112,9 @@ public class Api extends AbstractModelObject {
             // apply exclusions
             if (excludes != null) {
                 for (String exclude : excludes) {
-                    List<org.dom4j.Node> list = (List<org.dom4j.Node>) new XPath(exclude).selectNodes(dom);
+                    XPath ex = new XPath(exclude);
+                    ex.setFunctionFilter(new ApiFunctionFilter());
+                    List<org.dom4j.Node> list = (List<org.dom4j.Node>) ex.selectNodes(dom);
                     for (org.dom4j.Node n : list) {
                         Element parent = n.getParent();
                         if (parent != null) {
@@ -115,7 +127,9 @@ public class Api extends AbstractModelObject {
             if (xpath == null) {
                 result = dom;
             } else {
-                List list = new XPath(xpath).selectNodes(dom);
+                XPath ex = new XPath(xpath);
+                ex.setFunctionFilter(new ApiFunctionFilter());
+                List list = ex.selectNodes(dom);
                 if (wrapper != null) {
                     Element root = DocumentFactory.getInstance().createElement(wrapper);
                     for (Object o : list) {
