@@ -34,6 +34,7 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,7 +53,7 @@ import java.util.Map;
  *
  * @author Kohsuke Kawaguchi
  */
-public class DescribableList<T extends Describable<T>, D extends Descriptor<T>> extends PersistedList<T> {
+public class DescribableList<T extends Describable<T>, D extends Descriptor<T>> extends PersistedList<T> implements Serializable{
 
     protected DescribableList() {
     }
