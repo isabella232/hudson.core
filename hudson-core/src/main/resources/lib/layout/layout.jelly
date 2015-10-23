@@ -63,7 +63,12 @@
     <j:set var="imagesURL"  value="${rootURL}${h.resourcePath}/images" />
     <j:set var="cssURL"  value="${rootURL}${h.resourcePath}/css" />
     <j:set var="scriptsURL"  value="${rootURL}${h.resourcePath}/scripts" />
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    
+    <!-- Reverted because of bugs 480529 & 480396
     <j:expr value="&lt;!DOCTYPE html&gt;" escapeText="false"/>
+    -->
     <html>
         <head>
             ${h.checkPermission(it,permission)}
