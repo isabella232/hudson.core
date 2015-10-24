@@ -474,7 +474,7 @@ public class UpdateCenter extends AbstractModelObject implements Saveable {
     @SuppressWarnings({"UnusedDeclaration"})
     public static class UpdateCenterConfiguration implements ExtensionPoint {
 
-        private final String updateServer = System.getProperty("updateServer", "http://hudson-ci.org/update-center3.3/");
+        private final String updateServer = System.getProperty("updateServer", "http://hudson-ci.org/update-center3.3.2/");
 
         /**
          * Creates default update center configuration - uses settings for

@@ -60,7 +60,7 @@ import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * Source of the update center information, like
- * "http://hudson-ci.org/update-center3.3/update-center.json"
+ * "http://hudson-ci.org/update-center3.3.2/update-center.json"
  *
  * <p> Hudson can have multiple {@link UpdateSite}s registered in the system, so
  * that it can pick up plugins from different locations.
@@ -89,7 +89,7 @@ public class UpdateSite {
     private final String id;
     /**
      * Path to <tt>update-center.json</tt>, like
-     * <tt>http://hudson-ci.org/update-center3.3/update-center.json</tt>.
+     * <tt>http://hudson-ci.org/update-center3.3.2/update-center.json</tt>.
      */
     private final String url;
 

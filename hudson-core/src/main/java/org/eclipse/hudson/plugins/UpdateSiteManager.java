@@ -50,7 +50,7 @@ public final class UpdateSiteManager {
     public static final String RECOMMENDED = "recommended";
     public static final String OBSOLETE = "obsolete";
     private Map<String, AvailablePluginInfo> availablePluginInfos = new TreeMap<String, AvailablePluginInfo>(String.CASE_INSENSITIVE_ORDER);
-    private final String updateServer = System.getProperty("updateServer", "http://hudson-ci.org/update-center3.3/");
+    private final String updateServer = System.getProperty("updateServer", "http://hudson-ci.org/update-center3.3.2/");
     private String updateSiteUrl = updateServer + "update-center.json";
     private ProxyConfiguration proxyConfig;
     private final String id = "default";
