@@ -372,6 +372,17 @@ public abstract class ItemGroupMixIn {
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
+        // If root dir already exists on disk, save will just save to it,
+        // potentially re-using partially deleted project.
+        File rootDir = item.getRootDir();
+        if (rootDir.exists()) {
+            try {
+                Util.deleteRecursive(rootDir);
+                logger.info("Previously existing project dir deleted "+rootDir.getAbsolutePath());
+            } catch (IOException e) {
+                logger.warn("New project re-using previously deleted project's dir "+rootDir.getAbsolutePath()+" because "+e.getMessage());
+            }
+        }
         item.onCreatedFromScratch();
         item.save();
         add(item);

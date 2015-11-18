@@ -258,9 +258,9 @@ public class Util {
                 // I suspect other processes putting files in this directory
                 File[] files = f.listFiles();
                 if (files != null && files.length > 0) {
-                    throw new IOException("Unable to delete " + f.getPath() + " - files in dir: " + Arrays.asList(files));
+                    throw new IOException("Unable to delete " + f.getAbsolutePath() + " - files in dir: " + Arrays.asList(files));
                 }
-                throw new IOException("Unable to delete " + f.getPath());
+                throw new IOException("Unable to delete " + f.getAbsolutePath());
             }
         }
     }
@@ -335,7 +335,7 @@ public class Util {
         }
         return tmp;
     }
-	
+    
 	/**
 	 * Attempt to rename (move) directory only; do not copy.
 	 * @param oldDir
