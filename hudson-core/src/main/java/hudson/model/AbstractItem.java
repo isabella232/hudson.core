@@ -447,7 +447,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
      * Must not throw.
      * @return File; moved root dir if successful, otherwise original root dir
      */
-	private void trySidelineJobDir() {
+	private void trySidelineJobDir(File rootDir) {
 		File newDir = null;
         
         for (int retry = 0; retry < 5; retry++) {
@@ -456,28 +456,27 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
             StringBuilder sb = new StringBuilder("tmp#"); // Can't be a job name
             sb.append(n);
             sb.append('_');
-            sb.append(getRootDir().getName());
+            sb.append(rootDir.getName());
             if (sb.length() > 255) {
                 sb.setLength(255);
             }
-            File dir = new File(getRootDir().getParentFile(), sb.toString());
+            File dir = new File(rootDir.getParentFile(), sb.toString());
             if (!dir.exists()) {
                 newDir = dir;
                 break;
             }
         }
-                ;
 
         if (newDir != null) {
             try {
-                Files.move(getRootDir().toPath(), newDir.toPath(), StandardCopyOption.ATOMIC_MOVE ,StandardCopyOption.REPLACE_EXISTING);
+                Files.move(rootDir.toPath(), newDir.toPath(), StandardCopyOption.ATOMIC_MOVE ,StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
-                LOGGER.warn("Move job folder unsuccessful "+getRootDir().getAbsolutePath(), e);
+                LOGGER.warn("Move job folder unsuccessful "+rootDir.getAbsolutePath(), e);
                 return;
             }
-            LOGGER.info("Job folder successfully moved from "+getRootDir().getAbsolutePath()+" to "+newDir.getAbsolutePath());
+            LOGGER.info("Job folder successfully moved from "+rootDir.getAbsolutePath()+" to "+newDir.getAbsolutePath());
         } else {
-            LOGGER.warn("Move job folder unsuccessful "+getRootDir().getAbsolutePath());
+            LOGGER.warn("Move job folder unsuccessful "+rootDir.getAbsolutePath());
 		}
 	}
     
@@ -495,18 +494,19 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
             throw new IOException(getRootDir().getAbsolutePath()+"/config.xml can't be deleted");
         }
         // delete must succeed beyond this point
+        final File rootDir = getRootDir();
         deleted = true;
         
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Util.deleteRecursive(getRootDir());
-                    LOGGER.info("Job deleted at "+getRootDir().getAbsolutePath());
+                    Util.deleteRecursive(rootDir);
+                    LOGGER.info("Job deleted at "+rootDir.getAbsolutePath());
                 } catch (Exception e) {
-                    LOGGER.warn("Delete job folder failed "+getRootDir().getAbsolutePath()+" because "+e.getMessage());
+                    LOGGER.warn("Delete job folder failed "+rootDir.getAbsolutePath()+" because "+e.getMessage());
                     // Bug 432569 - If folder can't be deleted, leaves job in half-deleted state
-                    trySidelineJobDir();
+                    trySidelineJobDir(rootDir);
                 }
             }
         }, "Deleting "+getName()).start();
