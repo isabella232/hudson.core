@@ -126,6 +126,10 @@
       <f:optionalBlock name="allowUnsecuredAction" checked="${it.allowUnsecuredAction()}"
                        title="${%allowUnsecuredActionBlurb}"
                        help="/help/system-config/allow-unsecured-action.html" />
+      
+      <f:optionalBlock name="allowCli" checked="${it.allowCli()}"
+                       title="${%allowCLIBlurb}"
+                       help="/help/system-config/allow-cli.html" />
 
         <f:descriptorList title="${%Global properties}"
                           name="globalNodeProperties"

@@ -156,6 +156,11 @@ public abstract class CLICommand implements ExtensionPoint, Cloneable {
         this.channel = Channel.current();
         registerOptionHandlers();
         CmdLineParser p = new CmdLineParser(this);
+        
+        if (!Hudson.getInstance().allowCli()){
+            stderr.println("\n\nCommand Line access is disabled. Ask your administrator to enable CLI in the System Configuration\n\n");
+            return -1;
+        }
 
         // add options from the authenticator
         SecurityContext sc = SecurityContextHolder.getContext();
