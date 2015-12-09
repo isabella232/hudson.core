@@ -328,6 +328,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     
     private Boolean allowUnsecuredAction = false;
     
+    private Boolean allowCli = false;
+    
     /**
      * All {@link ExtensionList} keyed by their
      * {@link ExtensionList#extensionType}.
@@ -2741,12 +2743,21 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
     }
     
     /**
-     * Should Hudson use blue ball instead of default green ball for success
+     * Should Unsecured action be allowed by Hudson
      *
      * @return boolean
      */
     public boolean allowUnsecuredAction() {
         return allowUnsecuredAction;
+    }
+    
+    /**
+     * Should Hudson allow Command line interface
+     *
+     * @return boolean
+     */
+    public boolean allowCli() {
+        return allowCli;
     }
 
     public void setSlaveAgentPort(int slaveAgentPort) throws IOException {
@@ -2806,6 +2817,8 @@ public final class Hudson extends Node implements ItemGroup<TopLevelItem>, Stapl
             useBlueBall = json.has("useBlueBall");
             
             allowUnsecuredAction = json.has("allowUnsecuredAction");
+            
+            allowCli = json.has("allowCli");
 
             noUsageStatistics = json.has("usageStatisticsCollected") ? null : true;
 

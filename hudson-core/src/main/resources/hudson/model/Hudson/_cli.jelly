@@ -17,19 +17,36 @@
 
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-  <l:layout norefresh="true">
-    <st:include page="sidepanel.jelly" />
-    <l:main-panel>
-      <h1>
-        <img src="${imagesURL}/48x48/terminal.png" alt=""/>
-        ${%Hudson CLI}
-      </h1>
-      <p>
-        ${%blurb(rootURL)}
-      </p>
-      <pre style="color: white; background-color:black; padding:1em; font-weight: bold">java -jar <a
-              style="color: white"
-              href="jnlpJars/hudson-cli.jar">hudson-cli.jar</a> -s ${h.inferHudsonURL(request)} help</pre>
-    </l:main-panel>
-  </l:layout>
+    <l:layout norefresh="true">
+        <st:include page="sidepanel.jelly" />
+        <l:main-panel>
+            <h1>
+                <img src="${imagesURL}/48x48/terminal.png" alt=""/>
+                ${%Hudson CLI}
+            </h1>
+      
+            <j:if test="${!app.allowCli()}"> 
+                <p>
+                    ${%blurb3}
+                    <br/>
+                    <br/>
+                    ${%blurb4}
+                </p>
+            </j:if>
+          
+            <j:if test="${app.allowCli()}">
+                <p>
+                    ${%blurb(rootURL)}
+                </p>
+                <pre style="color: white; background-color:black; padding:1em; font-weight: bold">java -jar <a
+                        style="color: white"
+                        href="jnlpJars/hudson-cli.jar">hudson-cli.jar</a> -s ${h.inferHudsonURL(request)} help</pre>
+                <p>
+                    <b style="color:#a52a2a">
+                        ${%blurb2}
+                    </b>
+                </p>
+            </j:if>
+        </l:main-panel>
+    </l:layout>
 </j:jelly>
