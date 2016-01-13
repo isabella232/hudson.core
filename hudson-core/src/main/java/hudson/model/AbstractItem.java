@@ -502,7 +502,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
             public void run() {
                 try {
                     Util.deleteRecursive(rootDir);
-                    LOGGER.info("Job deleted at "+rootDir.getAbsolutePath());
+                    LOGGER.info("Job is deleted at "+rootDir.getAbsolutePath());
                 } catch (Exception e) {
                     LOGGER.warn("Delete job folder failed "+rootDir.getAbsolutePath()+" because "+e.getMessage());
                     // Bug 432569 - If folder can't be deleted, leaves job in half-deleted state
