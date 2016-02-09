@@ -19,12 +19,12 @@
   <parent>
     <groupId>org.eclipse.hudson</groupId>
     <artifactId>hudson-parent</artifactId>
-    <version> 3.3.3</version>
+    <version> 3.3.4-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>hudson-plugin-utils</artifactId>
-  <version>3.3.3</version>
+  <version>3.3.4-SNAPSHOT</version>
   <name>Hudson :: Plugin Utilities</name>
 
   <description>
