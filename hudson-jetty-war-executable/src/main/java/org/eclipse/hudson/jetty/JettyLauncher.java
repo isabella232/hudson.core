@@ -40,14 +40,17 @@ import org.eclipse.jetty.webapp.WebAppContext;
 public class JettyLauncher {
 
     private static String contextPath = "/";
+    private static final int CONNECTOR_DISABLED_PORT_VALUE = -1;
+    private static final int DEFAULT_HTTP_PORT_VALUE = 8080;
+    private static final int DEFAULT_HTTPS_PORT_VALUE = -1;
 
     public static void start(String[] args, URL warUrl) throws Exception {
 
         String httpListenAddress = "0.0.0.0";
         String httpsListenAddress = "0.0.0.0";
 
-        int httpPort = 8080;
-        int httpsPort = -1;
+        int httpPort = DEFAULT_HTTP_PORT_VALUE;
+        int httpsPort = DEFAULT_HTTPS_PORT_VALUE;
 
         String keyStorePath = null;
         String keyStorePassword = null;
@@ -117,15 +120,17 @@ public class JettyLauncher {
         HttpConfiguration http_config = new HttpConfiguration();
         http_config.setOutputBufferSize(32768);
 
-        ServerConnector httpConnector = new ServerConnector(server,
+        if (httpPort != CONNECTOR_DISABLED_PORT_VALUE) {
+            ServerConnector httpConnector = new ServerConnector(server,
                 new HttpConnectionFactory(http_config));
-        httpConnector.setHost(httpListenAddress);
-        httpConnector.setPort(httpPort);
-        httpConnector.setIdleTimeout(30000);
+            httpConnector.setHost(httpListenAddress);
+            httpConnector.setPort(httpPort);
+            httpConnector.setIdleTimeout(30000);
 
-        connectors.add(httpConnector);
+            connectors.add(httpConnector);
+        }
 
-        if (httpsPort != -1) {
+        if (httpsPort != CONNECTOR_DISABLED_PORT_VALUE) {
 
             SslContextFactory sslContextFactory = new SslContextFactory();
 
@@ -236,3 +241,4 @@ public class JettyLauncher {
         return deleted;
     }
 }
+
