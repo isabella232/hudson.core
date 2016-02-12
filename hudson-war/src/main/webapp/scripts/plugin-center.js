@@ -522,7 +522,7 @@ function uploadFile(file) {
             if (xhr.readyState == 4) {
                 jQuery("#progressbar").hide();
                 if (xhr.status == 200) {
-                    showMessage(jQuery("#pluginUploadMsg"), "Plugin " + file.name + " sucessfully uploaded.");
+                    showMessage(jQuery("#pluginUploadMsg"), "Plugin " + file.name + " successfully uploaded.");
                     jQuery('#restart-message').show();
                 } else {
                     showMessage(jQuery("#pluginUploadMsg"), xhr.responseText, true);
