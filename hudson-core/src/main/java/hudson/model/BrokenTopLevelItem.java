@@ -24,11 +24,11 @@ import java.util.SortedMap;
 public class BrokenTopLevelItem extends Job implements TopLevelItem {
     
     final private RunMap runMap;
-    final private Exception exception;
+    final private Throwable exception;
     final private LazyTopLevelItem.Key key;
     
     BrokenTopLevelItem(LazyTopLevelItem.Key key,
-                       Exception exception) {
+                       Throwable exception) {
         super(key.parent, key.name);
         
         this.key = key;

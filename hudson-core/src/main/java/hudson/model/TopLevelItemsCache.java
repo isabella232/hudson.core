@@ -88,7 +88,7 @@ class TopLevelItemsCache {
                         catch (Throwable ex) {
                             System.err.println("ERROR===: Unable to load " +key.name);
                             key.setLoadErrorFlag();
-                            return new BrokenTopLevelItem(key, new Exception(ex));
+                            return new BrokenTopLevelItem(key, ex);
                         }
                     }
                     

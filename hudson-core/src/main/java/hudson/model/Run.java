@@ -177,7 +177,7 @@ public abstract class Run<JobT extends Job<JobT, RunT>, RunT extends Run<JobT, R
     /**
      * Stores any exception thrown when loading from 'dataFile'(build.xml)
      */
-    private Exception dataFileLoadException;
+    private transient Exception dataFileLoadException;
     
 
     static enum State {
