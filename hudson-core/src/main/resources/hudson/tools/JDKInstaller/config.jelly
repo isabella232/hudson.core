@@ -49,7 +49,7 @@
     
     <div id="jdkInstallInfo">
         JDK automatic installation from Oracle Website is temporarily disabled. 
-        See <a href="http://issues.hudson-ci.org/browse/HUDSON-9016" target="_blank"> http://issues.hudson-ci.org/browse/HUDSON-9016 </a> for details. 
+        See <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=493055" target="_blank"> this bug </a> for details. 
         <br/> <br/> Install JDK via other automatic methods or install JDK manually and specify valid JAVA_HOME.
     </div>
   </f:entry>
